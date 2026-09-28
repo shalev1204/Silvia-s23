@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Zodiacal Engine & Dunes Patrol · The Eclipse Order</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../shared/navigator.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Ambient Dust & Dunes Canvas -->
+  <canvas id="dunes-bg-canvas"></canvas>
+
+  <div class="quest-wrapper">
+
+    <!-- Top Back Navigation -->
+    <div class="top-nav-bar">
+      <a href="../../index.html" class="nav-back-link">
+        <span>« Back to Grand Codex (Hub)</span>
+      </a>
+      <span class="nav-station-tag">STATION 07 // CACHE SECURED ✓</span>
+    </div>
+
+    <!-- Quest Header -->
+    <header class="quest-header">
+      <div class="quest-badge">✦ Constellation Path // Outskirts Outpost · 142.85 MHz ✦</div>
+      <h1 class="quest-title">The Zodiacal Engine</h1>
+      <p class="quest-subtitle">
+        Calibrate the celestial gear-train from Sheet 5 of your journal to assemble the Master Key and investigate the subterranean outpost at the desert's edge.
+      </p>
+    </header>
+
+    <!-- PART 1: THE ZODIACAL SCRIBE CONSOLE -->
+    <section class="zodiac-console-card" id="zodiac-console-card">
+      <div class="zodiac-layout-grid">
+        
+        <div class="console-prompt-box">
+          <span class="prompt-step-tag">Phase I · The Master Key Alignment</span>
+          <h2 class="prompt-heading">Harmonize the Seven Cross-Planes</h2>
+          <p class="prompt-text">
+            The raiders are fleeing with the stolen Astrolabe into the deep desert. To lock the resonant telemetry beacon across the desert outskirts and investigate the outpost where they discarded their heavy supplies, synchronize the celestial cross-planes of the firmament into the Order's Master Key.
+          </p>
+
+          <div class="prompt-journal-ref">
+            <strong>Check Sheet 5 (Cara B) in your Physical Journal:</strong><br>
+            Complete the 10 crossword definitions. Assemble the seven numbered circles (1 to 7) into the Order's Master Key below.
+          </div>
+
+          <!-- Master Key 7-Letter Inputs -->
+          <div class="master-key-wrap">
+            <div class="master-key-label">The Master Key (Circles 1 to 7)</div>
+            
+            <div class="letter-boxes-row">
+              <div class="letter-box-container">
+                <span class="circle-number-tag">①</span>
+                <input type="text" maxlength="1" class="letter-input" id="key-1" autocomplete="off" spellcheck="false" aria-label="Letter 1">
+              </div>
+              <div class="letter-box-container">
+                <span class="circle-number-tag">②</span>
+                <input type="text" maxlength="1" class="letter-input" id="key-2" autocomplete="off" spellcheck="false" aria-label="Letter 2">
+              </div>
+              <div class="letter-box-container">
+                <span class="circle-number-tag">③</span>
+                <input type="text" maxlength="1" class="letter-input" id="key-3" autocomplete="off" spellcheck="false" aria-label="Letter 3">
+              </div>
+              <div class="letter-box-container">
+                <span class="circle-number-tag">④</span>
+                <input type="text" maxlength="1" class="letter-input" id="key-4" autocomplete="off" spellcheck="false" aria-label="Letter 4">
+              </div>
+              <div class="letter-box-container">
+                <span class="circle-number-tag">⑤</span>
+                <input type="text" maxlength="1" class="letter-input" id="key-5" autocomplete="off" spellcheck="false" aria-label="Letter 5">
+              </div>
+              <div class="letter-box-container">
+                <span class="circle-number-tag">⑥</span>
+                <input type="text" maxlength="1" class="letter-input" id="key-6" autocomplete="off" spellcheck="false" aria-label="Letter 6">
+              </div>
+              <div class="letter-box-container">
+                <span class="circle-number-tag">⑦</span>
+                <input type="text" maxlength="1" class="letter-input" id="key-7" autocomplete="off" spellcheck="false" aria-label="Letter 7">
+              </div>
+            </div>
+
+            <button type="button" class="btn-engage-gears" id="btn-engage-gears">
+              <span>✦ ENGAGE ZODIACAL GEARS ✦</span>
+            </button>
+
+            <div class="zodiac-control-btn-row" style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; justify-content: center;">
+              <button type="button" class="btn-reward-tertiary" id="btn-reset-dials-top" style="height: 38px;" title="Reset all 7 letter dials to solve again">
+                <span>↺</span> Reset / Replay Puzzle
+              </button>
+              <button type="button" class="btn-reward-tertiary" id="btn-show-solution" style="height: 38px;" title="Auto-fill ECLIPSE and view solved gears">
+                <span>✦</span> View Solved State (ECLIPSE)
+              </button>
+              <button type="button" class="btn-reward-tertiary" id="btn-jump-victory-top" style="height: 38px;" title="Jump straight to recovered cache and dispatch">
+                <span>📜</span> View Recovered Cache & Letter K
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Astrolabe Gear Graphic -->
+        <div class="astrolabe-gear-wrap">
+          <svg class="gear-svg" id="gear-svg" viewBox="0 0 200 200">
+            <!-- Outer Limbo Ring -->
+            <circle cx="100" cy="100" r="92" fill="none" stroke="#c59b4c" stroke-width="2.5" />
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#ffd885" stroke-width="1.2" stroke-dasharray="3,3" />
+            <!-- Ecliptic Zodiac Ring -->
+            <circle cx="100" cy="100" r="62" fill="none" stroke="#4fe3c1" stroke-width="1.5" opacity="0.75" />
+            <circle cx="100" cy="100" r="40" fill="none" stroke="#c59b4c" stroke-width="2" />
+            <!-- Central Sun Hub -->
+            <circle cx="100" cy="100" r="16" fill="#ffd885" />
+            <circle cx="100" cy="100" r="6" fill="#04070d" />
+
+            <!-- Gear Teeth Outer -->
+            <g stroke="#ffd885" stroke-width="2.5" stroke-linecap="round">
+              <line x1="100" y1="4" x2="100" y2="16" />
+              <line x1="100" y1="184" x2="100" y2="196" />
+              <line x1="4" y1="100" x2="16" y2="100" />
+              <line x1="184" y1="100" x2="196" y2="100" />
+              <line x1="32" y1="32" x2="41" y2="41" />
+              <line x1="159" y1="159" x2="168" y2="168" />
+              <line x1="32" y1="168" x2="41" y2="159" />
+              <line x1="159" y1="41" x2="168" y2="32" />
+              <line x1="68" y1="8" x2="72" y2="19" />
+              <line x1="132" y1="8" x2="128" y2="19" />
+              <line x1="68" y1="192" x2="72" y2="181" />
+              <line x1="132" y1="192" x2="128" y2="181" />
+            </g>
+            <!-- Zodiac Cross Cardinal Spokes -->
+            <g stroke="#c59b4c" stroke-width="1.4" opacity="0.7">
+              <line x1="100" y1="40" x2="100" y2="82" />
+              <line x1="100" y1="118" x2="100" y2="160" />
+              <line x1="40" y1="100" x2="82" y2="100" />
+              <line x1="118" y1="100" x2="160" y2="100" />
+            </g>
+          </svg>
+          <div class="gear-status-readout" id="gear-status-readout">STANDBY · AWAITING 7-LETTER KEY</div>
+        </div>
+
+      </div>
+
+      <!-- Reward Slate (Shown upon entering ECLIPSE) -->
+      <div class="zodiac-reward-slate" id="zodiac-reward-slate">
+        <div class="reward-slate-header">
+          <span class="reward-slate-title">✦ ZODIACAL ENGINE SYNCHRONIZED · 100% RESONANCE ✦</span>
+          <span style="font-family:'JetBrains Mono', monospace; font-size:0.75rem; color:var(--cyan-beam);">LOCK: SOLID BRASS</span>
+        </div>
+
+        <p style="font-size:0.95rem; color:var(--parchment); line-height:1.65; margin-bottom:14px; font-family:'EB Garamond', Georgia, serif;">
+          The brass teeth align with a deep harmonic hum. As the celestial ring locks into true meridian, the astrometric sensors compute a resonant cross-difference between the celestial bearings and lock onto an active transmission across the dunes:
+        </p>
+
+        <div class="coordinate-slate-panel">
+          <div class="reward-panel-badge">✦ Ancient Celestial Resonance · Zodiacal Differential ✦</div>
+
+          <div class="coordinate-card">
+            <div class="coord-row">
+              <span class="coord-label">CELESTIAL RESONANCE</span>
+              <div class="coord-glyphs">
+                <span class="coord-group">
+                  <span class="letter-chip">O</span>
+                  <span class="coord-sym">−</span>
+                  <span class="letter-chip">A</span>
+                  <span class="coord-sym">= 16</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <p class="coordinate-slate-note">
+            Cross-reference this differential against Vector I in your field notes to calculate the values of your first letters in <em>The Cipher Ledger</em>.
+          </p>
+
+          <div class="radar-sync-strip">
+            <span>✦</span> 142.85 MHz RADAR LOCKED // SANDSTONE RUINS VISOR ACTIVE
+          </div>
+        </div>
+
+        <div class="reward-actions-row" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+          <button type="button" class="btn-start-raycast" id="btn-start-raycast">
+            <span>✦ COMMENCE 3D DUNES PATROL ➔</span>
+          </button>
+          <button type="button" class="btn-start-raycast" id="btn-jump-victory" style="background: linear-gradient(180deg, #319795 0%, #234e52 100%); border-color: #4fd1c5;">
+            <span>✦ VIEW RECOVERED CACHE & LETTER K ➔</span>
+          </button>
+          <button type="button" class="btn-reward-tertiary" id="btn-reset-dials">
+            <span>↺ RESET DIALS</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PART 2: 3D RETRO RAYCAST ENGINE -->
+    <section class="raycast-section" id="raycast-section">
+      
+      <!-- 3D Viewport Frame -->
+      <div class="raycast-viewport-frame" id="raycast-viewport-frame" tabindex="0" role="region" aria-label="3D Desert Raycast Visor">
+        <canvas id="raycast-canvas"></canvas>
+
+        <!-- Optical Visor Overlays -->
+        <div class="visor-reticle-overlay">
+          <div class="visor-corner tl"></div>
+          <div class="visor-corner tr"></div>
+          <div class="visor-corner bl"></div>
+          <div class="visor-corner br"></div>
+          <div class="visor-crosshair"></div>
+        </div>
+
+        <!-- Rune Badges Row (3 Celestial Obelisks) -->
+        <div class="hud-runes-row" id="hud-runes-row">
+          <div class="rune-pill" id="rune-badge-sun" title="Sun Obelisk (West Wing)">
+            <span class="rune-sym">☀</span>
+            <span class="rune-tag">SOL</span>
+          </div>
+          <div class="rune-pill" id="rune-badge-moon" title="Moon Obelisk (North-East Wing)">
+            <span class="rune-sym">☽</span>
+            <span class="rune-tag">LUNA</span>
+          </div>
+          <div class="rune-pill" id="rune-badge-star" title="Star Obelisk (South-East Wing)">
+            <span class="rune-sym">✦</span>
+            <span class="rune-tag">STELLA</span>
+          </div>
+        </div>
+
+        <!-- Center Atmospheric Announcement Banner -->
+        <div class="hud-center-banner" id="hud-center-banner"></div>
+
+        <!-- Proximity Action Prompt -->
+        <div class="hud-proximity-prompt" id="hud-proximity-prompt">
+          <span>✦ CHEST IN REACH · TAP OR PRESS [E] TO OPEN ✦</span>
+        </div>
+
+        <!-- Top In-Game HUD -->
+        <div class="raycast-hud-top">
+          <div class="hud-left-group">
+            <div class="hud-compass-box">
+              <span>🧭</span>
+              <span id="hud-compass-deg">063º ENE</span>
+            </div>
+            <div class="hud-beacon-box">
+              <span class="beacon-pulse-dot"></span>
+              <span>BEACON: </span>
+              <span id="hud-beacon-dist" style="font-weight:700;">37.5m</span>
+            </div>
+          </div>
+
+          <div class="hud-right-group">
+            <!-- Mini Archaeological Radar Scanner (128x128) -->
+            <div class="hud-radar-container" id="hud-radar-container" title="Archaeological Resonance Radar (142.85 MHz)">
+              <canvas id="hud-radar-canvas" width="128" height="128"></canvas>
+            </div>
+            <!-- Audio Toggle Button -->
+            <button type="button" class="hud-audio-btn" id="hud-audio-toggle" title="Toggle Sound (Mute/Unmute)">
+              <span id="hud-audio-icon">🔊</span>
+              <span id="hud-audio-label">SOUND</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Objective Bar -->
+        <div class="hud-objective-bar">
+          <span id="hud-objective-text">DESERT OUTPOST RUINS // ACTIVATE 3 CELESTIAL OBELISKS TO UNSEAL VAULT</span>
+          <span class="hud-gate-status" id="hud-gate-status">GATE: SEALED (0/3)</span>
+        </div>
+
+        <!-- Virtual Mobile Touch Controls -->
+        <div class="virtual-controls-wrap" id="virtual-controls-wrap">
+          <!-- Move D-Pad -->
+          <div class="virtual-dpad">
+            <div></div>
+            <button type="button" class="v-btn" id="v-btn-up" aria-label="Forward">▲</button>
+            <div></div>
+            <button type="button" class="v-btn" id="v-btn-left" aria-label="Strafe Left">◀</button>
+            <div style="background:rgba(0,0,0,0.35); border-radius:4px;"></div>
+            <button type="button" class="v-btn" id="v-btn-right" aria-label="Strafe Right">▶</button>
+            <div></div>
+            <button type="button" class="v-btn" id="v-btn-down" aria-label="Backward">▼</button>
+            <div></div>
+          </div>
+
+          <!-- Turn Controls -->
+          <div style="display:flex; gap:10px; align-items:flex-end;">
+            <button type="button" class="v-btn" id="v-btn-rot-l" style="width:56px; height:56px;" aria-label="Turn Left">↺</button>
+            <button type="button" class="v-btn" id="v-btn-rot-r" style="width:56px; height:56px;" aria-label="Turn Right">↻</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls Guide Strip -->
+      <div class="controls-guide-strip">
+        <span>Desktop: <kbd>W</kbd>/<kbd>S</kbd> Move · <kbd>A</kbd>/<kbd>D</kbd> Strafe · <kbd>◄</kbd><kbd>►</kbd> Turn Camera · <kbd>E</kbd> Interact / Open Chest · <em>Drag mouse to look around 360°</em></span>
+        <span>· Mobile: Touch D-pad, ↺/↻ to turn, tap prompt to interact, swipe screen to look around</span>
+      </div>
+
+    </section>
+
+    <!-- PART 3: THE VICTORY SCREEN (Cache Secured & Cartographer Dispatch) -->
+    <section class="victory-screen-card" id="victory-screen">
+      
+      <!-- Top Station Completion Header -->
+      <div class="victory-header-badge">✦ STATION 07 COMPLETED // OUTPOST CACHE SECURED ✦</div>
+      <h2 class="victory-title">The Outpost Cache Secured</h2>
+      <p class="victory-subtitle">
+        The raiders' discarded iron chest has been breached. The lost cipher plate has been recovered.
+      </p>
+
+      <!-- Cartographer's Field Voice Transmission (Exact Game 6 Format) -->
+      <div class="audio-transcript">
+        <div class="transcript-caption-header">
+          <span>📡</span> DECRYPTED VOICE RELAY · ORIGIN: DESERT OUTSKIRTS RIDGES · FREQ: 142.85 MHz
+        </div>
+        «Silvia! The signal came through... loud and clear! I've been shadowing the raiders from the ridges along the desert outskirts since dawn. They realized their convoy was too heavy dragged down by iron chests in the sand, so they dumped this cache inside these outpost ruins while plunging into the deep dunes. The dispatch you recovered confirms the worst: they aren't just curious about the stars—they know the Astrolabe triangulates the Fourth Forbidden Chamber when aligned with the Three Ancient Towers! But look south... the sky is turning pitch black. A violent sandstorm is brewing over the deep dunes. Inscribe the recovered glyph into your codex... we must stay on their trail before the storm wipes it clean!»
+      </div>
+
+      <!-- Decoded Glyph Reward (Exact Game 6 Canonical Reward Panel) -->
+      <div class="reward-panel">
+        <div class="reward-panel-badge">✦ Decrypted Cipher Key ✦</div>
+        <div class="glyph-display-frame">
+          <span class="letter-hero">K</span>
+        </div>
+        <div class="glyph-letter-label">Letter K</div>
+        <p class="glyph-instruction">
+          The secondary cardinal key recovered from the desert outskirts outpost.
+        </p>
+      </div>
+
+      <!-- Intercepted Raiders' Intel -->
+      <div class="dispatch-orders-scroll">
+        <div class="dispatch-header-tag">
+          <span>CLASSIFIED // FORWARD COMMAND</span>
+          <span>CH 284.10 kHz</span>
+        </div>
+        <div class="dispatch-order-item">
+          <span class="dispatch-order-num">[MOTIVE FOR THE THEFT · THE FOURTH FORBIDDEN CHAMBER]</span>
+          The Cartographer believed the stolen Astrolabe was only an observer's lens. He is blind. When calibrated across the <strong>Three Ancient Towers</strong> (The Alpine Observatory, Tower II in the deep desert, and The Stage), the dial triangulates the entrance to <strong>THE FOURTH FORBIDDEN CHAMBER</strong>.
+          Lighten the convoy. Abandon all heavy iron caches here at the desert outskirts outpost. Force-march into the deep dunes before the Cartographer or the Order's seeker can close the distance.
+        </div>
+      </div>
+
+      <!-- Bottom Action Row -->
+      <div class="victory-actions-row" style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; align-items: center;">
+        <a href="../../index.html" class="btn-victory-primary" id="btn-return-hub">
+          <span>✦ RETURN TO GRAND CODEX (HUB) ➔</span>
+        </a>
+        <button type="button" class="btn-victory-secondary" id="btn-revisit-maze">
+          <span>↺ RE-ENTER 3D LABYRINTH</span>
+        </button>
+        <button type="button" class="btn-victory-secondary" id="btn-replay-zodiac-bottom" style="border-color: #dfb256; color: #ffd978;">
+          <span>↺ RESET & REPLAY PUZZLE</span>
+        </button>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- Shared Navigator Drawer -->
+  <script src="../../shared/navigator.js"></script>
+
+  <!-- Quest Scripts -->
+  <script src="zodiac.js?v=4"></script>
+  <script src="raycast.js?v=4"></script>
+
+  <!-- Background Sand Haze Particles -->
+  <script>
+    (function () {
+      const canvas = document.getElementById('dunes-bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      const particles = [];
+      for (let i = 0; i < 45; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: Math.random() * 0.8 + 0.4,
+          vy: Math.random() * 0.2 - 0.1,
+          size: Math.random() * 2 + 1,
+          alpha: Math.random() * 0.4 + 0.1
+        });
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = '#e2b069';
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x > w) p.x = 0;
+          if (p.y > h) p.y = 0;
+          if (p.y < 0) p.y = h;
+
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    })();
+  </script>
+
+</body>
+</html>

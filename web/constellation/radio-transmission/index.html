@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>The Eclipse Order: Radio Transmissions · The Stolen Astrolabe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script>
+    (function() {
+      try {
+        if (window.self !== window.top || window.location.search.includes('embedded=true')) {
+          document.documentElement.classList.add('is-embedded');
+        }
+        if (window.location.search.includes('from=observatory') || (document.referrer && document.referrer.includes('celestial-flower-2'))) {
+          document.documentElement.classList.add('from-observatory-mode');
+        }
+        var s = 0;
+        if (window.location.search.includes('from=observatory') || (document.referrer && document.referrer.includes('celestial-flower-2'))) s = 0;
+        else if (window.location.hash === '#transmission-3' || window.location.hash === '#matrix' || window.location.search.includes('relay=3')) s = 2;
+        else if (window.location.hash === '#transmission-2' || window.location.hash === '#desert' || window.location.search.includes('relay=2')) s = 1;
+        else if (window.location.hash === '#transmission-1' || window.location.hash === '#observatory' || window.location.search.includes('relay=1')) s = 0;
+        else {
+          var saved = localStorage.getItem('cartographer_radio_active_slide');
+          if (saved !== null) s = parseInt(saved, 10) || 0;
+        }
+        if (s === 1) {
+          document.documentElement.classList.add('init-slide-2');
+        } else if (s === 2) {
+          document.documentElement.classList.add('init-slide-3');
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #020409;
+      color: #e2d7c5;
+      font-family: 'Cinzel', serif;
+      position: relative;
+    }
+
+    /* Zero-flash initial slide 2 positioning */
+    html.init-slide-2 #carousel-track {
+      transform: translateX(-100vw) !important;
+      transition: none !important;
+    }
+    html.init-slide-2 #tab-0 {
+      background: rgba(0, 0, 0, 0.4) !important;
+      color: #888 !important;
+      border-color: transparent !important;
+    }
+    html.init-slide-2 #tab-1 {
+      background: rgba(217, 119, 6, 0.25) !important;
+      color: #fde68a !important;
+      border-color: rgba(217, 119, 6, 0.5) !important;
+    }
+    html.init-slide-2 #arrow-next {
+      display: flex !important;
+    }
+    html.init-slide-2 #arrow-prev {
+      display: flex !important;
+    }
+
+    /* Zero-flash initial slide 3 positioning */
+    html.init-slide-3 #carousel-track {
+      transform: translateX(-200vw) !important;
+      transition: none !important;
+    }
+    html.init-slide-3 #tab-0, html.init-slide-3 #tab-1 {
+      background: rgba(0, 0, 0, 0.4) !important;
+      color: #888 !important;
+      border-color: transparent !important;
+    }
+    html.init-slide-3 #tab-2 {
+      background: rgba(14, 38, 48, 0.88) !important;
+      color: #80deea !important;
+      border-color: #4dd0e1 !important;
+      box-shadow: 0 0 16px rgba(77, 208, 225, 0.35) !important;
+    }
+    html.init-slide-3 #arrow-next {
+      display: none !important;
+    }
+    html.init-slide-3 #arrow-prev {
+      display: flex !important;
+    }
+
+    /* ── Top Header Navigation Bar ── */
+    .hub-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: linear-gradient(180deg, rgba(2, 4, 10, 0.95) 0%, rgba(2, 4, 10, 0) 100%);
+      pointer-events: auto;
+    }
+
+    .hub-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fs-sidebar-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ffd978;
+      background: rgba(8, 14, 28, 0.85);
+      border: 1px solid rgba(223, 178, 86, 0.45);
+      border-radius: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+    }
+
+    .fs-sidebar-toggle:hover {
+      background: rgba(223, 178, 86, 0.25);
+      border-color: #ffd978;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(223, 178, 86, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .hub-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #dfb256;
+      background: rgba(8, 14, 28, 0.8);
+      border: 1px solid rgba(223, 178, 86, 0.4);
+      border-radius: 20px;
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+    }
+
+    .hub-back-btn:hover {
+      background: rgba(223, 178, 86, 0.2);
+      border-color: #ffd978;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(223, 178, 86, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .hub-back-btn:focus,
+    .hub-back-btn:focus-visible {
+      outline: none !important;
+      border-color: #ffd978 !important;
+      box-shadow: 0 0 14px rgba(223, 178, 86, 0.6) !important;
+    }
+
+    .hub-chronicle-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ffd885;
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.25) 0%, rgba(180, 130, 45, 0.4) 100%);
+      border: 1px solid rgba(223, 178, 86, 0.55);
+      border-radius: 20px;
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 12px rgba(223, 178, 86, 0.25);
+      transition: all 0.25s ease;
+    }
+
+    .hub-chronicle-link:hover {
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.5) 0%, rgba(180, 130, 45, 0.7) 100%);
+      border-color: #ffd885;
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(223, 178, 86, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .hub-dossier-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #9ab0cf;
+      background: rgba(8, 14, 28, 0.8);
+      border: 1px solid rgba(154, 176, 207, 0.3);
+      border-radius: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+    }
+
+    .hub-dossier-btn:hover {
+      background: rgba(30, 45, 70, 0.9);
+      border-color: #80deea;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(128, 222, 234, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .hub-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── Fullscreen Collapsible Navigation Sidebar ── */
+    .fs-sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 3, 8, 0.72);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .fs-sidebar-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .fs-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 310px;
+      background: linear-gradient(180deg, rgba(8, 14, 25, 0.98) 0%, rgba(4, 7, 13, 0.99) 100%);
+      border-right: 1.5px solid rgba(197, 155, 76, 0.45);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px;
+      z-index: 101;
+      transform: translateX(-100%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 10px 0 35px rgba(0, 0, 0, 0.8);
+    }
+    .fs-sidebar.open {
+      transform: translateX(0);
+    }
+
+    .fs-sidebar .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(197, 155, 76, 0.3);
+      margin-bottom: 22px;
+      position: relative;
+    }
+    .fs-sidebar .brand-sigil-wrap {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .fs-sidebar .brand-sigil {
+      font-size: 1.9rem;
+      color: #ffd978;
+      filter: drop-shadow(0 0 10px rgba(255, 224, 153, 0.7));
+    }
+    .fs-sidebar .brand-order-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ffd978;
+      padding-right: 32px;
+      white-space: nowrap;
+    }
+    .fs-sidebar .sidebar-collapse-btn {
+      position: absolute;
+      right: 0;
+      top: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(12, 18, 30, 0.9);
+      border: 1px solid rgba(197, 155, 76, 0.5);
+      color: #ffd978;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .fs-sidebar .sidebar-collapse-btn:hover {
+      background: #142236;
+      border-color: #4fe3c1;
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
+    .fs-sidebar .sidebar-nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+    .fs-sidebar .nav-menu-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(12, 20, 34, 0.6);
+      border: 1px solid rgba(197, 155, 76, 0.2);
+      border-radius: 8px;
+      color: #c9d5e8;
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+    }
+    .fs-sidebar .nav-menu-link:hover {
+      background: rgba(22, 36, 60, 0.85);
+      border-color: rgba(79, 227, 193, 0.6);
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+    .fs-sidebar .nav-menu-link.active {
+      background: linear-gradient(90deg, rgba(212, 168, 83, 0.25) 0%, rgba(212, 168, 83, 0.08) 100%);
+      border-color: #ffd978;
+      color: #ffd978;
+      font-weight: 700;
+    }
+    .fs-sidebar .nav-menu-link .btn-icon {
+      font-size: 14px;
+    }
+
+    .fs-sidebar .sidebar-footer-lore {
+      padding-top: 16px;
+      border-top: 1px solid rgba(197, 155, 76, 0.2);
+      text-align: center;
+    }
+    .fs-sidebar .footer-lore-crest {
+      color: #ffd978;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      margin-bottom: 4px;
+    }
+    .fs-sidebar .footer-lore-text {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #8fa0b5;
+    }
+    .fs-sidebar .footer-lore-sub {
+      font-size: 8px;
+      color: #5d6f85;
+      margin-top: 2px;
+    }
+
+    /* Embedded Mode (Inside Hub Iframe): Zero Double Menus or Nested Frames */
+    html.is-embedded .hub-header-left,
+    html.is-embedded .fs-sidebar,
+    html.is-embedded .fs-sidebar-backdrop,
+    html.is-embedded .fs-sidebar-toggle,
+    html.is-embedded .hub-back-btn {
+      display: none !important;
+    }
+
+    html.is-embedded .hub-header {
+      justify-content: center !important;
+      background: transparent !important;
+    }
+
+    html.is-embedded .hub-header-actions {
+      position: absolute !important;
+      right: 16px !important;
+    }
+
+    .hub-tabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(8, 14, 26, 0.7);
+      color: #9ab0cf;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: rgba(223, 178, 86, 0.5);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .tab-btn.active {
+      border-color: #dfb256;
+      background: rgba(36, 24, 14, 0.85);
+      color: #ffd978;
+      box-shadow: 0 0 16px rgba(223, 178, 86, 0.35);
+    }
+
+    .tab-btn.active.tab-siege {
+      border-color: #ff5252;
+      background: rgba(45, 12, 16, 0.88);
+      color: #ff8a80;
+      box-shadow: 0 0 16px rgba(255, 82, 82, 0.35);
+    }
+
+    .tab-btn.active.tab-matrix {
+      border-color: #4dd0e1;
+      background: rgba(14, 38, 48, 0.88);
+      color: #80deea;
+      box-shadow: 0 0 16px rgba(77, 208, 225, 0.35);
+    }
+
+    .tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
+    .dot-gold { background: #ffc107; box-shadow: 0 0 6px #ffc107; }
+    .dot-cyan { background: #00e5ff; box-shadow: 0 0 6px #00e5ff; }
+
+    /* Single Relay Mode (embedded isolated transmission view) */
+    body.single-relay-mode .hub-header,
+    body.single-relay-mode .nav-arrow,
+    body.single-relay-mode #arrow-next,
+    body.single-relay-mode #arrow-prev,
+    body.single-relay-mode #btn-open-dossier,
+    body.single-relay-mode .hub-tabs,
+    body.single-relay-mode .dossier-modal {
+      display: none !important;
+    }
+    body.single-relay-mode .carousel-viewport {
+      height: 100vh;
+    }
+
+    /* Isolated Observatory Raid Mode (Transmission 1 only, standalone from Observatory) */
+    html.from-observatory-mode .hub-tabs,
+    html.from-observatory-mode #btn-open-dossier,
+    html.from-observatory-mode .hub-header-right,
+    html.from-observatory-mode .nav-arrow,
+    html.from-observatory-mode #arrow-next,
+    html.from-observatory-mode #arrow-prev,
+    html.from-observatory-mode .dossier-modal,
+    body.from-observatory-mode .hub-tabs,
+    body.from-observatory-mode #btn-open-dossier,
+    body.from-observatory-mode .hub-header-right,
+    body.from-observatory-mode .nav-arrow,
+    body.from-observatory-mode #arrow-next,
+    body.from-observatory-mode #arrow-prev,
+    body.from-observatory-mode .dossier-modal {
+      display: none !important;
+    }
+
+    body.from-observatory-mode .hub-header {
+      display: flex !important;
+      justify-content: flex-start !important;
+    }
+
+    /* ── Master Horizontal Carousel ── */
+    .carousel-viewport {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .carousel-track {
+      display: flex;
+      flex-direction: row;
+      width: 300vw;
+      height: 100vh;
+      transform: translateX(0vw);
+      transition: transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .transmission-slide {
+      width: 100vw;
+      height: 100vh;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 20px 20px 20px;
+    }
+
+    /* AI Photorealistic Cinematic Background Frame */
+    .bg-video-wrap {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-video,
+    .bg-static-image {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: 100vw;
+      height: 100vh;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      filter: brightness(0.85) contrast(1.15) saturate(1.1);
+      opacity: 0.95;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Ambient FX Canvases (Embers, Tracers & Dust) */
+    .bg-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Vignettes */
+    .vignette-raid {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 55%, rgba(2, 4, 10, 0.15) 0%, rgba(45, 12, 16, 0.45) 75%, #02040a 100%);
+      box-shadow: inset 0 0 100px rgba(220, 38, 38, 0.35);
+      z-index: 2;
+      pointer-events: none;
+      animation: raidVignettePulse 4s infinite ease-in-out;
+    }
+
+    @keyframes raidVignettePulse {
+      0%, 100% { opacity: 0.75; box-shadow: inset 0 0 90px rgba(220, 38, 38, 0.25); }
+      50% { opacity: 1; box-shadow: inset 0 0 140px rgba(239, 68, 68, 0.5); }
+    }
+
+    .vignette-desert {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(3, 7, 18, 0.1) 0%, rgba(12, 18, 34, 0.45) 75%, #020409 100%);
+      box-shadow: inset 0 0 100px rgba(18, 32, 60, 0.5), inset 0 -40px 80px rgba(180, 110, 30, 0.2);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ── Floating Side Navigation Arrows (Clean arrows without box or text) ── */
+    .nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 45;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: rgba(255, 217, 120, 0.75);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 14px;
+      transition: all 0.25s ease;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-arrow:hover {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      color: #ffd978;
+      filter: drop-shadow(0 0 16px rgba(255, 217, 120, 0.95));
+      transform: translateY(-50%) scale(1.22);
+    }
+
+    .nav-arrow-right {
+      right: 20px;
+    }
+    .nav-arrow-right:hover {
+      transform: translateY(-50%) translateX(4px) scale(1.22);
+    }
+
+    .nav-arrow-left {
+      left: 20px;
+      color: rgba(255, 217, 120, 0.75);
+    }
+    .nav-arrow-left:hover {
+      transform: translateY(-50%) translateX(-4px) scale(1.22);
+      color: #ffd978;
+      filter: drop-shadow(0 0 16px rgba(255, 217, 120, 0.95));
+    }
+
+    .arrow-glyph {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 300;
+      user-select: none;
+    }
+
+    /* ── Tactical Receiver Chassis Container ── */
+    .receiver-chassis {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      margin: auto;
+      padding: 22px 20px;
+      background: radial-gradient(circle at 50% 0%, rgba(32, 14, 20, 0.95) 0%, rgba(8, 14, 28, 0.98) 100%);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      border-radius: 8px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(220, 38, 38, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .chassis-desert {
+      background: radial-gradient(circle at 50% 0%, rgba(34, 24, 16, 0.95) 0%, rgba(8, 16, 30, 0.98) 100%);
+      border-color: rgba(223, 178, 86, 0.55);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(223, 178, 86, 0.22);
+    }
+
+    /* Corner Accents */
+    .corner {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-color: #ff6b6b;
+      pointer-events: none;
+    }
+    .chassis-desert .corner { border-color: #ffd978; }
+    .c-tl { top: -2px; left: -2px; border-top: 2px solid; border-left: 2px solid; }
+    .c-tr { top: -2px; right: -2px; border-top: 2px solid; border-right: 2px solid; }
+    .c-bl { bottom: -2px; left: -2px; border-bottom: 2px solid; border-left: 2px solid; }
+    .c-br { bottom: -2px; right: -2px; border-bottom: 2px solid; border-right: 2px solid; }
+
+    /* Top Tag */
+    .chassis-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: #ff6b6b;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      padding: 3px 12px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+    .chassis-desert .chassis-tag {
+      color: #ffd978;
+      background: rgba(223, 178, 86, 0.15);
+      border-color: rgba(223, 178, 86, 0.45);
+    }
+
+    /* Sigil */
+    .sigil {
+      font-size: 24px;
+      color: #ffd978;
+      text-shadow: 0 0 16px rgba(255, 217, 120, 0.7);
+      margin-bottom: 3px;
+    }
+
+    .kicker {
+      font-size: 9.5px;
+      letter-spacing: 0.26em;
+      color: #dfb256;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #ffffff;
+      margin-bottom: 3px;
+      text-shadow: 0 2px 14px rgba(0,0,0,0.8);
+    }
+
+    .frequency-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #ff8a80;
+      background: rgba(45, 12, 16, 0.75);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-top: 2px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 14px rgba(220, 38, 38, 0.35);
+    }
+    .chassis-desert .frequency-badge {
+      color: #ffd978;
+      background: rgba(38, 26, 14, 0.75);
+      border-color: rgba(223, 178, 86, 0.6);
+      box-shadow: 0 0 14px rgba(223, 178, 86, 0.3);
+    }
+
+    .frequency-dot {
+      width: 7px;
+      height: 7px;
+      background: #ff3333;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff3333;
+      animation: blinkRed 0.9s infinite;
+    }
+    .chassis-desert .frequency-dot {
+      background: #ffc107;
+      box-shadow: 0 0 10px #ffc107;
+      animation: blinkGold 1.1s infinite;
+    }
+
+    @keyframes blinkRed {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.25; transform: scale(0.8); }
+    }
+    @keyframes blinkGold {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.28; transform: scale(0.82); }
+    }
+
+    /* Oscilloscope Screen */
+    .oscilloscope-box {
+      width: 100%;
+      height: 78px;
+      background: rgba(3, 7, 16, 0.96);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.95), 0 0 16px rgba(220, 38, 38, 0.15);
+    }
+    .chassis-desert .oscilloscope-box {
+      border-color: rgba(223, 178, 86, 0.4);
+      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.95), 0 0 16px rgba(223, 178, 86, 0.15);
+    }
+
+    .oscilloscope-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Transmission Status & Transcript */
+    .transcript-box {
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      padding: 0 6px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .transcript-text {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 16px;
+      font-style: italic;
+      font-weight: 400;
+      color: #fff1e0;
+      line-height: 1.4;
+      text-shadow: 0 0 12px rgba(255, 230, 200, 0.3);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s ease;
+      text-align: center;
+    }
+
+    .transcript-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      color: #ff8a80;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .chassis-desert .transcript-sub {
+      color: #dfb256;
+    }
+
+    /* Active Subtitles Mode */
+    .transcript-box.active-subtitles {
+      min-height: 66px;
+      padding: 8px 12px;
+      background: rgba(4, 8, 18, 0.94);
+      border: 1px solid rgba(223, 178, 86, 0.45);
+      border-radius: 5px;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.85), 0 3px 12px rgba(0, 0, 0, 0.5);
+      gap: 3px;
+    }
+
+    .transcript-box.active-subtitles .transcript-text {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      font-style: normal;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      line-height: 1.38;
+      text-shadow: none;
+      min-height: 36px;
+    }
+
+    .transcript-box.active-subtitles .transcript-sub {
+      font-size: 8px;
+      letter-spacing: 0.14em;
+      color: #ff9999;
+      margin-top: 0;
+    }
+    .chassis-desert .transcript-box.active-subtitles .transcript-sub {
+      color: #ffd978;
+    }
+
+    /* ── Action & Deck Containers ── */
+    .action-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-tune {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 22px;
+      background: linear-gradient(180deg, #dfb256 0%, #a83228 100%);
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      border: 1px solid #ff8a80;
+      box-shadow: 0 0 25px rgba(220, 38, 38, 0.45);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-tune-desert {
+      background: linear-gradient(180deg, #e6b85c 0%, #8a5719 100%);
+      border-color: #ffd978;
+      box-shadow: 0 0 25px rgba(223, 178, 86, 0.45);
+    }
+
+    .btn-tune:hover, .btn-tune:active {
+      transform: scale(1.02);
+      border-color: #ffd978;
+      box-shadow: 0 0 35px rgba(255, 217, 120, 0.7);
+    }
+
+    /* Radio Deck Panel */
+    .radio-deck {
+      width: 100%;
+      background: rgba(5, 10, 20, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 6px;
+      padding: 11px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.8), 0 4px 20px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .deck-timeline-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .time-readout {
+      font-family: 'Space Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #dfb256;
+      min-width: 40px;
+      letter-spacing: 0.05em;
+    }
+
+    .scrubber-track-wrap {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 18px;
+    }
+
+    .scrubber-progress-bar {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 5px;
+      background: linear-gradient(90deg, #dfb256 0%, #ff4d4d 100%);
+      border-radius: 3px;
+      pointer-events: none;
+      width: 0%;
+      box-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+    }
+    .chassis-desert .scrubber-progress-bar {
+      background: linear-gradient(90deg, #dfb256 0%, #ffb74d 100%);
+      box-shadow: 0 0 8px rgba(255, 183, 77, 0.6);
+    }
+
+    .seek-slider {
+      position: relative;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .seek-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #ffd978;
+      border: 2px solid #a83228;
+      box-shadow: 0 0 8px rgba(255, 217, 120, 0.9);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .chassis-desert .seek-slider::-webkit-slider-thumb {
+      border-color: #8d5b1b;
+    }
+
+    .seek-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    .deck-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .deck-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 12px;
+      background: rgba(18, 24, 38, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: #ffd978;
+      font-family: 'Cinzel', serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .deck-btn:hover {
+      background: rgba(28, 22, 14, 0.95);
+      border-color: #ffd978;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary-play {
+      background: linear-gradient(180deg, #dfb256 0%, #b08328 100%);
+      color: #060a14;
+      border: 1px solid #ffe39b;
+      font-weight: 800;
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+      padding: 8px 16px;
+    }
+
+    .btn-primary-play:hover {
+      background: linear-gradient(180deg, #fff4cc 0%, #ffd885 50%, #c8952f 100%) !important;
+      color: #060a14 !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 0 22px rgba(255, 217, 120, 0.8), 0 3px 10px rgba(0, 0, 0, 0.5) !important;
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    .btn-primary-play:active {
+      background: linear-gradient(180deg, #a4771e 0%, #d4a342 100%) !important;
+      color: #060a14 !important;
+      transform: translateY(0) scale(0.99);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
+    }
+
+    .deck-vol-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(12, 16, 26, 0.7);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      padding: 4px 7px;
+      border-radius: 4px;
+    }
+
+    .deck-btn-mute {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      color: #ffd978;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+    }
+
+    .vol-slider-wrap {
+      width: 52px;
+      display: flex;
+      align-items: center;
+    }
+
+    .vol-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ffd978;
+      cursor: pointer;
+    }
+
+    .vol-percent {
+      font-family: 'Space Mono', monospace;
+      font-size: 8.5px;
+      color: #dfb256;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    .resolved-actions {
+      width: 100%;
+      margin-top: 2px;
+    }
+
+    .btn-vault-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(30, 10, 16, 0.85);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      color: #ff8a80;
+      font-family: 'Cinzel', serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.25);
+      transition: all 0.25s ease;
+    }
+    .chassis-desert .btn-vault-link {
+      background: rgba(32, 22, 12, 0.85);
+      border-color: rgba(223, 178, 86, 0.6);
+      color: #ffd978;
+      box-shadow: 0 0 20px rgba(223, 178, 86, 0.25);
+    }
+
+    .btn-vault-link:hover {
+      border-color: #ffd978;
+      color: #ffd978;
+      box-shadow: 0 0 25px rgba(255, 217, 120, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .foot-note {
+      font-size: 8.5px;
+      letter-spacing: 0.2em;
+      color: rgba(220, 80, 80, 0.6);
+      text-transform: uppercase;
+      margin-top: 12px;
+    }
+    .chassis-desert .foot-note {
+      color: rgba(223, 178, 86, 0.6);
+    }
+
+    @keyframes screenTremor {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-4px, 3px); }
+      40% { transform: translate(4px, -3px); }
+      60% { transform: translate(-3px, -2px); }
+      80% { transform: translate(3px, 2px); }
+      100% { transform: translate(0, 0); }
+    }
+    .tremor { animation: screenTremor 0.4s ease-out; }
+
+    /* ── Slide 3: Matrix Resonance Decrypted Theme ── */
+    .vignette-matrix {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(3, 14, 24, 0.12) 0%, rgba(6, 26, 38, 0.48) 75%, #020910 100%);
+      box-shadow: inset 0 0 100px rgba(0, 229, 255, 0.25), inset 0 -40px 80px rgba(223, 178, 86, 0.2);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .chassis-matrix {
+      background: radial-gradient(circle at 50% 0%, rgba(14, 34, 44, 0.96) 0%, rgba(6, 16, 26, 0.98) 100%);
+      border-color: rgba(77, 208, 225, 0.55);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(77, 208, 225, 0.25);
+    }
+    .chassis-matrix .corner { border-color: #4dd0e1; }
+    .chassis-matrix .chassis-tag {
+      color: #80deea;
+      background: rgba(0, 229, 255, 0.12);
+      border-color: rgba(77, 208, 225, 0.45);
+    }
+    .chassis-matrix .frequency-badge {
+      color: #80deea;
+      background: rgba(10, 36, 46, 0.8);
+      border-color: rgba(77, 208, 225, 0.6);
+      box-shadow: 0 0 14px rgba(77, 208, 225, 0.3);
+    }
+    .chassis-matrix .frequency-dot {
+      background: #00e5ff;
+      box-shadow: 0 0 10px #00e5ff;
+      animation: blinkCyan 1.0s infinite;
+    }
+    @keyframes blinkCyan {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.28; transform: scale(0.82); }
+    }
+    .chassis-matrix .oscilloscope-box {
+      border-color: rgba(77, 208, 225, 0.4);
+      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.95), 0 0 16px rgba(77, 208, 225, 0.15);
+    }
+    .chassis-matrix .transcript-sub {
+      color: #80deea;
+    }
+    .chassis-matrix .transcript-box.active-subtitles {
+      border-color: rgba(77, 208, 225, 0.45);
+    }
+    .chassis-matrix .transcript-box.active-subtitles .transcript-sub {
+      color: #80deea;
+    }
+    .btn-tune-matrix {
+      background: linear-gradient(180deg, #00acc1 0%, #006064 100%);
+      border-color: #80deea;
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+    }
+    .chassis-matrix .scrubber-progress-bar {
+      background: linear-gradient(90deg, #dfb256 0%, #00e5ff 100%);
+      box-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+    }
+    .chassis-matrix .seek-slider::-webkit-slider-thumb {
+      border-color: #00838f;
+      background: #80deea;
+    }
+    .chassis-matrix .foot-note {
+      color: rgba(128, 222, 234, 0.6);
+    }
+
+    /* Decrypted Reward Card in Slide 3 */
+    .glyph-reward-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      background: rgba(10, 28, 38, 0.9);
+      border: 1px solid rgba(77, 208, 225, 0.5);
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+      text-align: left;
+    }
+    .letter-reward-badge {
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffd978;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(77, 208, 225, 0.6);
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(77, 208, 225, 0.4);
+      text-shadow: 0 0 8px rgba(255, 217, 120, 0.6);
+    }
+    .glyph-reward-img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(77, 208, 225, 0.6));
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 3px;
+    }
+    .glyph-reward-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .glyph-reward-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffd978;
+      letter-spacing: 0.1em;
+    }
+    .glyph-reward-desc {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: #80deea;
+      letter-spacing: 0.05em;
+    }
+    .btn-vault-link-matrix {
+      background: rgba(14, 40, 52, 0.9);
+      border-color: rgba(77, 208, 225, 0.7);
+      color: #80deea;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.25);
+    }
+    .btn-vault-link-matrix:hover {
+      border-color: #00e5ff;
+      color: #ffffff;
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+    }
+
+    /* ── Transmission Dossier Modal ── */
+    .dossier-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(2, 5, 12, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .dossier-modal.open {
+      display: flex;
+      opacity: 1;
+    }
+    .dossier-content {
+      background: radial-gradient(circle at 50% 0%, rgba(26, 20, 16, 0.98) 0%, rgba(6, 12, 22, 0.99) 100%);
+      border: 1px solid rgba(223, 178, 86, 0.55);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 560px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(223, 178, 86, 0.25);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .dossier-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(223, 178, 86, 0.25);
+      padding-bottom: 12px;
+    }
+    .dossier-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffd978;
+      letter-spacing: 0.12em;
+    }
+    .dossier-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      color: #9ab0cf;
+      letter-spacing: 0.12em;
+      margin-top: 3px;
+    }
+    .dossier-close-btn {
+      background: transparent;
+      border: none;
+      color: #dfb256;
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px 8px;
+      transition: transform 0.2s ease;
+    }
+    .dossier-close-btn:hover {
+      transform: scale(1.2);
+      color: #ffffff;
+    }
+    .dossier-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px 16px;
+      background: rgba(10, 16, 28, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      margin-bottom: 12px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    .dossier-card:hover {
+      background: rgba(18, 28, 48, 0.85);
+      border-color: rgba(223, 178, 86, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    }
+    .dossier-card.card-active {
+      border-color: #dfb256;
+      background: rgba(36, 24, 14, 0.85);
+      box-shadow: 0 0 16px rgba(223, 178, 86, 0.3);
+    }
+    .dossier-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dossier-card-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+    .tag-distress {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ff8a80;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+    }
+    .tag-survivor {
+      background: rgba(223, 178, 86, 0.2);
+      color: #ffd978;
+      border: 1px solid rgba(223, 178, 86, 0.5);
+    }
+    .tag-decrypted {
+      background: rgba(0, 229, 255, 0.2);
+      color: #80deea;
+      border: 1px solid rgba(77, 208, 225, 0.5);
+    }
+    .dossier-card-duration {
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      color: #dfb256;
+    }
+    .dossier-card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.08em;
+    }
+    .dossier-card-summary {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 13px;
+      color: #c9d8e8;
+      line-height: 1.35;
+      font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+      .hub-header {
+        height: auto;
+        padding: 8px 10px;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+      }
+      .hub-back-btn, .hub-dossier-btn {
+        font-size: 8.5px;
+        padding: 4px 10px;
+      }
+      .hub-tabs {
+        gap: 6px;
+      }
+      .tab-btn {
+        font-size: 8px;
+        padding: 4px 8px;
+        gap: 4px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .receiver-chassis { padding: 18px 14px; max-width: 350px; }
+      .title { font-size: 16px; }
+      .transcript-text { font-size: 14.5px; }
+      .transcript-box.active-subtitles { min-height: 60px; padding: 6px 9px; }
+      .transcript-box.active-subtitles .transcript-text { font-size: 11.5px; }
+      .deck-controls-row { flex-wrap: wrap; justify-content: center; gap: 5px; }
+      .deck-btn { padding: 6px 9px; font-size: 9px; }
+      .vol-slider-wrap { width: 40px; }
+      .vol-percent { font-size: 8px; min-width: 24px; }
+      .nav-arrow { width: 42px; height: 64px; }
+      .nav-arrow-right { right: 8px; }
+      .nav-arrow-left { left: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Collapsible Full Screen Navigation Sidebar -->
+  <div class="fs-sidebar-backdrop" id="fs-sidebar-backdrop"></div>
+  <aside class="fs-sidebar" id="fs-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-sigil-wrap">
+        <div class="brand-sigil-ring"></div>
+        <div class="brand-sigil-ring-inner"></div>
+        <span class="brand-sigil">◐</span>
+      </div>
+      <div class="brand-text-wrap">
+        <span class="brand-order-title">The Eclipse Order</span>
+      </div>
+      <button type="button" class="sidebar-collapse-btn" id="btn-fs-sidebar-close" title="Close Menu">◀</button>
+    </div>
+
+    <nav class="sidebar-nav-menu">
+      <a href="../../index.html#view-trail" class="nav-menu-link" target="_top">
+        <span class="btn-icon">🌌</span>
+        <span>The Star Map</span>
+      </a>
+      <a href="../../index.html#view-transmissions" class="nav-menu-link active" target="_top">
+        <span class="btn-icon">📡</span>
+        <span>Transmissions</span>
+      </a>
+      <a href="../../index.html#view-archives" class="nav-menu-link" target="_top">
+        <span class="btn-icon">📜</span>
+        <span>The Archives</span>
+      </a>
+      <a href="../../index.html#view-chronicles" class="nav-menu-link" target="_top">
+        <span class="btn-icon">🏛️</span>
+        <span>Chronicles of the Raid</span>
+      </a>
+      <a href="../../index.html#view-cipher" class="nav-menu-link" target="_top">
+        <span class="btn-icon">🗝️</span>
+        <span>The Cipher Ledger</span>
+      </a>
+    </nav>
+
+    <div style="margin: 16px 0 8px 0;">
+      <a href="../../index.html" class="nav-menu-link" target="_top" style="background: linear-gradient(135deg, rgba(229,185,103,0.2) 0%, rgba(176,131,40,0.3) 100%); border-color: rgba(229,185,103,0.5); color: #ffd885; text-align: center; justify-content: center;">
+        <span>✦ Return to Hub Home ✦</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer-lore">
+      <div class="footer-lore-crest">✧ ✦ ✧</div>
+      <div class="footer-lore-text">The Eclipse Order · 2026</div>
+      <div class="footer-lore-sub">Silvia's Journey</div>
+    </div>
+  </aside>
+
+  <!-- Top Hub Bar with Direct Tabs and Dossier Logs -->
+  <header class="hub-header">
+    <div class="hub-header-left">
+      <button type="button" class="fs-sidebar-toggle" id="btn-fs-sidebar-toggle" title="Open Navigation Menu">
+        <span>☰</span>
+        <span>Menu</span>
+      </button>
+      <a href="../../index.html" class="hub-back-btn" id="hub-back-btn" target="_top" title="Return to The Star Map Hub">
+        <span id="hub-back-icon">←</span>
+        <span id="hub-back-label">The Star Map</span>
+      </a>
+      <a href="../celestial-flower-2/index.html" class="hub-chronicle-link" id="hub-chronicle-link" target="_top" style="display: none;" title="Inspect corresponding game in Chronicles of the Raid">
+        <span id="hub-chronicle-icon">⚔️</span>
+        <span id="hub-chronicle-label">Inspect The Observatory Raid ➔</span>
+      </a>
+    </div>
+
+    <nav class="hub-tabs" aria-label="Relay Navigation">
+      <button type="button" class="tab-btn tab-siege active" id="tab-0" onclick="goToSlide(0)">
+        <span class="tab-dot dot-red"></span>
+        <span>01 · OBSERVATORY UNDER ATTACK</span>
+      </button>
+      <button type="button" class="tab-btn" id="tab-1" onclick="goToSlide(1)">
+        <span class="tab-dot dot-gold"></span>
+        <span>02 · THE DESERT OUTPOST</span>
+      </button>
+      <button type="button" class="tab-btn tab-matrix" id="tab-2" onclick="goToSlide(2)">
+        <span class="tab-dot dot-cyan"></span>
+        <span>03 · MATRIX RESONANCE DECRYPTED ✓</span>
+      </button>
+    </nav>
+
+    <div class="hub-header-actions">
+      <button type="button" class="hub-dossier-btn" id="btn-open-dossier" title="Open Transmission Dossier">
+        <span>📻</span>
+        <span>Logs Dossier</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Side Floating Arrows (Only clean arrows, no frame, no text) -->
+  <button type="button" class="nav-arrow nav-arrow-right" id="arrow-next" onclick="goToSlide(currentSlide + 1)" title="Next Transmission" aria-label="Next Transmission">
+    <span class="arrow-glyph">❯</span>
+  </button>
+  <button type="button" class="nav-arrow nav-arrow-left" id="arrow-prev" onclick="goToSlide(currentSlide - 1)" title="Previous Transmission" aria-label="Previous Transmission" style="display: none;">
+    <span class="arrow-glyph">❮</span>
+  </button>
+
+  <!-- Carousel Viewport -->
+  <div class="carousel-viewport">
+    <div class="carousel-track" id="carousel-track">
+
+      <!-- ==========================================
+           SLIDE 1: THE OBSERVATORY UNDER ATTACK
+           ========================================== -->
+      <section class="transmission-slide" id="slide-0">
+        <!-- AI Photorealistic Cinematic Background (Optimized Static Frame) -->
+        <div class="bg-video-wrap">
+          <img class="bg-static-image" src="./bg_observatory_static.jpg" alt="Observatory under siege" loading="eager" decoding="async">
+        </div>
+        <!-- Atmospheric FX Canvas (Embers, Fire Halo & Ballistic Tracers) -->
+        <canvas class="bg-canvas" id="canvas-observatory"></canvas>
+        <div class="vignette-raid"></div>
+
+        <div class="receiver-chassis" id="receiver-chassis-1">
+          <div class="corner c-tl"></div>
+          <div class="corner c-tr"></div>
+          <div class="corner c-bl"></div>
+          <div class="corner c-br"></div>
+
+          <div class="chassis-tag">⚠ OBSERVATORY UNDER ATTACK · INTERCEPTED RELAY ⚠</div>
+
+          <div class="sigil">◐</div>
+          <div class="kicker">The Eclipse Order · Observatory Under Siege</div>
+          <h1 class="title">The Stolen Astrolabe</h1>
+          <div class="frequency-badge">
+            <span class="frequency-dot"></span>
+            <span>22.22 MHz · EMERGENCY DISTRESS RELAY</span>
+          </div>
+
+          <div class="oscilloscope-box">
+            <canvas class="oscilloscope-canvas" id="scope-canvas-1"></canvas>
+          </div>
+
+          <div class="transcript-box" id="transcript-box-1">
+            <div class="transcript-text" id="transcript-text-1">
+              "⚠ Emergency relay intercepted · Atmospheric interference heavy. The Cartographer is in the lower vaults. Touch below to decrypt."
+            </div>
+            <div class="transcript-sub" id="transcript-sub-1">
+              ORIGIN: SUB-LEVEL OBSERVATORY ARCHIVES · FREQUENCY: 22.22 MHz
+            </div>
+          </div>
+
+          <div class="action-container">
+            <button type="button" class="btn-tune" id="btn-tune-1">
+              <span>🚨</span>
+              <span>Decrypt Emergency Transmission</span>
+              <span>🚨</span>
+            </button>
+
+            <!-- Radio Deck 1 -->
+            <div class="radio-deck" id="radio-deck-1" style="display: none;">
+              <div class="deck-timeline-row">
+                <span class="time-readout" id="time-current-1">00:00</span>
+                <div class="scrubber-track-wrap">
+                  <div class="scrubber-progress-bar" id="scrubber-bar-1"></div>
+                  <input type="range" id="seek-slider-1" class="seek-slider" min="0" max="37.0" step="0.1" value="0">
+                </div>
+                <span class="time-readout" id="time-total-1">00:37</span>
+              </div>
+
+              <div class="deck-controls-row">
+                <button type="button" class="deck-btn" id="btn-restart-1" title="Restart">
+                  <span>⏮</span>
+                  <span>Restart</span>
+                </button>
+
+                <button type="button" class="deck-btn btn-primary-play" id="btn-play-pause-1" title="Play/Pause">
+                  <span id="play-icon-1">❚❚</span>
+                  <span id="play-label-1">Pause</span>
+                </button>
+
+                <div class="deck-vol-group">
+                  <button type="button" class="deck-btn-mute" id="btn-mute-1">
+                    <span id="mute-icon-1">🔊</span>
+                  </button>
+                  <div class="vol-slider-wrap">
+                    <input type="range" id="vol-slider-1" class="vol-slider" min="0" max="1" step="0.02" value="1">
+                  </div>
+                  <span class="vol-percent" id="vol-percent-1">100%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Link: Link to Observatory Raid -->
+            <div class="resolved-actions" id="resolved-actions-1" style="display: none;">
+              <a href="../celestial-flower-2/index.html" class="btn-vault-link" target="_top" onclick="if(window.top){window.top.location.href='../celestial-flower-2/index.html';return false;}">
+                Inspect The Observatory Raid (Game 04) ➔
+              </a>
+            </div>
+          </div>
+
+          <div class="foot-note">Phase II · The Constellation Path · The Stolen Astrolabe</div>
+        </div>
+
+        <audio id="audio-player-1" preload="none" data-src="./cartographer_raid.mp3"></audio>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 2: THE DESERT OUTPOST
+           ========================================== -->
+      <section class="transmission-slide" id="slide-1-view">
+        <!-- AI Photorealistic Cinematic Background (Optimized Static Frame) -->
+        <div class="bg-video-wrap">
+          <img class="bg-static-image" src="./bg_radio_static.jpg" alt="Emergency Radio Outpost in the Dunes" loading="lazy" decoding="async">
+        </div>
+        <!-- Atmospheric FX Canvas (Twinkling Stars & Blowing Sand Dust) -->
+        <canvas class="bg-canvas" id="canvas-desert"></canvas>
+        <div class="vignette-desert"></div>
+
+        <div class="receiver-chassis chassis-desert" id="receiver-chassis-2">
+          <div class="corner c-tl"></div>
+          <div class="corner c-tr"></div>
+          <div class="corner c-bl"></div>
+          <div class="corner c-br"></div>
+
+          <div class="chassis-tag">⚠ DESERT RECON FREQUENCY · SURVIVOR RELAY ⚠</div>
+
+          <div class="sigil">☽</div>
+          <div class="kicker">The Eclipse Order · Surviving the Siege</div>
+          <h1 class="title">Voices in the Dunes</h1>
+          <div class="frequency-badge">
+            <span class="frequency-dot"></span>
+            <span>19.84 MHz · SOUTHERN ERG BEACON</span>
+          </div>
+
+          <div class="oscilloscope-box">
+            <canvas class="oscilloscope-canvas" id="scope-canvas-2"></canvas>
+          </div>
+
+          <div class="transcript-box" id="transcript-box-2">
+            <div class="transcript-text" id="transcript-text-2">
+              "⚠ Desert beacon acquired · Signal is faint but steady. The Cartographer is transmitting from the dunes. Touch below to decrypt."
+            </div>
+            <div class="transcript-sub" id="transcript-sub-2">
+              ORIGIN: SOUTHERN ERG · UNCHARTED DESERT SECTOR · FREQ: 19.84 MHz
+            </div>
+          </div>
+
+          <div class="action-container">
+            <button type="button" class="btn-tune btn-tune-desert" id="btn-tune-2">
+              <span>🏜️</span>
+              <span>Decrypt Desert Transmission</span>
+              <span>📻</span>
+            </button>
+
+            <!-- Radio Deck 2 -->
+            <div class="radio-deck" id="radio-deck-2" style="display: none;">
+              <div class="deck-timeline-row">
+                <span class="time-readout" id="time-current-2">00:00</span>
+                <div class="scrubber-track-wrap">
+                  <div class="scrubber-progress-bar" id="scrubber-bar-2"></div>
+                  <input type="range" id="seek-slider-2" class="seek-slider" min="0" max="91.08" step="0.1" value="0">
+                </div>
+                <span class="time-readout" id="time-total-2">01:31</span>
+              </div>
+
+              <div class="deck-controls-row">
+                <button type="button" class="deck-btn" id="btn-restart-2" title="Restart">
+                  <span>⏮</span>
+                  <span>Restart</span>
+                </button>
+
+                <button type="button" class="deck-btn btn-primary-play" id="btn-play-pause-2" title="Play/Pause">
+                  <span id="play-icon-2">❚❚</span>
+                  <span id="play-label-2">Pause</span>
+                </button>
+
+                <div class="deck-vol-group">
+                  <button type="button" class="deck-btn-mute" id="btn-mute-2">
+                    <span id="mute-icon-2">🔊</span>
+                  </button>
+                  <div class="vol-slider-wrap">
+                    <input type="range" id="vol-slider-2" class="vol-slider" min="0" max="1" step="0.02" value="1">
+                  </div>
+                  <span class="vol-percent" id="vol-percent-2">100%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Link -->
+            <div class="resolved-actions" id="resolved-actions-2" style="display: none;">
+              <a href="../celestial-matrix/index.html" class="btn-vault-link" target="_top" onclick="if(window.top){window.top.location.href='../celestial-matrix/index.html';return false;}">
+                Open The Celestial Matrix · Calibrate Resonance Console ➔
+              </a>
+            </div>
+          </div>
+
+          <div class="foot-note">Phase II · The Desert Path · Surviving in Exile</div>
+        </div>
+
+        <audio id="audio-player-2" preload="none" data-src="./cartographer_desert_transmission.mp3"></audio>
+      </section>
+
+      <!-- ==========================================
+           SLIDE 3: MATRIX RESONANCE DECRYPTED (RELIEF & GLYPH P)
+           ========================================== -->
+      <section class="transmission-slide" id="slide-2-view">
+        <!-- AI Photorealistic Cinematic Background (Optimized Static Frame) -->
+        <div class="bg-video-wrap">
+          <img class="bg-static-image" src="./bg_matrix_relief_static.jpg" alt="Harmonic Relief Matrix" loading="lazy" decoding="async">
+        </div>
+        <!-- Atmospheric FX Canvas (Harmonic Celestial Resonance Particles) -->
+        <canvas class="bg-canvas" id="canvas-matrix-resonance"></canvas>
+        <div class="vignette-matrix"></div>
+
+        <div class="receiver-chassis chassis-matrix" id="receiver-chassis-3">
+          <div class="corner c-tl"></div>
+          <div class="corner c-tr"></div>
+          <div class="corner c-bl"></div>
+          <div class="corner c-br"></div>
+
+          <div class="chassis-tag">✦ HARMONIC SHORTWAVE CARRIER · DECRYPTED RESONANCE ✦</div>
+
+          <div class="sigil">◈</div>
+          <div class="kicker">The Celestial Matrix · Station 05 Cleared</div>
+          <h1 class="title">Harmonic Relief</h1>
+          <div class="frequency-badge">
+            <span class="frequency-dot"></span>
+            <span>142.85 MHz · CELESTIAL RESONANCE CARRIER</span>
+          </div>
+
+          <div class="oscilloscope-box">
+            <canvas class="oscilloscope-canvas" id="scope-canvas-3"></canvas>
+          </div>
+
+          <div class="transcript-box" id="transcript-box-3">
+            <div class="transcript-text" id="transcript-text-3">
+              "✦ Resonance carrier decoded · Signal locked onto deep desert coordinates. The Cartographer is in pursuit. Touch below to decrypt."
+            </div>
+            <div class="transcript-sub" id="transcript-sub-3">
+              ORIGIN: SANDSTONE PERIMETER · VECTOR I LOCKED · FREQ: 142.85 MHz
+            </div>
+          </div>
+
+          <div class="action-container">
+            <button type="button" class="btn-tune btn-tune-matrix" id="btn-tune-3">
+              <span>⚡</span>
+              <span>Decode Harmonic Transmission</span>
+              <span>✦</span>
+            </button>
+
+            <!-- Radio Deck 3 -->
+            <div class="radio-deck" id="radio-deck-3" style="display: none;">
+              <div class="deck-timeline-row">
+                <span class="time-readout" id="time-current-3">00:00</span>
+                <div class="scrubber-track-wrap">
+                  <div class="scrubber-progress-bar" id="scrubber-bar-3"></div>
+                  <input type="range" id="seek-slider-3" class="seek-slider" min="0" max="25.94" step="0.1" value="0">
+                </div>
+                <span class="time-readout" id="time-total-3">00:26</span>
+              </div>
+
+              <div class="deck-controls-row">
+                <button type="button" class="deck-btn" id="btn-restart-3" title="Restart">
+                  <span>⏮</span>
+                  <span>Restart</span>
+                </button>
+
+                <button type="button" class="deck-btn btn-primary-play" id="btn-play-pause-3" title="Play/Pause">
+                  <span id="play-icon-3">❚❚</span>
+                  <span id="play-label-3">Pause</span>
+                </button>
+
+                <div class="deck-vol-group">
+                  <button type="button" class="deck-btn-mute" id="btn-mute-3">
+                    <span id="mute-icon-3">🔊</span>
+                  </button>
+                  <div class="vol-slider-wrap">
+                    <input type="range" id="vol-slider-3" class="vol-slider" min="0" max="1" step="0.02" value="1">
+                  </div>
+                  <span class="vol-percent" id="vol-percent-3">100%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Link & Decrypted Reward -->
+            <div class="resolved-actions" id="resolved-actions-3" style="display: none;">
+              <div class="glyph-reward-card">
+                <div class="letter-reward-badge">P</div>
+                <div class="glyph-reward-info">
+                  <span class="glyph-reward-title">✦ DECRYPTED CIPHER KEY: P</span>
+                  <span class="glyph-reward-desc">Bearing Vector I: B + P = 38° · Southern Dunes Trail</span>
+                </div>
+              </div>
+              <a href="../celestial-matrix/index.html" class="btn-vault-link btn-vault-link-matrix" target="_top" onclick="if(window.top){window.top.location.href='../celestial-matrix/index.html';return false;}">
+                Inspect The Celestial Matrix (Game 05) ➔
+              </a>
+            </div>
+          </div>
+
+          <div class="foot-note">Phase II · The Sandstone Ruins · Vector I Unlocked</div>
+        </div>
+
+        <audio id="audio-player-3" preload="none" data-src="./cartographer_matrix_relief.mp3"></audio>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Master Transmissions Dossier Modal -->
+  <div class="dossier-modal" id="transmissions-dossier-modal" role="dialog" aria-modal="true" aria-labelledby="dossier-modal-title">
+    <div class="dossier-content">
+      <div class="dossier-header">
+        <div>
+          <div class="dossier-title" id="dossier-modal-title">✦ TRANSMISSION LOGS ✦</div>
+          <div class="dossier-subtitle">The Eclipse Order · Intercepted Audio Dossier</div>
+        </div>
+        <button type="button" class="dossier-close-btn" id="btn-close-dossier" aria-label="Close Dossier">✕</button>
+      </div>
+
+      <!-- Item 1 -->
+      <div class="dossier-card" onclick="jumpFromDossier(0)">
+        <div class="dossier-card-top">
+          <span class="dossier-card-tag tag-distress">01 · DISTRESS INTERCEPT</span>
+          <span class="dossier-card-duration">00:37 · 22.22 MHz</span>
+        </div>
+        <div class="dossier-card-title">The Stolen Astrolabe · Observatory Under Attack</div>
+        <div class="dossier-card-summary">
+          "They broke in! They are assaulting the observatory! They took the astrolabe! Silvia, I believe in you... you are the only one who can do this!"
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="dossier-card" onclick="jumpFromDossier(1)">
+        <div class="dossier-card-top">
+          <span class="dossier-card-tag tag-survivor">02 · SURVIVOR BEACON</span>
+          <span class="dossier-card-duration">01:31 · 19.84 MHz</span>
+        </div>
+        <div class="dossier-card-title">Voices in the Dunes · Southern Erg Outpost</div>
+        <div class="dossier-card-summary">
+          "Silvia, do you copy me? If this signal is reaching your receiver... I made it out alive. I broke through the lower aqueduct into the southern dunes. Guard the journal with your life."
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="dossier-card" onclick="jumpFromDossier(2)">
+        <div class="dossier-card-top">
+          <span class="dossier-card-tag tag-decrypted">03 · MATRIX RESOLVED ✓</span>
+          <span class="dossier-card-duration">00:26 · 142.85 MHz</span>
+        </div>
+        <div class="dossier-card-title">Harmonic Relief · Sandstone Dunes Vector</div>
+        <div class="dossier-card-summary">
+          "Silvia! The signal came through loud and clear! The console held! The raiders are marching south toward the Sandstone Ruins. I've locked Glyph P onto your screen... we're closing in."
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================
+       1. SLIDE NAVIGATION / CAROUSEL SYSTEM (STATE PERSISTENT)
+       ========================================================== */
+    let player1 = null;
+    let player2 = null;
+    let player3 = null;
+
+    const track = document.getElementById('carousel-track');
+    const tab0 = document.getElementById('tab-0');
+    const tab1 = document.getElementById('tab-1');
+    const tab2 = document.getElementById('tab-2');
+    const arrowNext = document.getElementById('arrow-next');
+    const arrowPrev = document.getElementById('arrow-prev');
+
+    // Single-mode and origin parameter detection
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasExplicitSingle = urlParams.has('single');
+    const isFromObservatory = !hasExplicitSingle && (
+                              urlParams.get('from') === 'observatory' ||
+                              urlParams.get('ref') === 'observatory' ||
+                              (document.referrer && document.referrer.includes('celestial-flower-2')));
+    let isSingleMode = hasExplicitSingle || isFromObservatory;
+    let singleIndex = hasExplicitSingle ? Math.min(2, Math.max(0, parseInt(urlParams.get('single'), 10) || 0)) : (isFromObservatory ? 0 : null);
+
+    if (isFromObservatory) {
+      document.body.classList.add('from-observatory-mode');
+      currentSlide = 0;
+
+      const hubBackBtn = document.getElementById('hub-back-btn');
+      const hubBackLabel = document.getElementById('hub-back-label');
+      if (hubBackBtn) {
+        hubBackBtn.href = '../celestial-flower-2/index.html';
+        hubBackBtn.target = '_top';
+        hubBackBtn.title = 'Return to The Observatory Raid';
+        if (hubBackLabel) {
+          hubBackLabel.innerText = 'Return to Observatory Raid';
+        } else {
+          hubBackBtn.innerHTML = '<span>←</span><span>Return to Observatory Raid</span>';
+        }
+      }
+    } else if (isSingleMode) {
+      document.body.classList.add('single-relay-mode');
+      currentSlide = singleIndex;
+    } else {
+      // Retrieve saved slide from URL hash or localStorage
+      try {
+        if (window.location.hash === '#transmission-3' || window.location.hash === '#matrix' || window.location.search.includes('relay=3')) {
+          currentSlide = 2;
+        } else if (window.location.hash === '#transmission-2' || window.location.hash === '#desert' || window.location.search.includes('relay=2')) {
+          currentSlide = 1;
+        } else if (window.location.hash === '#transmission-1' || window.location.hash === '#observatory' || window.location.search.includes('relay=1')) {
+          currentSlide = 0;
+        } else {
+          const saved = localStorage.getItem('cartographer_radio_active_slide');
+          if (saved !== null) {
+            currentSlide = parseInt(saved, 10) || 0;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // Dynamic On-Demand Media Loader (loads ONLY the active slide's audio and ensures background image)
+    function loadSlideMedia(idx) {
+      const slideId = idx === 0 ? 'slide-0' : (idx === 1 ? 'slide-1-view' : 'slide-2-view');
+      const slideEl = document.getElementById(slideId);
+      if (!slideEl) return;
+
+      const audio = slideEl.querySelector('audio');
+      if (audio && audio.dataset.src && !audio.src) {
+        audio.src = audio.dataset.src;
+        audio.load();
+      }
+    }
+
+    function pauseOtherSlideMedia(activeIdx) {
+      // Background videos replaced by high-performance static photographs; no video pausing needed.
+    }
+
+    function goToSlide(idx, animate = true) {
+      if (isSingleMode && idx !== singleIndex) {
+        return; // Locked in single transmission mode
+      }
+      if (idx < 0) idx = 0;
+      if (idx > 2) idx = 2;
+      currentSlide = idx;
+      document.documentElement.classList.remove('init-slide-2', 'init-slide-3');
+      if (!isSingleMode) {
+        try {
+          localStorage.setItem('cartographer_radio_active_slide', idx);
+        } catch (e) {}
+
+        if (history.replaceState) {
+          const hash = idx === 2 ? '#transmission-3' : (idx === 1 ? '#transmission-2' : '#transmission-1');
+          history.replaceState(null, null, hash);
+        }
+      }
+
+      // Load media for current slide and pause others
+      loadSlideMedia(idx);
+      pauseOtherSlideMedia(idx);
+
+      if (!animate) {
+        track.style.transition = 'none';
+      } else {
+        track.style.transition = 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)';
+      }
+      track.style.transform = `translateX(-${idx * 100}vw)`;
+
+      if (!animate) {
+        void track.offsetWidth; // force reflow
+        track.style.transition = 'transform 0.75s cubic-bezier(0.16, 1, 0.3, 1)';
+      }
+
+      // Update tabs
+      if (tab0) tab0.classList.toggle('active', idx === 0);
+      if (tab1) tab1.classList.toggle('active', idx === 1);
+      if (tab2) tab2.classList.toggle('active', idx === 2);
+
+      // Update arrows
+      if (arrowPrev) arrowPrev.style.display = (idx === 0 || isSingleMode) ? 'none' : 'flex';
+      if (arrowNext) arrowNext.style.display = (idx === 2 || isSingleMode) ? 'none' : 'flex';
+
+      // Update active highlight on dossier cards
+      const cards = document.querySelectorAll('.dossier-card');
+      cards.forEach((card, cIdx) => {
+        card.classList.toggle('card-active', cIdx === idx);
+      });
+
+      // Update top-left Chronicle Game jump button
+      const hubChronicleLink = document.getElementById('hub-chronicle-link');
+      const hubChronicleIcon = document.getElementById('hub-chronicle-icon');
+      const hubChronicleLabel = document.getElementById('hub-chronicle-label');
+      if (hubChronicleLink) {
+        if (idx === 0) {
+          hubChronicleLink.style.display = 'inline-flex';
+          hubChronicleLink.href = '../celestial-flower-2/index.html';
+          if (hubChronicleIcon) hubChronicleIcon.textContent = '⚔️';
+          if (hubChronicleLabel) hubChronicleLabel.textContent = 'Inspect The Observatory Raid ➔';
+        } else if (idx === 2) {
+          hubChronicleLink.style.display = 'inline-flex';
+          hubChronicleLink.href = '../celestial-matrix/index.html';
+          if (hubChronicleIcon) hubChronicleIcon.textContent = '🏛️';
+          if (hubChronicleLabel) hubChronicleLabel.textContent = 'Inspect The Celestial Matrix ➔';
+        } else {
+          hubChronicleLink.style.display = 'none';
+        }
+      }
+
+      // Pause inactive players
+      if (idx === 0) {
+        if (player2 && player2.isPlaying) player2.pause();
+        if (player3 && player3.isPlaying) player3.pause();
+      } else if (idx === 1) {
+        if (player1 && player1.isPlaying) player1.pause();
+        if (player3 && player3.isPlaying) player3.pause();
+      } else if (idx === 2) {
+        if (player1 && player1.isPlaying) player1.pause();
+        if (player2 && player2.isPlaying) player2.pause();
+      }
+    }
+
+    // Keyboard navigation (disabled in single mode)
+    window.addEventListener('keydown', (e) => {
+      if (isSingleMode) return;
+      if (e.key === 'ArrowRight' && currentSlide < 2) goToSlide(currentSlide + 1);
+      if (e.key === 'ArrowLeft' && currentSlide > 0) goToSlide(currentSlide - 1);
+    });
+
+    // Touch swipe support (disabled in single mode)
+    let touchStartX = 0;
+    window.addEventListener('touchstart', (e) => {
+      if (isSingleMode) return;
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    window.addEventListener('touchend', (e) => {
+      if (isSingleMode) return;
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (diff > 60 && currentSlide < 2) goToSlide(currentSlide + 1);
+      else if (diff < -60 && currentSlide > 0) goToSlide(currentSlide - 1);
+    }, { passive: true });
+
+
+    /* ==========================================================
+       2. CANVAS 1: BURNING OBSERVATORY AT NIGHT (WITH TRACERS)
+       ========================================================== */
+    const obsCanvas = document.getElementById('canvas-observatory');
+    const obsCtx = obsCanvas.getContext('2d');
+    let obsW, obsH;
+
+    // Fire particles & embers
+    let embers = [];
+    let smokePuffs = [];
+    let tracers = [];
+    let tracerTimer = 0;
+
+    function resizeObsCanvas() {
+      obsW = obsCanvas.width = window.innerWidth;
+      obsH = obsCanvas.height = window.innerHeight;
+    }
+    resizeObsCanvas();
+    window.addEventListener('resize', resizeObsCanvas);
+
+    // Seed background stars for Slide 1
+    const obsStars = [];
+    for (let i = 0; i < 90; i++) {
+      obsStars.push({
+        x: Math.random(),
+        y: Math.random() * 0.7,
+        r: Math.random() * 1.4 + 0.4,
+        alpha: Math.random() * 0.7 + 0.3,
+        flicker: Math.random() * 0.03 + 0.01
+      });
+    }
+
+    function createTracer(originX, originY) {
+      // Ballistic tracer shot: launches upwards and arcing across the open night sky
+      const angle = (Math.random() * 40 + 55) * (Math.PI / 180);
+      const speed = Math.random() * 14 + 18;
+      tracers.push({
+        x: originX + (Math.random() - 0.5) * 60,
+        y: originY + (Math.random() - 0.5) * 30,
+        vx: Math.cos(angle) * speed * (Math.random() < 0.2 ? -0.4 : 0.75),
+        vy: -Math.sin(angle) * speed,
+        len: Math.random() * 30 + 40,
+        alpha: 1.0,
+        decay: Math.random() * 0.016 + 0.012,
+        color: Math.random() < 0.75 ? '#ff4444' : '#ffb300',
+        trail: []
+      });
+    }
+
+    let lastObsTime = 0;
+    const fps24Interval = 1000 / 24;
+
+    function renderObservatoryScene(timestamp) {
+      requestAnimationFrame(renderObservatoryScene);
+      if (currentSlide !== 0 || document.hidden) return;
+
+      const elapsed = timestamp - lastObsTime;
+      if (elapsed < fps24Interval) return;
+      lastObsTime = timestamp - (elapsed % fps24Interval);
+
+      obsCtx.clearRect(0, 0, obsW, obsH);
+
+      const isMobile = obsW < 768;
+      const obsX = isMobile ? Math.min(obsW * 0.28, 140) : Math.min(obsW * 0.22, 320);
+      const obsY = isMobile ? obsH * 0.70 : obsH * 0.72;
+      const scale = isMobile ? Math.min(obsW, obsH) * 0.0020 : Math.min(obsW, obsH) * 0.0024;
+      const time = Date.now() * 0.004;
+
+      // 1. Dynamic Fire Glow Pulsing over the Besieged Fortress (Option A)
+      const firePulse = Math.sin(time * 2.8) * 0.14 + 0.96;
+      const fireGlow = obsCtx.createRadialGradient(obsX, obsY, 15, obsX, obsY, 260 * scale * firePulse);
+      fireGlow.addColorStop(0, 'rgba(255, 140, 40, 0.40)');
+      fireGlow.addColorStop(0.38, 'rgba(220, 65, 20, 0.18)');
+      fireGlow.addColorStop(0.72, 'rgba(150, 25, 20, 0.05)');
+      fireGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      obsCtx.fillStyle = fireGlow;
+      obsCtx.fillRect(0, 0, obsW, obsH);
+
+      // 2. Rising Fire Embers & Sparks from the breach
+      if (embers.length < 65) {
+        embers.push({
+          x: obsX + (Math.random() - 0.5) * 160 * scale,
+          y: obsY + (Math.random() * 45 - 25) * scale,
+          vx: (Math.random() - 0.5) * 1.4 + 0.3,
+          vy: -(Math.random() * 1.8 + 0.8),
+          r: Math.random() * 2.0 + 0.6,
+          life: Math.random() * 90 + 50,
+          maxLife: 140,
+          color: Math.random() < 0.65 ? '#ffb300' : (Math.random() < 0.5 ? '#ff4d4d' : '#ffe082')
+        });
+      }
+
+      for (let i = embers.length - 1; i >= 0; i--) {
+        const e = embers[i];
+        e.x += e.vx + Math.sin(time + e.y * 0.05) * 0.4;
+        e.y += e.vy;
+        e.life--;
+
+        if (e.life <= 0) {
+          embers.splice(i, 1);
+          continue;
+        }
+
+        const a = (e.life / e.maxLife);
+        obsCtx.fillStyle = e.color;
+        obsCtx.globalAlpha = a * 0.85;
+        obsCtx.beginPath();
+        obsCtx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+        obsCtx.fill();
+        obsCtx.globalAlpha = 1.0;
+      }
+
+      // 3. Ballistic Tracer Gunshots fired into the night sky
+      tracerTimer++;
+      if (tracerTimer > 75 && Math.random() < 0.045) {
+        const burstCount = Math.floor(Math.random() * 3) + 1;
+        for (let b = 0; b < burstCount; b++) {
+          setTimeout(() => {
+            createTracer(obsX, obsY);
+          }, b * 130);
+        }
+        tracerTimer = 0;
+      }
+
+      for (let i = tracers.length - 1; i >= 0; i--) {
+        const tr = tracers[i];
+        tr.trail.unshift({ x: tr.x, y: tr.y });
+        if (tr.trail.length > 8) tr.trail.pop();
+
+        tr.x += tr.vx;
+        tr.y += tr.vy;
+        tr.vy += 0.07; // gravity arc
+        tr.alpha -= tr.decay;
+
+        if (tr.alpha <= 0 || tr.y < -50 || tr.x > obsW + 50) {
+          tracers.splice(i, 1);
+          continue;
+        }
+
+        obsCtx.save();
+        obsCtx.strokeStyle = tr.color;
+        obsCtx.shadowColor = tr.color;
+        obsCtx.shadowBlur = 14;
+        obsCtx.lineWidth = 2.6;
+        obsCtx.globalAlpha = Math.max(0, tr.alpha);
+
+        obsCtx.beginPath();
+        if (tr.trail.length > 0) {
+          obsCtx.moveTo(tr.trail[0].x, tr.trail[0].y);
+          for (let p = 1; p < tr.trail.length; p++) {
+            obsCtx.lineTo(tr.trail[p].x, tr.trail[p].y);
+          }
+        }
+        obsCtx.lineTo(tr.x, tr.y);
+        obsCtx.stroke();
+
+        // Hot white core tip
+        obsCtx.fillStyle = '#ffffff';
+        obsCtx.beginPath();
+        obsCtx.arc(tr.x, tr.y, 2.0, 0, Math.PI * 2);
+        obsCtx.fill();
+
+        obsCtx.restore();
+      }
+    }
+    renderObservatoryScene();
+
+
+    /* ==========================================================
+       3. CANVAS 2: NIGHT DESERT ATMOSPHERE (STARS & SLOW DUST)
+       ========================================================== */
+    const desertCanvas = document.getElementById('canvas-desert');
+    const desertCtx = desertCanvas.getContext('2d');
+    let desW, desH;
+
+    function resizeDesertCanvas() {
+      desW = desertCanvas.width = window.innerWidth;
+      desH = desertCanvas.height = window.innerHeight;
+    }
+    resizeDesertCanvas();
+    window.addEventListener('resize', resizeDesertCanvas);
+
+    // Dynamic celestial sparkle stars for desert
+    const desertStars = [];
+    for (let i = 0; i < 110; i++) {
+      desertStars.push({
+        x: Math.random(),
+        y: Math.random() * 0.65,
+        r: Math.random() * 1.4 + 0.4,
+        alpha: Math.random() * 0.8 + 0.2,
+        speed: Math.random() * 0.012 + 0.004,
+        color: Math.random() < 0.25 ? '#ffe8b8' : (Math.random() < 0.2 ? '#d0e5ff' : '#ffffff')
+      });
+    }
+
+    // Drifting sand grains caught in the gentle slow desert breeze
+    const sandGrains = [];
+    for (let i = 0; i < 60; i++) {
+      sandGrains.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight * 0.4 + window.innerHeight * 0.6,
+        vx: Math.random() * 0.70 + 0.35,  // Slow gentle movement
+        vy: (Math.random() - 0.5) * 0.15,
+        size: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.40 + 0.10
+      });
+    }
+
+    let lastDesTime = 0;
+
+    function renderDesertScene(timestamp) {
+      requestAnimationFrame(renderDesertScene);
+      if (currentSlide !== 1 || document.hidden) return;
+
+      const elapsed = timestamp - lastDesTime;
+      if (elapsed < fps24Interval) return;
+      lastDesTime = timestamp - (elapsed % fps24Interval);
+
+      desertCtx.clearRect(0, 0, desW, desH);
+
+      // 1. Dynamic Twinkling Celestial Stars over the Milky Way
+      desertStars.forEach(s => {
+        s.alpha += s.speed;
+        const a = Math.abs(Math.sin(s.alpha));
+        desertCtx.beginPath();
+        desertCtx.arc(s.x * desW, s.y * desH, s.r, 0, Math.PI * 2);
+        desertCtx.fillStyle = s.color;
+        desertCtx.globalAlpha = a * 0.70;
+        desertCtx.fill();
+        desertCtx.globalAlpha = 1.0;
+      });
+
+      // 2. Drifting Sand Dust Grains blowing slowly over the dunes
+      desertCtx.fillStyle = '#f5d998';
+      sandGrains.forEach(g => {
+        g.x += g.vx;
+        g.y += g.vy;
+        if (g.x > desW + 10) {
+          g.x = -10;
+          g.y = Math.random() * desH * 0.45 + desH * 0.55;
+        }
+
+        desertCtx.globalAlpha = g.alpha;
+        desertCtx.beginPath();
+        desertCtx.arc(g.x, g.y, g.size, 0, Math.PI * 2);
+        desertCtx.fill();
+        desertCtx.globalAlpha = 1.0;
+      });
+    }
+    renderDesertScene();
+
+
+    /* ==========================================================
+       3b. CANVAS 3: HARMONIC CELESTIAL RESONANCE (CYAN & GOLD)
+       ========================================================== */
+    const matrixCanvas = document.getElementById('canvas-matrix-resonance');
+    const matrixCtx = matrixCanvas ? matrixCanvas.getContext('2d') : null;
+    let matW, matH;
+
+    function resizeMatrixCanvas() {
+      if (!matrixCanvas) return;
+      matW = matrixCanvas.width = window.innerWidth;
+      matH = matrixCanvas.height = window.innerHeight;
+    }
+    resizeMatrixCanvas();
+    window.addEventListener('resize', resizeMatrixCanvas);
+
+    const resonanceNodes = [];
+    for (let i = 0; i < 75; i++) {
+      resonanceNodes.push({
+        x: Math.random(),
+        y: Math.random(),
+        r: Math.random() * 1.8 + 0.5,
+        alpha: Math.random() * 0.8 + 0.2,
+        speed: Math.random() * 0.018 + 0.006,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: -(Math.random() * 0.45 + 0.15),
+        color: Math.random() < 0.55 ? '#80deea' : (Math.random() < 0.5 ? '#ffd978' : '#ffffff')
+      });
+    }
+
+    let lastMatTime = 0;
+
+    function renderMatrixResonanceScene(timestamp) {
+      requestAnimationFrame(renderMatrixResonanceScene);
+      if (!matrixCtx || currentSlide !== 2 || document.hidden) return;
+
+      const elapsed = timestamp - lastMatTime;
+      if (elapsed < fps24Interval) return;
+      lastMatTime = timestamp - (elapsed % fps24Interval);
+
+      matrixCtx.clearRect(0, 0, matW, matH);
+
+      for (let i = 0; i < resonanceNodes.length; i++) {
+        const n = resonanceNodes[i];
+        n.y += n.vy * 0.003;
+        n.x += n.vx * 0.003;
+        if (n.y < 0) {
+          n.y = 1.0;
+          n.x = Math.random();
+        }
+        n.alpha += n.speed;
+        const a = Math.abs(Math.sin(n.alpha));
+
+        matrixCtx.beginPath();
+        matrixCtx.arc(n.x * matW, n.y * matH, n.r, 0, Math.PI * 2);
+        matrixCtx.fillStyle = n.color;
+        matrixCtx.globalAlpha = a * 0.80;
+        matrixCtx.shadowColor = n.color;
+        matrixCtx.shadowBlur = 8;
+        matrixCtx.fill();
+        matrixCtx.shadowBlur = 0;
+        matrixCtx.globalAlpha = 1.0;
+      }
+    }
+    renderMatrixResonanceScene();
+
+
+    /* ==========================================================
+       4. AUDIO & INTERACTIVE CONTROLLERS (TRANSMISSIONS 1, 2 & 3)
+       ========================================================== */
+    function formatTime(sec) {
+      if (isNaN(sec)) return "00:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+    }
+
+    /* ── Subtitle Data ── */
+    const TIMED_LINES_01 = [
+      { time: 0.0, text: "[ FREQUENCY LOCKED · EMERGENCY TELEMETRY OVERRIDE... ]" },
+      { time: 0.85, text: '"SILVIA! SILVIA, LISTEN TO ME!"' },
+      { time: 4.10, text: '"I DO NOT HAVE TIME!"' },
+      { time: 5.65, text: '"THEY BROKE IN! THEY ARE ASSAULTING THE OBSERVATORY!"' },
+      { time: 8.90, text: '"THEY TOOK THE ARTIFACT! THEY TOOK THE ASTROLABE!"' },
+      { time: 12.05, text: '"I AM IN THE CATACOMBS, THEY ARE HUNTING ME!"' },
+      { time: 14.78, text: '"I SENT THE LAST CARRIER PIGEON WITH THE RECOVERY PROTOCOLS! I WON\'T MAKE IT, THEY\'RE GOING TO CATCH ME!"' },
+      { time: 20.78, text: '"FIND IT! RECOVER THE ASTROLABE!"' },
+      { time: 23.60, text: "[ BLAST DOOR SLAMMED SHUT · SECURING LOCKS ]" },
+      { time: 25.10, text: '"THEY ARE RIGHT OUTSIDE!"' },
+      { time: 26.90, text: '"SILVIA, I BELIEVE IN YOU... YOU ARE THE ONLY ONE WHO CAN DO THIS!"' },
+      { time: 31.05, text: "[ C4 VAULT BREACH DETONATION · TRANSMISSION LOST ]" },
+      { time: 34.00, text: "✦ TRANSMISSION TERMINATED · RECOVER THE ASTROLABE ✦" }
+    ];
+
+    const TIMED_LINES_02 = [
+      { time: 0.0, text: "[ FREQUENCY LOCKED · SOUTHERN DUNES OUTPOST RELAY... ]" },
+      { time: 1.2, text: '"SILVIA. SILVIA, DO YOU COPY ME? IT IS ME."' },
+      { time: 6.31, text: '"IF THIS SIGNAL IS REACHING YOUR RECEIVER... I MADE IT OUT ALIVE."' },
+      { time: 12.54, text: '"WHEN THE VAULT DOORS BUCKLED, I BROKE THROUGH THE LOWER AQUEDUCT INTO THE SOUTHERN DUNES."' },
+      { time: 18.71, text: '"THE OBSERVATORY... THEY BURNED IT TO THE GROUND. BUT I SURVIVED."' },
+      { time: 25.02, text: '"I AM OUT IN THE DEEP DESERT NOW. MILES OF OPEN SILENCE, COLD SAND, AND THE STARS ABOVE."' },
+      { time: 36.05, text: '"LISTEN CLOSELY. THE CARRIER PIGEON SHOULD BE REACHING ITALY ANY MOMENT NOW WITH MY PHYSICAL JOURNAL."' },
+      { time: 41.26, text: '"GUARD IT WITH YOUR LIFE."' },
+      { time: 44.53, text: '"THE RAIDERS TORE THE ASTROLABE FROM THE ALTAR, BUT THEY CANNOT DECIPHER ITS CELESTIAL GEARINGS."' },
+      { time: 51.74, text: '"WITHOUT THE CONSTELLATIONS AND CIPHERS YOU ARE SOLVING IN THE JOURNAL, I CANNOT CHART ITS RECOVERY ALONE."' },
+      { time: 59.57, text: '"WORK THROUGH THE STANZAS AND STAR CHARTS. FIND THE COORDINATES."' },
+      { time: 65.04, text: '"I WILL KEEP SHADOWING THEIR TRAIL ACROSS THE SANDS, TAKING FIELD NOTES AND TRANSMITTING THEM TO YOU."' },
+      { time: 71.93, text: '"TOGETHER, WE ARE GOING TO RECLAIM THE ASTROLABE AND SAVE THE ECLIPSE ORDER."' },
+      { time: 78.72, text: '"REST YOUR EYES WHEN YOU CAN, SILVIA. THE DESERT NIGHT IS FREEZING..."' },
+      { time: 83.93, text: '"...BUT THE HEAVENS ARE WATCHING OVER US. STAY SAFE. OUT."' },
+      { time: 89.18, text: "✦ CARRIER STANDBY · DECODE JOURNAL PUZZLES TO REACH THE DESERT ✦" }
+    ];
+
+    const TIMED_LINES_03 = [
+      { time: 0.0, text: "[ HARMONIC SHORTWAVE CARRIER LOCKED · 142.85 MHz // RELIEF ]" },
+      { time: 1.1, text: '"SILVIA! THE SIGNAL CAME THROUGH... LOUD AND CLEAR!"' },
+      { time: 4.2, text: '"THE CONSOLE HELD!"' },
+      { time: 6.0, text: '"THE RAIDERS ARE MARCHING SOUTH ACROSS THE DUNES TOWARD THE SANDSTONE RUINS..."' },
+      { time: 11.2, text: '"NOW I KNOW WHERE TO TRACK THE STOLEN ASTROLABE!"' },
+      { time: 14.5, text: '"I\'VE LOCKED THE FIRST DECRYPTED GLYPH ONTO YOUR SCREEN."' },
+      { time: 18.0, text: '"INSCRIBE IT INTO YOUR CODEX, AND TURN TO THE NEXT PAGE OF MY JOURNAL..."' },
+      { time: 22.2, text: '"...WE\'RE CLOSING IN."' },
+      { time: 24.5, text: "✦ GLYPH P DECRYPTED · BEARING VECTOR LOCKED ONTO SOUTHERN DUNES ✦" }
+    ];
+
+    /* ── Player Factory Function ── */
+    function createPlayer(cfg) {
+      const audio = document.getElementById(cfg.audioId);
+      const btnTune = document.getElementById(cfg.btnTuneId);
+      const deck = document.getElementById(cfg.deckId);
+      const btnPlayPause = document.getElementById(cfg.btnPlayPauseId);
+      const playIcon = document.getElementById(cfg.playIconId);
+      const playLabel = document.getElementById(cfg.playLabelId);
+      const btnRestart = document.getElementById(cfg.btnRestartId);
+      const btnMute = document.getElementById(cfg.btnMuteId);
+      const muteIcon = document.getElementById(cfg.muteIconId);
+      const volSlider = document.getElementById(cfg.volSliderId);
+      const volPercent = document.getElementById(cfg.volPercentId);
+      const seekSlider = document.getElementById(cfg.seekSliderId);
+      const scrubberBar = document.getElementById(cfg.scrubberBarId);
+      const timeCurrent = document.getElementById(cfg.timeCurrentId);
+      const timeTotal = document.getElementById(cfg.timeTotalId);
+      const resolvedActions = document.getElementById(cfg.resolvedActionsId);
+      const transcriptBox = document.getElementById(cfg.transcriptBoxId);
+      const transcriptText = document.getElementById(cfg.transcriptTextId);
+      const transcriptSub = document.getElementById(cfg.transcriptSubId);
+      const chassis = document.getElementById(cfg.chassisId);
+      const scopeCanvas = document.getElementById(cfg.scopeCanvasId);
+      const scopeCtx = scopeCanvas.getContext('2d');
+
+      let isPlaying = false;
+      let isUserSeeking = false;
+      let prevVolume = 1.0;
+      let activeLineIndex = -1;
+
+      function resizeScope() {
+        scopeCanvas.width = scopeCanvas.offsetWidth;
+        scopeCanvas.height = scopeCanvas.offsetHeight;
+      }
+      resizeScope();
+      window.addEventListener('resize', resizeScope);
+
+      function updateTranscript(sec) {
+        if (isPlaying && transcriptBox) {
+          transcriptBox.classList.add('active-subtitles');
+        }
+        let targetIdx = 0;
+        for (let i = 0; i < cfg.timedLines.length; i++) {
+          if (sec >= cfg.timedLines[i].time) {
+            targetIdx = i;
+          }
+        }
+        if (targetIdx !== activeLineIndex) {
+          activeLineIndex = targetIdx;
+          transcriptText.innerText = cfg.timedLines[targetIdx].text;
+        }
+      }
+
+      function getEnergy(t) {
+        if (!isPlaying || audio.paused) return 0;
+        if (t < 0.8) return 0.22;
+        if (t >= (audio.duration || 60) - 1) return 0.05;
+        // Natural speech cadence energy
+        return 0.45 + Math.sin(t * 8.0) * 0.25 + Math.cos(t * 19.0) * 0.15;
+      }
+
+      let lastScopeTime = 0;
+      function renderScope(timestamp) {
+        requestAnimationFrame(renderScope);
+        if (document.hidden) return;
+
+        const elapsed = timestamp - lastScopeTime;
+        if (elapsed < fps24Interval) return;
+        lastScopeTime = timestamp - (elapsed % fps24Interval);
+
+        const sw = scopeCanvas.width;
+        const sh = scopeCanvas.height;
+        scopeCtx.clearRect(0, 0, sw, sh);
+
+        // Center line
+        scopeCtx.strokeStyle = cfg.themeColorBorder || 'rgba(239, 68, 68, 0.15)';
+        scopeCtx.lineWidth = 1;
+        scopeCtx.beginPath();
+        scopeCtx.moveTo(0, sh * 0.5);
+        scopeCtx.lineTo(sw, sh * 0.5);
+        scopeCtx.stroke();
+
+        const t = audio.currentTime || 0;
+        const energy = getEnergy(t) * (audio.muted ? 0 : audio.volume);
+        const timeNow = Date.now() * 0.005;
+
+        if (isPlaying && !audio.paused && energy > 0.05) {
+          const isPeak = energy > 0.72;
+          if (isPeak && cfg.allowTremor && Math.random() < 0.1) {
+            chassis.classList.add('tremor');
+            setTimeout(() => chassis.classList.remove('tremor'), 300);
+          }
+
+          scopeCtx.lineWidth = isPeak ? 2.5 : 1.8;
+          scopeCtx.strokeStyle = isPeak ? (cfg.themeColorPeak || '#ff3333') : (cfg.themeColorWave || '#ff9f43');
+          scopeCtx.shadowColor = cfg.themeColorGlow || '#ff5522';
+          scopeCtx.shadowBlur = isPeak ? 12 : 6;
+          scopeCtx.beginPath();
+
+          const points = 70;
+          const step = sw / points;
+          for (let i = 0; i <= points; i++) {
+            const x = i * step;
+            const carrier = Math.sin(i * 0.22 + timeNow * 3.5);
+            const vocalMod = Math.sin(i * 0.45 - timeNow * 5.0) * Math.cos(i * 0.12);
+            const noise = (Math.random() - 0.5) * (isPeak ? 8 : 4);
+            const amp = energy * (sh * 0.4);
+            const y = (sh * 0.5) + (carrier * vocalMod * amp) + noise;
+            if (i === 0) scopeCtx.moveTo(x, y);
+            else scopeCtx.lineTo(x, y);
+          }
+          scopeCtx.stroke();
+          scopeCtx.shadowBlur = 0;
+        } else {
+          // Idle wave
+          const idleTime = Date.now() * 0.003;
+          scopeCtx.lineWidth = 1.4;
+          scopeCtx.strokeStyle = cfg.themeColorIdle || 'rgba(255, 120, 90, 0.4)';
+          scopeCtx.beginPath();
+          for (let x = 0; x < sw; x += 4) {
+            const y = (sh * 0.5) + Math.sin(x * 0.05 + idleTime) * 3.0;
+            if (x === 0) scopeCtx.moveTo(x, y);
+            else scopeCtx.lineTo(x, y);
+          }
+          scopeCtx.stroke();
+        }
+      }
+      renderScope();
+
+      function play() {
+        audio.volume = parseFloat(volSlider.value);
+        btnTune.style.display = 'none';
+        deck.style.display = 'flex';
+        resolvedActions.style.display = 'block';
+        if (transcriptBox) transcriptBox.classList.add('active-subtitles');
+        transcriptSub.innerText = cfg.activeSubtitleSub;
+
+        audio.play().then(() => {
+          isPlaying = true;
+          playIcon.innerText = "❚❚";
+          playLabel.innerText = "Pause";
+        }).catch(err => {
+          console.log("Playback policy notice:", err.message);
+          isPlaying = false;
+          playIcon.innerText = "▶";
+          playLabel.innerText = "Play";
+          transcriptSub.innerText = "CARRIER ACQUIRED · PRESS PLAY";
+        });
+      }
+
+      function pause() {
+        audio.pause();
+        isPlaying = false;
+        playIcon.innerText = "▶";
+        playLabel.innerText = "Resume";
+        transcriptSub.innerText = "TRANSMISSION PAUSED · CARRIER ON HOLD";
+      }
+
+      function togglePlay() {
+        if (audio.paused) play();
+        else pause();
+      }
+
+      function restart() {
+        audio.currentTime = 0;
+        activeLineIndex = -1;
+        updateTranscript(0);
+        seekSlider.value = 0;
+        scrubberBar.style.width = "0%";
+        timeCurrent.innerText = "00:00";
+        play();
+      }
+
+      // Listeners
+      btnTune.addEventListener('click', play);
+      btnPlayPause.addEventListener('click', togglePlay);
+      btnRestart.addEventListener('click', restart);
+
+      volSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        audio.volume = val;
+        audio.muted = (val === 0);
+        volPercent.innerText = Math.round(val * 100) + "%";
+        muteIcon.innerText = (val === 0) ? "🔇" : (val < 0.5 ? "🔉" : "🔊");
+      });
+
+      btnMute.addEventListener('click', () => {
+        if (audio.muted || audio.volume === 0) {
+          audio.muted = false;
+          audio.volume = prevVolume > 0 ? prevVolume : 1.0;
+          volSlider.value = audio.volume;
+          volPercent.innerText = Math.round(audio.volume * 100) + "%";
+          muteIcon.innerText = audio.volume < 0.5 ? "🔉" : "🔊";
+        } else {
+          prevVolume = audio.volume;
+          audio.muted = true;
+          audio.volume = 0;
+          volSlider.value = 0;
+          volPercent.innerText = "0%";
+          muteIcon.innerText = "🔇";
+        }
+      });
+
+      seekSlider.addEventListener('input', (e) => {
+        isUserSeeking = true;
+        const target = parseFloat(e.target.value);
+        timeCurrent.innerText = formatTime(target);
+        const total = audio.duration || cfg.defaultDur;
+        scrubberBar.style.width = (target / total * 100) + "%";
+      });
+
+      seekSlider.addEventListener('change', (e) => {
+        const target = parseFloat(e.target.value);
+        audio.currentTime = target;
+        updateTranscript(target);
+        isUserSeeking = false;
+      });
+
+      audio.addEventListener('loadedmetadata', () => {
+        const d = audio.duration || cfg.defaultDur;
+        timeTotal.innerText = formatTime(d);
+        seekSlider.max = d.toFixed(1);
+      });
+
+      audio.addEventListener('timeupdate', () => {
+        if (!isUserSeeking) {
+          const cur = audio.currentTime;
+          const total = audio.duration || cfg.defaultDur;
+          timeCurrent.innerText = formatTime(cur);
+          seekSlider.value = cur;
+          scrubberBar.style.width = (cur / total * 100) + "%";
+          updateTranscript(cur);
+        }
+      });
+
+      audio.addEventListener('ended', () => {
+        isPlaying = false;
+        playIcon.innerText = "⟲";
+        playLabel.innerText = "Replay";
+      });
+
+      return {
+        audio,
+        play,
+        pause,
+        get isPlaying() { return isPlaying; }
+      };
+    }
+
+    /* ── Initialize Player 1 (Observatory Raid) ── */
+    player1 = createPlayer({
+      audioId: 'audio-player-1',
+      btnTuneId: 'btn-tune-1',
+      deckId: 'radio-deck-1',
+      btnPlayPauseId: 'btn-play-pause-1',
+      playIconId: 'play-icon-1',
+      playLabelId: 'play-label-1',
+      btnRestartId: 'btn-restart-1',
+      btnMuteId: 'btn-mute-1',
+      muteIconId: 'mute-icon-1',
+      volSliderId: 'vol-slider-1',
+      volPercentId: 'vol-percent-1',
+      seekSliderId: 'seek-slider-1',
+      scrubberBarId: 'scrubber-bar-1',
+      timeCurrentId: 'time-current-1',
+      timeTotalId: 'time-total-1',
+      resolvedActionsId: 'resolved-actions-1',
+      transcriptBoxId: 'transcript-box-1',
+      transcriptTextId: 'transcript-text-1',
+      transcriptSubId: 'transcript-sub-1',
+      chassisId: 'receiver-chassis-1',
+      scopeCanvasId: 'scope-canvas-1',
+      timedLines: TIMED_LINES_01,
+      defaultDur: 37.0,
+      allowTremor: true,
+      activeSubtitleSub: "RECEIVING EMERGENCY RELAY · THE OBSERVATORY SIEGE",
+      themeColorBorder: 'rgba(239, 68, 68, 0.25)',
+      themeColorWave: '#ff9f43',
+      themeColorPeak: '#ff3333',
+      themeColorGlow: '#ff3b30',
+      themeColorIdle: 'rgba(255, 120, 90, 0.45)'
+    });
+
+    /* ── Initialize Player 2 (Desert Outpost) ── */
+    player2 = createPlayer({
+      audioId: 'audio-player-2',
+      btnTuneId: 'btn-tune-2',
+      deckId: 'radio-deck-2',
+      btnPlayPauseId: 'btn-play-pause-2',
+      playIconId: 'play-icon-2',
+      playLabelId: 'play-label-2',
+      btnRestartId: 'btn-restart-2',
+      btnMuteId: 'btn-mute-2',
+      muteIconId: 'mute-icon-2',
+      volSliderId: 'vol-slider-2',
+      volPercentId: 'vol-percent-2',
+      seekSliderId: 'seek-slider-2',
+      scrubberBarId: 'scrubber-bar-2',
+      timeCurrentId: 'time-current-2',
+      timeTotalId: 'time-total-2',
+      resolvedActionsId: 'resolved-actions-2',
+      transcriptBoxId: 'transcript-box-2',
+      transcriptTextId: 'transcript-text-2',
+      transcriptSubId: 'transcript-sub-2',
+      chassisId: 'receiver-chassis-2',
+      scopeCanvasId: 'scope-canvas-2',
+      timedLines: TIMED_LINES_02,
+      defaultDur: 91.08,
+      allowTremor: false,
+      activeSubtitleSub: "RECEIVING LIVE DESERT BEACON · THE CARTOGRAPHER TRANSMITS",
+      themeColorBorder: 'rgba(223, 178, 86, 0.25)',
+      themeColorWave: '#4dd0e1',
+      themeColorPeak: '#ffd54f',
+      themeColorGlow: '#26c6da',
+      themeColorIdle: 'rgba(77, 208, 225, 0.45)'
+    });
+
+    /* ── Initialize Player 3 (Matrix Resonance Decrypted) ── */
+    player3 = createPlayer({
+      audioId: 'audio-player-3',
+      btnTuneId: 'btn-tune-3',
+      deckId: 'radio-deck-3',
+      btnPlayPauseId: 'btn-play-pause-3',
+      playIconId: 'play-icon-3',
+      playLabelId: 'play-label-3',
+      btnRestartId: 'btn-restart-3',
+      btnMuteId: 'btn-mute-3',
+      muteIconId: 'mute-icon-3',
+      volSliderId: 'vol-slider-3',
+      volPercentId: 'vol-percent-3',
+      seekSliderId: 'seek-slider-3',
+      scrubberBarId: 'scrubber-bar-3',
+      timeCurrentId: 'time-current-3',
+      timeTotalId: 'time-total-3',
+      resolvedActionsId: 'resolved-actions-3',
+      transcriptBoxId: 'transcript-box-3',
+      transcriptTextId: 'transcript-text-3',
+      transcriptSubId: 'transcript-sub-3',
+      chassisId: 'receiver-chassis-3',
+      scopeCanvasId: 'scope-canvas-3',
+      timedLines: TIMED_LINES_03,
+      defaultDur: 25.94,
+      allowTremor: false,
+      activeSubtitleSub: "RECEIVING HARMONIC SHORTWAVE · MATRIX RESONANCE DECRYPTED",
+      themeColorBorder: 'rgba(77, 208, 225, 0.25)',
+      themeColorWave: '#00e5ff',
+      themeColorPeak: '#ffd978',
+      themeColorGlow: '#00b0ff',
+      themeColorIdle: 'rgba(0, 229, 255, 0.45)'
+    });
+
+    /* ── Master Transmissions Dossier Controller ── */
+    const dossierModal = document.getElementById('transmissions-dossier-modal');
+    const openDossierBtn = document.getElementById('btn-open-dossier');
+    const closeDossierBtn = document.getElementById('btn-close-dossier');
+
+    function openDossier() {
+      if (dossierModal) {
+        dossierModal.classList.add('open');
+        const cards = document.querySelectorAll('.dossier-card');
+        cards.forEach((card, idx) => {
+          card.classList.toggle('card-active', idx === currentSlide);
+        });
+      }
+    }
+
+    function closeDossier() {
+      if (dossierModal) {
+        dossierModal.classList.remove('open');
+      }
+    }
+
+    function jumpFromDossier(slideIdx) {
+      goToSlide(slideIdx);
+      closeDossier();
+    }
+
+    if (openDossierBtn) openDossierBtn.addEventListener('click', openDossier);
+    if (closeDossierBtn) closeDossierBtn.addEventListener('click', closeDossier);
+    if (dossierModal) {
+      dossierModal.addEventListener('click', (e) => {
+        if (e.target === dossierModal) closeDossier();
+      });
+    }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dossierModal && dossierModal.classList.contains('open')) {
+        closeDossier();
+      }
+    });
+
+    // Set initial slide on page load now that all players are ready
+    if (isSingleMode) {
+      goToSlide(singleIndex, false);
+      loadSlideMedia(singleIndex);
+    } else {
+      if (window.location.search.includes('relay=3') || window.location.hash === '#transmission-3' || window.location.hash === '#matrix') {
+        goToSlide(2, false);
+      } else if (window.location.search.includes('relay=2') || window.location.hash === '#transmission-2' || window.location.hash === '#desert') {
+        goToSlide(1, false);
+      } else if (window.location.search.includes('relay=1') || window.location.hash === '#transmission-1' || window.location.hash === '#observatory') {
+        goToSlide(0, false);
+      } else {
+        goToSlide(currentSlide, false);
+      }
+      loadSlideMedia(currentSlide);
+    }
+
+    // Fullscreen Collapsible Navigation Sidebar Controller
+    const fsSidebar = document.getElementById('fs-sidebar');
+    const fsBackdrop = document.getElementById('fs-sidebar-backdrop');
+    const btnFsOpen = document.getElementById('btn-fs-sidebar-toggle');
+    const btnFsClose = document.getElementById('btn-fs-sidebar-close');
+
+    function openFsSidebar() {
+      if (fsSidebar) fsSidebar.classList.add('open');
+      if (fsBackdrop) fsBackdrop.classList.add('open');
+    }
+
+    function closeFsSidebar() {
+      if (fsSidebar) fsSidebar.classList.remove('open');
+      if (fsBackdrop) fsBackdrop.classList.remove('open');
+    }
+
+    if (btnFsOpen) btnFsOpen.addEventListener('click', openFsSidebar);
+    if (btnFsClose) btnFsClose.addEventListener('click', closeFsSidebar);
+    if (fsBackdrop) fsBackdrop.addEventListener('click', closeFsSidebar);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && fsSidebar && fsSidebar.classList.contains('open')) {
+        closeFsSidebar();
+      }
+    });
+  </script>
+</body>
+</html>

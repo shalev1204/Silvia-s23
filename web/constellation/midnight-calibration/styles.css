@@ -1,0 +1,2238 @@
+/* ==========================================================================
+   THE ECLIPSE ORDER · STATION 08: THE MIDNIGHT CALIBRATION
+   Aesthetic: 80% Constellation (Renaissance Antique Brass, Optical Collimator, Navy)
+              20% Desert (Arid Amber, Electrostatic Lightning, Swirling Dust)
+   ========================================================================== */
+
+:root {
+  --bg-deep: #03060d;
+  --bg-panel: rgba(8, 14, 26, 0.94);
+  --bg-card: rgba(14, 22, 38, 0.88);
+  --brass-bright: #f3d48e;
+  --brass-base: #c89d53;
+  --brass-dark: #7b5825;
+  --brass-patina: #5a7b68;
+  --brass-glow: rgba(243, 212, 142, 0.35);
+  --parchment: #e9dec9;
+  --parchment-dim: #9c9281;
+  --amber-storm: #e88d38;
+  --amber-glow: rgba(232, 141, 56, 0.4);
+  --cyan-beam: #68d6e3;
+  --cyan-glow: rgba(104, 214, 227, 0.45);
+  --border-brass: rgba(200, 157, 83, 0.35);
+  --border-dim: rgba(255, 255, 255, 0.08);
+  --crimson-alert: #ff4757;
+  --crt-green: #4ade80;
+  --crt-glow: rgba(74, 222, 128, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(circle at 50% 15%, rgba(20, 35, 65, 0.45) 0%, transparent 70%),
+    radial-gradient(circle at 85% 80%, rgba(95, 45, 15, 0.2) 0%, transparent 60%);
+  color: var(--parchment);
+  font-family: 'EB Garamond', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  line-height: 1.5;
+}
+
+/* Background Starfield & Subtle Dust Canvas */
+#ambient-sky-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Stylized Procedural Storm Simulation Canvas */
+#storm-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.8s ease-in-out;
+}
+
+#storm-canvas.active {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   CEREMONIAL QUEST HEADER (Matches Celestial Matrix & Zodiac Engine)
+   ========================================================================== */
+.quest-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 900px;
+  margin: 50px auto 28px auto;
+  padding: 0 20px;
+}
+
+.order-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  color: var(--brass-bright);
+  text-transform: uppercase;
+  padding: 6px 20px;
+  border: 1px solid rgba(212, 175, 85, 0.45);
+  border-radius: 999px;
+  background: rgba(13, 18, 28, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 85, 0.15);
+  margin-bottom: 12px;
+}
+
+.order-badge span.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber-storm);
+  box-shadow: 0 0 10px var(--amber-storm);
+  animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.4; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+.quest-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: clamp(2.1rem, 4.4vw, 3.1rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, #ffffff 0%, #fff1b8 40%, #e2b96f 75%, #c59b4c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 28px rgba(226, 185, 111, 0.4));
+  margin: 6px 0 12px 0;
+  line-height: 1.15;
+}
+
+.quest-subtitle {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.12rem;
+  color: #c7beab;
+  max-width: 680px;
+  line-height: 1.55;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Main Container Layout */
+.main-layout {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 0 70px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   THE CARTOGRAPHER'S BENCH NOTE (IMMERSIVE RENAISSANCE MANUSCRIPT FOLIO)
+   ========================================================================== */
+.cartographer-parchment-note {
+  position: relative;
+  max-width: 1060px;
+  width: calc(100% - 48px);
+  margin: 36px auto 30px;
+  background: 
+    radial-gradient(circle at 85% 15%, rgba(68, 52, 28, 0.35) 0%, transparent 45%),
+    radial-gradient(circle at 15% 85%, rgba(48, 36, 18, 0.25) 0%, transparent 50%),
+    linear-gradient(165deg, rgba(20, 16, 12, 0.96) 0%, rgba(12, 10, 8, 0.98) 100%);
+  border: 1.5px solid rgba(212, 175, 85, 0.48);
+  outline: 1px solid rgba(212, 175, 85, 0.2);
+  outline-offset: -7px;
+  border-radius: 8px;
+  padding: 36px 48px 34px 44px;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.85),
+    0 0 30px rgba(212, 175, 85, 0.08),
+    inset 0 0 35px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Ornate Renaissance Corner Flourishes */
+.parchment-corner-tl,
+.parchment-corner-br {
+  position: absolute;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.95rem;
+  color: rgba(212, 175, 85, 0.55);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.parchment-corner-tl {
+  top: 13px;
+  left: 14px;
+}
+
+.parchment-corner-br {
+  bottom: 13px;
+  right: 14px;
+}
+
+/* Constellation Path Official Seal Medallion (Top Right, Natural Colors) */
+.parchment-seal-wrapper {
+  position: absolute;
+  top: 22px;
+  right: 28px;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.7));
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), filter 0.35s ease;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.parchment-seal-wrapper:hover {
+  transform: scale(1.1) rotate(6deg);
+  filter: drop-shadow(0 0 18px rgba(243, 212, 142, 0.55));
+}
+
+.constellation-path-seal {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Heading Box */
+.parchment-heading-box {
+  padding-right: 80px; /* Ample room so heading never crowds the seal */
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(212, 175, 85, 0.28);
+  padding-bottom: 16px;
+}
+
+.parchment-eyebrow {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  color: #c99e53;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.cartographer-parchment-note h3,
+.parchment-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 1.42rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #fff1b8;
+  line-height: 1.35;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 20px rgba(243, 212, 142, 0.25);
+  margin: 0;
+}
+
+/* Manuscript Body Text */
+.parchment-body-text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cartographer-parchment-note p {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.22rem;
+  line-height: 1.78;
+  color: #ece1ce;
+  letter-spacing: 0.015em;
+  margin: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.parchment-lead {
+  font-size: 1.28rem !important;
+  font-style: italic;
+  color: #ffe6a3 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.7 !important;
+}
+
+.cartographer-parchment-note p em {
+  color: #f5d282;
+  font-style: italic;
+  font-weight: 600;
+  border-bottom: 1px dotted rgba(245, 210, 130, 0.45);
+  padding-bottom: 1px;
+}
+
+/* Calligraphic Signature */
+.parchment-signature {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  color: #dfba73;
+  text-align: right;
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(212, 175, 85, 0.2);
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Direct Physical Journal Guide Callout */
+.physical-journal-guide {
+  margin-top: 24px;
+  background: rgba(18, 12, 6, 0.85);
+  border: 1px solid rgba(212, 175, 85, 0.45);
+  border-left: 4px solid #f59e0b;
+  border-radius: 6px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 25px rgba(217, 119, 6, 0.1);
+}
+
+.journal-guide-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #fbbf24;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  width: 100%;
+}
+
+.journal-guide-badge .guide-icon {
+  font-size: 1.15rem;
+}
+
+.journal-guide-text {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.25rem !important;
+  color: #fef3c7 !important;
+  line-height: 1.65 !important;
+  margin-bottom: 14px !important;
+}
+
+.journal-steps-list {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.journal-steps-list li {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: #e2d9cc;
+}
+
+.journal-steps-list li strong {
+  color: #fde68a;
+  font-weight: 600;
+}
+
+.journal-steps-list li em {
+  color: #fbbf24;
+  font-style: italic;
+}
+
+/* ==========================================================================
+   PANORAMIC FULL-WIDTH CARTOGRAPHER'S WORKBENCH SCENE
+   Edge-to-edge wooden cartography desk, desert dunes & starry sky background.
+   No boxed card frame; the astrolabe is natively integrated into the environment.
+   ========================================================================== */
+.astrolabe-workbench-scene {
+  width: 100%;
+  position: relative;
+  background: #080c14 url('workbench-bg.jpg') center top / cover no-repeat;
+  padding: 50px 24px 80px;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 35px 50px -10px rgba(3, 6, 13, 0.98),
+    inset 0 -35px 50px -10px rgba(3, 6, 13, 0.98);
+  border-top: 1px solid rgba(200, 157, 83, 0.35);
+  border-bottom: 1px solid rgba(200, 157, 83, 0.35);
+  display: flex;
+  justify-content: center;
+}
+
+.workbench-scene-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 50% 38%, rgba(8, 12, 20, 0.15) 0%, rgba(5, 8, 14, 0.45) 65%, rgba(2, 4, 8, 0.85) 100%),
+    linear-gradient(180deg, rgba(3, 6, 13, 0.88) 0%, rgba(3, 6, 13, 0.08) 18%, rgba(3, 6, 13, 0.08) 78%, rgba(3, 6, 13, 0.92) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.workbench-content-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Floating Instrument Header & Real-time Readouts */
+.astrolabe-instrument-header,
+.astrolabe-card-header {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 14px 26px;
+  background: rgba(16, 12, 8, 0.82);
+  border: 1px solid rgba(200, 157, 83, 0.4);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.75);
+}
+
+.astrolabe-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.96rem;
+  color: var(--brass-bright);
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.astrolabe-readout-strip {
+  display: flex;
+  gap: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+}
+
+.readout-item {
+  color: var(--parchment-dim);
+}
+
+.readout-item strong {
+  color: var(--brass-bright);
+}
+
+/* Mechanical Flaw Badges */
+.flaw-indicators-bar {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+}
+
+.slack-badge {
+  color: var(--brass-base);
+  background: rgba(200, 157, 83, 0.12);
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(200, 157, 83, 0.3);
+  transition: all 0.2s ease;
+}
+
+.slack-badge.rattling {
+  border-color: var(--amber-storm);
+  color: #fff;
+  background: rgba(232, 141, 56, 0.3);
+  transform: scale(1.05);
+}
+
+.binding-warning {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: var(--amber-storm);
+  background: rgba(232, 141, 56, 0.15);
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--amber-storm);
+  box-shadow: 0 0 12px rgba(232, 141, 56, 0.25);
+  animation: pulse-dot 1.2s infinite;
+  transition: all 0.25s ease;
+}
+
+.binding-warning.cleared {
+  color: #7bed9f;
+  border-color: rgba(123, 237, 159, 0.5);
+  background: rgba(123, 237, 159, 0.12);
+  box-shadow: 0 0 12px rgba(123, 237, 159, 0.2);
+  animation: none;
+}
+
+/* Astrolabe Main Flanked Rig Layout: Left Rig | Astrolabe Stage | Right Rig */
+.astrolabe-flanked-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1040px;
+  margin: 10px auto 26px;
+  position: relative;
+  z-index: 15;
+}
+
+/* Vertical Control Rigs (Alidade Left, Rete Right) */
+.vertical-control-rig {
+  width: 165px;
+  height: 480px;
+  background: linear-gradient(180deg, rgba(20, 15, 10, 0.94) 0%, rgba(10, 8, 6, 0.98) 100%);
+  border: 1px solid rgba(200, 157, 83, 0.45);
+  border-radius: 10px;
+  padding: 18px 14px 16px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(243, 212, 142, 0.22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  position: relative;
+  z-index: 20;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vertical-control-rig:hover {
+  border-color: rgba(243, 212, 142, 0.65);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 24px rgba(212, 175, 85, 0.18);
+}
+
+.rig-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid rgba(212, 175, 85, 0.25);
+  padding-bottom: 12px;
+}
+
+.rig-header .control-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #cf9f51;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.rig-header .control-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #ffd885;
+  text-shadow: 0 0 14px rgba(255, 216, 133, 0.5);
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-align: center;
+}
+
+.vertical-slider-track-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.vertical-rail-slot {
+  height: 260px;
+  width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: radial-gradient(circle at 50% 20%, #1e160d 0%, #0d0905 100%);
+  border: 2px solid #5a3f1b;
+  border-radius: 26px;
+  box-shadow: inset 0 3px 12px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(212, 175, 85, 0.25);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vertical-rail-slot:hover {
+  border-color: #8c6729;
+  box-shadow: inset 0 3px 12px rgba(0, 0, 0, 0.95), 0 0 14px rgba(212, 175, 85, 0.2), inset 0 0 0 1px rgba(243, 212, 142, 0.4);
+}
+
+.vertical-rail-slot:focus-visible {
+  border-color: #ffd885;
+  box-shadow: inset 0 3px 12px rgba(0, 0, 0, 0.95), 0 0 18px rgba(243, 212, 142, 0.6);
+}
+
+/* Polished Central Brass Groove Channel */
+.rail-groove-channel {
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  background: linear-gradient(90deg, #0a0603 0%, #22170a 50%, #0a0603 100%);
+  border-left: 1px solid rgba(212, 175, 85, 0.35);
+  border-right: 1px solid rgba(212, 175, 85, 0.35);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+/* Precision Engraved Tick Marks */
+.rail-tick-marks {
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 8px;
+  right: 8px;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(212, 175, 85, 0.45) 0px,
+    rgba(212, 175, 85, 0.45) 1px,
+    transparent 1px,
+    transparent 14px
+  );
+  pointer-events: none;
+}
+
+/* Antique Cast Brass Vernier Runner / Cursor */
+.brass-slider-cursor {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  z-index: 25;
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.brass-slider-cursor:hover {
+  filter: brightness(1.12);
+}
+
+.brass-slider-cursor.dragging,
+.brass-slider-cursor:active {
+  cursor: grabbing;
+  filter: brightness(1.22);
+}
+
+.cursor-brass-plate {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  margin: 0 1px;
+  background: linear-gradient(180deg, #ffe099 0%, #d4a754 22%, #8c6729 60%, #543b14 90%, #876226 100%);
+  border: 1px solid #ffd885;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(0, 0, 0, 0.8), inset 0 0 3px rgba(34, 68, 54, 0.35);
+  overflow: hidden;
+}
+
+.cursor-knurl-grip {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 6px;
+  right: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    #3d2a10 0px,
+    #3d2a10 1px,
+    #f5cb74 1px,
+    #f5cb74 3px
+  );
+  border-radius: 2px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
+  opacity: 0.88;
+}
+
+.cursor-hairline {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  transform: translateY(-50%);
+  background: #ffffff;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.9), 0 1px 1px rgba(0, 0, 0, 0.9);
+  z-index: 5;
+}
+
+.cursor-rivet {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #2a1b0a;
+  border: 0.5px solid #d4a754;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
+  z-index: 6;
+}
+
+.cursor-rivet.r-tl { top: 2px; left: 2px; }
+.cursor-rivet.r-tr { top: 2px; right: 2px; }
+.cursor-rivet.r-bl { bottom: 2px; left: 2px; }
+.cursor-rivet.r-br { bottom: 2px; right: 2px; }
+
+.cursor-pointer {
+  font-size: 8px;
+  line-height: 1;
+  color: #ffd885;
+  text-shadow: 0 0 4px rgba(255, 216, 133, 0.8);
+  user-select: none;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Hidden range input maintained for accessibility & form sync */
+.slider-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  margin: -1px;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+}
+
+.btn-micrometer-step.vert-step {
+  width: 84px;
+  padding: 8px 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: linear-gradient(180deg, #3d2b12 0%, #201508 100%);
+  border: 1px solid rgba(212, 175, 85, 0.5);
+  border-radius: 4px;
+  color: #f7d98c;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-micrometer-step.vert-step:hover {
+  background: linear-gradient(180deg, #593f1a 0%, #30200c 100%);
+  border-color: #ffd885;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(243, 212, 142, 0.4), 0 3px 8px rgba(0, 0, 0, 0.8);
+  transform: translateY(-1px);
+}
+
+.btn-micrometer-step.vert-step:active {
+  background: #180f05;
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+/* Astrolabe SVG Interactive Apparatus (Placed Directly onto Cartographer's Desk) */
+.astrolabe-stage {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  max-width: 90vw;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  pointer-events: none; /* Astrolabe wheel only moves via precision controls */
+  cursor: default;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.astrolabe-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 35px rgba(12, 9, 4, 0.85));
+}
+
+#astrolabe-alidade,
+#astrolabe-rete {
+  transform-origin: 250px 250px;
+  transform-box: view-box;
+}
+
+/* Astrolabe Optical Collimated Beam */
+.collimator-ray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 260px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(243, 212, 142, 0.9), transparent);
+  transform-origin: 0 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.2s ease-out;
+  box-shadow: 0 0 10px var(--brass-bright);
+}
+
+.collimator-ray.active {
+  opacity: 1;
+}
+
+.collimator-ray.resonance-success {
+  background: linear-gradient(90deg, #68d6e3, rgba(243, 212, 142, 0.9), #fff);
+  box-shadow: 0 0 20px #68d6e3, 0 0 45px var(--brass-bright);
+  height: 4px;
+}
+
+/* Desk Instrument Console Plate (Positioned Below Astrolabe) */
+.workbench-console-chassis {
+  width: 100%;
+  max-width: 820px;
+  background: linear-gradient(180deg, rgba(18, 14, 10, 0.9) 0%, rgba(10, 9, 7, 0.96) 100%);
+  border: 1px solid rgba(200, 157, 83, 0.45);
+  border-radius: 12px;
+  padding: 22px 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(243, 212, 142, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 20;
+}
+
+.btn-micrometer-step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dfba73;
+  background: linear-gradient(180deg, #2a2014 0%, #151009 100%);
+  border: 1px solid rgba(212, 175, 85, 0.5);
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(243, 212, 142, 0.2);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.btn-micrometer-step:hover {
+  background: linear-gradient(180deg, #42321c 0%, #22180c 100%);
+  border-color: #ffd885;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(243, 212, 142, 0.3);
+}
+
+.btn-micrometer-step:active {
+  transform: translateY(1px);
+  background: #110d06;
+}
+
+@keyframes mechanical-shudder {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 1px); }
+  40% { transform: translate(3px, -1px); }
+  60% { transform: translate(-2px, -1px); }
+  80% { transform: translate(2px, 1px); }
+  100% { transform: translate(0, 0); }
+}
+
+.jammed-shudder {
+  animation: mechanical-shudder 0.25s ease;
+  border-color: var(--amber-storm) !important;
+  box-shadow: 0 0 18px rgba(232, 141, 56, 0.45) !important;
+}
+
+.control-label {
+  color: #cf9f51;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  user-select: none;
+}
+
+.slider-input {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px; /* Generous hit box for mouse and touch */
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.slider-input::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(18, 14, 8, 0.95);
+  border: 1px solid rgba(160, 120, 55, 0.4);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+}
+
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e8be6a;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  border: 2px solid #140e04;
+  margin-top: -6px; /* (6px track - 18px thumb) / 2 = -6px; perfectly centers thumb */
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.slider-input::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background: #f5d282;
+}
+
+.slider-input::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(18, 14, 8, 0.95);
+  border: 1px solid rgba(160, 120, 55, 0.4);
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+}
+
+.slider-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e8be6a;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  border: 2px solid #140e04;
+}
+
+.control-value {
+  color: #cf9f51;
+  font-weight: 700;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+/* Mountain Vault Optical Collimation Console Block */
+.aperture-console-block {
+  width: 100%;
+  margin-top: 0;
+  padding-top: 26px;
+  border-top: 1px solid rgba(200, 157, 83, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.aperture-console-block .btn-lock-alignment {
+  width: 100%;
+}
+
+/* Optical Aperture Target Feedback Box */
+.aperture-feedback-box {
+  background: rgba(3, 6, 13, 0.9);
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.aperture-status-tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--parchment-dim);
+}
+
+.aperture-status-msg {
+  color: var(--parchment);
+  line-height: 1.45;
+}
+
+.aperture-feedback-box.error {
+  border-color: rgba(255, 71, 87, 0.4);
+  background: rgba(30, 8, 12, 0.6);
+}
+
+.aperture-feedback-box.error .aperture-status-tag {
+  color: var(--crimson-alert);
+}
+
+.aperture-feedback-box.success {
+  border-color: var(--cyan-beam);
+  background: rgba(10, 30, 40, 0.7);
+  box-shadow: 0 0 20px var(--cyan-glow);
+}
+
+.aperture-feedback-box.success .aperture-status-tag {
+  color: var(--cyan-beam);
+}
+
+.aperture-feedback-box.success .aperture-status-msg {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* The Lock Aperture Trigger Button (Renaissance Polished Brass) */
+.btn-lock-alignment {
+  font-family: 'Cinzel', serif;
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #05080f;
+  background: linear-gradient(180deg, #ffd885 0%, #d4af37 55%, #9e7520 100%);
+  border: 1px solid #fff2c4;
+  border-radius: 6px;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 25px rgba(212, 175, 55, 0.45), inset 0 1px 1px #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+}
+
+.btn-lock-alignment:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 35px rgba(243, 212, 142, 0.75);
+  filter: brightness(1.1);
+}
+
+.btn-lock-alignment.pulse-ready {
+  animation: pulse-lock-ready 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes pulse-lock-ready {
+  0% {
+    box-shadow: 0 0 15px rgba(243, 212, 142, 0.5), 0 0 30px rgba(104, 214, 227, 0.4);
+    transform: translateY(0);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(243, 212, 142, 0.9), 0 0 50px rgba(104, 214, 227, 0.7);
+    transform: translateY(-2px);
+  }
+}
+
+.btn-lock-alignment:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   THE 142.85 MHz EMERGENCY RADIO TRANSCEIVER CHASSIS
+   Interactive Audio Player, Real-time CRT Oscilloscope & Teletype Transcript
+   ========================================================================== */
+.emergency-radio-chassis {
+  display: none;
+  background: linear-gradient(180deg, #1b221a 0%, #101511 100%);
+  border: 2px solid #5a7b68;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 0 45px rgba(90, 123, 104, 0.4), 0 20px 60px rgba(0, 0, 0, 0.9);
+  position: relative;
+  overflow: hidden;
+  animation: modal-enter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1050px;
+  width: calc(100% - 48px);
+  margin: 36px auto 0;
+}
+
+.emergency-radio-chassis.active {
+  display: flex;
+}
+
+.radio-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(90, 123, 104, 0.4);
+  padding-bottom: 12px;
+}
+
+.radio-brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--crt-green);
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.radio-status-lights {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+}
+
+.led-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--parchment-dim);
+}
+
+.led-bulb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #333;
+}
+
+.led-bulb.green.active {
+  background: #4ade80;
+  box-shadow: 0 0 10px #4ade80;
+  animation: pulse-dot 1s infinite;
+}
+
+.led-bulb.amber.active {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+  animation: pulse-dot 0.7s infinite;
+}
+
+/* Radio Main Deck Grid */
+.radio-deck-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .radio-deck-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Oscilloscope & Audio Deck (Left) */
+.oscilloscope-chassis {
+  background: #050a06;
+  border: 1px solid #2d4536;
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+.oscilloscope-screen-wrap {
+  width: 100%;
+  height: 120px;
+  background: #020804;
+  border: 1px solid #1a3022;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+#radio-oscilloscope-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* Radio Tune In Hero Banner */
+.radio-tune-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.btn-tune-broadcast {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(20, 50, 35, 0.95) 0%, rgba(10, 30, 20, 0.98) 100%);
+  border: 2px solid #4ade80;
+  border-radius: 8px;
+  color: #4ade80;
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-shadow: 0 0 24px rgba(74, 222, 128, 0.4), inset 0 0 16px rgba(74, 222, 128, 0.2);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.btn-tune-broadcast:hover {
+  background: linear-gradient(135deg, rgba(28, 70, 48, 1) 0%, rgba(14, 40, 26, 1) 100%);
+  border-color: #86efac;
+  color: #86efac;
+  box-shadow: 0 0 35px rgba(74, 222, 128, 0.7), inset 0 0 24px rgba(74, 222, 128, 0.35);
+  transform: translateY(-2px);
+}
+
+.tune-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 12px #4ade80;
+  animation: pulse-dot 1s infinite;
+}
+
+.tune-pulse-dot.active {
+  background: #22c55e;
+  box-shadow: 0 0 15px #22c55e;
+}
+
+/* Timeline Scrubber Row */
+.deck-timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.time-readout {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #86efac;
+  letter-spacing: 0.05em;
+  min-width: 40px;
+}
+
+.scrubber-track-wrap {
+  flex: 1;
+  position: relative;
+  height: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.deck-seek-slider {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+}
+
+.scrubber-bar-fill {
+  position: absolute;
+  height: 6px;
+  background: linear-gradient(90deg, #10b981 0%, #4ade80 100%);
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+  width: 0%;
+  pointer-events: none;
+}
+
+.scrubber-track-wrap::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  background: #112216;
+  border: 1px solid #20402c;
+  border-radius: 3px;
+}
+
+/* Volume Group */
+.deck-vol-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-deck-mute {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 2px;
+}
+
+.deck-vol-slider {
+  width: 60px;
+  accent-color: #4ade80;
+  cursor: pointer;
+}
+
+/* Radio Control Buttons */
+.btn-radio-control {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  background: #1b2e21;
+  border: 1px solid #3d6349;
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-radio-control:hover,
+.btn-radio-control.active-state {
+  background: #2a4733;
+  color: var(--crt-green);
+  border-color: #4ade80;
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.5);
+}
+
+/* Synchronized Teletype Readout (Right) */
+.radio-teletype-chassis {
+  background: #030805;
+  border: 1px solid #2d4536;
+  border-radius: 6px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
+  position: relative;
+}
+
+.teletype-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #5a7b68;
+  border-bottom: 1px dashed rgba(90, 123, 104, 0.3);
+  padding-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.radio-teletype-content {
+  height: 180px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--crt-green);
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+}
+
+.teletype-line {
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.teletype-line.active-speaking {
+  color: #ffffff;
+  background: rgba(74, 222, 128, 0.16);
+  padding: 5px 10px;
+  border-left: 3px solid #4ade80;
+  border-radius: 3px;
+  text-shadow: 0 0 12px rgba(74, 222, 128, 0.9);
+  font-weight: 600;
+}
+
+.teletype-line.read-past {
+  color: #4ade80;
+  opacity: 0.78;
+}
+
+.teletype-standby {
+  color: #86efac;
+  padding: 14px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px dashed rgba(74, 222, 128, 0.3);
+  border-radius: 4px;
+  line-height: 1.7;
+}
+
+.teletype-carrier-end {
+  color: #f59e0b;
+  font-style: italic;
+  font-weight: 700;
+  padding: 6px 0;
+  border-top: 1px dashed rgba(245, 158, 11, 0.4);
+  margin-top: 10px;
+}
+
+.teletype-cursor {
+  animation: pulse-dot 0.8s infinite;
+}
+
+/* Violent Seismic / Thunder Chassis Tremor */
+@keyframes radio-chassis-tremor {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3px, 2px); }
+  40% { transform: translate(3px, -2px); }
+  60% { transform: translate(-2px, -3px); }
+  80% { transform: translate(2px, 3px); }
+  100% { transform: translate(0, 0); }
+}
+
+.emergency-radio-chassis.tremor-strike {
+  animation: radio-chassis-tremor 0.25s ease-in-out infinite;
+  border-color: #ffd54f !important;
+  box-shadow: 0 0 50px rgba(255, 213, 79, 0.5), 0 20px 60px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Radio Action Button */
+.btn-proceed-emergency {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #03060d;
+  background: linear-gradient(180deg, #ffb86c 0%, #e88d38 100%);
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 25px rgba(232, 141, 56, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-proceed-emergency:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 35px rgba(232, 141, 56, 0.75);
+}
+
+/* ==========================================================================
+   PHASE 2: THE 15-MINUTE EMERGENCY TRANSIT CONSOLE
+   ========================================================================== */
+.phase-emergency-container {
+  display: none;
+  flex-direction: column;
+  gap: 24px;
+  animation: modal-enter 0.6s ease;
+  max-width: 1050px;
+  width: calc(100% - 48px);
+  margin: 36px auto 0;
+}
+
+.phase-emergency-container.active {
+  display: flex;
+}
+
+/* Emergency Countdown Top Banner */
+.emergency-timer-banner {
+  background: linear-gradient(90deg, rgba(35, 12, 16, 0.95) 0%, rgba(20, 10, 20, 0.95) 100%);
+  border: 1px solid var(--crimson-alert);
+  border-radius: 8px;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 30px rgba(255, 71, 87, 0.3);
+}
+
+.emergency-timer-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.emergency-clock-digits {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(255, 71, 87, 0.8);
+  letter-spacing: 0.05em;
+}
+
+.emergency-meta-titles h4 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  color: var(--crimson-alert);
+  letter-spacing: 0.1em;
+}
+
+.emergency-meta-titles span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--parchment-dim);
+}
+
+.emergency-carrier-meter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.meter-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--parchment-dim);
+}
+
+.meter-track {
+  width: 180px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.meter-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan-beam), var(--amber-storm), var(--crimson-alert));
+  transition: width 1s linear;
+}
+
+/* Emergency Cipher Ledger Card */
+.emergency-cipher-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-brass);
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 14px 45px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.cipher-card-instructions {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-dim);
+  padding-bottom: 18px;
+}
+
+.instructions-text h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  color: var(--brass-bright);
+  margin-bottom: 6px;
+}
+
+.instructions-text p {
+  font-size: 0.92rem;
+  color: var(--parchment);
+  max-width: 720px;
+  line-height: 1.5;
+}
+
+/* Three Input Fields Grid */
+.transit-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .transit-inputs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-group-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 6px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.25s ease;
+}
+
+.input-group-box:focus-within {
+  border-color: var(--brass-bright);
+  box-shadow: 0 0 15px var(--brass-glow);
+}
+
+.input-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-num-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--brass-base);
+  background: rgba(200, 157, 83, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.input-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.input-hint-text {
+  font-size: 0.78rem;
+  color: var(--parchment-dim);
+  line-height: 1.4;
+  min-height: 38px;
+}
+
+.transit-text-input {
+  width: 100%;
+  background: rgba(3, 6, 13, 0.8);
+  border: 1px solid var(--border-brass);
+  border-radius: 4px;
+  padding: 12px 14px;
+  color: var(--brass-bright);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.08em;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.transit-text-input:focus {
+  border-color: #fff;
+  box-shadow: 0 0 12px var(--brass-bright);
+  background: rgba(10, 16, 28, 0.95);
+}
+
+.dual-anchor-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.dual-anchor-wrap span {
+  color: var(--brass-base);
+  font-weight: 700;
+}
+
+/* Submit Action Row */
+.emergency-submit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--border-dim);
+  padding-top: 20px;
+}
+
+.btn-signal-flare {
+  font-family: 'Cinzel', serif;
+  font-size: 0.76rem;
+  color: var(--amber-storm);
+  background: rgba(232, 141, 56, 0.1);
+  border: 1px solid rgba(232, 141, 56, 0.4);
+  padding: 12px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-signal-flare:hover {
+  background: rgba(232, 141, 56, 0.25);
+  box-shadow: 0 0 15px var(--amber-glow);
+}
+
+.btn-broadcast-packet {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #03060d;
+  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass-base) 100%);
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 20px rgba(200, 157, 83, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-broadcast-packet:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(243, 212, 142, 0.6);
+}
+
+/* ==========================================================================
+   VICTORY & DESERT TRANSITION EPILOGUE
+   ========================================================================== */
+.victory-epilogue-card {
+  display: none;
+  background: linear-gradient(180deg, rgba(16, 26, 42, 0.98) 0%, rgba(10, 16, 28, 0.98) 100%);
+  border: 1px solid var(--brass-bright);
+  border-radius: 8px;
+  padding: 36px;
+  box-shadow: 0 0 60px rgba(200, 157, 83, 0.35);
+  animation: modal-enter 0.7s ease;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1050px;
+  width: calc(100% - 48px);
+  margin: 36px auto 0;
+}
+
+.victory-epilogue-card.active {
+  display: flex;
+}
+
+.epilogue-header-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  color: var(--cyan-beam);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.epilogue-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 1.6rem;
+  color: #fff;
+  letter-spacing: 0.06em;
+}
+
+.epilogue-lore-content {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--parchment);
+}
+
+.epilogue-lore-content p {
+  margin-bottom: 16px;
+}
+
+.epilogue-lore-content strong {
+  color: var(--brass-bright);
+}
+
+.epilogue-lore-content em {
+  color: var(--amber-storm);
+}
+
+.epilogue-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  border-top: 1px solid var(--border-brass);
+  padding-top: 24px;
+}
+
+.btn-return-hub-gold {
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #03060d;
+  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass-base) 100%);
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 14px 28px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 25px rgba(200, 157, 83, 0.45);
+  transition: all 0.25s ease;
+}
+
+.btn-return-hub-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 35px rgba(243, 212, 142, 0.7);
+  filter: brightness(1.08);
+}
+
+.btn-replay-calibration {
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--brass-bright);
+  background: rgba(200, 157, 83, 0.12);
+  border: 1px solid var(--border-brass);
+  border-radius: 4px;
+  padding: 14px 22px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-replay-calibration:hover {
+  background: rgba(200, 157, 83, 0.25);
+  box-shadow: 0 0 16px var(--brass-glow);
+  transform: translateY(-2px);
+}
+
+/* Tactical Transit HUD Feedback */
+.transit-hud-feedback {
+  padding: 14px 20px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: modal-enter 0.3s ease;
+  margin-top: 8px;
+}
+
+.transit-hud-feedback.error {
+  background: rgba(255, 71, 87, 0.12);
+  border: 1px solid var(--crimson-alert);
+  color: #ff6b81;
+  box-shadow: 0 0 18px rgba(255, 71, 87, 0.25);
+}
+
+.transit-hud-feedback.success {
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid var(--crt-green);
+  color: var(--crt-green);
+  box-shadow: 0 0 18px rgba(74, 222, 128, 0.25);
+}
+
+/* Responsive Rules */
+@media (max-width: 768px) {
+  .quest-header {
+    margin: 60px auto 20px auto;
+    padding: 0 12px;
+  }
+  .order-badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    padding: 5px 14px;
+  }
+  .quest-title {
+    font-size: 1.7rem;
+    letter-spacing: 0.08em;
+    margin: 4px 0 8px 0;
+  }
+  .quest-subtitle {
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+  .cartographer-parchment-note {
+    width: calc(100% - 24px);
+    padding: 22px 16px 20px;
+    margin: 16px auto;
+    border-radius: 6px;
+  }
+  .parchment-heading-box {
+    padding-right: 48px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+  .parchment-eyebrow {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .cartographer-parchment-note h3,
+  .parchment-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.02rem;
+    line-height: 1.35;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  .cartographer-parchment-note p {
+    font-size: 1.02rem;
+    line-height: 1.62;
+    overflow-wrap: break-word;
+  }
+  .parchment-lead {
+    font-size: 1.1rem !important;
+  }
+  .parchment-signature {
+    font-size: 0.98rem;
+    margin-top: 16px;
+    padding-top: 10px;
+  }
+  .parchment-seal-wrapper {
+    top: 14px;
+    right: 12px;
+    width: 42px;
+    height: 42px;
+  }
+  .astrolabe-workbench-scene {
+    padding: 30px 14px 60px;
+  }
+  .astrolabe-instrument-header,
+  .astrolabe-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .astrolabe-readout-strip {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 0.74rem;
+  }
+  .astrolabe-flanked-layout {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+  .astrolabe-stage {
+    width: 340px;
+    height: 340px;
+    margin: 10px auto;
+  }
+  .vertical-control-rig {
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    padding: 14px 16px;
+    gap: 10px;
+  }
+  .vertical-slider-track-wrap {
+    flex-direction: row;
+    height: auto;
+    width: 100%;
+    margin: 4px 0;
+  }
+  .vertical-rail-slot {
+    height: 48px;
+    width: 100%;
+    border-radius: 24px;
+  }
+  .rail-groove-channel {
+    top: 50%;
+    bottom: auto;
+    left: 16px;
+    right: 16px;
+    height: 8px;
+    width: auto;
+    transform: translateY(-50%);
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid rgba(212, 175, 85, 0.35);
+    border-bottom: 1px solid rgba(212, 175, 85, 0.35);
+  }
+  .rail-tick-marks {
+    top: 6px;
+    bottom: 6px;
+    left: 18px;
+    right: 18px;
+    background: repeating-linear-gradient(
+      to right,
+      rgba(212, 175, 85, 0.45) 0px,
+      rgba(212, 175, 85, 0.45) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+  }
+  .brass-slider-cursor {
+    width: 32px;
+    height: 44px;
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .cursor-knurl-grip {
+    background: repeating-linear-gradient(
+      to bottom,
+      #3d2a10 0px,
+      #3d2a10 1px,
+      #f5cb74 1px,
+      #f5cb74 3px
+    );
+  }
+  .cursor-hairline {
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1.5px;
+    height: auto;
+    transform: translateX(-50%);
+  }
+  .cursor-pointer {
+    display: none;
+  }
+  .workbench-console-chassis {
+    padding: 18px 16px;
+  }
+  .epilogue-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-return-hub-gold,
+  .btn-replay-calibration {
+    justify-content: center;
+  }
+}
+
+/* ====================================================================
+   CINEMATIC THEATER DECK & VIDEO PLAYER (STATION 08 MASTER)
+   ==================================================================== */
+.cinematic-theater-deck {
+  width: 100%;
+  max-width: 1040px;
+  margin: 16px auto 36px;
+  background: linear-gradient(180deg, rgba(20, 15, 10, 0.96) 0%, rgba(12, 9, 6, 0.98) 100%);
+  border: 1px solid rgba(200, 157, 83, 0.45);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 24px rgba(200, 157, 83, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+}
+
+.theater-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: rgba(10, 8, 5, 0.9);
+  border-bottom: 1px solid rgba(200, 157, 83, 0.3);
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  color: #cf9f51;
+}
+
+.theater-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theater-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--amber-storm);
+  background: rgba(232, 141, 56, 0.15);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(232, 141, 56, 0.35);
+}
+
+.cinematic-screen-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
+}
+
+.cinematic-screen-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-overlay-hud {
+  position: absolute;
+  top: 14px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hud-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.hud-tag.rec {
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.4);
+}
+
+.rec-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #ff4757;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: pulse-dot 1.2s infinite;
+}
+
+.theater-action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 24px;
+  background: rgba(15, 11, 7, 0.9);
+  border-top: 1px solid rgba(200, 157, 83, 0.25);
+}
+
+.btn-replay-cinematic {
+  background: rgba(200, 157, 83, 0.12);
+  color: #cf9f51;
+  border: 1px solid rgba(200, 157, 83, 0.4);
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-replay-cinematic:hover {
+  background: rgba(200, 157, 83, 0.25);
+  border-color: #cf9f51;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(200, 157, 83, 0.3);
+}
+
+.btn-scroll-transceiver {
+  background: linear-gradient(135deg, #a87930 0%, #cf9f51 50%, #8c6020 100%);
+  color: #120c04;
+  border: 1px solid rgba(255, 220, 140, 0.6);
+  padding: 12px 26px;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 16px rgba(200, 157, 83, 0.35);
+  transition: all 0.25s ease;
+}
+
+.btn-scroll-transceiver:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(200, 157, 83, 0.5);
+  filter: brightness(1.1);
+}
+
+.transceiver-anchor-wrap {
+  scroll-margin-top: 24px;
+}
+

@@ -1,0 +1,2676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>The Eclipse Order: Archive of Distant Light</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/navigator.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #03060d;
+      color: #e2d7c5;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Ambient Background Canvas ── */
+    #sky-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* ── UI Header & Instructions ── */
+    .interface-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px 20px;
+    }
+
+    .top-header {
+      text-align: center;
+      pointer-events: auto;
+      transition: opacity 0.8s ease;
+    }
+
+    .order-seal {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 10px;
+      filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.45));
+      animation: pulseGlow 4s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 18px rgba(212, 175, 55, 0.7)); }
+    }
+
+    .order-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      color: #dfb256;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+
+    .archive-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      background: linear-gradient(180deg, #ffffff 0%, #fff0b8 50%, #d4af37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: #92a4c2;
+      background: rgba(14, 25, 48, 0.6);
+      border: 1px solid rgba(80, 120, 180, 0.25);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-top: 4px;
+      backdrop-filter: blur(4px);
+      transition: all 0.4s ease;
+    }
+
+    .status-badge.failed {
+      background: rgba(80, 14, 24, 0.85);
+      border-color: rgba(255, 75, 75, 0.7);
+      color: #ffb8b8;
+      box-shadow: 0 0 22px rgba(255, 50, 50, 0.55);
+    }
+
+    .status-badge.success {
+      background: rgba(25, 45, 20, 0.85);
+      border-color: rgba(212, 175, 55, 0.8);
+      color: #ffd978;
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+    }
+
+    /* ── Camera Zoom / Pan Controls (Bottom Left) ── */
+
+    @keyframes screenTremor {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-4px, 3px); }
+      40% { transform: translate(4px, -3px); }
+      60% { transform: translate(-3px, -2px); }
+      80% { transform: translate(3px, 2px); }
+      100% { transform: translate(0, 0); }
+    }
+    .tremor {
+      animation: screenTremor 0.4s ease-out;
+    }
+
+    .instruction-hud {
+      text-align: center;
+      margin-bottom: 12px;
+      pointer-events: auto;
+      transition: all 0.6s ease;
+    }
+
+    .instruction-text {
+      font-size: 18px;
+      font-weight: 600;
+      font-style: italic;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+      letter-spacing: 0.02em;
+      transition: color 0.4s ease;
+    }
+
+    .instruction-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      color: #ffd978;
+      margin-top: 5px;
+      text-transform: uppercase;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      transition: color 0.4s ease;
+    }
+
+    /* Camera Zoom / Pan Controls (Bottom Left) */
+    .camera-hud {
+      position: absolute;
+      bottom: 24px;
+      left: 20px;
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+      z-index: 20;
+    }
+
+    /* Sound / Reset / Codex Controls (Bottom Right) */
+    .controls-hud {
+      position: absolute;
+      bottom: 24px;
+      right: 20px;
+      display: flex;
+      gap: 12px;
+      pointer-events: auto;
+      z-index: 20;
+    }
+
+    .btn-view-relics {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 9px 24px;
+      background: linear-gradient(180deg, #dfb256 0%, #a67922 100%);
+      border: 1.5px solid #ffe099;
+      border-radius: 24px;
+      color: #0b0f19;
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-view-relics:hover {
+      background: linear-gradient(180deg, #ffe099 0%, #c49632 100%);
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.8), inset 0 1px 0 #ffffff;
+      color: #000000;
+    }
+
+    .btn-hud-relics {
+      border-color: #dfb256 !important;
+      background: rgba(212, 175, 55, 0.22) !important;
+      color: #ffe099 !important;
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-hud {
+      position: relative;
+      background: rgba(8, 14, 28, 0.7);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: #dfb256;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+
+    .btn-hud:hover, .btn-hud:active {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: #dfb256;
+      transform: scale(1.08);
+    }
+
+    .btn-hud.depleted {
+      opacity: 0.25;
+      filter: grayscale(0.85);
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #7b8292;
+    }
+
+    .btn-hud.depleted:hover, .btn-hud.depleted:active {
+      transform: none;
+      background: rgba(8, 14, 28, 0.7);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .hint-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 15px;
+      height: 15px;
+      background: linear-gradient(135deg, #ffd978, #dfb256);
+      color: #070b14;
+      font-family: 'Cinzel', serif;
+      font-size: 9.5px;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(223, 178, 86, 0.85);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-hud svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
+
+    /* ── Confirmation / Pre-Codex Warning Modal ── */
+    .confirm-modal {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 4, 10, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 96;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .confirm-modal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .confirm-frame {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(165deg, rgba(24, 14, 20, 0.98) 0%, rgba(10, 5, 12, 0.99) 100%);
+      border: 1.8px solid rgba(220, 90, 90, 0.65);
+      border-radius: 12px;
+      box-shadow: 
+        0 0 60px rgba(0, 0, 0, 0.95),
+        0 0 35px rgba(220, 70, 70, 0.25),
+        inset 0 0 30px rgba(220, 70, 70, 0.08);
+      padding: 32px 26px 28px;
+      position: relative;
+      text-align: center;
+    }
+
+    .confirm-icon {
+      font-size: 32px;
+      color: #ff7878;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 12px rgba(255, 100, 100, 0.5));
+    }
+
+    .confirm-kicker {
+      font-family: 'Cinzel', serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      color: #dfb256;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .confirm-title {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 14px;
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 15px rgba(255, 120, 120, 0.35);
+    }
+
+    .confirm-text {
+      font-size: 14.5px;
+      font-weight: 500;
+      line-height: 1.6;
+      color: #f0e6e6;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .confirm-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-confirm-break {
+      background: linear-gradient(180deg, #c44040 0%, #8a2020 100%);
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 120, 120, 0.5);
+      padding: 13px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(200, 50, 50, 0.4);
+      transition: all 0.3s ease;
+    }
+    .btn-confirm-break:hover {
+      background: linear-gradient(180deg, #df5050 0%, #a82828 100%);
+      box-shadow: 0 0 20px rgba(255, 80, 80, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-confirm-cancel {
+      background: rgba(14, 20, 36, 0.8);
+      color: #dfb256;
+      font-family: 'Cinzel', serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-confirm-cancel:hover {
+      background: rgba(212, 175, 55, 0.18);
+      border-color: #dfb256;
+      color: #ffffff;
+    }
+
+    /* ── The Codex / Guidance Parchment Modal ── */
+    .codex-modal {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 4, 10, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .codex-modal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .codex-frame {
+      width: 100%;
+      max-width: 620px;
+      max-height: 88vh;
+      background: linear-gradient(165deg, rgba(14, 22, 38, 0.98) 0%, rgba(5, 9, 18, 0.99) 100%);
+      border: 1.8px solid rgba(212, 175, 55, 0.7);
+      border-radius: 12px;
+      box-shadow: 
+        0 0 60px rgba(0, 0, 0, 0.95),
+        0 0 40px rgba(212, 175, 55, 0.25),
+        inset 0 0 35px rgba(212, 175, 55, 0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .codex-scroll-inner {
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 34px 30px 36px;
+      text-align: left;
+      position: relative;
+      z-index: 10;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .codex-scroll-inner::-webkit-scrollbar {
+      width: 6px;
+    }
+    .codex-scroll-inner::-webkit-scrollbar-track {
+      background: rgba(8, 12, 24, 0.5);
+    }
+    .codex-scroll-inner::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.35);
+      border-radius: 3px;
+    }
+
+    .codex-header-badge {
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .codex-kicker {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      color: #dfb256;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .codex-main-title {
+      font-family: 'Cinzel', serif;
+      font-size: 23px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 10px;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 20px rgba(255, 220, 130, 0.35);
+    }
+
+    .codex-gold-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      width: 80%;
+      max-width: 280px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #dfb256, transparent);
+      position: relative;
+    }
+    .codex-gold-rule span {
+      position: absolute;
+      background: #0d1527;
+      padding: 0 8px;
+      color: #dfb256;
+      font-size: 10px;
+    }
+
+    .codex-prologue {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 500;
+      line-height: 1.65;
+      color: #e5dfd2;
+      text-align: center;
+      margin-bottom: 22px;
+      padding: 0 10px;
+    }
+
+    /* Movement Cards */
+    .codex-movement-card {
+      background: rgba(18, 28, 50, 0.55);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 8px;
+      padding: 15px 18px;
+      margin-bottom: 12px;
+      transition: border-color 0.3s ease;
+    }
+    .codex-movement-card:hover {
+      border-color: rgba(212, 175, 55, 0.7);
+    }
+
+    .movement-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .movement-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: #ffd978;
+      text-transform: uppercase;
+    }
+
+    .movement-count {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: #8da4c4;
+    }
+
+    .movement-path {
+      font-family: 'Cinzel', serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      line-height: 1.45;
+      letter-spacing: 0.04em;
+    }
+    .movement-path span.arrow {
+      color: #dfb256;
+      padding: 0 2px;
+    }
+
+    .movement-desc {
+      font-size: 13.5px;
+      font-weight: 500;
+      line-height: 1.55;
+      color: #cbd8ec;
+    }
+
+    /* Scribe Note Box */
+    .codex-scribe-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(45, 18, 24, 0.45);
+      border: 1.5px solid rgba(255, 100, 100, 0.4);
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin-top: 18px;
+      margin-bottom: 20px;
+    }
+
+    .scribe-icon {
+      font-size: 18px;
+      color: #ff8888;
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .scribe-text {
+      font-size: 13.5px;
+      font-weight: 500;
+      line-height: 1.6;
+      color: #fce8e8;
+    }
+    .scribe-text strong {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 11.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ff9999;
+      margin-bottom: 4px;
+    }
+
+    .btn-close-codex {
+      display: block;
+      width: 100%;
+      background: linear-gradient(180deg, #dfb256 0%, #b08328 100%);
+      color: #0b0f19;
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(212, 175, 55, 0.4);
+      transition: all 0.3s ease;
+    }
+    .btn-close-codex:hover {
+      background: linear-gradient(180deg, #ffd978 0%, #c49632 100%);
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.65);
+      transform: translateY(-1px);
+    }
+
+    /* ── The Constellation Target Overlay Canvas ── */
+    #constellation-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+    }
+
+    /* ── Unlocked Cartouche / Revelation Modal ── */
+    .revelation-modal {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 4, 10, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .revelation-modal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Fixed Outer Card Frame: never scrolls, holds the 4 pinned corners */
+    .modal-card-frame {
+      width: 100%;
+      max-width: 600px;
+      max-height: 88vh;
+      position: relative;
+      background: linear-gradient(165deg, rgba(18, 25, 42, 0.97) 0%, rgba(8, 12, 22, 0.99) 100%);
+      border: 1.8px solid rgba(212, 175, 55, 0.65);
+      border-radius: 14px;
+      box-shadow: 
+        0 0 60px rgba(0, 0, 0, 0.98),
+        0 0 45px rgba(212, 175, 55, 0.28),
+        inset 0 0 35px rgba(212, 175, 55, 0.08);
+      overflow: hidden; /* Guarantees corners and content stay within borders */
+      transform: translateY(30px) scale(0.96);
+      transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .revelation-modal.visible .modal-card-frame {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Modal Corners: strictly pinned to the 4 corners of the outer frame */
+    .corner-decor {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border: 2.2px solid #dfb256;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 30;
+    }
+    .c-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .c-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+    .c-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+    .c-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    /* Scrollable Inner Container */
+    .modal-scroll-inner {
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 38px 32px 42px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Custom elegant scrollbar for modal */
+    .modal-scroll-inner::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modal-scroll-inner::-webkit-scrollbar-track {
+      background: rgba(8, 12, 24, 0.5);
+    }
+    .modal-scroll-inner::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.35);
+      border-radius: 3px;
+    }
+
+    /* Cartographer Modal Portrait */
+    .modal-portrait-wrap {
+      width: 116px;
+      height: 116px;
+      border-radius: 50%;
+      border: 2.5px solid #dfb256;
+      margin: 0 auto 16px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+      position: relative;
+    }
+
+    .modal-portrait-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+    }
+
+    .modal-pretitle {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      color: #dfb256;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+      margin-bottom: 14px;
+    }
+
+    .gold-divider {
+      width: 140px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #dfb256, transparent);
+      margin: 0 auto 20px;
+    }
+
+    .cartographer-log {
+      font-size: 21px;
+      font-weight: 500;
+      line-height: 1.68;
+      color: #ffffff;
+      font-style: italic;
+      text-align: left;
+      margin-bottom: 24px;
+      border-left: 2.5px solid rgba(212, 175, 55, 0.65);
+      padding-left: 20px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.85);
+    }
+
+    .cartographer-log p + p {
+      margin-top: 16px;
+    }
+
+    .cartographer-log strong {
+      font-family: 'Cinzel', serif;
+      font-style: normal;
+      color: #ffd978;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Glyphs Unlocked Showcase ── */
+    .glyph-reveal-card {
+      background: rgba(7, 10, 20, 0.7);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 8px;
+      padding: 22px 18px;
+      margin-bottom: 24px;
+    }
+
+    .reveal-badge-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: #ffd978;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .glyphs-pair {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      margin-bottom: 14px;
+    }
+
+    .glyph-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .glyph-svg-box {
+      width: 64px;
+      height: 84px;
+      background: rgba(212, 175, 55, 0.08);
+      border: 1.6px solid rgba(212, 175, 55, 0.6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+    }
+
+    .glyph-svg-box svg {
+      width: 46px;
+      height: 62px;
+      color: #ffd978;
+      filter: drop-shadow(0 0 8px rgba(255, 217, 120, 0.7));
+    }
+
+    .glyph-translation {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.1em;
+    }
+
+    .glyph-note {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.55;
+      color: #bcd0e8;
+      font-style: italic;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Next Alignment Lock */
+    .alignment-lock {
+      background: rgba(14, 21, 38, 0.7);
+      border: 1.2px dashed rgba(120, 160, 220, 0.45);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+
+    .lock-label {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      color: #9cb4d4;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .lock-date {
+      font-family: 'Cinzel', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.1em;
+    }
+
+    .lock-sub {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #b3c6dc;
+      margin-top: 6px;
+      font-style: italic;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .btn-close-modal {
+      margin-top: 8px;
+      background: linear-gradient(180deg, #dfb256 0%, #b08328 100%);
+      color: #0b0f19;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(212, 175, 55, 0.45);
+      transition: all 0.3s ease;
+    }
+
+    .btn-close-modal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(212, 175, 55, 0.55);
+    }
+
+    @media (max-width: 600px) {
+      .interface-layer {
+        padding: max(16px, env(safe-area-inset-top, 16px)) 14px max(18px, env(safe-area-inset-bottom, 18px));
+      }
+      .order-seal {
+        width: 36px;
+        height: 36px;
+        margin-bottom: 6px;
+      }
+      .order-sub {
+        font-size: 9px;
+        letter-spacing: 0.22em;
+      }
+      .archive-title {
+        font-size: 16px;
+        letter-spacing: 0.10em;
+        margin-bottom: 4px;
+      }
+      .status-badge {
+        font-size: 9px;
+        padding: 4px 10px;
+        letter-spacing: 0.12em;
+      }
+      .instruction-hud {
+        margin-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+        padding: 0 10px;
+      }
+      .instruction-text {
+        font-size: 13.5px;
+        line-height: 1.35;
+      }
+      .instruction-sub {
+        font-size: 8.5px;
+        letter-spacing: 0.08em;
+        line-height: 1.35;
+        max-width: 360px;
+        margin: 5px auto 0;
+      }
+      .camera-hud {
+        bottom: max(14px, env(safe-area-inset-bottom, 14px));
+        left: max(14px, env(safe-area-inset-left, 14px));
+        gap: 8px;
+      }
+      .controls-hud {
+        bottom: max(14px, env(safe-area-inset-bottom, 14px));
+        right: max(14px, env(safe-area-inset-right, 14px));
+        gap: 8px;
+      }
+      .btn-hud {
+        width: 38px;
+        height: 38px;
+      }
+      .btn-hud svg {
+        width: 17px;
+        height: 17px;
+      }
+      .codex-scroll-inner {
+        padding: 24px 14px 28px;
+      }
+      .codex-kicker {
+        font-size: 8.5px;
+        letter-spacing: 0.16em;
+      }
+      .codex-main-title {
+        font-size: 16.5px;
+        letter-spacing: 0.05em;
+      }
+      .codex-prologue {
+        font-size: 12.5px;
+        padding: 0 4px;
+        margin-bottom: 16px;
+      }
+      .codex-movement-card {
+        padding: 11px 12px;
+        margin-bottom: 10px;
+      }
+      .movement-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+        margin-bottom: 6px;
+      }
+      .movement-tag {
+        font-size: 9.5px;
+        letter-spacing: 0.12em;
+      }
+      .movement-count {
+        font-size: 9px;
+      }
+      .movement-path {
+        font-size: 10.5px;
+        line-height: 1.4;
+      }
+      .movement-desc {
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .codex-scribe-note {
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .scribe-text {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .revelation-modal, .codex-modal, .confirm-modal {
+        padding: max(14px, env(safe-area-inset-top, 14px)) max(10px, env(safe-area-inset-right, 10px)) max(14px, env(safe-area-inset-bottom, 14px)) max(10px, env(safe-area-inset-left, 10px));
+      }
+      .modal-scroll-inner {
+        padding: 26px 16px 30px;
+      }
+      .modal-title {
+        font-size: 17.5px;
+        letter-spacing: 0.08em;
+      }
+      .cartographer-log {
+        font-size: 14.5px;
+        line-height: 1.55;
+        padding-left: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Audio & Stars Canvas Layers -->
+  <canvas id="sky-canvas"></canvas>
+  <canvas id="constellation-canvas"></canvas>
+
+  <!-- Heads Up Display Layer -->
+  <div class="interface-layer">
+    <div class="top-header">
+      <!-- Order Seal -->
+      <svg class="order-seal" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#d4af37" stroke-width="2"/>
+        <circle cx="50" cy="50" r="40" fill="#060a14" stroke="#d4af37" stroke-width="1"/>
+        <path d="M 50,10 A 40,40 0 0,0 50,90 Z" fill="#020409"/>
+        <path d="M 50,10 A 40,40 0 0,1 50,90 Z" fill="#ffffff" fill-opacity="0.95"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#d4af37" stroke-width="1.5"/>
+      </svg>
+      <div class="order-sub">The Eclipse Order</div>
+      <h1 class="archive-title">Archive of Distant Light</h1>
+      <div class="status-badge" id="status-badge">Phase I · The Celestial Flower</div>
+    </div>
+
+    <div class="instruction-hud" id="instruction-hud">
+      <div class="instruction-text" id="instruction-text">
+        "Find the anchor stars of the Celestial Flower. Connect them in the order of the bloom."
+      </div>
+      <div class="instruction-sub" id="instruction-sub">Touch the apex star (Deneb) to begin tracing (Step 0 of 25)</div>
+      <button type="button" class="btn-view-relics" id="btn-view-relics" style="display: none;">✦ Inspect Decoded Glyphs (D & C) ✦</button>
+    </div>
+  </div>
+
+  <!-- Camera Zoom / Pan Controls (Bottom Left) -->
+  <div class="camera-hud">
+    <button class="btn-hud" id="btn-zoom-in" title="Magnify Celestial Vault (+)">
+      <svg viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        <rect x="7" y="8.75" width="5" height="1.5" rx="0.5"/>
+        <rect x="8.75" y="7" width="1.5" height="5" rx="0.5"/>
+      </svg>
+    </button>
+    <button class="btn-hud" id="btn-zoom-out" title="Widen Field of View (-)">
+      <svg viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        <rect x="7" y="8.75" width="5" height="1.5" rx="0.5"/>
+      </svg>
+    </button>
+    <button class="btn-hud" id="btn-recenter" title="Recenter Constellation">
+      <svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+    </button>
+  </div>
+
+  <!-- Bottom Control Buttons -->
+  <div class="controls-hud">
+    <button class="btn-hud btn-hud-relics" id="btn-relics-icon" title="View Decoded Glyphs (D & C)">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l2.4 7.4H22l-6 4.4 2.3 7.2-6.3-4.6-6.3 4.6 2.3-7.2-6-4.4h7.6z"/></svg>
+    </button>
+    <button class="btn-hud" id="btn-codex" title="Cartographer's Codex · Flight Lore">
+      <svg viewBox="0 0 24 24"><path d="M19 3H7c-1.66 0-3 1.34-3 3v12c0 1.66 1.34 3 3 3h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7c-.55 0-1-.45-1-1s.45-1 1-1h10v2zm0-4H7c-.55 0-1-.45-1-1s.45-1 1-1h10v2zm0-4H7c-.55 0-1-.45-1-1s.45-1 1-1h10v2z"/></svg>
+    </button>
+    <button class="btn-hud" id="btn-hint" title="Celestial Whisper (1 Use Only)">
+      <svg viewBox="0 0 24 24"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
+      <span class="hint-badge" id="hint-badge">1</span>
+    </button>
+    <button class="btn-hud" id="btn-sound" title="Toggle Celestial Chimes">
+      <svg id="icon-sound-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+    </button>
+    <button class="btn-hud" id="btn-reset" title="Reset Constellation">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+  </div>
+
+  <!-- Pre-Codex Warning Modal -->
+  <div class="confirm-modal" id="confirm-modal">
+    <div class="confirm-frame">
+      <div class="corner-decor c-tl"></div>
+      <div class="corner-decor c-tr"></div>
+      <div class="corner-decor c-bl"></div>
+      <div class="corner-decor c-br"></div>
+      <div class="confirm-icon">✦</div>
+      <div class="confirm-kicker">The Eclipse Order · Warning of the Threshold</div>
+      <h3 class="confirm-title">Consult the Cartographer's Notes?</h3>
+      <div class="confirm-text">
+        Opening the field codex reveals the Cartographer's celestial observations and sacred petal routes of the Celestial Flower.
+        <br><br>
+        If you wish to decipher the celestial vault purely by your own sight and intuition, keep the parchment sealed.
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn-confirm-break" id="btn-confirm-break">
+          Unseal Cartographer Notes
+        </button>
+        <button type="button" class="btn-confirm-cancel" id="btn-confirm-cancel">
+          Keep Sealed · Persevere
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hint Confirmation Modal -->
+  <div class="confirm-modal" id="hint-confirm-modal">
+    <div class="confirm-frame">
+      <div class="corner-decor c-tl"></div>
+      <div class="corner-decor c-tr"></div>
+      <div class="corner-decor c-bl"></div>
+      <div class="corner-decor c-br"></div>
+      <div class="confirm-icon">✦</div>
+      <div class="confirm-kicker">The Eclipse Order · Sacred Whisper</div>
+      <h3 class="confirm-title">Invoke the Celestial Whisper?</h3>
+      <div class="confirm-text">
+        The Order grants only <strong>ONE single whisper</strong> for this entire trial.
+        <br><br>
+        The next sacred anchor will illuminate for eight seconds. Once summoned, this vision will be consumed forever and cannot be recovered, even if you reset or fracture the alignment.
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="btn-confirm-break" id="btn-hint-confirm" style="border-color: rgba(212, 175, 55, 0.7); background: rgba(30, 20, 10, 0.95); color: #ffd978;">
+          Invoke Whisper (1 Use)
+        </button>
+        <button type="button" class="btn-confirm-cancel" id="btn-hint-cancel">
+          Preserve for Later
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Codex / Guidance Parchment Modal -->
+  <div class="codex-modal" id="codex-modal">
+    <div class="codex-frame">
+      <!-- Pinned Corner Brackets -->
+      <div class="corner-decor c-tl"></div>
+      <div class="corner-decor c-tr"></div>
+      <div class="corner-decor c-bl"></div>
+      <div class="corner-decor c-br"></div>
+
+      <!-- Scrollable Inner Content -->
+      <div class="codex-scroll-inner">
+        <div class="codex-header-badge">
+          <span class="codex-kicker">The Eclipse Order · Astrolabe Codex</span>
+          <h2 class="codex-main-title">The Sacred Anatomy of the Flower</h2>
+          <div class="codex-gold-rule"><span>✦</span></div>
+        </div>
+
+        <div class="codex-prologue">
+          "The vault does not yield to blind reaching. Twenty-two stars form the petals and stem of the Celestial Flower. Their light answers only when awakened through the four movements of its bloom."
+        </div>
+
+        <!-- Movement I -->
+        <div class="codex-movement-card">
+          <div class="movement-header">
+            <span class="movement-tag">Movement I · The Crown Petals & Core</span>
+            <span class="movement-count">Crown Anchors</span>
+          </div>
+          <div class="movement-desc">
+            The bloom awakes at the ancient Apex (Deneb). The crown unfolds across the western petal (Azelfafage) and eastern petal (Alrisha), anchored through the Corolla Base (Omicron). From these sacred upper petals, the central vein plunges straight into the Blossom Heart (Sadr).
+          </div>
+        </div>
+
+        <!-- Movement II -->
+        <div class="codex-movement-card">
+          <div class="movement-header">
+            <span class="movement-tag">Movement II · The Western Petals</span>
+            <span class="movement-count">Outer Arch & Petal Curves</span>
+          </div>
+          <div class="movement-desc">
+            From the Blossom Heart, the petals extend west along the shoulder (Delta Cygni) and curve (Fawaris) to the outer petal tip (Iota Cygni). The path sweeps inward through the three petal edges (Kappa, Lambda, Mu), curving past the inner flank (Rho Cygni) back into the Heart.
+          </div>
+        </div>
+
+        <!-- Movement III -->
+        <div class="codex-movement-card">
+          <div class="movement-header">
+            <span class="movement-tag">Movement III · The Eastern Petals</span>
+            <span class="movement-count">Mirrored Petals</span>
+          </div>
+          <div class="movement-desc">
+            Mirroring the west, the bloom surges east through the shoulder (Theta Cygni) and curve (Gienah) to the outer petal tip (Zeta Cygni). The starlight traces the three petal edges (Aljanah, Nu, Xi) along the flank (Sigma Cygni) to fold the petals home into the Heart.
+          </div>
+        </div>
+
+        <!-- Movement IV -->
+        <div class="codex-movement-card">
+          <div class="movement-header">
+            <span class="movement-tag">Movement IV · The Slender Stem & Golden Root</span>
+            <span class="movement-count">Beacon of Distant Light</span>
+          </div>
+          <div class="movement-desc">
+            With all petals balanced, the flower plunges downward from the Heart along its slender stem (Eta Cygni), arching through the stem node (Flower Crown) to ignite the golden root beacon at its base (Albireo).
+          </div>
+        </div>
+
+        <!-- Scribe Instruction Callout -->
+        <div class="codex-scribe-note">
+          <div class="scribe-icon">✦</div>
+          <div class="scribe-text">
+            <strong>The Cartographer's Invariant</strong>
+            "The sky will not whisper the next anchor to your hand. Take paper and pen, initiate. Map the anatomy of the flower, hold the route in your mind, and trace each movement. A single false step will fracture the alignment, returning the sky to darkness."
+          </div>
+        </div>
+
+        <button type="button" class="btn-close-codex" id="btn-close-codex">
+          Close Codex · Return to the Vigil
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revelation / Unlocked Scroll Modal -->
+  <div class="revelation-modal" id="revelation-modal">
+    <div class="modal-card-frame">
+      <!-- Fixed Corners strictly anchored to the 4 frame corners -->
+      <div class="corner-decor c-tl"></div>
+      <div class="corner-decor c-tr"></div>
+      <div class="corner-decor c-bl"></div>
+      <div class="corner-decor c-br"></div>
+
+      <!-- Scrollable Inner Content -->
+      <div class="modal-scroll-inner">
+        <!-- Cartographer Presence -->
+        <div class="modal-portrait-wrap">
+          <img src="cartographer-illustration.jpg" class="modal-portrait-img" alt="The Cartographer of Distant Light" />
+        </div>
+
+        <div class="modal-pretitle">The Archive of Distant Light</div>
+        <h2 class="modal-title">Log 01 · The Deneb Anchor</h2>
+        <div class="gold-divider"></div>
+
+        <div class="cartographer-log">
+          <p><strong>You looked into the deep night and traced the bloom of the Celestial Flower.</strong></p>
+          <p>The light you connected left Deneb fifteen hundred years ago. It crossed through cold and silence, never knowing whose eyes would receive it. Some journeys take an eternity because what they carry is precious.</p>
+          <p>You have unlocked the <strong>First Anchor of the Sky</strong>. In your hands now rest the solitary keys of the Order's sacred script.</p>
+        </div>
+
+        <!-- Unlocked Glyphs Card -->
+        <div class="glyph-reveal-card">
+          <div class="reveal-badge-title">✦ Eclipse Script · Solitary Key Decoded ✦</div>
+          <div class="glyphs-pair">
+            <div class="glyph-unit">
+              <div class="glyph-svg-box">
+                <!-- Glyph D (Solitary letter from Deneb, appears only 1 time in the ancient text) -->
+                <svg viewBox="0 0 48 64">
+                  <line x1="34" y1="10" x2="34" y2="54" stroke="currentColor" stroke-width="2.6"/>
+                  <path d="M34 16 Q12 24 34 32 Q12 40 34 48" stroke="currentColor" stroke-width="2.2" fill="none"/>
+                  <circle cx="34" cy="32" r="3.2" fill="currentColor"/>
+                  <circle cx="18" cy="32" r="2.8" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="glyph-translation">D</div>
+            </div>
+
+            <div class="glyph-unit">
+              <div class="glyph-svg-box">
+                <!-- Glyph C (Solitary letter from Cygnus, appears only 1 time in the ancient text) -->
+                <svg viewBox="0 0 48 64">
+                  <path d="M38 18 A16 16 0 0 0 14 32 A16 16 0 0 0 38 46" stroke="currentColor" stroke-width="2.6" fill="none"/>
+                  <circle cx="26" cy="32" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <circle cx="10" cy="32" r="2.8" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="glyph-translation">C</div>
+            </div>
+          </div>
+          <div class="glyph-note">
+            "Record these symbols in a temporary place while the vessel finds your hands to bind them all together. These keys are solitary; each appears only once in the prophecy of the threshold."
+          </div>
+        </div>
+
+        <!-- Temporal Lock Notice (Without explicit dates) -->
+        <div class="alignment-lock">
+          <div class="lock-label">Status · Anchor Established</div>
+          <div class="lock-date">Awaiting the Next Alignment</div>
+          <div class="lock-sub">
+            The stars are turning. Keep your vigil and await word from the Order. We will reach you when the night aligns again.
+          </div>
+        </div>
+
+        <button class="btn-close-modal" id="btn-close-modal">Return to the Sky</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Audio Synthesis Engine (Magical Celestial Chimes & Dissonance) ── */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playStepChime(stepIdx) {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      // Ascending celestial progression across the 25 flight steps (C4 to A5)
+      const baseFreq = 261.63 * Math.pow(2, (Math.min(stepIdx, 25) / 25) * 1.75);
+
+      const osc = audioCtx.createOscillator();
+      const harm = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.002, now + 1.2);
+
+      harm.type = 'triangle';
+      harm.frequency.setValueAtTime(baseFreq * 2, now); // Octave crystal overtone
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.28, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+
+      osc.connect(gain);
+      harm.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      harm.start(now);
+      osc.stop(now + 1.6);
+      harm.stop(now + 1.6);
+    }
+
+    // Failure: Low Dissonant Cosmic Rumble with Detuned Beating Frequencies
+    function playFailureDissonance() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc1 = audioCtx.createOscillator();
+      const osc2 = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc1.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(116.54, now); // Bb2
+      osc1.frequency.exponentialRampToValueAtTime(73.42, now + 0.85);
+
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(110.00, now); // A2 (dissonant semitone beating)
+      osc2.frequency.exponentialRampToValueAtTime(65.41, now + 0.85);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.35, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 0.9);
+      osc2.stop(now + 0.9);
+    }
+
+    // Victory: Majestic 8-Note Celestial Arpeggio
+    function playVictoryFanfare() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const victoryNotes = [261.63, 329.63, 392.00, 493.88, 523.25, 659.25, 783.99, 1046.50];
+      victoryNotes.forEach((freq, idx) => {
+        setTimeout(() => {
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(0.32, now + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 2.2);
+        }, idx * 150);
+      });
+    }
+
+    // Checkpoint: Warm Golden Celestial Triad Chord
+    function playCheckpointChime() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      const chord = [392.00, 493.88, 587.33, 783.99]; // G4, B4, D5, G5
+      chord.forEach((freq, idx) => {
+        setTimeout(() => {
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(0.24, now + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 1.8);
+        }, idx * 75);
+      });
+    }
+
+    /* ── Starfield Background & Retina High-DPI Canvas Setup ── */
+    const skyCanvas = document.getElementById('sky-canvas');
+    const skyCtx = skyCanvas.getContext('2d');
+    const constCanvas = document.getElementById('constellation-canvas');
+    const constCtx = constCanvas.getContext('2d');
+
+    let dpr = Math.min(window.devicePixelRatio || 1, 3);
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    /* ── Tactile Haptic Feedback (Vibration API) ── */
+    function triggerHaptic(type) {
+      if (typeof navigator === 'undefined' || !navigator.vibrate) return;
+      try {
+        if (type === 'tap') navigator.vibrate(12);
+        else if (type === 'step') navigator.vibrate(28);
+        else if (type === 'checkpoint') navigator.vibrate([35, 45, 55]);
+        else if (type === 'fail') navigator.vibrate([60, 40, 70]);
+        else if (type === 'victory') navigator.vibrate([40, 60, 40, 60, 100, 50, 160]);
+      } catch (e) {
+        // Safe fallback if restricted
+      }
+    }
+
+    /* ── Camera Pan, Zoom & Auto-Focus State ── */
+    const camera = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0,
+      zoom: 1.0,
+      targetZoom: 1.0,
+      minZoom: 0.85,
+      maxZoom: 2.8
+    };
+
+    function screenToWorld(sx, sy) {
+      const cx = width * 0.5;
+      const cy = height * 0.5;
+      return {
+        x: cx + (sx - cx - camera.x) / camera.zoom,
+        y: cy + (sy - cy - camera.y) / camera.zoom
+      };
+    }
+
+    function worldToScreen(wx, wy) {
+      const cx = width * 0.5;
+      const cy = height * 0.5;
+      return {
+        x: cx + (wx - cx) * camera.zoom + camera.x,
+        y: cy + (wy - cy) * camera.zoom + camera.y
+      };
+    }
+
+    function zoomRelative(factor) {
+      const newZoom = Math.max(camera.minZoom, Math.min(camera.maxZoom, camera.targetZoom * factor));
+      camera.targetZoom = newZoom;
+      const maxPan = Math.max(140, (width * 0.5) * (camera.targetZoom - 0.65));
+      camera.targetX = Math.max(-maxPan, Math.min(maxPan, camera.targetX));
+      camera.targetY = Math.max(-maxPan, Math.min(maxPan, camera.targetY));
+    }
+
+    function recenterCamera() {
+      camera.targetX = 0;
+      camera.targetY = 0;
+      camera.targetZoom = 1.0;
+    }
+
+    function focusOnStar(starId, zoomLevel = 1.65) {
+      const s = constellationStars[starId];
+      if (!s) return;
+      const isMobile = width < 600;
+      const targetZ = isMobile ? Math.min(2.3, zoomLevel * 1.15) : zoomLevel;
+      camera.targetZoom = targetZ;
+      const safeCenterY = isMobile ? 140 + (height - 280) * 0.46 : height * 0.48;
+      camera.targetX = -(s.x - width * 0.5) * targetZ;
+      camera.targetY = -(s.y - safeCenterY) * targetZ;
+      const maxPan = Math.max(160, (width * 0.5) * (targetZ - 0.55));
+      camera.targetX = Math.max(-maxPan, Math.min(maxPan, camera.targetX));
+      camera.targetY = Math.max(-maxPan, Math.min(maxPan, camera.targetY));
+    }
+
+    function resizeCanvases() {
+      dpr = Math.min(window.devicePixelRatio || 1, 3);
+      width = window.innerWidth;
+      height = window.innerHeight;
+
+      skyCanvas.width = Math.round(width * dpr);
+      skyCanvas.height = Math.round(height * dpr);
+      skyCanvas.style.width = width + 'px';
+      skyCanvas.style.height = height + 'px';
+      skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      constCanvas.width = Math.round(width * dpr);
+      constCanvas.height = Math.round(height * dpr);
+      constCanvas.style.width = width + 'px';
+      constCanvas.style.height = height + 'px';
+      constCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resizeCanvases();
+
+    let backgroundStars = [];
+    const NUM_BG_STARS = Math.min(240, Math.floor((width * height) / 3800));
+
+    function initBackgroundStars() {
+      backgroundStars = [];
+      for (let i = 0; i < NUM_BG_STARS; i++) {
+        backgroundStars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 1.4 + 0.4,
+          baseAlpha: Math.random() * 0.6 + 0.2,
+          twinkleSpeed: Math.random() * 0.02 + 0.005,
+          twinkleOffset: Math.random() * Math.PI * 2,
+          color: Math.random() > 0.8 ? '#ffe6a3' : (Math.random() > 0.6 ? '#cbe3ff' : '#ffffff')
+        });
+      }
+    }
+
+    function drawBackground(time) {
+      skyCtx.clearRect(0, 0, width, height);
+      skyCtx.fillStyle = '#03060d';
+      skyCtx.fillRect(0, 0, width, height);
+
+      skyCtx.save();
+      // Parallax effect: celestial background shifts at 18% of camera pan
+      const bgPanX = camera.x * 0.18;
+      const bgPanY = camera.y * 0.18;
+      const bgZoom = 1.0 + (camera.zoom - 1.0) * 0.14;
+
+      skyCtx.translate(width * 0.5 + bgPanX, height * 0.5 + bgPanY);
+      skyCtx.scale(bgZoom, bgZoom);
+      skyCtx.translate(-width * 0.5, -height * 0.5);
+
+      // Deep celestial radial haze
+      const haze = skyCtx.createRadialGradient(width * 0.5, height * 0.45, 80, width * 0.5, height * 0.45, width * 0.8);
+      haze.addColorStop(0, 'rgba(18, 32, 64, 0.48)');
+      haze.addColorStop(0.5, 'rgba(8, 16, 36, 0.28)');
+      haze.addColorStop(1, 'rgba(3, 6, 13, 0)');
+      skyCtx.fillStyle = haze;
+      skyCtx.fillRect(-width * 0.5, -height * 0.5, width * 2, height * 2);
+
+      // Subtle Milky Way sweep
+      const mw = skyCtx.createLinearGradient(0, 0, width, height);
+      mw.addColorStop(0, 'rgba(40, 70, 130, 0.04)');
+      mw.addColorStop(0.5, 'rgba(60, 95, 160, 0.09)');
+      mw.addColorStop(1, 'rgba(40, 70, 130, 0.04)');
+      skyCtx.fillStyle = mw;
+      skyCtx.fillRect(-width * 0.5, -height * 0.5, width * 2, height * 2);
+
+      // Twinkling stars
+      for (const s of backgroundStars) {
+        const alpha = s.baseAlpha + Math.sin(time * s.twinkleSpeed + s.twinkleOffset) * 0.22;
+        skyCtx.beginPath();
+        skyCtx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        skyCtx.fillStyle = s.color;
+        skyCtx.globalAlpha = Math.max(0.08, Math.min(1, alpha));
+        skyCtx.fill();
+      }
+      skyCtx.restore();
+      skyCtx.globalAlpha = 1.0;
+    }
+
+    /* ── The 22 Astronomical Stars of the Celestial Flower ── */
+    const STARS = [
+      // Movement I: The Tail Fan & Spine (4 stars)
+      { id: 0, name: 'Deneb', nx: 0.50, ny: 0.08, mag: 7.8, color: '#ffffff', labelAlign: 'center', labelDx: 0, labelDy: -18 },
+      { id: 1, name: 'Azelfafage', nx: 0.38, ny: 0.04, mag: 5.0, color: '#cbe3ff', labelAlign: 'right', labelDx: -14, labelDy: -2 },
+      { id: 2, name: 'Alrisha', nx: 0.62, ny: 0.04, mag: 5.0, color: '#cbe3ff', labelAlign: 'left', labelDx: 14, labelDy: -2 },
+      { id: 3, name: 'Omicron', nx: 0.50, ny: 0.16, mag: 5.4, color: '#eef6ff', labelAlign: 'center', labelDx: 0, labelDy: 18 },
+
+      // Center: The Beating Heart
+      { id: 4, name: 'Sadr', nx: 0.50, ny: 0.36, mag: 7.2, color: '#fff5da', labelAlign: 'center', labelDx: 0, labelDy: 18 },
+
+      // Movement II: The Western Wing (7 stars)
+      { id: 5, name: 'Delta Cygni', nx: 0.36, ny: 0.34, mag: 5.8, color: '#d8ebff', labelAlign: 'right', labelDx: -14, labelDy: 4 },
+      { id: 6, name: 'Fawaris', nx: 0.22, ny: 0.31, mag: 5.8, color: '#cbe4ff', labelAlign: 'right', labelDx: -12, labelDy: 0 },
+      { id: 7, name: 'Iota Cygni', nx: 0.08, ny: 0.23, mag: 5.6, color: '#bce0ff', labelAlign: 'right', labelDx: -12, labelDy: 0 },
+      { id: 8, name: 'Kappa Cygni', nx: 0.14, ny: 0.17, mag: 4.8, color: '#d2e7ff', labelAlign: 'right', labelDx: -12, labelDy: -10 },
+      { id: 9, name: 'Lambda Cygni', nx: 0.24, ny: 0.14, mag: 4.8, color: '#d2e7ff', labelAlign: 'right', labelDx: -12, labelDy: -10 },
+      { id: 10, name: 'Mu Cygni', nx: 0.35, ny: 0.21, mag: 5.0, color: '#e0efff', labelAlign: 'right', labelDx: -12, labelDy: 0 },
+      { id: 11, name: 'Rho Cygni', nx: 0.43, ny: 0.27, mag: 5.0, color: '#eaf4ff', labelAlign: 'right', labelDx: -14, labelDy: 0 },
+
+      // Movement III: The Eastern Wing (7 stars)
+      { id: 12, name: 'Theta Cygni', nx: 0.64, ny: 0.34, mag: 5.8, color: '#d8ebff', labelAlign: 'left', labelDx: 14, labelDy: 4 },
+      { id: 13, name: 'Gienah', nx: 0.78, ny: 0.31, mag: 5.8, color: '#cbe4ff', labelAlign: 'left', labelDx: 12, labelDy: 0 },
+      { id: 14, name: 'Zeta Cygni', nx: 0.92, ny: 0.23, mag: 5.6, color: '#bce0ff', labelAlign: 'left', labelDx: 12, labelDy: 0 },
+      { id: 15, name: 'Aljanah', nx: 0.86, ny: 0.17, mag: 4.8, color: '#d2e7ff', labelAlign: 'left', labelDx: 12, labelDy: -10 },
+      { id: 16, name: 'Nu Cygni', nx: 0.76, ny: 0.14, mag: 4.8, color: '#d2e7ff', labelAlign: 'left', labelDx: 12, labelDy: -10 },
+      { id: 17, name: 'Xi Cygni', nx: 0.65, ny: 0.21, mag: 5.0, color: '#e0efff', labelAlign: 'left', labelDx: 12, labelDy: 0 },
+      { id: 18, name: 'Sigma Cygni', nx: 0.57, ny: 0.27, mag: 5.0, color: '#eaf4ff', labelAlign: 'left', labelDx: 14, labelDy: 0 },
+
+      // Movement IV: The Slender Stem & Golden Root (3 stars)
+      { id: 19, name: 'Eta Cygni', nx: 0.48, ny: 0.50, mag: 5.4, color: '#fff0cb', labelAlign: 'left', labelDx: 16, labelDy: 0 },
+      { id: 20, name: 'Flower Crown', nx: 0.52, ny: 0.66, mag: 5.6, color: '#ffe29a', labelAlign: 'right', labelDx: -16, labelDy: 0 },
+      { id: 21, name: 'Albireo', nx: 0.50, ny: 0.82, mag: 6.8, color: '#ffd269', labelAlign: 'center', labelDx: 0, labelDy: 20 }
+    ];
+
+    /* ── The 25 Sequential Flight Steps of the Flower ── */
+    const FLIGHT_PATH = [
+      // Movement I: The Crown Petals & Core (Steps 1 to 6)
+      { from: 0, to: 1, sub: "Sweep out to the western petal: Azelfafage" },
+      { from: 1, to: 3, sub: "Fold inward to the corolla base: Omicron" },
+      { from: 3, to: 2, sub: "Reach east to the eastern petal: Alrisha" },
+      { from: 2, to: 0, sub: "Close the sacred crown petals at Deneb" },
+      { from: 0, to: 3, sub: "Draw down the central vein to the Corolla Base: Omicron" },
+      { from: 3, to: 4, sub: "Pierce the center into the Blossom Heart: Sadr" },
+
+      // Movement II: The Western Petals (Steps 7 to 14)
+      { from: 4, to: 5, sub: "Launch the western petal arch to the shoulder: Delta Cygni" },
+      { from: 5, to: 6, sub: "Extend along the petal curve: Fawaris" },
+      { from: 6, to: 7, sub: "Soar out to the outer petal tip: Iota Cygni" },
+      { from: 7, to: 8, sub: "Curve along petal edge II: Kappa Cygni" },
+      { from: 8, to: 9, sub: "Follow the outer edge to petal III: Lambda Cygni" },
+      { from: 9, to: 10, sub: "Sweep through the inner contour: Mu Cygni" },
+      { from: 10, to: 11, sub: "Anchor inward along the petal flank: Rho Cygni" },
+      { from: 11, to: 4, sub: "Fold the western petal home into the Heart: Sadr" },
+
+      // Movement III: The Eastern Petals (Steps 15 to 22)
+      { from: 4, to: 12, sub: "Launch the eastern petal arch to the shoulder: Theta Cygni" },
+      { from: 12, to: 13, sub: "Extend along the petal curve: Gienah" },
+      { from: 13, to: 14, sub: "Soar out to the outer petal tip: Zeta Cygni" },
+      { from: 14, to: 15, sub: "Curve along petal edge II: Aljanah" },
+      { from: 15, to: 16, sub: "Follow the outer edge to petal III: Nu Cygni" },
+      { from: 16, to: 17, sub: "Sweep through the inner contour: Xi Cygni" },
+      { from: 17, to: 18, sub: "Anchor inward along the petal flank: Sigma Cygni" },
+      { from: 18, to: 4, sub: "Fold the eastern petal home into the Heart: Sadr" },
+
+      // Movement IV: The Slender Stem & Golden Root (Steps 23 to 25)
+      { from: 4, to: 19, sub: "Dive downward along the slender stem: Eta Cygni" },
+      { from: 19, to: 20, sub: "Arch along the stem node: Flower Crown" },
+      { from: 20, to: 21, sub: "Ignite the Golden Root: Albireo!" }
+    ];
+
+    /* ── State Machine Variables & Movement Milestones ── */
+    const MOVEMENT_MILESTONES = [6, 14, 22]; // Sensory completion milestones (sound, light, haptics, auto-focus)
+
+    let constellationStars = [];
+    let currentStep = 0; // 0 to 25
+    let activeStarId = null; // Currently selected head of the flight
+    let completedLines = []; // Array of { from, to }
+    let failLine = null; // { x1, y1, x2, y2, alpha }
+    let isCompleted = false;
+    let wingGlowAlpha = 0;
+    let dragPos = null;
+    let particles = [];
+
+    // 1-Time Permanent Hint Mechanism (Persists across resets & reloads)
+    let hintUsed = false;
+    try {
+      hintUsed = (localStorage.getItem('eclipse_flower_hint_used') === 'true');
+    } catch (e) {}
+
+    // Developer test bypass: append ?reset_hint=1 to URL to restore hint for testing
+    if (new URLSearchParams(window.location.search).has('reset_hint')) {
+      try {
+        localStorage.removeItem('eclipse_flower_hint_used');
+        hintUsed = false;
+      } catch (e) {}
+    }
+
+    let hintActiveUntil = 0;
+    let hintTargetStarId = null;
+
+    function updateHintButtonUi() {
+      const btnHint = document.getElementById('btn-hint');
+      const badge = document.getElementById('hint-badge');
+      if (!btnHint) return;
+      if (hintUsed) {
+        btnHint.classList.add('depleted');
+        btnHint.title = "The Celestial Whisper has already faded";
+        if (badge) badge.style.display = 'none';
+      } else {
+        btnHint.classList.remove('depleted');
+        btnHint.title = "Celestial Whisper (1 Use Only)";
+        if (badge) badge.style.display = 'flex';
+      }
+    }
+
+    /* ── Responsive Coordinate Layout with Top Header Clearance ── */
+    function layoutConstellationStars() {
+      const isMobile = width < 600;
+      const cx = width * 0.5;
+
+      // Safe clearance: header takes ~150px on desktop, ~125px on mobile.
+      const topSafeY = isMobile ? 140 : 230;
+      const bottomSafeY = isMobile ? (height - 140) : (height - 110);
+      const availH = Math.max(260, bottomSafeY - topSafeY);
+
+      // Star ny range is [0.04, 0.82] (span 0.78, mid 0.43)
+      // Star nx range is [0.08, 0.92] (span 0.84, mid 0.50)
+      const maxW = isMobile ? Math.min(width - 130, 275) : Math.min(width - 80, 720);
+      const scaleX = maxW / 0.86;
+      const scaleY = (availH * 0.90) / 0.78;
+      const scale = Math.min(scaleX, scaleY);
+
+      // Center vertically in the safe band
+      const cy = topSafeY + availH * 0.46;
+
+      constellationStars = STARS.map(s => ({
+        ...s,
+        x: cx + (s.nx - 0.50) * scale,
+        y: cy + (s.ny - 0.43) * scale,
+        pulseOffset: Math.random() * Math.PI * 2
+      }));
+    }
+
+    /* ── Particle Engine (Golden Stardust & Crimson Embers) ── */
+    function spawnStardust(x, y, count, color = '#ffd978', speed = 2.4) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = (Math.random() * 0.8 + 0.2) * speed;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          radius: Math.random() * 2.2 + 0.8,
+          alpha: 1.0,
+          decay: Math.random() * 0.02 + 0.015,
+          color: color
+        });
+      }
+    }
+
+    function spawnFingerTrail(screenX, screenY) {
+      const world = screenToWorld(screenX, screenY);
+      for (let i = 0; i < 2; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 0.9 + 0.3;
+        particles.push({
+          x: world.x,
+          y: world.y,
+          vx: Math.cos(angle) * spd,
+          vy: Math.sin(angle) * spd,
+          radius: Math.random() * 1.6 + 0.8,
+          alpha: 0.85,
+          decay: 0.042,
+          color: Math.random() > 0.45 ? '#ffd978' : (Math.random() > 0.5 ? '#bfe3ff' : '#ffffff')
+        });
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+    }
+
+    function drawParticles(ctx) {
+      particles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    /* ── Draw The Sacred Flower Petals & Blossom Figure ── */
+    function drawFlowerPetalsFigure(ctx) {
+      if (wingGlowAlpha <= 0) return;
+
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, wingGlowAlpha);
+
+      // Helper to fetch star coordinates
+      const pt = (id) => constellationStars[id];
+
+      // 1. Tail Fan Polygon [0, 1, 3, 2]
+      ctx.beginPath();
+      ctx.moveTo(pt(0).x, pt(0).y);
+      ctx.lineTo(pt(1).x, pt(1).y);
+      ctx.lineTo(pt(3).x, pt(3).y);
+      ctx.lineTo(pt(2).x, pt(2).y);
+      ctx.closePath();
+      const tailGrad = ctx.createRadialGradient(pt(0).x, pt(0).y, 5, pt(3).x, pt(3).y, 100);
+      tailGrad.addColorStop(0, 'rgba(255, 230, 140, 0.32)');
+      tailGrad.addColorStop(1, 'rgba(212, 175, 55, 0.08)');
+      ctx.fillStyle = tailGrad;
+      ctx.fill();
+
+      // 2. West Wing Polygon [4, 5, 6, 7, 8, 9, 10, 11]
+      ctx.beginPath();
+      ctx.moveTo(pt(4).x, pt(4).y);
+      [5, 6, 7, 8, 9, 10, 11].forEach(id => ctx.lineTo(pt(id).x, pt(id).y));
+      ctx.closePath();
+      const wGrad = ctx.createRadialGradient(pt(4).x, pt(4).y, 10, pt(7).x, pt(7).y, 280);
+      wGrad.addColorStop(0, 'rgba(255, 225, 130, 0.28)');
+      wGrad.addColorStop(0.5, 'rgba(212, 175, 55, 0.14)');
+      wGrad.addColorStop(1, 'rgba(120, 180, 255, 0.03)');
+      ctx.fillStyle = wGrad;
+      ctx.fill();
+
+      // 3. East Wing Polygon [4, 12, 13, 14, 15, 16, 17, 18]
+      ctx.beginPath();
+      ctx.moveTo(pt(4).x, pt(4).y);
+      [12, 13, 14, 15, 16, 17, 18].forEach(id => ctx.lineTo(pt(id).x, pt(id).y));
+      ctx.closePath();
+      const eGrad = ctx.createRadialGradient(pt(4).x, pt(4).y, 10, pt(14).x, pt(14).y, 280);
+      eGrad.addColorStop(0, 'rgba(255, 225, 130, 0.28)');
+      eGrad.addColorStop(0.5, 'rgba(212, 175, 55, 0.14)');
+      eGrad.addColorStop(1, 'rgba(120, 180, 255, 0.03)');
+      ctx.fillStyle = eGrad;
+      ctx.fill();
+
+      // 4. Delicate Internal Feather Ribs (Ray filaments from Heart into wings)
+      ctx.strokeStyle = 'rgba(255, 235, 160, 0.45)';
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([4, 4]);
+
+      // West Ribs
+      ctx.beginPath();
+      ctx.moveTo(pt(4).x, pt(4).y);
+      ctx.lineTo(pt(8).x, pt(8).y);
+      ctx.moveTo(pt(4).x, pt(4).y);
+      ctx.lineTo(pt(9).x, pt(9).y);
+      ctx.stroke();
+
+      // East Ribs
+      ctx.beginPath();
+      ctx.moveTo(pt(4).x, pt(4).y);
+      ctx.lineTo(pt(15).x, pt(15).y);
+      ctx.moveTo(pt(4).x, pt(4).y);
+      ctx.lineTo(pt(16).x, pt(16).y);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+
+      // 5. Luminous Forward Spine
+      ctx.beginPath();
+      ctx.moveTo(pt(4).x, pt(4).y);
+      ctx.lineTo(pt(21).x, pt(21).y);
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = 'rgba(255, 240, 190, 0.4)';
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    /* ── Main Constellation Canvas Render Loop ── */
+    function drawConstellation(time) {
+      constCtx.clearRect(0, 0, width, height);
+
+      // Smooth camera interpolation
+      camera.x += (camera.targetX - camera.x) * 0.15;
+      camera.y += (camera.targetY - camera.y) * 0.15;
+      camera.zoom += (camera.targetZoom - camera.zoom) * 0.15;
+
+      constCtx.save();
+      constCtx.translate(width * 0.5 + camera.x, height * 0.5 + camera.y);
+      constCtx.scale(camera.zoom, camera.zoom);
+      constCtx.translate(-width * 0.5, -height * 0.5);
+
+      // Handle Wing Fade-in on Victory
+      if (isCompleted && wingGlowAlpha < 1.0) {
+        wingGlowAlpha = Math.min(1.0, wingGlowAlpha + 0.025);
+      }
+      drawFlowerPetalsFigure(constCtx);
+
+      // 1. Draw Completed Golden Lines
+      constCtx.lineWidth = 2.4;
+      constCtx.strokeStyle = isCompleted ? '#ffd978' : '#e6c268';
+      constCtx.shadowColor = '#dfb256';
+      constCtx.shadowBlur = isCompleted ? 25 : 12;
+
+      completedLines.forEach(line => {
+        const s1 = constellationStars[line.from];
+        const s2 = constellationStars[line.to];
+        if (s1 && s2) {
+          constCtx.beginPath();
+          constCtx.moveTo(s1.x, s1.y);
+          constCtx.lineTo(s2.x, s2.y);
+          constCtx.stroke();
+        }
+      });
+
+      // 2. Draw Live Drag Line from Active Star
+      if (activeStarId !== null && dragPos && !isCompleted) {
+        const s = constellationStars[activeStarId];
+        constCtx.beginPath();
+        constCtx.moveTo(s.x, s.y);
+        constCtx.lineTo(dragPos.x, dragPos.y);
+        constCtx.lineWidth = 1.8;
+        constCtx.strokeStyle = 'rgba(255, 230, 150, 0.8)';
+        constCtx.setLineDash([5, 5]);
+        constCtx.stroke();
+        constCtx.setLineDash([]);
+      }
+
+      // 3. Draw Failure Crimson Line if Active
+      if (failLine) {
+        constCtx.save();
+        constCtx.lineWidth = 3.2;
+        constCtx.strokeStyle = `rgba(255, 75, 75, ${failLine.alpha})`;
+        constCtx.shadowColor = '#ff3333';
+        constCtx.shadowBlur = 20;
+        constCtx.beginPath();
+        constCtx.moveTo(failLine.x1, failLine.y1);
+        constCtx.lineTo(failLine.x2, failLine.y2);
+        constCtx.stroke();
+        constCtx.restore();
+
+        failLine.alpha -= 0.035;
+        if (failLine.alpha <= 0) failLine = null;
+      }
+
+      // 3.5 Sacred Whisper Illumination (1-Time Divine Glimpse)
+      if (Date.now() < hintActiveUntil && hintTargetStarId !== null) {
+        const hStar = constellationStars[hintTargetStarId];
+        if (hStar) {
+          const remainingSec = (hintActiveUntil - Date.now()) / 1000;
+          const cycle = (Date.now() % 1500) / 1500;
+          const rRing = hStar.mag + 8 + cycle * 30;
+          const alphaRing = Math.sin(cycle * Math.PI) * Math.min(1, remainingSec);
+
+          constCtx.save();
+          // Pulsing Golden Ring
+          constCtx.beginPath();
+          constCtx.arc(hStar.x, hStar.y, rRing, 0, Math.PI * 2);
+          constCtx.strokeStyle = `rgba(255, 225, 120, ${alphaRing * 0.95})`;
+          constCtx.lineWidth = 2.2;
+          constCtx.setLineDash([5, 4]);
+          constCtx.stroke();
+
+          // Inner counter-glow
+          constCtx.beginPath();
+          constCtx.arc(hStar.x, hStar.y, hStar.mag * 3.0, 0, Math.PI * 2);
+          constCtx.strokeStyle = 'rgba(255, 240, 180, 0.75)';
+          constCtx.lineWidth = 1.4;
+          constCtx.setLineDash([]);
+          constCtx.stroke();
+
+          // Luminous golden name display while hint is active
+          const isMobile = width < 600;
+          constCtx.font = `bold ${isMobile ? 8.2 : 11}px 'Cinzel', serif`;
+          constCtx.textAlign = 'center';
+          constCtx.textBaseline = 'middle';
+          constCtx.strokeStyle = 'rgba(2, 4, 10, 0.98)';
+          constCtx.lineWidth = 3.2;
+          constCtx.strokeText(hStar.name, hStar.x, hStar.y + hStar.mag + 14);
+          constCtx.fillStyle = '#ffd978';
+          constCtx.shadowColor = '#ffd978';
+          constCtx.shadowBlur = 12;
+          constCtx.fillText(hStar.name, hStar.x, hStar.y + hStar.mag + 14);
+          constCtx.restore();
+        }
+      }
+
+      constCtx.shadowBlur = 0;
+
+      // 4. Update & Draw Particles
+      updateParticles();
+      drawParticles(constCtx);
+
+      // 5. Draw Constellation Stars (All 22 stars)
+      constellationStars.forEach((s) => {
+        const isHead = (activeStarId === s.id);
+        const isVisited = completedLines.some(l => l.from === s.id || l.to === s.id);
+        const pulse = Math.sin(time * 0.003 + s.pulseOffset) * 0.2 + 0.8;
+
+        // Outer Glow Halo
+        const glowRad = s.mag * (isHead ? 3.6 : (isVisited ? 2.6 : 1.9)) * pulse;
+        const radGrad = constCtx.createRadialGradient(s.x, s.y, 1, s.x, s.y, glowRad);
+        radGrad.addColorStop(0, isHead ? 'rgba(255, 240, 180, 0.95)' : 'rgba(212, 175, 55, 0.6)');
+        radGrad.addColorStop(0.5, 'rgba(212, 175, 55, 0.25)');
+        radGrad.addColorStop(1, 'rgba(212, 175, 55, 0)');
+        constCtx.fillStyle = radGrad;
+        constCtx.beginPath();
+        constCtx.arc(s.x, s.y, glowRad, 0, Math.PI * 2);
+        constCtx.fill();
+
+        // Star Core
+        constCtx.beginPath();
+        constCtx.arc(s.x, s.y, s.mag * (isHead ? 0.85 : 0.68), 0, Math.PI * 2);
+        constCtx.fillStyle = s.color;
+        constCtx.shadowColor = '#ffffff';
+        constCtx.shadowBlur = isHead ? 14 : 5;
+        constCtx.fill();
+        constCtx.shadowBlur = 0;
+
+        // Active Rotating Compass Ring on the Current Star
+        if (isHead) {
+          constCtx.beginPath();
+          constCtx.arc(s.x, s.y, 18 * pulse, 0, Math.PI * 2);
+          constCtx.strokeStyle = 'rgba(255, 217, 120, 0.8)';
+          constCtx.lineWidth = 1.3;
+          constCtx.stroke();
+        } else if (s.id === 0 && currentStep === 0) {
+          // Deneb Anchor Callout Pulse
+          constCtx.beginPath();
+          constCtx.arc(s.x, s.y, 16 * pulse, 0, Math.PI * 2);
+          constCtx.strokeStyle = 'rgba(223, 178, 86, 0.65)';
+          constCtx.lineWidth = 1.2;
+          constCtx.stroke();
+        }
+
+        // Star Label: Strictly and exclusively the 5 iconic landmark stars of Cygnus across all views and zoom levels
+        const isMobile = width < 600;
+        const shouldShowLabel = [0, 4, 5, 13, 21].includes(s.id); // Deneb, Sadr, Delta Cygni, Gienah, Albireo
+
+        if (shouldShowLabel) {
+          const fontSize = isMobile ? 7.6 : 10.5;
+          let align = s.labelAlign || 'center';
+          let dx = s.labelDx || 0;
+          let dy = s.labelDy !== undefined ? s.labelDy : (s.mag + (isMobile ? 10 : 16));
+
+          if (isMobile) {
+            if (s.id === 7 || s.id === 14) { // Wingtips (Iota & Zeta)
+              align = 'center';
+              dx = 0;
+              dy = s.mag + 10;
+            }
+          }
+
+          const lx = s.x + (isMobile ? dx * 0.8 : dx);
+          const ly = s.y + (isMobile ? dy * 0.8 : dy);
+
+          constCtx.save();
+          constCtx.textAlign = align;
+          constCtx.textBaseline = 'middle';
+          constCtx.lineJoin = 'round';
+          constCtx.miterLimit = 2;
+
+          // Dark shadow stroke for 100% crisp contrast against nebula
+          constCtx.font = `bold ${fontSize}px 'Cinzel', serif`;
+          constCtx.strokeStyle = 'rgba(2, 4, 10, 0.98)';
+          constCtx.lineWidth = isMobile ? 2.8 : 3.8;
+          constCtx.strokeText(s.name, lx, ly);
+
+          // Luminous pure white fill (or gold if active/visited)
+          constCtx.fillStyle = isHead ? '#ffffff' : (isVisited ? '#ffd978' : '#ffffff');
+          constCtx.shadowColor = isHead ? '#ffd978' : 'rgba(212, 175, 55, 0.45)';
+          constCtx.shadowBlur = isHead ? 10 : 3;
+          constCtx.fillText(s.name, lx, ly);
+          constCtx.restore();
+        }
+      });
+      constCtx.restore();
+    }
+
+    /* ── Touch, Drag & Camera Pan/Zoom Handling ── */
+    let isPanning = false;
+    let panStart = { x: 0, y: 0 };
+    let cameraStart = { x: 0, y: 0 };
+
+    let isPinching = false;
+    let pinchStartDist = 0;
+    let pinchStartZoom = 1.0;
+
+    let isDraggingLine = false;
+    let dragStartPos = { x: 0, y: 0 };
+
+    function getStarAt(screenPos) {
+      const worldPos = screenToWorld(screenPos.x, screenPos.y);
+      // Precise hit target: 22px on mobile, 18px on desktop (no sloppy false triggers)
+      const hitRadius = (width < 600 ? 22 : 18) / camera.zoom;
+      let closestIdx = -1;
+      let closestDistSq = hitRadius * hitRadius;
+
+      for (let i = 0; i < constellationStars.length; i++) {
+        const s = constellationStars[i];
+        const dx = s.x - worldPos.x;
+        const dy = s.y - worldPos.y;
+        const dSq = dx * dx + dy * dy;
+        if (dSq <= closestDistSq) {
+          closestDistSq = dSq;
+          closestIdx = i;
+        }
+      }
+      return closestIdx;
+    }
+
+    function handlePointerDown(screenPos) {
+      if (isCompleted) return;
+      initAudio();
+
+      const starIdx = getStarAt(screenPos);
+
+      // Step 0: Initial activation of the flower
+      if (currentStep === 0 && activeStarId === null) {
+        if (starIdx === 0) {
+          // Initiate flight at Deneb and allow dragging immediately
+          activeStarId = 0;
+          isDraggingLine = true;
+          dragStartPos = screenPos;
+          dragPos = screenToWorld(screenPos.x, screenPos.y);
+          playStepChime(0);
+          triggerHaptic('tap');
+          spawnStardust(constellationStars[0].x, constellationStars[0].y, 25, '#ffd978', 2.0);
+          updateHud();
+        } else if (starIdx !== -1) {
+          triggerFailure(constellationStars[starIdx], "The bloom must begin at the Apex (Deneb).");
+        } else {
+          // Empty sky: pan camera
+          isPanning = true;
+          panStart = screenPos;
+          cameraStart = { x: camera.targetX, y: camera.targetY };
+        }
+        return;
+      }
+
+      // Active Flight: MUST drag from the active anchor!
+      // Tapping another star will NEVER connect: it simply pans the camera
+      if (starIdx === activeStarId) {
+        isDraggingLine = true;
+        dragStartPos = screenPos;
+        dragPos = screenToWorld(screenPos.x, screenPos.y);
+        triggerHaptic('tap');
+      } else {
+        // Any press not on activeStarId is treated as camera pan
+        isPanning = true;
+        panStart = screenPos;
+        cameraStart = { x: camera.targetX, y: camera.targetY };
+      }
+    }
+
+    function handlePointerMove(screenPos) {
+      spawnFingerTrail(screenPos.x, screenPos.y);
+
+      if (isDraggingLine && activeStarId !== null && !isCompleted) {
+        dragPos = screenToWorld(screenPos.x, screenPos.y);
+      } else if (isPanning) {
+        const dx = screenPos.x - panStart.x;
+        const dy = screenPos.y - panStart.y;
+        const maxPan = Math.max(140, (width * 0.5) * (camera.targetZoom - 0.65));
+        camera.targetX = Math.max(-maxPan, Math.min(maxPan, cameraStart.x + dx));
+        camera.targetY = Math.max(-maxPan, Math.min(maxPan, cameraStart.y + dy));
+      }
+    }
+
+    function handlePointerUp(screenPos) {
+      if (isPanning) {
+        isPanning = false;
+      }
+
+      if (isDraggingLine && activeStarId !== null && !isCompleted) {
+        isDraggingLine = false;
+        const dragDist = Math.hypot(screenPos.x - dragStartPos.x, screenPos.y - dragStartPos.y);
+
+        // MUST have actually dragged (at least 12px) to attempt a connection
+        if (dragDist > 12) {
+          const targetStarIdx = getStarAt(screenPos);
+          if (targetStarIdx !== -1 && targetStarIdx !== activeStarId) {
+            attemptConnection(targetStarIdx);
+          }
+        }
+        dragPos = null;
+      }
+    }
+
+    /* ── Connection Evaluation with Movement Checkpoints & Auto-Focus ── */
+    function attemptConnection(targetId) {
+      if (currentStep >= FLIGHT_PATH.length) return;
+
+      const expected = FLIGHT_PATH[currentStep];
+      const sFrom = constellationStars[activeStarId];
+      const sTo = constellationStars[targetId];
+
+      if (activeStarId === expected.from && targetId === expected.to) {
+        // ── SUCCESSFUL STEP ──
+        completedLines.push({ from: activeStarId, to: targetId });
+        currentStep++;
+        activeStarId = targetId;
+
+        spawnStardust(sTo.x, sTo.y, 28, '#ffd978', 2.4);
+
+        // Check if movement milestone reached (sensory feedback without saving checkpoint)
+        if (MOVEMENT_MILESTONES.includes(currentStep)) {
+          playCheckpointChime();
+          triggerHaptic('checkpoint');
+          spawnStardust(sTo.x, sTo.y, 50, '#ffe29a', 3.4);
+
+          const badge = document.getElementById('status-badge');
+          badge.classList.add('success');
+          if (currentStep === 6) {
+            badge.innerText = "✦ Movement I Sealed · Heart Reached ✦";
+            // Feature 2: Auto-focus smoothly onto West Wing
+            setTimeout(() => focusOnStar(5, 1.45), 450);
+          } else if (currentStep === 14) {
+            badge.innerText = "✦ Movement II Sealed · West Wing Complete ✦";
+            // Feature 2: Auto-focus smoothly onto East Wing
+            setTimeout(() => focusOnStar(12, 1.45), 450);
+          } else if (currentStep === 22) {
+            badge.innerText = "✦ Movement III Sealed · East Wing Complete ✦";
+            // Feature 2: Auto-focus smoothly onto Slender Neck & Beak
+            setTimeout(() => focusOnStar(19, 1.40), 450);
+          }
+          setTimeout(() => {
+            if (!isCompleted) badge.classList.remove('success');
+          }, 3200);
+        } else {
+          playStepChime(currentStep);
+          triggerHaptic('step');
+        }
+
+        updateHud();
+
+        if (currentStep === FLIGHT_PATH.length) {
+          triggerVictory();
+        }
+      } else {
+        // ── FAILURE: FULL SKY RESET (MUST COMPLETE IN ONE GO) ──
+        triggerHaptic('fail');
+        triggerFailure(sTo, "The flight broke away from the stars.", sFrom);
+      }
+    }
+
+    function triggerFailure(failedStar, message, fromStar = null) {
+      playFailureDissonance();
+
+      if (fromStar && failedStar) {
+        failLine = { x1: fromStar.x, y1: fromStar.y, x2: failedStar.x, y2: failedStar.y, alpha: 1.0 };
+        spawnStardust((fromStar.x + failedStar.x) * 0.5, (fromStar.y + failedStar.y) * 0.5, 36, '#ff4d4d', 3.6);
+      } else if (failedStar) {
+        spawnStardust(failedStar.x, failedStar.y, 30, '#ff4d4d', 3.2);
+      }
+
+      // Trigger Screen Tremor Animation
+      document.body.classList.add('tremor');
+      setTimeout(() => document.body.classList.remove('tremor'), 400);
+
+      // Must complete in a single run: full sky reset back to Deneb
+      currentStep = 0;
+      activeStarId = null;
+      completedLines = [];
+
+      // Update HUD to Alert
+      const badge = document.getElementById('status-badge');
+      const text = document.getElementById('instruction-text');
+      const sub = document.getElementById('instruction-sub');
+
+      badge.classList.add('failed');
+      badge.innerText = "✦ Alignment Fractured · Sky Resets ✦";
+      text.innerText = message;
+      sub.innerText = "Touch Deneb (The Apex) to initiate the bloom anew";
+
+      setTimeout(() => {
+        if (!isCompleted) {
+          badge.classList.remove('failed');
+          updateHud();
+          updateHintButtonUi();
+        }
+      }, 2500);
+    }
+
+    function updateHud() {
+      const badge = document.getElementById('status-badge');
+      const text = document.getElementById('instruction-text');
+      const sub = document.getElementById('instruction-sub');
+
+      badge.classList.remove('failed');
+
+      if (currentStep === 0 && activeStarId === null) {
+        badge.innerText = "Phase I · The Celestial Flower";
+        text.innerText = "Touch the apex anchor (Deneb) to initiate the bloom.";
+        sub.innerText = "Step 0 of 25 · Consult the Codex of the Flower for the sacred route";
+      } else if (currentStep === 0 && activeStarId === 0) {
+        badge.innerText = "Phase I · Bloom in Motion";
+        text.innerText = "Trace the twenty-two stars of the Celestial Flower in the sacred order.";
+        sub.innerText = "Step 1 of 25 · Current Anchor: Deneb (Tap next star or drag)";
+      } else if (currentStep < FLIGHT_PATH.length) {
+        badge.innerText = "Phase I · Bloom in Motion";
+        text.innerText = "Trace the twenty-two stars of the Celestial Flower in the sacred order.";
+        const anchorName = constellationStars[activeStarId].name;
+        sub.innerText = `Anchors Aligned: ${currentStep} of 25 · Current Anchor: ${anchorName} (Tap next star)`;
+      }
+    }
+
+    function triggerVictory() {
+      isCompleted = true;
+      try { localStorage.setItem('order_flower_completed', 'true'); } catch (e) {}
+      playVictoryFanfare();
+      triggerHaptic('victory');
+      recenterCamera();
+
+      const badge = document.getElementById('status-badge');
+      const text = document.getElementById('instruction-text');
+      const sub = document.getElementById('instruction-sub');
+
+      badge.classList.remove('failed');
+      badge.classList.add('success');
+      badge.innerText = "✦ The Celestial Flower Awakens · Phase I Complete ✦";
+      text.innerText = "The celestial flower is fully revealed. The archive unseals.";
+      sub.innerText = "✦ 25 of 25 Anchors Aligned · Archive Open ✦";
+
+      const btnViewRelics = document.getElementById('btn-view-relics');
+      if (btnViewRelics) btnViewRelics.style.display = 'inline-flex';
+
+      // Spawn large starlight explosion at center (Sadr)
+      const sadr = constellationStars[4];
+      spawnStardust(sadr.x, sadr.y, 70, '#ffd978', 4.5);
+      spawnStardust(sadr.x, sadr.y, 50, '#ffffff', 3.2);
+
+      setTimeout(() => {
+        document.getElementById('revelation-modal').classList.add('visible');
+      }, 2400);
+    }
+
+    /* ── Event Listeners for Touch and Mouse ── */
+    function getPointerPos(e) {
+      const rect = constCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    constCanvas.addEventListener('mousedown', (e) => handlePointerDown(getPointerPos(e)));
+    window.addEventListener('mousemove', (e) => handlePointerMove(getPointerPos(e)));
+    window.addEventListener('mouseup', (e) => handlePointerUp(getPointerPos(e)));
+
+    constCanvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (e.touches.length === 2) {
+        isPinching = true;
+        isPanning = false;
+        dragPos = null;
+        pinchStartDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        pinchStartZoom = camera.targetZoom;
+      } else if (e.touches.length === 1) {
+        isPinching = false;
+        handlePointerDown(getPointerPos(e));
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && isPinching) {
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const newZoom = pinchStartZoom * (dist / Math.max(10, pinchStartDist));
+        camera.targetZoom = Math.max(camera.minZoom, Math.min(camera.maxZoom, newZoom));
+      } else if (e.touches.length === 1 && !isPinching) {
+        handlePointerMove(getPointerPos(e));
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) {
+        isPinching = false;
+      }
+      if (e.changedTouches.length > 0) {
+        const touch = e.changedTouches[0];
+        const rect = constCanvas.getBoundingClientRect();
+        handlePointerUp({ x: touch.clientX - rect.left, y: touch.clientY - rect.top });
+      }
+    });
+
+    window.addEventListener('wheel', (e) => {
+      const factor = e.deltaY < 0 ? 1.15 : 0.87;
+      zoomRelative(factor);
+    }, { passive: true });
+
+    /* ── Camera Buttons (Zoom in, Zoom out, Recenter / Focus Anchor) ── */
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      initAudio();
+      triggerHaptic('tap');
+      zoomRelative(1.30);
+    });
+
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      initAudio();
+      triggerHaptic('tap');
+      zoomRelative(1 / 1.30);
+    });
+
+    document.getElementById('btn-recenter').addEventListener('click', () => {
+      initAudio();
+      triggerHaptic('tap');
+      if (isCompleted) {
+        recenterCamera();
+      } else if (activeStarId !== null) {
+        focusOnStar(activeStarId);
+      } else {
+        recenterCamera();
+      }
+    });
+
+    /* ── Controls Handlers (Codex Warning, Codex, Sound, Reset, Modals) ── */
+    const confirmModal = document.getElementById('confirm-modal');
+    const codexModal = document.getElementById('codex-modal');
+
+    document.getElementById('btn-codex').addEventListener('click', () => {
+      initAudio();
+      triggerHaptic('tap');
+      confirmModal.classList.add('visible');
+    });
+
+    document.getElementById('btn-confirm-cancel').addEventListener('click', () => {
+      confirmModal.classList.remove('visible');
+    });
+
+    document.getElementById('btn-confirm-break').addEventListener('click', () => {
+      confirmModal.classList.remove('visible');
+      codexModal.classList.add('visible');
+    });
+
+    document.getElementById('btn-close-codex').addEventListener('click', () => {
+      codexModal.classList.remove('visible');
+    });
+
+    /* ── Hint Handlers (Celestial Whisper 1-Time Permanent Clue) ── */
+    const hintConfirmModal = document.getElementById('hint-confirm-modal');
+
+    document.getElementById('btn-hint').addEventListener('click', () => {
+      initAudio();
+      if (hintUsed) {
+        triggerHaptic('fail');
+        const text = document.getElementById('instruction-text');
+        const prev = text.innerText;
+        text.innerText = "The Celestial Whisper has already faded for this trial.";
+        setTimeout(() => { if (!isCompleted) text.innerText = prev; }, 3500);
+        return;
+      }
+      if (activeStarId === null) {
+        triggerHaptic('tap');
+        const text = document.getElementById('instruction-text');
+        const prev = text.innerText;
+        text.innerText = "Touch the apex anchor (Deneb) to initiate the bloom first.";
+        setTimeout(() => { if (!isCompleted) text.innerText = prev; }, 3500);
+        return;
+      }
+      if (isCompleted || currentStep >= FLIGHT_PATH.length) {
+        return;
+      }
+      triggerHaptic('tap');
+      hintConfirmModal.classList.add('visible');
+    });
+
+    document.getElementById('btn-hint-cancel').addEventListener('click', () => {
+      triggerHaptic('tap');
+      hintConfirmModal.classList.remove('visible');
+    });
+
+    document.getElementById('btn-hint-confirm').addEventListener('click', () => {
+      hintConfirmModal.classList.remove('visible');
+      if (hintUsed || isCompleted || currentStep >= FLIGHT_PATH.length || activeStarId === null) {
+        return;
+      }
+
+      hintUsed = true;
+      try {
+        localStorage.setItem('eclipse_flower_hint_used', 'true');
+      } catch (e) {}
+      updateHintButtonUi();
+
+      hintTargetStarId = FLIGHT_PATH[currentStep].to;
+      hintActiveUntil = Date.now() + 8500;
+
+      const targetStar = constellationStars[hintTargetStarId];
+      if (targetStar) {
+        spawnStardust(targetStar.x, targetStar.y, 45, '#ffd978', 3.5);
+        spawnStardust(targetStar.x, targetStar.y, 30, '#ffffff', 2.5);
+        playCheckpointChime();
+        triggerHaptic('checkpoint');
+      }
+
+      const text = document.getElementById('instruction-text');
+      const prev = text.innerText;
+      text.innerText = "✦ The Celestial Whisper illuminates the next anchor ✦";
+      setTimeout(() => { if (!isCompleted) text.innerText = prev; }, 4500);
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      triggerHaptic('tap');
+      completedLines = [];
+      currentStep = 0;
+      activeStarId = null;
+      isDraggingLine = false;
+      dragPos = null;
+      isCompleted = false;
+      wingGlowAlpha = 0;
+      failLine = null;
+      recenterCamera();
+      const badge = document.getElementById('status-badge');
+      badge.classList.remove('failed');
+      badge.classList.remove('success');
+      updateHud();
+      updateHintButtonUi();
+      document.getElementById('revelation-modal').classList.remove('visible');
+      codexModal.classList.remove('visible');
+      const btnViewRelics = document.getElementById('btn-view-relics');
+      if (btnViewRelics) btnViewRelics.style.display = 'none';
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('btn-sound').style.opacity = soundEnabled ? '1.0' : '0.4';
+    });
+
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+      document.getElementById('revelation-modal').classList.remove('visible');
+    });
+
+    /* Resize Handler */
+    window.addEventListener('resize', () => {
+      resizeCanvases();
+      initBackgroundStars();
+      layoutConstellationStars();
+    });
+
+    /* Main Render & Setup Loop */
+    initBackgroundStars();
+    layoutConstellationStars();
+    updateHud();
+    updateHintButtonUi();
+
+    // Support hash testing
+    if (window.location.hash === '#confirm-warning') {
+      confirmModal.classList.add('visible');
+    }
+    if (window.location.hash === '#hint-modal') {
+      hintConfirmModal.classList.add('visible');
+    }
+
+    if (window.location.hash.startsWith('#codex')) {
+      codexModal.classList.add('visible');
+      if (window.location.hash === '#codex-bottom') {
+        setTimeout(() => {
+          const scrollInner = document.querySelector('.codex-scroll-inner');
+          if (scrollInner) scrollInner.scrollTop = scrollInner.scrollHeight;
+        }, 100);
+      }
+    }
+
+    // Harmonized default state (Silvia has canonically completed this prologue stage)
+    const isFlowerSavedDone = localStorage.getItem('order_flower_completed') !== 'false';
+    if (isFlowerSavedDone || window.location.hash === '#figure') {
+      try { localStorage.setItem('order_flower_completed', 'true'); } catch (e) {}
+      completedLines = FLIGHT_PATH.map(p => ({ from: p.from, to: p.to }));
+      isCompleted = true;
+      currentStep = FLIGHT_PATH.length;
+      wingGlowAlpha = 1.0;
+      const badge = document.getElementById('status-badge');
+      if (badge) {
+        badge.classList.remove('failed');
+        badge.classList.add('success');
+        badge.innerText = "✦ The Celestial Flower Awakens · Phase I Harmonized ✦";
+      }
+      const instructionText = document.getElementById('instruction-text');
+      if (instructionText) instructionText.innerText = "The celestial flower is fully revealed and harmonized. The sanctuary archive is open.";
+      const instructionSub = document.getElementById('instruction-sub');
+      if (instructionSub) instructionSub.innerText = "✦ 25 of 25 Anchors Aligned · Harmonized ✓ (Tap Reset to trace again) ✦";
+      const btnViewRelics = document.getElementById('btn-view-relics');
+      if (btnViewRelics) btnViewRelics.style.display = 'inline-flex';
+    }
+
+    const btnViewRelicsEl = document.getElementById('btn-view-relics');
+    if (btnViewRelicsEl) {
+      btnViewRelicsEl.addEventListener('click', () => {
+        document.getElementById('revelation-modal').classList.add('visible');
+      });
+    }
+    const btnRelicsIcon = document.getElementById('btn-relics-icon');
+    if (btnRelicsIcon) {
+      btnRelicsIcon.addEventListener('click', () => {
+        document.getElementById('revelation-modal').classList.add('visible');
+      });
+    }
+
+    // Support #preview for immediate inspection of completed modal
+    if (window.location.hash.startsWith('#preview') || window.location.search.includes('modal=1')) {
+      completedLines = FLIGHT_PATH.map(p => ({ from: p.from, to: p.to }));
+      isCompleted = true;
+      wingGlowAlpha = 1.0;
+      document.getElementById('status-badge').innerText = "✦ Flower Awakened · Archive Open ✦";
+      document.getElementById('revelation-modal').classList.add('visible');
+      if (window.location.hash === '#preview-bottom') {
+        setTimeout(() => {
+          const scrollInner = document.querySelector('.modal-scroll-inner');
+          if (scrollInner) scrollInner.scrollTop = scrollInner.scrollHeight;
+        }, 100);
+      }
+    }
+
+    function animate(time) {
+      drawBackground(time);
+      drawConstellation(time);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  </script>
+  <!-- Universal Order Codex Drawer -->
+  <script src="../../shared/navigator.js"></script>
+ </body>
+ </html>

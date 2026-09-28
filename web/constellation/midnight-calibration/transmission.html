@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Station 08: The Shifting Tempest & Emergency Transmission · The Eclipse Order</title>
+  <meta name="description" content="Cinematic optical intercept of the shifting tempest and 142.85 MHz emergency radio transit dispatch.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Shared Navigator & Codex Stylesheet -->
+  <link rel="stylesheet" href="../../shared/navigator.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=20.0">
+</head>
+<body class="transmission-page">
+
+  <!-- Background Ambience & Storm Particle Canvases -->
+  <canvas id="ambient-sky-canvas"></canvas>
+  <canvas id="storm-canvas"></canvas>
+
+  <!-- Ceremonial Quest Header -->
+  <header class="quest-header">
+    <div class="order-badge">
+      <span class="pulse-dot"></span>
+      ✦ THE ECLIPSE ORDER · CONSTELLATION PATH // 142.85 MHz ✦
+    </div>
+    <div class="quest-title-wrap">
+      <span class="quest-eyebrow">STATION 08 · NOCTURNAL MERIDIAN TRANSIT</span>
+      <h1 class="quest-main-title">The Shifting Tempest & The Emergency Wire</h1>
+      <p class="quest-subtitle">
+        The Mountain Sanctuary Aperture has engaged at 97°. An apocalyptic wall of copper sand erupts across the horizon.
+      </p>
+    </div>
+  </header>
+
+  <!-- Main Experience Wrapper -->
+  <main class="midnight-calibration-app" id="app-root">
+
+    <!-- ====================================================================
+         SECTION 1: THE SHIFTING TEMPEST · 24-SECOND MASTER CINEMATIC
+         Photorealistic Video Generated via Google AI Studio Veo 3.1
+         ==================================================================== -->
+    <section class="cinematic-theater-deck" id="cinematic-theater-deck">
+      <div class="theater-header-bar">
+        <div class="theater-title-wrap">
+          <span>✦ THE SHIFTING TEMPEST // MASTER CINEMATIC CAPTURE</span>
+        </div>
+        <div class="theater-badge">
+          <span class="rec-dot"></span>
+          <span>OPTICAL INTERCEPT // 1080p 24fps</span>
+        </div>
+      </div>
+
+      <!-- High-End 16:9 Screen Frame with Video Player -->
+      <div class="cinematic-screen-frame">
+        <video id="tempest-cinematic-video" controls playsinline preload="auto" poster="video/tempest_poster.jpg">
+          <source src="video/tempest_cinematic_master.mp4" type="video/mp4">
+          Your browser does not support high-definition HTML5 video playback.
+        </video>
+        <div class="video-overlay-hud">
+          <span class="hud-tag rec"><span class="rec-dot"></span> OPTICAL LOG // MERIDIAN APERTURE ENGAGED</span>
+          <span class="hud-tag time">00:24 // VEO 3.1 CINEMATIC MASTER</span>
+        </div>
+      </div>
+
+      <!-- Action Bar Below Cinema Deck -->
+      <div class="theater-action-row">
+        <button type="button" class="btn-replay-cinematic" id="btn-replay-video">
+          <span>↺ Replay Cinematic</span>
+        </button>
+        <button type="button" class="btn-scroll-transceiver" id="btn-scroll-to-radio">
+          <span>⚡ PROCEED TO EMERGENCY TRANSCEIVER (142.85 MHz) ➔</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Anchor Wrap for Smooth Transition -->
+    <div class="transceiver-anchor-wrap" id="transceiver-anchor"></div>
+
+    <!-- ====================================================================
+         SECTION 2: THE 142.85 MHz EMERGENCY RADIO TRANSCEIVER CHASSIS
+         Interactive Audio Player, Real-time CRT Oscilloscope & Teletype Transcript
+         ==================================================================== -->
+    <section class="emergency-radio-chassis active" id="emergency-radio-chassis">
+      <audio id="radio-audio-element" preload="auto"></audio>
+
+      <!-- Top Status Bar -->
+      <div class="radio-top-bar">
+        <div class="radio-brand">
+          <span style="font-weight:700;">MIL-SPEC TRANSCEIVER // 142.85 MHz</span>
+          <span style="color:#5a7b68;">·</span>
+          <span id="radio-current-title">DISPATCH 08-A // PRIORITY DISTRESS: THE SHIFTING TEMPEST</span>
+        </div>
+        <div class="radio-status-lights">
+          <span class="led-indicator">
+            <span class="led-bulb green active" id="led-radio-rx"></span>
+            <span>RX ACTIVE</span>
+          </span>
+          <span class="led-indicator">
+            <span class="led-bulb amber active" id="led-radio-tx"></span>
+            <span>CARRIER LOCK</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Tune / Demodulate Hero Button -->
+      <div class="radio-tune-banner" id="radio-tune-banner">
+        <button type="button" class="btn-tune-broadcast" id="btn-tune-broadcast">
+          <span class="tune-pulse-dot"></span>
+          <span class="tune-icon">📻</span>
+          <span class="tune-label">TUNE 142.85 MHz // DECRYPT CARTOGRAPHER'S DISTRESS CALL</span>
+          <span class="tune-icon">⚡</span>
+        </button>
+      </div>
+
+      <!-- Main Deck: Oscilloscope & Teletype -->
+      <div class="radio-deck-grid" id="radio-deck-grid">
+
+        <!-- Oscilloscope Deck (Left) -->
+        <div class="oscilloscope-chassis">
+          <div class="oscilloscope-screen-wrap">
+            <canvas id="radio-oscilloscope-canvas" width="280" height="120"></canvas>
+            <div class="oscilloscope-glass-glare"></div>
+          </div>
+
+          <!-- Audio Timeline & Scrubber -->
+          <div class="deck-timeline-row">
+            <span class="time-readout" id="radio-time-current">00:00</span>
+            <div class="scrubber-track-wrap">
+              <input type="range" id="radio-seek-slider" class="deck-seek-slider" min="0" max="72" step="0.1" value="0">
+              <div class="scrubber-bar-fill" id="radio-scrubber-fill"></div>
+            </div>
+            <span class="time-readout" id="radio-time-total">01:11</span>
+          </div>
+
+          <!-- Audio Playback Controls & Volume -->
+          <div class="tape-deck-controls">
+            <button type="button" class="btn-radio-control" id="btn-radio-play">▶ PLAY</button>
+            <button type="button" class="btn-radio-control" id="btn-radio-pause">⏸ PAUSE</button>
+            <button type="button" class="btn-radio-control" id="btn-radio-replay">↺ REPLAY</button>
+
+            <div class="deck-vol-group">
+              <button type="button" class="btn-deck-mute" id="btn-radio-mute" title="Mute/Unmute">
+                <span id="radio-mute-icon">🔊</span>
+              </button>
+              <input type="range" id="radio-vol-slider" class="deck-vol-slider" min="0" max="1" step="0.05" value="1">
+            </div>
+          </div>
+        </div>
+
+        <!-- Synchronized Teletype Transcript (Right) -->
+        <div class="radio-teletype-chassis">
+          <div class="teletype-header">
+            <span>TRANSCEIVER DECODER // CARRIER STREAM</span>
+            <span>142.85 MHz AUDIO DEMODULATOR</span>
+          </div>
+          <div class="radio-teletype-content" id="radio-teletype-content">
+            <div class="teletype-standby">
+              <span class="teletype-cursor">█</span> SQUELCH OPEN // 142.85 MHz CARRIER LOCKED. PRESS <strong>[ TUNE 142.85 MHz ]</strong> OR <strong>[ ▶ PLAY ]</strong> TO HEAR THE CARTOGRAPHER.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action to Advance to Emergency Transit Phase on New Dedicated Desert Page -->
+      <a href="transit.html" class="btn-proceed-emergency" id="btn-proceed-emergency">
+        <span>⚡ ENGAGE EMERGENCY TRANSIT RELAY (15:00 CARRIER WINDOW) ➔</span>
+      </a>
+    </section>
+
+  </main>
+
+  <!-- Simulation & Controller Scripts -->
+  <script src="storm.js?v=9.0"></script>
+  <script src="radio.js?v=9.0"></script>
+  <script src="transmission.js?v=1.0"></script>
+
+  <!-- Shared Universal Navigator & Codex -->
+  <script src="../../shared/navigator.js"></script>
+
+</body>
+</html>

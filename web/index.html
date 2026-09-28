@@ -1,0 +1,5019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Eclipse Order</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./shared/navigator.css">
+
+  <!-- Preload Critical Archival Plates (WebP Optimized for Instant Load) -->
+  <link rel="preload" as="image" href="./assets/emails/email-01-parchment.webp" type="image/webp">
+  <link rel="preload" as="image" href="./assets/emails/email-02-fragment-1.webp" type="image/webp">
+  <link rel="preload" as="image" href="./assets/emails/email-03-zodiac-outpost.webp" type="image/webp">
+  <link rel="prefetch" as="image" href="./assets/emails/email-01-parchment-full.webp" type="image/webp">
+  <link rel="prefetch" as="image" href="./assets/emails/email-02-fragment-1-full.webp" type="image/webp">
+  <link rel="prefetch" as="image" href="./assets/emails/email-03-zodiac-outpost-full.webp" type="image/webp">
+
+  <!-- Preload Chronicles & Star Map Thumbnails for 0ms Instant Display -->
+  <link rel="preload" as="image" href="./assets/thumbnails/celestial_flower_preview.webp" type="image/webp">
+  <link rel="preload" as="image" href="./assets/thumbnails/severed_sky.webp" type="image/webp">
+  <link rel="preload" as="image" href="./assets/thumbnails/radio_cover.webp" type="image/webp">
+  <link rel="preload" as="image" href="./assets/thumbnails/planisphere_preview.webp" type="image/webp">
+  <link rel="preload" as="image" href="./assets/thumbnails/zodiac_journal_preview.webp" type="image/webp">
+
+  <style>
+    :root {
+      --bg-darkest: #020409;
+      --bg-deep: #050811;
+      --bg-surface: #080d19;
+      --bg-panel: rgba(10, 16, 28, 0.94);
+      --bg-panel-hover: rgba(16, 25, 42, 0.98);
+      --brass-bright: #ffe099;
+      --brass-base: #d4a853;
+      --brass-dark: #7a541c;
+      --brass-shadow: #3b280a;
+      --brass-dim: rgba(212, 168, 83, 0.35);
+      --brass-glow: rgba(255, 224, 153, 0.45);
+      --cyan-beam: #4fe3c1;
+      --cyan-glow: rgba(79, 227, 193, 0.5);
+      --amber-pulse: #f6ad55;
+      --parchment: #f6eee3;
+      --parchment-dim: #a4b3ca;
+      --parchment-muted: #67758d;
+      --border-brass: 1.5px solid rgba(212, 168, 83, 0.35);
+      --border-brass-bright: 1.5px solid rgba(255, 224, 153, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg-darkest);
+      color: var(--parchment);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+    }
+
+    /* Ambient Space Canvas & Vignette Layers */
+    #ambient-stars {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.95;
+    }
+
+    .cosmic-nebula-layer {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(17, 36, 74, 0.45) 0%, transparent 60%),
+        radial-gradient(circle at 80% 70%, rgba(13, 44, 49, 0.35) 0%, transparent 55%),
+        radial-gradient(circle at 50% 50%, rgba(68, 47, 18, 0.2) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 1;
+      animation: nebulaPulse 28s ease-in-out infinite alternate;
+    }
+
+    @keyframes nebulaPulse {
+      0% { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.04); }
+    }
+
+    .cosmic-vignette {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 60% 40%, transparent 45%, rgba(1, 3, 6, 0.92) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+
+    /* Master Layout */
+    .game-hub-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* =========================================================================
+       SIDEBAR / TACTICAL DECK
+       ========================================================================= */
+    .hub-sidebar {
+      width: 310px;
+      background: linear-gradient(180deg, rgba(8, 14, 25, 0.98) 0%, rgba(4, 7, 13, 0.99) 100%);
+      border-right: 1.5px solid var(--border-brass);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      padding: 26px 20px;
+      z-index: 20;
+      box-shadow: 8px 0 36px rgba(0, 0, 0, 0.9);
+      position: relative;
+      transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1), padding 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hub-sidebar.collapsed {
+      width: 0 !important;
+      min-width: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      border-right: none !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .sidebar-collapse-btn {
+      position: absolute;
+      right: 12px;
+      top: 18px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(12, 18, 30, 0.9);
+      border: 1px solid var(--border-brass);
+      color: var(--brass-bright);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+      transition: all 0.2s ease;
+      z-index: 25;
+    }
+
+    .sidebar-collapse-btn:hover {
+      background: #142236;
+      border-color: var(--cyan-beam);
+      color: #ffffff;
+      transform: scale(1.1);
+    }
+
+    /* Floating toggle when sidebar is collapsed */
+    .btn-floating-sidebar-toggle {
+      position: fixed;
+      left: 18px;
+      top: 18px;
+      z-index: 30;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      background: rgba(8, 14, 25, 0.92);
+      border: 1px solid var(--border-brass);
+      border-radius: 20px;
+      color: var(--brass-bright);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+      transition: all 0.25s ease;
+    }
+
+    .btn-floating-sidebar-toggle:hover {
+      background: rgba(20, 34, 54, 0.95);
+      border-color: var(--cyan-beam);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .hub-sidebar.collapsed ~ .btn-floating-sidebar-toggle {
+      display: inline-flex;
+    }
+
+    @media (max-width: 980px) {
+      .game-hub-container {
+        flex-direction: column;
+      }
+      .hub-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1.5px solid var(--border-brass);
+        padding: 16px 18px;
+      }
+      .hub-sidebar.collapsed {
+        height: 0 !important;
+        min-height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    }
+
+    /* Brand Header */
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-brass);
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    .brand-sigil-wrap {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-sigil {
+      font-size: 2.1rem;
+      color: var(--brass-bright);
+      filter: drop-shadow(0 0 10px rgba(255, 224, 153, 0.7));
+    }
+
+    .brand-sigil-ring {
+      position: absolute;
+      inset: -3px;
+      border: 1px dashed var(--brass-base);
+      border-radius: 50%;
+      animation: spinSigilRing 24s linear infinite;
+    }
+
+    .brand-sigil-ring-inner {
+      position: absolute;
+      inset: 2px;
+      border: 1px dotted rgba(79, 227, 193, 0.4);
+      border-radius: 50%;
+      animation: spinSigilRing 14s linear infinite reverse;
+    }
+
+    @keyframes spinSigilRing {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .brand-text-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-order-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--brass-bright);
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .brand-sub-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--cyan-beam);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    /* Navigation Menu Items */
+    .sidebar-nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      flex: 1;
+    }
+
+    .nav-menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(14, 21, 35, 0.5);
+      border: 1px solid rgba(212, 168, 83, 0.15);
+      border-radius: 6px;
+      color: var(--parchment-dim);
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-menu-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--brass-base);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .nav-menu-btn:hover {
+      color: var(--brass-bright);
+      background: rgba(212, 168, 83, 0.12);
+      border-color: rgba(212, 168, 83, 0.45);
+      transform: translateX(3px);
+    }
+
+    .nav-menu-btn:hover::before {
+      opacity: 1;
+    }
+
+    .nav-menu-btn.active {
+      color: #03050a;
+      background: linear-gradient(135deg, var(--brass-bright) 0%, var(--brass-base) 100%);
+      border-color: #ffffff;
+      box-shadow: 0 4px 18px rgba(255, 224, 153, 0.4);
+      transform: translateX(4px);
+    }
+
+    .nav-menu-btn.active::before {
+      opacity: 0;
+    }
+
+    .nav-menu-btn .btn-icon {
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+    }
+
+    /* Sidebar Atmospheric Lore Footer */
+    .sidebar-footer-lore {
+      padding: 16px 12px;
+      text-align: center;
+      border-top: 1px solid rgba(212, 168, 83, 0.15);
+      margin-top: auto;
+    }
+
+    .footer-lore-crest {
+      font-size: 0.85rem;
+      color: var(--brass-base);
+      letter-spacing: 0.3em;
+      margin-bottom: 6px;
+      opacity: 0.7;
+    }
+
+    .footer-lore-text {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--parchment-dim);
+      text-transform: uppercase;
+    }
+
+    .footer-lore-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--brass-base);
+      opacity: 0.6;
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+
+    /* Top Viewport Header Bar (In Natural Document Flow - Not Fixed, scrolls with page) */
+    .hub-viewport-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .viewport-header-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--brass-base);
+      text-transform: uppercase;
+    }
+
+    .viewport-header-status .status-crest {
+      color: var(--cyan-beam);
+      font-size: 1rem;
+      filter: drop-shadow(0 0 6px rgba(79, 227, 193, 0.6));
+    }
+
+    .hub-viewport-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+      position: static !important;
+    }
+
+    .hub-viewport-actions .order-nav-trigger {
+      position: static !important;
+      top: auto !important;
+      right: auto !important;
+      margin: 0 !important;
+    }
+
+    @media (max-width: 640px) {
+      .hub-viewport-header {
+        margin-bottom: 14px;
+      }
+      .hub-viewport-actions {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .hub-viewport-actions .order-nav-trigger {
+        padding: 6px 10px;
+        font-size: 0.68rem;
+        gap: 6px;
+      }
+    }
+
+    /* =========================================================================
+       MAIN VIEWPORT
+       ========================================================================= */
+    .hub-main-viewport {
+      flex: 1;
+      padding: 30px 38px 60px;
+      overflow-y: auto;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 980px) {
+      .hub-main-viewport {
+        padding: 20px 16px 60px;
+      }
+    }
+
+    /* =========================================================================
+       VIEW: TRANSMISSIONS (ATMOSPHERIC DOSSIER MENU + ON-DEMAND SINGLE RELAY)
+       ========================================================================= */
+    .transmissions-embedded-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    /* Transmission Logs Menu View */
+    .tx-logs-menu-view {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 10px 0 30px;
+    }
+
+    .tx-dossier-panel {
+      position: relative;
+      width: 100%;
+      max-width: 840px;
+      background: radial-gradient(circle at 50% 0%, rgba(26, 32, 48, 0.96) 0%, rgba(6, 11, 20, 0.99) 100%);
+      border: 1.5px solid var(--border-brass-bright);
+      border-radius: 12px;
+      padding: 34px 38px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 45px rgba(212, 168, 83, 0.15);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Tactical Corner Brackets */
+    .tactical-corner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-color: var(--brass-bright);
+      pointer-events: none;
+    }
+    .tc-tl { top: -2px; left: -2px; border-top: 2.5px solid; border-left: 2.5px solid; border-top-left-radius: 4px; }
+    .tc-tr { top: -2px; right: -2px; border-top: 2.5px solid; border-right: 2.5px solid; border-top-right-radius: 4px; }
+    .tc-bl { bottom: -2px; left: -2px; border-bottom: 2.5px solid; border-left: 2.5px solid; border-bottom-left-radius: 4px; }
+    .tc-br { bottom: -2px; right: -2px; border-bottom: 2.5px solid; border-right: 2.5px solid; border-bottom-right-radius: 4px; }
+
+    .tx-dossier-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.3);
+    }
+
+    .tx-dossier-sigil {
+      font-family: 'Cinzel', serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.14em;
+      text-shadow: 0 0 16px rgba(212, 168, 83, 0.4);
+    }
+
+    .tx-dossier-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      color: #9ab0cf;
+      letter-spacing: 0.14em;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    .tx-telemetry-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(79, 227, 193, 0.1);
+      border: 1px solid rgba(79, 227, 193, 0.35);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--cyan-beam);
+      letter-spacing: 0.12em;
+    }
+
+    .tx-live-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan-beam);
+      box-shadow: 0 0 8px var(--cyan-beam);
+      animation: pulseDot 1.8s infinite;
+    }
+
+    .tx-dossier-desc {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.08rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+
+    .tx-logs-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tx-log-card {
+      position: relative;
+      background: rgba(10, 16, 28, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 20px 24px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .tx-log-card:hover {
+      background: rgba(18, 28, 48, 0.95);
+      border-color: var(--border-brass-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 25px rgba(212, 168, 83, 0.22);
+    }
+
+    .tx-log-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dossier-card-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      padding: 3px 10px;
+      border-radius: 3px;
+    }
+
+    .tag-distress {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ff8a80;
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+    }
+
+    .tag-survivor {
+      background: rgba(223, 178, 86, 0.2);
+      color: #ffd978;
+      border: 1px solid rgba(223, 178, 86, 0.6);
+      box-shadow: 0 0 10px rgba(223, 178, 86, 0.2);
+    }
+
+    .tag-decrypted {
+      background: rgba(0, 229, 255, 0.2);
+      color: #80deea;
+      border: 1px solid rgba(77, 208, 225, 0.6);
+      box-shadow: 0 0 10px rgba(77, 208, 225, 0.2);
+    }
+
+    .dossier-card-freq {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.08em;
+    }
+
+    .tx-log-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .tx-log-card-summary {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      line-height: 1.45;
+      color: #c9d8e8;
+      font-style: italic;
+      margin-bottom: 14px;
+    }
+
+    .tx-log-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+    }
+
+    .tx-location-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      color: #8fa0ba;
+      letter-spacing: 0.06em;
+    }
+
+    .btn-launch-decoder {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 18px;
+      background: rgba(14, 22, 38, 0.9);
+      border: 1px solid var(--border-brass);
+      border-radius: 4px;
+      color: var(--brass-bright);
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tx-log-card:hover .btn-launch-decoder {
+      background: var(--brass-bright);
+      color: #060b14;
+      border-color: var(--brass-bright);
+      box-shadow: 0 0 14px rgba(212, 168, 83, 0.5);
+    }
+
+    /* Single Player View */
+    .tx-single-player-view {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .tx-player-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, rgba(14, 22, 38, 0.95) 0%, rgba(6, 11, 20, 0.98) 100%);
+      border: 1.5px solid var(--border-brass);
+      border-radius: 8px;
+      padding: 10px 18px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tx-toolbar-left-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-back-to-tx-logs {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      background: rgba(22, 32, 54, 0.9);
+      border: 1px solid var(--border-brass-bright);
+      border-radius: 6px;
+      color: var(--brass-bright);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-back-to-tx-logs:hover {
+      background: rgba(45, 68, 110, 0.98);
+      color: #ffffff;
+      border-color: var(--cyan-beam);
+      box-shadow: 0 0 14px rgba(79, 227, 193, 0.35);
+      transform: translateX(-2px);
+    }
+
+    .btn-tx-chronicle-quest {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.22) 0%, rgba(180, 130, 45, 0.38) 100%);
+      border: 1.5px solid var(--border-brass-bright);
+      border-radius: 6px;
+      color: #ffe099;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 12px rgba(212, 168, 83, 0.25);
+    }
+
+    .btn-tx-chronicle-quest:hover {
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.45) 0%, rgba(180, 130, 45, 0.65) 100%);
+      color: #ffffff;
+      border-color: #ffe8b3;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 168, 83, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-tx-chronicle-quest .quest-btn-icon {
+      font-size: 0.9rem;
+      filter: drop-shadow(0 0 6px rgba(212, 168, 83, 0.6));
+    }
+
+    .tx-player-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tx-carrier-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(79, 227, 193, 0.12);
+      border: 1px solid rgba(79, 227, 193, 0.4);
+      border-radius: 14px;
+      padding: 3px 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--cyan-beam);
+      letter-spacing: 0.1em;
+    }
+
+    .tx-current-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.06em;
+    }
+
+    .transmissions-frame-wrap {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 210px);
+      min-height: 740px;
+      border: 1.5px solid var(--border-brass);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 0, 0, 0.7);
+      background: #020409;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .transmissions-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.45s ease-in-out;
+    }
+
+    .transmissions-frame-wrap.loaded iframe {
+      opacity: 1;
+    }
+
+    .tx-frame-skeleton {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(14, 22, 38, 0.98) 0%, rgba(2, 4, 9, 0.99) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+      pointer-events: none;
+    }
+
+    .transmissions-frame-wrap.loaded .tx-frame-skeleton {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .skeleton-subtext {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--cyan-beam);
+      letter-spacing: 0.08em;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    /* Views */
+    .hub-view-section {
+      display: none;
+    }
+
+    .hub-view-section.active {
+      display: block;
+      animation: viewFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes viewFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* View Header */
+    .view-header {
+      margin-bottom: 22px;
+    }
+
+    .view-tagline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--cyan-beam);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .view-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .view-desc {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      color: var(--parchment-dim);
+      font-style: italic;
+      line-height: 1.6;
+      max-width: 840px;
+    }
+
+    /* =========================================================================
+       VIEW 1: THE CONSTELLATION OVERWORLD (ORGANIC CELESTIAL MAP)
+       ========================================================================= */
+    .constellation-map-frame {
+      background: radial-gradient(circle at 50% 45%, rgba(16, 27, 50, 0.97) 0%, rgba(4, 7, 16, 0.99) 80%);
+      border: 1.5px solid var(--brass-base);
+      border-radius: 12px;
+      padding: 22px 20px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 168, 83, 0.18);
+      position: relative;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    /* Renaissance Brass Corner Accents */
+    .map-frame-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--brass-bright);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .corner-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .corner-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+    .corner-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    .map-canvas-wrap {
+      width: 100%;
+      height: 480px;
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      .map-canvas-wrap {
+        height: 520px;
+      }
+    }
+
+    #trail-svg-map {
+      width: 100%;
+      height: 100%;
+      display: block;
+      user-select: none;
+    }
+
+    /* Filaments & Flowing Energy Particles */
+    .constellation-filament {
+      stroke: rgba(212, 168, 83, 0.35);
+      stroke-width: 2;
+      stroke-dasharray: 6, 6;
+      transition: stroke 0.5s ease;
+    }
+
+    .constellation-filament.lit {
+      stroke: var(--brass-bright);
+      stroke-width: 2.5;
+      stroke-dasharray: 8, 4;
+      animation: lightPulseFlow 12s linear infinite;
+      filter: drop-shadow(0 0 8px rgba(255, 224, 153, 0.85));
+    }
+
+    @keyframes lightPulseFlow {
+      from { stroke-dashoffset: 240; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Star Nodes (Smooth, Non-jumping hover) */
+    .map-node-trigger {
+      cursor: pointer;
+      outline: none;
+    }
+
+    .node-outer-gear {
+      fill: none;
+      stroke: var(--brass-base);
+      stroke-width: 1.2;
+      stroke-dasharray: 4, 3;
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+
+    .map-node-trigger:hover .node-outer-gear {
+      stroke: var(--cyan-beam);
+      opacity: 0.95;
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 8px var(--cyan-beam));
+    }
+
+    .node-orbit-ring {
+      fill: none;
+      stroke: var(--brass-bright);
+      stroke-width: 1;
+      opacity: 0.3;
+      transition: all 0.25s ease;
+    }
+
+    .map-node-trigger:hover .node-orbit-ring {
+      stroke: var(--cyan-beam);
+      opacity: 0.9;
+      stroke-width: 1.8;
+    }
+
+    .node-dot-completed {
+      fill: var(--brass-bright);
+      filter: drop-shadow(0 0 9px rgba(255, 224, 153, 0.9));
+    }
+
+    /* Active Node: Keplerian Orbital Rings */
+    .node-dot-active {
+      fill: var(--cyan-beam);
+      filter: drop-shadow(0 0 16px var(--cyan-beam));
+    }
+
+    .active-beacon-pulse {
+      fill: none;
+      stroke: var(--cyan-beam);
+      stroke-width: 1.5;
+      animation: beaconWave 2.8s infinite cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes beaconWave {
+      0% { r: 14; opacity: 1; }
+      100% { r: 48; opacity: 0; }
+    }
+
+
+    .node-dot-veiled {
+      fill: #141c28;
+      stroke: #334155;
+      stroke-width: 1.5;
+    }
+
+    .node-dot-future {
+      fill: #1a150e;
+      stroke: #e2b069;
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 10px rgba(226, 176, 105, 0.7));
+    }
+
+    .future-filament {
+      stroke: #e2b069;
+      stroke-width: 1.8;
+      stroke-dasharray: 4, 6;
+      animation: dashFlow 2.4s linear infinite;
+    }
+
+    @keyframes dashFlow {
+      from { stroke-dashoffset: 20; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Inspector Countdown Bar */
+    .inspector-countdown-bar {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0 8px 0;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(226, 176, 105, 0.08) 0%, rgba(10, 16, 26, 0.95) 100%);
+      border: 1px solid rgba(226, 176, 105, 0.35);
+      border-radius: 8px;
+      box-shadow: inset 0 0 15px rgba(226, 176, 105, 0.05);
+    }
+
+    .countdown-top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .countdown-pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: #e2b069;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px #e2b069;
+      animation: liveBlink 1.4s infinite;
+    }
+
+    .countdown-title-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: #e2b069;
+      font-weight: 700;
+    }
+
+    .countdown-station-ref {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: rgba(226, 232, 240, 0.5);
+    }
+
+    .countdown-digits-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #ffe099;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .countdown-unit-box {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    .countdown-unit-box small {
+      font-size: 0.65rem;
+      color: rgba(255, 224, 153, 0.65);
+      text-transform: uppercase;
+    }
+
+    .countdown-footer-msg {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.76rem;
+      color: rgba(226, 232, 240, 0.75);
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    /* Station 08 Unlock Cinematic Celebration Overlay */
+    .station8-unlock-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: radial-gradient(circle at center, rgba(20, 14, 8, 0.94) 0%, rgba(3, 5, 8, 0.98) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: unlockFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes unlockFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .unlock-modal-card {
+      width: 100%;
+      max-width: 580px;
+      background: linear-gradient(180deg, #18120a 0%, #0d0905 100%);
+      border: 2px solid var(--brass-bright);
+      border-radius: 14px;
+      padding: 36px 32px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(212, 175, 85, 0.45), 0 25px 60px rgba(0, 0, 0, 0.9);
+      animation: unlockCardPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes unlockCardPop {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .unlock-burst-glow {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255, 216, 133, 0.3) 0%, rgba(212, 175, 85, 0.08) 50%, transparent 70%);
+      pointer-events: none;
+      animation: burstPulse 2.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes burstPulse {
+      0% { transform: translateX(-50%) scale(0.9); opacity: 0.7; }
+      100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+    }
+
+    .unlock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      color: #ffd885;
+      background: rgba(212, 175, 85, 0.12);
+      border: 1px solid rgba(212, 175, 85, 0.5);
+      border-radius: 20px;
+      padding: 5px 14px;
+      margin-bottom: 18px;
+    }
+
+    .unlock-badge-pulse {
+      width: 7px;
+      height: 7px;
+      background: #ffd885;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ffd885;
+      animation: liveBlink 1.2s infinite;
+    }
+
+    .unlock-heraldic-seal {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 16px;
+      filter: drop-shadow(0 0 16px rgba(255, 216, 133, 0.5));
+    }
+
+    .unlock-seal-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .unlock-pretitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      letter-spacing: 0.22em;
+      color: #dfba73;
+      text-transform: uppercase;
+      margin: 0 0 6px 0;
+    }
+
+    .unlock-mission-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.08em;
+      margin: 0 0 14px 0;
+      text-shadow: 0 0 20px rgba(255, 216, 133, 0.6);
+    }
+
+    .unlock-mission-desc {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.12rem;
+      line-height: 1.55;
+      color: var(--parchment);
+      margin: 0 auto 24px auto;
+      max-width: 480px;
+    }
+
+    .unlock-actions-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .btn-unlock-engage {
+      width: 100%;
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #0b0703;
+      background: linear-gradient(180deg, #ffd885 0%, #d4af37 60%, #9e7520 100%);
+      border: 1px solid #fff2c4;
+      border-radius: 6px;
+      padding: 15px 24px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 4px 25px rgba(212, 175, 55, 0.6), inset 0 1px 1px #fff;
+      transition: all 0.2s ease;
+    }
+
+    .btn-unlock-engage:hover {
+      background: linear-gradient(180deg, #fff 0%, #ffd885 60%, #d4af37 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(255, 216, 133, 0.8);
+    }
+
+    .btn-unlock-dismiss {
+      background: transparent;
+      border: 1px solid rgba(212, 175, 85, 0.35);
+      color: var(--parchment-dim);
+      border-radius: 6px;
+      padding: 9px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-unlock-dismiss:hover {
+      color: #fff;
+      border-color: var(--brass-bright);
+      background: rgba(212, 175, 85, 0.08);
+    }
+
+    .node-unlock-beacon-pulse {
+      animation: beaconFlash 1s infinite alternate ease-in-out;
+    }
+
+    @keyframes beaconFlash {
+      from { r: 14; opacity: 0.6; stroke: #ffd885; }
+      to { r: 26; opacity: 1; stroke: #fff; }
+    }
+
+    .chronicle-unlock-glow {
+      border-color: var(--brass-bright) !important;
+      box-shadow: 0 0 25px rgba(212, 175, 85, 0.45) !important;
+      animation: cardUnlockFlash 0.8s ease-out;
+    }
+
+    @keyframes cardUnlockFlash {
+      0% { transform: scale(0.98); box-shadow: 0 0 40px #ffd885; }
+      100% { transform: scale(1); box-shadow: 0 0 25px rgba(212, 175, 85, 0.45); }
+    }
+
+
+    .node-title-svg {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      fill: var(--parchment);
+      text-anchor: middle;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
+    }
+
+    .node-tag-svg {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      fill: var(--brass-base);
+      text-anchor: middle;
+      letter-spacing: 0.12em;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95));
+    }
+
+    /* Star Inspector Panel (Active Mission Deck & Station Records) */
+    .star-inspector-panel {
+      background: linear-gradient(180deg, rgba(12, 19, 32, 0.96) 0%, rgba(5, 9, 17, 0.98) 100%);
+      border: 1.5px solid var(--brass-base);
+      border-radius: 10px;
+      padding: 22px 26px;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 24px;
+      align-items: center;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+      position: relative;
+      margin-bottom: 20px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .star-inspector-panel.inspector-pulse-update {
+      animation: inspectorFlash 0.45s ease-out;
+    }
+
+    @keyframes inspectorFlash {
+      0% { box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), 0 0 26px rgba(79, 227, 193, 0.5); border-color: var(--cyan-beam); }
+      100% { box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85); border-color: var(--brass-base); }
+    }
+
+    @media (max-width: 720px) {
+      .star-inspector-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Section Divider separating Mission Deck and Star Map */
+    .map-section-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 24px 0 16px 0;
+    }
+
+    .map-divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--border-brass) 50%, transparent 100%);
+      opacity: 0.7;
+    }
+
+    .map-divider-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      color: var(--brass-base);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .inspector-thumb-frame {
+      width: 100%;
+      height: 130px;
+      border: 1.5px solid var(--border-brass);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      background: #020408;
+      box-shadow: inset 0 0 16px rgba(0,0,0,0.85);
+    }
+
+    .inspector-thumb-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.92);
+      transition: transform 0.35s ease;
+    }
+
+    .star-inspector-panel:hover .inspector-thumb-frame img {
+      transform: scale(1.06);
+    }
+
+    .inspector-content-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .inspector-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .inspector-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      color: var(--cyan-beam);
+      text-transform: uppercase;
+    }
+
+    .inspector-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .status-done-badge {
+      background: rgba(79, 227, 193, 0.15);
+      color: var(--cyan-beam);
+      border: 1px solid var(--cyan-beam);
+    }
+
+    .status-live-badge {
+      background: rgba(246, 173, 85, 0.2);
+      color: var(--amber-pulse);
+      border: 1px solid var(--amber-pulse);
+    }
+
+    .status-veiled-badge {
+      background: rgba(100, 116, 139, 0.15);
+      color: #94a3b8;
+      border: 1px solid #475569;
+    }
+
+    .inspector-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: 1.45rem;
+      color: var(--brass-bright);
+      font-weight: 700;
+    }
+
+    .inspector-metadata-pills {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 2px 0;
+    }
+
+    .meta-spec-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--brass-base);
+      background: rgba(212, 168, 83, 0.08);
+      border: 1px solid rgba(212, 168, 83, 0.25);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .meta-spec-item strong {
+      color: var(--parchment);
+    }
+
+    .inspector-lore {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--parchment);
+      font-style: italic;
+    }
+
+    .inspector-actions-row {
+      display: flex;
+      gap: 14px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-inspector-launch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass-base) 100%);
+      color: #03050a;
+      border: 1px solid #ffffff;
+      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(212, 168, 83, 0.35);
+    }
+
+    .btn-inspector-launch:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 0 22px rgba(255, 224, 153, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .btn-inspector-cinematic {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(14, 25, 45, 0.85);
+      color: var(--cyan-beam);
+      border: 1px solid var(--cyan-beam);
+      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(79, 227, 193, 0.2);
+    }
+
+    .btn-inspector-cinematic:hover {
+      background: rgba(79, 227, 193, 0.2);
+      box-shadow: 0 0 20px rgba(79, 227, 193, 0.5);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn-inspector-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      background: rgba(212, 168, 83, 0.08);
+      color: var(--brass-bright);
+      border: 1px dashed var(--brass-base);
+      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-inspector-back:hover {
+      background: rgba(212, 168, 83, 0.2);
+      border-style: solid;
+      border-color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn-inspector-replay {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: rgba(18, 28, 48, 0.8);
+      color: #ffd978;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .btn-inspector-replay:hover {
+      background: rgba(30, 46, 78, 0.95);
+      border-color: #ffd978;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .inspector-relics-card {
+      background: rgba(14, 22, 38, 0.7);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 6px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .relics-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      color: var(--brass-bright);
+      text-transform: uppercase;
+    }
+
+    .relics-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .relic-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      background: rgba(7, 12, 22, 0.85);
+      border: 1px solid rgba(79, 227, 193, 0.35);
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--parchment);
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+    }
+
+    .relic-chip:hover {
+      border-color: var(--brass-bright);
+      background: rgba(18, 30, 52, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .relic-chip-icon {
+      font-size: 0.85rem;
+    }
+
+    .relic-chip-text {
+      font-weight: 600;
+      color: #ffd978;
+    }
+
+    .relic-chip-desc {
+      color: var(--parchment-dim);
+      font-size: 0.68rem;
+      margin-left: 2px;
+    }
+
+
+
+    /* =========================================================================
+       VIEW 2: THE ARCHIVES (REAL EMAIL PARCHMENT & DISPATCH VIEWER)
+       ========================================================================= */
+    .archives-deck {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .archives-deck {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .archives-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .archive-item-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-brass);
+      border-radius: 8px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+
+    .archive-item-card:hover {
+      border-color: var(--brass-bright);
+      background: var(--bg-panel-hover);
+      transform: translateX(4px);
+    }
+
+    .archive-item-card.active {
+      border-color: var(--cyan-beam);
+      background: rgba(14, 28, 48, 0.98);
+      box-shadow: 0 0 18px rgba(79, 227, 193, 0.25);
+    }
+
+    .archive-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .archive-item-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--brass-base);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .archive-item-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--cyan-beam);
+      border: 1px solid rgba(79, 227, 193, 0.3);
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    .archive-item-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      color: var(--parchment);
+      font-weight: 700;
+    }
+
+    /* Document Viewer Pane */
+    .archive-viewer-pane {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border-brass);
+      border-radius: 10px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+    }
+
+    .doc-viewer-meta {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-brass);
+      padding-bottom: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--cyan-beam);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* High-Res Parchment Container with Loading Ghost & Zoom Hint */
+    .doc-viewer-image-frame {
+      position: relative;
+      width: 100%;
+      min-height: 420px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1.5px solid var(--brass-dim);
+      background: #020306;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .doc-viewer-image-frame img {
+      width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.4s ease, transform 0.35s ease;
+    }
+
+    .doc-viewer-image-frame.loaded img {
+      opacity: 1;
+    }
+
+    .doc-viewer-image-frame:hover img {
+      transform: scale(1.02);
+    }
+
+    /* Elegant Astronomical Skeleton / Loading Ghost */
+    .doc-image-skeleton {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(14, 22, 38, 0.96) 0%, rgba(3, 6, 12, 0.99) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      pointer-events: none;
+    }
+
+    .doc-viewer-image-frame.loaded .doc-image-skeleton {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .doc-image-skeleton .skeleton-shimmer {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(212, 168, 83, 0.1) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: skeletonShimmerWave 1.8s infinite linear;
+    }
+
+    @keyframes skeletonShimmerWave {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .skeleton-ghost-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .skeleton-spinner {
+      width: 30px;
+      height: 30px;
+      border: 2px solid rgba(212, 168, 83, 0.2);
+      border-top-color: var(--brass-bright);
+      border-radius: 50%;
+      animation: spinGhost 0.9s linear infinite;
+    }
+
+    @keyframes spinGhost {
+      to { transform: rotate(360deg); }
+    }
+
+    .skeleton-text {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 0.76rem;
+      letter-spacing: 0.16em;
+      color: var(--brass-bright);
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(212, 168, 83, 0.5);
+    }
+
+    .image-zoom-hint {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      background: rgba(3, 5, 10, 0.88);
+      border: 1px solid var(--brass-base);
+      border-radius: 4px;
+      padding: 5px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--brass-bright);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+      z-index: 4;
+    }
+
+    .doc-viewer-content {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: var(--parchment);
+    }
+
+    .archive-record-note {
+      background: rgba(10, 17, 30, 0.7);
+      border: 1px solid var(--brass-dim);
+      border-left: 3px solid var(--brass-bright);
+      border-radius: 6px;
+      padding: 14px 18px;
+      color: var(--parchment-dim);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    .archive-record-note strong {
+      color: var(--brass-bright);
+      font-family: 'Cinzel', Georgia, serif;
+      letter-spacing: 0.04em;
+    }
+
+    /* Embedded Audio Player for Radio Dispatch with Wave Animation */
+    .archive-audio-widget {
+      background: rgba(6, 11, 20, 0.9);
+      border: 1px solid var(--border-brass);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn-audio-play-round {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass-base) 100%);
+      border: 1px solid #ffffff;
+      color: #03050a;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 16px rgba(212, 168, 83, 0.4);
+    }
+
+    .btn-audio-play-round:hover {
+      filter: brightness(1.15);
+      transform: scale(1.06);
+    }
+
+    .radio-wave-bars {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 20px;
+    }
+
+    .radio-bar {
+      width: 3px;
+      height: 6px;
+      background: var(--cyan-beam);
+      border-radius: 1px;
+      transition: height 0.2s ease;
+    }
+
+    .playing .radio-bar:nth-child(1) { animation: radioPulse 0.8s infinite ease-in-out; }
+    .playing .radio-bar:nth-child(2) { animation: radioPulse 0.6s infinite ease-in-out 0.15s; }
+    .playing .radio-bar:nth-child(3) { animation: radioPulse 0.9s infinite ease-in-out 0.3s; }
+    .playing .radio-bar:nth-child(4) { animation: radioPulse 0.5s infinite ease-in-out 0.45s; }
+    .playing .radio-bar:nth-child(5) { animation: radioPulse 0.75s infinite ease-in-out 0.2s; }
+
+    @keyframes radioPulse {
+      0%, 100% { height: 6px; }
+      50% { height: 20px; }
+    }
+
+    /* =========================================================================
+       VIEW 3: CHRONICLES OF THE RAID (HISTORICAL WEBS)
+       ========================================================================= */
+    .chronicles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .chronicle-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-brass);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .chronicle-card:hover {
+      border-color: var(--brass-bright);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.85), 0 0 24px rgba(212, 168, 83, 0.2);
+    }
+
+    .chronicle-thumb-wrap {
+      width: 100%;
+      height: 140px;
+      overflow: hidden;
+      position: relative;
+      background: #050811;
+      border-bottom: 1px solid var(--border-brass);
+    }
+
+    .chronicle-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.96) contrast(1.04);
+      transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    .chronicle-card:hover .chronicle-thumb-wrap img {
+      transform: scale(1.05);
+      filter: brightness(1.08) contrast(1.06);
+    }
+
+    .chronicle-body {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .chronicle-step-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--brass-base);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .chronicle-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      margin-bottom: 10px;
+    }
+
+    .chronicle-text {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      color: var(--parchment-dim);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .btn-historical-web {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(212, 168, 83, 0.15);
+      border: 1px solid var(--brass-base);
+      border-radius: 4px;
+      color: var(--brass-bright);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-historical-web:hover {
+      background: var(--brass-base);
+      color: #03050a;
+      box-shadow: 0 0 16px rgba(226, 185, 111, 0.5);
+    }
+
+    .chronicle-card.chronicle-locked-card {
+      border: 1px dashed rgba(226, 176, 105, 0.45);
+      background: linear-gradient(180deg, rgba(14, 18, 28, 0.95) 0%, rgba(8, 10, 18, 0.98) 100%);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .chronicle-countdown-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      background: rgba(10, 14, 24, 0.85);
+      border: 1px solid rgba(226, 176, 105, 0.35);
+      border-radius: 6px;
+    }
+
+    .chronicle-cd-unit {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3px;
+      font-family: 'Space Mono', monospace;
+      color: #e2b069;
+    }
+
+    .chronicle-cd-unit strong {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .chronicle-cd-unit small {
+      font-size: 0.75rem;
+      color: var(--brass-base);
+      text-transform: uppercase;
+    }
+
+    .btn-chronicle-locked {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 11px 20px;
+      background: rgba(226, 176, 105, 0.1);
+      border: 1px solid rgba(226, 176, 105, 0.4);
+      border-radius: 4px;
+      color: #e2b069;
+      font-family: 'Cinzel', serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: default;
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 2, 5, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .lightbox-modal.open {
+      display: flex;
+    }
+
+    .lightbox-img-wrap {
+      position: relative;
+      min-width: 320px;
+      min-height: 420px;
+      max-width: 92vw;
+      max-height: 90vh;
+      border: 1.5px solid var(--brass-base);
+      border-radius: 8px;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.95);
+      overflow: auto;
+      background: #04070e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-img-wrap img {
+      max-width: 100%;
+      max-height: 85vh;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+    }
+
+    .lightbox-img-wrap.loaded img {
+      opacity: 1;
+    }
+
+    .lightbox-skeleton {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(14, 22, 38, 0.98) 0%, rgba(3, 6, 12, 0.99) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      pointer-events: none;
+    }
+
+    .lightbox-img-wrap.loaded .lightbox-skeleton {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      background: #03050a;
+      border: 1.5px solid var(--brass-bright);
+      color: var(--brass-bright);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(0,0,0,0.9);
+      z-index: 100000;
+    }
+
+    /* =========================================================================
+       VIEW 5: THE CIPHER LEDGER & CELESTIAL MATH WORKBENCH (RENAISSANCE LUXURY)
+       ========================================================================= */
+    .cipher-ledger-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding-bottom: 70px;
+    }
+
+    /* 26-Letter Alphabet Vault Card */
+    .cipher-alphabet-card {
+      background: linear-gradient(180deg, rgba(12, 19, 33, 0.9) 0%, rgba(6, 11, 20, 0.96) 100%);
+      border: 1.5px solid var(--border-brass);
+      border-radius: 14px;
+      padding: 26px 22px 30px;
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 230, 160, 0.12);
+      backdrop-filter: blur(14px);
+      position: relative;
+      overflow: visible;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .cipher-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 34px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.25);
+    }
+
+    .cipher-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.22rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--brass-bright);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-shadow: 0 0 12px rgba(223, 178, 86, 0.35);
+    }
+
+    .cipher-card-hint {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      color: var(--parchment-dim);
+      font-style: italic;
+    }
+
+    /* Responsive 26-letter grid: strictly 3 rows on desktop / laptop (9 + 9 + 8 = 26) */
+    .alphabet-grid-26 {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      padding-top: 14px;
+      padding-bottom: 14px;
+      overflow: visible;
+    }
+
+    @media (max-width: 1100px) {
+      .alphabet-grid-26 {
+        grid-template-columns: repeat(9, minmax(0, 1fr));
+        gap: 6px;
+        padding-top: 10px;
+      }
+      .letter-node-box {
+        padding: 8px 3px 6px;
+      }
+      .letter-val-input {
+        width: 44px;
+        height: 32px;
+        font-size: 1rem;
+      }
+      .letter-char {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .alphabet-grid-26 {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .alphabet-grid-26 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* Individual Letter Node Box */
+    .letter-node-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 4px 10px;
+      background: rgba(14, 22, 38, 0.72);
+      border: 1.5px solid rgba(212, 168, 83, 0.28);
+      border-radius: 9px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      gap: 8px;
+      min-width: 0;
+      box-sizing: border-box;
+      overflow: visible;
+    }
+
+    .letter-node-box:hover {
+      background: rgba(22, 36, 62, 0.95);
+      border-color: var(--cyan-beam);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(79, 227, 193, 0.2);
+    }
+
+    .letter-node-box.has-value {
+      background: linear-gradient(180deg, rgba(22, 38, 64, 0.95) 0%, rgba(12, 22, 38, 0.98) 100%);
+      border-color: rgba(223, 178, 86, 0.75);
+      box-shadow: 0 0 14px rgba(223, 178, 86, 0.18);
+    }
+
+    .letter-node-box.has-conflict {
+      border-color: #f87171 !important;
+      background: linear-gradient(180deg, rgba(48, 16, 24, 0.92) 0%, rgba(24, 8, 14, 0.96) 100%) !important;
+      box-shadow: 0 0 14px rgba(248, 113, 113, 0.4) !important;
+    }
+
+    .letter-node-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .letter-char {
+      font-family: 'Cinzel', serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      line-height: 1;
+      text-shadow: 0 0 8px rgba(223, 178, 86, 0.4);
+      text-align: center;
+    }
+
+    .letter-val-input {
+      width: 52px;
+      height: 36px;
+      background: rgba(3, 6, 12, 0.95);
+      border: 1.5px solid rgba(212, 168, 83, 0.4);
+      border-radius: 6px;
+      text-align: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: #ffffff;
+      outline: none;
+      transition: all 0.2s ease;
+      -moz-appearance: textfield;
+    }
+
+    .letter-val-input::-webkit-outer-spin-button,
+    .letter-val-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .letter-val-input:focus {
+      border-color: var(--cyan-beam);
+      background: rgba(6, 14, 28, 1);
+      box-shadow: 0 0 14px rgba(79, 227, 193, 0.45);
+      color: var(--cyan-beam);
+    }
+
+    .letter-val-input::placeholder {
+      color: rgba(255, 255, 255, 0.18);
+      font-size: 0.95rem;
+    }
+
+    .letter-status-indicator {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 4px;
+      border-radius: 3px;
+      line-height: 1.2;
+      text-align: center;
+      color: rgba(148, 163, 184, 0.65);
+      background: rgba(148, 163, 184, 0.08);
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .letter-node-box.has-value .letter-status-indicator {
+      color: var(--brass-bright);
+      background: rgba(212, 168, 83, 0.15);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      font-weight: 700;
+    }
+
+    .letter-node-box.has-conflict .letter-status-indicator {
+      color: #fca5a5;
+      background: rgba(248, 113, 113, 0.25);
+      border: 1px solid #f87171;
+      font-weight: 700;
+    }
+
+    /* Vector I Sanctuary Coordinate Equations Card */
+    .sanctuary-equations-card {
+      background: linear-gradient(180deg, rgba(12, 19, 33, 0.9) 0%, rgba(6, 11, 20, 0.96) 100%);
+      border: 1.5px solid var(--border-brass);
+      border-radius: 14px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 230, 160, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .sanctuary-status-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--brass-bright);
+      padding: 5px 14px;
+      border: 1.5px solid var(--border-brass);
+      border-radius: 20px;
+      background: rgba(14, 22, 38, 0.85);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .sanctuary-status-pill.all-balanced {
+      border-color: var(--cyan-beam);
+      color: var(--cyan-beam);
+      background: rgba(79, 227, 193, 0.15);
+      box-shadow: 0 0 14px rgba(79, 227, 193, 0.3);
+    }
+
+    .workbench-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      color: var(--parchment-dim);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Clue Equations List */
+    .clue-equations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sanctuary-equations-card .cipher-card-header {
+      margin-bottom: 20px;
+    }
+
+    .clue-equation-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 24px;
+      background: rgba(14, 22, 38, 0.75);
+      border: 1.5px solid rgba(212, 168, 83, 0.3);
+      border-radius: 10px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .clue-equation-item:hover {
+      background: rgba(20, 32, 54, 0.95);
+      border-color: rgba(223, 178, 86, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 14px rgba(223, 178, 86, 0.15);
+    }
+
+    .clue-equation-item.is-balanced {
+      border-color: rgba(79, 227, 193, 0.55);
+      background: linear-gradient(180deg, rgba(16, 36, 44, 0.85) 0%, rgba(10, 22, 28, 0.95) 100%);
+      box-shadow: 0 0 16px rgba(79, 227, 193, 0.12);
+    }
+
+    .clue-eq-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .clue-eq-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .clue-eq-station {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--cyan-beam);
+      font-weight: 700;
+    }
+
+    .clue-eq-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--brass-bright);
+    }
+
+    .clue-eq-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .clue-eq-badge.badge-balanced {
+      background: rgba(79, 227, 193, 0.22);
+      border: 1px solid var(--cyan-beam);
+      color: var(--cyan-beam);
+      box-shadow: 0 0 10px rgba(79, 227, 193, 0.3);
+    }
+
+    .clue-eq-badge.badge-imbalanced {
+      background: rgba(248, 113, 113, 0.2);
+      border: 1px solid #f87171;
+      color: #fca5a5;
+    }
+
+    .clue-eq-badge.badge-waiting {
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid #64748b;
+      color: #94a3b8;
+    }
+
+    .clue-eq-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 4px;
+      border-top: 1px solid rgba(212, 168, 83, 0.15);
+    }
+
+    .clue-eq-formula {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.05em;
+    }
+
+    .clue-eq-breakdown {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.88rem;
+      color: var(--parchment-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Dynamic Stars Canvas & Cosmic Nebula -->
+  <canvas id="ambient-stars"></canvas>
+  <div class="cosmic-nebula-layer"></div>
+  <div class="cosmic-vignette"></div>
+  <div class="game-hub-container">
+
+    <!-- =====================================================================
+         SIDEBAR / TACTICAL DECK
+         ===================================================================== -->
+    <aside class="hub-sidebar">
+      <div>
+        <!-- Order Brand -->
+        <div class="sidebar-brand">
+          <div class="brand-sigil-wrap">
+            <div class="brand-sigil-ring"></div>
+            <div class="brand-sigil-ring-inner"></div>
+            <span class="brand-sigil">◐</span>
+          </div>
+          <div class="brand-text-wrap">
+            <span class="brand-order-title">The Eclipse Order</span>
+          </div>
+          <button type="button" class="sidebar-collapse-btn" id="btn-sidebar-collapse" title="Collapse Navigation Menu">◀</button>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav-menu">
+          <button type="button" class="nav-menu-btn active" data-view="view-trail">
+            <span class="btn-icon">🌌</span>
+            <span>The Star Map</span>
+          </button>
+          <button type="button" class="nav-menu-btn" data-view="view-transmissions">
+            <span class="btn-icon">📡</span>
+            <span>Transmissions</span>
+          </button>
+          <button type="button" class="nav-menu-btn" data-view="view-archives">
+            <span class="btn-icon">📜</span>
+            <span>The Archives</span>
+          </button>
+          <button type="button" class="nav-menu-btn" data-view="view-chronicles">
+            <span class="btn-icon">🏛️</span>
+            <span>Chronicles of the Raid</span>
+          </button>
+          <button type="button" class="nav-menu-btn" data-view="view-cipher">
+            <span class="btn-icon">🗝️</span>
+            <span>The Cipher Ledger</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Atmospheric Lore Footer -->
+      <div class="sidebar-footer-lore">
+        <div class="footer-lore-crest">✧ ✦ ✧</div>
+        <div class="footer-lore-text">The Eclipse Order · 2026</div>
+        <div class="footer-lore-sub">Silvia's Journey</div>
+      </div>
+    </aside>
+
+    <button type="button" class="btn-floating-sidebar-toggle" id="btn-sidebar-open" title="Open Navigation Menu">
+      <span>☰</span>
+      <span>Menu</span>
+    </button>
+
+    <!-- =====================================================================
+         MAIN VIEWPORT
+         ===================================================================== -->
+    <main class="hub-main-viewport">
+
+      <!-- Viewport Header Bar (In Natural Flow, not fixed to screen) -->
+      <header class="hub-viewport-header">
+        <div class="viewport-header-status">
+          <span class="status-crest">✦</span>
+          <span>The Constellation Path · Active Expedition</span>
+        </div>
+      </header>
+
+      <!-- ===================================================================
+           VIEW 1: THE STAR MAP (CONSTELLATION OVERWORLD)
+           =================================================================== -->
+      <section class="hub-view-section active" id="view-trail">
+        <header class="view-header">
+          <div class="view-tagline">✦ Celestial Progression ✦</div>
+          <h2 class="view-title">The Constellation Trail</h2>
+          <p class="view-desc">
+            Track your journey through the Order stations. Current objective is briefed below; select any station on the star chart to review past records.
+          </p>
+        </header>
+
+        <!-- Current / Inspected Mission Deck (Positioned directly below title and above map) -->
+        <!-- Current / Inspected Mission Deck (Positioned directly below title and above map) -->
+        <div class="star-inspector-panel" id="star-inspector">
+          <div class="inspector-thumb-frame">
+            <img src="./assets/thumbnails/chronicle_station8_locked.webp" id="insp-thumb-img" alt="Stage Thumbnail" loading="eager" fetchpriority="high" width="760" height="320">
+          </div>
+
+          <div class="inspector-content-box">
+            <div class="inspector-top-row">
+              <span class="inspector-badge" id="insp-badge">STATION 08 // ACTIVE OBJECTIVE</span>
+              <span class="inspector-status status-live-badge" id="insp-status">ASTRONOMICAL ALIGNMENT ⏳</span>
+            </div>
+            <h3 class="inspector-title" id="insp-title">Station 08 · [ Sealed ]</h3>
+
+            <p class="inspector-lore" id="insp-lore">
+              The path ahead remains veiled in nocturnal silence. The instruments of the Order and the celestial dials cannot be attuned until true astronomical midnight. Only when the countdown reaches zero will the meridian align with the stars, allowing the next stage of the journey to be calibrated.
+            </p>
+
+            <!-- Emergency Relay Countdown (Station 08 Teaser) -->
+            <div class="inspector-countdown-bar" id="insp-countdown-bar" style="display:flex;">
+              <div class="countdown-top-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="countdown-pulse-dot"></span>
+                  <span class="countdown-title-text">ASTRONOMICAL MERIDIAN ALIGNMENT WINDOW</span>
+                </div>
+                <span class="countdown-station-ref">STATION 08 · [ SEALED ]</span>
+              </div>
+              <div class="countdown-digits-wrap" id="countdown-timer-display">
+                <span class="countdown-unit-box"><strong id="cd-hours">35</strong><small>h</small></span>
+                <span>:</span>
+                <span class="countdown-unit-box"><strong id="cd-mins">59</strong><small>m</small></span>
+                <span>:</span>
+                <span class="countdown-unit-box"><strong id="cd-secs">42</strong><small>s</small></span>
+              </div>
+              <div class="countdown-footer-msg">
+                ✦ The celestial meridian aligns at astronomical midnight. Only then can the celestial dials and instruments be calibrated. ✦
+              </div>
+            </div>
+            <div class="inspector-relics-card" id="insp-relics-box" style="display:none;">
+              <div class="relics-header">
+                <span class="relics-icon">✦</span>
+                <span class="relics-title" id="insp-relics-title">RECOVERED RELICS & DECODED DISPATCHES</span>
+              </div>
+              <div class="relics-chips-row" id="insp-relics-chips">
+                <!-- Dynamically populated per station -->
+              </div>
+            </div>
+            <div class="inspector-actions-row">
+              <a href="./constellation/midnight-calibration/index.html" class="btn-inspector-launch" id="insp-btn-primary">
+                <span>⏳ Awaiting Astronomical Midnight</span>
+              </a>
+              <a href="./desert/zodiac-engine/index.html" class="btn-inspector-replay" id="insp-btn-replay" style="display:none;">
+                <span>↺ Replay Quest</span>
+              </a>
+              <button type="button" class="btn-inspector-back" id="insp-btn-reset" style="display:none;" onclick="selectMapNode(8, true)">
+                <span>⟵ Return to Active Mission</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Divider -->
+        <div class="map-section-divider">
+          <span class="map-divider-line"></span>
+          <span class="map-divider-label">✦ Celestial Route Map ✦</span>
+          <span class="map-divider-line"></span>
+        </div>
+
+        <!-- The Constellation Graphic Frame with Renaissance Brass Accents -->
+        <div class="constellation-map-frame" id="map-frame-container">
+          <div class="map-frame-corner corner-tl"></div>
+          <div class="map-frame-corner corner-tr"></div>
+          <div class="map-frame-corner corner-bl"></div>
+          <div class="map-frame-corner corner-br"></div>
+
+          <div class="map-canvas-wrap">
+            <svg id="trail-svg-map" viewBox="0 0 880 480">
+              <defs>
+                <radialGradient id="nebulaGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#4fe3c1" stop-opacity="0.16" />
+                  <stop offset="60%" stop-color="#d4a853" stop-opacity="0.08" />
+                  <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="starGlowGold" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffe099" stop-opacity="0.9" />
+                  <stop offset="40%" stop-color="#d4a853" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="starGlowCyan" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#4fe3c1" stop-opacity="0.9" />
+                  <stop offset="40%" stop-color="#2bb898" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                </radialGradient>
+                <radialGradient id="starGlowAmber" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffe099" stop-opacity="0.85" />
+                  <stop offset="50%" stop-color="#e2b069" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                </radialGradient>
+                <linearGradient id="futureFadeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#e2b069" stop-opacity="0.75" />
+                  <stop offset="50%" stop-color="#e2b069" stop-opacity="0.35" />
+                  <stop offset="100%" stop-color="#e2b069" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+
+              <!-- Central Nebula Aura -->
+              <circle cx="440" cy="240" r="280" fill="url(#nebulaGlow)" />
+
+              <!-- Renaissance Astronomical Planisphere Coordinate Circles -->
+              <g stroke="rgba(212,168,83,0.14)" stroke-width="1" fill="none">
+                <circle cx="440" cy="240" r="230" stroke-dasharray="2, 6" />
+                <circle cx="440" cy="240" r="160" />
+                <circle cx="440" cy="240" r="90" stroke-dasharray="4, 4" />
+                <line x1="60" y1="240" x2="820" y2="240" stroke-opacity="0.2" />
+                <line x1="440" y1="30" x2="440" y2="450" stroke-opacity="0.2" />
+                <!-- 12 Roman Astrolabe Degree Notches -->
+                <text x="440" y="24" fill="rgba(212,168,83,0.3)" font-family="'Cinzel', serif" font-size="9" text-anchor="middle">XII · ZENITH</text>
+                <text x="440" y="466" fill="rgba(212,168,83,0.3)" font-family="'Cinzel', serif" font-size="9" text-anchor="middle">VI · NADIR</text>
+                <text x="50" y="243" fill="rgba(212,168,83,0.3)" font-family="'Cinzel', serif" font-size="9" text-anchor="end">IX · OCCIDENS</text>
+                <text x="830" y="243" fill="rgba(212,168,83,0.3)" font-family="'Cinzel', serif" font-size="9" text-anchor="start">III · ORIENS</text>
+              </g>
+
+              <!-- Ancient Faint Constellation Asterism Lines in Background -->
+              <g stroke="rgba(212,168,83,0.08)" stroke-width="0.8" fill="none">
+                <!-- Ursa Minor & Polaris hint in upper left -->
+                <polyline points="120,80 160,95 190,85 220,110 200,130 160,125 160,95" />
+                <circle cx="120" cy="80" r="2" fill="rgba(255,224,153,0.3)" />
+                <!-- Cassiopeia 'W' in upper center -->
+                <polyline points="370,60 410,85 450,65 490,90 530,70" />
+                <circle cx="450" cy="65" r="2" fill="rgba(255,224,153,0.3)" />
+                <!-- Orion belt hint in lower right -->
+                <line x1="720" y1="390" x2="740" y2="385" />
+                <line x1="740" y1="385" x2="760" y2="380" />
+                <circle cx="720" cy="390" r="2" fill="rgba(255,224,153,0.25)" />
+                <circle cx="740" cy="385" r="2" fill="rgba(255,224,153,0.25)" />
+                <circle cx="760" cy="380" r="2" fill="rgba(255,224,153,0.25)" />
+              </g>
+
+              <!-- Sinuous Constellation Filaments with Animated Flow -->
+              <!-- 1 -> 2 -->
+              <path class="constellation-filament lit" id="path-1-2" d="M 75 270 Q 125 180 175 160" />
+              <!-- 2 -> 3 -->
+              <path class="constellation-filament lit" id="path-2-3" d="M 175 160 Q 225 170 280 250" />
+              <!-- 3 -> 4 -->
+              <path class="constellation-filament lit" id="path-3-4" d="M 280 250 Q 330 350 385 330" />
+              <!-- 4 -> 5 -->
+              <path class="constellation-filament lit" id="path-4-5" d="M 385 330 Q 435 300 490 230" />
+              <!-- 5 -> 6 -->
+              <path class="constellation-filament lit" id="path-5-6" d="M 490 230 Q 545 140 595 150" />
+              <!-- 6 -> 7 (Illuminated harmonic beam to the outskirts outpost) -->
+              <path id="filament-6-7" class="constellation-filament lit" d="M 595 150 Q 645 140 700 215" />
+              <!-- 7 -> 8 (Harmonic path to the Midnight Calibration) -->
+              <path id="filament-7-8" class="constellation-filament lit" d="M 700 215 Q 745 280 795 280" />
+              <!-- Fading filament trailing off into the deep unknown desert -->
+              <path class="constellation-filament-fading" d="M 795 280 Q 835 295 865 290" stroke="url(#futureFadeGrad)" stroke-width="1.8" stroke-dasharray="3, 6" fill="none" />
+
+              <!-- STAR NODE 1: The Opening Summons (22:22) -->
+              <g class="map-node-trigger" data-node="1">
+                <circle class="node-outer-gear" cx="75" cy="270" r="26" />
+                <circle class="node-orbit-ring" cx="75" cy="270" r="20" />
+                <circle cx="75" cy="270" r="14" fill="url(#starGlowGold)" opacity="0.6" />
+                <circle class="node-dot-completed" cx="75" cy="270" r="8" />
+                <text class="node-tag-svg" x="75" y="308">01 · ORIGIN ✓</text>
+                <text class="node-title-svg" x="75" y="324">The Threshold</text>
+              </g>
+
+              <!-- STAR NODE 2: DISPATCH 02 // CARTOGRAPHER ARRIVAL -->
+              <g class="map-node-trigger" data-node="2">
+                <circle class="node-outer-gear" cx="175" cy="160" r="26" />
+                <circle class="node-orbit-ring" cx="175" cy="160" r="20" />
+                <circle cx="175" cy="160" r="14" fill="url(#starGlowGold)" opacity="0.6" />
+                <circle class="node-dot-completed" cx="175" cy="160" r="8" />
+                <text class="node-tag-svg" x="175" y="122">02 · RECEIVED ✓</text>
+                <text class="node-title-svg" x="175" y="106">Cartographer Arrival</text>
+              </g>
+
+              <!-- STAR NODE 3: The Celestial Flower -->
+              <g class="map-node-trigger" data-node="3">
+                <circle class="node-outer-gear" cx="280" cy="250" r="28" />
+                <circle class="node-orbit-ring" cx="280" cy="250" r="22" />
+                <circle cx="280" cy="250" r="16" fill="url(#starGlowGold)" opacity="0.6" />
+                <circle class="node-dot-completed" cx="280" cy="250" r="9" />
+                <text class="node-tag-svg" x="280" y="290">03 · HARMONIZED ✓</text>
+                <text class="node-title-svg" x="280" y="306">Celestial Flower</text>
+              </g>
+
+              <!-- STAR NODE 4: The Observatory Raid (Transmission 1 + The Severed Sky) -->
+              <g class="map-node-trigger" data-node="4">
+                <circle class="node-outer-gear" cx="385" cy="330" r="28" />
+                <circle class="node-orbit-ring" cx="385" cy="330" r="22" />
+                <circle cx="385" cy="330" r="16" fill="url(#starGlowGold)" opacity="0.6" />
+                <circle class="node-dot-completed" cx="385" cy="330" r="9" />
+                <text class="node-tag-svg" x="385" y="370">04 · ARCHIVED ✓</text>
+                <text class="node-title-svg" x="385" y="386">Observatory Raid</text>
+              </g>
+
+              <!-- STAR NODE 5: Emergency Radio Relay (Transmission 2) -->
+              <g class="map-node-trigger" data-node="5">
+                <circle class="node-outer-gear" cx="490" cy="230" r="28" />
+                <circle class="node-orbit-ring" cx="490" cy="230" r="22" />
+                <circle cx="490" cy="230" r="16" fill="url(#starGlowGold)" opacity="0.6" />
+                <circle class="node-dot-completed" cx="490" cy="230" r="9" />
+                <text class="node-tag-svg" x="490" y="270">05 · RECEIVED ✓</text>
+                <text class="node-title-svg" x="490" y="286">Radio Relay</text>
+              </g>
+
+              <!-- STAR NODE 6: The Celestial Matrix + Transmission 3 -->
+              <g class="map-node-trigger" data-node="6">
+                <circle class="node-outer-gear" cx="595" cy="150" r="28" />
+                <circle class="node-orbit-ring" cx="595" cy="150" r="22" />
+                <circle cx="595" cy="150" r="16" fill="url(#starGlowGold)" opacity="0.6" />
+                <circle id="node-6-dot" class="node-dot-completed" cx="595" cy="150" r="9" />
+                <text class="node-tag-svg" id="node-6-tag" x="595" y="112">06 · CALIBRATED ✓</text>
+                <text class="node-title-svg" id="node-6-title" x="595" y="96">Celestial Matrix</text>
+              </g>
+
+              <!-- STAR NODE 7: The Zodiac Engine (Completed/Secured Stage) -->
+              <g class="map-node-trigger" data-node="7" style="cursor: pointer;">
+                <circle class="node-outer-gear" cx="700" cy="215" r="28" />
+                <circle class="node-orbit-ring" cx="700" cy="215" r="22" />
+                <circle cx="700" cy="215" r="16" fill="url(#starGlowGold)" opacity="0.6" />
+                <circle id="node-7-dot" class="node-dot-completed" cx="700" cy="215" r="9" />
+                <circle class="active-beacon-pulse" id="node-7-beacon" cx="700" cy="215" r="14" style="display: none;" />
+                <text class="node-tag-svg" id="node-7-tag" x="700" y="260" style="fill:var(--brass-bright); font-weight:700;">07 · SECURED ✓</text>
+                <text class="node-title-svg" id="node-7-title" x="700" y="276">The Zodiac Engine</text>
+              </g>
+
+              <!-- STAR NODE 8: [ Sealed ] (Active Objective Awaiting Astronomical Midnight) -->
+              <g class="map-node-trigger" data-node="8" style="cursor: pointer;">
+                <g transform="translate(795, 280)">
+                  <!-- Expanding Amber Beacon Wave -->
+                  <circle class="active-beacon-pulse" id="node-8-beacon" cx="0" cy="0" r="14" style="stroke: #e2b069; display: block;" />
+                  <!-- Amber Glow & Active Dot Marker -->
+                  <circle id="node-8-glow" cx="0" cy="0" r="22" fill="url(#starGlowAmber)" opacity="0.85" />
+                  <circle class="node-orbit-ring" cx="0" cy="0" r="18" stroke-dasharray="3, 3" />
+                  <circle id="node-8-dot" class="node-dot-active" cx="0" cy="0" r="11" />
+                  <text x="0" y="4" text-anchor="middle" font-family="'Cinzel', serif" font-size="10" font-weight="700" fill="#ffffff" opacity="0.95">⏳</text>
+                </g>
+                <text class="node-tag-svg" id="node-8-tag" x="795" y="320" style="fill:#e2b069; font-weight:700; opacity:1;">08 · ACTIVE OBJECTIVE ⏳</text>
+                <text class="node-title-svg" id="node-8-title" x="795" y="336" style="opacity:1;">[ Sealed ]</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 2: TRANSMISSIONS DOSSIER & DECODER
+           =================================================================== -->
+      <section class="hub-view-section" id="view-transmissions">
+        <header class="view-header">
+          <div class="view-tagline">✦ Intercepted Audio Dossier ✦</div>
+          <h2 class="view-title">Transmission Logs</h2>
+          <p class="view-desc">
+            Three intercepted audio broadcasts recovered from the Cartographer's field receiver. Select an intercepted log below to initialize its dedicated relay console, play the recorded signal, and examine its authentic telemetry.
+          </p>
+        </header>
+
+        <div class="transmissions-embedded-container">
+          
+          <!-- STATE A: TRANSMISSION LOGS MENU VIEW (ATMOSPHERIC DOSSIER) -->
+          <div class="tx-logs-menu-view" id="tx-logs-menu-view">
+            <div class="tx-dossier-panel">
+              <!-- Tactical Corner Accents -->
+              <div class="tactical-corner tc-tl"></div>
+              <div class="tactical-corner tc-tr"></div>
+              <div class="tactical-corner tc-bl"></div>
+              <div class="tactical-corner tc-br"></div>
+
+              <div class="tx-dossier-header">
+                <div>
+                  <div class="tx-dossier-sigil">Frequency Archive & Decoders</div>
+                  <div class="tx-dossier-subtitle">The Eclipse Order · Intercepted Audio Dossier</div>
+                </div>
+                <div class="tx-telemetry-badge">
+                  <span class="tx-live-pulse-dot"></span>
+                  <span>FREQUENCY ARCHIVE // 3 RECORDINGS READY</span>
+                </div>
+              </div>
+
+              <div class="tx-dossier-desc">
+                Three intercepted audio broadcasts recovered from the Cartographer's field receiver. Select an intercepted log below to initialize its dedicated relay console and examine its authentic telemetry.
+              </div>
+
+              <!-- 3 Transmission Cards -->
+              <div class="tx-logs-grid">
+                
+                <!-- Transmission 01 -->
+                <div class="tx-log-card" data-tx-index="0">
+                  <div class="tx-log-card-top">
+                    <span class="dossier-card-tag tag-distress">01 · DISTRESS INTERCEPT</span>
+                    <span class="dossier-card-freq">00:37 · 22.22 MHz</span>
+                  </div>
+                  <h3 class="tx-log-card-title">The Stolen Astrolabe · Observatory Under Attack</h3>
+                  <p class="tx-log-card-summary">
+                    "They broke in! They are assaulting the observatory! They took the astrolabe! Silvia, I believe in you... you are the only one who can do this!"
+                  </p>
+                  <div class="tx-log-card-footer">
+                    <span class="tx-location-tag">📍 High Observatory Peak // Teide</span>
+                    <button type="button" class="btn-launch-decoder">
+                      <span>Open Relay 01</span>
+                      <span class="arrow-sym">➔</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Transmission 02 -->
+                <div class="tx-log-card" data-tx-index="1">
+                  <div class="tx-log-card-top">
+                    <span class="dossier-card-tag tag-survivor">02 · SURVIVOR BEACON</span>
+                    <span class="dossier-card-freq">01:31 · 19.84 MHz</span>
+                  </div>
+                  <h3 class="tx-log-card-title">Voices in the Dunes · Southern Erg Outpost</h3>
+                  <p class="tx-log-card-summary">
+                    "Silvia, do you copy me? If this signal is reaching your receiver... I made it out alive. I broke through the lower aqueduct into the southern dunes. Guard the journal with your life."
+                  </p>
+                  <div class="tx-log-card-footer">
+                    <span class="tx-location-tag">📍 Southern Erg Aqueduct</span>
+                    <button type="button" class="btn-launch-decoder">
+                      <span>Open Relay 02</span>
+                      <span class="arrow-sym">➔</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Transmission 03 -->
+                <div class="tx-log-card" data-tx-index="2">
+                  <div class="tx-log-card-top">
+                    <span class="dossier-card-tag tag-decrypted">03 · MATRIX RESOLVED ✓</span>
+                    <span class="dossier-card-freq">00:26 · 142.85 MHz</span>
+                  </div>
+                  <h3 class="tx-log-card-title">Harmonic Relief · Sandstone Dunes Vector</h3>
+                  <p class="tx-log-card-summary">
+                    "Silvia! The signal came through loud and clear! The console held! The raiders are marching south toward the Sandstone Ruins. I've locked Letter P onto your screen... we're closing in."
+                  </p>
+                  <div class="tx-log-card-footer">
+                    <span class="tx-location-tag">📍 Sandstone Sanctuary Vector</span>
+                    <button type="button" class="btn-launch-decoder">
+                      <span>Open Relay 03</span>
+                      <span class="arrow-sym">➔</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- STATE B: SINGLE TRANSMISSION PLAYER VIEW (ON DEMAND ONLY) -->
+          <div class="tx-single-player-view" id="tx-single-player-view" style="display: none;">
+            <div class="tx-player-toolbar">
+              <div class="tx-toolbar-left-group">
+                <button type="button" class="btn-back-to-tx-logs" id="btn-back-to-tx-logs" title="Return to Transmission Logs">
+                  <span>←</span>
+                  <span>Return to Transmission Logs</span>
+                </button>
+                <a href="./constellation/celestial-flower-2/index.html" class="btn-tx-chronicle-quest" id="btn-tx-chronicle-quest" title="Inspect corresponding game in Chronicles of the Raid">
+                  <span class="quest-btn-icon" id="btn-tx-quest-icon">⚔️</span>
+                  <span id="btn-tx-quest-text">Inspect The Observatory Raid ➔</span>
+                </a>
+              </div>
+              <div class="tx-player-telemetry">
+                <span class="tx-carrier-indicator">
+                  <span class="tx-live-pulse-dot"></span>
+                  <span id="tx-current-carrier-tag">RELAY 01 ACTIVE</span>
+                </span>
+                <span class="tx-current-title" id="tx-current-title">01 · The Stolen Astrolabe</span>
+              </div>
+            </div>
+
+            <div class="transmissions-frame-wrap loading" id="tx-frame-wrap">
+              <div class="tx-frame-skeleton" id="tx-frame-skeleton">
+                <div class="skeleton-shimmer"></div>
+                <div class="skeleton-ghost-content">
+                  <div class="skeleton-spinner"></div>
+                  <span class="skeleton-text">✦ Calibrating Carrier Frequency & Neural Link... ✦</span>
+                  <span class="skeleton-subtext">Decrypting transmission audio feed & orbital telemetry</span>
+                </div>
+              </div>
+              <iframe id="transmissions-embedded-frame" src="about:blank" title="The Eclipse Order Transmissions Console" allow="autoplay"></iframe>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 3: THE ARCHIVES (REAL EMAIL PARCHMENT & DISPATCH VIEWER)
+           =================================================================== -->
+      <section class="hub-view-section" id="view-archives">
+        <header class="view-header">
+          <div class="view-tagline">✦ Intercepted Letters & Parchment Records ✦</div>
+          <h2 class="view-title">The Order Archives</h2>
+          <p class="view-desc">
+            The authentic physical dispatches and parchment fragments received by Silvia. Click any archive entry to inspect the original high-resolution parchment images and read their complete records.
+          </p>
+        </header>
+
+        <div class="archives-deck">
+          <!-- Left List of Dispatches -->
+          <div class="archives-list">
+            <div class="archive-item-card active" data-doc="doc1">
+              <div class="archive-item-top">
+                <span class="archive-item-date">1 Sep 2026 // 22:22</span>
+                <span class="archive-item-tag">PARCHMENT</span>
+              </div>
+              <span class="archive-item-title">Dispatch I: The Initiation Parchment</span>
+            </div>
+            <div class="archive-item-card" data-doc="doc2">
+              <div class="archive-item-top">
+                <span class="archive-item-date">Fragment 1 // Cartographer</span>
+                <span class="archive-item-tag">LETTER</span>
+              </div>
+              <span class="archive-item-title">Dispatch II: The Cartographer of Distant Light</span>
+            </div>
+            <div class="archive-item-card" data-doc="doc3">
+              <div class="archive-item-top">
+                <span class="archive-item-date">Dispatch III // Outpost</span>
+                <span class="archive-item-tag">DISPATCH</span>
+              </div>
+              <span class="archive-item-title">Dispatch III: The Subterranean Outpost</span>
+            </div>
+          </div>
+
+          <!-- Right Document Viewer Pane -->
+          <div class="archive-viewer-pane" id="archive-viewer">
+            <div class="doc-viewer-meta">
+              <span id="doc-meta-id">DISPATCH 01 // PARCHMENT IMAGE</span>
+              <span id="doc-meta-date">1 SEP 2026 · 22:22 EXACT</span>
+            </div>
+
+            <!-- Clickable Image Frame with Loading Ghost & Zoom Hint -->
+            <div class="doc-viewer-image-frame loading" id="doc-image-frame" title="Click to view full-resolution image">
+              <div class="doc-image-skeleton" id="doc-image-skeleton">
+                <div class="skeleton-shimmer"></div>
+                <div class="skeleton-ghost-content">
+                  <div class="skeleton-spinner"></div>
+                  <span class="skeleton-text">✦ Loading Archival Plate... ✦</span>
+                </div>
+              </div>
+              <img src="./assets/emails/email-01-parchment.webp" id="doc-view-img" alt="Order Dispatch Parchment">
+              <span class="image-zoom-hint">🔍 Click to Inspect High-Res</span>
+            </div>
+
+            <div class="doc-viewer-content" id="doc-view-text">
+              <p class="archive-record-note">
+                <strong>Dispatch I · September 1, 2026 (22:22):</strong> Opening dispatch parchment from the Eclipse Order. Confirms Silvia's designated path along <em>The Constellation Path</em> and the forthcoming delivery of the journal for the 56-day cycle.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 4: CHRONICLES OF THE RAID (HISTORICAL WEBS)
+           =================================================================== -->
+      <section class="hub-view-section" id="view-chronicles">
+        <header class="view-header">
+          <div class="view-tagline">✦ The Timeline of the Order ✦</div>
+          <h2 class="view-title">Chronicles of the Raid</h2>
+          <p class="view-desc">
+            Explore the historical timeline of events and revisit earlier stages of your journey. Each web page preserves the state of the heavens as they evolved.
+          </p>
+        </header>
+
+        <div class="chronicles-grid">
+          <!-- Chronicle 1 / Game 03 -->
+          <article class="chronicle-card">
+            <div class="chronicle-thumb-wrap">
+              <img src="./assets/thumbnails/celestial_flower_preview.webp" alt="Celestial Flower Dial" loading="eager" fetchpriority="high" width="760" height="320">
+            </div>
+            <div class="chronicle-body">
+              <div>
+                <div class="chronicle-step-tag">Game 03 · Harmonized & Completed ✓</div>
+                <h3 class="chronicle-title">The Celestial Flower</h3>
+                <p class="chronicle-text">
+                  The original 22-star harmonic dial at the gateway of the mountains. Silvia aligned the planetary petals, harmonizing the resonance channels into motion before the raid.
+                </p>
+              </div>
+              <a href="./constellation/celestial-flower/index.html" class="btn-historical-web">
+                <span>Revisit Harmonized Flower ➔</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Chronicle 2 / Game 04 -->
+          <article class="chronicle-card">
+            <div class="chronicle-thumb-wrap">
+              <img src="./assets/thumbnails/severed_sky.webp" alt="The Severed Sky" loading="eager" fetchpriority="high" width="760" height="320">
+            </div>
+            <div class="chronicle-body">
+              <div>
+                <div class="chronicle-step-tag">Game 04 · The Observatory Raid · Transmission 1 ✓</div>
+                <h3 class="chronicle-title">The Observatory Raid</h3>
+                <p class="chronicle-text">
+                  The aftermath of the raid. Masked assailants tear the sacred Astrolabe from its brass cradle. Transmission 1 broadcasts the urgent distress call (22.22 MHz) as the stars shatter into gravitational ripples.
+                </p>
+              </div>
+              <a href="./constellation/celestial-flower-2/index.html" class="btn-historical-web">
+                <span>Inspect Observatory Raid & Breach ➔</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Chronicle 3 / Game 05 -->
+          <article class="chronicle-card">
+            <div class="chronicle-thumb-wrap">
+              <img src="./assets/thumbnails/planisphere_preview.webp" alt="The Celestial Matrix" loading="eager" fetchpriority="high" width="760" height="320">
+            </div>
+            <div class="chronicle-body">
+              <div>
+                <div class="chronicle-step-tag">Game 05 · Calibrated & Stabilized · Transmission 3 ✓</div>
+                <h3 class="chronicle-title">The Celestial Matrix</h3>
+                <p class="chronicle-text">
+                  At the Observatory, Silvia aligned the sixteen celestial guides and harmonic mechanics from Sheet 4. Transmission 3 (142.85 MHz) confirmed stabilization, locking Vector I coordinates and projecting the southern beam.
+                </p>
+              </div>
+              <a href="./constellation/celestial-matrix/index.html" class="btn-historical-web">
+                <span>Inspect Calibrated Console ➔</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Chronicle 4 / Game 06 -->
+          <article class="chronicle-card" id="chronicle-card-7">
+            <div class="chronicle-thumb-wrap">
+              <img src="./assets/thumbnails/zodiac_journal_preview.webp" alt="The Zodiac Engine" loading="eager" fetchpriority="high" width="760" height="320">
+            </div>
+            <div class="chronicle-body">
+              <div>
+                <div class="chronicle-step-tag" id="chronicle-7-tag">Game 06 · Subterranean Cache Secured ✓</div>
+                <h3 class="chronicle-title" id="chronicle-7-title">The Zodiac Engine & Outpost Patrol</h3>
+                <p class="chronicle-text" id="chronicle-7-text">
+                  Calibrating the seven dials of the Zodiacal Engine from Sheet 5, Silvia locked the emergency frequency (142.85 MHz) and breached the subterranean outpost beneath the dunes. Attuning the celestial obelisks of Sol, Luna, and Stella, she recovered the iron cipher chest and unmasked Letter K.
+                </p>
+              </div>
+              <a href="./desert/zodiac-engine/index.html" class="btn-historical-web" id="chronicle-7-btn">
+                <span>↺ Revisit Outpost Patrol ➔</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Chronicle 5 / Station 08 (Misión Futura Misteriosa - Sin Nombre, Sin Pistas, Solo Cuenta Atrás) -->
+          <article class="chronicle-card chronicle-locked-card" id="chronicle-card-8">
+            <div class="chronicle-thumb-wrap">
+              <img src="./assets/thumbnails/chronicle_station8_locked.webp" alt="Station 08 Sealed" loading="eager" width="760" height="320">
+            </div>
+            <div class="chronicle-body">
+              <div>
+                <div class="chronicle-step-tag" style="color:var(--brass-bright);">Station 08 · Veiled Horizon ⏳</div>
+                <h3 class="chronicle-title" style="letter-spacing:0.08em; color:#e2b069;">Station 08 · [ Sealed ]</h3>
+                <p class="chronicle-text">
+                  The path ahead remains veiled in nocturnal silence. The instruments of the Order and the celestial dials cannot be attuned until true astronomical midnight. Only when the countdown reaches zero will the meridian align with the stars, allowing the next stage of the journey to be calibrated.
+                </p>
+                <div class="chronicle-countdown-strip">
+                  <span class="chronicle-cd-unit"><strong id="chron-cd-hours">35</strong><small>h</small></span>
+                  <span style="color:var(--brass-base); font-weight:700;">:</span>
+                  <span class="chronicle-cd-unit"><strong id="chron-cd-mins">31</strong><small>m</small></span>
+                  <span style="color:var(--brass-base); font-weight:700;">:</span>
+                  <span class="chronicle-cd-unit"><strong id="chron-cd-secs">19</strong><small>s</small></span>
+                </div>
+              </div>
+              <div class="btn-chronicle-locked" id="chron-btn-locked">
+                <span>⏳ Awaiting Astronomical Midnight</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 5: THE CIPHER LEDGER & CELESTIAL MATH WORKBENCH
+           =================================================================== -->
+      <section class="hub-view-section" id="view-cipher">
+        <header class="view-header">
+          <div class="view-tagline">✦ Celestial Arithmetic ✦</div>
+          <h2 class="view-title">The Cipher Ledger</h2>
+          <p class="view-desc">
+            Record the numerical values you discover for the 26 letters of the Order alphabet and balance the coordinates of the ancient sanctuaries.
+          </p>
+        </header>
+
+        <div class="cipher-ledger-container">
+
+          <!-- 26-Letter Alphabet Vault -->
+          <div class="cipher-alphabet-card">
+            <div class="cipher-card-header">
+              <div class="cipher-card-title">
+                <span>Alphabet Numerical Assignment (A – Z)</span>
+              </div>
+            </div>
+
+            <div class="alphabet-grid-26" id="alphabet-grid">
+              <!-- Dynamically populated A to Z letter boxes -->
+            </div>
+          </div>
+
+          <!-- Coordinate Equations -->
+          <div class="sanctuary-equations-card">
+            <div class="cipher-card-header">
+              <div class="cipher-card-title">
+                <span>📜</span>
+                <span>Coordinate Equations</span>
+              </div>
+              <div class="sanctuary-status-pill" id="sanctuary-status-pill">
+                0 / 5 Equations Balanced
+              </div>
+            </div>
+
+            <div class="clue-equations-list" id="clue-equations-container">
+              <!-- 5 Clue Equations dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div class="lightbox-modal" id="image-lightbox">
+    <div class="lightbox-img-wrap loading" id="lightbox-img-wrap">
+      <button type="button" class="lightbox-close-btn" id="btn-close-lightbox">×</button>
+      <div class="lightbox-skeleton" id="lightbox-skeleton">
+        <div class="skeleton-shimmer"></div>
+        <div class="skeleton-ghost-content">
+          <div class="skeleton-spinner"></div>
+          <span class="skeleton-text">✦ Decoding High-Resolution Master Plate... ✦</span>
+          <span class="skeleton-subtext">Rendering authentic high-DPI archival parchment</span>
+        </div>
+      </div>
+      <img src="" id="lightbox-full-img" alt="Zoomed Artifact">
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       STATION 08 CELESTIAL UNLOCK MODAL (Astronomical Midnight Celebration)
+       =================================================================== -->
+  <div id="station8-unlock-modal" class="station8-unlock-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="unlock-station8-title">
+    <div class="unlock-modal-card">
+      <div class="unlock-burst-glow"></div>
+      <div class="unlock-badge">
+        <span class="unlock-badge-pulse"></span>
+        ✦ THE ECLIPSE ORDER · CONSTELLATION PATH // 142.85 MHz ✦
+      </div>
+      <div class="unlock-heraldic-seal">
+        <svg viewBox="0 0 100 100" class="unlock-seal-svg">
+          <defs>
+            <linearGradient id="unlockGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffd885"/>
+              <stop offset="50%" stop-color="#d4af37"/>
+              <stop offset="100%" stop-color="#9e7520"/>
+            </linearGradient>
+          </defs>
+          <circle cx="50" cy="50" r="46" fill="none" stroke="url(#unlockGoldGrad)" stroke-width="2" stroke-dasharray="4 3"/>
+          <circle cx="50" cy="50" r="38" fill="rgba(212,175,85,0.08)" stroke="#ffd885" stroke-width="1.5"/>
+          <polygon points="50,15 54,38 77,23 62,46 85,50 62,54 77,77 54,62 50,85 46,62 23,77 38,54 15,50 38,46 23,23 46,38" fill="#ffd885" opacity="0.9"/>
+          <circle cx="50" cy="50" r="8" fill="#120c04" stroke="#ffd885" stroke-width="2"/>
+        </svg>
+      </div>
+      <h4 class="unlock-pretitle">ASTRONOMICAL MIDNIGHT ALIGNED</h4>
+      <h2 class="unlock-mission-title" id="unlock-station8-title">The Midnight Calibration</h2>
+      <p class="unlock-mission-desc">
+        True astronomical midnight has struck across the desert meridian. The veil of nocturnal silence has lifted, and the reserve astrolabe rig is primed to capture the light of Vega.
+      </p>
+      <div class="unlock-actions-row">
+        <a href="./constellation/midnight-calibration/index.html" class="btn-unlock-engage" id="btn-unlock-engage">
+          <span>✦ ENTER MERIDIAN ALIGNMENT ➔</span>
+        </a>
+        <button type="button" class="btn-unlock-dismiss" id="btn-unlock-dismiss">
+          <span>✕ Inspect on Codex Map</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hub Controller Script -->
+  <script>
+    (function () {
+      'use strict';
+
+      // 1. Tactile Audio Synthesizer (Web Audio API)
+      class TactileSound {
+        constructor() {
+          this.ctx = null;
+        }
+
+        init() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioCtx();
+          }
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+        }
+
+        playMechanicalClick() {
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(180, now + 0.035);
+
+            gain.gain.setValueAtTime(0.14, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.04);
+          } catch(e) {}
+        }
+
+        playChimeHover() {
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, now);
+            osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.08);
+
+            gain.gain.setValueAtTime(0.03, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.13);
+          } catch(e) {}
+        }
+
+        playCelestialChime() {
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            const freqs = [293.66, 369.99, 440.00, 587.33, 739.99, 880.00];
+            freqs.forEach((freq, idx) => {
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              const noteTime = now + (idx * 0.08);
+
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, noteTime);
+
+              gain.gain.setValueAtTime(0, noteTime);
+              gain.gain.linearRampToValueAtTime(0.08, noteTime + 0.04);
+              gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 2.2);
+
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+
+              osc.start(noteTime);
+              osc.stop(noteTime + 2.25);
+            });
+          } catch(e) {}
+        }
+      }
+
+      const sfx = new TactileSound();
+      try {
+        localStorage.setItem('order_hub_unlocked', 'true');
+        localStorage.setItem('order_hub_unlocked_v4', 'true');
+      } catch (e) {}
+
+      // Collapsible Hub Navigation Sidebar Controller
+      const hubSidebar = document.querySelector('.hub-sidebar');
+      const btnSidebarCollapse = document.getElementById('btn-sidebar-collapse');
+      const btnSidebarOpen = document.getElementById('btn-sidebar-open');
+
+      function setSidebarCollapsed(collapsed) {
+        if (!hubSidebar) return;
+        if (collapsed) {
+          hubSidebar.classList.add('collapsed');
+          try { localStorage.setItem('hub_sidebar_collapsed', 'true'); } catch (e) {}
+        } else {
+          hubSidebar.classList.remove('collapsed');
+          try { localStorage.setItem('hub_sidebar_collapsed', 'false'); } catch (e) {}
+        }
+      }
+
+      if (btnSidebarCollapse) {
+        btnSidebarCollapse.addEventListener('click', () => {
+          sfx.playMechanicalClick();
+          setSidebarCollapsed(true);
+        });
+      }
+
+      if (btnSidebarOpen) {
+        btnSidebarOpen.addEventListener('click', () => {
+          sfx.playMechanicalClick();
+          setSidebarCollapsed(false);
+        });
+      }
+
+      try {
+        if (localStorage.getItem('hub_sidebar_collapsed') === 'true') {
+          setSidebarCollapsed(true);
+        }
+      } catch (e) {}
+
+      // 2. Navigation Menu Switching (Sidebar) & View Management
+      const navButtons = document.querySelectorAll('.nav-menu-btn');
+      const viewSections = document.querySelectorAll('.hub-view-section');
+
+      // 2B. Transmission Logs Menu & On-Demand Single Relay Controller
+      const txLogCards = document.querySelectorAll('.tx-log-card');
+      const txLaunchBtns = document.querySelectorAll('.btn-launch-decoder');
+      const txMenuView = document.getElementById('tx-logs-menu-view');
+      const txSinglePlayerView = document.getElementById('tx-single-player-view');
+      const txEmbeddedFrame = document.getElementById('transmissions-embedded-frame');
+      const btnBackToTxLogs = document.getElementById('btn-back-to-tx-logs');
+      const btnTxChronicleQuest = document.getElementById('btn-tx-chronicle-quest');
+      const btnTxQuestIcon = document.getElementById('btn-tx-quest-icon');
+      const btnTxQuestText = document.getElementById('btn-tx-quest-text');
+      const txCurrentCarrierTag = document.getElementById('tx-current-carrier-tag');
+      const txCurrentTitle = document.getElementById('tx-current-title');
+      const txFrameWrap = document.getElementById('tx-frame-wrap');
+
+      const txMetaInfo = [
+        {
+          carrier: 'RELAY 01 ACTIVE',
+          title: '01 · The Stolen Astrolabe (Observatory Under Attack)',
+          gameUrl: './constellation/celestial-flower-2/index.html',
+          gameTitle: 'Inspect The Observatory Raid ➔',
+          gameIcon: '⚔️'
+        },
+        {
+          carrier: 'RELAY 02 ACTIVE',
+          title: '02 · Voices in the Dunes (Southern Erg Outpost)',
+          gameUrl: null
+        },
+        {
+          carrier: 'RELAY 03 ACTIVE',
+          title: '03 · Harmonic Relief (Sandstone Dunes Vector)',
+          gameUrl: './constellation/celestial-matrix/index.html',
+          gameTitle: 'Inspect The Celestial Matrix ➔',
+          gameIcon: '🏛️'
+        }
+      ];
+
+      function returnToTxLogsMenu() {
+        if (txFrameWrap) {
+          txFrameWrap.classList.remove('loaded');
+          txFrameWrap.classList.add('loading');
+        }
+        // Unload iframe completely to release all video, audio, and canvas memory/GPU
+        if (txEmbeddedFrame && txEmbeddedFrame.src && !txEmbeddedFrame.src.endsWith('about:blank')) {
+          txEmbeddedFrame.src = 'about:blank';
+        }
+        if (btnTxChronicleQuest) {
+          btnTxChronicleQuest.style.display = 'none';
+        }
+        if (txSinglePlayerView) txSinglePlayerView.style.display = 'none';
+        if (txMenuView) txMenuView.style.display = 'flex';
+      }
+
+      function openSingleTransmission(idx) {
+        if (sfx) sfx.playMechanicalClick();
+        if (txMenuView) txMenuView.style.display = 'none';
+        if (txSinglePlayerView) txSinglePlayerView.style.display = 'flex';
+
+        const meta = txMetaInfo[idx] || txMetaInfo[0];
+        if (txCurrentCarrierTag) txCurrentCarrierTag.textContent = meta.carrier;
+        if (txCurrentTitle) txCurrentTitle.textContent = meta.title;
+
+        // Configure "Go to Game" button for Transmissions 1 and 3 (top-left)
+        if (btnTxChronicleQuest) {
+          if (meta.gameUrl) {
+            btnTxChronicleQuest.style.display = 'inline-flex';
+            btnTxChronicleQuest.href = meta.gameUrl;
+            if (btnTxQuestIcon) btnTxQuestIcon.textContent = meta.gameIcon || '✦';
+            if (btnTxQuestText) btnTxQuestText.textContent = meta.gameTitle || 'Inspect Game Chronicles ➔';
+          } else {
+            btnTxChronicleQuest.style.display = 'none';
+          }
+        }
+
+        // Reset skeleton to loading state
+        if (txFrameWrap) {
+          txFrameWrap.classList.remove('loaded');
+          txFrameWrap.classList.add('loading');
+        }
+
+        // Dynamically load ONLY this single transmission
+        if (txEmbeddedFrame) {
+          let hasLoaded = false;
+          const markLoaded = () => {
+            if (hasLoaded) return;
+            hasLoaded = true;
+            if (txFrameWrap) {
+              txFrameWrap.classList.remove('loading');
+              txFrameWrap.classList.add('loaded');
+            }
+          };
+          txEmbeddedFrame.onload = () => {
+            setTimeout(markLoaded, 250);
+          };
+          // Fail-safe: After 1.2s, dismiss skeleton so content is never blocked
+          setTimeout(markLoaded, 1200);
+          txEmbeddedFrame.src = `./constellation/radio-transmission/index.html?embedded=true&single=${idx}`;
+        }
+      }
+
+      function activateHubView(targetView) {
+        navButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === targetView));
+        viewSections.forEach(s => s.classList.toggle('active', s.id === targetView));
+
+        // On-Demand Fast Loading & Ghost Skeleton: Archives Parchment
+        if (targetView === 'view-archives') {
+          const docImg = document.getElementById('doc-view-img');
+          const imgFrame = document.getElementById('doc-image-frame');
+          const activeDocKey = document.querySelector('.archive-item-card.active')?.getAttribute('data-doc') || 'doc1';
+          const activeDoc = archiveDocs[activeDocKey];
+          const targetSrc = activeDoc?.imgSrc || './assets/emails/email-01-parchment.webp';
+
+          if (docImg) {
+            if (!docImg.src || !docImg.src.endsWith(targetSrc.replace('./', ''))) {
+              if (imgFrame) {
+                imgFrame.classList.remove('loaded');
+                imgFrame.classList.add('loading');
+              }
+              docImg.onload = () => {
+                if (imgFrame) {
+                  imgFrame.classList.remove('loading');
+                  imgFrame.classList.add('loaded');
+                }
+              };
+              docImg.src = targetSrc;
+            } else if (docImg.complete && docImg.naturalWidth > 0) {
+              if (imgFrame) {
+                imgFrame.classList.remove('loading');
+                imgFrame.classList.add('loaded');
+              }
+            }
+          }
+
+          // Pre-fetch active master plate in the background so lightbox opens with 0ms delay
+          if (activeDoc && activeDoc.fullImgSrc) {
+            const preImg = new Image();
+            preImg.src = activeDoc.fullImgSrc;
+          }
+        }
+
+        // Clean-up or ensure transmission menu readiness
+        if (targetView !== 'view-transmissions') {
+          returnToTxLogsMenu();
+        } else {
+          // If entering transmissions view without an active iframe running, make sure the cards are visible
+          if (!txEmbeddedFrame || !txEmbeddedFrame.src || txEmbeddedFrame.src.endsWith('about:blank')) {
+            returnToTxLogsMenu();
+          }
+        }
+      }
+
+      // Nav menu button click handlers
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (sfx) sfx.playMechanicalClick();
+          const targetView = btn.getAttribute('data-view');
+          if (targetView === 'view-transmissions') {
+            // Clicking Transmissions from the menu always returns to the dossier cards view
+            returnToTxLogsMenu();
+          }
+          activateHubView(targetView);
+        });
+      });
+
+      // Handle URL hash and query params on load, hashchange, or pageshow
+      function handleHubUrlHash() {
+        const hash = (window.location.hash || '').replace('#', '').trim();
+        const params = new URLSearchParams(window.location.search);
+        const queryView = params.get('view');
+        const queryTx = params.get('tx') || params.get('single') || params.get('relay');
+
+        // Check if targeting a specific transmission directly
+        let targetTxIndex = null;
+        if (hash === 'transmission-1' || hash === 'tx-1' || hash === 'relay-1' || queryTx === '0' || (queryTx === '1' && params.has('single'))) {
+          targetTxIndex = 0;
+        } else if (hash === 'transmission-2' || hash === 'tx-2' || hash === 'relay-2' || queryTx === '1' || (queryTx === '2' && params.has('single'))) {
+          targetTxIndex = 1;
+        } else if (hash === 'transmission-3' || hash === 'tx-3' || hash === 'relay-3' || queryTx === '2' || (queryTx === '3' && params.has('single'))) {
+          targetTxIndex = 2;
+        }
+
+        if (targetTxIndex !== null) {
+          activateHubView('view-transmissions');
+          openSingleTransmission(targetTxIndex);
+          return;
+        }
+
+        // Routing for views
+        const targetViewId = hash || queryView;
+        if (targetViewId && document.getElementById(targetViewId)) {
+          activateHubView(targetViewId);
+        } else if (targetViewId === 'transmissions') {
+          activateHubView('view-transmissions');
+        } else if (targetViewId === 'chronicles') {
+          activateHubView('view-chronicles');
+        } else if (targetViewId === 'archives') {
+          activateHubView('view-archives');
+        } else if (targetViewId === 'trail' || targetViewId === 'map') {
+          activateHubView('view-trail');
+        } else if (targetViewId === 'cipher') {
+          activateHubView('view-cipher');
+        }
+      }
+
+      // Event listeners for transmission cards
+      txLogCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const idx = parseInt(card.getAttribute('data-tx-index'), 10) || 0;
+          openSingleTransmission(idx);
+        });
+      });
+
+      // Individual launch buttons
+      txLaunchBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const card = btn.closest('.tx-log-card');
+          const idx = card ? parseInt(card.getAttribute('data-tx-index'), 10) || 0 : 0;
+          openSingleTransmission(idx);
+        });
+      });
+
+      if (btnBackToTxLogs) {
+        btnBackToTxLogs.addEventListener('click', () => {
+          if (sfx) sfx.playMechanicalClick();
+          returnToTxLogsMenu();
+        });
+      }
+
+      // Hash, popstate, and pageshow event listeners
+      window.addEventListener('hashchange', handleHubUrlHash);
+      window.addEventListener('popstate', handleHubUrlHash);
+      window.addEventListener('pageshow', () => {
+        handleHubUrlHash();
+      });
+
+      // Execute on initial page load (all functions and vars are now ready!)
+      handleHubUrlHash();
+
+      // 3. Star Map Node Definitions & Click Inspection
+      const nodesData = {
+        1: {
+          badge: 'STATION 01 // ORIGIN DISPATCH',
+          status: 'COMPLETED',
+          statusClass: 'status-done-badge',
+          title: 'The Threshold (Dispatch 22:22)',
+          sector: 'Origin · Night Horizon',
+          journal: 'Prologue Letter',
+          freq: 'Personal Seal',
+          thumb: './assets/emails/email-01-parchment.webp',
+          lore: 'The initiation summons received at 22:22 on 1 September. Silvia chose The Constellation Path among the three ancient routes.',
+          rewards: [
+            { icon: '📜', label: 'The Initiation Summon', desc: '1 Sep 22:22 exact dispatch' },
+            { icon: '🧭', label: 'The Constellation Path', desc: 'Silvia\'s chosen destiny' },
+            { icon: '✨', label: 'Order Cipher Ledger', desc: 'Unsealed parchment codex' }
+          ],
+          btnText: 'Inspect In Archives ➔',
+          action: () => {
+            document.querySelector('[data-view="view-archives"]').click();
+            selectArchiveDoc('doc1');
+          }
+        },
+        2: {
+          badge: 'STATION 02 // CARTOGRAPHER ARRIVAL',
+          status: 'COMPLETED',
+          statusClass: 'status-done-badge',
+          title: 'DISPATCH 02 // CARTOGRAPHER ARRIVAL',
+          sector: 'Mountain Threshold',
+          journal: 'Fragment 1',
+          freq: 'Personal Seal',
+          thumb: './assets/emails/email-02-fragment-1.webp',
+          lore: 'The Cartographer introduced himself, announcing the handwritten journal, the sacred Astrolabe, and the path to the stars.',
+          rewards: [
+            { icon: '✉️', label: 'Cartographer Fragment 1', desc: 'The Cartographer of Distant Light' },
+            { icon: '🌌', label: 'Sacred Astrolabe Lore', desc: 'The 22-star instrument described' },
+            { icon: '📖', label: 'Handwritten Journal Summons', desc: '56-day chronological expedition' }
+          ],
+          btnText: 'Inspect In Archives ➔',
+          action: () => {
+            document.querySelector('[data-view="view-archives"]').click();
+            selectArchiveDoc('doc2');
+          }
+        },
+        3: {
+          badge: 'STATION 03 // CELESTIAL PROLOGUE',
+          status: 'HARMONIZED ✓',
+          statusClass: 'status-done-badge',
+          title: 'The Celestial Flower',
+          thumb: './assets/thumbnails/celestial_flower_preview.webp',
+          lore: 'The 22-star mechanical dial at the gateway of the sanctuary. Harmonized and aligned by Silvia before the raid on the Observatory.',
+          rewards: [
+            { icon: '🌸', label: '22 Anchor Stars Aligned', desc: 'Harmonic circuit complete' },
+            { icon: '🔤', label: 'Letter D Decoded (Deneb)', desc: 'Apex star cipher key' },
+            { icon: '🔤', label: 'Letter C Decoded (Cygnus)', desc: 'Constellation wing key' },
+            { icon: '🏛️', label: 'Sanctuary Archive Access', desc: 'Parchment chamber unsealed' }
+          ],
+          btnText: 'Inspect Decoded Letters & Flower ➔',
+          url: './constellation/celestial-flower/index.html',
+          replayUrl: './constellation/celestial-flower/index.html#reset',
+          replayText: '↺ Re-trace Constellation'
+        },
+        4: {
+          badge: 'STATION 04 // THE FALL & TRANSMISSION 1',
+          status: 'RAID ARCHIVED ✓',
+          statusClass: 'status-done-badge',
+          title: 'The Observatory Raid',
+          thumb: './assets/thumbnails/severed_sky.webp',
+          lore: 'Masked assailants breach the sanctuary and tear the sacred Astrolabe from its cradle. Transmission 1 broadcasts the urgent distress call (22.22 MHz) as the stars shatter into gravitational ripples.',
+          rewards: [
+            { icon: '⚔️', label: 'Observatory Breach Recorded', desc: 'Sacred Astrolabe stolen by raiders' },
+            { icon: '📻', label: 'Transmission 1 (22.22 MHz)', desc: 'Observatory Under Attack distress call' },
+            { icon: '🌌', label: 'The Severed Sky Record', desc: 'Gravitational ripple anomalies documented' }
+          ],
+          btnText: 'Inspect Observatory Raid & Breach ➔',
+          url: './constellation/celestial-flower-2/index.html',
+          replayUrl: './constellation/radio-transmission/index.html#transmission-1',
+          replayText: '📻 Listen to Transmission 1'
+        },
+        5: {
+          badge: 'STATION 05 // SHORTWAVE RELAY',
+          status: 'RECEIVED ✓',
+          statusClass: 'status-done-badge',
+          title: 'Emergency Radio Relay',
+          thumb: './assets/thumbnails/radio_cover.webp',
+          lore: 'Fleeing south through the mountain passes and aqueducts, the Cartographer beamed distress Transmission 2 at 19.84 MHz, confirming proof of life and urging Silvia to decipher the Planisphere in her journal.',
+          rewards: [
+            { icon: '📡', label: 'Survivor Beacon Locked', desc: '19.84 MHz shortwave carrier' },
+            { icon: '📻', label: 'Transmission 2 Intercepted', desc: 'Proof of life from southern dunes' },
+            { icon: '🧭', label: 'Planisphere Alert', desc: 'Guidance to unlock Sheet 4' }
+          ],
+          btnText: 'Open Radio Transmission ➔',
+          url: './constellation/radio-transmission/index.html#transmission-2'
+        },
+        6: {
+          badge: 'STATION 06 // OBSERVATORY RESONANCE',
+          status: 'CALIBRATED ✓',
+          statusClass: 'status-done-badge',
+          title: 'The Celestial Matrix',
+          thumb: './assets/thumbnails/planisphere_preview.webp',
+          lore: 'At the Observatory, Silvia aligned the sixteen celestial guides and harmonic mechanics from Sheet 4. Transmission 3 (142.85 MHz) confirmed signal stabilization, locking Vector I coordinates and projecting the southern harmonic beam into the dunes.',
+          rewards: [
+            { icon: '🔤', label: 'Secret Letter P Decoded', desc: 'Primary Cardinal Guide key' },
+            { icon: '📐', label: 'Ancient Vector I Locked', desc: 'Lat: [K]+[G]=48º, [A]+[O]=30\' · Lon: [B]+[P]=38º, [E]+[V]=14\', [F]+[T]=22″' },
+            { icon: '🎙️', label: 'Transmission 3 (142.85 MHz)', desc: 'Cartographer relief confirmation' }
+          ],
+          btnText: 'Inspect Calibrated Matrix ➔',
+          url: './constellation/celestial-matrix/index.html',
+          replayUrl: './constellation/celestial-matrix/index.html#phase-1',
+          replayText: '↺ Replay Calibration from Phase 1'
+        },
+        7: {
+          badge: 'STATION 07 // OUTPOST CACHE SECURED',
+          status: 'CACHE SECURED ✓',
+          statusClass: 'status-done-badge',
+          title: 'The Zodiacal Engine',
+          thumb: './assets/thumbnails/zodiac_journal_preview.webp',
+          lore: 'Calibrating the seven dials of the Zodiacal Engine from Sheet 5, Silvia locked the emergency frequency and breached the desert outskirts outpost. Navigating the ancient subterranean chambers, she attuned the celestial obelisks and recovered the iron cipher chest discarded by the fleeing raiders.',
+          rewards: [
+            { icon: '🔤', label: 'Secret Letter K Decoded', desc: 'Secondary Cardinal Guide key' },
+            { icon: '📐', label: 'Zodiacal Differential', desc: 'Meridian resonance: [O] − [A] = 16' },
+            { icon: '📜', label: 'Intercepted Orders', desc: 'Astrolabe triangulates the Fourth Chamber' }
+          ],
+          btnText: 'Inspect Secured Cache ➔',
+          url: './desert/zodiac-engine/index.html#victory',
+          replayUrl: './desert/zodiac-engine/index.html',
+          replayText: '↺ Replay Outpost Patrol'
+        },
+        8: () => {
+          const isMidnightDone = localStorage.getItem('order_midnight_completed') === 'true';
+          if (isMidnightDone) {
+            return {
+              badge: 'STATION 08 // CALIBRATED',
+              status: 'SECURED ✓',
+              statusClass: 'status-completed-badge',
+              title: 'The Midnight Calibration',
+              thumb: './assets/thumbnails/midnight_calibration_preview.webp',
+              lore: 'At true astronomical midnight, Silvia calibrated the astrolabe rig against Vega (97°), survived the electrostatic surge of The Shifting Tempest, and relayed the 2090 ly polar transit chords to the Cartographer before the radio blackout.',
+              rewards: [
+                { icon: '★', label: 'Vega Meridian Resonance', desc: 'Optical collimation locked at 97°' },
+                { icon: '📐', label: 'Hexagon Transit Constant', desc: 'Total chord distance: 2090 light-years' },
+                { icon: '🧭', label: 'Bipolar Stellar Anchors', desc: 'Achernar & Polaris bridge the shifted skies' }
+              ],
+              btnText: 'Inspect Secured Cache ➔',
+              url: './constellation/midnight-calibration/index.html#victory',
+              replayUrl: './constellation/midnight-calibration/index.html',
+              replayText: '↺ Replay Calibration'
+            };
+          }
+
+          const isMidnightReached = isStation8Unlocked();
+
+          if (isMidnightReached) {
+            return {
+              badge: 'STATION 08 // ALIGNMENT OPEN',
+              status: 'CALIBRATION READY ✦',
+              statusClass: 'status-live-badge',
+              title: 'The Midnight Calibration',
+              thumb: './assets/thumbnails/midnight_calibration_preview.webp',
+              lore: 'The celestial meridian has aligned at astronomical midnight. The instruments of the Order and the reserve astrolabe rig are now calibrated and ready for observation against the guide stars.',
+              rewards: [],
+              btnText: '✦ ENTER MERIDIAN ALIGNMENT ➔',
+              url: './constellation/midnight-calibration/index.html'
+            };
+          }
+
+          return {
+            badge: 'STATION 08 // ACTIVE OBJECTIVE',
+            status: 'ASTRONOMICAL ALIGNMENT ⏳',
+            statusClass: 'status-live-badge',
+            title: 'Station 08 · [ Sealed ]',
+            thumb: './assets/thumbnails/chronicle_station8_locked.webp',
+            lore: 'The path ahead remains veiled in nocturnal silence. The instruments of the Order and the celestial dials cannot be attuned until true astronomical midnight. Only when the countdown reaches zero will the meridian align with the stars, allowing the next stage of the journey to be calibrated.',
+            rewards: [],
+            btnText: '⏳ Awaiting Astronomical Midnight',
+            url: './constellation/midnight-calibration/index.html',
+            action: () => {
+              if (!isStation8Unlocked()) {
+                const inspCountdownBar = document.getElementById('insp-countdown-bar');
+                if (inspCountdownBar) {
+                  inspCountdownBar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              } else {
+                window.location.href = './constellation/midnight-calibration/index.html';
+              }
+            }
+          };
+        },
+      };
+
+      const inspBadge = document.getElementById('insp-badge');
+      const inspStatus = document.getElementById('insp-status');
+      const inspTitle = document.getElementById('insp-title');
+      const inspLore = document.getElementById('insp-lore');
+      const inspThumb = document.getElementById('insp-thumb-img');
+      const inspBtn = document.getElementById('insp-btn-primary');
+      const inspBtnReplay = document.getElementById('insp-btn-replay');
+      const inspBtnReset = document.getElementById('insp-btn-reset');
+      const inspRelicsBox = document.getElementById('insp-relics-box');
+      const inspRelicsChips = document.getElementById('insp-relics-chips');
+
+      window.selectMapNode = function (id, shouldScroll = false) {
+        sfx.playMechanicalClick();
+        const data = (typeof nodesData[id] === 'function') ? nodesData[id]() : nodesData[id];
+        if (!data) return;
+
+        // Switch to trail view if not already there
+        const trailNavBtn = document.querySelector('[data-view="view-trail"]');
+        if (trailNavBtn && !trailNavBtn.classList.contains('active')) {
+          trailNavBtn.click();
+        }
+
+        if (inspBadge) inspBadge.innerText = data.badge;
+        if (inspStatus) {
+          inspStatus.innerText = data.status;
+          inspStatus.className = 'inspector-status ' + data.statusClass;
+        }
+        if (inspTitle) inspTitle.innerText = data.title;
+        if (inspLore) inspLore.innerText = data.lore;
+        if (data.thumb && inspThumb) inspThumb.src = data.thumb;
+
+        // Render Unlocked Relics & Canonical Rewards
+        if (inspRelicsChips && data.rewards && data.rewards.length > 0) {
+          if (inspRelicsBox) inspRelicsBox.style.display = 'flex';
+          inspRelicsChips.innerHTML = data.rewards.map(r => `
+            <div class="relic-chip" title="${r.desc || ''}">
+              <span class="relic-chip-icon">${r.icon}</span>
+              <span class="relic-chip-text">${r.label}</span>
+              ${r.desc ? `<span class="relic-chip-desc">· ${r.desc}</span>` : ''}
+            </div>
+          `).join('');
+        } else if (inspRelicsBox) {
+          inspRelicsBox.style.display = 'none';
+        }
+
+        // Primary Action Button (Launch / Inspect)
+        if (inspBtn) {
+          if (data.btnText) {
+            inspBtn.style.display = 'inline-flex';
+            const span = inspBtn.querySelector('span');
+            if (span) span.innerText = data.btnText;
+            if (data.action) {
+              inspBtn.removeAttribute('href');
+              inspBtn.onclick = (e) => { e.preventDefault(); data.action(); };
+            } else {
+              inspBtn.onclick = null;
+              inspBtn.href = data.url;
+            }
+          } else {
+            inspBtn.style.display = 'none';
+          }
+        }
+
+        // Replay Button (Seamless replay from scratch)
+        if (inspBtnReplay) {
+          if (data.replayUrl) {
+            inspBtnReplay.style.display = 'inline-flex';
+            inspBtnReplay.href = data.replayUrl;
+            const span = inspBtnReplay.querySelector('span');
+            if (span) span.innerText = data.replayText || '↺ Replay';
+          } else {
+            inspBtnReplay.style.display = 'none';
+          }
+        }
+
+        const inspCountdownBar = document.getElementById('insp-countdown-bar');
+        if (inspCountdownBar) {
+          // Show countdown ONLY if Station 08 is active AND NOT yet unlocked!
+          inspCountdownBar.style.display = (id == 8 && !isStation8Unlocked()) ? 'flex' : 'none';
+        }
+
+        if (inspBtnReset) {
+          const currentActiveStation = 8;
+          if (id == currentActiveStation) {
+            inspBtnReset.style.display = 'none';
+          } else {
+            inspBtnReset.style.display = 'inline-flex';
+            const span = inspBtnReset.querySelector('span');
+            if (span) {
+              span.innerText = `➔ Return to Active Quest (Station 0${currentActiveStation})`;
+            } else {
+              inspBtnReset.innerText = `➔ Return to Active Quest (Station 0${currentActiveStation})`;
+            }
+            inspBtnReset.onclick = () => selectMapNode(currentActiveStation, true);
+          }
+        }
+
+        const inspectorEl = document.getElementById('star-inspector');
+        if (inspectorEl) {
+          inspectorEl.classList.remove('inspector-pulse-update');
+          void inspectorEl.offsetWidth; // trigger reflow
+          inspectorEl.classList.add('inspector-pulse-update');
+
+          if (shouldScroll) {
+            inspectorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+      };
+
+      document.querySelectorAll('.map-node-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const id = trigger.getAttribute('data-node');
+          selectMapNode(id, true);
+        });
+
+        trigger.addEventListener('mouseenter', () => {
+          sfx.playChimeHover();
+        });
+      });
+
+      // 4. Archives Document Switcher & Real Images (Physical Dispatches Only)
+      const archiveDocs = {
+        doc1: {
+          metaId: 'DISPATCH 01 // PARCHMENT IMAGE',
+          metaDate: '1 SEP 2026 · 22:22 EXACT',
+          imgSrc: './assets/emails/email-01-parchment.webp',
+          fullImgSrc: './assets/emails/email-01-parchment-full.webp',
+          bodyHtml: `
+            <p class="archive-record-note">
+              <strong>Dispatch I · September 1, 2026 (22:22):</strong> Opening dispatch parchment from the Eclipse Order. Confirms Silvia's designated path along <em>The Constellation Path</em> and the forthcoming delivery of the journal for the 56-day cycle.
+            </p>
+          `
+        },
+        doc2: {
+          metaId: 'DISPATCH 02 // CARTOGRAPHER ARRIVAL',
+          metaDate: 'FRAGMENT 1 · THE CARTOGRAPHER',
+          imgSrc: './assets/emails/email-02-fragment-1.webp',
+          fullImgSrc: './assets/emails/email-02-fragment-1-full.webp',
+          bodyHtml: `
+            <p class="archive-record-note">
+              <strong>Dispatch II · Fragment 1 (The Cartographer):</strong> Welcome letter from the Cartographer of Distant Light to the seeker who answered with the stars, standing watch at the Observatory at the edge of the dark.
+            </p>
+          `
+        },
+        doc3: {
+          metaId: 'DISPATCH 03 // SUBTERRANEAN OUTPOST',
+          metaDate: 'SOUTHERN FOOTHILLS · 142.85 MHz',
+          imgSrc: './assets/emails/email-03-zodiac-outpost.webp',
+          fullImgSrc: './assets/emails/email-03-zodiac-outpost-full.webp',
+          bodyHtml: `
+            <p class="archive-record-note">
+              <strong>Dispatch III · The Subterranean Outpost:</strong> Transmission received from the Cartographer at the desert threshold. Informs Silvia of the dormant central command console and directs her to solve Sheet 5 (The Zodiacal Engine) to extract the emergency override sequence.
+            </p>
+          `
+        }
+      };
+
+      const docMetaId = document.getElementById('doc-meta-id');
+      const docMetaDate = document.getElementById('doc-meta-date');
+      const docViewImg = document.getElementById('doc-view-img');
+      const docViewText = document.getElementById('doc-view-text');
+      const imgFrame = document.getElementById('doc-image-frame');
+
+      function selectArchiveDoc(docKey) {
+        const doc = archiveDocs[docKey];
+        if (!doc) return;
+
+        document.querySelectorAll('.archive-item-card').forEach(c => {
+          c.classList.toggle('active', c.getAttribute('data-doc') === docKey);
+        });
+
+        if (docMetaId) docMetaId.innerText = doc.metaId;
+        if (docMetaDate) docMetaDate.innerText = doc.metaDate;
+        if (docViewText) docViewText.innerHTML = doc.bodyHtml;
+
+        if (docViewImg && imgFrame) {
+          const targetSrc = doc.imgSrc;
+          if (!docViewImg.src || !docViewImg.src.endsWith(targetSrc.replace('./', ''))) {
+            imgFrame.classList.remove('loaded');
+            imgFrame.classList.add('loading');
+            docViewImg.onload = () => {
+              imgFrame.classList.remove('loading');
+              imgFrame.classList.add('loaded');
+            };
+            docViewImg.src = targetSrc;
+          } else if (docViewImg.complete && docViewImg.naturalWidth > 0) {
+            imgFrame.classList.remove('loading');
+            imgFrame.classList.add('loaded');
+          }
+        }
+
+        // Pre-fetch selected document's high-res plate in background
+        if (doc.fullImgSrc) {
+          const preImg = new Image();
+          preImg.src = doc.fullImgSrc;
+        }
+      }
+
+      // Initialize initial image state
+      if (docViewImg && imgFrame) {
+        if (docViewImg.complete && docViewImg.naturalWidth > 0) {
+          imgFrame.classList.remove('loading');
+          imgFrame.classList.add('loaded');
+        } else {
+          docViewImg.addEventListener('load', () => {
+            imgFrame.classList.remove('loading');
+            imgFrame.classList.add('loaded');
+          });
+        }
+      }
+
+      // 5. Transmissions Player Controls (Audio Intercept & Video Stream)
+      const txRadioAudio = document.getElementById('tx-radio-audio');
+      const btnTxRadioPlay = document.getElementById('btn-tx-radio-play');
+      const txCardRadio = document.getElementById('tx-card-radio');
+      const txTimeDisplay = document.getElementById('tx-time-display');
+
+      if (btnTxRadioPlay && txRadioAudio) {
+        btnTxRadioPlay.addEventListener('click', () => {
+          sfx.playMechanicalClick();
+          if (txRadioAudio.paused) {
+            txRadioAudio.play().then(() => {
+              btnTxRadioPlay.innerText = '⏸';
+              if (txCardRadio) txCardRadio.classList.add('playing');
+            }).catch(e => console.log('Audio playback prevented:', e));
+          } else {
+            txRadioAudio.pause();
+            btnTxRadioPlay.innerText = '▶';
+            if (txCardRadio) txCardRadio.classList.remove('playing');
+          }
+        });
+
+        txRadioAudio.addEventListener('timeupdate', () => {
+          if (!txTimeDisplay) return;
+          const cur = Math.floor(txRadioAudio.currentTime);
+          const dur = Math.floor(txRadioAudio.duration) || 48;
+          const curM = Math.floor(cur / 60);
+          const curS = (cur % 60).toString().padStart(2, '0');
+          const durM = Math.floor(dur / 60);
+          const durS = (dur % 60).toString().padStart(2, '0');
+          txTimeDisplay.innerText = `${curM}:${curS} / ${durM}:${durS}`;
+        });
+
+        txRadioAudio.addEventListener('ended', () => {
+          btnTxRadioPlay.innerText = '▶';
+          if (txCardRadio) txCardRadio.classList.remove('playing');
+        });
+      }
+
+      const btnTxCinematicPlay = document.getElementById('btn-tx-cinematic-play');
+      if (btnTxCinematicPlay) {
+        btnTxCinematicPlay.addEventListener('click', () => {
+          openCinematicTheater();
+        });
+      }
+
+      document.querySelectorAll('.archive-item-card').forEach(card => {
+        card.addEventListener('click', () => {
+          sfx.playMechanicalClick();
+          const docKey = card.getAttribute('data-doc');
+          selectArchiveDoc(docKey);
+        });
+      });
+
+      // 5. Image Lightbox Modal
+      const lightboxModal = document.getElementById('image-lightbox');
+      const lightboxImg = document.getElementById('lightbox-full-img');
+      const lightboxWrap = document.getElementById('lightbox-img-wrap');
+      const btnCloseLightbox = document.getElementById('btn-close-lightbox');
+
+      function closeLightbox() {
+        if (!lightboxModal) return;
+        lightboxModal.classList.remove('open');
+      }
+
+      if (imgFrame && lightboxModal) {
+        // Pre-fetch on hover for immediate 0ms readiness
+        imgFrame.addEventListener('mouseenter', () => {
+          const activeCard = document.querySelector('.archive-item-card.active');
+          const docKey = activeCard ? activeCard.getAttribute('data-doc') : 'doc1';
+          const doc = archiveDocs[docKey];
+          if (doc && doc.fullImgSrc) {
+            const pre = new Image();
+            pre.src = doc.fullImgSrc;
+          }
+        });
+
+        imgFrame.addEventListener('click', () => {
+          sfx.playMechanicalClick();
+          const activeCard = document.querySelector('.archive-item-card.active');
+          const docKey = activeCard ? activeCard.getAttribute('data-doc') : 'doc1';
+          const doc = archiveDocs[docKey];
+          const targetFullSrc = doc ? (doc.fullImgSrc || doc.imgSrc) : docViewImg.src;
+
+          const isAlreadyLoaded = lightboxImg.src && lightboxImg.src.endsWith(targetFullSrc.replace('./', '')) && lightboxImg.complete && lightboxImg.naturalWidth > 0;
+
+          if (isAlreadyLoaded) {
+            if (lightboxWrap) {
+              lightboxWrap.classList.remove('loading');
+              lightboxWrap.classList.add('loaded');
+            }
+          } else {
+            if (lightboxWrap) {
+              lightboxWrap.classList.remove('loaded');
+              lightboxWrap.classList.add('loading');
+            }
+
+            lightboxImg.onload = () => {
+              if (lightboxWrap) {
+                lightboxWrap.classList.remove('loading');
+                lightboxWrap.classList.add('loaded');
+              }
+            };
+
+            lightboxImg.src = targetFullSrc;
+            if (lightboxImg.complete && lightboxImg.naturalWidth > 0) {
+              if (lightboxWrap) {
+                lightboxWrap.classList.remove('loading');
+                lightboxWrap.classList.add('loaded');
+              }
+            }
+          }
+
+          lightboxModal.classList.add('open');
+        });
+      }
+
+      if (btnCloseLightbox && lightboxModal) {
+        btnCloseLightbox.addEventListener('click', closeLightbox);
+      }
+
+      if (lightboxModal) {
+        lightboxModal.addEventListener('click', (e) => {
+          if (e.target === lightboxModal) {
+            closeLightbox();
+          }
+        });
+      }
+
+      // Canonical Active Quest on Hub Load: Station 08 is the active objective (Zodiac completed)
+      try {
+        localStorage.setItem('order_zodiac_completed', 'true');
+      } catch (e) {}
+
+      const n7Tag = document.getElementById('node-7-tag');
+      if (n7Tag) {
+        n7Tag.textContent = '07 · SECURED ✓';
+        n7Tag.style.fill = 'var(--brass-bright)';
+      }
+      const n7Dot = document.getElementById('node-7-dot');
+      if (n7Dot) {
+        n7Dot.classList.remove('node-dot-active');
+        n7Dot.classList.add('node-dot-completed');
+      }
+      const n7Beacon = document.getElementById('node-7-beacon');
+      if (n7Beacon) n7Beacon.style.display = 'none';
+
+      // Illuminate filament 7 -> 8
+      const fil78 = document.getElementById('filament-7-8');
+      if (fil78) fil78.classList.add('lit');
+
+      // Node 8 map and active quest state
+      const isMidnightCompleted = localStorage.getItem('order_midnight_completed') === 'true';
+      const n8Beacon = document.getElementById('node-8-beacon');
+      const n8Dot = document.getElementById('node-8-dot');
+      const n8Tag = document.getElementById('node-8-tag');
+      const n8Title = document.getElementById('node-8-title');
+
+      if (isMidnightCompleted) {
+        if (n8Beacon) n8Beacon.style.display = 'none';
+        if (n8Dot) {
+          n8Dot.classList.remove('node-dot-veiled', 'node-dot-active');
+          n8Dot.classList.add('node-dot-completed');
+        }
+        if (n8Tag) {
+          n8Tag.textContent = '08 · SECURED ✓';
+          n8Tag.style.fill = 'var(--brass-bright)';
+          n8Tag.style.opacity = '1';
+        }
+        if (n8Title) {
+          n8Title.textContent = 'The Midnight Calibration';
+          n8Title.style.opacity = '1';
+        }
+      } else {
+        const isTimeUnlocked = isStation8Unlocked();
+        if (n8Beacon) n8Beacon.style.display = 'block';
+        if (n8Dot) {
+          n8Dot.classList.remove('node-dot-veiled');
+          n8Dot.classList.add('node-dot-active');
+        }
+        if (n8Tag) {
+          n8Tag.textContent = isTimeUnlocked ? '08 · CALIBRATION READY ✦' : '08 · ACTIVE OBJECTIVE ⏳';
+          n8Tag.style.fill = isTimeUnlocked ? 'var(--brass-bright)' : '#e2b069';
+          n8Tag.style.opacity = '1';
+        }
+        if (n8Title) {
+          n8Title.textContent = isTimeUnlocked ? 'The Midnight Calibration' : '[ Sealed ]';
+          n8Title.style.opacity = '1';
+        }
+      }
+
+      // Active node is Station 08:
+      selectMapNode(8, false);
+
+      // Update Chronicles of the Raid for completed state
+      const chronCard7 = document.getElementById('chronicle-card-7');
+      const chron7Tag = document.getElementById('chronicle-7-tag');
+      const chron7Title = document.getElementById('chronicle-7-title');
+      const chron7Text = document.getElementById('chronicle-7-text');
+      const chron7Btn = document.getElementById('chronicle-7-btn');
+      const chronCard8 = document.getElementById('chronicle-card-8');
+
+      if (chronCard7) {
+        chronCard7.style.borderColor = 'var(--border-brass)';
+        chronCard7.style.boxShadow = 'none';
+      }
+      if (chron7Tag) {
+        chron7Tag.textContent = 'Game 06 · Subterranean Cache Secured ✓';
+        chron7Tag.style.color = 'var(--brass-base)';
+      }
+      if (chron7Title) {
+        chron7Title.textContent = 'The Zodiac Engine & Outpost Patrol';
+      }
+      if (chron7Text) {
+        chron7Text.textContent = 'Calibrating the seven dials of the Zodiacal Engine from Sheet 5, Silvia locked the emergency beacon (142.85 MHz) and breached the subterranean outpost beneath the dunes. Attuning the celestial obelisks of Sol, Luna, and Stella, she recovered the iron cipher chest and unmasked Letter K.';
+      }
+      if (chron7Btn) {
+        chron7Btn.style.background = 'rgba(212, 168, 83, 0.15)';
+        chron7Btn.style.color = 'var(--brass-bright)';
+        chron7Btn.style.borderColor = 'var(--brass-base)';
+        const span = chron7Btn.querySelector('span');
+        if (span) span.textContent = '↺ Revisit Outpost Patrol ➔';
+      }
+
+      if (chronCard8) {
+        chronCard8.style.display = 'flex';
+        const chron8Tag = chronCard8.querySelector('.chronicle-step-tag');
+        const chron8Title = chronCard8.querySelector('.chronicle-title');
+        const chron8Text = chronCard8.querySelector('.chronicle-text');
+        const chron8Thumb = chronCard8.querySelector('img');
+        const chron8Countdown = chronCard8.querySelector('.chronicle-countdown-strip');
+        const chron8Btn = document.getElementById('chron-btn-locked');
+
+        if (isMidnightCompleted) {
+          if (chron8Tag) {
+            chron8Tag.textContent = 'Station 08 · Meridian Calibrated ✓';
+            chron8Tag.style.color = 'var(--brass-base)';
+          }
+          if (chron8Title) {
+            chron8Title.textContent = 'The Midnight Calibration & The Shifting Tempest';
+            chron8Title.style.color = '#fff';
+          }
+          if (chron8Text) {
+            chron8Text.textContent = 'At true astronomical midnight, Silvia calibrated the astrolabe rig against Vega (97°), survived the electrostatic surge of The Shifting Tempest, and relayed the 2090 ly polar transit chords to the Cartographer before the radio blackout.';
+          }
+          if (chron8Thumb) chron8Thumb.src = './assets/thumbnails/midnight_calibration_preview.webp';
+          if (chron8Countdown) chron8Countdown.style.display = 'none';
+          if (chron8Btn) {
+            chron8Btn.style.cursor = 'pointer';
+            chron8Btn.onclick = () => window.location.href = './constellation/midnight-calibration/index.html#victory';
+            const span = chron8Btn.querySelector('span');
+            if (span) span.textContent = '↺ Revisit Midnight Calibration ➔';
+          }
+        } else if (isStation8Unlocked()) {
+          chronCard8.classList.remove('chronicle-locked-card');
+          if (chron8Tag) {
+            chron8Tag.textContent = 'Station 08 · Meridian Open ✦';
+            chron8Tag.style.color = 'var(--brass-bright)';
+          }
+          if (chron8Title) {
+            chron8Title.textContent = 'The Midnight Calibration';
+            chron8Title.style.color = 'var(--brass-bright)';
+          }
+          if (chron8Text) {
+            chron8Text.textContent = 'The celestial meridian has aligned at astronomical midnight. The instruments of the Order and the reserve astrolabe rig are now calibrated and ready for observation against the guide stars.';
+          }
+          if (chron8Thumb) chron8Thumb.src = './assets/thumbnails/midnight_calibration_preview.webp';
+          if (chron8Countdown) chron8Countdown.style.display = 'none';
+          if (chron8Btn) {
+            chron8Btn.className = 'btn-historical-web';
+            chron8Btn.style.cursor = 'pointer';
+            chron8Btn.onclick = () => window.location.href = './constellation/midnight-calibration/index.html';
+            const span = chron8Btn.querySelector('span');
+            if (span) span.textContent = '✦ ENTER MERIDIAN ALIGNMENT ➔';
+          }
+        }
+      }
+
+      // Astronomical Midnight Countdown Timer for Station 08 (Target: Sep 29, 2026 at 00:00:00 CEST)
+      const COUNTDOWN_STORAGE_KEY = 'order_station8_unlock_target';
+      const UNLOCKED_STORAGE_KEY = 'order_station8_unlocked';
+      // September is month index 8 in JavaScript Date (0-indexed: Jan=0 .. Sep=8)
+      // Canonical target: Sep 29, 2026 at 00:00:00 local time
+      const MIDNIGHT_CALIBRATION_TARGET_MS = new Date(2026, 8, 29, 0, 0, 0).getTime();
+
+      function getOrCreateCountdownTarget() {
+        let target = localStorage.getItem(COUNTDOWN_STORAGE_KEY);
+        if (!target || parseInt(target, 10) !== MIDNIGHT_CALIBRATION_TARGET_MS) {
+          target = MIDNIGHT_CALIBRATION_TARGET_MS.toString();
+          try { localStorage.setItem(COUNTDOWN_STORAGE_KEY, target); } catch (e) {}
+        }
+        return parseInt(target, 10);
+      }
+
+      function isStation8Unlocked() {
+        if (localStorage.getItem('order_midnight_completed') === 'true') return true;
+        if (localStorage.getItem(UNLOCKED_STORAGE_KEY) === 'true') return true;
+        if (Date.now() >= getOrCreateCountdownTarget()) {
+          try { localStorage.setItem(UNLOCKED_STORAGE_KEY, 'true'); } catch (e) {}
+          return true;
+        }
+        return false;
+      }
+
+      let hasTriggeredUnlockAnim = false;
+
+      function triggerStation8UnlockSequence(isManual = false) {
+        if (hasTriggeredUnlockAnim && !isManual) return;
+        hasTriggeredUnlockAnim = true;
+
+        try {
+          localStorage.setItem(UNLOCKED_STORAGE_KEY, 'true');
+        } catch (e) {}
+
+        // Sound fanfare
+        try {
+          if (sfx && typeof sfx.playCelestialChime === 'function') {
+            sfx.playCelestialChime();
+          }
+        } catch (_) {}
+
+        // Hide countdown bars with smooth fade
+        const inspCountdownBar = document.getElementById('insp-countdown-bar');
+        if (inspCountdownBar) {
+          inspCountdownBar.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          inspCountdownBar.style.opacity = '0';
+          inspCountdownBar.style.transform = 'scaleY(0)';
+          setTimeout(() => { inspCountdownBar.style.display = 'none'; }, 400);
+        }
+
+        const chronCard8 = document.getElementById('chronicle-card-8');
+        if (chronCard8) {
+          chronCard8.classList.remove('chronicle-locked-card');
+          chronCard8.classList.add('chronicle-unlock-glow');
+          const cd = chronCard8.querySelector('.chronicle-countdown-strip');
+          if (cd) {
+            cd.style.transition = 'opacity 0.4s ease';
+            cd.style.opacity = '0';
+            setTimeout(() => { cd.style.display = 'none'; }, 400);
+          }
+
+          const chron8Tag = chronCard8.querySelector('.chronicle-step-tag');
+          const chron8Title = chronCard8.querySelector('.chronicle-title');
+          const chron8Text = chronCard8.querySelector('.chronicle-text');
+          const chron8Thumb = chronCard8.querySelector('img');
+          const chron8Btn = document.getElementById('chron-btn-locked');
+
+          if (chron8Tag) {
+            chron8Tag.textContent = 'Station 08 · Meridian Open ✦';
+            chron8Tag.style.color = 'var(--brass-bright)';
+          }
+          if (chron8Title) {
+            chron8Title.textContent = 'The Midnight Calibration';
+            chron8Title.style.color = 'var(--brass-bright)';
+          }
+          if (chron8Text) {
+            chron8Text.textContent = 'The celestial meridian has aligned at astronomical midnight. The instruments of the Order and the reserve astrolabe rig are now calibrated and ready for observation against the guide stars.';
+          }
+          if (chron8Thumb) {
+            chron8Thumb.src = './assets/thumbnails/midnight_calibration_preview.webp';
+          }
+          if (chron8Btn) {
+            chron8Btn.className = 'btn-historical-web';
+            chron8Btn.style.cursor = 'pointer';
+            chron8Btn.onclick = () => window.location.href = './constellation/midnight-calibration/index.html';
+            const span = chron8Btn.querySelector('span');
+            if (span) span.textContent = '✦ ENTER MERIDIAN ALIGNMENT ➔';
+          }
+        }
+
+        // Map Node 8 visual unlock
+        const n8Beacon = document.getElementById('node-8-beacon');
+        const n8Dot = document.getElementById('node-8-dot');
+        const n8Tag = document.getElementById('node-8-tag');
+        const n8Title = document.getElementById('node-8-title');
+        if (n8Beacon) {
+          n8Beacon.style.display = 'block';
+          n8Beacon.style.stroke = '#ffd885';
+          n8Beacon.classList.add('node-unlock-beacon-pulse');
+        }
+        if (n8Dot) {
+          n8Dot.classList.remove('node-dot-veiled');
+          n8Dot.classList.add('node-dot-active');
+        }
+        if (n8Tag) {
+          n8Tag.textContent = '08 · CALIBRATION READY ✦';
+          n8Tag.style.fill = 'var(--brass-bright)';
+        }
+        if (n8Title) {
+          n8Title.textContent = 'The Midnight Calibration';
+          n8Title.style.fill = '#ffd885';
+        }
+
+        // Refresh Inspector panel with unlocked data
+        selectMapNode(8, false);
+
+        // Show Unlock Modal
+        const unlockModal = document.getElementById('station8-unlock-modal');
+        if (unlockModal) {
+          unlockModal.style.display = 'flex';
+        }
+      }
+
+      window.triggerStation8UnlockAnimation = () => triggerStation8UnlockSequence(true);
+      window.resetStation8Lock = () => {
+        localStorage.removeItem(UNLOCKED_STORAGE_KEY);
+        localStorage.removeItem('order_midnight_completed');
+        window.location.reload();
+      };
+
+      const btnUnlockDismiss = document.getElementById('btn-unlock-dismiss');
+      if (btnUnlockDismiss) {
+        btnUnlockDismiss.addEventListener('click', () => {
+          const unlockModal = document.getElementById('station8-unlock-modal');
+          if (unlockModal) unlockModal.style.display = 'none';
+          if (sfx) sfx.playMechanicalClick();
+        });
+      }
+
+      function updateCountdownTimer() {
+        const cdHours = document.getElementById('cd-hours');
+        const cdMins = document.getElementById('cd-mins');
+        const cdSecs = document.getElementById('cd-secs');
+        const chronHours = document.getElementById('chron-cd-hours');
+        const chronMins = document.getElementById('chron-cd-mins');
+        const chronSecs = document.getElementById('chron-cd-secs');
+
+        const isUnlocked = isStation8Unlocked();
+
+        // If permanently unlocked, ensure countdown is hidden and buttons are active
+        if (isUnlocked) {
+          const inspCountdownBar = document.getElementById('insp-countdown-bar');
+          if (inspCountdownBar) inspCountdownBar.style.display = 'none';
+          const chronCard8 = document.getElementById('chronicle-card-8');
+          if (chronCard8) {
+            const cd = chronCard8.querySelector('.chronicle-countdown-strip');
+            if (cd) cd.style.display = 'none';
+          }
+          return;
+        }
+
+        const target = getOrCreateCountdownTarget();
+        const now = Date.now();
+        const diff = Math.max(0, target - now);
+
+        if (diff <= 0) {
+          triggerStation8UnlockSequence(false);
+          return;
+        }
+
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const hStr = hours.toString().padStart(2, '0');
+        const mStr = minutes.toString().padStart(2, '0');
+        const sStr = seconds.toString().padStart(2, '0');
+
+        if (cdHours) cdHours.textContent = hStr;
+        if (cdMins) cdMins.textContent = mStr;
+        if (cdSecs) cdSecs.textContent = sStr;
+
+        if (chronHours) chronHours.textContent = hStr;
+        if (chronMins) chronMins.textContent = mStr;
+        if (chronSecs) chronSecs.textContent = sStr;
+
+        const chronBtnSpan = document.querySelector('#chron-btn-locked span');
+        if (chronBtnSpan) {
+          chronBtnSpan.textContent = `⏳ Calibration Window in ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        const inspBadgeEl = document.getElementById('insp-badge');
+        if (inspBadgeEl && inspBadgeEl.innerText.includes('STATION 08')) {
+          const btnSpan = document.querySelector('#insp-btn-primary span');
+          if (btnSpan) {
+            btnSpan.textContent = `⏳ Calibration Window in ${hours}h ${minutes}m ${seconds}s`;
+          }
+        }
+      }
+
+      setInterval(updateCountdownTimer, 1000);
+      updateCountdownTimer();
+
+      // =====================================================================
+      // 6. THE CIPHER LEDGER & CELESTIAL MATH WORKBENCH CONTROLLER
+      // =====================================================================
+      const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      const CLUE_EQUATIONS = [
+        { id: 'lat-deg', station: 'Station 06 → 07 Bearing', name: 'Latitude Degrees', expr: 'K + G', l1: 'K', op: '+', l2: 'G', target: 48, unit: 'º N' },
+        { id: 'lat-min', station: 'Station 06 → 07 Bearing', name: 'Latitude Minutes', expr: 'A + O', l1: 'A', op: '+', l2: 'O', target: 30, unit: "' N" },
+        { id: 'zod-diff', station: 'Station 07 · Zodiacal Differential', name: 'Meridian Resonance', expr: 'O − A', l1: 'O', op: '-', l2: 'A', target: 16, unit: ' S' },
+        { id: 'lon-deg', station: 'Vector I · Deep Desert Vector', name: 'Longitude Degrees', expr: 'B + P', l1: 'B', op: '+', l2: 'P', target: 38, unit: 'º E' },
+        { id: 'lon-min', station: 'Vector I · Deep Desert Vector', name: 'Longitude Minutes', expr: 'E + V', l1: 'E', op: '+', l2: 'V', target: 14, unit: "' E" },
+        { id: 'lon-sec', station: 'Vector I · Deep Desert Vector', name: 'Longitude Seconds', expr: 'F + T', l1: 'F', op: '+', l2: 'T', target: 22, unit: "'' E" }
+      ];
+
+      const alphabetGridEl = document.getElementById('alphabet-grid');
+      const clueEquationsContainer = document.getElementById('clue-equations-container');
+      const sanctuaryStatusPill = document.getElementById('sanctuary-status-pill');
+      const btnCopyLedger = document.getElementById('btn-copy-ledger');
+      const copyBtnText = document.getElementById('copy-btn-text');
+      const btnResetLedger = document.getElementById('btn-reset-ledger');
+
+      // Zero Spoilers State: Silvia starts with empty ledger
+      let cipherLedger = {};
+      try {
+        const savedLedger = localStorage.getItem('silvia_cipher_ledger');
+        if (savedLedger) cipherLedger = JSON.parse(savedLedger);
+      } catch (e) {
+        cipherLedger = {};
+      }
+
+      function saveCipherLedger() {
+        try {
+          localStorage.setItem('silvia_cipher_ledger', JSON.stringify(cipherLedger));
+        } catch (e) {}
+      }
+
+      // Render 26 Alphabet Input Cards
+      function renderAlphabetGrid() {
+        if (!alphabetGridEl) return;
+        alphabetGridEl.innerHTML = '';
+
+        // Value frequency map to detect duplicates across alphabet
+        const valFreq = {};
+        Object.values(cipherLedger).forEach(val => {
+          if (val !== undefined && val !== null && val !== '') {
+            valFreq[val] = (valFreq[val] || 0) + 1;
+          }
+        });
+
+        ALPHABET.forEach((char, idx) => {
+          const val = cipherLedger[char];
+          const hasVal = (val !== undefined && val !== null && val !== '');
+          const isDuplicate = hasVal && valFreq[val] > 1;
+
+          const card = document.createElement('div');
+          card.className = 'letter-node-box' + (hasVal ? ' has-value' : '') + (isDuplicate ? ' has-conflict' : '');
+          card.id = `letter-card-${char}`;
+
+          let statusText = 'Unassigned';
+          if (hasVal) {
+            statusText = isDuplicate ? `⚠ Dup (${val})` : `Val: ${val}`;
+          }
+
+          card.innerHTML = `
+            <div class="letter-node-header">
+              <span class="letter-char">${char}</span>
+            </div>
+            <input type="number" min="1" max="26" class="letter-val-input" data-letter="${char}" placeholder="—" value="${hasVal ? val : ''}" autocomplete="off">
+            <span class="letter-status-indicator">${statusText}</span>
+          `;
+
+          const inputEl = card.querySelector('.letter-val-input');
+          inputEl.addEventListener('input', (e) => {
+            const raw = e.target.value.trim();
+            if (raw === '') {
+              delete cipherLedger[char];
+            } else {
+              const num = parseInt(raw, 10);
+              if (!isNaN(num)) {
+                cipherLedger[char] = num;
+              }
+            }
+            saveCipherLedger();
+            updateAllLedgerUI();
+          });
+
+          alphabetGridEl.appendChild(card);
+        });
+      }
+
+      // Render & Check Vector I Clue Equations
+      function updateClueEquations() {
+        if (!clueEquationsContainer) return;
+        clueEquationsContainer.innerHTML = '';
+
+        let balancedCount = 0;
+
+        CLUE_EQUATIONS.forEach(eq => {
+          const v1 = cipherLedger[eq.l1];
+          const v2 = cipherLedger[eq.l2];
+          const hasV1 = (v1 !== undefined && v1 !== null && v1 !== '');
+          const hasV2 = (v2 !== undefined && v2 !== null && v2 !== '');
+
+          let badgeClass = 'badge-waiting';
+          let badgeText = 'Waiting for values';
+          let isBalanced = false;
+
+          if (hasV1 && hasV2) {
+            const sum = (eq.op === '+') ? (v1 + v2) : (v1 - v2);
+            if (sum === eq.target) {
+              badgeClass = 'badge-balanced';
+              badgeText = 'Balanced ✓';
+              isBalanced = true;
+              balancedCount++;
+            } else {
+              badgeClass = 'badge-imbalanced';
+              badgeText = `Imbalanced (${sum})`;
+            }
+          } else if (hasV1 || hasV2) {
+            badgeClass = 'badge-waiting';
+            badgeText = '1 Value Needed';
+          }
+
+          const item = document.createElement('div');
+          item.className = 'clue-equation-item' + (isBalanced ? ' is-balanced' : '');
+          const opSymbol = (eq.op === '-') ? '−' : '+';
+          item.innerHTML = `
+            <div class="clue-eq-formula">[${eq.l1}] ${opSymbol} [${eq.l2}] = ${eq.target}${eq.unit}</div>
+            <span class="clue-eq-badge ${badgeClass}">${badgeText}</span>
+          `;
+
+          clueEquationsContainer.appendChild(item);
+        });
+
+        if (sanctuaryStatusPill) {
+          sanctuaryStatusPill.innerText = `${balancedCount} / ${CLUE_EQUATIONS.length} Equations Balanced`;
+          sanctuaryStatusPill.classList.toggle('all-balanced', balancedCount === CLUE_EQUATIONS.length);
+        }
+      }
+
+      // Update All Ledger UI
+      function updateAllLedgerUI() {
+        const valFreq = {};
+        Object.entries(cipherLedger).forEach(([k, val]) => {
+          if (val !== undefined && val !== null && val !== '') {
+            valFreq[val] = (valFreq[val] || 0) + 1;
+          }
+        });
+
+        ALPHABET.forEach(char => {
+          const card = document.getElementById(`letter-card-${char}`);
+          if (!card) return;
+          const val = cipherLedger[char];
+          const hasVal = (val !== undefined && val !== null && val !== '');
+          const isDuplicate = hasVal && valFreq[val] > 1;
+
+          card.classList.toggle('has-value', hasVal);
+          card.classList.toggle('has-conflict', isDuplicate);
+
+          const statusEl = card.querySelector('.letter-status-indicator');
+          if (statusEl) {
+            if (hasVal) {
+              statusEl.innerText = isDuplicate ? `⚠ Dup (${val})` : `Val: ${val}`;
+            } else {
+              statusEl.innerText = 'Unassigned';
+            }
+          }
+        });
+
+        updateClueEquations();
+      }
+
+      // Copy Ledger Summary Action
+      if (btnCopyLedger) {
+        btnCopyLedger.addEventListener('click', () => {
+          sfx.playMechanicalClick();
+
+          let text = '=========================================\n';
+          text += "THE ECLIPSE ORDER · THE CIPHER LEDGER\n";
+          text += "Silvia's Celestial Cryptanalysis Summary\n";
+          text += '=========================================\n\n';
+
+          text += '[Alphabet Numerical Values (1-26)]\n';
+          const chunks = [];
+          for (let i = 0; i < ALPHABET.length; i += 6) {
+            const slice = ALPHABET.slice(i, i + 6).map(ch => {
+              const v = cipherLedger[ch];
+              return `${ch}: ${v !== undefined && v !== null && v !== '' ? v : '—'}`;
+            });
+            chunks.push(slice.join(' | '));
+          }
+          text += chunks.join('\n') + '\n\n';
+
+          text += '[Coordinate Equations Balance]\n';
+          CLUE_EQUATIONS.forEach(eq => {
+            const v1 = cipherLedger[eq.l1];
+            const v2 = cipherLedger[eq.l2];
+            const hasBoth = (v1 !== undefined && v1 !== null && v1 !== '' && v2 !== undefined && v2 !== null && v2 !== '');
+            const opSign = (eq.op === '-') ? '−' : '+';
+            if (hasBoth) {
+              const res = (eq.op === '-') ? (v1 - v2) : (v1 + v2);
+              const isBal = (res === eq.target);
+              text += `• ${eq.name}: [${v1}] ${opSign} [${v2}] = ${res}${eq.unit} [${isBal ? 'BALANCED ✓' : 'IMBALANCED'}]\n`;
+            } else {
+              text += `• ${eq.name}: [${eq.l1}] ${opSign} [${eq.l2}] = ${eq.target}${eq.unit} [Awaiting letter values]\n`;
+            }
+          });
+
+          navigator.clipboard.writeText(text).then(() => {
+            if (copyBtnText) copyBtnText.innerText = 'Copied! ✓';
+            setTimeout(() => {
+              if (copyBtnText) copyBtnText.innerText = 'Copy Notes';
+            }, 2000);
+          }).catch(() => {
+            alert('Failed to copy to clipboard automatically.');
+          });
+        });
+      }
+
+      // Reset All Letters Action
+      if (btnResetLedger) {
+        btnResetLedger.addEventListener('click', () => {
+          sfx.playMechanicalClick();
+          const ok = confirm('Reset all alphabet letter assignments to empty?');
+          if (ok) {
+            cipherLedger = {};
+            saveCipherLedger();
+            renderAlphabetGrid();
+            updateAllLedgerUI();
+          }
+        });
+      }
+
+      // Initialize Alphabet & Ledger UI
+      renderAlphabetGrid();
+      updateAllLedgerUI();
+
+      // 7. Multi-Layered Cosmic Starfield & Shooting Stars Canvas (Lightweight & Smooth)
+      const canvas = document.getElementById('ambient-stars');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+          initStars();
+        });
+
+        let stars = [];
+        let shootingStars = [];
+
+        function initStars() {
+          stars = [];
+          const count = Math.floor((w * h) / 8000);
+          for (let i = 0; i < count; i++) {
+            // Chromatic mix: golden, cyan, icy white
+            const colorType = Math.random();
+            let color = 'rgba(255, 224, 153, '; // gold
+            if (colorType > 0.7) color = 'rgba(79, 227, 193, '; // cyan
+            else if (colorType > 0.5) color = 'rgba(230, 240, 255, '; // white
+
+            stars.push({
+              x: Math.random() * w,
+              y: Math.random() * h,
+              r: Math.random() * 1.5 + 0.3,
+              a: Math.random() * 0.7 + 0.25,
+              color: color,
+              speed: Math.random() * 0.015 + 0.005,
+              phase: Math.random() * Math.PI * 2
+            });
+          }
+        }
+        initStars();
+
+        function maybeSpawnShootingStar() {
+          if (shootingStars.length < 2 && Math.random() < 0.007) {
+            shootingStars.push({
+              x: Math.random() * w * 0.8,
+              y: Math.random() * h * 0.4,
+              len: Math.random() * 80 + 60,
+              speed: Math.random() * 7 + 9,
+              angle: (Math.PI / 4) + (Math.random() * 0.2 - 0.1),
+              opacity: 1
+            });
+          }
+        }
+
+        let lastStarsTime = 0;
+        const targetFPS = 24;
+        const frameInterval = 1000 / targetFPS; // 41.67 ms
+
+        function renderStars(timestamp) {
+          requestAnimationFrame(renderStars);
+          if (document.hidden) return; // Completely idle in background tabs
+
+          const elapsed = timestamp - lastStarsTime;
+          if (elapsed < frameInterval) return;
+          lastStarsTime = timestamp - (elapsed % frameInterval);
+
+          ctx.clearRect(0, 0, w, h);
+          const t = timestamp * 0.001;
+
+          // Render Calm Twinkling Stars (No mouse lag or parallax)
+          for (let i = 0; i < stars.length; i++) {
+            const s = stars[i];
+            const a = s.a + Math.sin(t * s.speed + s.phase) * 0.3;
+
+            ctx.fillStyle = s.color + Math.max(0.08, Math.min(1, a)) + ')';
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // Update & Render Shooting Stars
+          maybeSpawnShootingStar();
+          for (let i = shootingStars.length - 1; i >= 0; i--) {
+            const ss = shootingStars[i];
+            const tailX = ss.x - Math.cos(ss.angle) * ss.len;
+            const tailY = ss.y - Math.sin(ss.angle) * ss.len;
+
+            const grad = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
+            grad.addColorStop(0, 'rgba(255, 224, 153, 0)');
+            grad.addColorStop(1, `rgba(255, 255, 255, ${ss.opacity})`);
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(tailX, tailY);
+            ctx.lineTo(ss.x, ss.y);
+            ctx.stroke();
+
+            ss.x += Math.cos(ss.angle) * ss.speed;
+            ss.y += Math.sin(ss.angle) * ss.speed;
+            ss.opacity -= 0.016;
+
+            if (ss.opacity <= 0 || ss.x > w || ss.y > h) {
+              shootingStars.splice(i, 1);
+            }
+          }
+        }
+        requestAnimationFrame(renderStars);
+      }
+
+    })();
+  </script>
+
+</body>
+</html>

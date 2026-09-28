@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>The Eclipse Order: Archive of Distant Light · Severed Sanctuary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/navigator.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #030408;
+      color: #f0e6d6;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Emergency Atmosphere Vignette & CRT Scanline ── */
+    .emergency-vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      box-shadow: inset 0 0 100px rgba(220, 38, 38, 0.35), inset 0 0 220px rgba(180, 20, 20, 0.25);
+      animation: alarmBreathing 3.6s infinite ease-in-out;
+    }
+
+    @keyframes alarmBreathing {
+      0%, 100% {
+        opacity: 0.65;
+        box-shadow: inset 0 0 90px rgba(220, 38, 38, 0.35), inset 0 0 200px rgba(160, 20, 20, 0.2);
+      }
+      50% {
+        opacity: 1;
+        box-shadow: inset 0 0 160px rgba(239, 68, 68, 0.55), inset 0 0 320px rgba(220, 38, 38, 0.35);
+      }
+    }
+
+    .crt-interference {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 6;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 3px, 6px 100%;
+      opacity: 0.65;
+    }
+
+    /* ── Ambient Background Canvases ── */
+    #sky-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    #constellation-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      cursor: grab;
+      touch-action: none;
+    }
+    #constellation-canvas.grabbing {
+      cursor: grabbing;
+    }
+
+    /* ── UI Header & Instructions ── */
+    .interface-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px 18px 72px;
+    }
+
+    .top-header {
+      text-align: center;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── High-Urgency Top Warning Bar ── */
+    .breach-ticker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #ff6b6b;
+      background: rgba(45, 12, 16, 0.85);
+      border: 1px solid rgba(239, 68, 68, 0.55);
+      padding: 4px 14px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 16px rgba(220, 38, 38, 0.35);
+      animation: tickerPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes tickerPulse {
+      0%, 100% { border-color: rgba(239, 68, 68, 0.55); box-shadow: 0 0 14px rgba(220, 38, 38, 0.3); }
+      50% { border-color: rgba(255, 100, 100, 0.9); box-shadow: 0 0 24px rgba(239, 68, 68, 0.6); }
+    }
+
+    .ticker-icon {
+      width: 8px;
+      height: 8px;
+      background: #ff3333;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff3333;
+      animation: flashDot 0.8s infinite alternate;
+    }
+
+    @keyframes flashDot {
+      from { opacity: 0.3; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1.2); }
+    }
+
+    .order-seal {
+      width: 38px;
+      height: 38px;
+      margin: 0 auto 4px;
+      filter: drop-shadow(0 0 16px rgba(239, 68, 68, 0.4));
+      animation: sealAlarmPulse 3s infinite ease-in-out;
+    }
+
+    @keyframes sealAlarmPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.35)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 22px rgba(239, 68, 68, 0.6)); }
+    }
+
+    .order-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      color: #dfb256;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      opacity: 0.85;
+    }
+
+    .archive-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      background: linear-gradient(180deg, #ffffff 0%, #f7d5cd 50%, #e06c58 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+      text-shadow: 0 0 24px rgba(224, 108, 88, 0.35);
+      position: relative;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #ffc4be;
+      background: rgba(50, 14, 18, 0.8);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      padding: 5px 16px;
+      border-radius: 20px;
+      margin-top: 2px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 22px rgba(220, 38, 38, 0.35);
+    }
+
+    /* ── Upper Altar Breach Telemetry Stamp (Top Zone) ── */
+    .altar-breach-hud {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 6px;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .breach-warning-line {
+      font-family: 'Space Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #ff5252;
+      text-shadow: 0 0 10px rgba(255, 50, 50, 0.6);
+      line-height: 1.3;
+    }
+
+    .breach-status-line {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: #ffd978;
+      text-shadow: 0 0 8px rgba(255, 217, 120, 0.4);
+      margin-top: 2px;
+      opacity: 0.9;
+    }
+
+    /* ── Lower Coordinate Telemetry Badge (Bottom Zone) ── */
+    .coordinate-telemetry-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(8, 12, 22, 0.94);
+      border: 1px solid rgba(239, 68, 68, 0.75);
+      border-radius: 5px;
+      padding: 5px 14px;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+      font-family: 'Space Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      position: relative;
+      margin-bottom: 2px;
+      pointer-events: none;
+    }
+
+    .coordinate-telemetry-badge::before,
+    .coordinate-telemetry-badge::after {
+      content: '';
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-color: #ffd978;
+      border-style: solid;
+      pointer-events: none;
+    }
+
+    .coordinate-telemetry-badge::before {
+      top: -1px;
+      left: -1px;
+      border-width: 1.5px 0 0 1.5px;
+    }
+
+    .coordinate-telemetry-badge::after {
+      top: -1px;
+      right: -1px;
+      border-width: 1.5px 1.5px 0 0;
+    }
+
+    .coord-led {
+      width: 7px;
+      height: 7px;
+      background: #ff3333;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ff3333;
+      animation: flashDot 0.8s infinite alternate;
+      flex-shrink: 0;
+    }
+
+    .coord-coords {
+      color: #ffe082;
+      white-space: nowrap;
+    }
+
+    .coord-tag {
+      color: #ff6b6b;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #ff3333;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff3333;
+      animation: telemetryBlink 1s infinite;
+    }
+
+    @keyframes telemetryBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.2; transform: scale(0.75); }
+    }
+
+    @keyframes screenTremor {
+      0% { transform: translate(0, 0); }
+      15% { transform: translate(-6px, 4px); }
+      30% { transform: translate(5px, -5px); }
+      45% { transform: translate(-4px, -3px); }
+      60% { transform: translate(4px, 3px); }
+      75% { transform: translate(-2px, 1px); }
+      100% { transform: translate(0, 0); }
+    }
+    .tremor {
+      animation: screenTremor 0.45s ease-out;
+    }
+
+    /* ── Bottom Operational Stack ── */
+    .bottom-zone {
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ── Distress Radio Beacon Alert Card ── */
+    .distress-beacon-card {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 92%;
+      max-width: 540px;
+      background: linear-gradient(135deg, rgba(42, 12, 16, 0.92) 0%, rgba(20, 8, 12, 0.95) 100%);
+      border: 1px solid rgba(239, 68, 68, 0.65);
+      border-radius: 6px;
+      padding: 12px 18px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(220, 38, 38, 0.35), 0 8px 24px rgba(0, 0, 0, 0.8);
+      transition: all 0.3s ease;
+      animation: beaconCardPulse 2.4s infinite ease-in-out;
+    }
+
+    @keyframes beaconCardPulse {
+      0%, 100% {
+        border-color: rgba(239, 68, 68, 0.65);
+        box-shadow: 0 0 25px rgba(220, 38, 38, 0.3), 0 8px 24px rgba(0, 0, 0, 0.8);
+      }
+      50% {
+        border-color: rgba(255, 120, 120, 0.95);
+        box-shadow: 0 0 40px rgba(239, 68, 68, 0.6), 0 8px 28px rgba(0, 0, 0, 0.9);
+      }
+    }
+
+    .distress-beacon-card:hover, .distress-beacon-card:active {
+      transform: scale(1.02);
+      border-color: #ffd978;
+      box-shadow: 0 0 45px rgba(255, 217, 120, 0.6);
+    }
+
+    .beacon-indicator {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .beacon-wave {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1.5px solid #ff4d4d;
+      animation: waveExpand 1.6s infinite ease-out;
+    }
+
+    @keyframes waveExpand {
+      0% { transform: scale(0.3); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    .beacon-core {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff3333;
+      box-shadow: 0 0 14px #ff3333;
+    }
+
+    .beacon-info {
+      flex: 1;
+      text-align: left;
+    }
+
+    .beacon-kicker {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #ff8a80;
+      margin-bottom: 2px;
+    }
+
+    .beacon-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: #ffffff;
+      line-height: 1.35;
+    }
+
+    .beacon-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: linear-gradient(180deg, #dfb256 0%, #a87920 100%);
+      color: #050810;
+      font-family: 'Cinzel', serif;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+      flex-shrink: 0;
+      border: 1px solid #ffe39b;
+    }
+
+    /* ── Instruction HUD ── */
+    .instruction-hud {
+      text-align: center;
+      width: 92%;
+      max-width: 540px;
+      transition: all 0.5s ease;
+      background: radial-gradient(circle at center, rgba(14, 18, 30, 0.85) 0%, rgba(6, 9, 16, 0.95) 100%);
+      padding: 12px 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(220, 80, 80, 0.35);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    }
+
+    .instruction-text {
+      font-size: 15px;
+      font-style: italic;
+      color: #ffecd2;
+      line-height: 1.45;
+      text-shadow: 0 0 12px rgba(255, 236, 210, 0.25);
+      margin-bottom: 4px;
+    }
+
+    .instruction-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: #e57373;
+      text-transform: uppercase;
+    }
+
+    /* ── HUD Buttons ── */
+    .camera-hud, .controls-hud {
+      position: absolute;
+      bottom: 24px;
+      z-index: 20;
+      display: flex;
+      gap: 10px;
+    }
+
+    .camera-hud { left: 20px; }
+    .controls-hud { right: 20px; }
+
+    .btn-hud {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(14, 18, 30, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: #ffd978;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .btn-hud:hover, .btn-hud:active {
+      transform: scale(1.08);
+      border-color: #ffd978;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .btn-hud.alert-btn {
+      border-color: rgba(239, 68, 68, 0.6);
+      color: #ff8a80;
+    }
+    .btn-hud.alert-btn:hover {
+      border-color: #ff5252;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    }
+
+    .btn-hud svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .alert-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #ff3333;
+      color: #ffffff;
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #060a14;
+      animation: alertBadgeFlash 1.2s infinite;
+    }
+
+    @keyframes alertBadgeFlash {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    /* ── Breach Incident Modal (Codex) ── */
+    .codex-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(2, 4, 8, 0.88);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .codex-modal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .codex-frame {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      max-height: 88vh;
+      background: radial-gradient(circle at 50% 0%, rgba(35, 14, 20, 0.95) 0%, rgba(8, 12, 22, 0.98) 100%);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      box-shadow: 0 0 50px rgba(220, 38, 38, 0.35), 0 20px 60px rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      padding: 2px;
+    }
+
+    .corner-decor {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid #ff6b6b;
+      pointer-events: none;
+    }
+    .c-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+    .c-tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+    .c-bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+    .c-br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+    .codex-scroll-inner {
+      overflow-y: auto;
+      padding: 28px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(239, 68, 68, 0.4) transparent;
+    }
+
+    .codex-scroll-inner::-webkit-scrollbar { width: 4px; }
+    .codex-scroll-inner::-webkit-scrollbar-thumb { background: rgba(239, 68, 68, 0.4); border-radius: 2px; }
+
+    .codex-header-badge {
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+      padding-bottom: 16px;
+    }
+
+    .portrait-wrap {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(239, 68, 68, 0.7);
+      box-shadow: 0 0 20px rgba(220, 38, 38, 0.45);
+      overflow: hidden;
+      background: #060a14;
+    }
+
+    .portrait-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%) contrast(1.15);
+    }
+
+    .codex-stamp {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: #ff6b6b;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 3px 12px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+    }
+
+    .codex-kicker {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 10.5px;
+      letter-spacing: 0.24em;
+      color: #dfb256;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .codex-main-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 19px;
+      letter-spacing: 0.14em;
+      color: #ffffff;
+      text-shadow: 0 0 16px rgba(255, 255, 255, 0.3);
+    }
+
+    .codex-card {
+      background: rgba(10, 14, 24, 0.85);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-left: 3px solid #ff4d4d;
+      border-radius: 4px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .codex-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: #ffd978;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .codex-card-body {
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: #e2d7c5;
+    }
+
+    .codex-card-body strong {
+      color: #ff8a80;
+      font-weight: 600;
+    }
+
+    .btn-action-dispatch {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px 20px;
+      background: linear-gradient(180deg, #dfb256 0%, #b08328 100%);
+      color: #070b14;
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 4px;
+      border: 1px solid #ffd978;
+      box-shadow: 0 4px 25px rgba(212, 175, 55, 0.5);
+      margin-top: 10px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-action-dispatch:hover, .btn-action-dispatch:active {
+      transform: scale(1.02);
+      box-shadow: 0 6px 32px rgba(212, 175, 55, 0.75);
+    }
+
+    .btn-close-codex {
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(220, 80, 80, 0.4);
+      color: #ff8a80;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-close-codex:hover {
+      background: rgba(220, 80, 80, 0.15);
+      color: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .interface-layer { padding: 8px 8px 88px; }
+      .breach-ticker { font-size: 8px; padding: 3px 8px; letter-spacing: 0.08em; margin-bottom: 4px; }
+      .order-seal { width: 32px; height: 32px; margin: 0 auto 2px; }
+      .archive-title { font-size: 15px; letter-spacing: 0.12em; margin-bottom: 2px; }
+      .status-badge { font-size: 7.5px; padding: 3px 8px; }
+      .breach-warning-line { font-size: 8.5px; letter-spacing: 0.08em; }
+      .breach-status-line { font-size: 7.5px; }
+      .coordinate-telemetry-badge { font-size: 9px; padding: 3px 10px; gap: 6px; }
+      .coord-led { width: 6px; height: 6px; }
+      .bottom-zone { max-width: 360px; width: 100%; gap: 6px; }
+      .distress-beacon-card { width: 95%; padding: 8px 10px; gap: 8px; }
+      .beacon-indicator { width: 22px; height: 22px; }
+      .beacon-core { width: 9px; height: 9px; }
+      .beacon-title { font-size: 9.5px; line-height: 1.3; }
+      .beacon-kicker { font-size: 7.5px; }
+      .beacon-cta { font-size: 8.5px; padding: 5px 8px; white-space: nowrap; flex-shrink: 0; }
+      .instruction-hud { width: 95%; padding: 6px 10px; }
+      .instruction-text { font-size: 10.5px; line-height: 1.35; }
+      .instruction-sub { font-size: 7.5px; letter-spacing: 0.05em; line-height: 1.3; }
+      .camera-hud, .controls-hud { bottom: 12px; gap: 6px; }
+      .camera-hud { left: 12px; }
+      .controls-hud { right: 12px; }
+      .btn-hud { width: 36px; height: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient Emergency Lighting & CRT Distortion -->
+  <div class="emergency-vignette"></div>
+  <div class="crt-interference"></div>
+
+  <canvas id="sky-canvas"></canvas>
+  <canvas id="constellation-canvas"></canvas>
+
+  <div class="interface-layer">
+    <div class="top-header">
+      <div class="breach-ticker">
+        <span class="ticker-icon"></span>
+        <span>PRIORITY ZERO · SANCTUARY WARD BREACHED · CODE RED</span>
+        <span class="ticker-icon"></span>
+      </div>
+
+      <svg class="order-seal" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#d4af37" stroke-width="2"/>
+        <circle cx="50" cy="50" r="40" fill="#060a14" stroke="#d4af37" stroke-width="1"/>
+        <path d="M 50,10 A 40,40 0 0,0 50,90 Z" fill="#020409"/>
+        <path d="M 50,10 A 40,40 0 0,1 50,90 Z" fill="#ffffff" fill-opacity="0.95"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#ff3333" stroke-width="1.8"/>
+      </svg>
+
+      <div class="order-sub">The Eclipse Order</div>
+      <h1 class="archive-title">Archive of Distant Light</h1>
+
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot"></span>
+        <span>CRITICAL FAILURE · ALTAR SEVERED · 0/22 ANCHORS</span>
+      </div>
+
+      <div class="altar-breach-hud">
+        <div class="breach-warning-line">⚠ ALTAR BREACHED · ASTROLABE STOLEN ⚠</div>
+        <div class="breach-status-line">SANCTUARY INTEGRITY COMPROMISED</div>
+      </div>
+    </div>
+
+    <!-- Bottom Stack: High-Urgency Beacon Card + Instruction HUD -->
+    <div class="bottom-zone">
+      <div class="coordinate-telemetry-badge">
+        <span class="coord-led"></span>
+        <span class="coord-coords">RA 20h 22m · DEC +40° 15'</span>
+        <span class="coord-tag">· [SIGNAL SEVERED]</span>
+      </div>
+
+      <a href="../radio-transmission/index.html?from=observatory#transmission-1" class="distress-beacon-card" id="distress-beacon-card" target="_top">
+        <div class="beacon-indicator">
+          <span class="beacon-wave"></span>
+          <span class="beacon-core"></span>
+        </div>
+        <div class="beacon-info">
+          <div class="beacon-kicker">🚨 EMERGENCY CARRIER · 22.22 MHz</div>
+          <div class="beacon-title">Cartographer broadcasting distress relay from lower tunnels</div>
+        </div>
+        <div class="beacon-cta">
+          <span>INTERCEPT ➔</span>
+        </div>
+      </a>
+
+      <div class="instruction-hud" id="instruction-hud">
+        <div class="instruction-text" id="instruction-text">
+          "The sanctuary wards have collapsed. The dais is empty. The Astrolabe was taken."
+        </div>
+        <div class="instruction-sub" id="instruction-sub">
+          TELEMETRY OFFLINE · 22 OF 22 ANCHORS UNBOUND · EMERGENCY BEACON DETECTED
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera HUD (Bottom Left) -->
+  <div class="camera-hud">
+    <button class="btn-hud" id="btn-zoom-in" title="Magnify Void (+)">
+      <svg viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        <path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/>
+      </svg>
+    </button>
+    <button class="btn-hud" id="btn-zoom-out" title="Widen Field (-)">
+      <svg viewBox="0 0 24 24">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        <rect x="7" y="8.75" width="5" height="1.5" rx="0.5"/>
+      </svg>
+    </button>
+    <button class="btn-hud" id="btn-recenter" title="Recenter Observatory">
+      <svg viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+    </button>
+  </div>
+
+  <!-- Controls HUD (Bottom Right) -->
+  <div class="controls-hud">
+    <button class="btn-hud alert-btn" id="btn-codex" title="Incident Log · Sanctuary Breach">
+      <svg viewBox="0 0 24 24"><path d="M19 3H7c-1.66 0-3 1.34-3 3v12c0 1.66 1.34 3 3 3h12c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7c-.55 0-1-.45-1-1s.45-1 1-1h10v2zm0-4H7c-.55 0-1-.45-1-1s.45-1 1-1h10v2zm0-4H7c-.55 0-1-.45-1-1s.45-1 1-1h10v2z"/></svg>
+      <span class="alert-badge">!</span>
+    </button>
+    <button class="btn-hud" id="btn-hint" title="Whisper Lost">
+      <svg viewBox="0 0 24 24"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
+      <span class="alert-badge" id="hint-badge" style="background: #445566;">0</span>
+    </button>
+    <button class="btn-hud" id="btn-sound" title="Toggle Void Resonance">
+      <svg id="icon-sound-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+    </button>
+    <button class="btn-hud" id="btn-reset" title="Check Alignment Status">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    </button>
+  </div>
+
+  <!-- Incident Log Modal -->
+  <div class="codex-modal" id="codex-modal">
+    <div class="codex-frame">
+      <div class="corner-decor c-tl"></div>
+      <div class="corner-decor c-tr"></div>
+      <div class="corner-decor c-bl"></div>
+      <div class="corner-decor c-br"></div>
+
+      <div class="codex-scroll-inner">
+        <div class="codex-header-badge">
+          <div class="portrait-wrap">
+            <img src="cartographer-illustration.jpg" class="portrait-img" alt="The Cartographer" />
+          </div>
+          <div class="codex-stamp">CLASSIFIED · INCIDENT REPORT #02</div>
+          <span class="codex-kicker">Sanctuary Breach & Extraction</span>
+          <h2 class="codex-main-title">The Stolen Astrolabe</h2>
+        </div>
+
+        <div class="codex-card">
+          <div class="codex-card-title">01 · The Ambush at Dawn</div>
+          <div class="codex-card-body">
+            The Celestial Flower bloomed as foretold, completing the First Sacred Flight. But the flare breached the shroud: raiders used acoustic resonance cutters to collapse the outer perimeter wards in minutes.
+          </div>
+        </div>
+
+        <div class="codex-card">
+          <div class="codex-card-title">02 · The Violent Extraction</div>
+          <div class="codex-card-body">
+            They forced the sanctum and tore the <strong>Astrolabe of Distant Light</strong> violently from its stone setting. With the relic severed, all 22 stellar anchors have folded into pitch-black void. <strong>The sky is blind.</strong>
+          </div>
+        </div>
+
+        <div class="codex-card">
+          <div class="codex-card-title">03 · The Cartographer's Escape & Relay</div>
+          <div class="codex-card-body">
+            The Cartographer survived the raid and fled into the lower archive tunnels with the cipher keys. He has activated an emergency radio beacon on <strong>22.22 MHz</strong> and is broadcasting a distress signal right now.
+          </div>
+        </div>
+
+        <a href="../radio-transmission/index.html?from=observatory#transmission-1" class="btn-action-dispatch" target="_top">
+          <span>🚨 TUNE TO 22.22 MHz · LISTEN TO EMERGENCY RELAY ➔</span>
+        </a>
+
+        <button type="button" class="btn-close-codex" id="btn-close-codex">
+          Close Record · Observe Severed Sky
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── Cinematic Web Audio Engine (Emergency Alarm & Sub Drone) ── */
+    let audioCtx = null;
+    let soundEnabled = true;
+    let droneGain = null;
+    let alarmInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        
+        // Deep sub-bass heartbeat/alarm drone
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const filter = audioCtx.createBiquadFilter();
+        droneGain = audioCtx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(46.0, audioCtx.currentTime); // Low F#0
+        
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(49.0, audioCtx.currentTime); // Beating detune
+        
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(110, audioCtx.currentTime);
+
+        droneGain.gain.setValueAtTime(0.045, audioCtx.currentTime);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(droneGain);
+        droneGain.connect(audioCtx.destination);
+        osc1.start();
+        osc2.start();
+
+        // Rhythmic telemetry sonar chirp every 5 seconds
+        alarmInterval = setInterval(() => {
+          if (!soundEnabled || !audioCtx) return;
+          playSonarChirp();
+        }, 5200);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSonarChirp() {
+      if (!audioCtx || !soundEnabled) return;
+      try {
+        const chirp = audioCtx.createOscillator();
+        const chirpGain = audioCtx.createGain();
+        chirp.type = 'sine';
+        chirp.frequency.setValueAtTime(880, audioCtx.currentTime);
+        chirp.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.35);
+
+        chirpGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+        chirpGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+
+        chirp.connect(chirpGain);
+        chirpGain.connect(audioCtx.destination);
+        chirp.start();
+        chirp.stop(audioCtx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    function playShockwaveBoom() {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        // Deep pitch-drop impact
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140.0, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(28.0, audioCtx.currentTime + 0.8);
+
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+
+        // Subtle static electrical crackle
+        const bufferSize = audioCtx.sampleRate * 0.15;
+        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+        const whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        const noiseFilter = audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.value = 1200;
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.035, audioCtx.currentTime);
+        noiseGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+
+        whiteNoise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+        whiteNoise.start();
+      } catch (e) {}
+    }
+
+    const btnSound = document.getElementById('btn-sound');
+    btnSound.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      if (droneGain) {
+        droneGain.gain.setValueAtTime(soundEnabled ? 0.045 : 0, audioCtx.currentTime);
+      }
+      btnSound.style.opacity = soundEnabled ? '1' : '0.4';
+    });
+
+    /* ── Canvas & Viewport Setup ── */
+    const skyCanvas = document.getElementById('sky-canvas');
+    const skyCtx = skyCanvas.getContext('2d');
+    const constCanvas = document.getElementById('constellation-canvas');
+    const constCtx = constCanvas.getContext('2d');
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let centerY = height / 2;
+    const topHeaderEl = document.querySelector('.top-header');
+    const bottomZoneEl = document.querySelector('.bottom-zone');
+
+    function updateCenterY() {
+      const topMarker = document.querySelector('.altar-breach-hud') || document.querySelector('.top-header');
+      const bottomMarker = document.querySelector('.coordinate-telemetry-badge') || document.querySelector('.bottom-zone');
+      if (topMarker && bottomMarker) {
+        const topY = topMarker.getBoundingClientRect().bottom;
+        const botY = bottomMarker.getBoundingClientRect().top;
+        if (botY > topY) {
+          centerY = (topY + botY) / 2;
+          return;
+        }
+      }
+      centerY = height / 2;
+    }
+
+    function resizeCanvases() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      skyCanvas.width = width;
+      skyCanvas.height = height;
+      constCanvas.width = width;
+      constCanvas.height = height;
+      updateCenterY();
+    }
+    resizeCanvases();
+    window.addEventListener('resize', resizeCanvases);
+    window.addEventListener('load', updateCenterY);
+
+    /* ── Distant Cosmic Starfield ── */
+    const NUM_BACKGROUND_STARS = 260;
+    const bgStars = [];
+    for (let i = 0; i < NUM_BACKGROUND_STARS; i++) {
+      bgStars.push({
+        x: Math.random() * 2000 - 1000,
+        y: Math.random() * 2000 - 1000,
+        radius: Math.random() * 1.1 + 0.3,
+        baseAlpha: Math.random() * 0.45 + 0.15,
+        twinkleSpeed: Math.random() * 0.003 + 0.001,
+        twinkleOffset: Math.random() * Math.PI * 2,
+        color: ['#ffffff', '#cce1ff', '#ffe3ba', '#ffd2d2'][Math.floor(Math.random() * 4)]
+      });
+    }
+
+    /* ── Rising Astral Embers from Shattered Dais ── */
+    const NUM_EMBERS = 42;
+    const embers = [];
+    for (let i = 0; i < NUM_EMBERS; i++) {
+      embers.push({
+        x: (Math.random() - 0.5) * 80,
+        y: (Math.random() - 0.5) * 80,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -(Math.random() * 0.9 + 0.3),
+        size: Math.random() * 2.2 + 0.8,
+        alpha: Math.random() * 0.8 + 0.2,
+        life: Math.random() * 120 + 40,
+        maxLife: 160,
+        color: Math.random() > 0.4 ? '#ff5533' : '#ffd978'
+      });
+    }
+
+    /* ── The Shattered Dais Image & Conduit Discharges ── */
+    const altarImg = new Image();
+    let altarLoaded = false;
+    altarImg.onload = () => { altarLoaded = true; };
+    altarImg.src = 'shattered-altar.png';
+
+    let lastSparkTime = 0;
+    let nextSparkDelay = 1100;
+    const sparks = [];
+
+    /* ── Camera State (Draggable Cosmic Altar) ── */
+    const baseCameraZoom = (window.innerHeight < 780 || window.innerWidth < 500) ? 0.92 : 1.0;
+    let camX = 0;
+    let camY = 0;
+    let camZoom = baseCameraZoom;
+    let targetZoom = baseCameraZoom;
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    let camStartX = 0, camStartY = 0;
+    let hasDragged = false;
+
+    /* ── Gravitational Shockwave Ripples ── */
+    const ripples = [];
+    function addShockwave(screenX, screenY) {
+      const worldX = (screenX - width / 2) / camZoom - camX;
+      const worldY = (screenY - centerY) / camZoom - camY;
+      ripples.push({ wx: worldX, wy: worldY, r: 0, maxR: 190, alpha: 0.9 });
+      playShockwaveBoom();
+
+      // Screen tremor on touch
+      document.body.classList.add('tremor');
+      setTimeout(() => document.body.classList.remove('tremor'), 450);
+    }
+
+    /* ── Render Loop ── */
+    let frameCount = 0;
+    function render() {
+      camZoom += (targetZoom - camZoom) * 0.1;
+      const time = Date.now();
+      if (++frameCount % 45 === 0) updateCenterY();
+
+      // 1. Draw Background Space with Emergency Pulse
+      skyCtx.fillStyle = '#030408';
+      skyCtx.fillRect(0, 0, width, height);
+
+      // Deep cosmic void haze centered on visual midpoint
+      const haze = skyCtx.createRadialGradient(width * 0.5, centerY, 10, width * 0.5, centerY, width * 0.7);
+      haze.addColorStop(0, 'rgba(28, 10, 16, 0.45)');
+      haze.addColorStop(0.5, 'rgba(8, 12, 24, 0.35)');
+      haze.addColorStop(1, 'rgba(2, 4, 8, 0)');
+      skyCtx.fillStyle = haze;
+      skyCtx.fillRect(0, 0, width, height);
+
+      // Periodic scanline glitch flash
+      if (Math.random() < 0.03) {
+        skyCtx.fillStyle = 'rgba(255, 60, 60, 0.04)';
+        const jitterY = Math.random() * height;
+        skyCtx.fillRect(0, jitterY, width, Math.random() * 25 + 6);
+      }
+
+      // Draw faint background stars
+      skyCtx.save();
+      skyCtx.translate(width / 2, centerY);
+      skyCtx.scale(camZoom, camZoom);
+      skyCtx.translate(camX * 0.3, camY * 0.3);
+
+      bgStars.forEach(s => {
+        const alpha = s.baseAlpha + Math.sin(time * s.twinkleSpeed + s.twinkleOffset) * 0.15;
+        skyCtx.beginPath();
+        skyCtx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        skyCtx.fillStyle = s.color;
+        skyCtx.globalAlpha = Math.max(0.05, Math.min(0.8, alpha));
+        skyCtx.fill();
+      });
+      skyCtx.restore();
+
+      // 2. Draw Constellation Canvas (The Shattered Altar Centered Between Surrounding Elements)
+      constCtx.clearRect(0, 0, width, height);
+      constCtx.save();
+      constCtx.translate(width / 2, centerY);
+      constCtx.scale(camZoom, camZoom);
+      constCtx.translate(camX, camY);
+
+      // Responsive Dais Dimensions
+      const baseDaisR = Math.min(125, Math.max(92, Math.min(width, height) * 0.16));
+      const pulse = Math.sin(time * 0.0025) * 0.03 + 0.98;
+      const daisR = baseDaisR * pulse;
+
+      // ── Outer Tactical Telemetry Rings & Caliper Scanners ──
+      constCtx.save();
+      constCtx.beginPath();
+      constCtx.arc(0, 0, daisR + 10, 0, Math.PI * 2);
+      constCtx.strokeStyle = 'rgba(239, 68, 68, 0.42)';
+      constCtx.lineWidth = 1.2;
+      constCtx.setLineDash([8, 14]);
+      constCtx.stroke();
+
+      constCtx.beginPath();
+      constCtx.arc(0, 0, daisR + 2, 0, Math.PI * 2);
+      constCtx.strokeStyle = 'rgba(255, 100, 100, 0.22)';
+      constCtx.lineWidth = 1;
+      constCtx.setLineDash([3, 7]);
+      constCtx.stroke();
+
+      // Rotating Analysis Caliper Ticks
+      const rotAngle = time * 0.00035;
+      for (let a = 0; a < 4; a++) {
+        const ang = rotAngle + a * (Math.PI / 2);
+        const x1 = Math.cos(ang) * (daisR + 4);
+        const y1 = Math.sin(ang) * (daisR + 4);
+        const x2 = Math.cos(ang) * (daisR + 14);
+        const y2 = Math.sin(ang) * (daisR + 14);
+        constCtx.beginPath();
+        constCtx.moveTo(x1, y1);
+        constCtx.lineTo(x2, y2);
+        constCtx.strokeStyle = 'rgba(255, 140, 120, 0.55)';
+        constCtx.lineWidth = 1.5;
+        constCtx.setLineDash([]);
+        constCtx.stroke();
+      }
+      constCtx.restore();
+
+      // ── The Photorealistic Shattered Stone Dais ──
+      constCtx.save();
+      constCtx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      constCtx.shadowBlur = 32;
+      if (altarLoaded) {
+        constCtx.drawImage(altarImg, -daisR, -daisR, daisR * 2, daisR * 2);
+      } else {
+        // High-fidelity fallback circle while loading
+        constCtx.beginPath();
+        constCtx.arc(0, 0, daisR, 0, Math.PI * 2);
+        constCtx.fillStyle = '#0a0d18';
+        constCtx.strokeStyle = '#ef4444';
+        constCtx.lineWidth = 2;
+        constCtx.fill();
+        constCtx.stroke();
+      }
+      constCtx.restore();
+
+      // ── Pulsing Molten Magma Core Inside the Severed Crater ──
+      const magmaPulse = Math.sin(time * 0.0032) * 0.28 + 0.72;
+      const magmaGrad = constCtx.createRadialGradient(0, 0, 2, 0, 0, daisR * 0.36);
+      magmaGrad.addColorStop(0, `rgba(255, 170, 50, ${0.58 * magmaPulse})`);
+      magmaGrad.addColorStop(0.35, `rgba(255, 75, 25, ${0.45 * magmaPulse})`);
+      magmaGrad.addColorStop(0.7, `rgba(220, 30, 20, ${0.22 * magmaPulse})`);
+      magmaGrad.addColorStop(1, 'rgba(180, 20, 20, 0)');
+
+      constCtx.save();
+      constCtx.fillStyle = magmaGrad;
+      constCtx.beginPath();
+      constCtx.arc(0, 0, daisR * 0.36, 0, Math.PI * 2);
+      constCtx.fill();
+      constCtx.restore();
+
+      // ── Catastrophic Electrical Conduit Discharge Arcs ──
+      const rClamp = daisR * 0.43;
+      if (time - lastSparkTime > nextSparkDelay) {
+        lastSparkTime = time;
+        nextSparkDelay = Math.random() * 1100 + 650;
+
+        const clamps = [
+          [rClamp, -rClamp],
+          [-rClamp, -rClamp],
+          [-rClamp, rClamp],
+          [rClamp, rClamp]
+        ];
+        let p1, p2;
+        if (Math.random() < 0.6) {
+          // Arc from a torn brass clamp into the central magma pit
+          p1 = clamps[Math.floor(Math.random() * 4)];
+          p2 = [(Math.random() - 0.5) * 14, (Math.random() - 0.5) * 14];
+        } else {
+          // Arc between two adjacent brass clamps
+          const idx = Math.floor(Math.random() * 4);
+          p1 = clamps[idx];
+          p2 = clamps[(idx + 1) % 4];
+        }
+
+        const segs = 6;
+        const pts = [p1];
+        for (let s = 1; s < segs; s++) {
+          const t = s / segs;
+          const nx = p1[0] + (p2[0] - p1[0]) * t + (Math.random() - 0.5) * 16;
+          const ny = p1[1] + (p2[1] - p1[1]) * t + (Math.random() - 0.5) * 16;
+          pts.push([nx, ny]);
+        }
+        pts.push(p2);
+        sparks.push({ pts, life: 1.0, maxLife: 1.0, width: Math.random() * 1.5 + 1.2 });
+      }
+
+      // Render Active Sparks
+      for (let sIdx = sparks.length - 1; sIdx >= 0; sIdx--) {
+        const sp = sparks[sIdx];
+        sp.life -= 0.075;
+        if (sp.life <= 0) {
+          sparks.splice(sIdx, 1);
+          continue;
+        }
+        constCtx.save();
+        constCtx.beginPath();
+        constCtx.moveTo(sp.pts[0][0], sp.pts[0][1]);
+        for (let j = 1; j < sp.pts.length; j++) {
+          constCtx.lineTo(sp.pts[j][0], sp.pts[j][1]);
+        }
+        // Outer electrical flare
+        constCtx.strokeStyle = `rgba(255, 120, 80, ${sp.life * 0.9})`;
+        constCtx.lineWidth = sp.width + 2;
+        constCtx.shadowColor = '#ff3333';
+        constCtx.shadowBlur = 12;
+        constCtx.stroke();
+
+        // White-hot core arc
+        constCtx.strokeStyle = `rgba(255, 255, 255, ${sp.life})`;
+        constCtx.lineWidth = sp.width;
+        constCtx.shadowBlur = 4;
+        constCtx.stroke();
+        constCtx.restore();
+      }
+
+      // ── Rising Astral Embers from the Fractured Dais ──
+      embers.forEach(em => {
+        em.y += em.vy;
+        em.x += em.vx + Math.sin(time * 0.004 + em.y * 0.05) * 0.3;
+        em.life--;
+
+        if (em.life <= 0 || em.y < -daisR - 60) {
+          em.x = (Math.random() - 0.5) * (daisR * 0.6);
+          em.y = (Math.random() - 0.5) * (daisR * 0.4);
+          em.life = em.maxLife;
+          em.alpha = Math.random() * 0.85 + 0.25;
+        }
+
+        constCtx.save();
+        constCtx.beginPath();
+        constCtx.arc(em.x, em.y, em.size, 0, Math.PI * 2);
+        constCtx.fillStyle = em.color;
+        constCtx.globalAlpha = Math.max(0, em.alpha * (em.life / em.maxLife));
+        constCtx.shadowColor = em.color;
+        constCtx.shadowBlur = 6;
+        constCtx.fill();
+        constCtx.restore();
+      });
+
+      // Draw Gravitational Shockwaves
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const rp = ripples[i];
+        rp.r += 3.6;
+        rp.alpha -= 0.018;
+
+        if (rp.alpha <= 0) {
+          ripples.splice(i, 1);
+          continue;
+        }
+
+        constCtx.save();
+        constCtx.beginPath();
+        constCtx.arc(rp.wx, rp.wy, rp.r, 0, Math.PI * 2);
+        constCtx.strokeStyle = `rgba(255, 80, 80, ${rp.alpha * 0.8})`;
+        constCtx.lineWidth = 2;
+        constCtx.shadowColor = '#ff3333';
+        constCtx.shadowBlur = 10;
+        constCtx.stroke();
+        constCtx.restore();
+      }
+
+      constCtx.restore();
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+
+    /* ── Touch / Pointer Handling (Draggable Cosmic Altar) ── */
+    constCanvas.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      hasDragged = false;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      camStartX = camX;
+      camStartY = camY;
+      constCanvas.classList.add('grabbing');
+      if (constCanvas.setPointerCapture) {
+        try { constCanvas.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = (e.clientX - dragStartX) / camZoom;
+      const dy = (e.clientY - dragStartY) / camZoom;
+      if (Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) > 4) {
+        hasDragged = true;
+      }
+      camX = camStartX + dx;
+      camY = camStartY + dy;
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      constCanvas.classList.remove('grabbing');
+      if (constCanvas.releasePointerCapture) {
+        try { constCanvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
+      // If tapped without dragging, trigger shockwave ripple
+      if (!hasDragged) {
+        addShockwave(e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener('pointercancel', (e) => {
+      isDragging = false;
+      constCanvas.classList.remove('grabbing');
+      if (constCanvas.releasePointerCapture) {
+        try { constCanvas.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
+    });
+
+    constCanvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      targetZoom = Math.max(0.5, Math.min(2.5, targetZoom * zoomFactor));
+    }, { passive: false });
+
+    /* ── HUD Interactions ── */
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      targetZoom = Math.min(2.5, targetZoom * 1.3);
+    });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      targetZoom = Math.max(0.6, targetZoom / 1.3);
+    });
+    document.getElementById('btn-recenter').addEventListener('click', () => {
+      targetZoom = baseCameraZoom;
+      camX = 0;
+      camY = 0;
+    });
+
+    const instructionHud = document.getElementById('instruction-hud');
+    const instructionText = document.getElementById('instruction-text');
+    const instructionSub = document.getElementById('instruction-sub');
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      instructionHud.classList.add('tremor');
+      setTimeout(() => instructionHud.classList.remove('tremor'), 450);
+      instructionText.innerText = "Coordinates dead. Alignment cannot be restored without the Astrolabe.";
+      instructionSub.innerText = "CRITICAL ERROR · DAIS EMPTY · ASSET REMOVED BY INTRUDERS";
+      playShockwaveBoom();
+    });
+
+    document.getElementById('btn-hint').addEventListener('click', () => {
+      instructionHud.classList.add('tremor');
+      setTimeout(() => instructionHud.classList.remove('tremor'), 450);
+      instructionText.innerText = "The whisper finds no anchor in this darkness.";
+      instructionSub.innerText = "0 Whisper Keys Available · The sky is dark";
+      playShockwaveBoom();
+    });
+
+    /* ── Codex Modal Logic ── */
+    const codexModal = document.getElementById('codex-modal');
+    const btnCodex = document.getElementById('btn-codex');
+    const btnCloseCodex = document.getElementById('btn-close-codex');
+
+    btnCodex.addEventListener('click', () => {
+      codexModal.classList.add('visible');
+      initAudio();
+    });
+
+    btnCloseCodex.addEventListener('click', () => {
+      codexModal.classList.remove('visible');
+    });
+
+    codexModal.addEventListener('click', (e) => {
+      if (e.target === codexModal) codexModal.classList.remove('visible');
+    });
+
+    if (window.location.hash === '#codex' || window.location.search.includes('codex=1')) {
+      codexModal.classList.add('visible');
+    }
+  </script>
+  <script src="../../shared/navigator.js"></script>
+</body>
+</html>

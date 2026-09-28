@@ -1,0 +1,70 @@
+{
+  "alert": [
+    {
+      "t": 1.0,
+      "text": "Silvia! Silvia, do you copy me? It is the Cartographer."
+    },
+    {
+      "t": 6.14,
+      "text": "Your ninety-seven degree Vega calibration was absolute perfection\u2014the vault aperture sparked into life!"
+    },
+    {
+      "t": 13.68,
+      "text": "But the southern mountain pass has just erupted! Look to the horizon!"
+    },
+    {
+      "t": 19.18,
+      "text": "The barometers plummeted in seconds. It is the Shifting Tempest."
+    },
+    {
+      "t": 24.72,
+      "text": "A colossal wall of copper sand and violet lightning is tearing across the foothills at terrifying speed!"
+    },
+    {
+      "t": 33.02,
+      "text": "We have completely lost the raiders' trail! The swirling sands have erased their wagon tracks, their campfires, and every trace into the deep dunes."
+    },
+    {
+      "t": 44.29,
+      "text": "I am forced into a narrow sandstone crevice to keep from being thrown from the crags!"
+    },
+    {
+      "t": 50.87,
+      "text": "The electrostatic storm will collapse our radio carrier in fifteen minutes! Before the signal dies, we must transmit the nocturnal star transit vectors from Sheet Six, Side B."
+    },
+    {
+      "t": 64.25,
+      "text": "Solve the six chords in your journal before darkness takes the wire! Stay safe! Out!"
+    }
+  ],
+  "victory": [
+    {
+      "t": 1.0,
+      "text": "Silvia! Signal received loud and clear through the electrostatic gale!"
+    },
+    {
+      "t": 7.07,
+      "text": "Two thousand and ninety light-years... the celestial hexagon... anchored between Achernar and Polaris! You have done it!"
+    },
+    {
+      "t": 17.66,
+      "text": "The storm is now raging outside with apocalyptic fury. The winds are shifting entire mountains of sand!"
+    },
+    {
+      "t": 26.97,
+      "text": "All previous maps of the desert are now dead paper. The crescent dunes have slid miles south, ancient ravines are buried, and the raiders are now as lost and stranded as we are in this shifting sea."
+    },
+    {
+      "t": 40.92,
+      "text": "We have lost their trail, but we hold the three stellar constants! In the deep desert, beyond the moved dunes, dwells the only ancient soul who can read the shifted sands: The Desert Oracle."
+    },
+    {
+      "t": 56.55,
+      "text": "When this tempest subsides, we will navigate by these three chords directly to the Oracle's sanctuary."
+    },
+    {
+      "t": 64.95,
+      "text": "Rest now, Silvia, while the winds blow. The Desert Path awaits us. Stay safe. Out."
+    }
+  ]
+}

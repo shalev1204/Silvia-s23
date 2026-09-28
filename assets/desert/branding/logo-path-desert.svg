@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff2b2"/>
+      <stop offset="35%" stop-color="#d4af37"/>
+      <stop offset="70%" stop-color="#aa7c11"/>
+      <stop offset="100%" stop-color="#5a3805"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer Astro Ring -->
+  <circle cx="256" cy="256" r="236" fill="none" stroke="url(#gold)" stroke-width="10"/>
+  <circle cx="256" cy="256" r="218" fill="none" stroke="url(#gold)" stroke-width="4" stroke-dasharray="16 16"/>
+  <circle cx="256" cy="256" r="185" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <!-- Sun & Rays -->
+  <circle cx="256" cy="160" r="56" fill="#c89855" stroke="url(#gold)" stroke-width="8"/>
+  <line x1="256" y1="64" x2="256" y2="88" stroke="url(#gold)" stroke-width="8"/>
+  <line x1="256" y1="232" x2="256" y2="256" stroke="url(#gold)" stroke-width="8"/>
+  <line x1="160" y1="160" x2="184" y2="160" stroke="url(#gold)" stroke-width="8"/>
+  <line x1="328" y1="160" x2="352" y2="160" stroke="url(#gold)" stroke-width="8"/>
+  <!-- Desert Dunes -->
+  <path d="M 80,384 Q 180,256 280,352 Q 380,288 432,384" fill="none" stroke="url(#gold)" stroke-width="18" stroke-linecap="round"/>
+</svg>

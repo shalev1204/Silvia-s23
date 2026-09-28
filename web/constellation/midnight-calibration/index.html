@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Station 08: The Midnight Calibration · The Eclipse Order</title>
+  <meta name="description" content="Astronomical meridian calibration and nocturnal stellar transit at the threshold of the deep desert.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Shared Navigator & Codex Stylesheet -->
+  <link rel="stylesheet" href="../../shared/navigator.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=19.0">
+</head>
+<body>
+
+  <!-- Background Ambience & Storm Particle Canvases -->
+  <canvas id="ambient-sky-canvas"></canvas>
+  <canvas id="storm-canvas"></canvas>
+
+  <!-- Ceremonial Quest Header -->
+  <header class="quest-header">
+    <div class="order-badge">
+      <span class="pulse-dot"></span>
+      ✦ THE ECLIPSE ORDER · CONSTELLATION PATH // 142.85 MHz ✦
+    </div>
+    <h1 class="quest-title">The Midnight Calibration</h1>
+    <p class="quest-subtitle">
+      Astronomical meridian calibration and nocturnal stellar transit at the threshold of the deep desert.
+    </p>
+  </header>
+
+  <!-- Main Experience Container -->
+  <main class="main-layout">
+
+    <!-- ====================================================================
+         PHASE 1: THE BACKUP BRASS ASTROLABE RIG (SHEET 6 · SIDE A)
+         ==================================================================== -->
+    <div id="phase-1-calibration" style="display:flex; flex-direction:column; width:100%;">
+
+      <!-- Cartographer's Bench Parchment Note (100% English) -->
+      <section class="cartographer-parchment-note">
+        <div class="parchment-seal-wrapper" title="The Constellation Path · Official Seal">
+          <img src="logo-path-constellation.png" alt="The Constellation Path Seal" class="constellation-path-seal">
+        </div>
+        <div class="parchment-corner-tl">✦</div>
+        <div class="parchment-corner-br">✦</div>
+        <div class="parchment-heading-box">
+          <span class="parchment-eyebrow">✦ THE CONSTELLATION PATH · EXPEDITION ARCHIVE ✦</span>
+          <h3 class="parchment-title">The Cartographer's Bench Note · On the Reserve Apparatus</h3>
+        </div>
+        <div class="parchment-body-text">
+          <p class="parchment-lead">
+            "Treat this instrument with patience, Silvia.
+          </p>
+          <p>
+            It is not the grand optical astrolabe that graced our observatory altar—that masterwork now rests in the thieving hands of the raiders. What lies on this bench is my traveling field reserve, hammered together from salvage and beaten across stony mountain passes.
+          </p>
+          <p>
+            Its worn brass axles bind intermittently under rough rotation, and the tooth-work suffers from loose gear backlash. Whenever an axle stiffens, do not force the metal: engage the knurled worm-screw ratchets to step through the binding teeth with micrometer precision.
+          </p>
+          <p>
+            Match the altitude and azimuth of our six recorded guide stars (<em>Sheet 6 · Side A</em>), and observe the collimated ray. Only the true meridian delta will pierce the mountain aperture."
+          </p>
+
+          <!-- Direct Simple Physical Journal Instructions -->
+          <div class="physical-journal-guide">
+            <div class="journal-guide-badge">
+              <span class="guide-icon">📖</span>
+              <span>HOW TO USE YOUR PHYSICAL JOURNAL // SHEET 6 · SIDE A</span>
+            </div>
+            <p class="journal-guide-text">
+              Open your physical notebook to <strong>Sheet 6 · Side A</strong> (the page titled <em>"The Midnight Calibration"</em>). At the bottom of that page is your <strong>Field Observation Log</strong> table with six stars:
+            </p>
+            <ol class="journal-steps-list">
+              <li><strong>Test each star on this screen:</strong> Move the <strong>Alidade (left slider)</strong> to the star's altitude, and turn the <strong>Rete (right slider)</strong> to point at the star.</li>
+              <li><strong>Write in your journal table:</strong> Fill in the measured altitude and bearing for each star, and calculate its <em>Sanctuary Delta</em> using the simple formula written at the bottom of your page: <em>Delta = (Bearing + Altitude) - 38°</em>.</li>
+              <li><strong>Unlock the Mountain Vault:</strong> Test the alignment by clicking <em>"Collimate Beam & Engage Vault Aperture"</em> below. Only one star has the true angle that strikes the crystal aperture to open the secret door!</li>
+            </ol>
+          </div>
+        </div>
+        <div class="parchment-signature">— The Cartographer of Distant Light · Field Camp</div>
+      </section>
+
+      <!-- Panoramic Full-Width Cartographer's Desk Scene (Integrated Astrolabe, No Box) -->
+      <section class="astrolabe-workbench-scene" id="astrolabe-workbench-scene">
+        <div class="workbench-scene-overlay"></div>
+        <div class="workbench-content-wrapper">
+
+          <!-- Instrument Readout Bar -->
+          <div class="astrolabe-instrument-header">
+            <span class="astrolabe-card-title">
+              <span>✦ Reserve Optical Astrolabe // Lat. 38°N</span>
+            </span>
+            <div class="astrolabe-readout-strip">
+              <span class="readout-item">ALIDADE: <strong id="val-alidade">30°</strong></span>
+              <span class="readout-item">RETE: <strong id="val-rete">0°</strong></span>
+              <span class="readout-item">LIMBO: <strong id="val-limbo">030°</strong></span>
+            </div>
+          </div>
+
+          <!-- Mechanical Flaw Status Bar -->
+          <div class="flaw-indicators-bar">
+            <span class="slack-badge" id="mechanical-slack-badge">BACKLASH SLACK: ±3°</span>
+            <span class="binding-warning" id="binding-warning-tag"></span>
+          </div>
+
+          <!-- Flanked Astrolabe Layout: Left Control | Astrolabe Stage | Right Control -->
+          <div class="astrolabe-flanked-layout" id="astrolabe-flanked-layout">
+
+            <!-- LEFT FLANK: ALIDADE TILT RIG (Vertical) -->
+            <div class="vertical-control-rig left-rig" id="rig-alidade">
+              <div class="rig-header">
+                <span class="control-label">ALIDADE TILT:</span>
+                <span class="control-value" id="val-alidade-display">30°</span>
+              </div>
+              <div class="vertical-slider-track-wrap">
+                <button type="button" class="btn-micrometer-step vert-step" id="btn-alidade-inc" title="Elevate +1°">▲ +1°</button>
+                <div class="vertical-rail-slot" id="slot-alidade" role="slider" tabindex="0" aria-label="Alidade Elevation Slider" aria-valuemin="0" aria-valuemax="360" aria-valuenow="30">
+                  <div class="rail-groove-channel"></div>
+                  <div class="rail-tick-marks"></div>
+                  <div class="brass-slider-cursor" id="cursor-alidade" title="Drag to adjust Alidade Tilt">
+                    <span class="cursor-pointer left-pointer">◀</span>
+                    <div class="cursor-brass-plate">
+                      <div class="cursor-knurl-grip"></div>
+                      <div class="cursor-hairline"></div>
+                      <span class="cursor-rivet r-tl"></span>
+                      <span class="cursor-rivet r-tr"></span>
+                      <span class="cursor-rivet r-bl"></span>
+                      <span class="cursor-rivet r-br"></span>
+                    </div>
+                    <span class="cursor-pointer right-pointer">▶</span>
+                  </div>
+                  <input type="range" min="0" max="360" value="30" step="1" id="slider-alidade" class="slider-input-hidden" aria-hidden="true">
+                </div>
+                <button type="button" class="btn-micrometer-step vert-step" id="btn-alidade-dec" title="Lower -1°">▼ -1°</button>
+              </div>
+            </div>
+
+            <!-- Astrolabe Visual Apparatus -->
+            <div class="astrolabe-stage" id="astrolabe-stage">
+            <!-- Collimated Light Ray -->
+            <div class="collimator-ray" id="collimator-ray"></div>
+
+            <!-- SVG Antique Oxidized Brass Astrolabe (Museum-Grade Renaissance Patina) -->
+            <svg class="astrolabe-svg" viewBox="0 0 500 500">
+              <defs>
+                <!-- Heavy Oxidized Antique Brass Mater Plate Gradient -->
+                <radialGradient id="patinaMaterGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#140f08"/>
+                  <stop offset="35%" stop-color="#21180d"/>
+                  <stop offset="55%" stop-color="#362612"/>
+                  <stop offset="70%" stop-color="#243328"/>
+                  <stop offset="82%" stop-color="#4a3617"/>
+                  <stop offset="90%" stop-color="#7a5822"/>
+                  <stop offset="95%" stop-color="#9e7735"/>
+                  <stop offset="98%" stop-color="#543c16"/>
+                  <stop offset="100%" stop-color="#181005"/>
+                </radialGradient>
+
+                <!-- Weathered Outer Cast Brass Limbo Gradient -->
+                <linearGradient id="antiqueBrassLimb" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#1a1105"/>
+                  <stop offset="20%" stop-color="#473212"/>
+                  <stop offset="45%" stop-color="#8a672a"/>
+                  <stop offset="52%" stop-color="#a67e35"/>
+                  <stop offset="75%" stop-color="#4d3615"/>
+                  <stop offset="100%" stop-color="#140c03"/>
+                </linearGradient>
+
+                <!-- Heavy Forged Cast Bronze/Brass Alidade Gradient -->
+                <linearGradient id="alidadeHeavyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#120c04"/>
+                  <stop offset="18%" stop-color="#3d2a0f"/>
+                  <stop offset="45%" stop-color="#8c6628"/>
+                  <stop offset="55%" stop-color="#241708"/>
+                  <stop offset="80%" stop-color="#6e4f1d"/>
+                  <stop offset="100%" stop-color="#100a03"/>
+                </linearGradient>
+
+                <!-- Pierced Openwork Rete Star Web Tarnished Brass Gradient -->
+                <radialGradient id="oxidizedReteGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#99722f"/>
+                  <stop offset="40%" stop-color="#735220"/>
+                  <stop offset="68%" stop-color="#422f12"/>
+                  <stop offset="88%" stop-color="#22362b"/>
+                  <stop offset="100%" stop-color="#1e1406"/>
+                </radialGradient>
+
+                <!-- Organic Verdigris Patina Oxidation Gradients -->
+                <radialGradient id="verdigrisSpot" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(48, 92, 74, 0.65)"/>
+                  <stop offset="45%" stop-color="rgba(34, 68, 54, 0.38)"/>
+                  <stop offset="80%" stop-color="rgba(22, 44, 35, 0.15)"/>
+                  <stop offset="100%" stop-color="rgba(14, 26, 20, 0)"/>
+                </radialGradient>
+
+                <radialGradient id="verdigrisRimSpot" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(60, 115, 92, 0.55)"/>
+                  <stop offset="60%" stop-color="rgba(28, 56, 44, 0.25)"/>
+                  <stop offset="100%" stop-color="rgba(10, 20, 15, 0)"/>
+                </radialGradient>
+              </defs>
+
+              <!-- Top Suspension Shackle & Throne Bracket (Kursi / Halqa) -->
+              <g id="astrolabe-throne">
+                <!-- Forged Iron & Brass Suspension Ring (Shackle) -->
+                <circle cx="250" cy="18" r="14" fill="none" stroke="url(#antiqueBrassLimb)" stroke-width="5"/>
+                <circle cx="250" cy="18" r="14" fill="none" stroke="#0e0802" stroke-width="1.2"/>
+                <circle cx="250" cy="18" r="9" fill="none" stroke="#0e0802" stroke-width="0.8"/>
+                <!-- Throne Bracket (Cast Winged Renaissance Lobe with Aged Patina) -->
+                <path d="M 210 33 C 222 17 238 13 250 13 C 262 13 278 17 290 33 C 278 38 262 40 250 40 C 238 40 222 38 210 33 Z" fill="url(#antiqueBrassLimb)" stroke="#120c04" stroke-width="1.8"/>
+                <!-- Pierced Throne Cutout & Rivets -->
+                <circle cx="250" cy="26" r="3.5" fill="#100a03" stroke="#66491b" stroke-width="0.8"/>
+                <circle cx="232" cy="30" r="1.8" fill="#100a03" stroke="#543c16" stroke-width="0.6"/>
+                <circle cx="268" cy="30" r="1.8" fill="#100a03" stroke="#543c16" stroke-width="0.6"/>
+              </g>
+
+              <!-- Heavy Beaten Brass Mater Basin Plate (Aged, Tarnished, Hammered) -->
+              <circle cx="250" cy="250" r="238" fill="url(#patinaMaterGrad)" stroke="#100a03" stroke-width="4"/>
+
+              <!-- Outer Heavy Cast Brass Limbo Rim -->
+              <circle cx="250" cy="250" r="235" fill="none" stroke="url(#antiqueBrassLimb)" stroke-width="8"/>
+              <circle cx="250" cy="250" r="239" fill="none" stroke="#120a02" stroke-width="1.8"/>
+
+              <!-- Verdigris Encrustations on the Antique Brass Rim & Corners -->
+              <ellipse cx="380" cy="130" rx="35" ry="18" fill="url(#verdigrisRimSpot)"/>
+              <ellipse cx="120" cy="370" rx="42" ry="22" fill="url(#verdigrisRimSpot)"/>
+              <ellipse cx="440" cy="290" rx="28" ry="16" fill="url(#verdigrisRimSpot)"/>
+              <ellipse cx="80" cy="210" rx="32" ry="18" fill="url(#verdigrisRimSpot)"/>
+
+              <!-- Engraved 360-Degree Graduation Rim (Chiseled Degree Notches in Metal) -->
+              <!-- Single Degree Ticks (360 notches) -->
+              <circle cx="250" cy="250" r="231" fill="none" stroke="#0d0802" stroke-width="3" stroke-dasharray="0.8 3.24" opacity="0.88"/>
+              <!-- Five Degree Notches (72 notches) -->
+              <circle cx="250" cy="250" r="229" fill="none" stroke="#3b2910" stroke-width="7" stroke-dasharray="1.5 18.5" opacity="0.95"/>
+              <!-- Ten Degree Deep Stamped Notches (36 notches) -->
+              <circle cx="250" cy="250" r="227" fill="none" stroke="#080501" stroke-width="11" stroke-dasharray="2 37.6"/>
+              <!-- Inner Rim Chamfer Wire -->
+              <circle cx="250" cy="250" r="221" fill="none" stroke="#6e4e1e" stroke-width="1.2"/>
+
+              <!-- Stamped Cardinal & Octant Notations on the Aged Brass Limbo -->
+              <text x="250" y="27" fill="#0d0802" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="middle" dy="1">000° [N]</text>
+              <text x="250" y="26" fill="#cf9f51" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="middle">000° [N]</text>
+
+              <text x="473" y="255" fill="#0d0802" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="end" dy="1">090° [E]</text>
+              <text x="473" y="254" fill="#cf9f51" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="end">090° [E]</text>
+
+              <text x="250" y="489" fill="#0d0802" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="middle" dy="1">180° [S]</text>
+              <text x="250" y="488" fill="#cf9f51" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="middle">180° [S]</text>
+
+              <text x="27" y="255" fill="#0d0802" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="start" dy="1">270° [W]</text>
+              <text x="27" y="254" fill="#cf9f51" font-family="'Cinzel', serif" font-size="13" font-weight="700" text-anchor="start">270° [W]</text>
+
+              <text x="406" y="96" fill="#8c6a32" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">045° [NE]</text>
+              <text x="406" y="413" fill="#8c6a32" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">135° [SE]</text>
+              <text x="94" y="413" fill="#8c6a32" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">225° [SW]</text>
+              <text x="94" y="96" fill="#8c6a32" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="middle">315° [NW]</text>
+
+              <!-- Interior Tympan Plate: Aged Verdigris Stains & Engraved Stereographic Curves -->
+              <g id="astrolabe-tympan-lines">
+                <!-- Rich Verdigris Oxidation Stains in the Brass Recesses & Engravings -->
+                <ellipse cx="325" cy="210" rx="55" ry="38" fill="url(#verdigrisSpot)"/>
+                <ellipse cx="165" cy="295" rx="65" ry="42" fill="url(#verdigrisSpot)"/>
+                <ellipse cx="250" cy="130" rx="42" ry="28" fill="url(#verdigrisSpot)"/>
+                <ellipse cx="230" cy="380" rx="50" ry="30" fill="url(#verdigrisSpot)"/>
+
+                <!-- Weathered Compass-Scored Construction Scratches (Historical Instrument Tooling) -->
+                <line x1="85" y1="120" x2="160" y2="105" stroke="rgba(195, 148, 72, 0.12)" stroke-width="0.6"/>
+                <line x1="330" y1="360" x2="410" y2="390" stroke="rgba(195, 148, 72, 0.12)" stroke-width="0.6"/>
+
+                <!-- Engraved Stereographic Azimuth Arcs (Chiseled into the weathered metal) -->
+                <path d="M 85 250 A 165 165 0 0 1 415 250" fill="none" stroke="rgba(195, 148, 72, 0.18)" stroke-width="0.8"/>
+                <path d="M 115 250 A 135 135 0 0 1 385 250" fill="none" stroke="rgba(195, 148, 72, 0.18)" stroke-width="0.8"/>
+                <path d="M 145 250 A 105 105 0 0 1 355 250" fill="none" stroke="rgba(195, 148, 72, 0.18)" stroke-width="0.8"/>
+                <path d="M 175 250 A 75 75 0 0 1 325 250" fill="none" stroke="rgba(195, 148, 72, 0.18)" stroke-width="0.8"/>
+                <line x1="250" y1="35" x2="250" y2="465" stroke="rgba(195, 148, 72, 0.22)" stroke-width="0.8" stroke-dasharray="4 4"/>
+                <line x1="35" y1="250" x2="465" y2="250" stroke="rgba(195, 148, 72, 0.22)" stroke-width="0.8" stroke-dasharray="4 4"/>
+
+                <!-- Concentric Altitude Ellipses (0°, 15°, 30°, 45°, 60°) - Uniform Engraved Metal -->
+                <circle cx="250" cy="250" r="195" fill="none" stroke="rgba(195, 148, 72, 0.28)" stroke-width="1"/>
+                <text x="250" y="65" fill="#7a6749" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle">0° Horizon</text>
+
+                <circle cx="250" cy="250" r="160" fill="none" stroke="rgba(195, 148, 72, 0.28)" stroke-width="1" stroke-dasharray="3 4"/>
+                <text x="250" y="100" fill="#7a6749" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle">15° Alt</text>
+
+                <circle cx="250" cy="250" r="125" fill="none" stroke="rgba(195, 148, 72, 0.28)" stroke-width="1" stroke-dasharray="3 4"/>
+                <text x="250" y="135" fill="#7a6749" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle">30° Alt</text>
+
+                <circle cx="250" cy="250" r="90" fill="none" stroke="rgba(195, 148, 72, 0.28)" stroke-width="1" stroke-dasharray="3 4"/>
+                <text x="250" y="170" fill="#7a6749" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle">45° Alt</text>
+
+                <circle cx="250" cy="250" r="55" fill="none" stroke="rgba(195, 148, 72, 0.28)" stroke-width="1" stroke-dasharray="3 4"/>
+                <text x="250" y="205" fill="#7a6749" font-family="'JetBrains Mono', monospace" font-size="9" text-anchor="middle">60° Alt</text>
+              </g>
+
+              <!-- Rotating Pierced Brass Rete Web Group (Aged Openwork Cutout) -->
+              <g id="astrolabe-rete" transform-origin="250 250">
+                <!-- Ecliptic Zodiac Ring (Authentic Astrolabe Offset Circle) -->
+                <circle cx="250" cy="225" r="95" fill="none" stroke="url(#oxidizedReteGrad)" stroke-width="2.8"/>
+                <circle cx="250" cy="225" r="92" fill="none" stroke="#100a03" stroke-width="0.9"/>
+
+                <!-- Gothic Arabesque Openwork Curves (Tarnished Cut-Brass Tracery) -->
+                <path d="M 125 250 A 125 125 0 0 1 375 250" fill="none" stroke="url(#oxidizedReteGrad)" stroke-width="2.6"/>
+                <path d="M 250 125 A 125 125 0 0 1 250 375" fill="none" stroke="url(#oxidizedReteGrad)" stroke-width="2.6"/>
+                <circle cx="250" cy="250" r="140" fill="none" stroke="url(#oxidizedReteGrad)" stroke-width="1.8"/>
+                <circle cx="250" cy="250" r="80" fill="none" stroke="url(#oxidizedReteGrad)" stroke-width="1.4" stroke-dasharray="4 6"/>
+
+                <!-- Star Pointers (Uniform Flame-Shaped Aged Brass Tangs with Silver Jewel Pins) -->
+                <!-- Polaris Pointer (North) -->
+                <g transform="translate(250, 125)">
+                  <polygon points="0,-9 5,0 0,6 -5,0" fill="#cf9f51" stroke="#36250e" stroke-width="0.9"/>
+                  <circle cx="0" cy="0" r="2.2" fill="#dce0e5" stroke="#180f04" stroke-width="0.6"/>
+                  <text x="8" y="3" fill="#cf9f51" font-family="'Cinzel', serif" font-size="9.5" font-weight="600">Polaris [Pol]</text>
+                </g>
+
+                <!-- Vega Pointer (East 45°) -->
+                <g transform="translate(340, 250)">
+                  <polygon points="0,-9 5,0 0,6 -5,0" fill="#cf9f51" stroke="#36250e" stroke-width="0.9"/>
+                  <circle cx="0" cy="0" r="2.2" fill="#dce0e5" stroke="#180f04" stroke-width="0.6"/>
+                  <text x="-4" y="-14" fill="#cf9f51" font-family="'Cinzel', serif" font-size="9.5" font-weight="600" text-anchor="middle">Vega [Veg]</text>
+                </g>
+
+                <!-- Arcturus Pointer (West 45°) -->
+                <g transform="translate(160, 250)">
+                  <polygon points="0,-9 5,0 0,6 -5,0" fill="#cf9f51" stroke="#36250e" stroke-width="0.9"/>
+                  <circle cx="0" cy="0" r="2.2" fill="#dce0e5" stroke="#180f04" stroke-width="0.6"/>
+                  <text x="0" y="-12" fill="#cf9f51" font-family="'Cinzel', serif" font-size="9.5" font-weight="600" text-anchor="middle">Arcturus [Arc]</text>
+                </g>
+
+                <!-- Deneb Pointer (NE 15°) -->
+                <g transform="translate(363, 137)">
+                  <polygon points="0,-9 5,0 0,6 -5,0" fill="#cf9f51" stroke="#36250e" stroke-width="0.9"/>
+                  <circle cx="0" cy="0" r="2.2" fill="#dce0e5" stroke="#180f04" stroke-width="0.6"/>
+                  <text x="6" y="4" fill="#cf9f51" font-family="'Cinzel', serif" font-size="9.5" font-weight="600">Deneb [Den]</text>
+                </g>
+
+                <!-- Aldebaran Pointer (SW 15°) -->
+                <g transform="translate(137, 363)">
+                  <polygon points="0,-9 5,0 0,6 -5,0" fill="#cf9f51" stroke="#36250e" stroke-width="0.9"/>
+                  <circle cx="0" cy="0" r="2.2" fill="#dce0e5" stroke="#180f04" stroke-width="0.6"/>
+                  <text x="6" y="4" fill="#cf9f51" font-family="'Cinzel', serif" font-size="9.5" font-weight="600">Aldebaran [Ald]</text>
+                </g>
+
+                <!-- Altair Pointer (South 15°) -->
+                <g transform="translate(250, 410)">
+                  <polygon points="0,-9 5,0 0,6 -5,0" fill="#cf9f51" stroke="#36250e" stroke-width="0.9"/>
+                  <circle cx="0" cy="0" r="2.2" fill="#dce0e5" stroke="#180f04" stroke-width="0.6"/>
+                  <text x="8" y="4" fill="#cf9f51" font-family="'Cinzel', serif" font-size="9.5" font-weight="600">Altair [Alt]</text>
+                </g>
+              </g>
+
+              <!-- Rotating Alidade Sight Ruler (Heavy Weathered Cast Bronze Rule) -->
+              <g id="astrolabe-alidade" transform-origin="250 250">
+                <rect x="244" y="16" width="12" height="468" rx="3" fill="url(#alidadeHeavyGrad)" stroke="#160e04" stroke-width="1.6"/>
+                <!-- Central Sight Groove Line -->
+                <line x1="250" y1="20" x2="250" y2="480" stroke="#0d0702" stroke-width="1.2"/>
+                <!-- Upper Sighting Pinule with Sight Aperture Hole -->
+                <rect x="236" y="38" width="28" height="12" rx="2" fill="url(#antiqueBrassLimb)" stroke="#140c03" stroke-width="1.2"/>
+                <circle cx="250" cy="44" r="2.8" fill="#080502"/>
+                <!-- Lower Sighting Pinule with Sight Aperture Hole -->
+                <rect x="236" y="450" width="28" height="12" rx="2" fill="url(#antiqueBrassLimb)" stroke="#140c03" stroke-width="1.2"/>
+                <circle cx="250" cy="456" r="2.8" fill="#080502"/>
+              </g>
+
+              <!-- Center Axis Pin & Renaissance Horse Wedge Pin (Al-Faras) -->
+              <circle cx="250" cy="250" r="20" fill="url(#antiqueBrassLimb)" stroke="#120b03" stroke-width="2"/>
+              <circle cx="250" cy="250" r="12" fill="#201406" stroke="#6e4d1d" stroke-width="1"/>
+              <!-- Sculpted Horse-Head Wedge Pin Passing Through Center Arbor -->
+              <path d="M 247 232 C 247 230 253 230 253 232 L 255 244 C 258 246 261 249 261 252 C 261 257 254 266 251 268 L 249 268 C 246 266 239 257 239 252 C 239 249 242 246 245 244 Z" fill="#cf9f51" stroke="#140d04" stroke-width="1"/>
+              <circle cx="250" cy="250" r="2.5" fill="#100a03"/>
+            </svg>
+            </div>
+
+            <!-- RIGHT FLANK: RETE ROTATION RIG (Vertical) -->
+            <div class="vertical-control-rig right-rig" id="rig-rete">
+              <div class="rig-header">
+                <span class="control-label">RETE ROTATION:</span>
+                <span class="control-value" id="val-rete-display">0°</span>
+              </div>
+              <div class="vertical-slider-track-wrap">
+                <button type="button" class="btn-micrometer-step vert-step" id="btn-rete-inc" title="Rotate +1°">▲ +1°</button>
+                <div class="vertical-rail-slot" id="slot-rete" role="slider" tabindex="0" aria-label="Rete Rotation Slider" aria-valuemin="0" aria-valuemax="360" aria-valuenow="0">
+                  <div class="rail-groove-channel"></div>
+                  <div class="rail-tick-marks"></div>
+                  <div class="brass-slider-cursor" id="cursor-rete" title="Drag to adjust Rete Meridian">
+                    <span class="cursor-pointer left-pointer">◀</span>
+                    <div class="cursor-brass-plate">
+                      <div class="cursor-knurl-grip"></div>
+                      <div class="cursor-hairline"></div>
+                      <span class="cursor-rivet r-tl"></span>
+                      <span class="cursor-rivet r-tr"></span>
+                      <span class="cursor-rivet r-bl"></span>
+                      <span class="cursor-rivet r-br"></span>
+                    </div>
+                    <span class="cursor-pointer right-pointer">▶</span>
+                  </div>
+                  <input type="range" min="0" max="360" value="0" step="1" id="slider-rete" class="slider-input-hidden" aria-hidden="true">
+                </div>
+                <button type="button" class="btn-micrometer-step vert-step" id="btn-rete-dec" title="Rotate -1°">▼ -1°</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BELOW ASTROLABE: FEEDBACK CARD ("si se falla") & CONTINUE BUTTON -->
+          <div class="workbench-console-chassis console-below-astrolabe" id="workbench-console-chassis">
+            <div class="aperture-console-block">
+              <!-- Aperture Optical Feedback Box -->
+              <div class="aperture-feedback-box" id="aperture-feedback-box">
+                <span class="aperture-status-tag" id="aperture-status-tag">OPTICAL SCANNING // READY FOR CALIBRATION</span>
+                <span class="aperture-status-msg" id="aperture-status-msg">Open Sheet 6 · Side A in your physical journal. Adjust the left slider (Alidade) and right slider (Rete) for each star, then click below to test the beam.</span>
+              </div>
+
+              <!-- Collimation Trigger Button -->
+              <button type="button" class="btn-lock-alignment" id="btn-lock-alignment">
+                <span>✦ COLLIMATE BEAM & ENGAGE VAULT APERTURE ➔</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Simulation & Controller Scripts -->
+  <script src="storm.js?v=7.0"></script>
+  <script src="radio.js?v=8.0"></script>
+  <script src="astrolabe.js?v=13.0"></script>
+
+  <!-- Shared Universal Navigator & Codex -->
+  <script src="../../shared/navigator.js"></script>
+
+</body>
+</html>
