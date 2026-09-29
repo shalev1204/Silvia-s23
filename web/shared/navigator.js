@@ -98,7 +98,9 @@
       path: 'Station 08 · The Shifting Tempest',
       title: 'The Midnight Calibration',
       icon: '⏳',
-      url: root + 'constellation/midnight-calibration/index.html',
+      url: isMidnightCompleted
+        ? root + 'constellation/midnight-calibration/transit.html#victory'
+        : root + 'constellation/midnight-calibration/index.html',
       status: isMidnightCompleted ? 'Calibrated ✓' : 'Midnight Watch ⏳',
       statusClass: isMidnightCompleted ? 'status-completed' : 'status-active',
       unlocked: true

@@ -9,7 +9,6 @@
   // DOM Elements
   const videoElem = document.getElementById('tempest-cinematic-video');
   const btnReplayVideo = document.getElementById('btn-replay-video');
-  const btnScrollToRadio = document.getElementById('btn-scroll-to-radio');
   const transceiverSection = document.getElementById('emergency-radio-chassis');
   const transceiverAnchor = document.getElementById('transceiver-anchor');
   const btnProceedEmergency = document.getElementById('btn-proceed-emergency');
@@ -48,13 +47,6 @@
       btnReplayVideo.addEventListener('click', () => {
         videoElem.currentTime = 0;
         videoElem.play();
-      });
-    }
-
-    if (btnScrollToRadio) {
-      btnScrollToRadio.addEventListener('click', () => {
-        if (videoElem && !videoElem.paused) videoElem.pause();
-        proceedToRadioTransceiver(true, true);
       });
     }
 

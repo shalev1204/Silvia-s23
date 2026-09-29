@@ -796,22 +796,36 @@
   }
 
   // Direct Victory Check from URL hash (#victory)
-  function checkDirectVictory() {
-    if (window.location.hash === '#victory') {
-      if (phase1Container) phase1Container.style.display = 'none';
-      if (phase2Container) phase2Container.style.display = 'none';
-      if (radioSection) {
-        radioSection.style.display = 'flex';
-        if (btnProceedEmergency) btnProceedEmergency.style.display = 'none';
-      }
-      if (victoryCard) {
-        victoryCard.classList.add('active');
-        victoryCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      if (window.OrderRadioSystem) {
-        window.OrderRadioSystem.loadTransmission('victory', false);
-      }
+  function showSolvedCalibration() {
+    currentReteAngle = 97;
+    currentAlidadeAngle = 45;
+    if (sliderRete) sliderRete.value = '97';
+    if (sliderAlidade) sliderAlidade.value = '45';
+    isApertureUnlocked = true;
+    updateAstrolabeView(false);
+    if (collimatorRayEl) collimatorRayEl.classList.add('active', 'resonance-success');
+    if (apertureBox) apertureBox.className = 'aperture-feedback-box success';
+    if (apertureStatusTag) apertureStatusTag.textContent = 'OPTICAL RESONANCE CONFIRMED · 97° MERIDIAN (VEGA)';
+    if (apertureStatusMsg) {
+      apertureStatusMsg.textContent = 'This alignment is already locked. The golden ray rests on Vega. Revisit the secured transit, or replay from the start.';
     }
+    if (btnLockAlignment) {
+      btnLockAlignment.classList.add('pulse-ready');
+      btnLockAlignment.disabled = false;
+      btnLockAlignment.innerHTML = `<span>✦ LOCK APERTURE & ENGAGE MOUNTAIN VAULT (97°) ➔</span>`;
+    }
+    const archiveBar = document.getElementById('completed-archive-bar');
+    if (archiveBar) archiveBar.hidden = false;
+  }
+
+  function checkDirectVictory() {
+    const isDone = localStorage.getItem('order_midnight_completed') === 'true';
+    if (window.location.hash === '#victory') {
+      window.location.replace('transit.html#victory');
+      return;
+    }
+    if (window.location.hash === '#replay') return;
+    if (isDone) showSolvedCalibration();
   }
 
   window.addEventListener('hashchange', checkDirectVictory);

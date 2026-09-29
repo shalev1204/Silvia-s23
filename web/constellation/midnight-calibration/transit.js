@@ -300,8 +300,18 @@
 
   // --- Main Initializer ---
   function initTransitPage() {
-    startHighPrecisionCountdown();
-    setupStickyHudScroll();
+    const openVictoryArchive = window.location.hash === '#victory';
+
+    if (!openVictoryArchive) {
+      startHighPrecisionCountdown();
+      setupStickyHudScroll();
+    } else {
+      isTimerActive = false;
+      if (inputSection) inputSection.style.display = 'none';
+      if (mainTimerBanner) mainTimerBanner.style.display = 'none';
+      if (emergencyVignettePulse) emergencyVignettePulse.style.display = 'none';
+      if (stickyHud) stickyHud.classList.remove('visible');
+    }
 
     // Flare Triggers (Banner, Sticky HUD, and Bottom Cipher Row)
     if (btnSignalFlare) btnSignalFlare.addEventListener('click', fireEmergencyFlare);
@@ -328,7 +338,7 @@
 
     if (btnReplayCalibration) {
       btnReplayCalibration.addEventListener('click', () => {
-        window.location.href = 'index.html';
+        window.location.href = 'index.html#replay';
       });
     }
 
@@ -381,6 +391,11 @@
           victorySeekSlider.max = (victoryAudio.duration || 82.3).toString();
         }
       });
+    }
+
+    if (window.location.hash === '#victory' && victoryCard) {
+      victoryCard.classList.add('active');
+      triggerVictoryRadio();
     }
   }
 
@@ -607,6 +622,10 @@
       // SUCCESS! Freeze countdown and cease ticking
       isTimerActive = false;
       if (countdownTimerId) clearInterval(countdownTimerId);
+
+      try {
+        localStorage.setItem('order_midnight_completed', 'true');
+      } catch (e) {}
 
       // Hide sticky HUD
       if (stickyHud) stickyHud.classList.remove('visible');

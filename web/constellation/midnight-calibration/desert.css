@@ -80,8 +80,12 @@ body.desert-transit-page::after {
 
 /* Ceremonial Desert Header */
 .desert-header {
+  position: relative;
+  z-index: 10;
   text-align: center;
-  margin-bottom: 32px;
+  max-width: 900px;
+  margin: 72px auto 32px auto;
+  padding: 0 20px;
   animation: desert-fade-down 0.8s ease-out;
 }
 
@@ -218,19 +222,24 @@ body.desert-transit-page::after {
 .sticky-countdown-hud {
   position: fixed;
   top: -80px;
-  left: 0;
-  width: 100%;
-  height: 64px;
-  background: rgba(22, 11, 6, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 2px solid var(--desert-border-bright);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(920px, calc(100% - 360px));
+  height: 56px;
+  background: rgba(22, 11, 6, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid var(--desert-border-bright);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(217, 119, 6, 0.3);
   z-index: 99;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 0 20px;
   transition: top 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
 }
 
@@ -242,6 +251,8 @@ body.desert-transit-page::after {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .sticky-hazard-beacon {
@@ -265,6 +276,8 @@ body.desert-transit-page::after {
   color: var(--crt-amber);
   text-shadow: 0 0 14px var(--crt-amber-glow);
   letter-spacing: 0.06em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sticky-ms {
@@ -279,15 +292,20 @@ body.desert-transit-page::after {
   letter-spacing: 0.15em;
   padding-left: 8px;
   border-left: 1px solid rgba(217, 119, 6, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .sticky-hud-center {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
+  flex: 1 1 220px;
   max-width: 380px;
-  margin: 0 24px;
+  min-width: 0;
+  margin: 0;
 }
 
 .sticky-meter-info {
@@ -328,6 +346,7 @@ body.desert-transit-page::after {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 0 0 auto;
 }
 
 .btn-sticky-flare {
@@ -1098,7 +1117,7 @@ body.desert-transit-page::after {
   border-color: var(--desert-amber);
 }
 
-.btn-enter-desert-path {
+.btn-return-hub {
   padding: 16px 30px;
   background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f59e0b 100%);
   border: 1px solid #fef3c7;
@@ -1116,7 +1135,7 @@ body.desert-transit-page::after {
   gap: 10px;
 }
 
-.btn-enter-desert-path:hover {
+.btn-return-hub:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 50px rgba(245, 158, 11, 0.8);
   color: #000;
@@ -1367,7 +1386,32 @@ body.desert-transit-page::after {
 }
 
 /* Responsive */
+@media (max-width: 1180px) {
+  .sticky-status-label {
+    display: none;
+  }
+  .sticky-hud-center {
+    max-width: none;
+  }
+}
+
 @media (max-width: 850px) {
+  .sticky-hud-center {
+    display: none;
+  }
+  .sticky-clock-digits {
+    font-size: 1.15rem;
+  }
+  .sticky-meter-label {
+    display: none;
+  }
+  .btn-sticky-flare span {
+    font-size: 0;
+  }
+  .btn-sticky-flare span::before {
+    content: "⚡";
+    font-size: 0.9rem;
+  }
   .plaque-body {
     grid-template-columns: 1fr;
     gap: 22px;
@@ -1400,6 +1444,18 @@ body.desert-transit-page::after {
   .btn-signal-flare, .btn-broadcast-packet {
     width: 100%;
     text-align: center;
+  }
+}
+
+@media (max-width: 980px) {
+  .sticky-countdown-hud {
+    width: calc(100% - 32px);
+    top: -100px;
+    border-top: 1.5px solid var(--desert-border-bright);
+    border-radius: 10px;
+  }
+  .sticky-countdown-hud.visible {
+    top: 70px;
   }
 }
 

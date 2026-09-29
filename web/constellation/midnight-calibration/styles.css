@@ -88,6 +88,55 @@ body {
   padding: 0 20px;
 }
 
+.completed-archive-bar {
+  position: relative;
+  z-index: 12;
+  max-width: 860px;
+  margin: 0 auto 22px auto;
+  padding: 16px 20px;
+  text-align: center;
+  color: #f4ece0;
+  background: rgba(18, 14, 8, 0.92);
+  border: 1px solid rgba(212, 175, 85, 0.55);
+  border-radius: 8px;
+}
+
+.completed-archive-bar p {
+  margin: 0 0 12px 0;
+  font-family: 'EB Garamond', serif;
+  font-size: 1.15rem;
+}
+
+.completed-archive-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-archive-revisit,
+.btn-archive-replay {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.btn-archive-revisit {
+  background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
+  color: #1a1105;
+}
+
+.btn-archive-replay {
+  border: 1px solid rgba(212, 175, 85, 0.7);
+  color: #ffd885;
+}
+
 .order-badge {
   display: inline-flex;
   align-items: center;
@@ -2183,7 +2232,7 @@ body {
 
 .theater-action-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
