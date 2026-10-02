@@ -625,6 +625,8 @@
 
       try {
         localStorage.setItem('order_midnight_completed', 'true');
+        const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+        localStorage.setItem(`seeker_${activeSeeker}_midnight_completed`, 'true');
       } catch (e) {}
 
       // Hide sticky HUD

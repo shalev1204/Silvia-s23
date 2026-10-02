@@ -107,6 +107,38 @@
     });
   }
 
+  const isCipherCompleted = localStorage.getItem('order_cipher_completed') === 'true';
+  const activeSeekerNav = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+  const isCarlesNav = (activeSeekerNav === 'carles');
+
+  if (isMidnightCompleted) {
+    if (isCarlesNav) {
+      stages.push({
+        id: 'celestial-cipher',
+        folder: 'celestial-cipher',
+        path: 'Station 09 · Constellation Finale',
+        title: 'The Celestial Cipher',
+        icon: '📜',
+        url: root + 'constellation/celestial-cipher/index.html',
+        status: isCipherCompleted ? 'Decrypted ✓' : 'Awaiting Decryption ✦',
+        statusClass: isCipherCompleted ? 'status-completed' : 'status-active',
+        unlocked: true
+      });
+    } else {
+      stages.push({
+        id: 'celestial-cipher',
+        folder: 'celestial-cipher',
+        path: 'Station 09 · Unknown Horizon',
+        title: 'Station 09 · [ Incógnita ]',
+        icon: '⏳',
+        url: 'javascript:void(0)',
+        status: 'Sealed Horizon ⏳',
+        statusClass: 'status-active',
+        locked: true
+      });
+    }
+  }
+
   function getCurrentStageId(stagesList) {
     const normPath = (window.location.pathname || '').replace(/\\/g, '/').toLowerCase();
 

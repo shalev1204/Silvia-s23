@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>The Celestial Cipher · Station 09 · The Eclipse Order</title>
+  
+  <!-- Typography & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../shared/navigator.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="cipher-expedition-body">
+
+  <!-- Background Sandstorm Canvas & Dynamic Sky Atmosphere -->
+  <canvas id="sandstorm-canvas"></canvas>
+  <div class="sky-backdrop-gradient"></div>
+  <div class="vignette-overlay"></div>
+  <div class="sandstorm-haze" id="sandstorm-haze"></div>
+
+  <!-- Main Game Container -->
+  <div class="cipher-game-viewport">
+
+    <!-- Top Navigation & Telemetry Banner -->
+    <header class="cipher-top-banner">
+      <div class="banner-left">
+        <a href="../../index.html#view-trail" class="btn-back-hub" title="Return to Celestial Route Map">
+          <span class="btn-icon">⟵</span>
+          <span class="btn-text">Route Map</span>
+        </a>
+        <div class="telemetry-pill">
+          <span class="pulse-beacon"></span>
+          <span class="telemetry-label">STATION 09 // CONSTELLATION FINALE</span>
+        </div>
+      </div>
+
+      <div class="banner-center">
+        <h1 class="cipher-main-title">The Celestial Cipher</h1>
+        <div class="cipher-sub-title">✦ SHEET 07 · THE ASTROLABE COORDINATE DIAL ✦</div>
+      </div>
+
+      <div class="banner-right">
+        <div class="radio-status-pill" id="radio-pill">
+          <span class="radio-freq">142.85 MHz</span>
+          <span class="radio-state">CARRIER LOCKED</span>
+        </div>
+        <button type="button" class="btn-quick-preview" id="btn-quick-solve" title="Expedition Auto-Attune (Testing Assist)">
+          <span>✦ Auto-Attune</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Workspace Split -->
+    <main class="cipher-workspace-layout">
+
+      <!-- LEFT COLUMN: The Concentric Coordinate Dial -->
+      <section class="dial-workbench-section">
+        <div class="brass-card-frame dial-frame">
+          <div class="card-corner corner-tl"></div>
+          <div class="card-corner corner-tr"></div>
+          <div class="card-corner corner-bl"></div>
+          <div class="card-corner corner-br"></div>
+
+          <!-- Dial Header & Active Target Readout -->
+          <div class="dial-header-row">
+            <div class="readout-box">
+              <span class="readout-label">ALIGNMENT TARGET</span>
+              <span class="readout-val" id="target-coord-readout">HOUR IV · DECL +45°</span>
+            </div>
+            <div class="readout-box letter-readout-box">
+              <span class="readout-label">RESOLVED LETTER</span>
+              <span class="readout-val letter-val" id="target-letter-readout">Y</span>
+            </div>
+          </div>
+
+          <!-- The Interactive SVG Dial Container -->
+          <div class="dial-svg-wrapper" id="dial-wrapper">
+            <svg id="celestial-dial-svg" viewBox="-300 -300 600 600" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <radialGradient id="dialBrassGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#1c140a" />
+                  <stop offset="65%" stop-color="#120c06" />
+                  <stop offset="100%" stop-color="#0a0603" />
+                </radialGradient>
+
+                <radialGradient id="hubGoldGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffe099" stop-opacity="0.9" />
+                  <stop offset="50%" stop-color="#d4a853" stop-opacity="0.4" />
+                  <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                </radialGradient>
+
+                <linearGradient id="needleRayGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" stop-color="#4fe3c1" stop-opacity="0.2" />
+                  <stop offset="70%" stop-color="#4fe3c1" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="#ffffff" stop-opacity="1" />
+                </linearGradient>
+
+                <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Outer Brass Rim & Bevels -->
+              <circle cx="0" cy="0" r="275" fill="url(#dialBrassGrad)" stroke="#d4a853" stroke-width="2.5" />
+              <circle cx="0" cy="0" r="268" fill="none" stroke="rgba(212,168,83,0.35)" stroke-width="1.2" stroke-dasharray="3, 5" />
+              <circle cx="0" cy="0" r="255" fill="none" stroke="#b45309" stroke-width="1" />
+
+              <!-- Concentric Declination Circles (Outer to Inner) -->
+              <!-- Ring 0: +45° (R: 255 -> 210) -->
+              <circle cx="0" cy="0" r="210" fill="none" stroke="rgba(212,168,83,0.3)" stroke-width="1" />
+              <!-- Ring 1: +15° (R: 210 -> 165) -->
+              <circle cx="0" cy="0" r="165" fill="none" stroke="rgba(212,168,83,0.3)" stroke-width="1" />
+              <!-- Ring 2: -15° (R: 165 -> 120) -->
+              <circle cx="0" cy="0" r="120" fill="none" stroke="rgba(212,168,83,0.3)" stroke-width="1" />
+              <!-- Ring 3: -45° (R: 120 -> 75) -->
+              <circle cx="0" cy="0" r="75" fill="none" stroke="rgba(212,168,83,0.4)" stroke-width="1.2" />
+
+              <!-- Dynamically Populated Sectors, Letters & Rays -->
+              <g id="dial-cells-group"></g>
+              <g id="dial-hour-lines-group"></g>
+              <g id="dial-romans-group"></g>
+
+              <!-- Optical Targeting Reticle & Sighting Beam -->
+              <g id="optical-reticle-group">
+                <line id="optical-needle" x1="0" y1="0" x2="0" y2="-255" stroke="url(#needleRayGrad)" stroke-width="2.2" stroke-linecap="round" />
+                <circle id="target-bead" cx="0" cy="-232" r="16" fill="rgba(79, 227, 193, 0.15)" stroke="#4fe3c1" stroke-width="1.8" filter="url(#glowFilter)" />
+                <circle id="target-bead-inner" cx="0" cy="-232" r="3.5" fill="#ffffff" />
+              </g>
+
+              <!-- Central Celestial Pole Pivot & Astrolabe Hub -->
+              <circle cx="0" cy="0" r="42" fill="#140d07" stroke="#d4a853" stroke-width="2" />
+              <circle cx="0" cy="0" r="32" fill="none" stroke="rgba(212,168,83,0.4)" stroke-dasharray="2, 4" />
+              <circle cx="0" cy="0" r="14" fill="url(#hubGoldGlow)" />
+              <circle cx="0" cy="0" r="5" fill="#ffe099" />
+              <text x="0" y="24" fill="#d4a853" font-family="'Cinzel', serif" font-size="8.5" font-weight="700" letter-spacing="0.1em" text-anchor="middle">POLE</text>
+            </svg>
+          </div>
+
+          <!-- Dial Rotation & Sector Alignment Quick Controls -->
+          <div class="dial-controls-bar">
+            <button type="button" class="btn-step-dial" id="btn-dial-prev" title="Step counter-clockwise">◀ -30°</button>
+            <div class="dial-decl-tabs" id="decl-tabs">
+              <button type="button" class="decl-tab active" data-band="+45°">+45°</button>
+              <button type="button" class="decl-tab" data-band="+15°">+15°</button>
+              <button type="button" class="decl-tab" data-band="-15°">-15°</button>
+              <button type="button" class="decl-tab" data-band="-45°">-45°</button>
+            </div>
+            <button type="button" class="btn-step-dial" id="btn-dial-next" title="Step clockwise">+30° ▶</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Sighting Log & Decoded Prophecy -->
+      <section class="deduction-log-section">
+
+        <!-- Panel 1: Sighting Log (Cuaderno de Avistamientos) -->
+        <div class="brass-card-frame log-card">
+          <div class="card-corner corner-tl"></div>
+          <div class="card-corner corner-tr"></div>
+          <div class="card-corner corner-bl"></div>
+          <div class="card-corner corner-br"></div>
+
+          <div class="log-card-header">
+            <div>
+              <div class="log-section-sigil">📜 THE CARTOGRAPHER'S FIELD RECORD</div>
+              <h2 class="log-section-title">Sighting Log</h2>
+            </div>
+            <div class="log-progress-badge" id="sighting-progress-badge">0 / 24 LOCKED</div>
+          </div>
+
+          <p class="log-instructions">
+            Cross each <strong>Hour Angle</strong> (Roman numeral) with its <strong>Declination Ring</strong> on the celestial dial to resolve its locked letter. Click any coordinate chip to align the instruments automatically.
+          </p>
+
+          <!-- 5 Canonical Thematic Groups -->
+          <div class="sighting-groups-container" id="sighting-groups-container">
+            <!-- Dynamically populated via JS with chips -->
+          </div>
+        </div>
+
+        <!-- Panel 2: The Decoded Prophecy Deduction Board -->
+        <div class="brass-card-frame prophecy-card">
+          <div class="card-corner corner-tl"></div>
+          <div class="card-corner corner-tr"></div>
+          <div class="card-corner corner-bl"></div>
+          <div class="card-corner corner-br"></div>
+
+          <div class="prophecy-card-header">
+            <span class="prophecy-sigil">✦ ANCIENT STELLAR DECREE ✦</span>
+            <h3 class="prophecy-title">The Decoded Prophecy</h3>
+          </div>
+
+          <!-- The 5 Word Input Blocks -->
+          <div class="prophecy-board" id="prophecy-board">
+            <!-- Row 1: Word I (YOU), Word II (WERE), Word III (ALWAYS) -->
+            <div class="prophecy-row row-1">
+              <div class="word-block" data-word-idx="0">
+                <span class="word-tag">I</span>
+                <div class="word-boxes" id="word-0-boxes"></div>
+              </div>
+              <div class="word-block" data-word-idx="1">
+                <span class="word-tag">II</span>
+                <div class="word-boxes" id="word-1-boxes"></div>
+              </div>
+              <div class="word-block" data-word-idx="2">
+                <span class="word-tag">III</span>
+                <div class="word-boxes" id="word-2-boxes"></div>
+              </div>
+            </div>
+
+            <!-- Row 2: Word IV (THE), Word V (TREASURE) -->
+            <div class="prophecy-row row-2">
+              <div class="word-block" data-word-idx="3">
+                <span class="word-tag">IV</span>
+                <div class="word-boxes" id="word-3-boxes"></div>
+              </div>
+              <div class="word-block" data-word-idx="4">
+                <span class="word-tag">V</span>
+                <div class="word-boxes" id="word-4-boxes"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validation Feedback / Status Bar -->
+          <div class="prophecy-status-bar" id="prophecy-status-bar">
+            <span class="status-icon">⏳</span>
+            <span class="status-msg">Attune all 24 coordinates to unveil the Cartographer's prophecy...</span>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+  </div>
+
+  <!-- =====================================================================
+       ⚡ DRAMATIC CLIMAX MODAL: LA GRAN TORMENTA DE ARENA DEL SUR
+       ===================================================================== -->
+  <div class="sandstorm-climax-modal" id="climax-modal">
+    <div class="climax-backdrop"></div>
+
+    <div class="climax-panel brass-card-frame">
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+
+      <!-- Warning Header -->
+      <div class="climax-alarm-strip">
+        <span class="alarm-pulsing-dot"></span>
+        <span>⚡ EMERGENCY TELEMETRY · GALE VORTEX SANGUINE ⚡</span>
+        <span class="alarm-pulsing-dot"></span>
+      </div>
+
+      <!-- Audio Oscilloscope & Telemetry Waveform -->
+      <div class="radio-overload-box">
+        <div class="overload-header">
+          <span class="freq-tag">FREQ 142.85 MHz // SHORTWAVE CARRIER</span>
+          <span class="signal-tag" id="radio-overload-state">SIGNAL CRITICAL · CARRIER OVERLOAD</span>
+        </div>
+        <div class="oscilloscope-screen">
+          <svg viewBox="0 0 400 36" preserveAspectRatio="none">
+            <line x1="0" y1="18" x2="400" y2="18" stroke="rgba(239, 68, 68, 0.25)" stroke-dasharray="4, 4" />
+            <path class="oscilloscope-wave" id="storm-wave" d="M 0 18 Q 20 2, 40 18 T 80 18 T 120 2 T 160 34 T 200 18 T 240 18 T 280 2 T 320 34 T 360 18 T 400 18" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Cartographer Urgent Audio Dispatch Transcript -->
+      <div class="dispatch-container">
+        <div class="dispatch-sender-tag">
+          <span class="sender-avatar">🎙️</span>
+          <div>
+            <div class="sender-name">The Cartographer</div>
+            <div class="sender-loc">Ridge Overlook · Frontier Outskirts of Deserti Limen</div>
+          </div>
+        </div>
+
+        <div class="dispatch-text-box">
+          <p id="dispatch-typewriter-text" class="typewriter-text">
+            <!-- Dynamically animated text -->
+          </p>
+        </div>
+      </div>
+
+      <!-- Prophecy Unlocked Ribbon -->
+      <div class="prophecy-banner-award">
+        <span class="award-sigil">✦ ANCIENT PROPHETIC MERIDIAN UNLOCKED ✦</span>
+        <div class="award-quote">"YOU WERE ALWAYS THE TREASURE"</div>
+      </div>
+
+      <!-- Relic Chips Row -->
+      <div class="climax-relics-row">
+        <div class="climax-relic-chip">
+          <span class="relic-icon">📜</span>
+          <div class="relic-info">
+            <div class="relic-name">The Final Prophecy</div>
+            <div class="relic-sub">"YOU WERE ALWAYS THE TREASURE"</div>
+          </div>
+        </div>
+        <div class="climax-relic-chip">
+          <span class="relic-icon">🏜️</span>
+          <div class="relic-info">
+            <div class="relic-name">Gateway to The Desert Path</div>
+            <div class="relic-sub">Deserti Limen · Station 10 Unveiled</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="climax-actions-row">
+        <a href="../../index.html#view-trail" class="btn-climax-hub">
+          <span>✦ Return to Route Map & Inspect Frontier ➔</span>
+        </a>
+        <button type="button" class="btn-climax-replay" id="btn-replay-cipher">
+          <span>↺ Replay Decryption</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/navigator.js"></script>
+  <script src="./cipher.js"></script>
+</body>
+</html>

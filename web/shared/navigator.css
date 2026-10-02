@@ -343,16 +343,16 @@
   gap: 8px;
   background: rgba(9, 14, 23, 0.94);
   border: 1.5px solid var(--order-gold);
-  border-radius: 6px;
-  padding: 7px 14px;
+  border-radius: 20px;
+  padding: 7px 15px;
   color: var(--order-gold-bright);
   font-family: 'Cinzel', serif;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65), 0 0 12px rgba(229, 185, 103, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7), 0 0 10px rgba(229, 185, 103, 0.2);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: all 0.25s ease;
@@ -646,7 +646,7 @@
   .order-nav-trigger {
     top: 12px;
     right: 12px;
-    padding: 6px 11px;
+    padding: 6px 12px;
     font-size: 0.68rem;
     gap: 6px;
   }

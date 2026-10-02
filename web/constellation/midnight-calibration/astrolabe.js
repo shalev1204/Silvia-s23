@@ -758,6 +758,8 @@
 
       try {
         localStorage.setItem('order_midnight_completed', 'true');
+        const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+        localStorage.setItem(`seeker_${activeSeeker}_midnight_completed`, 'true');
       } catch (e) {}
 
       // Switch to Victory Screen and Keep Radio Deck Active to display Live Transcript & Oscilloscope

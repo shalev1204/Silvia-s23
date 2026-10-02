@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { margin: 0; background: #040918; display: flex; justify-content: center; }
+  svg { width: 1120px; height: 1100px; }
+  .road { fill: none; stroke: rgba(212,168,83,0.3); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+  .core { fill: none; stroke: #f59e0b; stroke-width: 3; stroke-dasharray: 8, 6; }
+  .node { fill: #ffe099; stroke: #d4a853; stroke-width: 2; }
+  text { fill: #fde68a; font-family: sans-serif; font-size: 14px; text-anchor: middle; font-weight: bold; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1120 1100">
+  <rect width="1120" height="1100" fill="#040918" />
+  <!-- Margin guides -->
+  <rect x="50" y="50" width="1020" height="1000" fill="none" stroke="rgba(212,168,83,0.15)" stroke-dasharray="4, 4" />
+  <path class="road" d="M 180 970 C 252.0 941.2, 305.9 912.8, 380 890 C 493.5 855.1, 642.8 914.0, 700 810 C 742.0 733.7, 565.7 733.0, 490 690 C 407.3 643.0, 232.3 651.0, 260 560 C 293.1 451.1, 452.4 497.1, 560 460 C 661.2 425.1, 830.3 466.6, 840 360 C 849.3 257.3, 589.3 342.7, 580 240 C 571.5 146.8, 734.1 177.3, 820 140 C 871.0 117.9, 909.6 98.4, 960 75" />
+  <path class="core" d="M 180 970 C 252.0 941.2, 305.9 912.8, 380 890 C 493.5 855.1, 642.8 914.0, 700 810 C 742.0 733.7, 565.7 733.0, 490 690 C 407.3 643.0, 232.3 651.0, 260 560 C 293.1 451.1, 452.4 497.1, 560 460 C 661.2 425.1, 830.3 466.6, 840 360 C 849.3 257.3, 589.3 342.7, 580 240 C 571.5 146.8, 734.1 177.3, 820 140 C 871.0 117.9, 909.6 98.4, 960 75" />
+  <circle class="node" cx="180" cy="970" r="12" /><text x="180" y="996">1</text><circle class="node" cx="380" cy="890" r="12" /><text x="380" y="916">2</text><circle class="node" cx="700" cy="810" r="12" /><text x="700" y="836">3</text><circle class="node" cx="490" cy="690" r="12" /><text x="490" y="716">4</text><circle class="node" cx="260" cy="560" r="12" /><text x="260" y="586">5</text><circle class="node" cx="560" cy="460" r="12" /><text x="560" y="486">6</text><circle class="node" cx="840" cy="360" r="12" /><text x="840" y="386">7</text><circle class="node" cx="580" cy="240" r="12" /><text x="580" y="266">8</text><circle class="node" cx="820" cy="140" r="12" /><text x="820" y="166">9</text>
+  <circle cx="960" cy="75" r="6" fill="#fbbf24" />
+  <text x="960" y="95">End</text>
+</svg>
+</body>
+</html>

@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../shared/navigator.css">
   <script>
     (function() {
       try {
@@ -147,29 +148,35 @@
     }
 
     .hub-back-btn {
+      position: fixed;
+      top: 18px;
+      left: 112px;
+      z-index: 1000;
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 6px 14px;
+      padding: 7px 16px;
       font-family: 'Cinzel', serif;
-      font-size: 10px;
+      font-size: 10.5px;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #dfb256;
-      background: rgba(8, 14, 28, 0.8);
-      border: 1px solid rgba(223, 178, 86, 0.4);
+      color: #ffd978;
+      background: rgba(8, 14, 28, 0.85);
+      border: 1px solid rgba(223, 178, 86, 0.45);
       border-radius: 20px;
       text-decoration: none;
       backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 10px rgba(223, 178, 86, 0.15);
       transition: all 0.25s ease;
+      cursor: pointer;
     }
 
     .hub-back-btn:hover {
-      background: rgba(223, 178, 86, 0.2);
+      background: rgba(223, 178, 86, 0.25);
       border-color: #ffd978;
       color: #ffffff;
-      box-shadow: 0 0 14px rgba(223, 178, 86, 0.4);
+      box-shadow: 0 0 16px rgba(223, 178, 86, 0.45);
       transform: translateY(-1px);
     }
 
@@ -177,35 +184,11 @@
     .hub-back-btn:focus-visible {
       outline: none !important;
       border-color: #ffd978 !important;
-      box-shadow: 0 0 14px rgba(223, 178, 86, 0.6) !important;
+      box-shadow: 0 0 16px rgba(223, 178, 86, 0.6) !important;
     }
 
     .hub-chronicle-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 14px;
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #ffd885;
-      background: linear-gradient(135deg, rgba(212, 168, 83, 0.25) 0%, rgba(180, 130, 45, 0.4) 100%);
-      border: 1px solid rgba(223, 178, 86, 0.55);
-      border-radius: 20px;
-      text-decoration: none;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 0 12px rgba(223, 178, 86, 0.25);
-      transition: all 0.25s ease;
-    }
-
-    .hub-chronicle-link:hover {
-      background: linear-gradient(135deg, rgba(212, 168, 83, 0.5) 0%, rgba(180, 130, 45, 0.7) 100%);
-      border-color: #ffd885;
-      color: #ffffff;
-      box-shadow: 0 0 16px rgba(223, 178, 86, 0.5);
-      transform: translateY(-1px);
+      display: none !important;
     }
 
     .hub-dossier-btn {
@@ -1506,96 +1489,11 @@
 </head>
 <body>
 
-  <!-- Collapsible Full Screen Navigation Sidebar -->
-  <div class="fs-sidebar-backdrop" id="fs-sidebar-backdrop"></div>
-  <aside class="fs-sidebar" id="fs-sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-sigil-wrap">
-        <div class="brand-sigil-ring"></div>
-        <div class="brand-sigil-ring-inner"></div>
-        <span class="brand-sigil">◐</span>
-      </div>
-      <div class="brand-text-wrap">
-        <span class="brand-order-title">The Eclipse Order</span>
-      </div>
-      <button type="button" class="sidebar-collapse-btn" id="btn-fs-sidebar-close" title="Close Menu">◀</button>
-    </div>
-
-    <nav class="sidebar-nav-menu">
-      <a href="../../index.html#view-trail" class="nav-menu-link" target="_top">
-        <span class="btn-icon">🌌</span>
-        <span>The Star Map</span>
-      </a>
-      <a href="../../index.html#view-transmissions" class="nav-menu-link active" target="_top">
-        <span class="btn-icon">📡</span>
-        <span>Transmissions</span>
-      </a>
-      <a href="../../index.html#view-archives" class="nav-menu-link" target="_top">
-        <span class="btn-icon">📜</span>
-        <span>The Archives</span>
-      </a>
-      <a href="../../index.html#view-chronicles" class="nav-menu-link" target="_top">
-        <span class="btn-icon">🏛️</span>
-        <span>Chronicles of the Raid</span>
-      </a>
-      <a href="../../index.html#view-cipher" class="nav-menu-link" target="_top">
-        <span class="btn-icon">🗝️</span>
-        <span>The Cipher Ledger</span>
-      </a>
-    </nav>
-
-    <div style="margin: 16px 0 8px 0;">
-      <a href="../../index.html" class="nav-menu-link" target="_top" style="background: linear-gradient(135deg, rgba(229,185,103,0.2) 0%, rgba(176,131,40,0.3) 100%); border-color: rgba(229,185,103,0.5); color: #ffd885; text-align: center; justify-content: center;">
-        <span>✦ Return to Hub Home ✦</span>
-      </a>
-    </div>
-
-    <div class="sidebar-footer-lore">
-      <div class="footer-lore-crest">✧ ✦ ✧</div>
-      <div class="footer-lore-text">The Eclipse Order · 2026</div>
-      <div class="footer-lore-sub">Silvia's Journey</div>
-    </div>
-  </aside>
-
-  <!-- Top Hub Bar with Direct Tabs and Dossier Logs -->
-  <header class="hub-header">
-    <div class="hub-header-left">
-      <button type="button" class="fs-sidebar-toggle" id="btn-fs-sidebar-toggle" title="Open Navigation Menu">
-        <span>☰</span>
-        <span>Menu</span>
-      </button>
-      <a href="../../index.html" class="hub-back-btn" id="hub-back-btn" target="_top" title="Return to The Star Map Hub">
-        <span id="hub-back-icon">←</span>
-        <span id="hub-back-label">The Star Map</span>
-      </a>
-      <a href="../celestial-flower-2/index.html" class="hub-chronicle-link" id="hub-chronicle-link" target="_top" style="display: none;" title="Inspect corresponding game in Chronicles of the Raid">
-        <span id="hub-chronicle-icon">⚔️</span>
-        <span id="hub-chronicle-label">Inspect The Observatory Raid ➔</span>
-      </a>
-    </div>
-
-    <nav class="hub-tabs" aria-label="Relay Navigation">
-      <button type="button" class="tab-btn tab-siege active" id="tab-0" onclick="goToSlide(0)">
-        <span class="tab-dot dot-red"></span>
-        <span>01 · OBSERVATORY UNDER ATTACK</span>
-      </button>
-      <button type="button" class="tab-btn" id="tab-1" onclick="goToSlide(1)">
-        <span class="tab-dot dot-gold"></span>
-        <span>02 · THE DESERT OUTPOST</span>
-      </button>
-      <button type="button" class="tab-btn tab-matrix" id="tab-2" onclick="goToSlide(2)">
-        <span class="tab-dot dot-cyan"></span>
-        <span>03 · MATRIX RESONANCE DECRYPTED ✓</span>
-      </button>
-    </nav>
-
-    <div class="hub-header-actions">
-      <button type="button" class="hub-dossier-btn" id="btn-open-dossier" title="Open Transmission Dossier">
-        <span>📻</span>
-        <span>Logs Dossier</span>
-      </button>
-    </div>
-  </header>
+  <!-- Top Return Button when arriving from Observatory Raid -->
+  <a href="../celestial-flower-2/index.html" class="hub-back-btn" id="hub-back-btn" target="_top" title="Return to The Observatory Raid" style="display: none;">
+    <span id="hub-back-icon">←</span>
+    <span id="hub-back-label">Return to Observatory Raid</span>
+  </a>
 
   <!-- Side Floating Arrows (Only clean arrows, no frame, no text) -->
   <button type="button" class="nav-arrow nav-arrow-right" id="arrow-next" onclick="goToSlide(currentSlide + 1)" title="Next Transmission" aria-label="Next Transmission">
@@ -1988,6 +1886,7 @@
       const hubBackBtn = document.getElementById('hub-back-btn');
       const hubBackLabel = document.getElementById('hub-back-label');
       if (hubBackBtn) {
+        hubBackBtn.style.display = 'inline-flex';
         hubBackBtn.href = '../celestial-flower-2/index.html';
         hubBackBtn.target = '_top';
         hubBackBtn.title = 'Return to The Observatory Raid';
@@ -2090,19 +1989,7 @@
       const hubChronicleIcon = document.getElementById('hub-chronicle-icon');
       const hubChronicleLabel = document.getElementById('hub-chronicle-label');
       if (hubChronicleLink) {
-        if (idx === 0) {
-          hubChronicleLink.style.display = 'inline-flex';
-          hubChronicleLink.href = '../celestial-flower-2/index.html';
-          if (hubChronicleIcon) hubChronicleIcon.textContent = '⚔️';
-          if (hubChronicleLabel) hubChronicleLabel.textContent = 'Inspect The Observatory Raid ➔';
-        } else if (idx === 2) {
-          hubChronicleLink.style.display = 'inline-flex';
-          hubChronicleLink.href = '../celestial-matrix/index.html';
-          if (hubChronicleIcon) hubChronicleIcon.textContent = '🏛️';
-          if (hubChronicleLabel) hubChronicleLabel.textContent = 'Inspect The Celestial Matrix ➔';
-        } else {
-          hubChronicleLink.style.display = 'none';
-        }
+        hubChronicleLink.style.display = 'none';
       }
 
       // Pause inactive players
@@ -2921,31 +2808,7 @@
       }
       loadSlideMedia(currentSlide);
     }
-
-    // Fullscreen Collapsible Navigation Sidebar Controller
-    const fsSidebar = document.getElementById('fs-sidebar');
-    const fsBackdrop = document.getElementById('fs-sidebar-backdrop');
-    const btnFsOpen = document.getElementById('btn-fs-sidebar-toggle');
-    const btnFsClose = document.getElementById('btn-fs-sidebar-close');
-
-    function openFsSidebar() {
-      if (fsSidebar) fsSidebar.classList.add('open');
-      if (fsBackdrop) fsBackdrop.classList.add('open');
-    }
-
-    function closeFsSidebar() {
-      if (fsSidebar) fsSidebar.classList.remove('open');
-      if (fsBackdrop) fsBackdrop.classList.remove('open');
-    }
-
-    if (btnFsOpen) btnFsOpen.addEventListener('click', openFsSidebar);
-    if (btnFsClose) btnFsClose.addEventListener('click', closeFsSidebar);
-    if (fsBackdrop) fsBackdrop.addEventListener('click', closeFsSidebar);
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && fsSidebar && fsSidebar.classList.contains('open')) {
-        closeFsSidebar();
-      }
-    });
   </script>
+  <script src="../../shared/navigator.js"></script>
 </body>
 </html>
