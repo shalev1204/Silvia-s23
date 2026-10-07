@@ -1,6 +1,7 @@
 /**
  * THE ECLIPSE ORDER · THE CELESTIAL CIPHER (STATION 09)
- * Production Logic: Concentric Dial, Sighting Log, Deduction Engine & Sanguine Sandstorm Climax
+ * Pure Reading Immersion: Continuous Atmospheric Scroll LERP, Candlelight Focus,
+ * Folio Parallax, Living Textures & Distant Horizon Beacon
  */
 
 (function () {
@@ -8,99 +9,18 @@
 
   // Seeker access control: Station 09 remains veiled / locked for Silvia until release
   const currentSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
-  if (currentSeeker !== 'carles') {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isDevBypass = urlParams.get('preview') === '1' || urlParams.get('auth') === '1' || urlParams.get('dev') === '1' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (currentSeeker !== 'carles' && !isDevBypass && localStorage.getItem('order_midnight_completed') !== 'true') {
     alert("Station 09 remains veiled under the Order's nocturnal seal. The path will unlock when the next dispatch is broadcast.");
     window.location.replace('../../index.html#view-trail');
     return;
   }
 
-  // ── 1. Astronomical Constants & Canonical Dial Data ──
-  const ROMANS = ["XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
-  const BANDS = ["+45°", "+15°", "-15°", "-45°"];
-  const RADII = [255, 210, 165, 120, 75]; // Outer to Inner rings
-
-  // Exact 48-Cell Dial Letter Mapping (Calculated from Sheet 07 / build_constellation_games.py)
-  const DIAL_MAP = {
-    "IV|+45°": "Y", "VII|-15°": "O", "II|+15°": "U",
-    "IX|-15°": "W", "V|+15°": "E", "I|+45°": "R", "XI|-45°": "E",
-    "III|+15°": "A", "VIII|+45°": "L", "X|-15°": "W", "VI|+45°": "A", "IV|-15°": "Y", "XII|-45°": "S",
-    "I|-15°": "T", "VII|+45°": "H", "V|-45°": "E",
-    "X|+15°": "T", "III|-45°": "R", "VIII|-15°": "E", "VI|-45°": "A", "IX|+45°": "S", "II|-45°": "U", "XI|+15°": "R", "XII|+15°": "E",
-    "XII|+45°": "B", "XII|-15°": "D", "I|+15°": "H", "I|-45°": "K",
-    "II|+45°": "L", "II|-15°": "N", "III|+45°": "Q", "III|-15°": "S",
-    "IV|+15°": "W", "IV|-45°": "Z", "V|+45°": "B", "V|-15°": "D",
-    "VI|+15°": "H", "VI|-15°": "J", "VII|+15°": "M", "VII|-45°": "P",
-    "VIII|+15°": "R", "VIII|-45°": "T", "IX|+15°": "W", "IX|-45°": "Z",
-    "X|+45°": "B", "X|-45°": "F", "XI|+45°": "G", "XI|-15°": "J"
-  };
-
-  // 5 Canonical Thematic Sighting Groups from the Cartographer
-  const SIGHTING_GROUPS = [
-    {
-      title: "I. The Seeker's Identity",
-      wordIdx: 0,
-      coords: [
-        { roman: "IV", band: "+45°" },
-        { roman: "VII", band: "-15°" },
-        { roman: "II", band: "+15°" }
-      ]
-    },
-    {
-      title: "II. The Past Meridian",
-      wordIdx: 1,
-      coords: [
-        { roman: "IX", band: "-15°" },
-        { roman: "V", band: "+15°" },
-        { roman: "I", band: "+45°" },
-        { roman: "XI", band: "-45°" }
-      ]
-    },
-    {
-      title: "III. The Timeless Stance",
-      wordIdx: 2,
-      coords: [
-        { roman: "III", band: "+15°" },
-        { roman: "VIII", band: "+45°" },
-        { roman: "X", band: "-15°" },
-        { roman: "VI", band: "+45°" },
-        { roman: "IV", band: "-15°" },
-        { roman: "XII", band: "-45°" }
-      ]
-    },
-    {
-      title: "IV. The Definite Sun",
-      wordIdx: 3,
-      coords: [
-        { roman: "I", band: "-15°" },
-        { roman: "VII", band: "+45°" },
-        { roman: "V", band: "-45°" }
-      ]
-    },
-    {
-      title: "V. The Final Mystery",
-      wordIdx: 4,
-      coords: [
-        { roman: "X", band: "+15°" },
-        { roman: "III", band: "-45°" },
-        { roman: "VIII", band: "-15°" },
-        { roman: "VI", band: "-45°" },
-        { roman: "IX", band: "+45°" },
-        { roman: "II", band: "-45°" },
-        { roman: "XI", band: "+15°" },
-        { roman: "XII", band: "+15°" }
-      ]
-    }
-  ];
-
-  const TARGET_WORDS = ["YOU", "WERE", "ALWAYS", "THE", "TREASURE"];
-  const TOTAL_LETTERS = 24;
-
-  // ── 2. Tactile Audio Synthesis Engine ──
-  class TacticalSFX {
+  // ── 1. Minimal Audio FX (Only for final transmission click & resolution) ──
+  class MinimalAudio {
     constructor() {
       this.ctx = null;
-      this.windSource = null;
-      this.windGain = null;
     }
 
     init() {
@@ -133,53 +53,6 @@
       } catch (e) {}
     }
 
-    playChime() {
-      try {
-        this.init();
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.exponentialRampToValueAtTime(1320, now + 0.08);
-
-        gain.gain.setValueAtTime(0.035, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.13);
-      } catch (e) {}
-    }
-
-    playWordUnlocked() {
-      try {
-        this.init();
-        const now = this.ctx.currentTime;
-        const freqs = [329.63, 440.00, 554.37, 659.25];
-        freqs.forEach((f, i) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          const t = now + i * 0.06;
-
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(f, t);
-
-          gain.gain.setValueAtTime(0.06, t);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(t);
-          osc.stop(t + 1.25);
-        });
-      } catch (e) {}
-    }
-
     playProphecyResolved() {
       try {
         this.init();
@@ -188,468 +61,843 @@
         freqs.forEach((f, i) => {
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-          const t = now + i * 0.1;
+          const t = now + i * 0.08;
 
           osc.type = 'sine';
           osc.frequency.setValueAtTime(f, t);
 
           gain.gain.setValueAtTime(0.08, t);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t + 3.0);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 2.5);
 
           osc.connect(gain);
           gain.connect(this.ctx.destination);
 
           osc.start(t);
-          osc.stop(t + 3.1);
+          osc.stop(t + 2.6);
         });
-      } catch (e) {}
-    }
-
-    startStormSound() {
-      try {
-        this.init();
-        const bufferSize = this.ctx.sampleRate * 2;
-        const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = Math.random() * 2 - 1;
-        }
-
-        const whiteNoise = this.ctx.createBufferSource();
-        whiteNoise.buffer = noiseBuffer;
-        whiteNoise.loop = true;
-
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 380;
-        filter.Q.value = 3.0;
-
-        const gainNode = this.ctx.createGain();
-        gainNode.gain.setValueAtTime(0.01, this.ctx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.18, this.ctx.currentTime + 3.0);
-
-        whiteNoise.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
-
-        whiteNoise.start();
-        this.windSource = whiteNoise;
-        this.windGain = gainNode;
       } catch (e) {}
     }
   }
 
-  const sfx = new TacticalSFX();
+  const sfx = new MinimalAudio();
 
-  // ── 3. State Management ──
-  const state = {
-    selectedRoman: "IV",
-    selectedBand: "+45°",
-    activeSightingIndex: 0,
-    userLetters: ["", "", "", "", ""].map((_, i) => new Array(TARGET_WORDS[i].length).fill("")),
-    isCompleted: false
+  // ── 2. Mathematical Continuous LERP Utilities ──
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function lerpColor(c1, c2, t) {
+    return [
+      Math.round(lerp(c1[0], c2[0], t)),
+      Math.round(lerp(c1[1], c2[1], t)),
+      Math.round(lerp(c1[2], c2[2], t))
+    ];
+  }
+
+  // 4 Core Atmospheric Keyframes across scroll progression (0.00 to 1.00)
+  const atmosphericKeyframes = [
+    {
+      progress: 0.00,
+      name: 'alpine',
+      skyCenter: [22, 32, 56],      // Deep crystalline lapis #162038
+      skyPerimeter: [4, 6, 12],     // Cold mountain void #04060c
+      nebulaOpacity: 0.75,          // Crystalline starlight cloud
+      dustOpacity: 0.08,            // Low ground dust
+      hazeOpacity: 0.00,
+      particleSpeed: 0.55,
+      particleColor1: [147, 197, 253], // Icy cyan #93c5fd
+      particleColor2: [226, 232, 240]  // Silver white #e2e8f0
+    },
+    {
+      progress: 0.33,
+      name: 'cataclysm',
+      skyCenter: [74, 21, 11],      // Bruised tempest crimson #4a150b
+      skyPerimeter: [16, 3, 2],     // Scorched stone #100302
+      nebulaOpacity: 0.12,          // Choked by red sand
+      dustOpacity: 0.70,            // Heavy copper sand haze
+      hazeOpacity: 0.65,
+      particleSpeed: 2.7,
+      particleColor1: [239, 68, 68],  // Fiery vermilion #ef4444
+      particleColor2: [249, 115, 22]  // Blazing amber #f97316
+    },
+    {
+      progress: 0.66,
+      name: 'ashen',
+      skyCenter: [28, 24, 27],      // Muted ash charcoal #1c181b
+      skyPerimeter: [6, 5, 7],      // Dead obsidian #060507
+      nebulaOpacity: 0.05,          // Barren sky
+      dustOpacity: 0.42,            // Lingering cold ash motes
+      hazeOpacity: 0.22,
+      particleSpeed: 0.72,
+      particleColor1: [156, 163, 175], // Ash gray #9ca3af
+      particleColor2: [100, 116, 139]  // Slate soot #64748b
+    },
+    {
+      progress: 1.00,
+      name: 'beacon',
+      skyCenter: [64, 40, 13],      // Warm radiant gold dawn #40280d
+      skyPerimeter: [7, 8, 18],     // Midnight southern horizon #070812
+      nebulaOpacity: 0.55,          // Stars return with golden light
+      dustOpacity: 0.20,            // Gentle desert dunes
+      hazeOpacity: 0.08,
+      particleSpeed: 1.15,
+      particleColor1: [251, 191, 36], // Radiant stardust gold #fbbf24
+      particleColor2: [254, 240, 138] // Pale gold spark #fef08a
+    }
+  ];
+
+  // Dynamic DOM elements
+  const skyBackdrop = document.getElementById('sky-backdrop');
+  const skyNebula = document.getElementById('sky-nebula');
+  const skyDust = document.getElementById('sky-dust');
+  const sandstormHaze = document.getElementById('sandstorm-haze');
+  const beaconEmitter = document.getElementById('distant-beacon-emitter');
+
+  // Living Astronomical Instrumentation & Climax DOM References
+  const caliperEl = document.getElementById('declination-caliper');
+
+  const silkFill = document.getElementById('silk-gold-fill');
+  const threadSpark = document.getElementById('thread-spark');
+  const threadNode1 = document.getElementById('thread-node-1');
+  const threadNode2 = document.getElementById('thread-node-2');
+  const threadNode3 = document.getElementById('thread-node-3');
+  const threadNode4 = document.getElementById('thread-node-4');
+
+  const compassBtn = document.getElementById('astrolabe-compass-btn');
+  const compassNeedle = document.getElementById('compass-needle-group');
+  const chartMesh = document.querySelector('.chart-svg-mesh');
+
+  const climaxStage = document.getElementById('climax-stage');
+  const radioTransceiverPanel = document.getElementById('radio-transceiver-panel');
+
+  const stepElements = {
+    1: document.getElementById('step-1'),
+    2: document.getElementById('step-2'),
+    3: document.getElementById('step-3'),
+    4: document.getElementById('step-4'),
   };
 
-  // Flattened mapping of all 24 coordinates
-  const flatSightings = [];
-  SIGHTING_GROUPS.forEach((grp, gIdx) => {
-    grp.coords.forEach((c, lIdx) => {
-      flatSightings.push({
-        groupIndex: gIdx,
-        letterIndex: lIdx,
-        roman: c.roman,
-        band: c.band,
-        expectedLetter: DIAL_MAP[`${c.roman}|${c.band}`]
+  const readableElements = document.querySelectorAll('.novel-para, .novel-quote-card, .charred-relic-facsimile');
+  const shimmerElements = document.querySelectorAll(
+    '.novel-quote-card, .charred-relic-facsimile, .gold-glow-title, .novel-center-name'
+  );
+  const plateImages = document.querySelectorAll('.plate-image');
+
+  // Particle state for Canvas
+  let currentParticleSpeed = 0.55;
+  let currentParticleRGB1 = [147, 197, 253];
+  let currentParticleRGB2 = [226, 232, 240];
+  let currentChapter = 1;
+  let lightningTimer = null;
+
+  // ── Atmospheric Tempest Lightning (Chapter II Cataclysm) ──
+  function triggerLightningFlash() {
+    const flash = document.getElementById('lightning-flash-overlay');
+    if (!flash) return;
+    flash.style.opacity = '0.52';
+    setTimeout(() => {
+      flash.style.opacity = '0.05';
+      setTimeout(() => {
+        flash.style.opacity = '0.38';
+        setTimeout(() => {
+          flash.style.opacity = '0';
+        }, 80);
+      }, 45);
+    }, 60);
+  }
+
+  function startLightningCycle() {
+    stopLightningCycle();
+    function scheduleNext() {
+      const delay = 6000 + Math.random() * 8000;
+      lightningTimer = setTimeout(() => {
+        if (currentChapter === 2) {
+          triggerLightningFlash();
+          scheduleNext();
+        }
+      }, delay);
+    }
+    scheduleNext();
+  }
+
+  function stopLightningCycle() {
+    if (lightningTimer) {
+      clearTimeout(lightningTimer);
+      lightningTimer = null;
+    }
+    const flash = document.getElementById('lightning-flash-overlay');
+    if (flash) flash.style.opacity = '0';
+  }
+
+  // ── 3. Continuous Novel Scroll & Anchor Navigation Engine ──
+  let isNavigatingManually = false;
+  let manualNavTimer = null;
+  let currentScrollProgress = 0;
+
+  function scrollToChapter(num) {
+    num = Math.max(1, Math.min(4, parseInt(num, 10) || 1));
+    const target = document.getElementById(`chapter-${num}`);
+    if (target) {
+      isNavigatingManually = true;
+      if (manualNavTimer) clearTimeout(manualNavTimer);
+      setChapterAtmosphere(num);
+
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      manualNavTimer = setTimeout(() => {
+        isNavigatingManually = false;
+      }, 1000);
+    }
+  }
+
+  function setChapterAtmosphere(num) {
+    num = Math.max(1, Math.min(4, parseInt(num, 10) || 1));
+    if (currentChapter === num && document.body.classList.contains(`theme-chapter-${num}`)) {
+      return;
+    }
+    currentChapter = num;
+
+    // A. Update buttons in navigation bar
+    for (let i = 1; i <= 4; i++) {
+      const step = stepElements[i];
+      const chap = document.getElementById(`chapter-${i}`);
+      const isActive = (i === num);
+
+      if (step) {
+        if (isActive) {
+          step.classList.add('active');
+          step.setAttribute('aria-selected', 'true');
+          step.setAttribute('tabindex', '0');
+        } else {
+          step.classList.remove('active');
+          step.setAttribute('aria-selected', 'false');
+          step.setAttribute('tabindex', '-1');
+        }
+      }
+
+      if (chap) {
+        if (isActive) {
+          chap.classList.add('active-chapter');
+        } else {
+          chap.classList.remove('active-chapter');
+        }
+      }
+    }
+
+    // B. Update body theme class & Scenic Atmosphere plates
+    document.body.classList.remove('theme-chapter-1', 'theme-chapter-2', 'theme-chapter-3', 'theme-chapter-4');
+    document.body.classList.add(`theme-chapter-${num}`);
+
+    for (let p = 1; p <= 4; p++) {
+      const plate = document.querySelector(`.scenic-plate-${p}`);
+      if (plate) {
+        if (p === num) plate.classList.add('active');
+        else plate.classList.remove('active');
+      }
+    }
+
+    // C. Chapter Atmospheric Keyframes & Canvas particles
+    const kf = atmosphericKeyframes[num - 1] || atmosphericKeyframes[0];
+    currentParticleSpeed = kf.particleSpeed;
+    currentParticleRGB1 = kf.particleColor1;
+    currentParticleRGB2 = kf.particleColor2;
+
+    // D. Distant Horizon Beacon (Chapter IV Revelation)
+    if (beaconEmitter) {
+      if (num === 4) {
+        beaconEmitter.classList.add('beacon-revealed');
+      } else {
+        beaconEmitter.classList.remove('beacon-revealed');
+      }
+    }
+
+    // E. Atmospheric Lightning Storm (Chapter II)
+    if (num === 2) {
+      startLightningCycle();
+    } else {
+      stopLightningCycle();
+    }
+  }
+
+  // Cached DOM geometry metrics (Updated only on resize/init, zero layout thrashing on scroll)
+  let cachedChapterTops = [0, 0, 0, 0];
+  let cachedClimaxTop = 0;
+  let cachedScaleHeight = 1000;
+  let cachedTrackWidth = 580;
+
+  function updateCachedMetrics() {
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    for (let i = 1; i <= 4; i++) {
+      const chap = document.getElementById(`chapter-${i}`);
+      if (chap) {
+        const rect = chap.getBoundingClientRect();
+        cachedChapterTops[i - 1] = rect.top + scrollY;
+      }
+    }
+    if (climaxStage) {
+      const rect = climaxStage.getBoundingClientRect();
+      cachedClimaxTop = rect.top + scrollY;
+    }
+    const scaleLeft = document.querySelector('.codex-margin-scale.scale-left');
+    if (scaleLeft) {
+      cachedScaleHeight = scaleLeft.offsetHeight;
+    }
+    const track = document.querySelector('.silk-reading-thread-track');
+    if (track) {
+      cachedTrackWidth = track.offsetWidth;
+    }
+  }
+  window.addEventListener('resize', updateCachedMetrics);
+
+  function updateActiveChapterOnScroll() {
+    if (isNavigatingManually) return;
+    
+    const viewportHeight = window.innerHeight;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight;
+
+    // A. Scrolled near the bottom of document -> Chapter IV
+    if (docHeight - (scrollY + viewportHeight) <= 140) {
+      setChapterAtmosphere(4);
+      return;
+    }
+
+    // B. At the very top -> Chapter I
+    if (scrollY < 180) {
+      setChapterAtmosphere(1);
+      return;
+    }
+
+    // C. Optical focus line at reader's gaze level (~38% down viewport)
+    const focusY = scrollY + viewportHeight * 0.38;
+    let activeIndex = 1;
+    for (let i = 3; i >= 0; i--) {
+      if (focusY >= (cachedChapterTops[i] || 0) - 120) {
+        activeIndex = i + 1;
+        break;
+      }
+    }
+
+    setChapterAtmosphere(activeIndex);
+  }
+
+  // ── Tab & Navigation Event Handlers ──
+  Object.keys(stepElements).forEach(numStr => {
+    const stepEl = stepElements[numStr];
+    if (stepEl) {
+      stepEl.addEventListener('click', () => {
+        sfx.playClick();
+        scrollToChapter(parseInt(numStr, 10));
       });
-    });
+      stepEl.addEventListener('keydown', (e) => {
+        let target = null;
+        const current = parseInt(numStr, 10);
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          target = current === 4 ? 1 : current + 1;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          target = current === 1 ? 4 : current - 1;
+        }
+        if (target) {
+          e.preventDefault();
+          scrollToChapter(target);
+          const nextStep = stepElements[target];
+          if (nextStep) nextStep.focus();
+        }
+      });
+    }
   });
 
-  // ── 4. Dial Rendering & SVG Geometry ──
-  const cellsGroup = document.getElementById('dial-cells-group');
-  const hourLinesGroup = document.getElementById('dial-hour-lines-group');
-  const romansGroup = document.getElementById('dial-romans-group');
-  const opticalNeedle = document.getElementById('optical-needle');
-  const targetBead = document.getElementById('target-bead');
-  const targetBeadInner = document.getElementById('target-bead-inner');
-  const targetCoordReadout = document.getElementById('target-coord-readout');
-  const targetLetterReadout = document.getElementById('target-letter-readout');
-  const declTabs = document.querySelectorAll('.decl-tab');
-
-  function renderDial() {
-    if (!cellsGroup) return;
-    cellsGroup.innerHTML = '';
-    hourLinesGroup.innerHTML = '';
-    romansGroup.innerHTML = '';
-
-    // Draw 12 Sector Dividers & Roman Numeral Labels
-    for (let i = 0; i < 12; i++) {
-      const deg = i * 30 - 90;
-      const rad = deg * (Math.PI / 180);
-      const cosA = Math.cos(rad);
-      const sinA = Math.sin(rad);
-
-      // Line from Pole to Outer Rim
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', (RADII[4] * cosA).toFixed(1));
-      line.setAttribute('y1', (RADII[4] * sinA).toFixed(1));
-      line.setAttribute('x2', (RADII[0] * cosA).toFixed(1));
-      line.setAttribute('y2', (RADII[0] * sinA).toFixed(1));
-      line.setAttribute('stroke', 'rgba(212, 168, 83, 0.28)');
-      line.setAttribute('stroke-width', '1');
-      hourLinesGroup.appendChild(line);
-
-      // Roman Numeral text label just outside the rim
-      const romanText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      const rLabel = RADII[0] + 18;
-      romanText.setAttribute('x', (rLabel * cosA).toFixed(1));
-      romanText.setAttribute('y', (rLabel * sinA + 4).toFixed(1));
-      romanText.setAttribute('class', 'dial-roman-label');
-      romanText.setAttribute('data-roman', ROMANS[i]);
-      romanText.textContent = ROMANS[i];
-      romanText.addEventListener('click', () => {
-        setDialPosition(ROMANS[i], state.selectedBand);
-      });
-      romansGroup.appendChild(romanText);
-    }
-
-    // Draw 48 Annular Sector Cells
-    for (let sIdx = 0; sIdx < 12; sIdx++) {
-      const roman = ROMANS[sIdx];
-      const startDeg = sIdx * 30 - 90;
-      const endDeg = (sIdx + 1) * 30 - 90;
-      const midDeg = sIdx * 30 - 75;
-
-      for (let bIdx = 0; bIdx < 4; bIdx++) {
-        const band = BANDS[bIdx];
-        const rOuter = RADII[bIdx];
-        const rInner = RADII[bIdx + 1];
-        const rMid = (rOuter + rInner) / 2;
-
-        const pathD = describeAnnularSector(0, 0, rInner, rOuter, startDeg, endDeg);
-        const letter = DIAL_MAP[`${roman}|${band}`] || '?';
-
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('class', 'dial-cell');
-        g.setAttribute('data-roman', roman);
-        g.setAttribute('data-band', band);
-        g.setAttribute('data-letter', letter);
-
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathD);
-
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        const radMid = midDeg * (Math.PI / 180);
-        text.setAttribute('x', (rMid * Math.cos(radMid)).toFixed(1));
-        text.setAttribute('y', (rMid * Math.sin(radMid)).toFixed(1));
-        text.textContent = letter;
-
-        g.appendChild(path);
-        g.appendChild(text);
-
-        g.addEventListener('click', () => {
-          setDialPosition(roman, band);
-          handleCellClick(letter);
-        });
-
-        cellsGroup.appendChild(g);
-      }
-    }
-  }
-
-  function describeAnnularSector(cx, cy, rInner, rOuter, startAngle, endAngle) {
-    const toRad = Math.PI / 180;
-    const sRad = startAngle * toRad;
-    const eRad = endAngle * toRad;
-
-    const x1 = cx + rOuter * Math.cos(sRad);
-    const y1 = cy + rOuter * Math.sin(sRad);
-    const x2 = cx + rOuter * Math.cos(eRad);
-    const y2 = cy + rOuter * Math.sin(eRad);
-
-    const x3 = cx + rInner * Math.cos(eRad);
-    const y3 = cy + rInner * Math.sin(eRad);
-    const x4 = cx + rInner * Math.cos(sRad);
-    const y4 = cy + rInner * Math.sin(sRad);
-
-    return `M ${x1.toFixed(1)} ${y1.toFixed(1)} ` +
-           `A ${rOuter} ${rOuter} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)} ` +
-           `L ${x3.toFixed(1)} ${y3.toFixed(1)} ` +
-           `A ${rInner} ${rInner} 0 0 0 ${x4.toFixed(1)} ${y4.toFixed(1)} Z`;
-  }
-
-  function setDialPosition(roman, band, shouldPlaySound = true) {
-    state.selectedRoman = roman;
-    state.selectedBand = band;
-
-    if (shouldPlaySound) sfx.playClick();
-
-    const sIdx = ROMANS.indexOf(roman);
-    const bIdx = BANDS.indexOf(band);
-    if (sIdx === -1 || bIdx === -1) return;
-
-    // Center angle of this hour sector
-    const midDeg = sIdx * 30 - 75;
-    const radMid = midDeg * (Math.PI / 180);
-    const rMid = (RADII[bIdx] + RADII[bIdx + 1]) / 2;
-
-    // Aim Optical Reticle Needle & Bead
-    const needleTipX = (RADII[0] * Math.cos(radMid)).toFixed(1);
-    const needleTipY = (RADII[0] * Math.sin(radMid)).toFixed(1);
-    const beadX = (rMid * Math.cos(radMid)).toFixed(1);
-    const beadY = (rMid * Math.sin(radMid)).toFixed(1);
-
-    if (opticalNeedle) {
-      opticalNeedle.setAttribute('x2', needleTipX);
-      opticalNeedle.setAttribute('y2', needleTipY);
-    }
-    if (targetBead) {
-      targetBead.setAttribute('cx', beadX);
-      targetBead.setAttribute('cy', beadY);
-    }
-    if (targetBeadInner) {
-      targetBeadInner.setAttribute('cx', beadX);
-      targetBeadInner.setAttribute('cy', beadY);
-    }
-
-    // Highlight Cell
-    document.querySelectorAll('.dial-cell').forEach(c => {
-      const match = c.getAttribute('data-roman') === roman && c.getAttribute('data-band') === band;
-      c.classList.toggle('cell-active', match);
-    });
-
-    // Highlight Roman
-    document.querySelectorAll('.dial-roman-label').forEach(r => {
-      r.classList.toggle('active', r.getAttribute('data-roman') === roman);
-    });
-
-    // Highlight Declination Tab
-    declTabs.forEach(t => {
-      t.classList.toggle('active', t.getAttribute('data-band') === band);
-    });
-
-    // Update Readouts
-    const letter = DIAL_MAP[`${roman}|${band}`] || '?';
-    if (targetCoordReadout) targetCoordReadout.textContent = `HOUR ${roman} · DECL ${band}`;
-    if (targetLetterReadout) targetLetterReadout.textContent = letter;
-  }
-
-  // ── 5. Sighting Log & Deduction Logic ──
-  const sightingContainer = document.getElementById('sighting-groups-container');
-  const sightingBadge = document.getElementById('sighting-progress-badge');
-  const prophecyStatusBar = document.getElementById('prophecy-status-bar');
-
-  function renderSightingLog() {
-    if (!sightingContainer) return;
-    sightingContainer.innerHTML = '';
-
-    SIGHTING_GROUPS.forEach((grp, gIdx) => {
-      const grpRow = document.createElement('div');
-      grpRow.className = 'sighting-group-row';
-      grpRow.setAttribute('data-group-idx', gIdx);
-
-      const titleRow = document.createElement('div');
-      titleRow.className = 'group-title-row';
-      titleRow.innerHTML = `
-        <span class="group-name">${grp.title}</span>
-        <span class="group-status" id="group-${gIdx}-status">0 / ${grp.coords.length} RESOLVED</span>
-      `;
-      grpRow.appendChild(titleRow);
-
-      const chipsRow = document.createElement('div');
-      chipsRow.className = 'chips-row';
-
-      grp.coords.forEach((c, lIdx) => {
-        const flatIdx = flatSightings.findIndex(f => f.groupIndex === gIdx && f.letterIndex === lIdx);
-        const resolvedLetter = state.userLetters[gIdx][lIdx];
-        const isResolved = resolvedLetter === DIAL_MAP[`${c.roman}|${c.band}`];
-
-        const chip = document.createElement('div');
-        chip.className = 'coord-chip' + (flatIdx === state.activeSightingIndex ? ' chip-active' : '') + (isResolved ? ' chip-resolved' : '');
-        chip.setAttribute('data-flat-idx', flatIdx);
-        chip.innerHTML = `
-          <span>${c.roman} · ${c.band}</span>
-          ${isResolved ? `<span class="chip-arrow">➔</span><span class="chip-resolved-letter">${resolvedLetter}</span>` : ''}
-        `;
-
-        chip.addEventListener('click', () => {
-          setActiveSighting(flatIdx);
-        });
-
-        chipsRow.appendChild(chip);
-      });
-
-      grpRow.appendChild(chipsRow);
-      sightingContainer.appendChild(grpRow);
-    });
-  }
-
-  function renderProphecyBoxes() {
-    TARGET_WORDS.forEach((word, wIdx) => {
-      const container = document.getElementById(`word-${wIdx}-boxes`);
-      if (!container) return;
-      container.innerHTML = '';
-
-      for (let lIdx = 0; lIdx < word.length; lIdx++) {
-        const flatIdx = flatSightings.findIndex(f => f.groupIndex === wIdx && f.letterIndex === lIdx);
-        const box = document.createElement('input');
-        box.type = 'text';
-        box.maxLength = 1;
-        box.className = 'letter-box';
-        box.setAttribute('data-word-idx', wIdx);
-        box.setAttribute('data-letter-idx', lIdx);
-        box.setAttribute('data-flat-idx', flatIdx);
-        box.value = state.userLetters[wIdx][lIdx] || '';
-
-        box.addEventListener('focus', () => {
-          setActiveSighting(flatIdx);
-        });
-
-        box.addEventListener('keydown', (e) => {
-          handleBoxKeydown(e, wIdx, lIdx, flatIdx);
-        });
-
-        box.addEventListener('input', (e) => {
-          handleBoxInput(e, wIdx, lIdx, flatIdx);
-        });
-
-        container.appendChild(box);
-      }
-    });
-
-    updateValidation();
-  }
-
-  function setActiveSighting(flatIdx) {
-    if (flatIdx < 0 || flatIdx >= flatSightings.length) return;
-    state.activeSightingIndex = flatIdx;
-    const item = flatSightings[flatIdx];
-
-    setDialPosition(item.roman, item.band);
-
-    // Update Chips
-    document.querySelectorAll('.coord-chip').forEach(c => {
-      c.classList.toggle('chip-active', parseInt(c.getAttribute('data-flat-idx'), 10) === flatIdx);
-    });
-
-    // Focus input box
-    const targetBox = document.querySelector(`.letter-box[data-flat-idx="${flatIdx}"]`);
-    if (targetBox && document.activeElement !== targetBox) {
-      targetBox.focus();
-    }
-  }
-
-  function handleBoxInput(e, wIdx, lIdx, flatIdx) {
-    const val = (e.target.value || '').toUpperCase().trim();
-    e.target.value = val;
-    state.userLetters[wIdx][lIdx] = val;
-
-    sfx.playClick();
-    updateValidation();
-
-    if (val && flatIdx < flatSightings.length - 1) {
-      setActiveSighting(flatIdx + 1);
-    }
-  }
-
-  function handleBoxKeydown(e, wIdx, lIdx, flatIdx) {
-    if (e.key === 'Backspace' && !e.target.value && flatIdx > 0) {
-      setActiveSighting(flatIdx - 1);
-    } else if (e.key === 'ArrowRight' && flatIdx < flatSightings.length - 1) {
-      setActiveSighting(flatIdx + 1);
-    } else if (e.key === 'ArrowLeft' && flatIdx > 0) {
-      setActiveSighting(flatIdx - 1);
-    }
-  }
-
-  function handleCellClick(letter) {
-    const item = flatSightings[state.activeSightingIndex];
-    if (!item) return;
-
-    state.userLetters[item.groupIndex][item.letterIndex] = letter;
-    const box = document.querySelector(`.letter-box[data-flat-idx="${state.activeSightingIndex}"]`);
-    if (box) box.value = letter;
-
-    updateValidation();
-
-    if (state.activeSightingIndex < flatSightings.length - 1) {
-      setActiveSighting(state.activeSightingIndex + 1);
-    }
-  }
-
-  function updateValidation() {
-    let correctCount = 0;
-
-    TARGET_WORDS.forEach((word, wIdx) => {
-      let wordDone = true;
-      for (let lIdx = 0; lIdx < word.length; lIdx++) {
-        const inputLetter = state.userLetters[wIdx][lIdx];
-        const expectedLetter = word[lIdx];
-        const flatIdx = flatSightings.findIndex(f => f.groupIndex === wIdx && f.letterIndex === lIdx);
-        const box = document.querySelector(`.letter-box[data-flat-idx="${flatIdx}"]`);
-
-        if (inputLetter === expectedLetter) {
-          correctCount++;
-          if (box) box.classList.add('box-correct');
+  // ── Reading Focus Beam & Gold Leaf Shimmer (Offloaded to Native IntersectionObserver) ──
+  if ('IntersectionObserver' in window) {
+    const focusObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reading-focus');
         } else {
-          wordDone = false;
-          if (box) box.classList.remove('box-correct');
+          entry.target.classList.remove('reading-focus');
         }
-      }
-
-      const wordBlock = document.querySelector(`.word-block[data-word-idx="${wIdx}"]`);
-      if (wordBlock) {
-        const wasDone = wordBlock.classList.contains('word-completed');
-        wordBlock.classList.toggle('word-completed', wordDone);
-        if (wordDone && !wasDone && correctCount < TOTAL_LETTERS) {
-          sfx.playWordUnlocked();
-        }
-      }
-
-      // Update group status
-      const grpResolved = state.userLetters[wIdx].filter((l, i) => l === word[i]).length;
-      const statusEl = document.getElementById(`group-${wIdx}-status`);
-      if (statusEl) {
-        statusEl.textContent = `${grpResolved} / ${word.length} RESOLVED`;
-        statusEl.style.color = (grpResolved === word.length) ? 'var(--brass-bright)' : '';
-      }
+      });
+    }, {
+      rootMargin: "-18% 0px -18% 0px",
+      threshold: 0
     });
+    readableElements.forEach(el => focusObserver.observe(el));
 
-    // Update Chips status
-    renderSightingLog();
+    const shimmerObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('gold-leaf-shimmer');
+        } else {
+          entry.target.classList.remove('gold-leaf-shimmer');
+        }
+      });
+    }, {
+      rootMargin: "-28% 0px -28% 0px",
+      threshold: 0
+    });
+    shimmerElements.forEach(el => shimmerObserver.observe(el));
+  } else {
+    readableElements.forEach(el => el.classList.add('reading-focus'));
+  }
 
-    if (sightingBadge) {
-      sightingBadge.textContent = `${correctCount} / ${TOTAL_LETTERS} LOCKED`;
-      if (correctCount === TOTAL_LETTERS) {
-        sightingBadge.style.color = '#86efac';
-        sightingBadge.style.borderColor = 'rgba(34, 197, 94, 0.5)';
-      }
-    }
+  // ── High-Performance Liquid Physics Engine (LERP Damped Smooth Animations) ──
+  let targetProgress = 0;
+  let currentProgress = 0;
+  let targetCompassAngle = 0;
+  let currentCompassAngle = 0;
+  let targetChartAngle = 0;
+  let currentChartAngle = 0;
+  let isPhysicsLoopRunning = false;
 
-    if (prophecyStatusBar) {
-      if (correctCount === TOTAL_LETTERS) {
-        prophecyStatusBar.innerHTML = `<span class="status-icon" style="color:var(--brass-bright);">★</span> <strong style="color:var(--brass-bright); letter-spacing:0.1em;">"YOU WERE ALWAYS THE TREASURE" — PROPHECY SEALED!</strong>`;
+  // Reading Caliper Kinetic Physics (Dynamic inertial lag, pitch tilt & starlight glow)
+  let currentCaliperDeflection = 0;
+  let currentCaliperTilt = 0;
+  let currentCaliperScale = 1;
+
+  function physicsTick() {
+    // Smooth damping factor: 0.14 provides instant tactile responsiveness with silky liquid easing
+    const deltaProgress = targetProgress - currentProgress;
+    currentProgress += deltaProgress * 0.14;
+
+    // 1. Reading Focus Needle: Kinetic liquid inertia, tilt & active momentum glow
+    // Pinned to reader eye-level (top: 38vh sticky); GPU translate3d & rotate adds organic physical inertia
+    const scrollVelocity = deltaProgress * 70; // normalized momentum & direction
+    const targetDeflection = Math.max(-14, Math.min(14, scrollVelocity * 16));
+    const targetTilt = Math.max(-4.5, Math.min(4.5, scrollVelocity * 5.2));
+    const targetScale = 1 + Math.min(0.09, Math.abs(scrollVelocity) * 0.08);
+
+    currentCaliperDeflection += (targetDeflection - currentCaliperDeflection) * 0.14;
+    currentCaliperTilt += (targetTilt - currentCaliperTilt) * 0.16;
+    currentCaliperScale += (targetScale - currentCaliperScale) * 0.14;
+
+    if (caliperEl) {
+      caliperEl.style.transform = `translate3d(0, ${currentCaliperDeflection.toFixed(2)}px, 0) rotate(${currentCaliperTilt.toFixed(2)}deg) scale(${currentCaliperScale.toFixed(3)})`;
+      
+      if (Math.abs(scrollVelocity) > 0.06) {
+        caliperEl.classList.add('caliper-active-glide');
       } else {
-        prophecyStatusBar.innerHTML = `<span class="status-icon">⏳</span> <span>${correctCount} of 24 coordinates aligned... continue crossing the dial.</span>`;
+        caliperEl.classList.remove('caliper-active-glide');
       }
     }
 
-    // Check Victory / Climax Trigger
-    if (correctCount === TOTAL_LETTERS && !state.isCompleted) {
-      triggerClimaxSequence();
+    // 2. Silk Reading Thread (Zero layout reflow: pure GPU scaleX matrix)
+    if (silkFill) {
+      silkFill.style.transform = `scaleX(${currentProgress.toFixed(4)})`;
+    }
+
+    // 3. Thread Spark (Zero layout reflow: pure GPU translate3d)
+    if (threadSpark) {
+      const sparkX = currentProgress * cachedTrackWidth;
+      threadSpark.style.transform = `translate3d(${sparkX.toFixed(1)}px, -50%, 0)`;
+    }
+
+    // 4. Chapter Nodes Ignition
+    if (threadNode1) threadNode1.classList.add('ignited');
+    if (threadNode2) threadNode2.classList.toggle('ignited', currentProgress >= 0.28);
+    if (threadNode3) threadNode3.classList.toggle('ignited', currentProgress >= 0.60);
+    if (threadNode4) threadNode4.classList.toggle('ignited', currentProgress >= 0.92);
+
+    // 5. Compass Needle (Organic floating magnetic liquid damping)
+    const deltaCompass = targetCompassAngle - currentCompassAngle;
+    currentCompassAngle += deltaCompass * 0.10;
+    if (compassNeedle) {
+      compassNeedle.style.transform = `rotate(${currentCompassAngle.toFixed(1)}deg)`;
+    }
+
+    // 6. Celestial Chart Mesh (Slow 0° to 14° astronomical rotation)
+    const deltaChart = targetChartAngle - currentChartAngle;
+    currentChartAngle += deltaChart * 0.08;
+    if (chartMesh) {
+      chartMesh.style.transform = `rotate(${currentChartAngle.toFixed(2)}deg)`;
+    }
+
+    // Continue running until momentum completely settles
+    const isPhysicsActive = Math.abs(deltaProgress) > 0.0001 || 
+                           Math.abs(deltaCompass) > 0.05 || 
+                           Math.abs(deltaChart) > 0.02 ||
+                           Math.abs(currentCaliperDeflection) > 0.08 ||
+                           Math.abs(currentCaliperTilt) > 0.08;
+
+    if (isPhysicsActive) {
+      requestAnimationFrame(physicsTick);
+    } else {
+      currentProgress = targetProgress;
+      currentCompassAngle = targetCompassAngle;
+      currentChartAngle = targetChartAngle;
+      currentCaliperDeflection = 0;
+      currentCaliperTilt = 0;
+      currentCaliperScale = 1;
+      if (caliperEl) {
+        caliperEl.style.transform = 'translate3d(0, 0, 0) rotate(0deg) scale(1)';
+        caliperEl.classList.remove('caliper-active-glide');
+      }
+      isPhysicsLoopRunning = false;
     }
   }
 
-  // ── 6. Climax Sequence: La Gran Tormenta de Arena del Sur ──
-  const climaxModal = document.getElementById('climax-modal');
-  const typewriterTextEl = document.getElementById('dispatch-typewriter-text');
-  const radioPill = document.getElementById('radio-pill');
-  const radioOverloadState = document.getElementById('radio-overload-state');
+  function startPhysicsLoop() {
+    if (!isPhysicsLoopRunning) {
+      isPhysicsLoopRunning = true;
+      requestAnimationFrame(physicsTick);
+    }
+  }
 
-  const DISPATCH_TRANSCRIPT = 
-    "«Silvia! The storm has broken without warning! The sky has turned pitch crimson and the shifting sands are scouring everything... we have lost the raiders' trail! All previous maps are dead paper now... the crescent dunes have slid miles south and ancient ravines are buried! Listen closely: you must open the next sheet of my journal... find the Desert Oracle. In the deep desert, beyond the moved dunes, only the Oracle can read what the wind has buried...!»";
+  // Interactive Astrolabe Caliper Click & Sparkle
+  if (caliperEl) {
+    caliperEl.addEventListener('click', () => {
+      sfx.playClick();
+      caliperEl.classList.add('caliper-sparkle');
+      setTimeout(() => caliperEl.classList.remove('caliper-sparkle'), 600);
+    });
+  }
+
+  // Quick-Return Astrolabe Compass Click Handler
+  if (compassBtn) {
+    compassBtn.addEventListener('click', () => {
+      sfx.playClick();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Unified Scroll Listener (Zero layout queries on hot scroll path)
+  let chapterCheckPending = false;
+  window.addEventListener('scroll', () => {
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight;
+    const winHeight = window.innerHeight;
+    const maxScroll = Math.max(1, docHeight - winHeight);
+
+    targetProgress = Math.max(0, Math.min(1, scrollY / maxScroll));
+    targetCompassAngle = targetProgress * 540;
+    targetChartAngle = targetProgress * 14;
+
+    if (compassBtn) {
+      if (scrollY > 350) {
+        compassBtn.classList.add('compass-visible');
+      } else {
+        compassBtn.classList.remove('compass-visible');
+      }
+    }
+
+    // Climax Stage Detection (Using cached offset: 0 DOM queries)
+    if (climaxStage && cachedClimaxTop > 0) {
+      const triggerThreshold = cachedClimaxTop - winHeight * 0.85;
+      if (scrollY >= triggerThreshold) {
+        if (!document.body.classList.contains('sandstorm-active')) {
+          document.body.classList.add('sandstorm-active');
+          try {
+            localStorage.setItem('order_cipher_completed', 'true');
+            localStorage.setItem('order_sandstorm_triggered', 'true');
+            const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+            localStorage.setItem(`seeker_${activeSeeker}_cipher_completed`, 'true');
+          } catch (e) {}
+        }
+      } else if (scrollY < cachedClimaxTop - winHeight && !isRadioPlaying) {
+        document.body.classList.remove('sandstorm-active');
+      }
+    }
+
+    // Wake up physics engine
+    startPhysicsLoop();
+
+    // Lightweight throttled chapter theme check
+    if (!chapterCheckPending) {
+      chapterCheckPending = true;
+      requestAnimationFrame(() => {
+        updateActiveChapterOnScroll();
+        chapterCheckPending = false;
+      });
+    }
+  }, { passive: true });
+
+  // Initial setup: initialize metrics, chapter atmosphere, and kickstart physics loop
+  updateCachedMetrics();
+  setChapterAtmosphere(1);
+  startPhysicsLoop();
+  setTimeout(updateCachedMetrics, 400); // recheck after web fonts settle
+
+  // ── 4. Climax Sequence & Desert Radio Transceiver Engine ──
+  const radioOverloadState = document.getElementById('radio-overload-state');
+  const btnTransmitStory = document.getElementById('btn-transmit-story');
+  const btnOpenStoryAgain = document.getElementById('btn-open-story-again');
+  const radioModalOverlay = document.getElementById('radio-modal-overlay');
+  const radioModalBackdrop = document.getElementById('radio-modal-backdrop');
+  const btnCloseRadioModal = document.getElementById('btn-close-radio-modal');
+
+  // Subtitle Data Synchronized with Master Broadcast (cartographer_sandstorm_emergency.mp3)
+  const SANDSTORM_SUBTITLES = [
+    { time: 0.0, text: "[ 142.85 MHz SHORTWAVE LOCKED · SOUTHERN SANDSTORM OVERRIDE... ]" },
+    { time: 0.8, text: "\"SILVIA! SILVIA, CAN YOU HEAR ME THROUGH THE STATIC? THE STORM IS RIGHT ON TOP OF ME OUT HERE IN THE DUNES!\"" },
+    { time: 7.92, text: "\"THOSE WORDS... YOU SPOKE THE VOW I CARVED INTO THAT BRASS DIAL FIFTY-SIX YEARS AGO! AFTER A DECADE OF WATCHING THE DISTANT LIGHT... YOU GAVE ME BACK MY TRUE NAME!\"" },
+    { time: 21.40, text: "\"I TRACKED THE RAIDERS DOWN INTO THE DESERT, BUT THIS RED SANDSTORM CAUGHT ME IN THE OPEN! THEY FLED DEEPER INTO THE SANDS WITH OUR STOLEN ASTROLABE!\"" },
+    { time: 31.24, text: "\"THE GALE IS COLOSSAL—IT IS SEALING THE MOUNTAIN PASS BEHIND YOU! OUR JOURNEY OF MOUNTAIN NUMBERS IS FINISHED!\"" },
+    { time: 39.68, text: "\"I MUST FIND SHELTER IN THE CANYON RUINS BEFORE THIS TEMPEST SWALLOWS ME WHOLE! WHEN THE WINDS FINALLY DIE DOWN, YOU MUST DESCEND INTO THE DESERT.\"" },
+    { time: 50.72, text: "\"OPEN THE NEXT SHEET OF MY JOURNAL! STUDY THE DESERT PATH—DOWN HERE, MOUNTAIN EQUATIONS HAVE NO POWER; ONLY THE ANCIENT LANGUAGES OF THE SAND CAN GUIDE YOU!\"" },
+    { time: 62.69, text: "\"THE SAND IS RIPPING MY ANTENNA AWAY! THE CARRIER IS DYING! ONCE YOU REACH THE DESERT THRESHOLD, WE WILL FIND THE DESERT ORACLE TOGETHER AND RECOVER THE ASTROLABE!\"" },
+    { time: 75.57, text: "\"HOLD YOUR GROUND UNTIL THE GALE CLEARS! I WILL BE WAITING FOR YOU AT THE EDGE OF THE SANDS!\"" },
+    { time: 83.21, text: "[ ANTENNA MAST TORN DOWN · CARRIER COLLAPSED · RECONNECT IN THE DESERT PATH ]" }
+  ];
+
+  // Radio Transceiver DOM Elements
+  const radioAudio = document.getElementById('radio-audio-element');
+  const btnTuneBroadcast = document.getElementById('btn-tune-broadcast');
+  const radioDeckControls = document.getElementById('radio-deck-controls');
+  const radioTimeCurrent = document.getElementById('radio-time-current');
+  const radioTimeTotal = document.getElementById('radio-time-total');
+  const radioSeekSlider = document.getElementById('radio-seek-slider');
+  const radioScrubberFill = document.getElementById('radio-scrubber-fill');
+  const btnRadioPlayPause = document.getElementById('btn-radio-play-pause');
+  const radioPlayIcon = document.getElementById('radio-play-icon');
+  const radioPlayLabel = document.getElementById('radio-play-label');
+  const btnRadioRestart = document.getElementById('btn-radio-restart');
+  const btnRadioMute = document.getElementById('btn-radio-mute');
+  const radioMuteIcon = document.getElementById('radio-mute-icon');
+  const radioVolSlider = document.getElementById('radio-vol-slider');
+  const radioVolPercent = document.getElementById('radio-vol-percent');
+  const transcriptBox = document.getElementById('sandstorm-transcript-box');
+  const transcriptText = document.getElementById('sandstorm-transcript-text');
+  const transcriptSub = document.getElementById('sandstorm-transcript-sub');
+  const scopeCanvas = document.getElementById('radio-oscilloscope-canvas');
+  const scopeCtx = scopeCanvas ? scopeCanvas.getContext('2d') : null;
+
+  let isRadioPlaying = false;
+  let isSeekingRadio = false;
+  let activeSubtitleIndex = -1;
+  let prevRadioVolume = 1.0;
+
+  function formatTime(sec) {
+    if (isNaN(sec) || sec < 0) return "00:00";
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function resizeScopeCanvas() {
+    if (!scopeCanvas) return;
+    scopeCanvas.width = scopeCanvas.offsetWidth || 600;
+    scopeCanvas.height = scopeCanvas.offsetHeight || 70;
+  }
+  window.addEventListener('resize', resizeScopeCanvas);
+
+  function updateSubtitles(sec) {
+    if (!transcriptText) return;
+    let targetIdx = 0;
+    for (let i = 0; i < SANDSTORM_SUBTITLES.length; i++) {
+      if (sec >= SANDSTORM_SUBTITLES[i].time) {
+        targetIdx = i;
+      }
+    }
+    if (targetIdx !== activeSubtitleIndex) {
+      activeSubtitleIndex = targetIdx;
+      transcriptText.classList.add('line-switching');
+      setTimeout(() => {
+        transcriptText.innerText = SANDSTORM_SUBTITLES[targetIdx].text;
+        transcriptText.classList.remove('line-switching');
+      }, 150);
+    }
+  }
+
+  // CRT Phosphor Oscilloscope (Amber/Desert Glow)
+  function renderPhosphorScope() {
+    requestAnimationFrame(renderPhosphorScope);
+    if (!scopeCanvas || !scopeCtx) return;
+
+    const sw = scopeCanvas.width;
+    const sh = scopeCanvas.height;
+    scopeCtx.clearRect(0, 0, sw, sh);
+
+    // Central guideline
+    scopeCtx.strokeStyle = 'rgba(217, 119, 6, 0.2)';
+    scopeCtx.lineWidth = 1;
+    scopeCtx.beginPath();
+    scopeCtx.moveTo(0, sh * 0.5);
+    scopeCtx.lineTo(sw, sh * 0.5);
+    scopeCtx.stroke();
+
+    const t = radioAudio ? (radioAudio.currentTime || 0) : 0;
+    const isLive = isRadioPlaying && radioAudio && !radioAudio.paused;
+    const timeNow = Date.now() * 0.005;
+
+    if (isLive) {
+      // Audio speech cadence & storm tremor
+      const energy = (0.5 + Math.sin(t * 7.5) * 0.28 + Math.cos(t * 18.0) * 0.18) * (radioAudio.muted ? 0 : radioAudio.volume);
+      const isStormPeak = energy > 0.72;
+
+      scopeCtx.lineWidth = isStormPeak ? 2.5 : 1.8;
+      scopeCtx.strokeStyle = isStormPeak ? '#ef4444' : '#f59e0b';
+      scopeCtx.shadowColor = isStormPeak ? '#ef4444' : '#fbbf24';
+      scopeCtx.shadowBlur = isStormPeak ? 14 : 7;
+      scopeCtx.beginPath();
+
+      const points = 72;
+      const step = sw / points;
+      for (let i = 0; i <= points; i++) {
+        const x = i * step;
+        const carrier = Math.sin(i * 0.22 + timeNow * 3.8);
+        const voiceMod = Math.sin(i * 0.42 - timeNow * 5.2) * Math.cos(i * 0.14);
+        const noise = (Math.random() - 0.5) * (isStormPeak ? 10 : 5);
+        const amp = energy * (sh * 0.42);
+        const y = (sh * 0.5) + (carrier * voiceMod * amp) + noise;
+
+        if (i === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+      scopeCtx.shadowBlur = 0;
+    } else {
+      // Idle carrier sine wave
+      const idleTime = Date.now() * 0.003;
+      scopeCtx.lineWidth = 1.4;
+      scopeCtx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+      scopeCtx.beginPath();
+      for (let x = 0; x < sw; x += 4) {
+        const y = (sh * 0.5) + Math.sin(x * 0.05 + idleTime) * 3.5;
+        if (x === 0) scopeCtx.moveTo(x, y);
+        else scopeCtx.lineTo(x, y);
+      }
+      scopeCtx.stroke();
+    }
+  }
+
+  function playRadio() {
+    if (!radioAudio) return;
+    resizeScopeCanvas();
+    if (btnTuneBroadcast) btnTuneBroadcast.style.display = 'none';
+    if (radioDeckControls) radioDeckControls.style.display = 'flex';
+
+    if (transcriptSub) {
+      transcriptSub.innerText = "RECEIVING LIVE EMERGENCY BROADCAST · ICARUS TRANSMITTING AMIDST GALE";
+    }
+
+    radioAudio.play().then(() => {
+      isRadioPlaying = true;
+      if (radioPlayIcon) radioPlayIcon.innerText = "❚❚";
+      if (radioPlayLabel) radioPlayLabel.innerText = "Pause";
+      if (radioOverloadState) {
+        radioOverloadState.textContent = 'SIGNAL CRITICAL · SANDSTORM ENGULFING ANTENNA';
+        radioOverloadState.style.color = '#ef4444';
+      }
+    }).catch(err => {
+      console.warn("Autoplay notice:", err.message);
+      isRadioPlaying = false;
+      if (radioPlayIcon) radioPlayIcon.innerText = "▶";
+      if (radioPlayLabel) radioPlayLabel.innerText = "Play";
+    });
+  }
+
+  function pauseRadio() {
+    if (!radioAudio) return;
+    radioAudio.pause();
+    isRadioPlaying = false;
+    if (radioPlayIcon) radioPlayIcon.innerText = "▶";
+    if (radioPlayLabel) radioPlayLabel.innerText = "Resume";
+    if (transcriptSub) {
+      transcriptSub.innerText = "CARRIER PAUSED · 142.85 MHz SQUELCH OPEN";
+    }
+  }
+
+  function initRadioTransceiver() {
+    if (!radioAudio) return;
+
+    if (btnTuneBroadcast) {
+      btnTuneBroadcast.addEventListener('click', () => {
+        sfx.playClick();
+        playRadio();
+      });
+    }
+
+    if (btnRadioPlayPause) {
+      btnRadioPlayPause.addEventListener('click', () => {
+        sfx.playClick();
+        if (isRadioPlaying) pauseRadio();
+        else playRadio();
+      });
+    }
+
+    if (btnRadioRestart) {
+      btnRadioRestart.addEventListener('click', () => {
+        sfx.playClick();
+        radioAudio.currentTime = 0;
+        playRadio();
+      });
+    }
+
+    if (btnRadioMute) {
+      btnRadioMute.addEventListener('click', () => {
+        radioAudio.muted = !radioAudio.muted;
+        if (radioMuteIcon) radioMuteIcon.innerText = radioAudio.muted ? "🔇" : "🔊";
+      });
+    }
+
+    if (radioVolSlider) {
+      radioVolSlider.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        radioAudio.volume = val;
+        radioAudio.muted = (val === 0);
+        if (radioMuteIcon) radioMuteIcon.innerText = radioAudio.muted ? "🔇" : "🔊";
+        if (radioVolPercent) radioVolPercent.innerText = Math.round(val * 100) + "%";
+      });
+    }
+
+    if (radioSeekSlider) {
+      radioSeekSlider.addEventListener('input', (e) => {
+        isSeekingRadio = true;
+        const val = parseFloat(e.target.value);
+        if (radioTimeCurrent) radioTimeCurrent.innerText = formatTime(val);
+        if (radioScrubberFill && radioAudio.duration) {
+          const pct = (val / radioAudio.duration) * 100;
+          radioScrubberFill.style.width = pct + "%";
+        }
+      });
+      radioSeekSlider.addEventListener('change', (e) => {
+        radioAudio.currentTime = parseFloat(e.target.value);
+        isSeekingRadio = false;
+      });
+    }
+
+    radioAudio.addEventListener('loadedmetadata', () => {
+      if (radioTimeTotal && radioAudio.duration) {
+        radioTimeTotal.innerText = formatTime(radioAudio.duration);
+        if (radioSeekSlider) radioSeekSlider.max = radioAudio.duration.toFixed(1);
+      }
+    });
+
+    radioAudio.addEventListener('timeupdate', () => {
+      const cur = radioAudio.currentTime;
+      const dur = radioAudio.duration || 82.46;
+      if (!isSeekingRadio) {
+        if (radioTimeCurrent) radioTimeCurrent.innerText = formatTime(cur);
+        if (radioSeekSlider) radioSeekSlider.value = cur;
+        if (radioScrubberFill) {
+          const pct = (cur / dur) * 100;
+          radioScrubberFill.style.width = pct + "%";
+        }
+      }
+      updateSubtitles(cur);
+    });
+
+    radioAudio.addEventListener('ended', () => {
+      isRadioPlaying = false;
+      if (radioPlayIcon) radioPlayIcon.innerText = "↺";
+      if (radioPlayLabel) radioPlayLabel.innerText = "Replay";
+      if (radioOverloadState) {
+        radioOverloadState.textContent = 'CARRIER COLLAPSED // ANTENNA LOST';
+        radioOverloadState.style.color = '#9ca3af';
+      }
+      if (transcriptSub) {
+        transcriptSub.innerText = "TRANSMISSION CONCLUDED · PROCEED TO THE DESERT PATH";
+      }
+      const btnDesert = document.getElementById('btn-climax-desert');
+      if (btnDesert) {
+        btnDesert.style.animation = 'alarmPulse 1.4s infinite alternate';
+      }
+    });
+
+    renderPhosphorScope();
+  }
 
   function triggerClimaxSequence() {
-    state.isCompleted = true;
+    sfx.playClick();
     sfx.playProphecyResolved();
 
     // Mark completion in storage for Hub navigation and route map
@@ -660,44 +908,138 @@
       localStorage.setItem(`seeker_${activeSeeker}_cipher_completed`, 'true');
     } catch (e) {}
 
-    // 1. Atmosphere Shift to Red & Storm Howl
+    // Atmosphere Shift & Modal Display for Emergency Radio
+    openRadioModal();
+  }
+
+  function openRadioModal() {
+    if (!radioModalOverlay) return;
+    radioModalOverlay.classList.add('active');
+    radioModalOverlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('sandstorm-active');
+    document.body.style.overflow = 'hidden';
+
     setTimeout(() => {
-      document.body.classList.add('sandstorm-active');
-      sfx.startStormSound();
-      if (radioPill) {
-        radioPill.style.borderColor = '#ef4444';
-        radioPill.style.background = 'rgba(185, 28, 28, 0.4)';
-        radioPill.querySelector('.radio-state').textContent = '⚡ CARRIER OVERLOAD';
-        radioPill.querySelector('.radio-state').style.color = '#fca5a5';
+      resizeScopeCanvas();
+      playRadio();
+    }, 300);
+  }
+
+  function closeRadioModal() {
+    if (!radioModalOverlay) return;
+    radioModalOverlay.classList.remove('active');
+    radioModalOverlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('sandstorm-active');
+    document.body.style.overflow = '';
+    pauseRadio();
+  }
+
+  // ── 4B. Climax Reward & Spoils Modal Controller ──
+  const rewardModalOverlay = document.getElementById('reward-modal-overlay');
+  const rewardModalBackdrop = document.getElementById('reward-modal-backdrop');
+  const btnCloseRewardModal = document.getElementById('btn-close-reward-modal');
+  const btnClimaxDesert = document.getElementById('btn-climax-desert');
+
+  function openRewardModal() {
+    if (radioModalOverlay) closeRadioModal();
+    if (!rewardModalOverlay) return;
+
+    rewardModalOverlay.classList.add('active');
+    rewardModalOverlay.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    // Persist all completion flags to local storage
+    try {
+      localStorage.setItem('order_cipher_completed', 'true');
+      localStorage.setItem('order_sandstorm_triggered', 'true');
+      localStorage.setItem('order_desert_path_unlocked', 'true');
+      localStorage.setItem('order_cipher_reward_claimed', 'true');
+      const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+      localStorage.setItem(`seeker_${activeSeeker}_cipher_completed`, 'true');
+      localStorage.setItem(`seeker_silvia_cipher_completed`, 'true');
+    } catch (e) {}
+
+    sfx.playProphecyResolved();
+  }
+
+  function closeRewardModal() {
+    if (!rewardModalOverlay) return;
+    rewardModalOverlay.classList.remove('active');
+    rewardModalOverlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (btnClimaxDesert) {
+    btnClimaxDesert.addEventListener('click', () => {
+      sfx.playClick();
+      openRewardModal();
+    });
+  }
+
+  if (btnCloseRewardModal) {
+    btnCloseRewardModal.addEventListener('click', () => {
+      sfx.playClick();
+      closeRewardModal();
+    });
+  }
+
+  if (rewardModalBackdrop) {
+    rewardModalBackdrop.addEventListener('click', () => {
+      sfx.playClick();
+      closeRewardModal();
+    });
+  }
+
+  if (btnTransmitStory) {
+    btnTransmitStory.addEventListener('click', triggerClimaxSequence);
+  }
+
+  if (btnCloseRadioModal) {
+    btnCloseRadioModal.addEventListener('click', () => {
+      sfx.playClick();
+      closeRadioModal();
+    });
+  }
+
+  if (radioModalBackdrop) {
+    radioModalBackdrop.addEventListener('click', () => {
+      sfx.playClick();
+      closeRadioModal();
+    });
+  }
+
+  if (btnOpenStoryAgain) {
+    btnOpenStoryAgain.addEventListener('click', () => {
+      sfx.playClick();
+      closeRadioModal();
+    });
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (rewardModalOverlay && rewardModalOverlay.classList.contains('active')) {
+        closeRewardModal();
+      } else if (radioModalOverlay && radioModalOverlay.classList.contains('active')) {
+        closeRadioModal();
       }
-    }, 900);
-
-    // 2. Open Climax Modal
-    setTimeout(() => {
-      if (climaxModal) climaxModal.classList.add('modal-open');
-      typewriteDispatch(DISPATCH_TRANSCRIPT, 0);
-    }, 1800);
-  }
-
-  function typewriteDispatch(text, charIndex) {
-    if (!typewriterTextEl) return;
-    if (charIndex <= text.length) {
-      typewriterTextEl.textContent = text.slice(0, charIndex);
-      setTimeout(() => {
-        typewriteDispatch(text, charIndex + 1);
-      }, 22);
-    } else {
-      // Finished typing: Carrier Drops
-      setTimeout(() => {
-        if (radioOverloadState) {
-          radioOverloadState.textContent = 'CARRIER LOST // SIGNAL DROPPED';
-          radioOverloadState.style.color = '#9ca3af';
-        }
-      }, 1200);
     }
-  }
+  });
 
-  // ── 7. Atmospheric Sandstorm Canvas Engine ──
+  // Check URL triggers (e.g. ?mode=radio or #reward)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    if (urlParams.get('mode') === 'radio' || hash === '#radio' || hash === '#radio-modal-overlay') {
+      setTimeout(openRadioModal, 500);
+    } else if (urlParams.get('mode') === 'reward' || hash === '#reward' || hash === '#reward-modal-overlay') {
+      setTimeout(openRewardModal, 500);
+    }
+  } catch (e) {}
+
+  // Initialize Transceiver Engine
+  initRadioTransceiver();
+
+  // ── 5. Atmospheric Continuous Particle Canvas Engine ──
   const sandCanvas = document.getElementById('sandstorm-canvas');
   if (sandCanvas) {
     const ctx = sandCanvas.getContext('2d');
@@ -709,111 +1051,122 @@
       height = sandCanvas.height = window.innerHeight;
     });
 
-    const GRAIN_COUNT = 240;
+    const GRAIN_COUNT = 160;
     const grains = [];
     for (let i = 0; i < GRAIN_COUNT; i++) {
       grains.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: -(Math.random() * 5.0 + 3.0),
-        vy: (Math.random() - 0.25) * 1.5,
-        size: Math.random() * 2.0 + 0.8,
-        alpha: Math.random() * 0.5 + 0.2,
-        color: Math.random() > 0.4 ? '#f59e0b' : '#fbbf24'
+        vx: -(Math.random() * 2.8 + 0.8),
+        vy: (Math.random() - 0.25) * 0.8,
+        size: Math.random() * 2.2 + 0.6,
+        alpha: Math.random() * 0.5 + 0.25,
+        phase: Math.random() * Math.PI * 2,
+        twinkleSpeed: Math.random() * 0.04 + 0.015,
+        isSpikeStar: Math.random() < 0.14,
       });
     }
 
-    function renderSand() {
+    let animTime = 0;
+
+    function renderAtmosphere() {
       ctx.clearRect(0, 0, width, height);
+      animTime += 0.02;
 
       const isStorm = document.body.classList.contains('sandstorm-active');
-      const speedMult = isStorm ? 2.4 : 1.0;
+      const activeSpeedMult = isStorm ? 3.6 : currentParticleSpeed;
+
+      const c1 = isStorm ? [239, 68, 68] : currentParticleRGB1;
+      const c2 = isStorm ? [249, 115, 22] : currentParticleRGB2;
+      const c1Str = c1.join(', ');
+      const c2Str = c2.join(', ');
 
       for (let g of grains) {
-        g.x += g.vx * speedMult;
-        g.y += g.vy * speedMult;
+        g.phase += g.twinkleSpeed;
+        const twinkle = Math.sin(g.phase) * 0.35 + 0.65;
 
-        if (g.x < -10) {
-          g.x = width + Math.random() * 20;
-          g.y = Math.random() * height;
+        if (currentChapter === 4 && !isStorm) {
+          // Chapter IV: Golden stardust & embers float upwards toward the night sky
+          g.x += g.vx * 0.35 * activeSpeedMult;
+          g.y -= (Math.abs(g.vy) + 0.45) * activeSpeedMult;
+          if (g.y < -15) {
+            g.y = height + 15;
+            g.x = Math.random() * width;
+          }
+        } else if (currentChapter === 3 && !isStorm) {
+          // Chapter III: Cold ash flakes drift slowly downward with gentle horizontal sway
+          g.x += (Math.sin(animTime + g.phase) * 0.6 + g.vx * 0.3) * activeSpeedMult;
+          g.y += (Math.abs(g.vy) * 0.5 + 0.4) * activeSpeedMult;
+          if (g.y > height + 15) {
+            g.y = -15;
+            g.x = Math.random() * width;
+          }
+        } else if (currentChapter === 2 || isStorm) {
+          // Chapter II & Climax: Fast horizontal tempest gusts with wind streaks
+          g.x += (g.vx * 2.4) * activeSpeedMult;
+          g.y += (g.vy * 1.5 + Math.sin(animTime * 2 + g.phase) * 0.4) * activeSpeedMult;
+
+          if (g.x < -30) {
+            g.x = width + Math.random() * 40;
+            g.y = Math.random() * height;
+          }
+          if (g.y > height + 20) g.y = -10;
+          if (g.y < -20) g.y = height + 10;
+        } else {
+          // Chapter I: Crystalline alpine stars & slow silver stardust drift
+          g.x += g.vx * 0.6 * activeSpeedMult;
+          g.y += g.vy * 0.4 * activeSpeedMult;
+
+          if (g.x < -15) {
+            g.x = width + Math.random() * 20;
+            g.y = Math.random() * height;
+          }
+          if (g.y > height + 15) g.y = -10;
+          if (g.y < -15) g.y = height + 10;
         }
-        if (g.y > height + 10) g.y = -5;
-        if (g.y < -10) g.y = height + 5;
 
-        ctx.fillStyle = isStorm ? '#ef4444' : g.color;
-        ctx.globalAlpha = isStorm ? Math.min(1, g.alpha * 1.6) : g.alpha;
-        ctx.beginPath();
-        ctx.arc(g.x, g.y, g.size * (isStorm ? 1.4 : 1), 0, Math.PI * 2);
-        ctx.fill();
+        const isSecondary = (g.phase % 2 > 1);
+        ctx.fillStyle = isSecondary ? `rgb(${c2Str})` : `rgb(${c1Str})`;
+        const finalAlpha = isStorm 
+          ? Math.min(1, g.alpha * 1.4) 
+          : (currentChapter === 1 ? g.alpha * twinkle : g.alpha);
+
+        ctx.globalAlpha = Math.max(0.08, Math.min(1, finalAlpha));
+
+        if ((currentChapter === 2 || isStorm) && g.size > 1.2) {
+          // Draw streak tail for windstorm
+          ctx.beginPath();
+          ctx.moveTo(g.x, g.y);
+          ctx.lineTo(g.x + 14 * (isStorm ? 2 : 1), g.y - g.vy * 4);
+          ctx.strokeStyle = `rgb(${c1Str})`;
+          ctx.lineWidth = g.size * 0.8;
+          ctx.stroke();
+        } else {
+          // Draw circular star / grain
+          ctx.beginPath();
+          ctx.arc(g.x, g.y, g.size * (isStorm ? 1.25 : 1), 0, Math.PI * 2);
+          ctx.fill();
+
+          // Delicate 4-point cross diffraction spike for bright stars in Chapter 1 & 4
+          if ((currentChapter === 1 || currentChapter === 4) && g.isSpikeStar && g.size > 1.4 && twinkle > 0.75) {
+            const spikeLen = g.size * 4.2 * twinkle;
+            ctx.strokeStyle = isSecondary ? `rgba(${c2Str}, 0.45)` : `rgba(${c1Str}, 0.55)`;
+            ctx.lineWidth = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(g.x - spikeLen, g.y);
+            ctx.lineTo(g.x + spikeLen, g.y);
+            ctx.moveTo(g.x, g.y - spikeLen);
+            ctx.lineTo(g.x, g.y + spikeLen);
+            ctx.stroke();
+          }
+        }
       }
 
       ctx.globalAlpha = 1.0;
-      requestAnimationFrame(renderSand);
+      requestAnimationFrame(renderAtmosphere);
     }
 
-    requestAnimationFrame(renderSand);
+    requestAnimationFrame(renderAtmosphere);
   }
-
-  // ── 8. Controls & Initialization ──
-  const btnPrev = document.getElementById('btn-dial-prev');
-  const btnNext = document.getElementById('btn-dial-next');
-  const btnAutoSolve = document.getElementById('btn-quick-solve');
-  const btnReplay = document.getElementById('btn-replay-cipher');
-
-  if (btnPrev) {
-    btnPrev.addEventListener('click', () => {
-      const curIdx = ROMANS.indexOf(state.selectedRoman);
-      const prevIdx = (curIdx - 1 + 12) % 12;
-      setDialPosition(ROMANS[prevIdx], state.selectedBand);
-    });
-  }
-
-  if (btnNext) {
-    btnNext.addEventListener('click', () => {
-      const curIdx = ROMANS.indexOf(state.selectedRoman);
-      const nextIdx = (curIdx + 1) % 12;
-      setDialPosition(ROMANS[nextIdx], state.selectedBand);
-    });
-  }
-
-  declTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const band = tab.getAttribute('data-band');
-      setDialPosition(state.selectedRoman, band);
-    });
-  });
-
-  if (btnAutoSolve) {
-    btnAutoSolve.addEventListener('click', () => {
-      TARGET_WORDS.forEach((word, wIdx) => {
-        for (let lIdx = 0; lIdx < word.length; lIdx++) {
-          state.userLetters[wIdx][lIdx] = word[lIdx];
-          const flatIdx = flatSightings.findIndex(f => f.groupIndex === wIdx && f.letterIndex === lIdx);
-          const box = document.querySelector(`.letter-box[data-flat-idx="${flatIdx}"]`);
-          if (box) box.value = word[lIdx];
-        }
-      });
-      sfx.playClick();
-      updateValidation();
-    });
-  }
-
-  if (btnReplay) {
-    btnReplay.addEventListener('click', () => {
-      if (climaxModal) climaxModal.classList.remove('modal-open');
-      document.body.classList.remove('sandstorm-active');
-      state.isCompleted = false;
-      state.userLetters = ["", "", "", "", ""].map((_, i) => new Array(TARGET_WORDS[i].length).fill(""));
-      renderProphecyBoxes();
-      setActiveSighting(0);
-    });
-  }
-
-  // Initial Assembly
-  renderDial();
-  renderSightingLog();
-  renderProphecyBoxes();
-  setDialPosition("IV", "+45°", false);
-  setActiveSighting(0);
 
 })();

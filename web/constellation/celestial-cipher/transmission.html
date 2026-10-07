@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Station 09: Emergency Radio Transmission · 142.85 MHz · The Eclipse Order</title>
+  <meta name="description" content="Master 142.85 MHz emergency shortwave broadcast from the Cartographer of Distant Light during the southern sandstorm at Deserti Limen.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Shared Navigator & Codex Stylesheet -->
+  <link rel="stylesheet" href="../../shared/navigator.css">
+
+  <!-- Station 09 Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=26.0">
+
+  <style>
+    body.transmission-standalone {
+      background: #090503;
+      color: #f3ece0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 16px 60px;
+      overflow-x: hidden;
+    }
+    .standalone-container {
+      width: 100%;
+      max-width: 860px;
+      margin: 20px auto 0;
+      z-index: 10;
+      position: relative;
+    }
+    .standalone-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .standalone-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: #fbbf24;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 999px;
+      background: rgba(20, 10, 5, 0.85);
+      backdrop-filter: blur(8px);
+      margin-bottom: 14px;
+    }
+    .standalone-badge .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 10px #ef4444;
+      animation: pulseGlow 1.5s infinite alternate;
+    }
+    .standalone-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      color: #fff;
+      background: linear-gradient(180deg, #ffffff 0%, #fed7aa 40%, #f59e0b 80%, #b45309 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0 0 8px 0;
+    }
+    .standalone-sub {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.15rem;
+      color: #d1c7b7;
+      font-style: italic;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body class="transmission-standalone sandstorm-active">
+
+  <!-- Background Sandstorm Canvas -->
+  <canvas id="sandstorm-canvas" style="position: fixed; inset: 0; pointer-events: none; z-index: 1;"></canvas>
+
+  <div class="standalone-container">
+    <header class="standalone-header">
+      <div class="standalone-badge">
+        <span class="live-dot"></span>
+        <span>THE ECLIPSE ORDER · CONSTELLATION PATH // 142.85 MHz</span>
+      </div>
+      <h1 class="standalone-title">Dispatch 09-A: The Sandstorm Wire</h1>
+      <p class="standalone-sub">
+        Intercepted master transmission from The Cartographer of Distant Light as the southern sandstorm engulfs the frontier canyon of Deserti Limen.
+      </p>
+    </header>
+
+    <!-- Transceiver Panel -->
+    <div class="climax-panel brass-card-frame chassis-desert" id="radio-transceiver-panel">
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+
+      <!-- Warning Header & Status Lights -->
+      <div class="radio-top-bar">
+        <div class="radio-brand">
+          <span class="brand-title">MIL-SPEC DESERT TRANSCEIVER // 142.85 MHz</span>
+          <span class="brand-sep">·</span>
+          <span id="radio-current-title">DISPATCH 09-A // EMERGENCY WIRE: THE SANDSTORM ENGULFS ICARUS</span>
+        </div>
+        <div class="radio-status-lights">
+          <span class="led-indicator">
+            <span class="led-bulb red active" id="led-radio-rx"></span>
+            <span>RX CARRIER</span>
+          </span>
+          <span class="led-indicator">
+            <span class="led-bulb amber active" id="led-radio-tx"></span>
+            <span>SANDSTORM TREMOR</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Cartographer Sender Profile -->
+      <div class="dispatch-sender-tag">
+        <div class="sender-avatar-portrait">
+          <img src="./assets/logo-path-constellation.png" alt="The Constellation Path Seal" class="sender-portrait-img">
+          <span class="sender-radio-dot"></span>
+        </div>
+        <div>
+          <div class="sender-name">Icarus · The Cartographer of Distant Light</div>
+          <div class="sender-loc">High Ridge Overlook · Frontier Gate of Deserti Limen // 142.85 MHz</div>
+        </div>
+      </div>
+
+      <!-- Real-Time Phosphor Oscilloscope (Amber CRT Glow) -->
+      <div class="radio-overload-box">
+        <div class="overload-header">
+          <span class="freq-tag">FREQ 142.85 MHz // SHORTWAVE CARRIER</span>
+          <span class="signal-tag" id="radio-overload-state">SIGNAL DETECTED · SANDSTORM ENGULFING ANTENNA</span>
+        </div>
+        <div class="oscilloscope-screen">
+          <canvas id="radio-oscilloscope-canvas" width="600" height="70"></canvas>
+          <div class="crt-scanlines"></div>
+        </div>
+      </div>
+
+      <!-- Synchronized Active Subtitles Teletype -->
+      <div class="sandstorm-transcript-box active-subtitles" id="sandstorm-transcript-box">
+        <div class="sandstorm-transcript-text" id="sandstorm-transcript-text">
+          [ 142.85 MHz SHORTWAVE LOCKED · SOUTHERN SANDSTORM OVERRIDE... ]
+        </div>
+        <div class="sandstorm-transcript-sub" id="sandstorm-transcript-sub">
+          RECEIVING EMERGENCY SHORTWAVE RELAY // ICARUS TRANSMITTING AMIDST GALE
+        </div>
+      </div>
+
+      <!-- Interactive Audio Deck & Controls -->
+      <div class="action-container">
+        <button type="button" class="btn-tune btn-tune-desert" id="btn-tune-broadcast">
+          <span>📻</span>
+          <span>TUNE 142.85 MHz // DECRYPT CARTOGRAPHER'S EMERGENCY CALL</span>
+          <span>⚡</span>
+        </button>
+
+        <div class="radio-deck" id="radio-deck-controls" style="display: none;">
+          <div class="deck-timeline-row">
+            <span class="time-readout" id="radio-time-current">00:00</span>
+            <div class="scrubber-track-wrap">
+              <div class="scrubber-progress-bar" id="radio-scrubber-fill"></div>
+              <input type="range" id="radio-seek-slider" class="seek-slider" min="0" max="82.46" step="0.1" value="0">
+            </div>
+            <span class="time-readout" id="radio-time-total">01:22</span>
+          </div>
+
+          <div class="deck-controls-row">
+            <button type="button" class="deck-btn" id="btn-radio-restart" title="Restart Transmission">
+              <span>⏮</span>
+              <span>Restart</span>
+            </button>
+
+            <button type="button" class="deck-btn btn-primary-play" id="btn-radio-play-pause" title="Play or Pause">
+              <span id="radio-play-icon">❚❚</span>
+              <span id="radio-play-label">Pause</span>
+            </button>
+
+            <div class="deck-vol-group">
+              <button type="button" class="deck-btn-mute" id="btn-radio-mute" title="Mute/Unmute">
+                <span id="radio-mute-icon">🔊</span>
+              </button>
+              <div class="vol-slider-wrap">
+                <input type="range" id="radio-vol-slider" class="vol-slider" min="0" max="1" step="0.02" value="1">
+              </div>
+              <span class="vol-percent" id="radio-vol-percent">100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio Element for Master Emergency Broadcast -->
+      <audio id="radio-audio-element" preload="auto" src="./audio/cartographer_sandstorm_emergency.mp3"></audio>
+
+      <!-- Climax Actions -->
+      <div class="climax-actions-row">
+        <a href="./index.html#reward" class="btn-climax-hub" id="btn-standalone-reward" title="Claim Field Rewards">
+          <span>✦ Claim Field Rewards & Enter Desert Path ➔</span>
+        </a>
+        <a href="./index.html" class="btn-climax-replay">
+          <span>▲ Read Folio Limen Manuscript</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../../shared/navigator.js"></script>
+  <script src="./cipher.js"></script>
+</body>
+</html>

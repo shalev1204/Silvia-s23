@@ -359,23 +359,37 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
      - Grupo III: (III, +15°), (VIII, +45°), (X, -15°), (VI, +45°), (IV, -15°), (XII, -45°) ➔ `A`, `L`, `W`, `A`, `Y`, `S`.
      - Grupo IV: (I, -15°), (VII, +45°), (V, -45°) ➔ `T`, `H`, `E`.
      - Grupo V: (X, +15°), (III, -45°), (VIII, -15°), (VI, -45°), (IX, +45°), (II, -45°), (XI, +15°), (XII, +15°) ➔ `T`, `R`, `E`, `A`, `S`, `U`, `R`, `E`.
-3. **La Profecía Decodificada del Cartógrafo**:
-   - Frase resultante: `"YOU WERE ALWAYS THE TREASURE"`.
-   - Conexión emocional directa con la profecía del primer pergamino de la aventura.
+3. **El Voto de Icarus & La Revelación del Cartógrafo**:
+   - Frase resultante del disco: `"YOU WERE ALWAYS THE TREASURE"`.
+   - **Canon de la Historia**:
+     - Esta frase **NO va dirigida a Silvia**. Silvia comprende que no es un mensaje sobre ella, sino un registro íntimo y desgarrador del pasado.
+     - El Cartógrafo se llamaba realmente **Icarus** cuando era un joven y febril astrónomo en el Observatorio Alpino (Anno 1970).
+     - Vivía con su gran amor, **Aurelia**, una artista y astrónoma que iluminaba sus cartas celestes con tinta índigo y pan de plata. Icarus estaba ciegamente obsesionado con descifrar la arquitectura de las **Tres Antiguas Torres** (Observatorio Alpino, Torre de Arenisca del desierto y Torre Escenario) y hallar bóvedas de los fundadores que le dieran renombre.
+     - Una mañana, tras desplomarse por el agotamiento, despertó y vio a Aurelia temblando de frío en su banco, con las manos entintadas, completando sus cálculos para que su trabajo no se perdiera. Comprendiendo al fin su arrogancia, Icarus forjó para ella el disco maestro de coordenadas de 24 posiciones como una confesión de amor y arrepentimiento. Se lo entregó en la terraza y le susurró: *"Aurelia... todos estos años buscando tesoros en piedras frías... Estaba ciego. Tú siempre fuiste el tesoro."*
+     - Durante la Primera Gran Catástrofe (Otoño de 1971), un terremoto y una colosal tormenta roja destrozaron los cimientos del observatorio en Deserti Limen. Al evacuar, Aurelia regresó al estudio en llamas para rescatar el disco de bronce y las cartas de Icarus. Al cruzar el Puente Meridional, los arcos colapsaron y Aurelia cayó al abismo del desierto con el disco apretado contra el pecho.
+     - Enloquecido de culpa, Icarus quemó todos los registros que llevaban su nombre, juró no volver a pronunciar el nombre de *Icarus* y adoptó el título sobrio de **« The Cartographer »**.
+     - **1971–1998 (27 años de vigilia y reconstrucción)**: Durante casi tres décadas reconstruyó el Observatorio Alpino en las cumbres y trazó las 9 estaciones del **Constellation Path** (matemáticas celestes), usando sus telescopios de día para escanear el cañón de Deserti Limen buscando el disco de bronce o rastros de Aurelia.
+     - **Otoño de 1998 (Expedición de frontera)**: Realizó la prospección de agrimensura al borde del abismo registrada en su cuaderno de campo (`page07_back`). Firmó estrictamente como **« The Cartographer »**. Al no hallar respuesta, creyó que Aurelia y el disco estaban perdidos para siempre.
+     - **Otoño de 2016 (Anno 2016 — Diez años antes de la Llamada)**: En una vigilia nocturna con su telescopio hacia las ruinas de la Torre de Arenisca en el desierto, divisó un haz dorado pulsando rítmicamente (3 cortos, pausa, 2 largos: el código del disco de Aurelia). Renace su esperanza y adopta el título: **« The Cartographer of Distant Light »**.
+     - Durante los 10 años siguientes (2016–2026), construye **The Astrolabe of Distant Light** para calcular la alineación celestial de las Tres Antiguas Torres.
+     - **2026 (Presente)**: Asaltantes atacan el observatorio y roban el Astrolabio, llevándolo al desierto. El Cartógrafo contacta a Silvia por radio (142.85 MHz). Silvia completa el Constellation Path (matemáticas), transmite el voto recuperado de Icarus y se prepara para adentrarse en el **Desert Path** (donde mandan los idiomas y dialectos antiguos) para recuperar el Astrolabio y llegar hasta la Luz Distante.
+   - **Flujo de Juego (Journal ➔ Web)**:
+     - En el **Journal físico (Hoja 7)**: Silvia resuelve el cruce del disco de coordenadas sobre papel y descubre las 5 palabras.
+     - En el **Web Hub (Station 09)**: Silvia accede directamente a la experiencia novelada completa (*"The Man Behind the Maps"*), escrita con prosa literaria, profunda y dramática, donde descubre la verdad.
+     - Al finalizar la lectura, transmite el voto de Icarus por radio para devolverle su verdadero nombre.
 
 ### ⚡ El Clímax Narrativo: La Gran Tormenta de Arena del Sur
 - **El Evento Ineludible**:
-  - Al validar la profecía, la atmósfera cambia violentamente en la pantalla y el sonido: un vendaval atronador ruge en el horizonte.
-  - La **Tormenta de Arena del Sur** golpea con furia ciega las crestas montañosas.
-  - Las nubes de polvo cubren el cielo, sepultando las rodadas y huellas de los forajidos en cuestión de segundos.
+  - Al transmitir el voto recuperado, la atmósfera de la pantalla cambia violentamente: el cielo se tiñe de rojo sangre y el vendaval ruge a través de los riscos de Deserti Limen.
 - **Ruptura de la Portadora de Radio (142.85 MHz)**:
-  - La señal se satura de estática ensordecedora y armónicos distorsionados.
-  - Última transmisión entrecortada del Cartógrafo:
-    *«¡Silvia! ¡La tormenta ha estallado sin previo aviso! El cielo se ha vuelto rojo y las arenas están borrando todo... ¡hemos perdido el rastro de los asaltantes! Es imposible seguir a pie sin guía... estamos ciegos en la inmensidad. Escucha con atención: debes abrir la siguiente hoja de mi cuaderno... encuentra al Oráculo del Desierto. Solo el Oráculo sabe leer lo que el viento ha sepultado...»*
+  - La señal se satura en el osciloscopio: `SIGNAL CRITICAL · CARRIER OVERLOAD`.
+  - Transmisión final de Icarus emocionado por haber recuperado su nombre y advirtiéndole del muro de arena:
+    *«¡Silvia! Esas palabras... pronunciaste el voto que grabé en el bronce hace diez años en la terraza del observatorio. Me has devuelto mi nombre. ¡Mira hacia la cresta! La tormenta ha estallado sin previo aviso... El cielo se ha vuelto rojo y las arenas están borrando todo... ¡hemos perdido el rastro de los asaltantes! Todas las cartas anteriores son papel muerto... La senda de las constelaciones ha terminado. Escucha con atención: abre la siguiente hoja de mi cuaderno... encuentra al Oráculo del Desierto. ¡Entra en las dunas... sigue la luz distante!»*
+  - La portadora cae: `CARRIER LOST // SIGNAL DROPPED`.
 - **Consecuencia de Gameplay**:
-  - La señal de radio se apaga.
-  - El camino directo de las constelaciones queda temporalmente bloqueado por la tempestad.
-  - Se desbloquea la entrada al **Desert Path** y la búsqueda del Oráculo.
+  - La Estación 09 queda marcada como `DECRYPTED ✓`.
+  - Se despide con emoción y dramatismo la Fase A (*Constellation Path*).
+  - Se abre el portal de acceso hacia la Fase B (*The Desert Path* y la búsqueda del Oráculo).
 
 ---
 

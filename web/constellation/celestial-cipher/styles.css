@@ -1,6 +1,6 @@
 /* ==========================================================================
    THE ECLIPSE ORDER · THE CELESTIAL CIPHER (STATION 09)
-   Master Production Stylesheet: Renaissance Brass & Sandstorm Transition
+   Master Production Stylesheet: The Man Behind the Maps & Sandstorm Climax
    ========================================================================== */
 
 :root {
@@ -10,7 +10,7 @@
   --brass-dark: #8c6d3b;
   --brass-shadow: #3b2812;
 
-  /* Palette: Starfire & Astrolabe Collimators */
+  /* Palette: Starfire & Astrolabe Accents */
   --cyan-beam: #4fe3c1;
   --cyan-glow: rgba(79, 227, 193, 0.45);
   --amber-beam: #f59e0b;
@@ -25,9 +25,8 @@
 
   /* Surfaces & Glass */
   --bg-deep: #060811;
-  --bg-card: rgba(18, 14, 24, 0.82);
+  --bg-card: rgba(18, 14, 24, 0.88);
   --bg-card-border: rgba(212, 168, 83, 0.32);
-  --bg-input: rgba(10, 8, 14, 0.88);
 }
 
 * {
@@ -39,16 +38,103 @@
 
 html, body {
   width: 100%;
-  height: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
   background-color: var(--bg-deep);
-  color: #f5eedf;
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: #fdfaf2;
+  font-family: 'Newsreader', 'Lora', Georgia, serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
-/* ── Dynamic Sky & Atmospheric Background ── */
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(10, 6, 4, 0.7);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 168, 83, 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brass-base);
+}
+
+/* ── Scenic Atmospheric Background System (Chapter by Chapter Environments) ── */
+.scenic-atmosphere-system {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+}
+
+.scenic-plate {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: translateZ(0);
+  transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity;
+  pointer-events: none;
+}
+
+/* Chapter 1: The Alpine Turret & Scriptorium */
+.scenic-plate-1.active,
+body.theme-chapter-1 .scenic-plate-1 {
+  opacity: 0.92;
+}
+
+/* Chapter 2: The Cataclysm Tempest */
+.scenic-plate-2.active,
+body.theme-chapter-2 .scenic-plate-2 {
+  opacity: 0.95;
+}
+
+/* Chapter 3: The Ashen Waste */
+.scenic-plate-3.active,
+body.theme-chapter-3 .scenic-plate-3 {
+  opacity: 0.88;
+}
+
+/* Chapter 4: The Desert Threshold & Golden Beacon */
+.scenic-plate-4.active,
+body.theme-chapter-4 .scenic-plate-4 {
+  opacity: 0.96;
+}
+
+/* Atmospheric Vignette & Contrast Depth Mask */
+.scenic-vignette-mask {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse at 50% 40%, rgba(7, 9, 18, 0.04) 0%, rgba(5, 7, 14, 0.3) 60%, rgba(2, 3, 6, 0.72) 100%);
+}
+
+/* Living Candlelight & Starlight Ambiance */
+.scenic-candlelight-warmth {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse at 80% 68%, rgba(245, 158, 11, 0.16) 0%, transparent 52%),
+              radial-gradient(ellipse at 20% 32%, rgba(56, 189, 248, 0.10) 0%, transparent 56%);
+  animation: candleAmbientFlicker 6.5s infinite ease-in-out;
+}
+
+@keyframes candleAmbientFlicker {
+  0%, 100% { opacity: 0.88; transform: scale(1); }
+  33% { opacity: 1; transform: scale(1.02); }
+  66% { opacity: 0.82; transform: scale(0.99); }
+}
+
+/* Dynamic Sky & Atmospheric Background Particles */
 #sandstorm-canvas {
   position: fixed;
   top: 0;
@@ -56,43 +142,357 @@ html, body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 .sky-backdrop-gradient {
+  display: none; /* Replaced by the living scenic-atmosphere-system */
+}
+
+/* Tactile Antique Vellum Parchment Texture Layer (Museum-grade fibrous paper) */
+.global-vellum-texture-layer {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(circle at 50% 30%, #15162a 0%, #0c0d1b 45%, #05060d 100%);
-  transition: background 2s ease, filter 2s ease;
+  z-index: 3;
+  background-image: url('./assets/texture-antique-vellum.jpg');
+  background-repeat: repeat;
+  background-size: 550px 550px;
+  mix-blend-mode: soft-light;
+  opacity: 0.16;
+}
+
+/* Renaissance Astrolabe & Cartographic Celestial Mesh Overlay */
+.celestial-chart-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.chart-svg-mesh {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.chart-group {
+  opacity: 0;
+  transform-origin: center center;
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s ease;
+}
+
+/* Dynamic Chapter Horizon Silhouettes (Replaced by Painted Scenic Master Plates) */
+.horizon-silhouette-layer {
+  display: none;
+}
+
+.horizon-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.horizon-group {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 1.3s cubic-bezier(0.16, 1, 0.3, 1), transform 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sky-nebula-texture {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(ellipse at 75% 20%, rgba(56, 189, 248, 0.16) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 65%);
+  opacity: 0.5;
+  transition: opacity 1.2s ease, filter 1.2s ease;
+}
+
+.sky-dust-texture {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(circle at 50% 60%, rgba(217, 119, 6, 0.22) 0%, transparent 70%);
+  opacity: 0.1;
+  transition: opacity 1.2s ease;
 }
 
 .vignette-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
-  box-shadow: inset 0 0 100px rgba(0,0,0,0.85), inset 0 0 180px rgba(0,0,0,0.6);
+  z-index: 4;
+  box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.5), inset 0 0 140px rgba(0, 0, 0, 0.3);
 }
 
 .sandstorm-haze {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 3;
+  z-index: 5;
   opacity: 0;
-  background: radial-gradient(circle at 60% 70%, rgba(217, 119, 6, 0.45) 0%, rgba(120, 53, 15, 0.5) 60%, rgba(17, 6, 4, 0.85) 100%);
-  transition: opacity 3.5s cubic-bezier(0.16, 1, 0.3, 1);
+  background: radial-gradient(circle at 60% 70%, rgba(217, 119, 6, 0.5) 0%, rgba(120, 53, 15, 0.55) 60%, rgba(17, 6, 4, 0.9) 100%);
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-body.sandstorm-active .sandstorm-haze {
+/* Atmospheric Tempest Lightning Overlay (Chapter II Cataclysm) */
+.lightning-flash-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  background: radial-gradient(circle at 60% 40%, rgba(216, 180, 254, 0.55) 0%, rgba(244, 63, 94, 0.4) 45%, rgba(15, 2, 8, 0) 80%);
+  mix-blend-mode: screen;
+  transition: opacity 0.05s ease;
+}
+
+/* ==========================================================================
+   DYNAMIC CHAPTER ATMOSPHERIC THEMES (High-Detail Living Backgrounds)
+   ========================================================================== */
+
+/* CHAPTER I: The Alpine Turret (Cold Mountain Solitude & Silver Charts) */
+body.theme-chapter-1 #sky-backdrop {
+  background: radial-gradient(circle at 50% 25%, #141e34 0%, #080d19 50%, #020408 100%);
+}
+body.theme-chapter-1 .chart-theme-1 {
+  opacity: 0.95;
+  transform: scale(1);
+}
+body.theme-chapter-1 .horizon-alpine {
+  opacity: 0.95;
+  transform: translateY(0);
+}
+body.theme-chapter-1 #sky-nebula {
+  opacity: 0.85;
+}
+body.theme-chapter-1 #sky-dust {
+  opacity: 0.08;
+}
+body.theme-chapter-1 #sandstorm-haze {
+  opacity: 0;
+}
+
+/* CHAPTER II: When the Sky Wept Blood (Sanguine Gale & Violent Sand Tempest) */
+body.theme-chapter-2 #sky-backdrop {
+  background: radial-gradient(circle at 50% 35%, #441108 0%, #1e050b 50%, #0a0105 100%);
+}
+body.theme-chapter-2 .chart-theme-2 {
+  opacity: 0.95;
+  transform: scale(1.02);
+}
+body.theme-chapter-2 .horizon-cataclysm {
+  opacity: 0.95;
+  transform: translateY(0);
+}
+body.theme-chapter-2 #sky-nebula {
+  opacity: 0.18;
+}
+body.theme-chapter-2 #sky-dust {
+  opacity: 0.82;
+}
+body.theme-chapter-2 #sandstorm-haze {
+  opacity: 0.68;
+}
+
+/* CHAPTER III: The Erasure of a Soul (Muted Charcoal, Ash & Cold Slate) */
+body.theme-chapter-3 #sky-backdrop {
+  background: radial-gradient(circle at 50% 45%, #19151c 0%, #0d0b10 50%, #040305 100%);
+}
+body.theme-chapter-3 .chart-theme-3 {
+  opacity: 0.88;
+  transform: scale(1);
+}
+body.theme-chapter-3 .horizon-ashen {
+  opacity: 0.92;
+  transform: translateY(0);
+}
+body.theme-chapter-3 #sky-nebula {
+  opacity: 0.06;
+}
+body.theme-chapter-3 #sky-dust {
+  opacity: 0.42;
+}
+body.theme-chapter-3 #sandstorm-haze {
+  opacity: 0.22;
+}
+
+/* CHAPTER IV: The Beacon Across the Abyss (Desert Gold & Aurelia's Horizon Pulse) */
+body.theme-chapter-4 #sky-backdrop {
+  background: radial-gradient(circle at 50% 55%, #3d1e08 0%, #160a04 50%, #050306 100%);
+}
+body.theme-chapter-4 .chart-theme-4 {
+  opacity: 0.95;
+  transform: scale(1);
+}
+body.theme-chapter-4 .horizon-dunes {
+  opacity: 0.95;
+  transform: translateY(0);
+}
+body.theme-chapter-4 #sky-nebula {
+  opacity: 0.65;
+}
+body.theme-chapter-4 #sky-dust {
+  opacity: 0.28;
+}
+body.theme-chapter-4 #sandstorm-haze {
+  opacity: 0.12;
+}
+body.theme-chapter-4 .distant-beacon-emitter {
   opacity: 1;
+  transform: translateY(0);
 }
 
-body.sandstorm-active .sky-backdrop-gradient {
-  background: radial-gradient(circle at 50% 60%, #451a08 0%, #290d05 50%, #120402 100%);
-  filter: saturate(1.4) contrast(1.2);
+/* Propuesta C: Physical Distant Horizon Beacon (Chapter IV Revelation) */
+.distant-beacon-emitter {
+  position: fixed;
+  bottom: 70px;
+  right: 28px;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1.4s ease, transform 1.4s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 1560px) {
+  .distant-beacon-emitter {
+    right: 18px;
+    bottom: 50px;
+  }
+  .distant-beacon-emitter .beacon-locator-text {
+    display: none;
+  }
+}
+
+.distant-beacon-emitter.beacon-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Master geometric anchor for all optical beacon components */
+.beacon-lamp-head {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 1. Atmospheric conical flare projecting upward from the lamp center (12px, 12px) */
+.beacon-cone-flare {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 32px;
+  height: 190px;
+  margin-left: -16px;
+  background: linear-gradient(to top, rgba(245, 158, 11, 0.4) 0%, rgba(245, 158, 11, 0.12) 45%, transparent 100%);
+  clip-path: polygon(44% 100%, 56% 100%, 100% 0%, 0% 0%);
+  transform-origin: bottom center;
+  pointer-events: none;
+  z-index: 1;
+  animation: beamSway 8s ease-in-out infinite alternate;
+}
+
+/* 2. Razor-sharp vertical light needle projecting upward from exact center (12px, 12px) */
+.beacon-ray-shaft {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  width: 2px;
+  height: 240px;
+  margin-left: -1px;
+  background: linear-gradient(to top, #ffffff 0%, rgba(254, 240, 138, 0.95) 15%, rgba(245, 158, 11, 0.5) 60%, transparent 100%);
+  transform-origin: bottom center;
+  pointer-events: none;
+  z-index: 2;
+  filter: blur(0.3px);
+  animation: beamSway 8s ease-in-out infinite alternate;
+}
+
+/* 3. Golden radial corona / pulsation centered exactly on (12px, 12px) */
+.beacon-pulse-corona {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, #fef08a 25%, #f59e0b 60%, transparent 100%);
+  box-shadow: 0 0 16px #f59e0b, 0 0 45px rgba(245, 158, 11, 0.85), 0 0 75px rgba(245, 158, 11, 0.5);
+  transform-origin: center center;
+  animation: lighthouseRhythm 10s infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 4. Pure white incandescent lens core at exact center (12px, 12px) */
+.beacon-lens-core {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 6px #ffffff, 0 0 12px #fef08a, 0 0 20px #ffffff;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.beacon-locator-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  color: rgba(254, 215, 170, 0.85);
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
+  white-space: nowrap;
+}
+
+@keyframes lighthouseRhythm {
+  /* 3 Steady Short Pulses */
+  0%, 100% { opacity: 0.18; transform: scale(0.75); }
+  2% { opacity: 1; transform: scale(1.5); }
+  5% { opacity: 0.2; transform: scale(0.8); }
+  8% { opacity: 1; transform: scale(1.5); }
+  11% { opacity: 0.2; transform: scale(0.8); }
+  14% { opacity: 1; transform: scale(1.5); }
+  17% { opacity: 0.2; transform: scale(0.8); }
+  /* Calibration Pause */
+  17.1%, 31% { opacity: 0.15; transform: scale(0.65); }
+  /* 2 Long Flashes */
+  32% { opacity: 1; transform: scale(2.0); }
+  42% { opacity: 0.95; transform: scale(1.85); }
+  44% { opacity: 0.2; transform: scale(0.8); }
+  46% { opacity: 0.2; transform: scale(0.8); }
+  48% { opacity: 1; transform: scale(2.0); }
+  58% { opacity: 0.95; transform: scale(1.85); }
+  60% { opacity: 0.2; transform: scale(0.8); }
+  /* Horizon resting */
+  60.1%, 99.9% { opacity: 0.18; transform: scale(0.75); }
+}
+
+@keyframes beamSway {
+  0% { transform: rotate(-2deg); opacity: 0.6; }
+  50% { transform: rotate(2deg); opacity: 0.95; }
+  100% { transform: rotate(-2deg); opacity: 0.6; }
 }
 
 /* ── Main Viewport Container ── */
@@ -102,104 +502,83 @@ body.sandstorm-active .sky-backdrop-gradient {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: 18px 24px 40px;
-  max-width: 1440px;
+  padding: 18px 24px 60px;
+  max-width: 1560px;
   margin: 0 auto;
 }
 
-/* ── Top Navigation & Telemetry Banner ── */
-.cipher-top-banner {
+/* ==========================================================================
+   CEREMONIAL QUEST HEADER (Matches Station 07 & Station 08)
+   ========================================================================== */
+.quest-header {
+  position: relative;
+  z-index: 10;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(212, 168, 83, 0.22);
-  margin-bottom: 22px;
-}
-
-.banner-left, .banner-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.btn-back-hub {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(28, 20, 12, 0.7);
-  border: 1px solid rgba(212, 168, 83, 0.4);
-  color: var(--brass-bright);
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  padding: 7px 14px;
-  border-radius: 4px;
-  text-decoration: none;
-  transition: all 0.25s ease;
-}
-
-.btn-back-hub:hover {
-  background: rgba(212, 168, 83, 0.18);
-  border-color: var(--brass-bright);
-  box-shadow: 0 0 14px rgba(212, 168, 83, 0.35);
-  transform: translateX(-2px);
-}
-
-.telemetry-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(8, 12, 24, 0.75);
-  border: 1px solid rgba(79, 227, 193, 0.3);
-  padding: 6px 12px;
-  border-radius: 20px;
-}
-
-.pulse-beacon {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--cyan-beam);
-  box-shadow: 0 0 8px var(--cyan-beam);
-  animation: beaconBlink 2.2s infinite ease-in-out;
-}
-
-@keyframes beaconBlink {
-  0%, 100% { opacity: 0.35; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 12px var(--cyan-beam); }
-}
-
-.telemetry-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  color: var(--cyan-beam);
-}
-
-.banner-center {
   text-align: center;
+  max-width: 1180px;
+  margin: 32px auto 28px auto;
+  padding: 0 20px;
 }
 
-.cipher-main-title {
+.order-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.2em;
+  color: var(--brass-bright);
+  text-transform: uppercase;
+  padding: 6px 20px;
+  border: 1px solid rgba(212, 175, 85, 0.45);
+  border-radius: 999px;
+  background: rgba(13, 18, 28, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 85, 0.15);
+  margin-bottom: 12px;
+}
+
+.order-badge span.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+  animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.4; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+.quest-title {
   font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-size: 24px;
+  font-size: clamp(2.1rem, 4.4vw, 3.1rem);
   font-weight: 700;
-  letter-spacing: 0.22em;
-  color: #fff4d6;
-  text-shadow: 0 0 16px rgba(255, 224, 153, 0.4), 0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(180deg, #ffffff 0%, #fff1b8 40%, #e2b96f 75%, #c59b4c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 28px rgba(226, 185, 111, 0.4));
+  margin: 6px 0 10px 0;
+  line-height: 1.18;
 }
 
-.cipher-sub-title {
-  font-family: 'Cinzel', serif;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  color: var(--brass-base);
-  margin-top: 3px;
-  opacity: 0.85;
+.quest-subtitle {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.12rem;
+  color: #c7beab;
+  max-width: 680px;
+  line-height: 1.55;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .radio-status-pill {
@@ -208,42 +587,22 @@ body.sandstorm-active .sky-backdrop-gradient {
   gap: 8px;
   background: rgba(26, 16, 8, 0.75);
   border: 1px solid rgba(245, 158, 11, 0.38);
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
 }
 
 .radio-freq {
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
   color: #fbbf24;
 }
 
 .radio-state {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
+  font-size: 9.5px;
   letter-spacing: 0.1em;
   color: rgba(254, 243, 199, 0.7);
-}
-
-.btn-quick-preview {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px dashed rgba(245, 158, 11, 0.5);
-  color: #fde68a;
-  font-family: 'Cinzel', serif;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  padding: 7px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-quick-preview:hover {
-  background: rgba(245, 158, 11, 0.25);
-  border-style: solid;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
 }
 
 /* ── Brass Frame & Tactical Cards ── */
@@ -258,786 +617,2419 @@ body.sandstorm-active .sky-backdrop-gradient {
 
 .card-corner {
   position: absolute;
-  width: 9px;
-  height: 9px;
-  border-color: var(--brass-base);
+  width: 18px;
+  height: 18px;
+  border-color: var(--brass-bright);
   border-style: solid;
   pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 6px rgba(212, 168, 83, 0.45));
 }
-.corner-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-.corner-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
-.corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
-.corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+.corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 4px; }
+.corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 4px; }
+.corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 4px; }
+.corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 4px; }
 
-/* ── Layout Grid ── */
-.cipher-workspace-layout {
-  display: grid;
-  grid-template-columns: 520px 1fr;
-  gap: 22px;
-  align-items: start;
+/* ==========================================================================
+   IMMERSIVE READING NOVEL: THE MAN BEHIND THE MAPS
+   ========================================================================== */
+.novel-main-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 15px auto 70px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 10;
 }
 
-/* ── Left Column: Dial Workbench ── */
-.dial-workbench-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.dial-frame {
-  padding: 18px 20px 16px;
+/* Interactive Atmospheric Reading Tracker */
+.reading-atmosphere-bar {
+  position: sticky;
+  top: 0;
+  z-index: 90;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 18px 8px;
+  background: rgba(14, 10, 7, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(212, 168, 83, 0.45);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.85);
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
 }
 
-.dial-header-row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.readout-box {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: rgba(10, 7, 12, 0.6);
-  border: 1px solid rgba(212, 168, 83, 0.2);
-  padding: 6px 12px;
-  border-radius: 4px;
-}
-
-.readout-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 0.16em;
-  color: rgba(212, 168, 83, 0.65);
-}
-
-.readout-val {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--brass-bright);
-}
-
-.letter-readout-box {
-  text-align: right;
-  border-color: rgba(79, 227, 193, 0.3);
-}
-.letter-readout-box .readout-label {
-  color: rgba(79, 227, 193, 0.7);
-}
-.letter-val {
-  font-size: 18px;
-  color: var(--cyan-beam);
-  text-shadow: 0 0 10px var(--cyan-beam);
-}
-
-.dial-svg-wrapper {
-  width: 100%;
-  max-width: 480px;
-  aspect-ratio: 1 / 1;
-  position: relative;
+.reading-steps-row {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-#celestial-dial-svg {
+  gap: 8px;
   width: 100%;
-  height: 100%;
+  flex-wrap: nowrap;
   overflow: visible;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
-}
-
-/* Dial Interactive Sector Cells */
-.dial-cell {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dial-cell path {
-  fill: transparent;
-  stroke: rgba(212, 168, 83, 0.12);
-  stroke-width: 0.8;
-  transition: fill 0.25s ease, stroke 0.25s ease;
-}
-
-.dial-cell text {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  font-weight: 700;
-  fill: rgba(255, 235, 190, 0.65);
-  text-anchor: middle;
-  dominant-baseline: central;
-  pointer-events: none;
-  transition: fill 0.25s ease, transform 0.25s ease, filter 0.25s ease;
-}
-
-.dial-cell:hover path {
-  fill: rgba(212, 168, 83, 0.15);
-  stroke: rgba(212, 168, 83, 0.5);
-}
-.dial-cell:hover text {
-  fill: #ffffff;
-  filter: drop-shadow(0 0 6px var(--brass-bright));
-}
-
-.dial-cell.cell-active path {
-  fill: rgba(79, 227, 193, 0.25);
-  stroke: var(--cyan-beam);
-  stroke-width: 1.5;
-}
-.dial-cell.cell-active text {
-  fill: #ffffff;
-  font-weight: 700;
-  filter: drop-shadow(0 0 10px var(--cyan-beam));
-}
-
-.dial-roman-label {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 700;
-  fill: var(--brass-base);
-  text-anchor: middle;
-  dominant-baseline: central;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: fill 0.2s ease, filter 0.2s ease;
-}
-
-.dial-roman-label:hover, .dial-roman-label.active {
-  fill: var(--brass-bright);
-  filter: drop-shadow(0 0 8px var(--brass-bright));
-}
-
-/* Dial Quick Controls */
-.dial-controls-bar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(212, 168, 83, 0.18);
-}
-
-.btn-step-dial {
-  background: rgba(24, 17, 10, 0.7);
-  border: 1px solid rgba(212, 168, 83, 0.35);
-  color: var(--brass-bright);
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-step-dial:hover {
-  background: rgba(212, 168, 83, 0.18);
-  border-color: var(--brass-bright);
-  box-shadow: 0 0 10px rgba(212, 168, 83, 0.3);
-}
-
-.dial-decl-tabs {
-  display: flex;
-  gap: 6px;
-}
-
-.decl-tab {
-  background: rgba(12, 8, 16, 0.6);
-  border: 1px solid rgba(212, 168, 83, 0.2);
-  color: rgba(255, 235, 190, 0.65);
+  padding: 4px 8px;
   font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.decl-tab:hover {
-  color: var(--brass-bright);
-  border-color: rgba(212, 168, 83, 0.45);
-}
-
-.decl-tab.active {
-  background: rgba(79, 227, 193, 0.14);
-  border-color: var(--cyan-beam);
-  color: var(--cyan-beam);
-  box-shadow: 0 0 8px rgba(79, 227, 193, 0.3);
-}
-
-/* ── Right Column: Sighting Log & Deduction ── */
-.deduction-log-section {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.log-card {
-  padding: 18px 22px;
-}
-
-.log-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.log-section-sigil {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.18em;
-  color: var(--brass-base);
-}
-
-.log-section-title {
-  font-family: 'Cinzel', serif;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #fff0d4;
-}
-
-.log-progress-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 12px;
-  background: rgba(245, 158, 11, 0.14);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  color: #fbbf24;
-}
-
-.log-instructions {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 15px;
-  font-style: italic;
-  color: rgba(245, 238, 223, 0.72);
-  line-height: 1.45;
-  margin-bottom: 14px;
-}
-
-.sighting-groups-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.sighting-group-row {
-  background: rgba(14, 10, 18, 0.65);
-  border: 1px solid rgba(212, 168, 83, 0.16);
-  border-radius: 4px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: border-color 0.25s ease;
-}
-
-.sighting-group-row:hover {
-  border-color: rgba(212, 168, 83, 0.32);
-}
-
-.group-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.group-name {
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
   letter-spacing: 0.08em;
-  color: var(--brass-bright);
+  color: #a8a29e;
 }
 
-.group-status {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: rgba(212, 168, 83, 0.55);
+/* Silk & Gold Reading Thread */
+.silk-reading-thread-track {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  height: 3px;
+  background: rgba(212, 168, 83, 0.22);
+  border-radius: 2px;
+  margin: 3px 0 2px;
 }
 
-.chips-row {
+.silk-gold-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+  background: linear-gradient(90deg, #d4a853 0%, #ffe099 50%, #f59e0b 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+}
+
+.thread-spark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  margin-left: -3.5px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ffe099, 0 0 16px #f59e0b;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.thread-node {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #140d08;
+  border: 1px solid rgba(212, 168, 83, 0.4);
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: #a8a29e;
+  transition: all 0.35s ease;
+  pointer-events: none;
 }
 
-.coord-chip {
-  background: rgba(24, 18, 12, 0.85);
-  border: 1px solid rgba(212, 168, 83, 0.3);
-  padding: 5px 9px;
-  border-radius: 4px;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  color: #fde68a;
-  cursor: pointer;
+.thread-node.node-1 { left: 0%; }
+.thread-node.node-2 { left: 33%; }
+.thread-node.node-3 { left: 66%; }
+.thread-node.node-4 { left: 100%; }
+
+.thread-node.ignited {
+  background: #2b1708;
+  border-color: #ffd580;
+  color: #ffd580;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.8), inset 0 0 4px #ffe099;
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+.chapter-step {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  transition: all 0.2s ease;
-  user-select: none;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.65;
+  color: #a8a29e;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
 }
 
-.coord-chip:hover {
-  background: rgba(212, 168, 83, 0.16);
-  border-color: var(--brass-bright);
-  box-shadow: 0 0 10px rgba(212, 168, 83, 0.3);
+.chapter-step:hover {
+  opacity: 1;
+  color: #fde68a;
+  background: rgba(212, 168, 83, 0.1);
+  border-color: rgba(212, 168, 83, 0.35);
   transform: translateY(-1px);
 }
 
-.coord-chip.chip-active {
-  background: rgba(79, 227, 193, 0.18);
-  border-color: var(--cyan-beam);
-  color: #ffffff;
-  box-shadow: 0 0 12px rgba(79, 227, 193, 0.45);
+.chapter-step.active {
+  opacity: 1;
+  color: #ffd580;
+  background: rgba(212, 168, 83, 0.16);
+  border-color: rgba(212, 168, 83, 0.6);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25), inset 0 0 8px rgba(245, 158, 11, 0.1);
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
 }
 
-.coord-chip.chip-resolved {
-  background: rgba(34, 197, 94, 0.12);
-  border-color: rgba(34, 197, 94, 0.45);
-  color: #86efac;
+.chapter-step.active .step-sigil {
+  transform: scale(1.3);
+  color: #f59e0b;
+  filter: drop-shadow(0 0 6px #f59e0b);
 }
 
-.chip-arrow {
-  color: rgba(212, 168, 83, 0.5);
-  font-size: 9px;
+.step-divider {
+  color: rgba(212, 168, 83, 0.35);
+  font-size: 10px;
 }
 
-.chip-resolved-letter {
-  font-family: 'Cinzel', serif;
-  font-weight: 700;
-  color: var(--brass-bright);
+.novel-reading-frame {
+  width: 100%;
+  position: relative;
+  background: linear-gradient(175deg, rgba(22, 16, 12, 0.98) 0%, rgba(13, 9, 6, 0.99) 100%);
+  border: 2px solid rgba(212, 168, 83, 0.65);
+  outline: 1px solid rgba(212, 168, 83, 0.28);
+  outline-offset: -8px;
+  box-shadow: 
+    0 32px 100px rgba(0, 0, 0, 0.96), 
+    0 0 60px rgba(212, 168, 83, 0.16),
+    inset 0 0 100px rgba(0, 0, 0, 0.9),
+    inset 0 0 2px 2px rgba(254, 243, 199, 0.15);
+  border-radius: 8px;
+  overflow: visible; /* allows marginalia cards and ribbon bookmark to drape naturally */
+  transition: border-color 1.2s ease, box-shadow 1.2s ease;
 }
 
-/* ── Prophecy Deduction Board ── */
-.prophecy-card {
-  padding: 18px 22px 16px;
+/* Chapter 1 Patina: Cold Mountain Solitude - Pristine Starlight Rim */
+body.theme-chapter-1 .novel-reading-frame {
+  box-shadow: 
+    0 32px 100px rgba(0, 0, 0, 0.96), 
+    0 0 60px rgba(147, 197, 253, 0.16),
+    inset 0 0 100px rgba(0, 0, 0, 0.9),
+    inset 0 0 2px 2px rgba(254, 243, 199, 0.15);
+  border-color: rgba(212, 168, 83, 0.65);
 }
 
-.prophecy-card-header {
-  text-align: center;
-  margin-bottom: 16px;
+/* Chapter 2 Patina: First Cataclysm - Scorched Crimson Sandstorm Rim */
+body.theme-chapter-2 .novel-reading-frame {
+  box-shadow: 
+    0 32px 100px rgba(0, 0, 0, 0.96), 
+    0 0 75px rgba(239, 68, 68, 0.22),
+    inset 0 0 90px rgba(120, 53, 15, 0.35),
+    inset 0 0 2px 2px rgba(248, 113, 113, 0.25);
+  border-color: rgba(239, 68, 68, 0.55);
 }
 
-.prophecy-sigil {
-  font-family: 'Cinzel', serif;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  color: var(--brass-base);
+/* Chapter 3 Patina: The Erasure of a Soul - Charred Soot & Dark Obsidian Margins */
+body.theme-chapter-3 .novel-reading-frame {
+  box-shadow: 
+    0 32px 100px rgba(0, 0, 0, 0.96), 
+    0 0 50px rgba(100, 116, 139, 0.16),
+    inset 0 0 110px rgba(15, 12, 14, 0.95),
+    inset 0 0 2px 2px rgba(156, 163, 175, 0.18);
+  border-color: rgba(156, 163, 175, 0.45);
 }
 
-.prophecy-title {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  color: #fff5e0;
-  margin-top: 2px;
+/* Chapter 4 Patina: The Beacon - Radiant Warm Desert Gold Dust Patina */
+body.theme-chapter-4 .novel-reading-frame {
+  box-shadow: 
+    0 32px 100px rgba(0, 0, 0, 0.96), 
+    0 0 85px rgba(245, 158, 11, 0.32),
+    inset 0 0 85px rgba(217, 119, 6, 0.22),
+    inset 0 0 2px 2px rgba(254, 240, 138, 0.28);
+  border-color: rgba(251, 191, 36, 0.7);
 }
 
-.prophecy-board {
+/* Authentic Antique Parchment & Vellum Fiber Texture Layer */
+.codex-vellum-texture-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url('./assets/texture-antique-vellum.jpg');
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  mix-blend-mode: screen;
+  opacity: 0.22;
+  filter: sepia(0.35) contrast(1.25);
+  border-radius: 7px;
+}
+
+/* Warm Center Candlelight Vignette & Breathing Glow */
+.codex-candlelight-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse at 78% 22%, rgba(254, 240, 138, 0.08) 0%, rgba(217, 119, 6, 0.035) 45%, transparent 75%),
+              radial-gradient(ellipse at 22% 70%, rgba(217, 119, 6, 0.04) 0%, transparent 65%);
+  animation: candleCodexFlicker 5.5s infinite ease-in-out;
+  border-radius: 7px;
+}
+
+@keyframes candleCodexFlicker {
+  0%, 100% { opacity: 0.88; }
+  25% { opacity: 1; }
+  50% { opacity: 0.82; }
+  75% { opacity: 0.94; }
+}
+
+/* Renaissance Crimson Silk Bookmark Ribbon */
+.codex-silk-ribbon {
+  position: absolute;
+  top: -6px;
+  right: 88px;
+  width: 26px;
+  height: 220px;
+  z-index: 10;
+  pointer-events: none;
+  background: linear-gradient(180deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 85%, #d97706 100%);
+  box-shadow: 3px 6px 16px rgba(0, 0, 0, 0.85), inset 1px 0 2px rgba(255, 255, 255, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  justify-content: flex-end;
   align-items: center;
+  padding-bottom: 12px;
 }
 
-.prophecy-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 22px;
-}
-
-.word-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.word-tag {
-  font-family: 'Cinzel', serif;
+.codex-silk-ribbon .ribbon-sigil {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: rgba(212, 168, 83, 0.7);
+  color: #ffd580;
+  text-shadow: 0 0 6px #f59e0b;
 }
 
-.word-boxes {
+.codex-silk-ribbon .ribbon-notch {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-top: 10px solid #d97706;
+}
+
+/* Astrolabe Graduated Margin Measurement Scales */
+.codex-margin-scale {
+  position: absolute;
+  top: 140px;
+  bottom: 100px;
+  width: 28px;
+  z-index: 25;
+  pointer-events: none;
   display: flex;
-  gap: 6px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0.65;
+  transition: opacity 0.5s ease;
 }
 
-.letter-box {
-  width: 40px;
-  height: 48px;
-  background: var(--bg-input);
-  border: 1.5px solid rgba(212, 168, 83, 0.35);
-  border-radius: 4px;
+.codex-margin-scale.scale-left {
+  left: 12px;
+  border-right: 1px solid rgba(212, 168, 83, 0.28);
+  padding-right: 4px;
+}
+
+/* Living Astrolabe Reading Focus Needle (Pinned at constant optical reading height with liquid kinetic physics) */
+.declination-caliper {
+  position: sticky;
+  top: 38vh;
+  margin-left: 8px;
+  margin-bottom: -28px; /* Zero layout disruption on graduated degree ticks */
+  z-index: 50;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: 'Cinzel', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff9ea;
-  text-align: center;
-  text-transform: uppercase;
-  outline: none;
+  pointer-events: auto;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+  width: 46px;
+  height: 28px;
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.75)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9));
+  transform: translate3d(0, 0, 0);
+  will-change: transform, filter;
+  transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.letter-box:focus, .letter-box.box-active {
-  border-color: var(--cyan-beam);
-  box-shadow: 0 0 14px rgba(79, 227, 193, 0.45), inset 0 2px 6px rgba(0,0,0,0.6);
-  background: rgba(14, 28, 32, 0.85);
+/* Kinetic Scroll Energy Aura */
+.declination-caliper.caliper-active-glide {
+  filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.98)) drop-shadow(0 0 32px rgba(245, 158, 11, 0.65)) drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95));
 }
 
-.letter-box.box-correct {
-  border-color: rgba(212, 168, 83, 0.8);
-  color: var(--brass-bright);
-  background: rgba(36, 26, 14, 0.75);
-  box-shadow: 0 0 12px rgba(255, 224, 153, 0.3);
+.declination-caliper:hover {
+  filter: drop-shadow(0 0 20px rgba(251, 191, 36, 1)) drop-shadow(0 0 38px rgba(245, 158, 11, 0.8));
 }
 
-.word-block.word-completed .word-tag {
-  color: var(--brass-bright);
-  text-shadow: 0 0 8px var(--brass-bright);
+.caliper-needle-bracket {
+  display: flex;
+  align-items: center;
+  position: relative;
+  transform-origin: 10px 14px; /* Center gimbal rotation around circular brass eye */
+  animation: caliperIdleFloat 4s ease-in-out infinite alternate;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.word-block.word-completed .letter-box {
-  border-color: var(--brass-base);
-  animation: wordLockGlow 1.2s ease;
+.declination-caliper:hover .caliper-needle-bracket {
+  transform: scale(1.15) translate3d(3px, 0, 0);
 }
 
-@keyframes wordLockGlow {
+@keyframes caliperIdleFloat {
+  0% {
+    transform: translate3d(0, -2.4px, 0) rotate(-0.8deg);
+  }
+  50% {
+    transform: translate3d(0, 0.4px, 0) rotate(0.2deg);
+  }
+  100% {
+    transform: translate3d(0, 2.4px, 0) rotate(0.8deg);
+  }
+}
+
+.caliper-needle-svg {
+  width: 44px;
+  height: 26px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.caliper-needle-svg circle:last-child {
+  animation: caliperCoreAmberPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes caliperCoreAmberPulse {
+  0%, 100% {
+    fill: #f59e0b;
+    filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.6));
+  }
+  50% {
+    fill: #fbbf24;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.95));
+  }
+}
+
+/* Radiant Reading Alignment Beam (Illuminating the active reading line into the text) */
+.caliper-focus-beam {
+  position: absolute;
+  left: 42px;
+  top: 13.5px;
+  width: 32px;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.85) 0%, rgba(212, 168, 83, 0.4) 65%, transparent 100%);
+  pointer-events: none;
+  opacity: 0.65;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.8));
+}
+
+.declination-caliper.caliper-active-glide .caliper-focus-beam,
+.declination-caliper:hover .caliper-focus-beam {
+  width: 68px;
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.95));
+}
+
+/* Tactile Click Starlight Pulse */
+.declination-caliper.caliper-sparkle .caliper-needle-bracket {
+  animation: caliperSparkleBurst 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes caliperSparkleBurst {
   0% { transform: scale(1); }
-  50% { transform: scale(1.06); box-shadow: 0 0 20px var(--brass-bright); }
+  40% { transform: scale(1.3) translate3d(5px, 0, 0); filter: brightness(1.6); }
   100% { transform: scale(1); }
 }
 
-.prophecy-status-bar {
-  margin-top: 14px;
-  padding: 8px 14px;
-  border-radius: 4px;
-  background: rgba(12, 8, 16, 0.6);
-  border: 1px solid rgba(212, 168, 83, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
-  color: rgba(245, 238, 223, 0.8);
+.codex-margin-scale.scale-right {
+  right: 12px;
+  border-left: 1px solid rgba(212, 168, 83, 0.28);
+  padding-left: 4px;
 }
 
-/* ── Climax Modal: Sanguine Sandstorm Gale ── */
-.sandstorm-climax-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  opacity: 0;
+.codex-margin-scale .scale-deg {
+  font-family: 'Space Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  color: var(--brass-base);
+}
+
+.codex-margin-scale .scale-tick {
+  width: 6px;
+  height: 1px;
+  background: rgba(212, 168, 83, 0.4);
+}
+
+.codex-margin-scale .scale-tick.major {
+  width: 12px;
+  background: var(--brass-bright);
+}
+
+/* Brass Corner Ornaments */
+.codex-brass-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: var(--brass-bright);
+  border-style: solid;
   pointer-events: none;
-  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 5;
+  opacity: 0.85;
 }
 
-.sandstorm-climax-modal.modal-open {
+.codex-brass-corner.corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+.codex-brass-corner.corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+.codex-brass-corner.corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+.codex-brass-corner.corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+.story-reader-header,
+.story-reader-body {
+  position: relative;
+  z-index: 2;
+}
+
+.story-reader-header {
+  text-align: center;
+  padding: 38px 44px 20px;
+  border-bottom: 1px solid rgba(212, 168, 83, 0.25);
+  background: rgba(10, 7, 4, 0.4);
+}
+
+.story-order-sigil {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brass-base);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.story-main-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 36px;
+  color: var(--brass-bright);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-top: 10px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+}
+
+.story-sub-tag {
+  font-family: 'Newsreader', 'Lora', Georgia, serif;
+  font-size: 19px;
+  color: #e2e8f0;
+  font-style: italic;
+  margin-top: 6px;
+}
+
+.story-ornament-line {
+  color: var(--brass-base);
+  font-size: 13px;
+  letter-spacing: 0.4em;
+  margin-top: 10px;
+  opacity: 0.85;
+}
+
+.story-reader-body {
+  padding: 46px 64px 40px;
+  font-family: 'Newsreader', 'Lora', Georgia, serif;
+  font-size: 22px;
+  line-height: 1.86;
+  color: #fefcf7;
+  letter-spacing: 0.012em;
+}
+
+.novel-chapter {
+  display: block;
   opacity: 1;
-  pointer-events: auto;
+  transform: none;
+  margin-bottom: 40px;
+  scroll-margin-top: 68px;
+  position: relative;
 }
 
-.climax-backdrop {
+/* Inter-Chapter Renaissance Flourish Divider */
+.chapter-scroll-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 64px auto 54px;
+  max-width: 460px;
+  padding: 0 16px;
+  opacity: 0.85;
+}
+
+.chapter-scroll-divider .divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.45), transparent);
+}
+
+.chapter-scroll-divider .divider-sigil {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--brass-bright);
+  letter-spacing: 0.25em;
+  text-shadow: 0 0 10px rgba(212, 168, 83, 0.45);
+}
+
+/* Chapter Navigation Buttons */
+.chapter-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 44px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(212, 168, 83, 0.25);
+  flex-wrap: wrap;
+}
+
+.chapter-nav-spacer {
+  flex: 1;
+}
+
+.btn-chapter-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 22px;
+  background: linear-gradient(135deg, rgba(32, 22, 15, 0.95) 0%, rgba(18, 12, 8, 0.98) 100%);
+  border: 1px solid rgba(212, 168, 83, 0.45);
+  border-radius: 4px;
+  color: var(--brass-bright);
+  font-family: 'Cinzel', serif;
+  font-size: 13.5px;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 8px rgba(212, 168, 83, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn-chapter-nav:hover {
+  background: linear-gradient(135deg, rgba(48, 32, 22, 0.98) 0%, rgba(28, 18, 12, 1) 100%);
+  border-color: rgba(245, 158, 11, 0.85);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 16px rgba(245, 158, 11, 0.3);
+}
+
+.btn-chapter-nav:active {
+  transform: translateY(0);
+}
+
+.btn-chapter-next {
+  margin-left: auto;
+  border-color: rgba(212, 168, 83, 0.65);
+  background: linear-gradient(135deg, rgba(42, 28, 18, 0.96) 0%, rgba(22, 14, 8, 0.98) 100%);
+}
+
+.btn-chapter-icon {
+  font-size: 14px;
+}
+
+.novel-part-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brass-bright);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  border-bottom: 1px dashed rgba(212, 168, 83, 0.3);
+  padding-bottom: 8px;
+}
+
+/* ── Propuesta A: Candlelight Focus Beam Reading ── */
+.novel-para {
+  margin-bottom: 24px;
+  text-align: justify;
+  text-justify: inter-word;
+  transition: opacity 0.35s ease, color 0.35s ease;
+  opacity: 0.8;
+}
+
+.novel-para.reading-focus {
+  opacity: 1;
+  color: #fffaf0;
+}
+
+.novel-para.reading-focus strong,
+.novel-para.reading-focus em {
+  color: #ffd580;
+}
+
+.novel-dropcap {
+  float: left;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 35px;
+  line-height: 32px;
+  padding-right: 9px;
+  padding-top: 0;
+  margin-top: -5px;
+  color: var(--brass-bright);
+  font-weight: 700;
+  text-shadow: 0 0 14px rgba(255, 224, 153, 0.45);
+}
+
+.novel-quote-card {
+  position: relative;
+  background: rgba(212, 168, 83, 0.1);
+  border-left: 4px solid var(--brass-base);
+  padding: 22px 28px;
+  margin: 28px 0;
+  border-radius: 0 8px 8px 0;
+  transition: opacity 0.5s ease;
+  opacity: 0.85;
+}
+
+.novel-quote-card.reading-focus {
+  opacity: 1;
+  border-left-color: #ffd580;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
+}
+
+/* Gold Leaf Shimmer (Metalic gold reflection upon focal reading) */
+.novel-quote-card.gold-leaf-shimmer,
+.charred-relic-facsimile.gold-leaf-shimmer,
+.gold-glow-title.gold-leaf-shimmer,
+.novel-center-name.gold-leaf-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.novel-quote-card.gold-leaf-shimmer::after,
+.charred-relic-facsimile.gold-leaf-shimmer::after,
+.gold-glow-title.gold-leaf-shimmer::after,
+.novel-center-name.gold-leaf-shimmer::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -130%;
+  width: 60%;
+  height: 220%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255, 224, 153, 0.05) 30%,
+    rgba(255, 248, 220, 0.7) 50%,
+    rgba(245, 158, 11, 0.4) 70%,
+    transparent 100%
+  );
+  transform: rotate(22deg);
+  pointer-events: none;
+  animation: goldLeafSweep 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes goldLeafSweep {
+  0% { left: -130%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 0.9; }
+  100% { left: 160%; opacity: 0; }
+}
+
+.quote-sigil {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 42px;
+  color: var(--brass-base);
+  line-height: 1;
+  opacity: 0.55;
+  display: block;
+  margin-bottom: -15px;
+}
+
+.quote-text {
+  font-size: 23px;
+  font-style: italic;
+  color: #fff9e6;
+  line-height: 1.65;
+}
+
+.quote-author {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 13.5px;
+  color: var(--brass-base);
+  letter-spacing: 0.08em;
+  margin-top: 12px;
+  text-align: right;
+}
+
+.novel-center-name {
+  text-align: center;
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--brass-bright);
+  letter-spacing: 0.16em;
+  margin: 26px 0;
+  text-shadow: 0 0 18px rgba(212, 168, 83, 0.4);
+}
+
+.novel-center-name.gold-glow-title {
+  color: #fff4d0;
+  text-shadow: 0 0 26px rgba(255, 224, 153, 0.7);
+}
+
+
+/* ── Propuesta B: Illuminated Folio Plates & Parallax Depth ── */
+.illuminated-plate-figure {
+  width: 100%;
+  max-width: 820px;
+  margin: 38px auto 44px;
+  background: rgba(14, 9, 6, 0.95);
+  border: 1.5px solid rgba(212, 168, 83, 0.45);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 25px rgba(212, 168, 83, 0.12);
+  position: relative;
+  display: block;
+}
+
+.plate-frame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  line-height: 0;
+  background: transparent;
+}
+
+.plate-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transform: none;
+  transition: transform 0.35s ease, filter 0.4s ease;
+  filter: contrast(1.06) brightness(0.98);
+}
+
+.plate-frame:hover .plate-image {
+  transform: scale(1.02);
+}
+
+.plate-specular-shimmer {
   position: absolute;
   inset: 0;
-  background: rgba(10, 4, 3, 0.88);
-  backdrop-filter: blur(12px);
+  pointer-events: none;
+  background: linear-gradient(135deg, transparent 35%, rgba(255, 225, 140, 0.14) 50%, transparent 65%);
+  mix-blend-mode: overlay;
+  opacity: 0.7;
+  animation: specularSweep 6s ease-in-out infinite alternate;
+}
+
+@keyframes specularSweep {
+  0% { transform: translateX(-35%) translateY(-10%); }
+  100% { transform: translateX(35%) translateY(10%); }
+}
+
+.plate-corner-flourish {
+  position: absolute;
+  color: #ffd580;
+  font-size: 14px;
+  text-shadow: 0 0 8px #f59e0b;
+  pointer-events: none;
+  z-index: 2;
+}
+.plate-corner-flourish.tl { top: 8px; left: 10px; }
+.plate-corner-flourish.tr { top: 8px; right: 10px; }
+.plate-corner-flourish.bl { bottom: 8px; left: 10px; }
+.plate-corner-flourish.br { bottom: 8px; right: 10px; }
+
+.plate-caption {
+  padding: 16px 24px 18px;
+  border-top: 1px solid rgba(212, 168, 83, 0.25);
+  background: linear-gradient(180deg, rgba(22, 15, 10, 0.96) 0%, rgba(14, 9, 6, 0.98) 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plate-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--brass-bright);
+}
+
+.plate-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff6e0;
+  letter-spacing: 0.05em;
+}
+
+.plate-sub {
+  font-family: 'Newsreader', 'Lora', Georgia, serif;
+  font-size: 15px;
+  color: #c7beab;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+/* ── Propuesta D: Codex Marginalia (Renaissance Notes in Margins) ── */
+.novel-chapter {
+  position: relative;
+  margin-bottom: 54px;
+}
+
+.chapter-marginalia-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 10px 0 24px;
+  width: 100%;
+}
+
+.chapter-marginalia {
+  position: static;
+  width: 100%;
+  pointer-events: auto;
+  user-select: none;
+  z-index: 8;
+  opacity: 0.94;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.chapter-marginalia:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.marginalia-card {
+  background: linear-gradient(135deg, rgba(24, 17, 12, 0.94) 0%, rgba(16, 11, 7, 0.96) 100%);
+  border: 1px solid rgba(212, 168, 83, 0.42);
+  border-radius: 6px;
+  padding: 10px 16px;
+  box-shadow: 
+    0 10px 28px rgba(0, 0, 0, 0.78),
+    inset 0 0 16px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.marginalia-card:hover {
+  border-color: var(--brass-bright);
+  box-shadow: 
+    0 12px 34px rgba(0, 0, 0, 0.9), 
+    0 0 18px rgba(212, 168, 83, 0.32);
+}
+
+/* Chapter Variants for Marginalia Cards */
+.marginalia-card.card-cataclysm {
+  border-color: rgba(239, 68, 68, 0.48);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.82), 0 0 14px rgba(239, 68, 68, 0.2);
+}
+.marginalia-card.card-cataclysm:hover {
+  border-color: #f87171;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.92), 0 0 20px rgba(239, 68, 68, 0.38);
+}
+
+.marginalia-card.card-ashen {
+  border-color: rgba(156, 163, 175, 0.36);
+  background: linear-gradient(135deg, rgba(20, 18, 20, 0.95) 0%, rgba(12, 11, 13, 0.97) 100%);
+}
+.marginalia-card.card-ashen:hover {
+  border-color: #cbd5e1;
+}
+
+.marginalia-card.card-beacon {
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.82), 0 0 16px rgba(245, 158, 11, 0.25);
+}
+.marginalia-card.card-beacon:hover {
+  border-color: #fde047;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.92), 0 0 22px rgba(245, 158, 11, 0.45);
+}
+
+.marginalia-stamp {
+  color: var(--brass-base);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.stamp-seismic {
+  color: #ef4444;
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
+}
+
+.stamp-strike {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ef4444;
+  opacity: 0.85;
+}
+
+.stamp-ash {
+  color: #94a3b8;
+}
+
+.stamp-beacon {
+  color: #fbbf24;
+  text-shadow: 0 0 8px #f59e0b;
+}
+
+.marginalia-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.m-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  color: var(--brass-bright);
+  text-transform: uppercase;
+}
+
+.m-gloss {
+  font-family: 'Newsreader', 'Lora', Georgia, serif;
+  font-size: 13.5px;
+  font-style: italic;
+  color: #f1ede6;
+  line-height: 1.35;
+}
+
+.m-sub {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 11.5px;
+  font-style: italic;
+  color: rgba(212, 168, 83, 0.85);
+  line-height: 1.3;
+  margin-top: 1px;
+}
+
+.m-gloss.strike-gloss del,
+.m-gloss.strike-gloss s {
+  color: #ef4444;
+  text-decoration-color: #ef4444;
+}
+
+.m-gloss.gold-gloss {
+  color: #ffd580;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+@media (max-width: 800px) {
+  .chapter-marginalia-strip {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+/* ── Propuesta E: Charred Relic Facsimile (The Act of Renunciation) ── */
+.charred-relic-facsimile {
+  position: relative;
+  margin: 32px 0;
+  background: linear-gradient(135deg, rgba(26, 16, 10, 0.96) 0%, rgba(13, 8, 5, 0.98) 100%);
+  border: 1px solid rgba(180, 83, 9, 0.5);
+  border-left: 4px solid #b45309;
+  padding: 24px 28px;
+  border-radius: 4px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(180, 83, 9, 0.2);
+  overflow: hidden;
+  transition: opacity 0.5s ease;
+  opacity: 0.88;
+}
+
+.charred-relic-facsimile.reading-focus {
+  opacity: 1;
+  border-color: #f59e0b;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.95), inset 0 0 35px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.25);
+}
+
+.charred-ash-fringe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1c0d06 0%, #7c2d12 25%, #1c0d06 50%, #b45309 75%, #1c0d06 100%);
+  filter: blur(0.5px);
+}
+
+.burnt-wax-seal {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 49% 51% 48% 52% / 52% 48% 51% 49%;
+  background: radial-gradient(circle at 34% 30%, #b91c1c 0%, #881313 45%, #4c0505 85%, #250202 100%);
+  border: 1.5px solid rgba(239, 68, 68, 0.45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.9),
+              inset 0 2px 4px rgba(254, 202, 202, 0.35),
+              inset 0 -3px 6px rgba(0, 0, 0, 0.75),
+              0 0 16px rgba(185, 28, 28, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: default;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.burnt-wax-seal:hover {
+  transform: scale(1.05) rotate(-2deg);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.95),
+              inset 0 2px 4px rgba(254, 202, 202, 0.45),
+              inset 0 -3px 6px rgba(0, 0, 0, 0.75),
+              0 0 22px rgba(239, 68, 68, 0.5);
+}
+
+.wax-seal-svg {
+  width: 44px;
+  height: 44px;
+  display: block;
+  color: #fecaca;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.85)) drop-shadow(0 -0.5px 0.5px rgba(254, 202, 202, 0.3));
+}
+
+.charred-signature-witness {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(212, 168, 83, 0.25);
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: #a8a29e;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.witness-carbon {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+.dossier-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.dossier-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dossier-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--brass-bright);
+  text-transform: uppercase;
+  flex-wrap: wrap;
+}
+
+.dossier-seal-badge {
+  background: rgba(185, 28, 28, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.dossier-title {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff6e0;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+}
+
+
+.dossier-body {
+  font-family: 'Newsreader', 'Lora', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #f1f5f9;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ==========================================================================
+   DYNAMIC ATMOSPHERIC THEMES (SCROLLYTELLING READ ENGINE)
+   ========================================================================== */
+
+/* Chapter I: Alpine Sanctuary Night (Deep lapis lazuli and silver winter starlight) */
+body.theme-alpine .sky-backdrop-gradient {
+  background: radial-gradient(circle at 50% 20%, #162038 0%, #0b1120 50%, #04060c 100%);
+  filter: none;
+}
+
+/* Chapter II: When the Sky Wept Blood (Cataclysmic burnt crimson and bruised purple) */
+body.theme-cataclysm .sky-backdrop-gradient {
+  background: radial-gradient(circle at 50% 55%, #4a150b 0%, #2b0b06 50%, #100302 100%);
+  filter: saturate(1.4) contrast(1.15);
+}
+body.theme-cataclysm .sandstorm-haze {
+  opacity: 0.55;
+}
+
+/* Chapter III: The Erasure of a Soul (Muted melancholy ashen charcoal and cold stone) */
+body.theme-ashen .sky-backdrop-gradient {
+  background: radial-gradient(circle at 50% 40%, #1c181b 0%, #100d10 50%, #060507 100%);
+  filter: saturate(0.8) contrast(1.05);
+}
+
+/* Chapter IV: The Beacon Across the Abyss (Deep midnight horizon with blooming warm gold dawn) */
+body.theme-beacon .sky-backdrop-gradient {
+  background: radial-gradient(ellipse at 50% 80%, #3e270d 0%, #1b1207 45%, #070812 100%);
+  filter: saturate(1.25);
+}
+
+
+
+.story-reader-footer {
+  padding: 30px 44px 38px;
+  border-top: 1px solid rgba(212, 168, 83, 0.25);
+  text-align: center;
+  background: rgba(10, 7, 4, 0.85);
+}
+
+.btn-story-transmit {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #d4a853 0%, #b45309 100%);
+  color: #0a0603;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 16px 36px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(212, 168, 83, 0.5);
+  transition: all 0.25s ease;
+}
+
+.btn-story-transmit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 45px rgba(212, 168, 83, 0.8);
+  background: linear-gradient(135deg, #ffe099 0%, #d4a853 100%);
+}
+
+.story-footer-hint {
+  font-family: 'Space Mono', monospace;
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 10px;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   ⚡ CLIMAX INTEGRATED STAGE: THE DESERT THRESHOLD GATEWAY & TRANSCEIVER
+   ========================================================================== */
+.climax-scroll-gateway {
+  margin-top: 54px;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.desert-horizon-transition {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.parchment-fringe-tear {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.65), #f59e0b, rgba(217, 119, 6, 0.65), transparent);
+  margin-bottom: 24px;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+.dunes-horizon-crest {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.crest-sigil {
+  font-size: 14px;
+  color: var(--brass-bright);
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 10px #f59e0b;
+}
+
+.crest-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 22px;
+  color: #ffd580;
+  letter-spacing: 0.08em;
+  margin-top: 8px;
+  text-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+}
+
+.crest-sub {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 16px;
+  color: #d1d5db;
+  margin-top: 6px;
+  line-height: 1.5;
 }
 
 .climax-panel {
   position: relative;
+  margin: 0 auto;
   width: 100%;
-  max-width: 660px;
-  background: rgba(28, 14, 10, 0.94);
-  border-color: #d97706;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(217, 119, 6, 0.35);
-  padding: 26px 30px 24px;
+  max-width: 780px;
+  background: rgba(22, 11, 7, 0.98);
+  border: 2px solid #d97706;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.98), 0 0 60px rgba(217, 119, 6, 0.45);
+  padding: 30px 34px 28px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  animation: modalAscend 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 18px;
+  border-radius: 6px;
 }
 
-@keyframes modalAscend {
-  0% { transform: scale(0.92) translateY(20px); opacity: 0; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
-}
-
-.climax-alarm-strip {
+/* Astrolabe Quick-Return Floating Compass */
+.astrolabe-compass-btn {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 80;
+  background: rgba(18, 12, 8, 0.94);
+  border: 1.5px solid rgba(212, 168, 83, 0.65);
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  background: rgba(185, 28, 28, 0.28);
-  border: 1px solid rgba(239, 68, 68, 0.6);
-  padding: 6px 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.85), 0 0 16px rgba(212, 168, 83, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: opacity 0.4s ease, transform 0.3s ease, border-color 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.astrolabe-compass-btn.compass-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.astrolabe-compass-btn:hover {
+  border-color: #ffd580;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.95), 0 0 24px rgba(245, 158, 11, 0.55);
+  transform: translateY(-2px) scale(1.06);
+}
+
+.compass-dial-ring {
+  width: 44px;
+  height: 44px;
+}
+
+.compass-svg {
+  width: 100%;
+  height: 100%;
+}
+
+#compass-needle-group {
+  transform-origin: 27px 27px;
+  will-change: transform;
+}
+
+/* ── Desert Radio Transceiver Top Status Bar ── */
+.radio-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(18, 10, 6, 0.95);
+  border: 1px solid rgba(217, 119, 6, 0.55);
+  padding: 9px 14px;
   border-radius: 4px;
   font-family: 'Space Mono', monospace;
   font-size: 11px;
+}
+
+.radio-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fbbf24;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-title {
   font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #fca5a5;
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  color: #f59e0b;
+  letter-spacing: 0.08em;
 }
 
-.alarm-pulsing-dot {
-  width: 8px;
-  height: 8px;
+.brand-sep {
+  color: #78350f;
+}
+
+#radio-current-title {
+  color: #fde68a;
+  letter-spacing: 0.05em;
+}
+
+.radio-status-lights {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.led-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: #fed7aa;
+}
+
+.led-bulb {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--storm-crimson);
-  box-shadow: 0 0 10px var(--storm-crimson);
-  animation: alarmPulse 1s infinite alternate;
+  background: #374151;
+  box-shadow: none;
 }
 
-@keyframes alarmPulse {
-  0% { opacity: 0.3; transform: scale(0.8); }
-  100% { opacity: 1; transform: scale(1.3); }
+.led-bulb.red.active {
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444, 0 0 4px #f87171;
+  animation: pulseGlow 1s infinite alternate;
 }
 
+.led-bulb.amber.active {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b, 0 0 4px #fbbf24;
+  animation: pulseGlow 1.4s infinite alternate;
+}
+
+/* ── Oscilloscope Chassis & CRT Canvas ── */
 .radio-overload-box {
-  background: rgba(12, 5, 4, 0.85);
-  border: 1px solid rgba(217, 119, 6, 0.4);
-  border-radius: 4px;
-  padding: 10px 14px;
+  background: rgba(12, 6, 4, 0.96);
+  border: 1.5px solid rgba(217, 119, 6, 0.55);
+  border-radius: 5px;
+  padding: 10px 14px 12px;
+  overflow: hidden;
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.9);
 }
 
 .overload-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  align-items: center;
+  margin-bottom: 8px;
   font-family: 'Space Mono', monospace;
-  font-size: 9.5px;
+  font-size: 10.5px;
 }
-.freq-tag { color: #f59e0b; }
-.signal-tag { color: #ef4444; font-weight: 700; }
+.freq-tag { color: #f59e0b; letter-spacing: 0.08em; font-weight: 700; }
+.signal-tag { color: #ef4444; font-weight: 700; letter-spacing: 0.08em; }
 
 .oscilloscope-screen {
+  position: relative;
   width: 100%;
-  height: 36px;
-  background: #060201;
-  border: 1px solid rgba(217, 119, 6, 0.25);
-  border-radius: 2px;
+  height: 70px;
+  background: #080302;
+  border: 1px solid rgba(217, 119, 6, 0.4);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.95), inset 0 0 8px rgba(245, 158, 11, 0.15);
 }
 
-.oscilloscope-wave {
-  fill: none;
-  stroke: #ef4444;
-  stroke-width: 1.8;
-  filter: drop-shadow(0 0 6px #ef4444);
-  animation: stormOscillate 0.6s infinite linear;
+#radio-oscilloscope-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-@keyframes stormOscillate {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-40px); }
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.3) 0px,
+    rgba(0, 0, 0, 0.3) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  opacity: 0.7;
 }
 
-.dispatch-container {
+/* ── Active Synchronized Subtitles (Desert Aesthetic) ── */
+.sandstorm-transcript-box.active-subtitles {
+  min-height: 84px;
+  padding: 14px 18px;
+  background: rgba(10, 4, 3, 0.96);
+  border: 1.5px solid rgba(217, 119, 6, 0.6);
+  border-radius: 5px;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.95), 0 4px 20px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.sandstorm-transcript-text {
+  font-family: 'Newsreader', 'Lora', Georgia, serif;
+  font-size: 18.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #fff8eb;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sandstorm-transcript-text.line-switching {
+  opacity: 0.2;
+  transform: translateY(2px);
+}
+
+.sandstorm-transcript-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: #f59e0b;
+  text-transform: uppercase;
+}
+
+/* ── Interactive Action Deck & Tune Controls ── */
+.action-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-tune {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, #d97706 0%, #92400e 100%);
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  border: 1px solid #f59e0b;
+  box-shadow: 0 0 25px rgba(217, 119, 6, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-tune:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.7);
+  background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+}
+
+.radio-deck {
+  width: 100%;
+  background: rgba(14, 7, 5, 0.92);
+  border: 1px solid rgba(217, 119, 6, 0.45);
+  border-radius: 5px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.85);
 }
 
-.dispatch-sender-tag {
+.deck-timeline-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
 }
 
-.sender-avatar {
-  font-size: 22px;
+.time-readout {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #f59e0b;
+  min-width: 44px;
+}
+
+.scrubber-track-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 20px;
+}
+
+.scrubber-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 5px;
+  background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
+  border-radius: 3px;
+  pointer-events: none;
+  width: 0%;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.seek-slider {
+  position: relative;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.seek-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fde68a;
+  border: 2px solid #b45309;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.9);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.seek-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.deck-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.deck-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(26, 14, 9, 0.9);
+  border: 1px solid rgba(217, 119, 6, 0.45);
+  color: #fde68a;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deck-btn:hover {
+  background: rgba(45, 24, 15, 0.95);
+  border-color: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.btn-primary-play {
+  background: linear-gradient(180deg, #d97706 0%, #92400e 100%);
+  color: #060201;
+  border: 1px solid #fde68a;
+  font-weight: 800;
+  box-shadow: 0 0 16px rgba(217, 119, 6, 0.45);
+  padding: 8px 18px;
+}
+
+.btn-primary-play:hover {
+  background: linear-gradient(180deg, #fde68a 0%, #f59e0b 50%, #b45309 100%);
+  color: #000000;
+}
+
+.deck-vol-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-btn-mute {
+  background: none;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.vol-slider-wrap {
+  width: 70px;
+  display: flex;
+  align-items: center;
+}
+
+.vol-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f59e0b;
+  cursor: pointer;
+}
+
+.vol-percent {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #fde68a;
+  min-width: 32px;
+}
+
+/* ── Sender Avatar ── */
+.dispatch-sender-tag {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sender-avatar-portrait {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #f59e0b;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+.sender-portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: rgba(18, 10, 5, 0.95);
+  padding: 3px;
+  border-radius: 50%;
+  display: block;
+}
+
+.sender-radio-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border: 2px solid #060201;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseGlow 1.6s infinite alternate;
 }
 
 .sender-name {
   font-family: 'Cinzel', serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--brass-bright);
 }
 
 .sender-loc {
   font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  color: rgba(254, 215, 170, 0.7);
-}
-
-.dispatch-text-box {
-  background: rgba(10, 4, 3, 0.85);
-  border: 1px solid rgba(217, 119, 6, 0.3);
-  padding: 14px 16px;
-  border-radius: 4px;
-  min-height: 100px;
-}
-
-.typewriter-text {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 16px;
-  font-style: italic;
-  line-height: 1.5;
-  color: #ffedd5;
-}
-
-.prophecy-banner-award {
-  text-align: center;
-  background: rgba(212, 168, 83, 0.12);
-  border: 1px solid rgba(212, 168, 83, 0.5);
-  padding: 12px 16px;
-  border-radius: 4px;
-}
-
-.award-sigil {
-  font-family: 'Cinzel', serif;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: var(--brass-base);
-}
-
-.award-quote {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: #ffffff;
-  text-shadow: 0 0 14px var(--brass-bright);
-  margin-top: 4px;
-}
-
-.climax-relics-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.climax-relic-chip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(14, 7, 5, 0.7);
-  border: 1px solid rgba(212, 168, 83, 0.28);
-  padding: 8px 12px;
-  border-radius: 4px;
-}
-
-.relic-icon { font-size: 20px; }
-.relic-name {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--brass-bright);
+  font-size: 10px;
+  color: rgba(254, 215, 170, 0.75);
 }
 .relic-sub {
   font-family: 'Space Mono', monospace;
-  font-size: 8.5px;
+  font-size: 9.5px;
   color: rgba(254, 215, 170, 0.75);
 }
 
 .climax-actions-row {
   display: flex;
-  gap: 12px;
-  margin-top: 4px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+  margin-top: 6px;
 }
 
 .btn-climax-hub {
-  flex: 1;
+  flex: 1.25 1 0%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
-  border: 1px solid #fde68a;
-  color: #1a0802;
+  gap: 6px;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #fff;
   font-family: 'Cinzel', serif;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  padding: 12px 18px;
+  letter-spacing: 0.05em;
+  padding: 12px 10px;
   border-radius: 4px;
   text-decoration: none;
   box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
   transition: all 0.25s ease;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .btn-climax-hub:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(245, 158, 11, 0.65);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.75);
 }
 
 .btn-climax-replay {
-  background: rgba(20, 10, 8, 0.8);
+  flex: 1 1 0%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(20, 10, 8, 0.85);
   border: 1px solid rgba(212, 168, 83, 0.35);
   color: var(--brass-bright);
   font-family: 'Cinzel', serif;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 12px 18px;
+  letter-spacing: 0.04em;
+  padding: 12px 10px;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  text-align: center;
 }
 
 .btn-climax-replay:hover {
-  background: rgba(212, 168, 83, 0.16);
+  background: rgba(212, 168, 83, 0.2);
   border-color: var(--brass-bright);
 }
 
-/* ── Responsive Viewport ── */
-@media (max-width: 1080px) {
-  .cipher-workspace-layout {
-    grid-template-columns: 1fr;
-  }
-  .dial-workbench-section {
-    max-width: 520px;
-    margin: 0 auto;
-    width: 100%;
+@media (max-width: 640px) {
+  .climax-actions-row {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
+/* ── Responsive Viewport ── */
 @media (max-width: 768px) {
   .cipher-top-banner {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 12px;
   }
   .banner-left, .banner-right {
     justify-content: space-between;
   }
-  .letter-box {
-    width: 32px;
-    height: 40px;
-    font-size: 18px;
+  .story-reader-header {
+    padding: 28px 20px 16px;
   }
-  .word-boxes {
-    gap: 4px;
+  .story-main-title {
+    font-size: 28px;
   }
-  .prophecy-row {
-    gap: 12px;
+  .story-reader-body {
+    padding: 28px 20px 24px;
+    font-size: 19px;
+  }
+  .climax-panel {
+    padding: 22px 18px 20px;
+  }
+  .reading-steps-row {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 6px 10px 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .codex-margin-scale {
+    display: none;
   }
 }
+
+/* ===========================================================================
+   ⚡ DEDICATED RADIO TRANSCEIVER MODAL STAGE
+   =========================================================================== */
+.radio-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.radio-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.radio-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 4, 2, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 0 150px rgba(217, 119, 6, 0.4);
+}
+
+.radio-modal-dialog {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 820px;
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d97706 rgba(20, 10, 5, 0.8);
+  transform: scale(0.92) translateY(24px);
+  transition: transform 0.45 cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 8px;
+}
+
+.radio-modal-overlay.active .radio-modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+.radio-modal-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  z-index: 30;
+  background: rgba(30, 15, 8, 0.95);
+  border: 1.5px solid rgba(245, 158, 11, 0.7);
+  color: #fbbf24;
+  font-size: 15px;
+  font-weight: bold;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.75);
+  transition: all 0.25s ease;
+}
+
+.radio-modal-close-btn:hover {
+  background: #d97706;
+  color: #110500;
+  border-color: #ffd580;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+  transform: scale(1.12);
+}
+
+.radio-modal-header {
+  text-align: center;
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed rgba(245, 158, 11, 0.35);
+}
+
+.modal-header-tag {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: #f59e0b;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+.modal-header-title {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+/* ===========================================================================
+   🏆 CIPHER REWARD & SPOILS MODAL (CONSTELLATION PATH FINALE)
+   =========================================================================== */
+.reward-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reward-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.reward-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 3, 2, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 0 160px rgba(217, 119, 6, 0.35);
+}
+
+.reward-modal-dialog {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 900px;
+  max-height: 92vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d4af37 rgba(18, 10, 5, 0.9);
+  transform: scale(0.92) translateY(24px);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 12px;
+}
+
+.reward-modal-overlay.active .reward-modal-dialog {
+  transform: scale(1) translateY(0);
+}
+
+.reward-modal-panel {
+  background: radial-gradient(circle at 50% 0%, rgba(38, 24, 12, 0.98) 0%, rgba(14, 8, 4, 0.99) 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.55);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.2);
+  padding: 36px 32px 32px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.reward-modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 30;
+  background: rgba(26, 14, 6, 0.9);
+  border: 1.5px solid rgba(212, 175, 55, 0.6);
+  color: #ffd580;
+  font-size: 15px;
+  font-weight: bold;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.reward-modal-close-btn:hover {
+  background: #d4af37;
+  color: #120902;
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.8);
+  transform: scale(1.12);
+}
+
+.reward-modal-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.3);
+}
+
+.reward-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.22em;
+  color: #ffd580;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.reward-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, #ffffff 0%, #ffe9b8 40%, #d4af37 80%, #996515 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 10px 0;
+  line-height: 1.25;
+}
+
+.reward-subtitle {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: #dcd1be;
+  font-style: italic;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+.reward-section-block {
+  margin-bottom: 26px;
+}
+
+.reward-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.section-num {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff1b8;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.04em;
+}
+
+.section-desc {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.96rem;
+  color: #c9bda8;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Glyphs Grid */
+.glyphs-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .glyphs-reward-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.glyph-reward-card {
+  background: rgba(20, 12, 6, 0.85);
+  border: 1.2px solid rgba(212, 175, 55, 0.35);
+  border-radius: 8px;
+  padding: 16px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glyph-reward-card:hover {
+  border-color: #ffd580;
+  background: rgba(30, 18, 9, 0.95);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(212, 175, 55, 0.3);
+}
+
+.glyph-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.glyph-latin-char {
+  font-family: 'Cinzel', serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #ffd580;
+  line-height: 1;
+}
+
+.glyph-symbol-display {
+  margin: 2px 0 0;
+  color: #ffd580;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+}
+
+.glyph-svg {
+  width: 48px;
+  height: 56px;
+  transition: transform 0.3s ease;
+}
+
+.glyph-reward-card:hover .glyph-svg {
+  transform: scale(1.08);
+}
+
+.glyph-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  border-top: 1px dashed rgba(212, 175, 55, 0.2);
+  padding-top: 6px;
+}
+
+.glyph-occur-note {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.8rem;
+  color: #fed7aa;
+  font-style: italic;
+}
+
+.glyph-nature {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  color: #9ca3af;
+  line-height: 1.25;
+}
+
+/* Equations Grid */
+.equations-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .equations-reward-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.equation-reward-card {
+  background: rgba(20, 12, 6, 0.85);
+  border: 1.2px solid rgba(212, 175, 55, 0.35);
+  border-radius: 8px;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+}
+
+.equation-reward-card:hover {
+  border-color: #ffd580;
+  background: rgba(30, 18, 9, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 175, 55, 0.25);
+}
+
+.eq-reward-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.eq-reward-formula {
+  font-family: 'Cinzel', serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.eq-reward-pair {
+  font-family: 'EB Garamond', serif;
+  font-size: 0.88rem;
+  color: #fed7aa;
+}
+
+.eq-reward-hint {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  line-height: 1.25;
+}
+
+/* Synchronization Banner */
+.reward-sync-banner {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sync-banner-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.84rem;
+  color: #86efac;
+}
+
+.sync-check {
+  font-weight: 800;
+  color: #4ade80;
+  font-size: 1rem;
+}
+
+/* Action Buttons */
+.reward-actions-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-reward-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  background: linear-gradient(180deg, #d4af37 0%, #b8860b 100%);
+  border: 1.5px solid #ffe9b8;
+  border-radius: 8px;
+  color: #120902;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.4);
+  transition: all 0.25s ease;
+}
+
+.btn-reward-primary:hover {
+  background: linear-gradient(180deg, #ffd700 0%, #d4af37 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.8), 0 0 28px rgba(212, 175, 55, 0.6);
+}
+
+.btn-reward-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  background: rgba(26, 16, 8, 0.9);
+  border: 1.2px solid rgba(212, 175, 55, 0.5);
+  border-radius: 8px;
+  color: #ffd580;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-reward-secondary:hover {
+  background: rgba(38, 24, 12, 0.95);
+  border-color: #ffd580;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+

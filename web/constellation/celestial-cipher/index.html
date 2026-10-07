@@ -5,323 +5,932 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>The Celestial Cipher · Station 09 · The Eclipse Order</title>
   
-  <!-- Typography & Fonts -->
+  <!-- Typography & Fonts: Premium Editorial Serifs for effortless reading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="../../shared/navigator.css">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body class="cipher-expedition-body">
 
-  <!-- Background Sandstorm Canvas & Dynamic Sky Atmosphere -->
+  <!-- Scenic Atmospheric Background System (Chapter by Chapter Environments) -->
+  <div class="scenic-atmosphere-system" id="scenic-atmosphere" aria-hidden="true">
+    <div class="scenic-plate scenic-plate-1 active" style="background-image: url('./assets/bg-chapter1-observatory.jpg');"></div>
+    <div class="scenic-plate scenic-plate-2" style="background-image: url('./assets/bg-chapter2-cataclysm.jpg');"></div>
+    <div class="scenic-plate scenic-plate-3" style="background-image: url('./assets/bg-chapter3-ashen.jpg');"></div>
+    <div class="scenic-plate scenic-plate-4" style="background-image: url('./assets/bg-chapter4-beacon.jpg');"></div>
+    <div class="scenic-vignette-mask"></div>
+    <div class="scenic-candlelight-warmth"></div>
+  </div>
+
+  <!-- Background Continuous Canvas & Dynamic Atmospheric Overlays -->
   <canvas id="sandstorm-canvas"></canvas>
-  <div class="sky-backdrop-gradient"></div>
+  <div class="sky-backdrop-gradient" id="sky-backdrop"></div>
+  
+  <!-- Tactile Antique Vellum Parchment Texture Layer (Museum-grade fibrous paper) -->
+  <div class="global-vellum-texture-layer" aria-hidden="true"></div>
+
+  <!-- Renaissance Astrolabe & Cartographic Celestial Mesh Overlay -->
+  <div class="celestial-chart-overlay" aria-hidden="true">
+    <svg class="chart-svg-mesh" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="chartGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffd580" stop-opacity="0.38"/>
+          <stop offset="50%" stop-color="#d4a853" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#8c6d3b" stop-opacity="0.05"/>
+        </linearGradient>
+        <linearGradient id="chartCrimsonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ef4444" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#7f1d1d" stop-opacity="0.08"/>
+        </linearGradient>
+        <linearGradient id="chartCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.08"/>
+        </linearGradient>
+      </defs>
+
+      <!-- CHAPTER I: High Alpine Astrolabe & Constellation Coordinates -->
+      <g class="chart-group chart-theme-1">
+        <circle cx="800" cy="380" r="540" fill="none" stroke="url(#chartCyanGrad)" stroke-width="1.2" stroke-dasharray="4 6"/>
+        <circle cx="800" cy="380" r="440" fill="none" stroke="rgba(147, 197, 253, 0.22)" stroke-width="0.8"/>
+        <circle cx="800" cy="380" r="320" fill="none" stroke="rgba(147, 197, 253, 0.28)" stroke-width="1.5" stroke-dasharray="12 4 2 4"/>
+        <circle cx="800" cy="380" r="180" fill="none" stroke="rgba(147, 197, 253, 0.3)" stroke-width="0.8"/>
+        <circle cx="800" cy="380" r="60" fill="none" stroke="rgba(147, 197, 253, 0.4)" stroke-width="1"/>
+        
+        <line x1="800" y1="-100" x2="800" y2="900" stroke="rgba(147, 197, 253, 0.18)" stroke-width="1" stroke-dasharray="8 6"/>
+        <line x1="200" y1="380" x2="1400" y2="380" stroke="rgba(147, 197, 253, 0.18)" stroke-width="1" stroke-dasharray="8 6"/>
+        <line x1="380" y1="-40" x2="1220" y2="800" stroke="rgba(147, 197, 253, 0.12)" stroke-width="0.7"/>
+        <line x1="1220" y1="-40" x2="380" y2="800" stroke="rgba(147, 197, 253, 0.12)" stroke-width="0.7"/>
+
+        <!-- Constellation Mesh -->
+        <path d="M720 180 L760 210 L800 230 L840 260 L890 280 L880 320 L840 330 Z" fill="none" stroke="rgba(254, 240, 138, 0.4)" stroke-width="1.2"/>
+        <circle cx="800" cy="380" r="3.5" fill="#fef08a"/>
+        <text x="815" y="385" font-family="'Space Mono', monospace" font-size="10" fill="rgba(147, 197, 253, 0.6)" letter-spacing="2">POLARIS · 00°00'N</text>
+        <text x="1260" y="395" font-family="'Cinzel', serif" font-size="12" fill="rgba(147, 197, 253, 0.5)" letter-spacing="3">HORIZON ALPINUS</text>
+      </g>
+
+      <!-- CHAPTER II: Cataclysm Seismic Vectors & Sandstorm Fractures -->
+      <g class="chart-group chart-theme-2">
+        <path d="M100 850 L340 680 L520 710 L750 540 L880 570 L1150 380 L1320 420 L1550 210" fill="none" stroke="url(#chartCrimsonGrad)" stroke-width="2.2"/>
+        <path d="M280 820 L420 740 L650 630 L820 490 L980 430 L1220 280 L1450 160" fill="none" stroke="rgba(239, 68, 68, 0.3)" stroke-width="1.2" stroke-dasharray="6 4"/>
+        <path d="M800 500 C600 450, 450 300, 520 150 C600 20, 850 40, 950 180 C1050 320, 920 540, 720 580 C480 620, 320 420, 380 200" fill="none" stroke="rgba(249, 115, 22, 0.22)" stroke-width="1.6" stroke-dasharray="14 8"/>
+        <circle cx="800" cy="500" r="380" fill="none" stroke="rgba(239, 68, 68, 0.22)" stroke-width="1.5" stroke-dasharray="2 8"/>
+        <text x="740" y="860" font-family="'Space Mono', monospace" font-size="11" fill="rgba(239, 68, 68, 0.6)" letter-spacing="3">TEMPESTAS ARENAE RUBRAE // ANNO TRIBULATIONIS</text>
+      </g>
+
+      <!-- CHAPTER III: Sterile Surveyor Grid & Charred Meridian Ledger -->
+      <g class="chart-group chart-theme-3">
+        <line x1="200" y1="0" x2="200" y2="1000" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+        <line x1="400" y1="0" x2="400" y2="1000" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+        <line x1="600" y1="0" x2="600" y2="1000" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+        <line x1="800" y1="0" x2="800" y2="1000" stroke="rgba(156, 163, 175, 0.15)" stroke-width="1.2" stroke-dasharray="4 4"/>
+        <line x1="1000" y1="0" x2="1000" y2="1000" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+        <line x1="1200" y1="0" x2="1200" y2="1000" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+        <line x1="1400" y1="0" x2="1400" y2="1000" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+
+        <line x1="0" y1="250" x2="1600" y2="250" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+        <line x1="0" y1="500" x2="1600" y2="500" stroke="rgba(156, 163, 175, 0.15)" stroke-width="1.2" stroke-dasharray="4 4"/>
+        <line x1="0" y1="750" x2="1600" y2="750" stroke="rgba(156, 163, 175, 0.1)" stroke-width="1"/>
+
+        <polygon points="400,750 600,500 800,750" fill="none" stroke="rgba(156, 163, 175, 0.15)" stroke-width="1"/>
+        <polygon points="800,750 1000,500 1200,750" fill="none" stroke="rgba(156, 163, 175, 0.15)" stroke-width="1"/>
+        <text x="650" y="930" font-family="'Space Mono', monospace" font-size="10" fill="rgba(156, 163, 175, 0.45)" letter-spacing="4">PARCHMENT DAMNATUS // TABULA STERILIS</text>
+      </g>
+
+      <!-- CHAPTER IV: Desert Horizon Radial Rays & Beacon Triangulation -->
+      <g class="chart-group chart-theme-4">
+        <path d="M0 900 A900 900 0 0 1 1600 900" fill="none" stroke="url(#chartGoldGrad)" stroke-width="1.8"/>
+        <path d="M150 900 A750 750 0 0 1 1450 900" fill="none" stroke="rgba(251, 191, 36, 0.25)" stroke-width="1.2" stroke-dasharray="8 6"/>
+        <path d="M300 900 A600 600 0 0 1 1300 900" fill="none" stroke="rgba(251, 191, 36, 0.22)" stroke-width="1.2"/>
+        <path d="M480 900 A420 420 0 0 1 1120 900" fill="none" stroke="rgba(251, 191, 36, 0.28)" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <line x1="1245" y1="780" x2="300" y2="100" stroke="rgba(254, 240, 138, 0.26)" stroke-width="1.4" stroke-dasharray="10 8"/>
+        <line x1="1245" y1="780" x2="600" y2="40" stroke="rgba(254, 240, 138, 0.3)" stroke-width="1.6"/>
+        <line x1="1245" y1="780" x2="900" y2="20" stroke="rgba(254, 240, 138, 0.24)" stroke-width="1.2"/>
+        <line x1="1245" y1="780" x2="1350" y2="100" stroke="rgba(254, 240, 138, 0.28)" stroke-width="1.4"/>
+
+        <text x="1100" y="860" font-family="'Cinzel', serif" font-size="12" fill="rgba(254, 240, 138, 0.7)" letter-spacing="4">LUMEN REMOTUM // 142.85 MHz</text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Dynamic Chapter Horizon Silhouettes (Alpine Peaks / Storm Front / Desert Dunes) -->
+  <div class="horizon-silhouette-layer" aria-hidden="true">
+    <svg class="horizon-svg" viewBox="0 0 1600 240" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- CHAPTER I: Alpine Peaks Silhouette -->
+      <g class="horizon-group horizon-alpine">
+        <path d="M0 240 L0 180 L120 130 L220 165 L350 90 L480 170 L600 110 L740 185 L850 75 L980 160 L1120 100 L1260 175 L1380 80 L1490 145 L1600 120 L1600 240 Z" fill="#040710"/>
+        <path d="M0 240 L0 200 L150 160 L300 210 L460 140 L620 195 L780 130 L940 180 L1100 125 L1250 190 L1420 140 L1600 185 L1600 240 Z" fill="#020409" opacity="0.85"/>
+        <polyline points="330 100 350 90 380 115" stroke="rgba(147, 197, 253, 0.55)" stroke-width="2" fill="none"/>
+        <polyline points="830 85 850 75 880 105" stroke="rgba(147, 197, 253, 0.65)" stroke-width="2.2" fill="none"/>
+        <polyline points="1360 90 1380 80 1410 105" stroke="rgba(147, 197, 253, 0.55)" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- CHAPTER II: Shattered Viaduct & Storm Cloud Silhouette -->
+      <g class="horizon-group horizon-cataclysm">
+        <path d="M0 240 L0 170 Q140 120 280 180 T560 140 T840 200 T1120 130 T1400 175 L1600 140 L1600 240 Z" fill="#150305"/>
+        <path d="M420 240 L420 150 L460 150 L460 180 Q500 150 540 180 L540 150 L570 150 L570 240 Z" fill="#0d0203"/>
+        <path d="M880 240 L880 130 L920 130 L935 155 Q970 130 1005 160 L1020 130 L1050 130 L1050 240 Z" fill="#0d0203"/>
+      </g>
+
+      <!-- CHAPTER III: Cold Wasteland Plateaus & Lonely Ruins -->
+      <g class="horizon-group horizon-ashen">
+        <path d="M0 240 L0 205 L200 190 L380 200 L540 185 L720 195 L900 180 L1100 200 L1300 185 L1500 195 L1600 190 L1600 240 Z" fill="#080709"/>
+        <rect x="680" y="160" width="16" height="50" fill="#050406"/>
+        <rect x="730" y="145" width="22" height="65" fill="#050406"/>
+        <rect x="780" y="170" width="14" height="40" fill="#050406"/>
+      </g>
+
+      <!-- CHAPTER IV: Vast Undulating Desert Dunes & Distant Tower -->
+      <g class="horizon-group horizon-dunes">
+        <path d="M0 240 L0 195 Q250 150 500 185 T1000 145 T1500 180 L1600 170 L1600 240 Z" fill="#140902"/>
+        <path d="M0 240 L0 215 Q350 175 700 210 T1400 175 L1600 195 L1600 240 Z" fill="#0b0501" opacity="0.9"/>
+        <path d="M1225 185 L1225 125 L1245 110 L1265 125 L1265 185 Z" fill="#070301"/>
+        <circle cx="1245" cy="108" r="4.5" fill="#fbbf24" opacity="0.95"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Ambient Lighting Overlays -->
+  <div class="sky-nebula-texture" id="sky-nebula"></div>
+  <div class="sky-dust-texture" id="sky-dust"></div>
   <div class="vignette-overlay"></div>
   <div class="sandstorm-haze" id="sandstorm-haze"></div>
+  <div class="lightning-flash-overlay" id="lightning-flash-overlay" aria-hidden="true"></div>
 
-  <!-- Main Game Container -->
+  <!-- Propuesta C: Physical Distant Beacon Pulse (Visible in Chapter IV) -->
+  <div class="distant-beacon-emitter" id="distant-beacon-emitter" aria-hidden="true">
+    <div class="beacon-lamp-head">
+      <div class="beacon-cone-flare"></div>
+      <div class="beacon-ray-shaft"></div>
+      <div class="beacon-pulse-corona"></div>
+      <div class="beacon-lens-core"></div>
+    </div>
+    <span class="beacon-locator-text">DESERTI LIMEN // 142.85 MHz</span>
+  </div>
+
+  <!-- Main Viewport Container -->
   <div class="cipher-game-viewport">
 
-    <!-- Top Navigation & Telemetry Banner -->
-    <header class="cipher-top-banner">
-      <div class="banner-left">
-        <a href="../../index.html#view-trail" class="btn-back-hub" title="Return to Celestial Route Map">
-          <span class="btn-icon">⟵</span>
-          <span class="btn-text">Route Map</span>
-        </a>
-        <div class="telemetry-pill">
-          <span class="pulse-beacon"></span>
-          <span class="telemetry-label">STATION 09 // CONSTELLATION FINALE</span>
-        </div>
+    <!-- Ceremonial Quest Header (Matches Station 07 & Station 08) -->
+    <header class="quest-header">
+      <div class="order-badge">
+        <span class="pulse-dot"></span>
+        ✦ THE ECLIPSE ORDER · CONSTELLATION PATH // STATION 09 ✦
       </div>
-
-      <div class="banner-center">
-        <h1 class="cipher-main-title">The Celestial Cipher</h1>
-        <div class="cipher-sub-title">✦ SHEET 07 · THE ASTROLABE COORDINATE DIAL ✦</div>
-      </div>
-
-      <div class="banner-right">
-        <div class="radio-status-pill" id="radio-pill">
-          <span class="radio-freq">142.85 MHz</span>
-          <span class="radio-state">CARRIER LOCKED</span>
-        </div>
-        <button type="button" class="btn-quick-preview" id="btn-quick-solve" title="Expedition Auto-Attune (Testing Assist)">
-          <span>✦ Auto-Attune</span>
-        </button>
-      </div>
+      <h1 class="quest-title">The Celestial Cipher</h1>
     </header>
 
-    <!-- Main Workspace Workspace Split -->
-    <main class="cipher-workspace-layout">
-
-      <!-- LEFT COLUMN: The Concentric Coordinate Dial -->
-      <section class="dial-workbench-section">
-        <div class="brass-card-frame dial-frame">
-          <div class="card-corner corner-tl"></div>
-          <div class="card-corner corner-tr"></div>
-          <div class="card-corner corner-bl"></div>
-          <div class="card-corner corner-br"></div>
-
-          <!-- Dial Header & Active Target Readout -->
-          <div class="dial-header-row">
-            <div class="readout-box">
-              <span class="readout-label">ALIGNMENT TARGET</span>
-              <span class="readout-val" id="target-coord-readout">HOUR IV · DECL +45°</span>
-            </div>
-            <div class="readout-box letter-readout-box">
-              <span class="readout-label">RESOLVED LETTER</span>
-              <span class="readout-val letter-val" id="target-letter-readout">Y</span>
-            </div>
-          </div>
-
-          <!-- The Interactive SVG Dial Container -->
-          <div class="dial-svg-wrapper" id="dial-wrapper">
-            <svg id="celestial-dial-svg" viewBox="-300 -300 600 600" preserveAspectRatio="xMidYMid meet">
-              <defs>
-                <radialGradient id="dialBrassGrad" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#1c140a" />
-                  <stop offset="65%" stop-color="#120c06" />
-                  <stop offset="100%" stop-color="#0a0603" />
-                </radialGradient>
-
-                <radialGradient id="hubGoldGlow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#ffe099" stop-opacity="0.9" />
-                  <stop offset="50%" stop-color="#d4a853" stop-opacity="0.4" />
-                  <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                </radialGradient>
-
-                <linearGradient id="needleRayGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-                  <stop offset="0%" stop-color="#4fe3c1" stop-opacity="0.2" />
-                  <stop offset="70%" stop-color="#4fe3c1" stop-opacity="0.8" />
-                  <stop offset="100%" stop-color="#ffffff" stop-opacity="1" />
-                </linearGradient>
-
-                <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="4" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
-
-              <!-- Outer Brass Rim & Bevels -->
-              <circle cx="0" cy="0" r="275" fill="url(#dialBrassGrad)" stroke="#d4a853" stroke-width="2.5" />
-              <circle cx="0" cy="0" r="268" fill="none" stroke="rgba(212,168,83,0.35)" stroke-width="1.2" stroke-dasharray="3, 5" />
-              <circle cx="0" cy="0" r="255" fill="none" stroke="#b45309" stroke-width="1" />
-
-              <!-- Concentric Declination Circles (Outer to Inner) -->
-              <!-- Ring 0: +45° (R: 255 -> 210) -->
-              <circle cx="0" cy="0" r="210" fill="none" stroke="rgba(212,168,83,0.3)" stroke-width="1" />
-              <!-- Ring 1: +15° (R: 210 -> 165) -->
-              <circle cx="0" cy="0" r="165" fill="none" stroke="rgba(212,168,83,0.3)" stroke-width="1" />
-              <!-- Ring 2: -15° (R: 165 -> 120) -->
-              <circle cx="0" cy="0" r="120" fill="none" stroke="rgba(212,168,83,0.3)" stroke-width="1" />
-              <!-- Ring 3: -45° (R: 120 -> 75) -->
-              <circle cx="0" cy="0" r="75" fill="none" stroke="rgba(212,168,83,0.4)" stroke-width="1.2" />
-
-              <!-- Dynamically Populated Sectors, Letters & Rays -->
-              <g id="dial-cells-group"></g>
-              <g id="dial-hour-lines-group"></g>
-              <g id="dial-romans-group"></g>
-
-              <!-- Optical Targeting Reticle & Sighting Beam -->
-              <g id="optical-reticle-group">
-                <line id="optical-needle" x1="0" y1="0" x2="0" y2="-255" stroke="url(#needleRayGrad)" stroke-width="2.2" stroke-linecap="round" />
-                <circle id="target-bead" cx="0" cy="-232" r="16" fill="rgba(79, 227, 193, 0.15)" stroke="#4fe3c1" stroke-width="1.8" filter="url(#glowFilter)" />
-                <circle id="target-bead-inner" cx="0" cy="-232" r="3.5" fill="#ffffff" />
-              </g>
-
-              <!-- Central Celestial Pole Pivot & Astrolabe Hub -->
-              <circle cx="0" cy="0" r="42" fill="#140d07" stroke="#d4a853" stroke-width="2" />
-              <circle cx="0" cy="0" r="32" fill="none" stroke="rgba(212,168,83,0.4)" stroke-dasharray="2, 4" />
-              <circle cx="0" cy="0" r="14" fill="url(#hubGoldGlow)" />
-              <circle cx="0" cy="0" r="5" fill="#ffe099" />
-              <text x="0" y="24" fill="#d4a853" font-family="'Cinzel', serif" font-size="8.5" font-weight="700" letter-spacing="0.1em" text-anchor="middle">POLE</text>
-            </svg>
-          </div>
-
-          <!-- Dial Rotation & Sector Alignment Quick Controls -->
-          <div class="dial-controls-bar">
-            <button type="button" class="btn-step-dial" id="btn-dial-prev" title="Step counter-clockwise">◀ -30°</button>
-            <div class="dial-decl-tabs" id="decl-tabs">
-              <button type="button" class="decl-tab active" data-band="+45°">+45°</button>
-              <button type="button" class="decl-tab" data-band="+15°">+15°</button>
-              <button type="button" class="decl-tab" data-band="-15°">-15°</button>
-              <button type="button" class="decl-tab" data-band="-45°">-45°</button>
-            </div>
-            <button type="button" class="btn-step-dial" id="btn-dial-next" title="Step clockwise">+30° ▶</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- RIGHT COLUMN: Sighting Log & Decoded Prophecy -->
-      <section class="deduction-log-section">
-
-        <!-- Panel 1: Sighting Log (Cuaderno de Avistamientos) -->
-        <div class="brass-card-frame log-card">
-          <div class="card-corner corner-tl"></div>
-          <div class="card-corner corner-tr"></div>
-          <div class="card-corner corner-bl"></div>
-          <div class="card-corner corner-br"></div>
-
-          <div class="log-card-header">
-            <div>
-              <div class="log-section-sigil">📜 THE CARTOGRAPHER'S FIELD RECORD</div>
-              <h2 class="log-section-title">Sighting Log</h2>
-            </div>
-            <div class="log-progress-badge" id="sighting-progress-badge">0 / 24 LOCKED</div>
-          </div>
-
-          <p class="log-instructions">
-            Cross each <strong>Hour Angle</strong> (Roman numeral) with its <strong>Declination Ring</strong> on the celestial dial to resolve its locked letter. Click any coordinate chip to align the instruments automatically.
-          </p>
-
-          <!-- 5 Canonical Thematic Groups -->
-          <div class="sighting-groups-container" id="sighting-groups-container">
-            <!-- Dynamically populated via JS with chips -->
-          </div>
+    <!-- NOVEL READING EXPERIENCE: THE MAN BEHIND THE MAPS -->
+    <main class="novel-main-page" id="novel-page">
+      <article class="novel-reading-frame brass-card-frame">
+        <!-- Living Vellum & Candlelight Codex Texture Layers -->
+        <div class="codex-vellum-texture-layer" aria-hidden="true"></div>
+        <div class="codex-candlelight-glow" aria-hidden="true"></div>
+        <div class="codex-silk-ribbon" aria-hidden="true">
+          <span class="ribbon-notch"></span>
+          <span class="ribbon-sigil">✦</span>
         </div>
 
-        <!-- Panel 2: The Decoded Prophecy Deduction Board -->
-        <div class="brass-card-frame prophecy-card">
-          <div class="card-corner corner-tl"></div>
-          <div class="card-corner corner-tr"></div>
-          <div class="card-corner corner-bl"></div>
-          <div class="card-corner corner-br"></div>
-
-          <div class="prophecy-card-header">
-            <span class="prophecy-sigil">✦ ANCIENT STELLAR DECREE ✦</span>
-            <h3 class="prophecy-title">The Decoded Prophecy</h3>
-          </div>
-
-          <!-- The 5 Word Input Blocks -->
-          <div class="prophecy-board" id="prophecy-board">
-            <!-- Row 1: Word I (YOU), Word II (WERE), Word III (ALWAYS) -->
-            <div class="prophecy-row row-1">
-              <div class="word-block" data-word-idx="0">
-                <span class="word-tag">I</span>
-                <div class="word-boxes" id="word-0-boxes"></div>
-              </div>
-              <div class="word-block" data-word-idx="1">
-                <span class="word-tag">II</span>
-                <div class="word-boxes" id="word-1-boxes"></div>
-              </div>
-              <div class="word-block" data-word-idx="2">
-                <span class="word-tag">III</span>
-                <div class="word-boxes" id="word-2-boxes"></div>
-              </div>
-            </div>
-
-            <!-- Row 2: Word IV (THE), Word V (TREASURE) -->
-            <div class="prophecy-row row-2">
-              <div class="word-block" data-word-idx="3">
-                <span class="word-tag">IV</span>
-                <div class="word-boxes" id="word-3-boxes"></div>
-              </div>
-              <div class="word-block" data-word-idx="4">
-                <span class="word-tag">V</span>
-                <div class="word-boxes" id="word-4-boxes"></div>
-              </div>
+        <!-- Astrolabe Declination & Latitude Graduated Border Scales -->
+        <div class="codex-margin-scale scale-left" aria-hidden="true">
+          <!-- Living Astrolabe Declination Caliper (Tracks real-time scroll position along the graduated scale) -->
+          <div class="declination-caliper" id="declination-caliper" aria-label="Celestial Declination Caliper" title="Astrolabe Reading Alidade · Stations of the Cartographer">
+            <div class="caliper-needle-bracket">
+              <svg class="caliper-needle-svg" viewBox="0 0 46 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 14 L30 14" stroke="#d4a853" stroke-width="2.2" stroke-linecap="round"/>
+                <polygon points="28,7 44,14 28,21" fill="#ffe099" stroke="#d4a853" stroke-width="1.4"/>
+                <circle cx="10" cy="14" r="5.5" fill="#180f08" stroke="#d4a853" stroke-width="1.8"/>
+                <circle cx="10" cy="14" r="2.5" fill="#f59e0b"/>
+              </svg>
+              <div class="caliper-focus-beam" aria-hidden="true"></div>
             </div>
           </div>
 
-          <!-- Validation Feedback / Status Bar -->
-          <div class="prophecy-status-bar" id="prophecy-status-bar">
-            <span class="status-icon">⏳</span>
-            <span class="status-msg">Attune all 24 coordinates to unveil the Cartographer's prophecy...</span>
-          </div>
+          <span class="scale-deg">80°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-tick"></span>
+          <span class="scale-deg">60°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-tick"></span>
+          <span class="scale-deg">40°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-tick"></span>
+          <span class="scale-deg">20°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-deg">00°</span>
+        </div>
+        <div class="codex-margin-scale scale-right" aria-hidden="true">
+          <span class="scale-deg">80°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-tick"></span>
+          <span class="scale-deg">60°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-tick"></span>
+          <span class="scale-deg">40°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-tick"></span>
+          <span class="scale-deg">20°N</span>
+          <span class="scale-tick major"></span>
+          <span class="scale-deg">00°</span>
         </div>
 
-      </section>
+        <div class="codex-brass-corner corner-tl" aria-hidden="true"></div>
+        <div class="codex-brass-corner corner-tr" aria-hidden="true"></div>
+        <div class="codex-brass-corner corner-bl" aria-hidden="true"></div>
+        <div class="codex-brass-corner corner-br" aria-hidden="true"></div>
+
+        <!-- Atmospheric Chapter Progress Tracker (Interactive Chapter Tabs & Silk Thread) -->
+        <nav class="reading-atmosphere-bar" id="reading-atmosphere-bar" aria-label="Reading chapters" role="tablist">
+          <div class="reading-steps-row">
+            <button type="button" class="chapter-step active" id="step-1" data-chapter="1" role="tab" aria-selected="true" aria-controls="chapter-1">
+              <span class="step-sigil">✦</span> <span class="step-title">I. The Alpine Turret</span>
+            </button>
+            <span class="step-divider" aria-hidden="true">✧</span>
+            <button type="button" class="chapter-step" id="step-2" data-chapter="2" role="tab" aria-selected="false" aria-controls="chapter-2">
+              <span class="step-sigil">⚡</span> <span class="step-title">II. The Cataclysm</span>
+            </button>
+            <span class="step-divider" aria-hidden="true">✧</span>
+            <button type="button" class="chapter-step" id="step-3" data-chapter="3" role="tab" aria-selected="false" aria-controls="chapter-3">
+              <span class="step-sigil">🌑</span> <span class="step-title">III. The Ashen Waste</span>
+            </button>
+            <span class="step-divider" aria-hidden="true">✧</span>
+            <button type="button" class="chapter-step" id="step-4" data-chapter="4" role="tab" aria-selected="false" aria-controls="chapter-4">
+              <span class="step-sigil">✨</span> <span class="step-title">IV. The Distant Light</span>
+            </button>
+          </div>
+
+          <!-- Silk & Gold Reading Thread (0% to 100% continuous progress) -->
+          <div class="silk-reading-thread-track" aria-hidden="true">
+            <div class="silk-gold-fill" id="silk-gold-fill"></div>
+            <div class="thread-spark" id="thread-spark"></div>
+            <div class="thread-node node-1 ignited" id="thread-node-1" title="I. The Alpine Turret"><span>✦</span></div>
+            <div class="thread-node node-2" id="thread-node-2" title="II. The Cataclysm"><span>⚡</span></div>
+            <div class="thread-node node-3" id="thread-node-3" title="III. The Ashen Waste"><span>🌑</span></div>
+            <div class="thread-node node-4" id="thread-node-4" title="IV. The Distant Light"><span>✨</span></div>
+          </div>
+        </nav>
+
+        <!-- Chapter Header -->
+        <header class="story-reader-header">
+          <div class="story-order-sigil">✦ THE ARCHIVE OF DESERTI LIMEN ✦</div>
+          <h2 class="story-main-title">The Man Behind the Maps</h2>
+          <div class="story-ornament-line">✧ ✦ ✧</div>
+        </header>
+
+        <!-- Chapter Content with Illuminated Plates -->
+        <div class="story-reader-body">
+          
+          <!-- CHAPTER I -->
+          <section class="novel-chapter active-chapter" id="chapter-1" data-theme="alpine" role="tabpanel" aria-labelledby="step-1">
+            <!-- Marginalia Wings (Propuesta D: Annotations in the Margins) -->
+            <div class="chapter-marginalia-strip" aria-hidden="true">
+              <aside class="chapter-marginalia margin-left">
+                <div class="marginalia-card">
+                  <div class="marginalia-stamp">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                      <circle cx="12" cy="12" r="9"/>
+                      <path d="M12 3v18M3 12h18M6.5 6.5l11 11M6.5 17.5l11-11"/>
+                    </svg>
+                  </div>
+                  <div class="marginalia-text">
+                    <span class="m-date">RECORD 09-A · ANNO 1970</span>
+                    <span class="m-gloss">«Declinatio Vega +38° · Lapis lazuli &amp; argentum»</span>
+                    <span class="m-sub">"Cobalt ink on the celestial sphere."</span>
+                  </div>
+                </div>
+              </aside>
+              <aside class="chapter-marginalia margin-right">
+                <div class="marginalia-card">
+                  <div class="marginalia-stamp">✦</div>
+                  <div class="marginalia-text">
+                    <span class="m-date">ALPES SEPTENTRIONALES</span>
+                    <span class="m-gloss">«In arce altissima, ante tempestatem magnam»</span>
+                    <span class="m-sub">"Set to true polaris with a silver compass."</span>
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            <h3 class="novel-part-heading">I. The Caliper and the Silver Dust</h3>
+            <p class="novel-para"><span class="novel-dropcap">L</span>ong before the mountain towers fell silent, before the roads were buried by dust and the old world broke, the Cartographer was not an old man living in shadows. He was young, burning with ambition, and possessed by a brilliant, restless mind. His real name was <strong>Icarus</strong>.</p>
+            <p class="novel-para">He lived in the highest tower of the Alpine Observatory, where cold winds blew against the windows and the rooms smelled of warm tea, old paper, and metal tools. But he was not alone in that quiet solitude. With him lived <strong>Aurelia</strong>—an astronomer whose calm heart brought him peace, and an artist who painted the night sky with deep blue ink, gold powder, and silver leaf.</p>
+
+            <!-- ILLUMINATED PLATE I: AURELIA AT WORK -->
+            <figure class="illuminated-plate-figure">
+              <div class="plate-frame">
+                <img src="./assets/aurelia-studio.jpg" alt="Aurelia illuminating celestial charts in the observatory turret" class="plate-image" loading="lazy">
+                <div class="plate-specular-shimmer"></div>
+                <div class="plate-corner-flourish tl">✦</div>
+                <div class="plate-corner-flourish tr">✦</div>
+                <div class="plate-corner-flourish bl">✦</div>
+                <div class="plate-corner-flourish br">✦</div>
+              </div>
+              <figcaption class="plate-caption">
+                <span class="plate-tag">FOLIO PLATE I</span>
+                <strong class="plate-title">Aurelia at the Worktable · Alpine Sanctuary (Anno 1970)</strong>
+                <span class="plate-sub">Grinding blue stones into deep ink while painting the star maps with silver leaf.</span>
+              </figcaption>
+            </figure>
+
+            <p class="novel-para">In those proud, feverish years, young Icarus rarely stopped to simply admire the stars. While Aurelia found quiet peace in the serene wonder of the night sky, his mind was consumed by restless ambition. He was obsessed with unravelling the grand mysteries of the Order—above all, the legendary architecture of the <strong>Three Ancient Towers</strong>. Night after night, while the mountain froze outside, he sat over worn manuscripts, architectural drawings, and mechanical schematics, determined to decipher the hidden mechanisms that would unlock the ancient founders' vaults and bring immortal renown.</p>
+            <p class="novel-para">Aurelia never shared his hunger for forgotten vaults or worldly glory. Her world was the quiet majesty of the constellations. While he argued over complex mechanisms and unsolved riddles, she sat by the hearth, gently grinding lapis lazuli into deep blue pigment and applying silver leaf to her star charts. When the alpine frost chilled his hands, she wrapped her warm wool shawl around his shoulders and set a bowl of hot soup beside his drafting compass.</p>
+            <p class="novel-para">One winter morning, after five days without sleep, Icarus collapsed over his desk, his head resting on scattered notes and numbers. When he woke hours later, soft morning sunlight filled the room. Aurelia was still sitting at his bench. Her eyes were red with exhaustion, her fingers stiff with cold. She was patiently finishing the complex drawings and calculations he had left behind, saving his life's work line by line so nothing would be lost.</p>
+            <p class="novel-para">Looking at her bowed head, and the gentle care with which she blew dry the fresh ink on his parchment, something hard and stubborn broke inside Icarus's heart. For years he had chased distant glory and forgotten vaults, completely blind to the true wonder living right beside him.</p>
+            <p class="novel-para">That evening, Icarus put his ambitious schemes away. Taking a plate of polished brass, he spent weeks engraving a master star dial: a beautiful disc marked with twelve hours and the rings of the night sky. It was not made to unlock ancient vaults. It was a gift of love—a puzzle of four turning rings that revealed a secret message only when aligned with the stars she loved most.</p>
+            <p class="novel-para">On the terrace, under a clear sky of winter stars, Icarus took Aurelia's ink-stained hands into his own, pressed the brass dial into her palms, and whispered the truth he had discovered too late:</p>
+            
+            <div class="novel-quote-card">
+              <span class="quote-sigil">“</span>
+              <p class="quote-text">Aurelia... all these years I tore the world apart looking for an ancient treasure to make us immortal. I was blind. You were the only light that mattered. You were always the treasure.</p>
+              <span class="quote-author">— Icarus, on the Alpine Terrace</span>
+            </div>
+
+            <p class="novel-para">Aurelia cried soft tears of joy and hung the dial from a cord around her neck. For a short time, the high tower knew peace.</p>
+          </section>
+
+          <!-- Inter-Chapter Renaissance Flourish Divider -->
+          <div class="chapter-scroll-divider" aria-hidden="true">
+            <span class="divider-line"></span>
+            <span class="divider-sigil">✧ ✦ ✧</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- CHAPTER II -->
+          <section class="novel-chapter" id="chapter-2" data-theme="cataclysm" role="tabpanel" aria-labelledby="step-2">
+            <!-- Marginalia Wings -->
+            <div class="chapter-marginalia-strip" aria-hidden="true">
+              <aside class="chapter-marginalia margin-left">
+                <div class="marginalia-card card-cataclysm">
+                  <div class="marginalia-stamp stamp-seismic">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                  </div>
+                  <div class="marginalia-text">
+                    <span class="m-date">DIES TRIBULATIONIS · MAG 7.8</span>
+                    <span class="m-gloss">«Pons lapideus fractus... cubitis XL in voragine»</span>
+                    <span class="m-sub">"The Southern Bridge fell at midday."</span>
+                  </div>
+                </div>
+              </aside>
+              <aside class="chapter-marginalia margin-right">
+                <div class="marginalia-card card-cataclysm">
+                  <div class="marginalia-stamp stamp-seismic">⚡</div>
+                  <div class="marginalia-text">
+                    <span class="m-date">ARENA RUBRA · ANNO 1971</span>
+                    <span class="m-gloss">«Aurelia... non amplius tangere potui»</span>
+                    <span class="m-sub">"His dial held to her heart as she fell."</span>
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            <h3 class="novel-part-heading">II. When the Sky Wept Blood</h3>
+            <p class="novel-para"><span class="novel-dropcap">O</span>ne year later, in the autumn of 1971, came the terrible day of the First Cataclysm.</p>
+            <p class="novel-para">To understand what happened, one must picture where they lived. The Alpine Observatory did not rest upon safe, solid ground. It was built atop an isolated pillar of rock, right at the jagged southern border known as <strong>Deserti Limen</strong>—the edge of the mountain world. Below its cliffs lay a colossal canyon that dropped thousands of feet straight into the southern desert. The only path connecting the observatory tower to the safe mountain mainland was the <strong>Southern Bridge</strong>: a magnificent, two-tiered stone bridge built with ancient arches spanning across the empty abyss.</p>
+
+            <p class="novel-para">The disaster struck just after midday. Without warning, a colossal earthquake tore through the bedrock of the canyon fault. At the very same moment, a violent red sandstorm surged out of the southern desert, rising into the sky like a tidal wave of choking crimson dust. The sky turned a bruised, unnatural purple, and hurricane-force winds howled through the mountain peaks.</p>
+            <p class="novel-para">Inside the observatory turret, the violent shaking threw heavy furniture across the rooms. Glass lanterns shattered against the flagstones, spilling burning oil across dry drafting paper, scroll racks, and wooden worktables. In seconds, thick black smoke and bright flames engulfed the upper workshop.</p>
+            <p class="novel-para">Icarus grabbed Aurelia’s hand and pulled her down the spiral stairs. They burst out through the tower gate and ran onto the high stone bridge, heading toward the solid mountain cliff where the shelter vaults were carved into the rock. The stone arches trembled beneath their feet, but safety was only fifty paces ahead.</p>
+            <p class="novel-para">Then, halfway across the bridge, Aurelia suddenly pulled her hand free and stopped.</p>
+            <p class="novel-para">She looked back at the burning tower. In that moment of panic, she realized what was still trapped in the flames: the polished brass star dial Icarus had spent weeks engraving for her—his precious vow of love—along with the leather portfolio containing his life's master star maps. She knew how much his work meant to his soul. She could not bear to let his masterpiece burn into ashes.</p>
+            <p class="novel-para"><em>«Aurelia, no! Leave it!»</em> Icarus screamed through the roaring wind. <em>«Run to the cliff!»</em></p>
+            <p class="novel-para">But she had already turned back. Covering her mouth against the heat and smoke, Aurelia sprinted through the embers and disappeared into the burning tower entrance. Desperate with terror, Icarus turned around and ran back across the stone bridge after her.</p>
+            <p class="novel-para">Moments later, Aurelia stumbled out through the flaming doorway, coughing violently from the smoke. She was holding the brass dial clutched tightly against her chest with one arm, and the leather case of maps under the other. Seeing Icarus on the bridge, a look of immense relief washed over her face, and she ran back out onto the high span to meet him.</p>
+            <p class="novel-para">They were only three paces apart, reaching out with both hands, when the second massive earthquake shockwave struck.</p>
+
+            <!-- ILLUMINATED PLATE II: THE BRIDGE COLLAPSE -->
+            <figure class="illuminated-plate-figure">
+              <div class="plate-frame">
+                <img src="./assets/cataclysm-bridge.jpg" alt="Fracture of the Southern Bridge during the First Cataclysm" class="plate-image" loading="lazy">
+                <div class="plate-specular-shimmer"></div>
+                <div class="plate-corner-flourish tl">✦</div>
+                <div class="plate-corner-flourish tr">✦</div>
+                <div class="plate-corner-flourish bl">✦</div>
+                <div class="plate-corner-flourish br">✦</div>
+              </div>
+              <figcaption class="plate-caption">
+                <span class="plate-tag">FOLIO PLATE II</span>
+                <strong class="plate-title">The Fall of the Southern Bridge · The First Cataclysm (Anno 1971)</strong>
+                <span class="plate-sub">The central arches collapse over the abyss. The brass dial, star charts, and maps tumble into the red storm.</span>
+              </figcaption>
+            </figure>
+            <p class="novel-para">With an ear-splitting crack of fracturing granite, the keystone of the central arch gave way. The entire middle span of the bridge sheared clean off, dropping straight into the empty void. The stone pavement crumbled from beneath Aurelia's boots.</p>
+            <p class="novel-para">Icarus threw his entire body forward onto the edge of the remaining stone pier. His chest slammed hard against the broken rock, scraping his skin as he lunged out over the abyss. For a single, fleeting second, his trembling fingers caught the rough wool of her sleeve. He pulled with all his strength—but the falling stones tore her away.</p>
+            <p class="novel-para">The map case split open in mid-air, scattering loose star charts and coordinates across the gale like white leaves. And there, falling through the blinding red dust and roaring wind, Aurelia disappeared into the deep desert canyon below, clutching the brass dial to her heart until the storm swallowed her completely.</p>
+          </section>
+
+          <!-- Inter-Chapter Renaissance Flourish Divider -->
+          <div class="chapter-scroll-divider" aria-hidden="true">
+            <span class="divider-line"></span>
+            <span class="divider-sigil">✧ ⚡ ✧</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- CHAPTER III -->
+          <section class="novel-chapter" id="chapter-3" data-theme="ashen" role="tabpanel" aria-labelledby="step-3">
+            <!-- Marginalia Wings -->
+            <div class="chapter-marginalia-strip" aria-hidden="true">
+              <aside class="chapter-marginalia margin-left">
+                <div class="marginalia-card card-ashen">
+                  <div class="marginalia-stamp stamp-strike">✕</div>
+                  <div class="marginalia-text">
+                    <span class="m-date">ANNO RENUNTIATIONIS</span>
+                    <span class="m-gloss strike-gloss">«<del>Icarus</del> · Nomen in ignem proiectum»</span>
+                    <span class="m-sub">"The name thrown forever into the fire."</span>
+                  </div>
+                </div>
+              </aside>
+              <aside class="chapter-marginalia margin-right">
+                <div class="marginalia-card card-ashen">
+                  <div class="marginalia-stamp stamp-ash">🌑</div>
+                  <div class="marginalia-text">
+                    <span class="m-date">VIGILIA IN ARCE</span>
+                    <span class="m-gloss">«Mortuus homo depingens mortuum mundum»</span>
+                    <span class="m-sub">"Decades searching from the Alpine Sanctuary."</span>
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            <h3 class="novel-part-heading">III. A Name Turned to Ash</h3>
+            <p class="novel-para"><span class="novel-dropcap">I</span>carus survived the fall of the mountain, but the man he used to be was gone forever.</p>
+            <p class="novel-para">When the red storm finally stopped three days later, the mountain world was completely changed. The old paths were buried under deep red dunes. The observatory was a ruined, silent tomb. Icarus climbed down into the canyon on his knees, digging through the sand with his bare hands, desperately searching for a piece of cloth, a scrap of brass, anything. There was nothing. Only endless, shifting red sand.</p>
+            <p class="novel-para">His grief was unbearable, and he blamed himself completely. It was his ambition and his hunger for ancient treasures that had brought them to this dangerous mountain. If he had never chased forgotten ruins, Aurelia would still be alive.</p>
+
+            <!-- ARCHIVAL DOCUMENT: THE ACT OF RENUNCIATION (Propuesta E: Charred Relic Facsimile) -->
+            <div class="archival-parchment-dossier charred-relic-facsimile">
+              <div class="charred-ash-fringe"></div>
+              <div class="dossier-header">
+                <div class="burnt-wax-seal" title="Sigillum Ordinis · Anno 1971" aria-label="Official Seal of the Order">
+                  <svg class="wax-seal-svg" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Concentric Intaglio Rings -->
+                    <circle cx="30" cy="30" r="26" stroke="rgba(254, 202, 202, 0.3)" stroke-width="1.2" stroke-dasharray="2.5 2" />
+                    <circle cx="30" cy="30" r="23" stroke="rgba(0, 0, 0, 0.5)" stroke-width="1" />
+                    <circle cx="30" cy="30" r="21.5" stroke="rgba(254, 202, 202, 0.45)" stroke-width="1.2" />
+
+                    <!-- Cardinal Notches of the Astronomical Order -->
+                    <path d="M30 5v3.5M30 51.5v3.5M5 30h3.5M51.5 30h3.5" stroke="rgba(254, 202, 202, 0.7)" stroke-width="1.5" stroke-linecap="round"/>
+                    
+                    <!-- Inner Celestial Orbit -->
+                    <circle cx="30" cy="30" r="15" stroke="rgba(0, 0, 0, 0.4)" stroke-width="0.8" stroke-dasharray="1.5 1.5"/>
+
+                    <!-- Heraldic Renaissance Fleur-de-lis & Quadrant Crest -->
+                    <g fill="currentColor" stroke="rgba(0, 0, 0, 0.45)" stroke-width="0.6">
+                      <!-- Central Spire -->
+                      <path d="M30 16 C28.2 20 26.5 24 26.5 29 C28 28.5 29.2 28 30 28 C30.8 28 32 28.5 33.5 29 C33.5 24 31.8 20 30 16 Z"/>
+                      <!-- Left Petal -->
+                      <path d="M26.5 29 C23.5 28 20.5 25 19.5 28 C18.5 31 21.5 33 25.5 32.5 C24.5 35 22.5 37 20.5 39 C24.5 39 27.5 36 28.5 33 C28 31.5 27 30 26.5 29 Z"/>
+                      <!-- Right Petal -->
+                      <path d="M33.5 29 C36.5 28 39.5 25 40.5 28 C41.5 31 38.5 33 34.5 32.5 C35.5 35 37.5 37 39.5 39 C35.5 39 32.5 36 31.5 33 C32 31.5 33 30 33.5 29 Z"/>
+                      <!-- Horizontal Bind Ring -->
+                      <rect x="24.5" y="32" width="11" height="2.2" rx="0.8"/>
+                      <!-- Lower Base Stem -->
+                      <path d="M28 35 C27 38 25 40 23 41 C26 42 28 40 30 38 C32 40 34 42 37 41 C35 40 33 38 32 35 Z"/>
+                    </g>
+
+                    <!-- Authentic Fire Fracture Line across the wax edge -->
+                    <path d="M50 22 L45 28 L53 33" stroke="rgba(24, 6, 6, 0.9)" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="dossier-meta">
+                  <div class="dossier-tag">
+                    <span class="dossier-seal-badge">SIGILLUM ORDINIS</span>
+                    <span>ARCHIVES OF THE HIGH PASS · CODEX LIMEN // FOLIO DAMNATUS</span>
+                  </div>
+                  <div class="dossier-title">The Act of Total Renunciation (Anno 1971)</div>
+                </div>
+              </div>
+              <blockquote class="dossier-body">
+                «Let it be written upon this stone: the scholar once called Icarus has thrown his maps, his instruments, and his past into the fire. He has sworn never to answer to his former name. From this day on, he walks as a nameless wanderer across the ridges.»
+              </blockquote>
+              <div class="charred-signature-witness">
+                <span class="witness-seal">IN PERPETUUM OBLIVIONIS</span>
+                <span class="witness-carbon">CINIS ET CARBON // NON AMPLIUS ICARUS</span>
+              </div>
+            </div>
+
+            <p class="novel-para">He gathered every remaining paper that carried his name. One by one, he threw them into the flames. He made a solemn promise: never again would he answer to the name of <em>Icarus</em>.</p>
+            <p class="novel-para">He retreated into the solitude of the mountain peaks, donning a weathered traveler's cloak and brass protective goggles. To the few travelers and scholars he encountered along the high alpine passes, he gave only a cold, simple title:</p>
+            <p class="novel-center-name">« THE CARTOGRAPHER »</p>
+
+            <!-- OPTICAL INTERCEPT: THE CARTOGRAPHER OF YEARS AGO -->
+            <figure class="illuminated-plate-figure optical-archive-figure">
+              <div class="plate-frame">
+                <img src="./assets/cartographer-young-expedition.jpg" alt="The Cartographer during his 1998 frontier survey at Deserti Limen" class="plate-image" loading="lazy">
+                <div class="plate-specular-shimmer"></div>
+                <div class="plate-corner-flourish tl">✦</div>
+                <div class="plate-corner-flourish tr">✦</div>
+                <div class="plate-corner-flourish bl">✦</div>
+                <div class="plate-corner-flourish br">✦</div>
+              </div>
+              <figcaption class="plate-caption">
+                <span class="plate-tag">OPTICAL INTERCEPT · RECORD 08-C (THE 1998 FRONTIER SURVEY)</span>
+                <strong class="plate-title">The Frontier Survey at Deserti Limen · Autumn 1998</strong>
+                <span class="plate-sub">An archival photograph from his survey of the southern boundary gorge, twenty-eight years before the Call. At the perilous precipice where the alpine range ends, the Cartographer mapped the frontier edge and calibrated his emergency radio receiver.</span>
+              </figcaption>
+            </figure>
+
+            <p class="novel-para">In his sorrow, he abandoned his old hunger for vaults and renown. Yet he refused to believe that Aurelia was truly gone without a trace. He needed answers. He needed to search every fissure, shadow, and gorge of the southern abyss. To conduct his search, he made the high summit his permanent fortress. Over the course of twenty-seven solitary years—from 1971 to 1998—he rebuilt the Alpine Observatory stone by stone, hauling heavy brass tubes, glass lenses, and mirror quadrants up the mountain trails. By night, he used its giant telescopes to map the stars and calculate the celestial meridians; by day, he turned his long-range lenses downward toward the abyss of Deserti Limen, searching the endless red sands for any glint of polished brass, any scrap of cloth, or any sign of the dial he had crafted for her. In his notes and field maps, he signed only one humble name: <strong>« The Cartographer »</strong>.</p>
+            <p class="novel-para">In <strong>Autumn, 1998</strong>—twenty-eight years before the Call—he packed his surveying gear and descended to the very edge of the abyss for the grueling <strong>Frontier Survey at Deserti Limen</strong>, recorded in his personal field journal. Armed with a vacuum-tube radio receiver and measuring rods, he mapped the sheer sandstone canyon where the bridge had fallen. Yet despite weeks of scanning the dust, the desert remained completely silent. No light flashed. No signal answered his calls. Believing his search had failed, he returned to the high observatory, resigned to living out his days in a cold world of pure mathematics.</p>
+
+          </section>
+
+          <!-- Inter-Chapter Renaissance Flourish Divider -->
+          <div class="chapter-scroll-divider" aria-hidden="true">
+            <span class="divider-line"></span>
+            <span class="divider-sigil">✧ 🌑 ✧</span>
+            <span class="divider-line"></span>
+          </div>
+
+          <!-- CHAPTER IV -->
+          <section class="novel-chapter" id="chapter-4" data-theme="beacon" role="tabpanel" aria-labelledby="step-4">
+            <!-- Marginalia Wings -->
+            <div class="chapter-marginalia-strip" aria-hidden="true">
+              <aside class="chapter-marginalia margin-left">
+                <div class="marginalia-card card-beacon">
+                  <div class="marginalia-stamp stamp-beacon">✨</div>
+                  <div class="marginalia-text">
+                    <span class="m-date">DESERTI LIMEN · 142.85 MHz</span>
+                    <span class="m-gloss">«Pulsus III · silentium · pulsus II ... Aurelia vivit?»</span>
+                    <span class="m-sub">"A lone radio signal through the dust."</span>
+                  </div>
+                </div>
+              </aside>
+              <aside class="chapter-marginalia margin-right">
+                <div class="marginalia-card card-beacon">
+                  <div class="marginalia-stamp stamp-beacon">✧</div>
+                  <div class="marginalia-text">
+                    <span class="m-date">TITULUS RENATUS</span>
+                    <span class="m-gloss gold-gloss">«Cartographus Lucis Remotae»</span>
+                    <span class="m-sub">"You were always the treasure."</span>
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            <h3 class="novel-part-heading">IV. The Distant Light</h3>
+            <p class="novel-para"><span class="novel-dropcap">Y</span>ears went by in unbroken silence after the 1998 expedition. Nearly half a century had passed since the day the Southern Bridge fell.</p>
+            <p class="novel-para">The Cartographer grew old in his high mountain tower, keeping his nightly vigil over the southern void, convinced that Aurelia's brass dial was lost forever beneath forty cubits of moving dunes.</p>
+            <p class="novel-para">Then came a crystal-clear night in the autumn of <strong>2016</strong>—exactly ten years before the Call. The Cartographer sat alone at his telescope on the precipice of Deserti Limen, watching the cold moonlight wash over the southern horizon.</p>
+
+            <!-- ILLUMINATED PLATE IV: THE CARTOGRAPHER AT THE PRECIPICE -->
+            <figure class="illuminated-plate-figure">
+              <div class="plate-frame">
+                <img src="./assets/distant-light-precipice.jpg" alt="The Cartographer at the Deserti Limen precipice looking at the golden beacon" class="plate-image" loading="lazy">
+                <div class="plate-specular-shimmer"></div>
+                <div class="plate-corner-flourish tl">✦</div>
+                <div class="plate-corner-flourish tr">✦</div>
+                <div class="plate-corner-flourish bl">✦</div>
+                <div class="plate-corner-flourish br">✦</div>
+              </div>
+              <figcaption class="plate-caption">
+                <span class="plate-tag">FOLIO PLATE IV</span>
+                <strong class="plate-title">The Midnight Vigil at Deserti Limen · The Distant Light (Anno 2016)</strong>
+                <span class="plate-sub">Ten years before the Call, a golden light pulses between the desert ruins. Hope returns, and the Cartographer of Distant Light is born.</span>
+              </figcaption>
+            </figure>
+
+            <p class="novel-para">The mountain air was biting cold. He trained his optical lens south toward the far desert horizon, where the buried sandstone arches of the second ancient tower lay hidden beneath the dunes. And there, far out in the dangerous sands where no traveler could survive, he saw it.</p>
+            <p class="novel-para">A small, rhythmic pulse of golden light.</p>
+            <p class="novel-para">It was not a campfire, and it was not a star. It was a clear, steady beam of light, flashing with mathematical precision between the ruined sandstone pillars: three short pulses, a pause, and two long flashes. It was the exact secret light code he had engraved upon Aurelia's brass dial on the observatory terrace all those years ago.</p>
+            <p class="novel-para">Whether the brass dial was signaling on its own through ancient mechanisms, or whether Aurelia's legacy lived on in the heart of the desert, his heart reignited with ferocious hope. The ice broke. After forty-five years of living like a ghost among cold equations, he felt the terrifying power of purpose.</p>
+            <p class="novel-para">That night, with trembling hands, he took a fresh sheet of vellum and signed his master celestial map with his true, definitive title:</p>
+            <p class="novel-center-name gold-glow-title">« THE CARTOGRAPHER OF DISTANT LIGHT »</p>
+            <p class="novel-para">The distant light was not a hallucination. It was real. But the Cartographer knew he could not simply hike down into the dunes. The southern desert was a lethal expanse of moving sandstorms and treacherous nomad territories. Ancient records of the Order revealed that to unlock the path through the desert, one had to master the celestial alignment of the <strong>Three Ancient Towers</strong>: the Alpine Observatory in the snowy peaks, the Sandstone Tower in the desert dunes, and the Stage Tower.</p>
+            <p class="novel-para">To bridge the divide between the mountains and the desert, the Cartographer spent the next ten years crafting his magnum opus in the observatory workshops: <strong>The Astrolabe of Distant Light</strong>. It was a master instrument designed to measure the six key stars, calculate the celestial meridian, and align the Three Towers when the time arrived.</p>
+            <p class="novel-para">Night after night, he kept his lonely vigil at the edge of the canyon, watching the golden light flicker across the distant dunes. He knew that one day, a worthy seeker would follow the trail of stars he had left behind across the peaks, unlock the brass dial's secret vow, and face the shifting sands to bring the truth to light.</p>
+
+            <!-- Action Strip to Proceed to Radio Climax -->
+            <footer class="story-reader-footer" id="chapter-4-climax-footer">
+              <button type="button" class="btn-story-transmit" id="btn-transmit-story">
+                <span class="btn-sigil">✦</span>
+                <span>Return to the Present · Transmit the Vow ➔</span>
+              </button>
+              <div class="story-footer-hint">Back in the present — listen to the message of The Cartographer of Distant Light across frequency 142.85 MHz before the sandstorm breaks</div>
+            </footer>
+          </section>
+
+        </div>
+
+      </article>
     </main>
-
   </div>
 
   <!-- =====================================================================
-       ⚡ DRAMATIC CLIMAX MODAL: LA GRAN TORMENTA DE ARENA DEL SUR
+       ⚡ DEDICATED RADIO TRANSCEIVER MODAL STAGE (PRESENT DAY EMERGENCY DISPATCH)
        ===================================================================== -->
-  <div class="sandstorm-climax-modal" id="climax-modal">
-    <div class="climax-backdrop"></div>
+  <div class="radio-modal-overlay" id="radio-modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="radio-modal-title">
+    <div class="radio-modal-backdrop" id="radio-modal-backdrop"></div>
+    <div class="radio-modal-dialog">
 
-    <div class="climax-panel brass-card-frame">
-      <div class="card-corner corner-tl"></div>
-      <div class="card-corner corner-tr"></div>
-      <div class="card-corner corner-bl"></div>
-      <div class="card-corner corner-br"></div>
+      <!-- MIL-SPEC DESERT RADIO TRANSCEIVER CHASSIS -->
+      <div class="climax-panel brass-card-frame chassis-desert" id="radio-transceiver-panel">
+        <button type="button" class="radio-modal-close-btn" id="btn-close-radio-modal" aria-label="Close Radio Transceiver" title="Close Radio Window">✕</button>
 
-      <!-- Warning Header -->
-      <div class="climax-alarm-strip">
-        <span class="alarm-pulsing-dot"></span>
-        <span>⚡ EMERGENCY TELEMETRY · GALE VORTEX SANGUINE ⚡</span>
-        <span class="alarm-pulsing-dot"></span>
-      </div>
+        <div class="card-corner corner-tl"></div>
+        <div class="card-corner corner-tr"></div>
+        <div class="card-corner corner-bl"></div>
+        <div class="card-corner corner-br"></div>
 
-      <!-- Audio Oscilloscope & Telemetry Waveform -->
-      <div class="radio-overload-box">
-        <div class="overload-header">
-          <span class="freq-tag">FREQ 142.85 MHz // SHORTWAVE CARRIER</span>
-          <span class="signal-tag" id="radio-overload-state">SIGNAL CRITICAL · CARRIER OVERLOAD</span>
+        <!-- Header: Returning to Present Day -->
+        <div class="radio-modal-header">
+          <span class="modal-header-tag">✦ PRESENT DAY EMERGENCY DISPATCH ✦</span>
+          <h4 class="modal-header-title" id="radio-modal-title">142.85 MHz Shortwave Receiver</h4>
         </div>
-        <div class="oscilloscope-screen">
-          <svg viewBox="0 0 400 36" preserveAspectRatio="none">
-            <line x1="0" y1="18" x2="400" y2="18" stroke="rgba(239, 68, 68, 0.25)" stroke-dasharray="4, 4" />
-            <path class="oscilloscope-wave" id="storm-wave" d="M 0 18 Q 20 2, 40 18 T 80 18 T 120 2 T 160 34 T 200 18 T 240 18 T 280 2 T 320 34 T 360 18 T 400 18" />
-          </svg>
-        </div>
-      </div>
 
-      <!-- Cartographer Urgent Audio Dispatch Transcript -->
-      <div class="dispatch-container">
+        <!-- Warning Header & Status Lights -->
+        <div class="radio-top-bar">
+          <div class="radio-brand">
+            <span class="brand-title">MIL-SPEC DESERT TRANSCEIVER // 142.85 MHz</span>
+            <span class="brand-sep">·</span>
+            <span id="radio-current-title">DISPATCH 09-A // EMERGENCY WIRE: THE SANDSTORM ENGULFS ICARUS</span>
+          </div>
+          <div class="radio-status-lights">
+            <span class="led-indicator">
+              <span class="led-bulb red active" id="led-radio-rx"></span>
+              <span>RX CARRIER</span>
+            </span>
+            <span class="led-indicator">
+              <span class="led-bulb amber active" id="led-radio-tx"></span>
+              <span>SANDSTORM TREMOR</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Cartographer Sender Profile -->
         <div class="dispatch-sender-tag">
-          <span class="sender-avatar">🎙️</span>
+          <div class="sender-avatar-portrait">
+            <img src="./assets/logo-path-constellation.png" alt="The Constellation Path Seal" class="sender-portrait-img">
+            <span class="sender-radio-dot"></span>
+          </div>
           <div>
-            <div class="sender-name">The Cartographer</div>
-            <div class="sender-loc">Ridge Overlook · Frontier Outskirts of Deserti Limen</div>
+            <div class="sender-name">Icarus · The Cartographer of Distant Light</div>
+            <div class="sender-loc">High Ridge Overlook · Frontier Gate of Deserti Limen // 142.85 MHz</div>
           </div>
         </div>
 
-        <div class="dispatch-text-box">
-          <p id="dispatch-typewriter-text" class="typewriter-text">
-            <!-- Dynamically animated text -->
-          </p>
-        </div>
-      </div>
-
-      <!-- Prophecy Unlocked Ribbon -->
-      <div class="prophecy-banner-award">
-        <span class="award-sigil">✦ ANCIENT PROPHETIC MERIDIAN UNLOCKED ✦</span>
-        <div class="award-quote">"YOU WERE ALWAYS THE TREASURE"</div>
-      </div>
-
-      <!-- Relic Chips Row -->
-      <div class="climax-relics-row">
-        <div class="climax-relic-chip">
-          <span class="relic-icon">📜</span>
-          <div class="relic-info">
-            <div class="relic-name">The Final Prophecy</div>
-            <div class="relic-sub">"YOU WERE ALWAYS THE TREASURE"</div>
+        <!-- Real-Time Phosphor Oscilloscope (Amber/Desert CRT Glow) -->
+        <div class="radio-overload-box">
+          <div class="overload-header">
+            <span class="freq-tag">FREQ 142.85 MHz // SHORTWAVE CARRIER</span>
+            <span class="signal-tag" id="radio-overload-state">SIGNAL DETECTED · SANDSTORM ENGULFING ANTENNA</span>
+          </div>
+          <div class="oscilloscope-screen">
+            <canvas id="radio-oscilloscope-canvas" width="600" height="70"></canvas>
+            <div class="crt-scanlines"></div>
           </div>
         </div>
-        <div class="climax-relic-chip">
-          <span class="relic-icon">🏜️</span>
-          <div class="relic-info">
-            <div class="relic-name">Gateway to The Desert Path</div>
-            <div class="relic-sub">Deserti Limen · Station 10 Unveiled</div>
+
+        <!-- Synchronized Active Subtitles Teletype -->
+        <div class="sandstorm-transcript-box active-subtitles" id="sandstorm-transcript-box">
+          <div class="sandstorm-transcript-text" id="sandstorm-transcript-text">
+            [ 142.85 MHz SHORTWAVE LOCKED · SOUTHERN SANDSTORM OVERRIDE... ]
+          </div>
+          <div class="sandstorm-transcript-sub" id="sandstorm-transcript-sub">
+            RECEIVING EMERGENCY SHORTWAVE RELAY // ICARUS TRANSMITTING AMIDST GALE
           </div>
         </div>
-      </div>
 
-      <!-- Modal Actions -->
-      <div class="climax-actions-row">
-        <a href="../../index.html#view-trail" class="btn-climax-hub">
-          <span>✦ Return to Route Map & Inspect Frontier ➔</span>
-        </a>
-        <button type="button" class="btn-climax-replay" id="btn-replay-cipher">
-          <span>↺ Replay Decryption</span>
-        </button>
+        <!-- Interactive Audio Deck & Controls -->
+        <div class="action-container">
+          <button type="button" class="btn-tune btn-tune-desert" id="btn-tune-broadcast">
+            <span>📻</span>
+            <span>TUNE 142.85 MHz // DECRYPT CARTOGRAPHER'S EMERGENCY CALL</span>
+            <span>⚡</span>
+          </button>
+
+          <div class="radio-deck" id="radio-deck-controls" style="display: none;">
+            <div class="deck-timeline-row">
+              <span class="time-readout" id="radio-time-current">00:00</span>
+              <div class="scrubber-track-wrap">
+                <div class="scrubber-progress-bar" id="radio-scrubber-fill"></div>
+                <input type="range" id="radio-seek-slider" class="seek-slider" min="0" max="82.46" step="0.1" value="0">
+              </div>
+              <span class="time-readout" id="radio-time-total">01:22</span>
+            </div>
+
+            <div class="deck-controls-row">
+              <button type="button" class="deck-btn" id="btn-radio-restart" title="Restart Transmission">
+                <span>⏮</span>
+                <span>Restart</span>
+              </button>
+
+              <button type="button" class="deck-btn btn-primary-play" id="btn-radio-play-pause" title="Play or Pause">
+                <span id="radio-play-icon">❚❚</span>
+                <span id="radio-play-label">Pause</span>
+              </button>
+
+              <div class="deck-vol-group">
+                <button type="button" class="deck-btn-mute" id="btn-radio-mute" title="Mute/Unmute">
+                  <span id="radio-mute-icon">🔊</span>
+                </button>
+                <div class="vol-slider-wrap">
+                  <input type="range" id="radio-vol-slider" class="vol-slider" min="0" max="1" step="0.02" value="1">
+                </div>
+                <span class="vol-percent" id="radio-vol-percent">100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Element for Master Emergency Broadcast -->
+        <audio id="radio-audio-element" preload="auto" src="./audio/cartographer_sandstorm_emergency.mp3"></audio>
+
+        <!-- Climax Actions -->
+        <div class="climax-actions-row">
+          <button type="button" class="btn-climax-hub" id="btn-climax-desert" title="Claim Field Rewards & Enter Desert Path">
+            <span>✦ Enter The Desert Path ➔</span>
+          </button>
+          <button type="button" class="btn-climax-replay" id="btn-open-story-again">
+            <span>▲ Return to the Manuscript</span>
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
+
+  <!-- =====================================================================
+       🏆 DEDICATED CIPHER REWARD & SPOILS MODAL (CONSTELLATION PATH FINALE)
+       ===================================================================== -->
+  <div class="reward-modal-overlay" id="reward-modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="reward-modal-title">
+    <div class="reward-modal-backdrop" id="reward-modal-backdrop"></div>
+    <div class="reward-modal-dialog">
+      <div class="reward-modal-panel brass-card-frame">
+        <button type="button" class="reward-modal-close-btn" id="btn-close-reward-modal" aria-label="Close Reward Window" title="Close Window">✕</button>
+
+        <div class="card-corner corner-tl"></div>
+        <div class="card-corner corner-tr"></div>
+        <div class="card-corner corner-bl"></div>
+        <div class="card-corner corner-br"></div>
+
+        <!-- Header -->
+        <div class="reward-modal-header">
+          <div class="reward-eyebrow">
+            <span class="reward-star-sigil">✦</span>
+            <span>THE CONSTELLATION PATH IS CONCLUDED</span>
+            <span class="reward-star-sigil">✦</span>
+          </div>
+          <h2 class="reward-title" id="reward-modal-title">The Scholar's Spoils & The Eclipse Script</h2>
+          <p class="reward-subtitle">
+            You have spoken the Cartographer's sacred vow and weathered the tempest. The nine mountain stations of celestial arithmetic are secured. From the ruins of the Alpine Observatory, the Cartographer's personal ledger yields its deepest secrets before you face the shifting sands.
+          </p>
+        </div>
+
+        <!-- Section 1: Sacred Glyphs of the Eclipse Script -->
+        <div class="reward-section-block">
+          <div class="reward-section-heading">
+            <span class="section-num">I</span>
+            <div>
+              <h3 class="section-title">Sacred Glyphs of the Eclipse Script</h3>
+              <p class="section-desc">
+                Four authentic characters from the substitution alphabet of the Eclipse Order. Use these correspondences to decode words within the initial prophecy and uncover hidden phrases across your journey.
+              </p>
+            </div>
+          </div>
+
+          <div class="glyphs-reward-grid">
+            
+            <!-- Glyph B -->
+            <div class="glyph-reward-card">
+              <div class="glyph-card-header">
+                <span class="glyph-latin-char">B</span>
+              </div>
+              <div class="glyph-symbol-display">
+                <svg class="glyph-svg" viewBox="0 0 48 64">
+                  <line x1="24" y1="8" x2="24" y2="56" stroke="currentColor" stroke-width="2.5"/>
+                  <path d="M24 16 Q10 24 24 32 Q10 40 24 48" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M24 16 Q38 24 24 32 Q38 40 24 48" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <circle cx="24" cy="32" r="3" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Glyph G -->
+            <div class="glyph-reward-card">
+              <div class="glyph-card-header">
+                <span class="glyph-latin-char">G</span>
+              </div>
+              <div class="glyph-symbol-display">
+                <svg class="glyph-svg" viewBox="0 0 48 64">
+                  <circle cx="24" cy="32" r="18" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <path d="M24 14 A9 9 0 0 1 24 32 A9 9 0 0 0 24 50" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                  <circle cx="24" cy="14" r="2.5" fill="currentColor"/>
+                  <circle cx="24" cy="50" r="2.5" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Glyph V -->
+            <div class="glyph-reward-card">
+              <div class="glyph-card-header">
+                <span class="glyph-latin-char">V</span>
+              </div>
+              <div class="glyph-symbol-display">
+                <svg class="glyph-svg" viewBox="0 0 48 64">
+                  <path d="M10 16 L24 50 L38 16" stroke="currentColor" stroke-width="2.5" fill="none"/>
+                  <line x1="14" y1="28" x2="34" y2="28" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="24" cy="50" r="3.5" fill="currentColor"/>
+                  <circle cx="24" cy="20" r="3" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Glyph F -->
+            <div class="glyph-reward-card">
+              <div class="glyph-card-header">
+                <span class="glyph-latin-char">F</span>
+              </div>
+              <div class="glyph-symbol-display">
+                <svg class="glyph-svg" viewBox="0 0 48 64">
+                  <path d="M12 20 L36 20 L28 50 L20 50 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                  <line x1="6" y1="20" x2="42" y2="20" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="24" cy="10" r="3" fill="currentColor"/>
+                  <circle cx="24" cy="35" r="3" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 2: The Alpine Differential Equations -->
+        <div class="reward-section-block">
+          <div class="reward-section-heading">
+            <span class="section-num">II</span>
+            <div>
+              <h3 class="section-title">The Alpine Differential Equations</h3>
+              <p class="section-desc">
+                Four new mathematical relationships inscribed directly into your <strong>Cipher Ledger</strong> in the Central Hub.
+              </p>
+            </div>
+          </div>
+
+          <div class="equations-reward-grid">
+            
+            <div class="equation-reward-card">
+              <div class="eq-reward-tag">Meridian Parallax</div>
+              <div class="eq-reward-formula">K − G = 4 N</div>
+            </div>
+
+            <div class="equation-reward-card">
+              <div class="eq-reward-tag">Frontier Shift</div>
+              <div class="eq-reward-formula">P − B = 4 E</div>
+            </div>
+
+            <div class="equation-reward-card">
+              <div class="eq-reward-tag">Solar Amplitude</div>
+              <div class="eq-reward-formula">V − E = 10 S</div>
+            </div>
+
+            <div class="equation-reward-card">
+              <div class="eq-reward-tag">Polar Resonance</div>
+              <div class="eq-reward-formula">T − F = 10 O</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="reward-actions-row">
+          <a href="../../index.html?auth=1&view=view-cipher#view-cipher" class="btn-reward-primary" id="btn-goto-cipher-ledger">
+            <span>✦ Enter The Cipher Ledger & Solve Values ➔</span>
+          </a>
+          <a href="../../index.html?auth=1&view=view-trail#view-trail" class="btn-reward-secondary" id="btn-goto-desert-trail">
+            <span>✦ View Star Map & Desert Gateway ➔</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Astrolabe Quick-Return Compass (Dynamic Scroll Rotation & Fast Ascent) -->
+  <button type="button" class="astrolabe-compass-btn" id="astrolabe-compass-btn" aria-label="Return to Observatory" title="Redire ad Summum · Retorno al Observatorio">
+    <div class="compass-dial-ring">
+      <svg class="compass-svg" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="27" cy="27" r="25" stroke="#d4a853" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <circle cx="27" cy="27" r="21" stroke="rgba(212, 168, 83, 0.4)" stroke-width="0.8"/>
+        <!-- Cardinal ticks -->
+        <line x1="27" y1="2" x2="27" y2="7" stroke="#ffe099" stroke-width="1.8"/>
+        <line x1="27" y1="47" x2="27" y2="52" stroke="#d4a853" stroke-width="1.2"/>
+        <line x1="2" y1="27" x2="7" y2="27" stroke="#d4a853" stroke-width="1.2"/>
+        <line x1="47" y1="27" x2="52" y2="27" stroke="#d4a853" stroke-width="1.2"/>
+        <!-- Compass Rose Needle (Rotates with scroll!) -->
+        <g id="compass-needle-group">
+          <polygon points="27,6 23,27 27,24" fill="#ef4444"/>
+          <polygon points="27,6 31,27 27,24" fill="#f87171"/>
+          <polygon points="27,48 23,27 27,30" fill="#94a3b8"/>
+          <polygon points="27,48 31,27 27,30" fill="#cbd5e1"/>
+          <circle cx="27" cy="27" r="3.5" fill="#ffe099" stroke="#78350f" stroke-width="1"/>
+        </g>
+      </svg>
+    </div>
+  </button>
 
   <script src="../../shared/navigator.js"></script>
   <script src="./cipher.js"></script>

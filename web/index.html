@@ -4491,7 +4491,7 @@
                     <span class="tick active-beacon">▲ 22.22 [RELAY 01]</span>
                     <span class="tick">50 MHz</span>
                     <span class="tick">100 MHz</span>
-                    <span class="tick active-beacon">▲ 142.85 [RELAY 03]</span>
+                    <span class="tick active-beacon">▲ 142.85 [RELAYS & 09-A]</span>
                     <span class="tick">160 MHz</span>
                   </div>
                 </div>
@@ -4642,6 +4642,33 @@
                   </div>
                 </div>
 
+                <!-- Transmission 06 · Station 09 Climax (Dispatch 09-A: The Sandstorm Engulfs Icarus) -->
+                <div class="tx-log-card tx-log-card-cipher" data-tx-href="./constellation/celestial-cipher/transmission.html" hidden>
+                  <div class="tx-log-card-top">
+                    <span class="dossier-card-tag tag-distress" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #fca5a5;">06 · SANDSTORM GALE</span>
+                    <span class="dossier-card-freq">01:22 · 142.85 MHz</span>
+                  </div>
+                  <div class="tx-log-card-body">
+                    <h3 class="tx-log-card-title">The Sandstorm Wire · Dispatch 09-A</h3>
+                    <div class="tx-card-oscilloscope" title="Analog Frequency Waveform">
+                      <svg viewBox="0 0 240 24" preserveAspectRatio="none">
+                        <line x1="0" y1="12" x2="240" y2="12" stroke="rgba(239, 68, 68, 0.25)" stroke-dasharray="3,3" />
+                        <path class="wave-line" style="stroke: #ef4444;" d="M 0 12 Q 10 2, 20 22 T 40 12 T 60 2 T 80 22 T 100 2 T 120 22 T 140 12 T 160 2 T 180 22 T 200 12 T 220 22 T 240 12" />
+                      </svg>
+                    </div>
+                    <p class="tx-log-card-summary">
+                      "Silvia! Silvia, can you hear me through the static? The storm is right on top of me out here in the dunes! You spoke the vow I carved fifty-six years ago... you gave me back my true name!"
+                    </p>
+                  </div>
+                  <div class="tx-log-card-footer">
+                    <div class="tx-location-tag">📍 Frontier Canyon · Deserti Limen // 142.85 MHz</div>
+                    <a class="btn-launch-decoder" href="./constellation/celestial-cipher/transmission.html">
+                      <span>📻 Decrypt Dispatch 09-A</span>
+                      <span class="arrow-sym">➔</span>
+                    </a>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -4720,6 +4747,13 @@
                 <span class="archive-item-tag">DISPATCH</span>
               </div>
               <span class="archive-item-title">Dispatch III: The Subterranean Outpost</span>
+            </div>
+            <div class="archive-item-card" data-doc="doc4" id="archive-item-doc4">
+              <div class="archive-item-top">
+                <span class="archive-item-date">Folio Limen // Memoirs</span>
+                <span class="archive-item-tag" style="background: rgba(212, 175, 55, 0.15); border-color: #d4af37; color: #ffd580;">FOLIO</span>
+              </div>
+              <span class="archive-item-title">Record 09-A: The Man Behind the Maps</span>
             </div>
             <div id="archive-optical-logs" hidden>
               <div class="archive-section-label">Optical Logs</div>
@@ -5391,13 +5425,11 @@
         return `seeker_${u}_${suffix}`;
       }
 
-      // Silvia has completed Game 8! Ensure storage reflects completion
+      // Seeker progression defaults:
+      // Silvia has NOT completed Game 8 yet; Carles (tester) has completed Game 8.
       try {
-        if (localStorage.getItem('seeker_silvia_midnight_completed') !== 'true') {
-          localStorage.setItem('seeker_silvia_midnight_completed', 'true');
-        }
-        if (localStorage.getItem('order_midnight_completed') !== 'true') {
-          localStorage.setItem('order_midnight_completed', 'true');
+        if (localStorage.getItem('seeker_carles_midnight_completed') === null) {
+          localStorage.setItem('seeker_carles_midnight_completed', 'true');
         }
       } catch (e) {}
 
@@ -5406,8 +5438,10 @@
         const key = `seeker_${u}_midnight_completed`;
         const val = localStorage.getItem(key);
         if (val !== null) return val === 'true';
-        // Both Silvia and Carles have completed Game 8 (The Midnight Calibration)
-        return true;
+        // Carles is tester (has completed Game 8)
+        if (u === 'carles') return true;
+        // Silvia has NOT yet completed Game 8
+        return false;
       }
 
       function getSeekerCipherCompleted() {
@@ -5629,15 +5663,16 @@
               statusClass: 'status-done-badge',
               title: 'The Celestial Cipher',
               thumb: './assets/thumbnails/desert_frontier_preview.webp',
-              lore: 'Crossing the twelve hour sectors with the four declination rings from Sheet 7, Silvia decrypted the Cartographer\'s sacred prophecy: \'YOU WERE ALWAYS THE TREASURE\'. At the moment of resolution, the southern sandstorm swept across the frontier, plunging the mountain sanctuary into red twilight and opening the pathway into the deep dunes.',
+              lore: 'Reading the folio of Deserti Limen, Silvia uncovered the Cartographer\'s true name—Icarus—and transmitted his sacred vow: \'You were always the treasure\'. As the signal cleared, the southern sandstorm broke, sealing the Constellation Path forever.',
               rewards: [
-                { icon: '📜', label: 'The Final Prophecy', desc: '"YOU WERE ALWAYS THE TREASURE"' },
-                { icon: '🏜️', label: 'Threshold to Desert Path', desc: 'Gateway to the Great Dunes and the First Tower' }
+                { icon: '📜', label: "Icarus's Celestial Vow", desc: '"YOU WERE ALWAYS THE TREASURE"' },
+                { icon: '★', label: "The True Name Revealed", desc: 'Icarus · The Cartographer of Distant Light' },
+                { icon: '🏜️', label: 'Threshold to Desert Path', desc: 'Gateway to the Great Dunes & Desert Oracle' }
               ],
-              btnText: 'Inspect Decrypted Cipher ➔',
+              btnText: 'Read "The Man Behind the Maps" ➔',
               url: './constellation/celestial-cipher/index.html',
               replayUrl: './constellation/celestial-cipher/index.html',
-              replayText: '↺ Replay Decryption'
+              replayText: '↺ Re-read Chapter'
             };
           }
 
@@ -5647,9 +5682,10 @@
             statusClass: 'status-live-badge',
             title: 'The Celestial Cipher',
             thumb: './assets/thumbnails/desert_frontier_preview.webp',
-            lore: 'At the southern precipice where the Shifting Tempest begins to scour the mountain passes, Silvia reaches the final station of the Constellation Path. Here lies The Celestial Cipher from Sheet 7: a 12-hour coordinate dial locking the ancient prophecy. Beyond this threshold, the stars give way to the shifting sands of the Desert Path and the search for the Desert Oracle.',
+            lore: 'At the southern cliff where the alpine rocks meet the burning sands, Silvia reaches the threshold of Deserti Limen. Here lies the sacred record of the Cartographer: the confession he carved into brass for Aurelia before the world broke. Beyond this threshold, the stars give way to the shifting sands of the Desert Path and the search for the Desert Oracle.',
             rewards: [
-              { icon: '📜', label: 'The Final Prophecy', desc: '"YOU WERE ALWAYS THE TREASURE"' },
+              { icon: '📜', label: "Icarus's Celestial Vow", desc: '"YOU WERE ALWAYS THE TREASURE"' },
+              { icon: '★', label: "The Secret Behind the Maps", desc: 'The real name and lost love of the Cartographer' },
               { icon: '🏜️', label: 'Threshold to Desert Path', desc: 'Gateway to the Great Dunes and the First Tower' }
             ],
             btnText: '✦ ENTER CELESTIAL CIPHER ➔',
@@ -5816,6 +5852,22 @@
             <p class="archive-record-note">
               <strong>Dispatch III · The Subterranean Outpost:</strong> Transmission received from the Cartographer at the desert threshold. Informs Silvia of the dormant central command console and directs her to solve Sheet 5 (The Zodiacal Engine) to extract the emergency override sequence.
             </p>
+          `
+        },
+        doc4: {
+          metaId: 'RECORD 09-A // THE MAN BEHIND THE MAPS',
+          metaDate: 'FOLIO LIMEN · MEMOIRS OF ICARUS (ANNO 1970–2026)',
+          imgSrc: './constellation/celestial-cipher/assets/distant-light-precipice.jpg',
+          fullImgSrc: './constellation/celestial-cipher/assets/distant-light-precipice.jpg',
+          bodyHtml: `
+            <p class="archive-record-note">
+              <strong>Folio Limen · The Man Behind the Maps (Anno 1970–2026):</strong> The recovered personal memoirs of Icarus, the Cartographer of Distant Light. Documents the fall of the Southern Bridge in 1970, twenty-seven years of rebuilding the Alpine Observatory stone by stone, the grueling 1998 frontier survey along the gorge precipice, and the midnight beacon of 2016 that reignited his lifelong search for Aurelia.
+            </p>
+            <div style="margin-top: 14px;">
+              <a href="./constellation/celestial-cipher/index.html" class="btn-historical-web" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; font-size: 0.85rem; cursor: pointer;">
+                <span>📖 Read Complete Folio in Celestial Cipher ➔</span>
+              </a>
+            </div>
           `
         },
         vid1: {
@@ -6114,23 +6166,39 @@
         midnightTxCards.forEach(card => {
           card.hidden = !isMidnightCompleted;
         });
+        const cipherTxCards = document.querySelectorAll('.tx-log-card-cipher');
+        cipherTxCards.forEach(card => {
+          card.hidden = !isCipherCompleted && !isCarles;
+        });
         const txArchiveCount = document.getElementById('tx-archive-count');
         const txDossierDesc = document.getElementById('tx-dossier-desc');
         if (txArchiveCount) {
-          txArchiveCount.textContent = isMidnightCompleted
-            ? 'FREQUENCY ARCHIVE // 5 RECORDINGS READY'
-            : 'FREQUENCY ARCHIVE // 3 RECORDINGS READY';
+          if (isCipherCompleted) {
+            txArchiveCount.textContent = 'FREQUENCY ARCHIVE // 6 RECORDINGS READY';
+          } else if (isMidnightCompleted) {
+            txArchiveCount.textContent = 'FREQUENCY ARCHIVE // 5 RECORDINGS READY';
+          } else {
+            txArchiveCount.textContent = 'FREQUENCY ARCHIVE // 3 RECORDINGS READY';
+          }
         }
         if (txDossierDesc) {
-          txDossierDesc.textContent = isMidnightCompleted
-            ? 'Five intercepted audio broadcasts recovered from the Cartographer\'s field receiver. Select an intercepted log below to initialize its dedicated relay console and examine its authentic telemetry.'
-            : 'Three intercepted audio broadcasts recovered from the Cartographer\'s field receiver. Select an intercepted log below to initialize its dedicated relay console, play the recorded signal, and examine its authentic telemetry.';
+          if (isCipherCompleted) {
+            txDossierDesc.textContent = 'Six intercepted audio broadcasts recovered from the Cartographer\'s field receiver, including the emergency wire from the southern sandstorm at Deserti Limen.';
+          } else if (isMidnightCompleted) {
+            txDossierDesc.textContent = 'Five intercepted audio broadcasts recovered from the Cartographer\'s field receiver. Select an intercepted log below to initialize its dedicated relay console and examine its authentic telemetry.';
+          } else {
+            txDossierDesc.textContent = 'Three intercepted audio broadcasts recovered from the Cartographer\'s field receiver. Select an intercepted log below to initialize its dedicated relay console, play the recorded signal, and examine its authentic telemetry.';
+          }
         }
 
-        // 2. The Order Archives (Optical Logs)
+        // 2. The Order Archives (Optical Logs & Station 09 Folio Limen)
         const opticalLogs = document.getElementById('archive-optical-logs');
         if (opticalLogs) {
           opticalLogs.hidden = !isMidnightCompleted;
+        }
+        const cipherArchiveCard = document.getElementById('archive-item-doc4');
+        if (cipherArchiveCard) {
+          cipherArchiveCard.hidden = !isCipherCompleted && !isCarles;
         }
 
         // 3. SVG Map Relics (Relic 8 text & Relic 9 dial)
@@ -6188,7 +6256,7 @@
           }
           if (fadeFil) fadeFil.style.display = 'none';
 
-          if (!isCarles) {
+          if (!isCarles && !isCipherCompleted) {
             // Silvia: Station 09 appears as an INCÓGNITA (? / mystery)
             if (n9Beacon) n9Beacon.style.display = 'none';
             if (n9Gear) n9Gear.style.opacity = '0.35';
@@ -6212,7 +6280,7 @@
               n9Title.style.fill = '#94a3b8';
             }
           } else {
-            // Carles: Game 09 is the current active game
+            // Carles or Silvia completed: Game 09 is visible and interactive
             if (n9Gear) n9Gear.style.opacity = '0.85';
             if (n9Ring) n9Ring.style.opacity = '0.85';
             if (n9Glow) n9Glow.style.opacity = '0.7';
@@ -6350,7 +6418,7 @@
             const chron9Thumb = document.getElementById('chronicle-9-thumb') || chronCard9.querySelector('img');
             const chron9Btn = document.getElementById('chronicle-9-btn');
 
-            if (!isCarles) {
+            if (!isCarles && !isCipherCompleted) {
               chronCard9.className = 'chronicle-card chronicle-locked-card';
               if (chron9Tag) {
                 chron9Tag.textContent = 'Station 09 · Unknown Horizon ⏳';
@@ -6390,14 +6458,14 @@
                   chron9Title.style.color = 'var(--brass-bright)';
                 }
                 if (chron9Text) {
-                  chron9Text.textContent = 'Crossing the twelve hour sectors with the four declination rings from Sheet 7, Silvia decrypted the Cartographer\'s sacred prophecy: \'YOU WERE ALWAYS THE TREASURE\'. At the moment of resolution, the southern sandstorm swept across the frontier, plunging the mountain sanctuary into red twilight and opening the pathway into the deep dunes.';
+                  chron9Text.textContent = 'Reading the folio of Deserti Limen, Silvia uncovered the Cartographer\'s true name and spoke his sacred vow across 142.85 MHz: \'You were always the treasure\'. As the transmission ended, the great sandstorm broke, sealing the Constellation Path forever.';
                 }
                 if (chron9Btn) {
                   chron9Btn.className = 'btn-historical-web';
                   chron9Btn.href = './constellation/celestial-cipher/index.html';
                   chron9Btn.onclick = null;
                   const span = chron9Btn.querySelector('span');
-                  if (span) span.textContent = '↺ Replay Decryption ➔';
+                  if (span) span.textContent = '↺ Re-read Chapter ➔';
                 }
               } else {
                 if (chron9Tag) {
@@ -6409,7 +6477,7 @@
                   chron9Title.style.color = 'var(--brass-bright)';
                 }
                 if (chron9Text) {
-                  chron9Text.textContent = 'At the southern precipice where the Shifting Tempest begins to scour the mountain passes, Silvia reaches the final station of the Constellation Path. Here lies The Celestial Cipher from Sheet 7: a 12-hour coordinate dial locking the ancient prophecy. Beyond this threshold, the stars give way to the shifting sands of the Desert Path.';
+                  chron9Text.textContent = 'At the southern precipice where the Shifting Tempest begins to scour the mountain passes, Silvia reaches the final station of the Constellation Path: Deserti Limen. Here lies the sacred record of the Cartographer: the confession he carved into brass for Aurelia before the world broke. Beyond this threshold, the stars give way to the shifting sands of the Desert Path and the search for the Desert Oracle.';
                 }
                 if (chron9Btn) {
                   chron9Btn.className = 'btn-historical-web';
@@ -6635,7 +6703,11 @@
         { id: 'zod-diff', station: 'Station 07 · Zodiacal Differential', name: 'Meridian Resonance', expr: 'O − A', l1: 'O', op: '-', l2: 'A', target: 16, unit: ' S' },
         { id: 'lon-deg', station: 'Vector I · Deep Desert Vector', name: 'Longitude Degrees', expr: 'B + P', l1: 'B', op: '+', l2: 'P', target: 38, unit: 'º E' },
         { id: 'lon-min', station: 'Vector I · Deep Desert Vector', name: 'Longitude Minutes', expr: 'E + V', l1: 'E', op: '+', l2: 'V', target: 14, unit: "' E" },
-        { id: 'lon-sec', station: 'Vector I · Deep Desert Vector', name: 'Longitude Seconds', expr: 'F + T', l1: 'F', op: '+', l2: 'T', target: 22, unit: "'' E" }
+        { id: 'lon-sec', station: 'Vector I · Deep Desert Vector', name: 'Longitude Seconds', expr: 'F + T', l1: 'F', op: '+', l2: 'T', target: 22, unit: "'' E" },
+        { id: 'diff-kg', station: 'Station 09 · Folio Limen', name: 'Meridian Parallax', expr: 'K − G', l1: 'K', op: '-', l2: 'G', target: 4, unit: ' N' },
+        { id: 'diff-pb', station: 'Station 09 · Folio Limen', name: 'Frontier Shift', expr: 'P − B', l1: 'P', op: '-', l2: 'B', target: 4, unit: ' E' },
+        { id: 'diff-ve', station: 'Station 09 · Folio Limen', name: 'Solar Amplitude', expr: 'V − E', l1: 'V', op: '-', l2: 'E', target: 10, unit: ' S' },
+        { id: 'diff-tf', station: 'Station 09 · Folio Limen', name: 'Polar Resonance', expr: 'T − F', l1: 'T', op: '-', l2: 'F', target: 10, unit: ' O' }
       ];
 
       const alphabetGridEl = document.getElementById('alphabet-grid');
