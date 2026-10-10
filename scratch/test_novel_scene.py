@@ -45,7 +45,7 @@ def run_tests():
         story_content = page.text_content(".story-reader-body")
         print(f"Story Title: '{story_title}'")
         assert "The Man Behind the Maps" in story_title
-        assert "Icarus" in story_content, "Expected Icarus in story"
+        assert "Hermes" in story_content, "Expected Hermes in story"
         assert "Aurelia" in story_content, "Expected Aurelia in story"
         assert "CARTOGRAPHER OF DISTANT LIGHT" in story_content.upper(), "Expected signature evolution"
         assert "you were always the treasure" in story_content.lower()
@@ -53,7 +53,7 @@ def run_tests():
         page.screenshot(path="scratch/story_reader_modal_verified.png")
         print("Captured scratch/story_reader_modal_verified.png")
 
-        # 4. Click 'Transmit Aurelia's Words to Icarus'
+        # 4. Click 'Transmit Aurelia's Words to Hermes'
         btn_transmit = page.locator("#btn-transmit-story")
         btn_transmit.click()
         page.wait_for_timeout(1500)
@@ -67,7 +67,7 @@ def run_tests():
         print(f"Sender: '{sender_name}'")
         assert is_storm_active, "Body should have sandstorm-active class"
         assert climax_modal_open, "Climax modal should be open"
-        assert "Icarus" in sender_name
+        assert "Hermes" in sender_name
         assert "Desert Oracle" in dispatch_text
         assert "follow the distant light" in dispatch_text
 

@@ -51,7 +51,7 @@ def run_tests():
         page.screenshot(path="scratch/novel_fullscreen_bottom.png")
         print("Captured scratch/novel_fullscreen_bottom.png")
 
-        # 2. Click 'Transmit Aurelia's Words to Icarus'
+        # 2. Click 'Transmit Aurelia's Words to Hermes'
         btn_transmit = page.locator("#btn-transmit-story")
         btn_transmit.click()
         page.wait_for_timeout(1000)

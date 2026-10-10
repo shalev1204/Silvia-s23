@@ -3007,6 +3007,30 @@ body.theme-beacon .sky-backdrop-gradient {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.8), 0 0 28px rgba(212, 175, 55, 0.6);
 }
 
+.btn-storm-climax-trigger {
+  width: 100%;
+  max-width: 540px;
+  padding: 16px 32px;
+  font-size: 1.05rem;
+  background: linear-gradient(180deg, #b91c1c 0%, #991b1b 50%, #7f1d1d 100%) !important;
+  border: 1.5px solid #fca5a5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.8), 0 0 25px rgba(239, 68, 68, 0.6) !important;
+  animation: stormButtonPulse 2.2s infinite alternate !important;
+}
+
+.btn-storm-climax-trigger:hover {
+  background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%) !important;
+  border-color: #fee2e2 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 35px rgba(239, 68, 68, 0.9) !important;
+  transform: translateY(-2px) scale(1.02);
+}
+
+@keyframes stormButtonPulse {
+  0% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(239, 68, 68, 0.4); }
+  100% { box-shadow: 0 8px 28px rgba(0, 0, 0, 0.9), 0 0 32px rgba(239, 68, 68, 0.8); }
+}
+
 .btn-reward-secondary {
   display: inline-flex;
   align-items: center;
@@ -3030,6 +3054,310 @@ body.theme-beacon .sky-backdrop-gradient {
   border-color: #ffd580;
   color: #ffffff;
   transform: translateY(-2px);
+}
+
+/* =====================================================================
+   🔒 MERIDIAN PASSWORD GATE: THE CELESTIAL CIPHER (STATION 09)
+   ===================================================================== */
+.cipher-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: radial-gradient(circle at 50% 40%, rgba(18, 12, 24, 0.96) 0%, rgba(4, 3, 7, 0.99) 100%);
+  backdrop-filter: blur(18px);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s ease, visibility 0.75s;
+}
+
+.cipher-gate-overlay.gate-unlocked {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(1.05);
+}
+
+.cipher-gate-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(212, 168, 83, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cipher-gate-astrolabe-bg {
+  position: absolute;
+  width: 580px;
+  height: 580px;
+  pointer-events: none;
+  opacity: 0.65;
+  animation: slowGateRotate 180s linear infinite;
+}
+
+@keyframes slowGateRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.gate-astrolabe-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cipher-gate-modal {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  width: 100%;
+  background: linear-gradient(175deg, rgba(22, 16, 28, 0.96) 0%, rgba(11, 8, 14, 0.98) 100%);
+  border: 1.5px solid rgba(212, 168, 83, 0.45);
+  border-radius: 12px;
+  padding: 40px 34px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 50px rgba(212, 168, 83, 0.15);
+  text-align: center;
+}
+
+.cipher-gate-header {
+  margin-bottom: 22px;
+}
+
+.cipher-gate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #ffd580;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border: 1px solid rgba(212, 168, 83, 0.35);
+  border-radius: 999px;
+  background: rgba(36, 24, 12, 0.75);
+  margin-bottom: 12px;
+}
+
+.gate-star {
+  color: #f59e0b;
+}
+
+.cipher-gate-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+  color: #fff;
+  background: linear-gradient(180deg, #ffffff 0%, #ffe099 50%, #d4a853 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+
+.cipher-gate-subtitle {
+  font-family: 'EB Garamond', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  color: #d1c7b7;
+}
+
+.cipher-gate-card {
+  background: rgba(14, 10, 8, 0.75);
+  border: 1px solid rgba(212, 168, 83, 0.25);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 26px;
+  text-align: left;
+}
+
+.gate-journal-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.cipher-gate-desc {
+  font-family: 'Newsreader', 'Lora', serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: #f3ece0;
+  margin-bottom: 10px;
+}
+
+.cipher-gate-instruction {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #c9b99e;
+}
+
+.cipher-gate-instruction strong {
+  color: #ffd580;
+}
+
+.cipher-input-wrap {
+  text-align: left;
+  margin-bottom: 22px;
+}
+
+.cipher-input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffd580;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.cipher-input-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: #94a3b8;
+  letter-spacing: 0.05em;
+}
+
+.cipher-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cipher-key-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1.1rem;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.cipher-password-input {
+  width: 100%;
+  background: rgba(8, 6, 12, 0.9);
+  border: 1.5px solid rgba(212, 168, 83, 0.45);
+  border-radius: 8px;
+  padding: 14px 16px 14px 44px;
+  color: #fff4db;
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  outline: none;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7);
+  transition: all 0.25s ease;
+}
+
+.cipher-password-input:focus {
+  border-color: #ffd580;
+  background: rgba(14, 10, 18, 0.95);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 18px rgba(212, 168, 83, 0.4);
+}
+
+.cipher-password-input.input-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+  animation: shakeGateInput 0.45s ease;
+}
+
+@keyframes shakeGateInput {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.cipher-feedback-msg {
+  margin-top: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  color: #a4b3ca;
+  min-height: 20px;
+  transition: color 0.2s ease;
+}
+
+.cipher-feedback-msg.feedback-error {
+  color: #f87171;
+  font-weight: 500;
+}
+
+.cipher-feedback-msg.feedback-success {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.cipher-gate-actions {
+  margin-bottom: 16px;
+}
+
+.btn-cipher-unlock {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 24px;
+  background: linear-gradient(180deg, #ffd580 0%, #d4a853 50%, #9e7529 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  color: #120904;
+  font-family: 'Cinzel', serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 24px rgba(212, 168, 83, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-cipher-unlock:hover {
+  background: linear-gradient(180deg, #ffe099 0%, #e2b963 50%, #b38431 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.7), 0 0 32px rgba(212, 168, 83, 0.55);
+}
+
+.cipher-dev-bypass {
+  margin-top: 10px;
+}
+
+.btn-dev-autofill {
+  background: transparent;
+  border: 1px dashed rgba(245, 158, 11, 0.45);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #fbbf24;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dev-autofill:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #fbbf24;
+}
+
+.cipher-gate-footer {
+  margin-top: 18px;
+  border-top: 1px solid rgba(212, 168, 83, 0.2);
+  padding-top: 14px;
+}
+
+.gate-return-link {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #a4b3ca;
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  transition: color 0.2s ease;
+}
+
+.gate-return-link:hover {
+  color: #ffd580;
 }
 
 

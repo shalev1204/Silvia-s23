@@ -107,10 +107,12 @@ with sync_playwright() as p:
     page.goto('http://localhost:8080/constellation/celestial-cipher/index.html')
     page.wait_for_timeout(600)
     
-    # Trigger Climax Transceiver via transmit button
+    # Navigate to Chapter 4 and trigger Climax Transceiver via transmit button
+    page.click('#step-4')
+    page.wait_for_timeout(400)
     page.locator('#btn-transmit-story').scroll_into_view_if_needed()
     page.click('#btn-transmit-story')
-    page.wait_for_selector('#climax-modal.modal-open', timeout=5000)
+    page.wait_for_selector('#radio-modal-overlay.active', timeout=5000)
     page.wait_for_timeout(1000)
     
     modal_title = page.locator('#radio-current-title').inner_text()
@@ -123,8 +125,8 @@ with sync_playwright() as p:
     print("Subtitles Initial:", sub_text)
     print("Audio Source:", audio_src)
     
-    assert "THE SANDSTORM ENGULFS ICARUS" in modal_title
-    assert "Icarus" in sender_name
+    assert "THE SANDSTORM ENGULFS HERMES" in modal_title
+    assert "Hermes" in sender_name
     assert "cartographer_sandstorm_emergency.mp3" in audio_src
     
     print("\n✓ ALL TESTS PASSED WITH 100% SUCCESS!")

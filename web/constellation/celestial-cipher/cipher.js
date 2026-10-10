@@ -7,15 +7,10 @@
 (function () {
   'use strict';
 
-  // Seeker access control: Station 09 remains veiled / locked for Silvia until release
+  // Seeker access control: Station 09 is available for both Silvia and Carles
   const currentSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
   const urlParams = new URLSearchParams(window.location.search);
   const isDevBypass = urlParams.get('preview') === '1' || urlParams.get('auth') === '1' || urlParams.get('dev') === '1' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  if (currentSeeker !== 'carles' && !isDevBypass && localStorage.getItem('order_midnight_completed') !== 'true') {
-    alert("Station 09 remains veiled under the Order's nocturnal seal. The path will unlock when the next dispatch is broadcast.");
-    window.location.replace('../../index.html#view-trail');
-    return;
-  }
 
   // ── 1. Minimal Audio FX (Only for final transmission click & resolution) ──
   class MinimalAudio {
@@ -80,6 +75,112 @@
   }
 
   const sfx = new MinimalAudio();
+
+  // =====================================================================
+  // 🔒 MERIDIAN PASSWORD GATE: THE CELESTIAL CIPHER (STATION 09)
+  // =====================================================================
+  const cipherGateOverlay = document.getElementById('cipher-gate-overlay');
+  const cipherGateForm = document.getElementById('cipher-gate-form');
+  const cipherPasswordInput = document.getElementById('cipher-password-input');
+  const btnCipherUnlock = document.getElementById('btn-cipher-unlock');
+  const cipherFeedbackMsg = document.getElementById('cipher-feedback-msg');
+  const cipherDevBypass = document.getElementById('cipher-dev-bypass');
+  const btnDevAutofill = document.getElementById('btn-dev-autofill');
+
+  const TARGET_CIPHER_PHRASE = "YOU WERE ALWAYS THE TREASURE";
+
+  function normalizeCipherInput(str) {
+    if (!str) return '';
+    return str
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z\s]/g, '')
+      .replace(/\s+/g, ' ');
+  }
+
+  function isCipherGateUnlocked() {
+    if (urlParams.get('lock') === '1' || urlParams.get('reset') === '1') return false;
+    const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+    if (localStorage.getItem('order_cipher_unlocked') === 'true') return true;
+    if (localStorage.getItem(`seeker_${activeSeeker}_cipher_unlocked`) === 'true') return true;
+    return false;
+  }
+
+  function unlockCipherGate(animate = true) {
+    const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+    try {
+      localStorage.setItem('order_cipher_unlocked', 'true');
+      localStorage.setItem(`seeker_${activeSeeker}_cipher_unlocked`, 'true');
+      localStorage.setItem('order_cipher_completed', 'true');
+      localStorage.setItem(`seeker_${activeSeeker}_cipher_completed`, 'true');
+    } catch(e) {}
+
+    if (cipherGateOverlay) {
+      if (animate) {
+        cipherGateOverlay.classList.add('gate-unlocked');
+        setTimeout(() => {
+          cipherGateOverlay.style.display = 'none';
+        }, 750);
+      } else {
+        cipherGateOverlay.style.display = 'none';
+      }
+    }
+  }
+
+  function handleCipherSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!cipherPasswordInput) return;
+    const rawVal = cipherPasswordInput.value || '';
+    const cleaned = normalizeCipherInput(rawVal);
+    const compactCleaned = cleaned.replace(/\s/g, '');
+    const compactTarget = TARGET_CIPHER_PHRASE.replace(/\s/g, '');
+
+    if (cleaned === TARGET_CIPHER_PHRASE || compactCleaned === compactTarget) {
+      if (sfx) sfx.playProphecyResolved();
+      cipherPasswordInput.classList.remove('input-error');
+      if (cipherFeedbackMsg) {
+        cipherFeedbackMsg.className = 'cipher-feedback-msg feedback-success';
+        cipherFeedbackMsg.innerHTML = '✓ Meridian unlocked: "YOU WERE ALWAYS THE TREASURE" · Breaking seal...';
+      }
+      setTimeout(() => {
+        unlockCipherGate(true);
+      }, 500);
+    } else {
+      if (sfx) sfx.playClick();
+      cipherPasswordInput.classList.add('input-error');
+      setTimeout(() => cipherPasswordInput.classList.remove('input-error'), 450);
+      if (cipherFeedbackMsg) {
+        cipherFeedbackMsg.className = 'cipher-feedback-msg feedback-error';
+        cipherFeedbackMsg.innerHTML = '✕ The gears do not mesh. Align the 24 sightings from Sheet 7A in your journal.';
+      }
+    }
+  }
+
+  if (cipherGateOverlay) {
+    const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+    const isExplicitDev = urlParams.get('dev') === '1' || urlParams.get('test') === '1';
+    if (activeSeeker === 'carles' || (isExplicitDev && activeSeeker !== 'silvia')) {
+      if (cipherDevBypass) cipherDevBypass.style.display = 'block';
+    }
+
+    if (isCipherGateUnlocked()) {
+      unlockCipherGate(false);
+    } else {
+      if (cipherGateForm) cipherGateForm.addEventListener('submit', handleCipherSubmit);
+      if (btnCipherUnlock) btnCipherUnlock.addEventListener('click', handleCipherSubmit);
+      if (btnDevAutofill) {
+        btnDevAutofill.addEventListener('click', () => {
+          if (cipherPasswordInput) cipherPasswordInput.value = TARGET_CIPHER_PHRASE;
+          handleCipherSubmit();
+        });
+      }
+      if (cipherPasswordInput) {
+        cipherPasswordInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') handleCipherSubmit(e);
+        });
+      }
+    }
+  }
 
   // ── 2. Mathematical Continuous LERP Utilities ──
   function lerp(a, b, t) {
@@ -766,7 +867,7 @@
     if (radioDeckControls) radioDeckControls.style.display = 'flex';
 
     if (transcriptSub) {
-      transcriptSub.innerText = "RECEIVING LIVE EMERGENCY BROADCAST · ICARUS TRANSMITTING AMIDST GALE";
+      transcriptSub.innerText = "RECEIVING LIVE EMERGENCY BROADCAST · HERMES TRANSMITTING AMIDST GALE";
     }
 
     radioAudio.play().then(() => {
@@ -952,11 +1053,23 @@
     try {
       localStorage.setItem('order_cipher_completed', 'true');
       localStorage.setItem('order_sandstorm_triggered', 'true');
+      localStorage.setItem('order_sandstorm_active', 'true');
+      const today8pm = new Date();
+      today8pm.setHours(20, 0, 0, 0);
+      const targetTime = today8pm.getTime() + (48 * 60 * 60 * 1000);
+      if (!localStorage.getItem('order_sandstorm_target_time')) {
+        localStorage.setItem('order_sandstorm_target_time', targetTime.toString());
+      }
+      if (!localStorage.getItem('order_sandstorm_start_time')) {
+        localStorage.setItem('order_sandstorm_start_time', Date.now().toString());
+      }
       localStorage.setItem('order_desert_path_unlocked', 'true');
       localStorage.setItem('order_cipher_reward_claimed', 'true');
       const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
       localStorage.setItem(`seeker_${activeSeeker}_cipher_completed`, 'true');
+      localStorage.setItem(`seeker_${activeSeeker}_sandstorm_active`, 'true');
       localStorage.setItem(`seeker_silvia_cipher_completed`, 'true');
+      localStorage.setItem(`seeker_silvia_sandstorm_active`, 'true');
     } catch (e) {}
 
     sfx.playProphecyResolved();
@@ -969,9 +1082,38 @@
     document.body.style.overflow = '';
   }
 
+  function triggerSandstormHubLockdown() {
+    try {
+      localStorage.setItem('order_sandstorm_active', 'true');
+      const today8pm = new Date();
+      today8pm.setHours(20, 0, 0, 0);
+      const targetTime = today8pm.getTime() + (48 * 60 * 60 * 1000);
+      localStorage.setItem('order_sandstorm_target_time', targetTime.toString());
+      if (!localStorage.getItem('order_sandstorm_start_time')) {
+        localStorage.setItem('order_sandstorm_start_time', Date.now().toString());
+      }
+      const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+      localStorage.setItem(`seeker_${activeSeeker}_sandstorm_active`, 'true');
+      localStorage.setItem('seeker_silvia_sandstorm_active', 'true');
+      localStorage.setItem('order_cipher_completed', 'true');
+      localStorage.setItem(`seeker_${activeSeeker}_cipher_completed`, 'true');
+      localStorage.setItem('seeker_silvia_cipher_completed', 'true');
+    } catch(e) {}
+  }
+
+  const btnGotoDesertTrail = document.getElementById('btn-goto-desert-trail');
+  if (btnGotoDesertTrail) {
+    btnGotoDesertTrail.addEventListener('click', triggerSandstormHubLockdown);
+  }
+  const btnStandaloneReward = document.getElementById('btn-standalone-reward');
+  if (btnStandaloneReward) {
+    btnStandaloneReward.addEventListener('click', triggerSandstormHubLockdown);
+  }
+
   if (btnClimaxDesert) {
     btnClimaxDesert.addEventListener('click', () => {
       sfx.playClick();
+      triggerSandstormHubLockdown();
       openRewardModal();
     });
   }

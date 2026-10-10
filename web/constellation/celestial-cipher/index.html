@@ -15,6 +15,101 @@
 </head>
 <body class="cipher-expedition-body">
 
+  <!-- =====================================================================
+       🔒 CELESTIAL CIPHER MERIDIAN SEAL (PASSWORD GATE BEFORE NOVEL READING)
+       ===================================================================== -->
+  <div class="cipher-gate-overlay" id="cipher-gate-overlay">
+    <div class="cipher-gate-backdrop"></div>
+    
+    <!-- Antique Astrolabe Rotating Rings Background -->
+    <div class="cipher-gate-astrolabe-bg" aria-hidden="true">
+      <svg class="gate-astrolabe-svg" viewBox="0 0 500 500">
+        <circle cx="250" cy="250" r="230" fill="none" stroke="rgba(212, 168, 83, 0.25)" stroke-width="1.5" stroke-dasharray="4 6"/>
+        <circle cx="250" cy="250" r="180" fill="none" stroke="rgba(212, 168, 83, 0.35)" stroke-width="1" stroke-dasharray="12 4 2 4"/>
+        <circle cx="250" cy="250" r="120" fill="none" stroke="rgba(212, 168, 83, 0.45)" stroke-width="1.2"/>
+        <circle cx="250" cy="250" r="60" fill="none" stroke="rgba(212, 168, 83, 0.3)" stroke-width="1"/>
+        <line x1="250" y1="10" x2="250" y2="490" stroke="rgba(212, 168, 83, 0.2)" stroke-width="1" stroke-dasharray="6 4"/>
+        <line x1="10" y1="250" x2="490" y2="250" stroke="rgba(212, 168, 83, 0.2)" stroke-width="1" stroke-dasharray="6 4"/>
+      </svg>
+    </div>
+
+    <div class="cipher-gate-modal brass-card-frame">
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+
+      <!-- Header -->
+      <div class="cipher-gate-header">
+        <div class="cipher-gate-badge">
+          <span class="gate-star">✦</span>
+          <span>THE ECLIPSE ORDER · STATION 09</span>
+          <span class="gate-star">✦</span>
+        </div>
+        <h1 class="cipher-gate-title">The Celestial Cipher</h1>
+        <p class="cipher-gate-subtitle">The Meridian Seal of Deserti Limen</p>
+      </div>
+
+      <!-- Lore & Prompt Card -->
+      <div class="cipher-gate-card">
+        <div class="gate-journal-icon">📖</div>
+        <p class="cipher-gate-desc">
+          The personal manuscript of the Cartographer remains sealed beneath the concentric coordinates of the Alpine Observatory.
+        </p>
+        <p class="cipher-gate-instruction">
+          Open your physical journal to <strong>Sheet 7 · Side A</strong> ("The Celestial Cipher"). Align the concentric dial across the twenty-four recorded sightings and enter the recovered secret inscription to break the seal.
+        </p>
+      </div>
+
+      <!-- Password Input Form -->
+      <form class="cipher-gate-form" id="cipher-gate-form" onsubmit="return false;">
+        <div class="cipher-input-wrap">
+          <label for="cipher-password-input" class="cipher-input-label">
+            <span>✦ Recovered Inscription (5 Words)</span>
+            <span class="cipher-input-hint">24 Sightings · Sectors I–XII</span>
+          </label>
+          <div class="cipher-input-box">
+            <span class="cipher-key-icon">🗝️</span>
+            <input 
+              type="text" 
+              id="cipher-password-input" 
+              class="cipher-password-input" 
+              placeholder="ENTER THE INSCRIPTION..." 
+              autocomplete="off" 
+              autocorrect="off" 
+              autocapitalize="characters" 
+              spellcheck="false"
+              required
+            >
+          </div>
+          <div class="cipher-feedback-msg" id="cipher-feedback-msg">
+            Enter the 5 words deciphered from your journal dial.
+          </div>
+        </div>
+
+        <div class="cipher-gate-actions">
+          <button type="submit" class="btn-cipher-unlock" id="btn-cipher-unlock">
+            <span>✦ Break Meridian Seal & Read Manuscript ➔</span>
+          </button>
+        </div>
+
+        <!-- Dev Sandbox Bypass (Only visible for Carles or with preview) -->
+        <div class="cipher-dev-bypass" id="cipher-dev-bypass" style="display: none;">
+          <button type="button" class="btn-dev-autofill" id="btn-dev-autofill">
+            ⚙ Dev Sandbox: Autofill "YOU WERE ALWAYS THE TREASURE"
+          </button>
+        </div>
+      </form>
+
+      <!-- Return Link -->
+      <div class="cipher-gate-footer">
+        <a href="../../index.html#view-trail" class="gate-return-link">
+          <span>‹ Return to Star Map</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Scenic Atmospheric Background System (Chapter by Chapter Environments) -->
   <div class="scenic-atmosphere-system" id="scenic-atmosphere" aria-hidden="true">
     <div class="scenic-plate scenic-plate-1 active" style="background-image: url('./assets/bg-chapter1-observatory.jpg');"></div>
@@ -315,7 +410,7 @@
             </div>
 
             <h3 class="novel-part-heading">I. The Caliper and the Silver Dust</h3>
-            <p class="novel-para"><span class="novel-dropcap">L</span>ong before the mountain towers fell silent, before the roads were buried by dust and the old world broke, the Cartographer was not an old man living in shadows. He was young, burning with ambition, and possessed by a brilliant, restless mind. His real name was <strong>Icarus</strong>.</p>
+            <p class="novel-para"><span class="novel-dropcap">L</span>ong before the mountain towers fell silent, before the roads were buried by dust and the old world broke, the Cartographer was not an old man living in shadows. He was young, burning with ambition, and possessed by a brilliant, restless mind. His real name was <strong>Hermes</strong>.</p>
             <p class="novel-para">He lived in the highest tower of the Alpine Observatory, where cold winds blew against the windows and the rooms smelled of warm tea, old paper, and metal tools. But he was not alone in that quiet solitude. With him lived <strong>Aurelia</strong>—an astronomer whose calm heart brought him peace, and an artist who painted the night sky with deep blue ink, gold powder, and silver leaf.</p>
 
             <!-- ILLUMINATED PLATE I: AURELIA AT WORK -->
@@ -335,17 +430,17 @@
               </figcaption>
             </figure>
 
-            <p class="novel-para">In those proud, feverish years, young Icarus rarely stopped to simply admire the stars. While Aurelia found quiet peace in the serene wonder of the night sky, his mind was consumed by restless ambition. He was obsessed with unravelling the grand mysteries of the Order—above all, the legendary architecture of the <strong>Three Ancient Towers</strong>. Night after night, while the mountain froze outside, he sat over worn manuscripts, architectural drawings, and mechanical schematics, determined to decipher the hidden mechanisms that would unlock the ancient founders' vaults and bring immortal renown.</p>
+            <p class="novel-para">In those proud, feverish years, young Hermes rarely stopped to simply admire the stars. While Aurelia found quiet peace in the serene wonder of the night sky, his mind was consumed by restless ambition. He was obsessed with unravelling the grand mysteries of the Order—above all, the legendary architecture of the <strong>Three Ancient Towers</strong>. Night after night, while the mountain froze outside, he sat over worn manuscripts, architectural drawings, and mechanical schematics, determined to decipher the hidden mechanisms that would unlock the ancient founders' vaults and bring immortal renown.</p>
             <p class="novel-para">Aurelia never shared his hunger for forgotten vaults or worldly glory. Her world was the quiet majesty of the constellations. While he argued over complex mechanisms and unsolved riddles, she sat by the hearth, gently grinding lapis lazuli into deep blue pigment and applying silver leaf to her star charts. When the alpine frost chilled his hands, she wrapped her warm wool shawl around his shoulders and set a bowl of hot soup beside his drafting compass.</p>
-            <p class="novel-para">One winter morning, after five days without sleep, Icarus collapsed over his desk, his head resting on scattered notes and numbers. When he woke hours later, soft morning sunlight filled the room. Aurelia was still sitting at his bench. Her eyes were red with exhaustion, her fingers stiff with cold. She was patiently finishing the complex drawings and calculations he had left behind, saving his life's work line by line so nothing would be lost.</p>
-            <p class="novel-para">Looking at her bowed head, and the gentle care with which she blew dry the fresh ink on his parchment, something hard and stubborn broke inside Icarus's heart. For years he had chased distant glory and forgotten vaults, completely blind to the true wonder living right beside him.</p>
-            <p class="novel-para">That evening, Icarus put his ambitious schemes away. Taking a plate of polished brass, he spent weeks engraving a master star dial: a beautiful disc marked with twelve hours and the rings of the night sky. It was not made to unlock ancient vaults. It was a gift of love—a puzzle of four turning rings that revealed a secret message only when aligned with the stars she loved most.</p>
-            <p class="novel-para">On the terrace, under a clear sky of winter stars, Icarus took Aurelia's ink-stained hands into his own, pressed the brass dial into her palms, and whispered the truth he had discovered too late:</p>
+            <p class="novel-para">One winter morning, after five days without sleep, Hermes collapsed over his desk, his head resting on scattered notes and numbers. When he woke hours later, soft morning sunlight filled the room. Aurelia was still sitting at his bench. Her eyes were red with exhaustion, her fingers stiff with cold. She was patiently finishing the complex drawings and calculations he had left behind, saving his life's work line by line so nothing would be lost.</p>
+            <p class="novel-para">Looking at her bowed head, and the gentle care with which she blew dry the fresh ink on his parchment, something hard and stubborn broke inside Hermes's heart. For years he had chased distant glory and forgotten vaults, completely blind to the true wonder living right beside him.</p>
+            <p class="novel-para">That evening, Hermes put his ambitious schemes away. Taking a plate of polished brass, he spent weeks engraving a master star dial: a beautiful disc marked with twelve hours and the rings of the night sky. It was not made to unlock ancient vaults. It was a gift of love—a puzzle of four turning rings that revealed a secret message only when aligned with the stars she loved most.</p>
+            <p class="novel-para">On the terrace, under a clear sky of winter stars, Hermes took Aurelia's ink-stained hands into his own, pressed the brass dial into her palms, and whispered the truth he had discovered too late:</p>
             
             <div class="novel-quote-card">
               <span class="quote-sigil">“</span>
               <p class="quote-text">Aurelia... all these years I tore the world apart looking for an ancient treasure to make us immortal. I was blind. You were the only light that mattered. You were always the treasure.</p>
-              <span class="quote-author">— Icarus, on the Alpine Terrace</span>
+              <span class="quote-author">— Hermes, on the Alpine Terrace</span>
             </div>
 
             <p class="novel-para">Aurelia cried soft tears of joy and hung the dial from a cord around her neck. For a short time, the high tower knew peace.</p>
@@ -394,12 +489,12 @@
 
             <p class="novel-para">The disaster struck just after midday. Without warning, a colossal earthquake tore through the bedrock of the canyon fault. At the very same moment, a violent red sandstorm surged out of the southern desert, rising into the sky like a tidal wave of choking crimson dust. The sky turned a bruised, unnatural purple, and hurricane-force winds howled through the mountain peaks.</p>
             <p class="novel-para">Inside the observatory turret, the violent shaking threw heavy furniture across the rooms. Glass lanterns shattered against the flagstones, spilling burning oil across dry drafting paper, scroll racks, and wooden worktables. In seconds, thick black smoke and bright flames engulfed the upper workshop.</p>
-            <p class="novel-para">Icarus grabbed Aurelia’s hand and pulled her down the spiral stairs. They burst out through the tower gate and ran onto the high stone bridge, heading toward the solid mountain cliff where the shelter vaults were carved into the rock. The stone arches trembled beneath their feet, but safety was only fifty paces ahead.</p>
+            <p class="novel-para">Hermes grabbed Aurelia’s hand and pulled her down the spiral stairs. They burst out through the tower gate and ran onto the high stone bridge, heading toward the solid mountain cliff where the shelter vaults were carved into the rock. The stone arches trembled beneath their feet, but safety was only fifty paces ahead.</p>
             <p class="novel-para">Then, halfway across the bridge, Aurelia suddenly pulled her hand free and stopped.</p>
-            <p class="novel-para">She looked back at the burning tower. In that moment of panic, she realized what was still trapped in the flames: the polished brass star dial Icarus had spent weeks engraving for her—his precious vow of love—along with the leather portfolio containing his life's master star maps. She knew how much his work meant to his soul. She could not bear to let his masterpiece burn into ashes.</p>
-            <p class="novel-para"><em>«Aurelia, no! Leave it!»</em> Icarus screamed through the roaring wind. <em>«Run to the cliff!»</em></p>
-            <p class="novel-para">But she had already turned back. Covering her mouth against the heat and smoke, Aurelia sprinted through the embers and disappeared into the burning tower entrance. Desperate with terror, Icarus turned around and ran back across the stone bridge after her.</p>
-            <p class="novel-para">Moments later, Aurelia stumbled out through the flaming doorway, coughing violently from the smoke. She was holding the brass dial clutched tightly against her chest with one arm, and the leather case of maps under the other. Seeing Icarus on the bridge, a look of immense relief washed over her face, and she ran back out onto the high span to meet him.</p>
+            <p class="novel-para">She looked back at the burning tower. In that moment of panic, she realized what was still trapped in the flames: the polished brass star dial Hermes had spent weeks engraving for her—his precious vow of love—along with the leather portfolio containing his life's master star maps. She knew how much his work meant to his soul. She could not bear to let his masterpiece burn into ashes.</p>
+            <p class="novel-para"><em>«Aurelia, no! Leave it!»</em> Hermes screamed through the roaring wind. <em>«Run to the cliff!»</em></p>
+            <p class="novel-para">But she had already turned back. Covering her mouth against the heat and smoke, Aurelia sprinted through the embers and disappeared into the burning tower entrance. Desperate with terror, Hermes turned around and ran back across the stone bridge after her.</p>
+            <p class="novel-para">Moments later, Aurelia stumbled out through the flaming doorway, coughing violently from the smoke. She was holding the brass dial clutched tightly against her chest with one arm, and the leather case of maps under the other. Seeing Hermes on the bridge, a look of immense relief washed over her face, and she ran back out onto the high span to meet him.</p>
             <p class="novel-para">They were only three paces apart, reaching out with both hands, when the second massive earthquake shockwave struck.</p>
 
             <!-- ILLUMINATED PLATE II: THE BRIDGE COLLAPSE -->
@@ -419,7 +514,7 @@
               </figcaption>
             </figure>
             <p class="novel-para">With an ear-splitting crack of fracturing granite, the keystone of the central arch gave way. The entire middle span of the bridge sheared clean off, dropping straight into the empty void. The stone pavement crumbled from beneath Aurelia's boots.</p>
-            <p class="novel-para">Icarus threw his entire body forward onto the edge of the remaining stone pier. His chest slammed hard against the broken rock, scraping his skin as he lunged out over the abyss. For a single, fleeting second, his trembling fingers caught the rough wool of her sleeve. He pulled with all his strength—but the falling stones tore her away.</p>
+            <p class="novel-para">Hermes threw his entire body forward onto the edge of the remaining stone pier. His chest slammed hard against the broken rock, scraping his skin as he lunged out over the abyss. For a single, fleeting second, his trembling fingers caught the rough wool of her sleeve. He pulled with all his strength—but the falling stones tore her away.</p>
             <p class="novel-para">The map case split open in mid-air, scattering loose star charts and coordinates across the gale like white leaves. And there, falling through the blinding red dust and roaring wind, Aurelia disappeared into the deep desert canyon below, clutching the brass dial to her heart until the storm swallowed her completely.</p>
           </section>
 
@@ -439,7 +534,7 @@
                   <div class="marginalia-stamp stamp-strike">✕</div>
                   <div class="marginalia-text">
                     <span class="m-date">ANNO RENUNTIATIONIS</span>
-                    <span class="m-gloss strike-gloss">«<del>Icarus</del> · Nomen in ignem proiectum»</span>
+                    <span class="m-gloss strike-gloss">«<del>Hermes</del> · Nomen in ignem proiectum»</span>
                     <span class="m-sub">"The name thrown forever into the fire."</span>
                   </div>
                 </div>
@@ -457,8 +552,8 @@
             </div>
 
             <h3 class="novel-part-heading">III. A Name Turned to Ash</h3>
-            <p class="novel-para"><span class="novel-dropcap">I</span>carus survived the fall of the mountain, but the man he used to be was gone forever.</p>
-            <p class="novel-para">When the red storm finally stopped three days later, the mountain world was completely changed. The old paths were buried under deep red dunes. The observatory was a ruined, silent tomb. Icarus climbed down into the canyon on his knees, digging through the sand with his bare hands, desperately searching for a piece of cloth, a scrap of brass, anything. There was nothing. Only endless, shifting red sand.</p>
+            <p class="novel-para"><span class="novel-dropcap">H</span>ermes survived the fall of the mountain, but the man he used to be was gone forever.</p>
+            <p class="novel-para">When the red storm finally stopped three days later, the mountain world was completely changed. The old paths were buried under deep red dunes. The observatory was a ruined, silent tomb. Hermes climbed down into the canyon on his knees, digging through the sand with his bare hands, desperately searching for a piece of cloth, a scrap of brass, anything. There was nothing. Only endless, shifting red sand.</p>
             <p class="novel-para">His grief was unbearable, and he blamed himself completely. It was his ambition and his hunger for ancient treasures that had brought them to this dangerous mountain. If he had never chased forgotten ruins, Aurelia would still be alive.</p>
 
             <!-- ARCHIVAL DOCUMENT: THE ACT OF RENUNCIATION (Propuesta E: Charred Relic Facsimile) -->
@@ -505,15 +600,15 @@
                 </div>
               </div>
               <blockquote class="dossier-body">
-                «Let it be written upon this stone: the scholar once called Icarus has thrown his maps, his instruments, and his past into the fire. He has sworn never to answer to his former name. From this day on, he walks as a nameless wanderer across the ridges.»
+                «Let it be written upon this stone: the scholar once called Hermes has thrown his maps, his instruments, and his past into the fire. He has sworn never to answer to his former name. From this day on, he walks as a nameless wanderer across the ridges.»
               </blockquote>
               <div class="charred-signature-witness">
                 <span class="witness-seal">IN PERPETUUM OBLIVIONIS</span>
-                <span class="witness-carbon">CINIS ET CARBON // NON AMPLIUS ICARUS</span>
+                <span class="witness-carbon">CINIS ET CARBON // NON AMPLIUS HERMES</span>
               </div>
             </div>
 
-            <p class="novel-para">He gathered every remaining paper that carried his name. One by one, he threw them into the flames. He made a solemn promise: never again would he answer to the name of <em>Icarus</em>.</p>
+            <p class="novel-para">He gathered every remaining paper that carried his name. One by one, he threw them into the flames. He made a solemn promise: never again would he answer to the name of <em>Hermes</em>.</p>
             <p class="novel-para">He retreated into the solitude of the mountain peaks, donning a weathered traveler's cloak and brass protective goggles. To the few travelers and scholars he encountered along the high alpine passes, he gave only a cold, simple title:</p>
             <p class="novel-center-name">« THE CARTOGRAPHER »</p>
 
@@ -647,7 +742,7 @@
           <div class="radio-brand">
             <span class="brand-title">MIL-SPEC DESERT TRANSCEIVER // 142.85 MHz</span>
             <span class="brand-sep">·</span>
-            <span id="radio-current-title">DISPATCH 09-A // EMERGENCY WIRE: THE SANDSTORM ENGULFS ICARUS</span>
+            <span id="radio-current-title">DISPATCH 09-A // EMERGENCY WIRE: THE SANDSTORM ENGULFS HERMES</span>
           </div>
           <div class="radio-status-lights">
             <span class="led-indicator">
@@ -668,7 +763,7 @@
             <span class="sender-radio-dot"></span>
           </div>
           <div>
-            <div class="sender-name">Icarus · The Cartographer of Distant Light</div>
+            <div class="sender-name">Hermes · The Cartographer of Distant Light</div>
             <div class="sender-loc">High Ridge Overlook · Frontier Gate of Deserti Limen // 142.85 MHz</div>
           </div>
         </div>
@@ -691,7 +786,7 @@
             [ 142.85 MHz SHORTWAVE LOCKED · SOUTHERN SANDSTORM OVERRIDE... ]
           </div>
           <div class="sandstorm-transcript-sub" id="sandstorm-transcript-sub">
-            RECEIVING EMERGENCY SHORTWAVE RELAY // ICARUS TRANSMITTING AMIDST GALE
+            RECEIVING EMERGENCY SHORTWAVE RELAY // HERMES TRANSMITTING AMIDST GALE
           </div>
         </div>
 
@@ -742,8 +837,8 @@
 
         <!-- Climax Actions -->
         <div class="climax-actions-row">
-          <button type="button" class="btn-climax-hub" id="btn-climax-desert" title="Claim Field Rewards & Enter Desert Path">
-            <span>✦ Enter The Desert Path ➔</span>
+          <button type="button" class="btn-climax-hub" id="btn-climax-desert" title="Claim Field Rewards & Prepare for the Storm">
+            <span>🌪️ The Storm is Here · Claim Field Rewards ➔</span>
           </button>
           <button type="button" class="btn-climax-replay" id="btn-open-story-again">
             <span>▲ Return to the Manuscript</span>
@@ -895,13 +990,10 @@
           </div>
         </div>
 
-        <!-- Action Row -->
-        <div class="reward-actions-row">
-          <a href="../../index.html?auth=1&view=view-cipher#view-cipher" class="btn-reward-primary" id="btn-goto-cipher-ledger">
-            <span>✦ Enter The Cipher Ledger & Solve Values ➔</span>
-          </a>
-          <a href="../../index.html?auth=1&view=view-trail#view-trail" class="btn-reward-secondary" id="btn-goto-desert-trail">
-            <span>✦ View Star Map & Desert Gateway ➔</span>
+        <!-- Action Row (Single Action: The Storm Has Arrived) -->
+        <div class="reward-actions-row single-action-row">
+          <a href="../../index.html" class="btn-reward-primary btn-storm-climax-trigger" id="btn-goto-desert-trail" title="The Storm Has Arrived · Brace for Impact">
+            <span>🌪️ The Storm Has Arrived · Brace for Impact ➔</span>
           </a>
         </div>
 

@@ -359,31 +359,31 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
      - Grupo III: (III, +15°), (VIII, +45°), (X, -15°), (VI, +45°), (IV, -15°), (XII, -45°) ➔ `A`, `L`, `W`, `A`, `Y`, `S`.
      - Grupo IV: (I, -15°), (VII, +45°), (V, -45°) ➔ `T`, `H`, `E`.
      - Grupo V: (X, +15°), (III, -45°), (VIII, -15°), (VI, -45°), (IX, +45°), (II, -45°), (XI, +15°), (XII, +15°) ➔ `T`, `R`, `E`, `A`, `S`, `U`, `R`, `E`.
-3. **El Voto de Icarus & La Revelación del Cartógrafo**:
+3. **El Voto de Hermes & La Revelación del Cartógrafo**:
    - Frase resultante del disco: `"YOU WERE ALWAYS THE TREASURE"`.
    - **Canon de la Historia**:
      - Esta frase **NO va dirigida a Silvia**. Silvia comprende que no es un mensaje sobre ella, sino un registro íntimo y desgarrador del pasado.
-     - El Cartógrafo se llamaba realmente **Icarus** cuando era un joven y febril astrónomo en el Observatorio Alpino (Anno 1970).
-     - Vivía con su gran amor, **Aurelia**, una artista y astrónoma que iluminaba sus cartas celestes con tinta índigo y pan de plata. Icarus estaba ciegamente obsesionado con descifrar la arquitectura de las **Tres Antiguas Torres** (Observatorio Alpino, Torre de Arenisca del desierto y Torre Escenario) y hallar bóvedas de los fundadores que le dieran renombre.
-     - Una mañana, tras desplomarse por el agotamiento, despertó y vio a Aurelia temblando de frío en su banco, con las manos entintadas, completando sus cálculos para que su trabajo no se perdiera. Comprendiendo al fin su arrogancia, Icarus forjó para ella el disco maestro de coordenadas de 24 posiciones como una confesión de amor y arrepentimiento. Se lo entregó en la terraza y le susurró: *"Aurelia... todos estos años buscando tesoros en piedras frías... Estaba ciego. Tú siempre fuiste el tesoro."*
-     - Durante la Primera Gran Catástrofe (Otoño de 1971), un terremoto y una colosal tormenta roja destrozaron los cimientos del observatorio en Deserti Limen. Al evacuar, Aurelia regresó al estudio en llamas para rescatar el disco de bronce y las cartas de Icarus. Al cruzar el Puente Meridional, los arcos colapsaron y Aurelia cayó al abismo del desierto con el disco apretado contra el pecho.
-     - Enloquecido de culpa, Icarus quemó todos los registros que llevaban su nombre, juró no volver a pronunciar el nombre de *Icarus* y adoptó el título sobrio de **« The Cartographer »**.
+     - El Cartógrafo se llamaba realmente **Hermes** cuando era un joven y febril astrónomo en el Observatorio Alpino (Anno 1970).
+     - Vivía con su gran amor, **Aurelia**, una artista y astrónoma que iluminaba sus cartas celestes con tinta índigo y pan de plata. Hermes estaba ciegamente obsesionado con descifrar la arquitectura de las **Tres Antiguas Torres** (Observatorio Alpino, Torre de Arenisca del desierto y Torre Escenario) y hallar bóvedas de los fundadores que le dieran renombre.
+     - Una mañana, tras desplomarse por el agotamiento, despertó y vio a Aurelia temblando de frío en su banco, con las manos entintadas, completando sus cálculos para que su trabajo no se perdiera. Comprendiendo al fin su arrogancia, Hermes forjó para ella el disco maestro de coordenadas de 24 posiciones como una confesión de amor y arrepentimiento. Se lo entregó en la terraza y le susurró: *"Aurelia... todos estos años buscando tesoros en piedras frías... Estaba ciego. Tú siempre fuiste el tesoro."*
+     - Durante la Primera Gran Catástrofe (Otoño de 1971), un terremoto y una colosal tormenta roja destrozaron los cimientos del observatorio en Deserti Limen. Al evacuar, Aurelia regresó al estudio en llamas para rescatar el disco de bronce y las cartas de Hermes. Al cruzar el Puente Meridional, los arcos colapsaron y Aurelia cayó al abismo del desierto con el disco apretado contra el pecho.
+     - Enloquecido de culpa, Hermes quemó todos los registros que llevaban su nombre, juró no volver a pronunciar el nombre de *Hermes* y adoptó el título sobrio de **« The Cartographer »**.
      - **1971–1998 (27 años de vigilia y reconstrucción)**: Durante casi tres décadas reconstruyó el Observatorio Alpino en las cumbres y trazó las 9 estaciones del **Constellation Path** (matemáticas celestes), usando sus telescopios de día para escanear el cañón de Deserti Limen buscando el disco de bronce o rastros de Aurelia.
      - **Otoño de 1998 (Expedición de frontera)**: Realizó la prospección de agrimensura al borde del abismo registrada en su cuaderno de campo (`page07_back`). Firmó estrictamente como **« The Cartographer »**. Al no hallar respuesta, creyó que Aurelia y el disco estaban perdidos para siempre.
      - **Otoño de 2016 (Anno 2016 — Diez años antes de la Llamada)**: En una vigilia nocturna con su telescopio hacia las ruinas de la Torre de Arenisca en el desierto, divisó un haz dorado pulsando rítmicamente (3 cortos, pausa, 2 largos: el código del disco de Aurelia). Renace su esperanza y adopta el título: **« The Cartographer of Distant Light »**.
      - Durante los 10 años siguientes (2016–2026), construye **The Astrolabe of Distant Light** para calcular la alineación celestial de las Tres Antiguas Torres.
-     - **2026 (Presente)**: Asaltantes atacan el observatorio y roban el Astrolabio, llevándolo al desierto. El Cartógrafo contacta a Silvia por radio (142.85 MHz). Silvia completa el Constellation Path (matemáticas), transmite el voto recuperado de Icarus y se prepara para adentrarse en el **Desert Path** (donde mandan los idiomas y dialectos antiguos) para recuperar el Astrolabio y llegar hasta la Luz Distante.
+     - **2026 (Presente)**: Asaltantes atacan el observatorio y roban el Astrolabio, llevándolo al desierto. El Cartógrafo contacta a Silvia por radio (142.85 MHz). Silvia completa el Constellation Path (matemáticas), transmite el voto recuperado de Hermes y se prepara para adentrarse en el **Desert Path** (donde mandan los idiomas y dialectos antiguos) para recuperar el Astrolabio y llegar hasta la Luz Distante.
    - **Flujo de Juego (Journal ➔ Web)**:
      - En el **Journal físico (Hoja 7)**: Silvia resuelve el cruce del disco de coordenadas sobre papel y descubre las 5 palabras.
      - En el **Web Hub (Station 09)**: Silvia accede directamente a la experiencia novelada completa (*"The Man Behind the Maps"*), escrita con prosa literaria, profunda y dramática, donde descubre la verdad.
-     - Al finalizar la lectura, transmite el voto de Icarus por radio para devolverle su verdadero nombre.
+     - Al finalizar la lectura, transmite el voto de Hermes por radio para devolverle su verdadero nombre.
 
 ### ⚡ El Clímax Narrativo: La Gran Tormenta de Arena del Sur
 - **El Evento Ineludible**:
   - Al transmitir el voto recuperado, la atmósfera de la pantalla cambia violentamente: el cielo se tiñe de rojo sangre y el vendaval ruge a través de los riscos de Deserti Limen.
 - **Ruptura de la Portadora de Radio (142.85 MHz)**:
   - La señal se satura en el osciloscopio: `SIGNAL CRITICAL · CARRIER OVERLOAD`.
-  - Transmisión final de Icarus emocionado por haber recuperado su nombre y advirtiéndole del muro de arena:
+  - Transmisión final de Hermes emocionado por haber recuperado su nombre y advirtiéndole del muro de arena:
     *«¡Silvia! Esas palabras... pronunciaste el voto que grabé en el bronce hace diez años en la terraza del observatorio. Me has devuelto mi nombre. ¡Mira hacia la cresta! La tormenta ha estallado sin previo aviso... El cielo se ha vuelto rojo y las arenas están borrando todo... ¡hemos perdido el rastro de los asaltantes! Todas las cartas anteriores son papel muerto... La senda de las constelaciones ha terminado. Escucha con atención: abre la siguiente hoja de mi cuaderno... encuentra al Oráculo del Desierto. ¡Entra en las dunas... sigue la luz distante!»*
   - La portadora cae: `CARRIER LOST // SIGNAL DROPPED`.
 - **Consecuencia de Gameplay**:
@@ -395,42 +395,75 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 
 ## 11. EL UMBRAL DE LA FRONTERA & EL GRAN SILENCIO (Hojas 7B y 8A)
 
-1. **Hoja 7 · Cara B (`page07_back` · Cuaderno de Campo)**:
-   - Registro de expedición del Cartógrafo en el cañón de acceso al desierto.
-   - Diagrama del cuadrante de agrimensor de 90° con plomada suspendida a 30°.
-   - Panorama Da Vinci del cañón, Atalaya VI y los Tres Mojones de orientación.
-   - **Los Dos Sellos de Lacre Canónicos**:
-     - Sello de la Constelación (cielo estelar).
-     - Sello del Desierto (sol y dunas ardientes).
-2. **Hoja 8 · Cara A (`page08_front` · El Gran Silencio)**:
-   - Título: *"The Desert"* — Prólogo al Páramo.
-   - *I. El Espejo de la Tierra*: Memoria litológica de las dunas.
-   - *II. La Voz de las Sombras*: Introducción a la figura enigmática del **Oráculo del Desierto**.
-   - *III. Las Tres Leyes del Páramo*:
-     - La sombra meridiana nunca miente.
-     - Sigue el lecho seco, no la cresta ventosa.
-     - El tercer mojón guarda el punto de retorno.
-   - Lema canónico: *"What the wind covers, the sun shall reveal"* (Lo que el viento cubre, el sol lo revelará).
+### 1. Hoja 7 · Cara B (`page07_back` · Cuaderno de Campo: The Desert Frontier)
+- **Marco Temporal y Autor**: *Autumn, 1998 — Twenty-eight years before the Call*. Escrito por Hermes a los 24 años al abandonar la biblioteca del Santuario.
+- **Datos Matemáticos, Geodésicos y Topográficos Canónicos (100% de uso en puzzles)**:
+  * **Los Tres Mojones (`The Three Cairns`)**: Construidos en el lecho del cauce seco (*dry wash bed*), apuntando en dirección **sur-sureste (SSE)** hacia el acceso a las mesas de arenisca.
+  * **El Tercer Mojón (`Cairn III`) & La Placa de Cobre**: Bajo las piedras de cimentación de Cairn III, oculta bajo una losa plana de arenisca roja (*flat red sandstone slab*), Hermes enterró la **Placa de Referencia de Cobre (`The Copper Benchmark Plate`)**.
+  * **Azimut Grabado en Cobre**: **112 grados hacia el Este (`Azimuth: 112° East`)**.
+  * **Atalaya Exterior VI (`Outer Watchtower VI`)**: Atalaya de observación encaramada en la cornisa del cañón, azimut visual $112^\circ\text{ E}$.
+  * **Línea Base del Agrimensor (`Base Baseline`)**: **5.420 pasos** (*5,420 paces to Red Ridge*).
+  * **Corrección de Norte Magnético a Verdadero (`Magnetic Offset`)**: **$+04^\circ\ 15'$** (*True N. Corr.*).
+  * **Elevación del Vértice (`Apex Elevation - Peak VII`)**: **1.240 varas**.
+  * **Altura Polar (`Polaris Altitude Reading`)**: **$30^\circ\ 00'\text{ N}$** medida con el cuadrante de altitud de 90°.
+  * **Los Dos Sellos de Lacre Canónicos**:
+    - Sello de la Constelación (cielo estelar de las cumbres).
+    - Sello del Desierto (sol ardiente y horizonte del páramo).
+
+### 2. Hoja 8 · Cara A (`page08_front` · The Desert: Of Sun, Silence, and Buried Stone)
+- **Prólogo del Páramo**:
+  * *I. El Espejo de la Tierra*: «Lo que se escribe en la ciudad se olvida a la mañana; lo que se entierra bajo una losa plana de arenisca roja permanece intacto mil años».
+  * *II. La Voz de las Sombras*: Presentación formal de la segunda guardiana, **El Oráculo del Desierto** (moradora de la Torre II). No tiene rostro, no habla palabras ociosas, no deja pisadas en las dunas. Señala solo a la tierra y al sol: «La sombra es la única brújula que nunca olvida la luz».
+- **Las Tres Leyes del Páramo (`The Three Laws of the Waste`) (Mecánicas activas de juego)**:
+  1. **La Sombra Meridiana (`The Meridian Shadow`)**: Al mediodía solar verdadero, el gnomon proyecta su sombra más corta exactamente sobre la línea meridiana. Solo entonces se revela el norte verdadero, apuntando directamente de vuelta hacia el antiguo observatorio.
+  2. **El Cauce Seco (`The Dry Wash`)**: Donde las antiguas riadas de invierno labraron la arenisca, el lecho de grava compacta es el único paso firme y seguro a través del laberinto de cañones y precipicios.
+  3. **La Placa de Referencia (`The Benchmark Plate`)**: Tres mojones de piedra seca marcan el giro hacia el sur para internarse en el cauce. Bajo la losa de fundación del tercero reposa la placa de cobre, orientada al azimut de **ciento doce grados ($112^\circ$)**.
+- **Lema Rector de la Fase**: *«What the wind covers, the sun shall reveal»* (Lo que el viento cubre, el sol lo revelará).
 
 ---
 
-## 12. EL CAMINO OFICIAL DEL DESIERTO (THE DESERT PATH) & EL GRAN MAPA CUÁDRUPLE
+## 12. ARQUITECTURA DEL DESERT PATH EN EL HUB & CANALES ACTIVOS
 
-1. **El Gran Mapa Continuo del Desierto (The Grand Desert Map)**:
-   - 4 cuadrantes que forman un monumental mapa mural continuo de 2 pliegos dobles A4:
-     - **Hoja 8 · Cara B (`page08_back`)**: Cuadrante Noroeste (NW).
-     - **Hoja 9 · Cara A (`page09_front`)**: Cuadrante Noreste (NE) — Completa el Spread 1.
-     - **Hoja 10 · Cara B (`page10_back`)**: Cuadrante Suroeste (SW).
-     - **Hoja 11 · Cara A (`page11_front`)**: Cuadrante Sureste (SE) — Completa el Spread 2.
-2. **Juego D1: The Whispering Chasm Maze (Hoja 9 · Cara B · Station 10)**:
-   - **Primer juego web oficial del Desert Path**.
-   - Laberinto táctico de cañones tallados por el viento en arenisca roja.
-   - Silvia navega entre ecos y corrientes de aire para descubrir el primer manantial oculto y el rastro del Oráculo.
-3. **Progresión de Juegos del Desierto (Hojas 10 a 12)**:
-   - **Juego D2 (Hoja 10 · Cara A)**: *The Desert Lexicon & Al-Qibla* (Crucigrama del desierto y alineación solar).
-   - **Juego D3 (Hoja 11 · Cara B)**: *The Oasis Clepsydra & 4 Wells* (Reloj de agua astronómico y balance de cántaros).
-   - **Juego D4 (Hoja 12 · Cara A)**: *The Polybius Stele* (Cifrado numérico en la estela de arenisca).
-   - **Hoja 12 · Cara B**: *Epílogo y Entrada al Santuario del Oráculo* — Revelación de los secretos de la **Torre II** (El Santuario de Arenisca) y transición hacia el **Stage Path**.
+### 1. El Taller Mecánico en las Rocas: "The Cliffside Workshop" (El Taller del Risco · Relé Artesanal con Hermes)
+- **Motivación en Lore**: Tras la caída de la portadora de radio analógica (142.85 MHz) por la tormenta movediza, Hermes se resguarda en una hendidura natural de arenisca en Outer Watchtower VI. Al abrigo de las paredes de roca viva y un hogar de piedra ancestral, monta un taller improvisado con herramientas de cantería y despieces mecánicos dispersos.
+- **Naturaleza del Dispositivo**: Utilizando engranajes de latón rescatados de un reloj de agua, bobinas de cobre enrolladas a mano y el cristal de cuarzo de la radio rota, Hermes construye un telégrafo mecánico artesanal montado sobre roca y hierro (*The Cliffside Workshop* // El Taller del Risco). El aparato envía pulsos galvánicos a través de las vetas minerales de la roca madre directamente a la consola de Silvia.
+- **UX & Mecánica de Interacción (Doble Modo: Misión & Base de Conocimiento)**:
+  * Formato de telégrafo artesanal sobre pergamino continuo y piezas mecánicas táctiles, con indicador de engranajes y pulsos, marcas de tiempo y sonido mecánico de escape.
+  * **Sistema de Respuestas Prehechas**: Silvia no escribe texto libre ambiguo. Dispone de placas de respuesta tácticas basadas en su diario físico.
+  * **Modo A: Misión Operativa (`Active Expedition`)**:
+    - Línea principal de avance donde Silvia guía a Hermes con los datos de las páginas (Tres Mojones, Cairn III a 112°, cauce seco, etc.).
+  * **Modo B: Consultas del Taller & Conocimiento (`Workshop Inquiries / Lore Q&A`)**:
+    - Pestaña o menú accesible en todo momento para que Silvia **nunca se sienta perdida ni haya agujeros de guion**.
+    - Silvia puede pulsar preguntas mecánicas y de lore para que Hermes le refresque la historia con explicaciones accesibles, directas y cómplices:
+      1. *«¿Dónde está ubicado este taller en el risco?»*
+         ➔ Hermes explica que montó su banco de trabajo dentro de una hendidura rocosa en los riscos de Outer Watchtower VI (112° E), con un hogar de piedra para protegerse del frío y el polvo.
+      2. *«¿Por qué el mapa del desierto está dividido en cuatro partes?»*
+         ➔ Hermes explica que el desierto profundo es inmenso y que las 4 hojas de su diario forman un mapa continuo de dos pliegos dobles que cubren desde los riscos iniciales hasta la Torre II.
+      3. *«¿Qué pasó con los asaltantes y el Astrolabio?»*
+         ➔ Hermes recuerda que los asaltantes robaron el **Astrolabio auténtico** del observatorio. Él solo lleva una **réplica de latón que fabricó él mismo en el taller y que falla**. Los asaltantes huyeron hacia las dunas pero su convoy encalló durante la tormenta. Recuperar el original es vital.
+      4. *«¿Quién es el Oráculo del Desierto?»*
+         ➔ Hermes explica que es la guardiana ancestral de la Torre II (el Santuario de Arenisca). Conoce la memoria de las arenas y es la única que puede descifrar la alineación final de las torres.
+      5. *«¿Cómo nos orientamos si el cielo está cubierto de tormenta?»*
+         ➔ Hermes recuerda las Tres Leyes de la Hoja 8A: la sombra meridiana, el cauce seco y las marcas fijas grabadas en piedra.
+      6. *«¿Cómo funciona este telégrafo mecánico artesanal?»*
+         ➔ Hermes explica cómo acopló los engranajes recuperados, las bobinas de cobre y el cristal de cuarzo para transmitir pulsos galvánicos de baja frecuencia por la roca madre sin interferencias de la tormenta.
+
+### 2. Acceso Permanente al Astrolabio de Latón en el Hub (`The Brass Astrolabe`)
+- **Canon del Instrumento**: El Cartógrafo construyó con sus propias manos esta **réplica de latón de campo**, la cual presenta ciertas holguras y errores ópticos respecto al original robado.
+- **Integración Permanente**: En el Hub principal de la Orden se habilita una entrada/pestaña fija para el **Astrolabio de Latón**.
+- **Utilidad Contínua**: No queda como un minijuego desechable de la Estación 08. Silvia puede abrirlo en cualquier momento para:
+  * Consultar los punteros de las estrellas maestras (*Vega, Polaris, Deneb, Arcturus, Aldebaran, Altair*).
+  * Contrastar alturas angulares y declinaciones cuando el Cartógrafo le reporte avistamientos celestes entre claros de nubes en el desierto.
+  * Recordar que el artefacto maestro auténtico está en manos del convoy enemigo y debe ser rescatado.
+
+### 3. El Primer Paso Jugable del Desert Path: La Baliza de los Tres Mojones (Station 10 - Prólogo)
+- **Secuencia de Entrada**:
+  1. Silvia abre el Hub tras la Estación 09. La radio emite estática apagada, pero en la barra superior parpadea un indicador ámbar: `FIELD WIRE DETECTED // PULSE SYNC REQUIRED`.
+  2. Al pulsar, se activa el teletipo de campaña. Hermes envía sus primeros mensajes tras la tormenta: está a salvo en la base del cañón pero desorientado, rodeado de polvo y sin referencias.
+  3. Si Silvia tiene dudas, puede abrir `Field Inquiries` y consultar cualquier concepto antes de avanzar.
+  4. En el chat de misión, Hermes pregunta por las notas de 1998 en su cuaderno. Silvia consulta la **Hoja 7 Cara B** y la **Hoja 8 Cara A**.
+  5. Silvia selecciona las claves del diario: orientarlo hacia los **Tres Mojones**, seguir el **Cauce Seco** y fijar la mira a **112° hacia el Este** bajo la losa de **Cairn III**.
+  6. Esta primera triangulación permite al Cartógrafo encontrar el primer refugio de piedra, despejar la arena de su equipo de campaña y desbloquear la visualización del primer cuadrante del **Gran Mapa del Desierto**.
 
 
 

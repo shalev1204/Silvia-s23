@@ -56,7 +56,7 @@ def test_widescreen_codex():
         page.screenshot(path="scratch/young_cartographer_chapter.png")
         print("Captured scratch/young_cartographer_chapter.png")
 
-        # 6. Click 'Transmit the Vow of Icarus' and verify the modal with Cartographer Avatar
+        # 6. Click 'Transmit the Vow of Hermes' and verify the modal with Cartographer Avatar
         btn_transmit = page.locator("#btn-transmit-story")
         btn_transmit.scroll_into_view_if_needed()
         btn_transmit.click()

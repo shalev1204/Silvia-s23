@@ -72,6 +72,7 @@
       z-index: 0;
       pointer-events: none;
       opacity: 0.95;
+      transition: opacity 0.6s ease;
     }
 
     .cosmic-nebula-layer {
@@ -84,13 +85,16 @@
       pointer-events: none;
       z-index: 1;
       animation: nebulaPulse 28s ease-in-out infinite alternate;
+      transition: opacity 0.6s ease;
     }
 
-    body.constellation-trail .cosmic-nebula-layer {
+    body.constellation-trail .cosmic-nebula-layer,
+    body[data-active-view="view-trail"] .cosmic-nebula-layer {
       background:
         radial-gradient(circle at 75% 80%, rgba(120, 78, 32, 0.28) 0%, transparent 55%),
         radial-gradient(circle at 20% 30%, rgba(12, 18, 32, 0.35) 0%, transparent 60%),
         radial-gradient(circle at 50% 50%, rgba(48, 32, 14, 0.22) 0%, transparent 70%);
+      opacity: 1;
     }
 
     @keyframes nebulaPulse {
@@ -104,6 +108,109 @@
       background: radial-gradient(circle at 60% 40%, transparent 45%, rgba(1, 3, 6, 0.92) 100%);
       pointer-events: none;
       z-index: 1;
+      transition: background 0.6s ease;
+    }
+
+    /* Tab-Specific Dynamic Environmental Backdrops */
+    .hub-dynamic-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), background 0.6s ease;
+    }
+
+    /* 1. THE CLIFFSIDE WORKSHOP: Artisan Clockwork & Rock Cavern Laboratory */
+    body[data-active-view="view-field-wire"] #ambient-stars {
+      opacity: 0.35; /* Subtle gentle ambient dust motes */
+    }
+    body[data-active-view="view-field-wire"] .cosmic-nebula-layer {
+      opacity: 0;
+    }
+    body[data-active-view="view-field-wire"] .cosmic-vignette {
+      opacity: 0.2;
+      background: radial-gradient(circle at 50% 50%, transparent 65%, rgba(18, 22, 16, 0.4) 100%);
+    }
+    body[data-active-view="view-field-wire"] .hub-dynamic-backdrop {
+      opacity: 1;
+      background:
+        linear-gradient(180deg, rgba(24, 28, 22, 0.15) 0%, rgba(18, 22, 16, 0.3) 100%),
+        url('./assets/cliffside_workshop_bg.jpg') no-repeat center center / cover;
+    }
+
+    /* 2. TRANSMISSIONS: Vintage Radio Station & Mountain Outpost Desk */
+    body[data-active-view="view-transmissions"] #ambient-stars {
+      opacity: 0;
+    }
+    body[data-active-view="view-transmissions"] .cosmic-nebula-layer {
+      opacity: 0;
+    }
+    body[data-active-view="view-transmissions"] .hub-dynamic-backdrop {
+      opacity: 1;
+      background:
+        radial-gradient(circle at 14% 24%, rgba(255, 170, 20, 0.32) 0%, transparent 42%),
+        radial-gradient(circle at 86% 28%, rgba(255, 210, 90, 0.36) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(6, 11, 20, 0.25) 0%, rgba(3, 6, 12, 0.85) 85%),
+        url('./assets/radio_station_bg.jpg') no-repeat center top / cover;
+    }
+
+    /* 3. THE ARCHIVES: Ancient Library & Scholar's Scriptorium Vault */
+    body[data-active-view="view-archives"] #ambient-stars {
+      opacity: 0;
+    }
+    body[data-active-view="view-archives"] .cosmic-nebula-layer {
+      opacity: 0;
+    }
+    body[data-active-view="view-archives"] .hub-dynamic-backdrop {
+      opacity: 1;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 15% 70%, rgba(180, 83, 9, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 75%, rgba(120, 53, 15, 0.12) 0%, transparent 50%),
+        linear-gradient(180deg, #180d06 0%, #100804 50%, #0a0402 100%);
+    }
+
+    /* 4. CHRONICLES OF THE RAID: Stone Temple & Historical Vault */
+    body[data-active-view="view-chronicles"] #ambient-stars {
+      opacity: 0.2;
+    }
+    body[data-active-view="view-chronicles"] .cosmic-nebula-layer {
+      opacity: 0.3;
+    }
+    body[data-active-view="view-chronicles"] .hub-dynamic-backdrop {
+      opacity: 1;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(212, 168, 83, 0.15) 0%, transparent 60%),
+        linear-gradient(180deg, #0d1322 0%, #080c16 50%, #04060b 100%);
+    }
+
+    /* 5. THE CIPHER LEDGER: Cryptographic Renaissance Studio */
+    body[data-active-view="view-cipher"] #ambient-stars {
+      opacity: 0.25;
+    }
+    body[data-active-view="view-cipher"] .cosmic-nebula-layer {
+      opacity: 0.4;
+    }
+    body[data-active-view="view-cipher"] .hub-dynamic-backdrop {
+      opacity: 1;
+      background:
+        radial-gradient(circle at 50% 15%, rgba(245, 158, 11, 0.14) 0%, transparent 55%),
+        linear-gradient(180deg, #0e121d 0%, #080b12 50%, #04060a 100%);
+    }
+
+    /* 6. THE BRASS ASTROLABE: Workshop & Meridian Sighting Platform */
+    body[data-active-view="view-astrolabe"] #ambient-stars {
+      opacity: 0.85;
+    }
+    body[data-active-view="view-astrolabe"] .cosmic-nebula-layer {
+      opacity: 0.6;
+    }
+    body[data-active-view="view-astrolabe"] .hub-dynamic-backdrop {
+      opacity: 1;
+      background:
+        radial-gradient(circle at 35% 25%, rgba(212, 168, 83, 0.18) 0%, transparent 50%),
+        linear-gradient(180deg, #0a1120 0%, #050912 50%, #020408 100%);
     }
 
 
@@ -2014,144 +2121,405 @@
 
 
     /* =========================================================================
-       VIEW 2: THE ARCHIVES (REAL EMAIL PARCHMENT & DISPATCH VIEWER)
+    /* =========================================================================
+       VIEW 3: THE SCRIPTORIUM & ANCIENT ARCHIVES (CODEX CUSTODIA)
        ========================================================================= */
-    .archives-deck {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 24px;
+    #view-archives {
+      position: relative;
+      background: 
+        radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.14) 0%, transparent 60%),
+        radial-gradient(ellipse at 15% 70%, rgba(180, 83, 9, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 75%, rgba(120, 53, 15, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #180d06 0%, #100804 50%, #0a0402 100%);
+      border: 2px solid #78350f;
+      border-radius: 18px;
+      padding: 28px 32px 36px;
+      box-shadow: 
+        0 24px 64px rgba(0, 0, 0, 0.95),
+        inset 0 1px 0 rgba(254, 215, 170, 0.18),
+        inset 0 0 60px rgba(0, 0, 0, 0.75);
     }
 
-    @media (max-width: 900px) {
-      .archives-deck {
-        grid-template-columns: 1fr;
+    @media (max-width: 768px) {
+      #view-archives {
+        padding: 20px 16px 24px;
+        border-radius: 14px;
       }
     }
 
-    .archives-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .archive-item-card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-brass);
-      border-radius: 8px;
-      padding: 16px 18px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      position: relative;
-    }
-
-    .archive-item-card:hover {
-      border-color: var(--brass-bright);
-      background: var(--bg-panel-hover);
-      transform: translateX(4px);
-    }
-
-    .archive-item-card.active {
-      border-color: var(--cyan-beam);
-      background: rgba(14, 28, 48, 0.98);
-      box-shadow: 0 0 18px rgba(79, 227, 193, 0.25);
-    }
-
-    .archive-item-top {
+    /* Library Scriptorium Banner Strip */
+    .library-codex-strip {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
+      background: linear-gradient(180deg, #2a160c 0%, #170c05 100%);
+      border: 1.5px solid #854d0e;
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(254, 215, 170, 0.15);
+      flex-wrap: wrap;
     }
 
-    .archive-item-date {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--brass-base);
-      letter-spacing: 0.12em;
+    .codex-strip-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .codex-strip-seal {
+      font-size: 1.4rem;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 35% 35%, #991b1b 0%, #7f1d1d 60%, #450a0a 100%);
+      border: 1.5px solid #dc2626;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+      flex-shrink: 0;
+    }
+
+    .codex-strip-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .codex-strip-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #ffd580;
       text-transform: uppercase;
     }
 
-    .archive-item-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.6rem;
-      color: var(--cyan-beam);
-      border: 1px solid rgba(79, 227, 193, 0.3);
-      padding: 1px 6px;
+    .codex-strip-sub {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 0.88rem;
+      color: #d6b88b;
+      font-style: italic;
+    }
+
+    .codex-strip-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .codex-chip {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      background: rgba(30, 16, 8, 0.8);
+      border: 1px solid #78350f;
+      border-radius: 4px;
+      color: #d6b88b;
+    }
+
+    .codex-chip.active {
+      background: rgba(180, 83, 9, 0.25);
+      border-color: #f59e0b;
+      color: #ffd580;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+    }
+
+    /* Archives Layout Deck */
+    .archives-deck {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 26px;
+    }
+
+    @media (max-width: 960px) {
+      .archives-deck {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    /* Left Column: Library Catalog Drawer */
+    .archives-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .library-drawer-head {
+      background: linear-gradient(180deg, #2b170c 0%, #1a0d06 100%);
+      border: 1.5px solid #854d0e;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(254, 215, 170, 0.12);
+    }
+
+    .drawer-head-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ffd580;
+      letter-spacing: 0.12em;
+    }
+
+    .drawer-head-icon {
+      font-size: 1rem;
+    }
+
+    .drawer-head-latin {
+      font-family: 'Cinzel', serif;
+      font-size: 0.64rem;
+      letter-spacing: 0.14em;
+      color: #b8976b;
+      text-transform: uppercase;
+      border: 1px solid #78350f;
+      padding: 2px 6px;
       border-radius: 3px;
     }
 
-    .archive-item-title {
-      font-family: 'Cinzel', serif;
-      font-size: 0.95rem;
-      color: var(--parchment);
-      font-weight: 700;
-    }
-
     .archive-section-label {
-      margin: 8px 2px 0;
+      margin: 10px 2px 2px;
       font-family: 'Cinzel', serif;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--brass-base);
+      color: #fde68a;
+      background: linear-gradient(90deg, rgba(120, 53, 15, 0.5) 0%, rgba(69, 26, 3, 0.1) 100%);
+      border-left: 3px solid #d97706;
+      padding: 5px 10px;
+      border-radius: 0 4px 4px 0;
     }
 
     .archive-section-label:first-child {
       margin-top: 0;
     }
 
-    .doc-viewer-video-frame {
-      position: relative;
-      background: #05080f;
-      border: 1px solid var(--border-brass);
+    /* Card Items: Antique Library Docket Call Slips */
+    .archive-item-card {
+      background: linear-gradient(135deg, #22130a 0%, #150a04 100%);
+      border: 1.5px solid #633010;
+      border-left: 5px solid #854d0e;
       border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .doc-viewer-video-frame video {
-      display: block;
-      width: 100%;
-      height: auto;
-      background: #000;
-    }
-
-    /* Document Viewer Pane */
-    .archive-viewer-pane {
-      background: var(--bg-panel);
-      border: 1.5px solid var(--border-brass);
-      border-radius: 10px;
-      padding: 28px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+      gap: 6px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(254, 215, 170, 0.08);
     }
 
-    .doc-viewer-meta {
+    .archive-item-card:hover {
+      border-color: #b45309;
+      border-left-color: #f59e0b;
+      background: linear-gradient(135deg, #2e1a0e 0%, #1c0e06 100%);
+      transform: translateX(6px);
+      box-shadow: 0 6px 20px rgba(180, 83, 9, 0.35), inset 0 1px 0 rgba(254, 215, 170, 0.15);
+    }
+
+    .archive-item-card.active {
+      background: linear-gradient(135deg, #3b2010 0%, #241208 100%);
+      border-color: #f59e0b;
+      border-left: 5px solid #fbbf24;
+      box-shadow: 0 0 24px rgba(245, 158, 11, 0.35), inset 0 0 14px rgba(217, 119, 6, 0.2);
+    }
+
+    .archive-item-top {
       display: flex;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border-brass);
-      padding-bottom: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--cyan-beam);
-      flex-wrap: wrap;
+      align-items: center;
       gap: 8px;
     }
 
-    /* High-Res Parchment Container with Loading Ghost & Zoom Hint */
+    .archive-item-date {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 0.7rem;
+      color: #d6b88b;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Tags as Antique Wax Seals & Embossed Docket Badges */
+    .archive-item-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .archive-item-tag.tag-parchment {
+      background: rgba(153, 27, 27, 0.35);
+      border: 1px solid #dc2626;
+      color: #fca5a5;
+    }
+
+    .archive-item-tag.tag-letter {
+      background: rgba(180, 83, 9, 0.35);
+      border: 1px solid #d97706;
+      color: #fde68a;
+    }
+
+    .archive-item-tag.tag-dispatch {
+      background: rgba(120, 53, 15, 0.35);
+      border: 1px solid #f59e0b;
+      color: #fef3c7;
+    }
+
+    .archive-item-tag.tag-folio {
+      background: rgba(217, 119, 6, 0.3);
+      border: 1px solid #fbbf24;
+      color: #fffbeb;
+    }
+
+    .archive-item-tag.tag-video {
+      background: rgba(49, 46, 129, 0.4);
+      border: 1px solid #818cf8;
+      color: #e0e7ff;
+    }
+
+    .archive-item-title {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 0.98rem;
+      color: #f7eed9;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .archive-item-callnum {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: #a88255;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .archive-item-card.active .archive-item-callnum {
+      color: #ffd580;
+    }
+
+    /* Right Column: The Scholar's Mahogany Reading Lectern */
+    .archive-viewer-pane {
+      background: 
+        radial-gradient(circle at 50% 12%, rgba(245, 158, 11, 0.1) 0%, transparent 65%),
+        linear-gradient(180deg, #22140a 0%, #150a04 100%);
+      border: 2px solid #854d0e;
+      border-radius: 14px;
+      padding: 26px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.95),
+        inset 0 1px 0 rgba(254, 215, 170, 0.2),
+        inset 0 0 35px rgba(0, 0, 0, 0.85);
+      position: relative;
+    }
+
+    /* Ornamental Brass Lectern Corner Clasps */
+    .lectern-bracket {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .lectern-bracket::before,
+    .lectern-bracket::after {
+      content: '';
+      position: absolute;
+      background: linear-gradient(135deg, #ffd580 0%, #b45309 100%);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .lectern-bracket.top-left { top: 8px; left: 8px; }
+    .lectern-bracket.top-left::before { top: 0; left: 0; width: 18px; height: 3px; }
+    .lectern-bracket.top-left::after { top: 0; left: 0; width: 3px; height: 18px; }
+
+    .lectern-bracket.top-right { top: 8px; right: 8px; }
+    .lectern-bracket.top-right::before { top: 0; right: 0; width: 18px; height: 3px; }
+    .lectern-bracket.top-right::after { top: 0; right: 0; width: 3px; height: 18px; }
+
+    .lectern-bracket.bottom-left { bottom: 8px; left: 8px; }
+    .lectern-bracket.bottom-left::before { bottom: 0; left: 0; width: 18px; height: 3px; }
+    .lectern-bracket.bottom-left::after { bottom: 0; left: 0; width: 3px; height: 18px; }
+
+    .lectern-bracket.bottom-right { bottom: 8px; right: 8px; }
+    .lectern-bracket.bottom-right::before { bottom: 0; right: 0; width: 18px; height: 3px; }
+    .lectern-bracket.bottom-right::after { bottom: 0; right: 0; width: 3px; height: 18px; }
+
+    /* Engraved Brass Catalog Docket Plate */
+    .doc-viewer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, #2b170c 0%, #170c05 100%);
+      border: 1.5px solid #92400e;
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow: inset 0 1px 0 rgba(254, 215, 170, 0.15), 0 3px 8px rgba(0, 0, 0, 0.6);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #doc-meta-id {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #ffd580;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #doc-meta-id::before {
+      content: '📜';
+      font-size: 1rem;
+    }
+
+    #doc-meta-date {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #d6b88b;
+      letter-spacing: 0.04em;
+    }
+
+    /* Archival Document Matting & Display Frame */
     .doc-viewer-image-frame {
       position: relative;
       width: 100%;
-      min-height: 420px;
+      min-height: 440px;
       border-radius: 8px;
       overflow: hidden;
-      border: 1.5px solid var(--brass-dim);
-      background: #020306;
+      border: 2px solid #78350f;
+      background: #080402;
       cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+      box-shadow: 
+        inset 0 0 30px rgba(0, 0, 0, 0.95),
+        0 10px 30px rgba(0, 0, 0, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2159,11 +2527,12 @@
 
     .doc-viewer-image-frame img {
       width: 100%;
-      max-height: 480px;
+      max-height: 520px;
       object-fit: contain;
       display: block;
       opacity: 0;
       transition: opacity 0.4s ease, transform 0.35s ease;
+      filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.85));
     }
 
     .doc-viewer-image-frame.loaded img {
@@ -2174,11 +2543,11 @@
       transform: scale(1.02);
     }
 
-    /* Elegant Astronomical Skeleton / Loading Ghost */
+    /* Candlelit Archival Skeleton / Loading Ghost */
     .doc-image-skeleton {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(14, 22, 38, 0.96) 0%, rgba(3, 6, 12, 0.99) 100%);
+      background: radial-gradient(circle at center, rgba(35, 20, 11, 0.98) 0%, rgba(12, 6, 3, 0.99) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -2196,14 +2565,9 @@
     .doc-image-skeleton .skeleton-shimmer {
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(212, 168, 83, 0.1) 50%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.16) 50%, transparent 100%);
       background-size: 200% 100%;
       animation: skeletonShimmerWave 1.8s infinite linear;
-    }
-
-    @keyframes skeletonShimmerWave {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
     }
 
     .skeleton-ghost-content {
@@ -2216,75 +2580,111 @@
     }
 
     .skeleton-spinner {
-      width: 30px;
-      height: 30px;
-      border: 2px solid rgba(212, 168, 83, 0.2);
-      border-top-color: var(--brass-bright);
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(212, 168, 83, 0.25);
+      border-top-color: #ffd580;
       border-radius: 50%;
       animation: spinGhost 0.9s linear infinite;
     }
 
-    @keyframes spinGhost {
-      to { transform: rotate(360deg); }
-    }
-
     .skeleton-text {
       font-family: 'Cinzel', Georgia, serif;
-      font-size: 0.76rem;
+      font-size: 0.8rem;
       letter-spacing: 0.16em;
-      color: var(--brass-bright);
+      color: #ffd580;
       text-transform: uppercase;
-      text-shadow: 0 0 10px rgba(212, 168, 83, 0.5);
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
     }
 
     .image-zoom-hint {
       position: absolute;
-      bottom: 12px;
-      right: 14px;
-      background: rgba(3, 5, 10, 0.88);
-      border: 1px solid var(--brass-base);
-      border-radius: 4px;
-      padding: 5px 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem;
-      color: var(--brass-bright);
+      bottom: 14px;
+      right: 16px;
+      background: rgba(22, 12, 6, 0.92);
+      border: 1.5px solid #b45309;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #ffd580;
+      letter-spacing: 0.08em;
       pointer-events: none;
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+      gap: 7px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.85);
       z-index: 4;
+    }
+
+    /* Optical Video Player Frame */
+    .doc-viewer-video-frame {
+      position: relative;
+      background: #080402;
+      border: 2px solid #854d0e;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
+    }
+
+    .doc-viewer-video-frame video {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #000;
     }
 
     .doc-viewer-content {
       font-family: 'EB Garamond', Georgia, serif;
-      font-size: 1.05rem;
-      line-height: 1.6;
-      color: var(--parchment);
+      font-size: 1.08rem;
+      line-height: 1.65;
+      color: #f3ebd6;
     }
 
+    /* Illuminated Scholar's Marginalia / Annotation Slip */
     .archive-record-note {
-      background: rgba(10, 17, 30, 0.7);
-      border: 1px solid var(--brass-dim);
-      border-left: 3px solid var(--brass-bright);
-      border-radius: 6px;
-      padding: 14px 18px;
-      color: var(--parchment-dim);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      margin-top: 8px;
+      background: linear-gradient(180deg, rgba(38, 22, 12, 0.92) 0%, rgba(22, 12, 6, 0.96) 100%);
+      border: 1.5px solid #854d0e;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      padding: 18px 22px;
+      color: #f3ebd6;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.68;
+      margin-top: 10px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+      position: relative;
     }
 
     .archive-record-note strong {
-      color: var(--brass-bright);
+      color: #ffd580;
       font-family: 'Cinzel', Georgia, serif;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
+    }
+
+    .archive-viewer-pane .btn-historical-web {
+      background: rgba(180, 83, 9, 0.25);
+      border: 1.5px solid #d97706;
+      color: #ffd580;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      transition: all 0.2s ease;
+    }
+
+    .archive-viewer-pane .btn-historical-web:hover {
+      background: #b45309;
+      color: #fffbeb;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
     }
 
     /* Embedded Audio Player for Radio Dispatch with Wave Animation */
     .archive-audio-widget {
-      background: rgba(6, 11, 20, 0.9);
-      border: 1px solid var(--border-brass);
+      background: linear-gradient(180deg, #2a160c 0%, #170c05 100%);
+      border: 1.5px solid #854d0e;
       border-radius: 8px;
       padding: 16px 20px;
       display: flex;
@@ -2298,8 +2698,8 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass-base) 100%);
-      border: 1px solid #ffffff;
+      background: linear-gradient(180deg, #ffd580 0%, #b45309 100%);
+      border: 1px solid #fed7aa;
       color: #03050a;
       font-size: 1.2rem;
       display: flex;
@@ -2308,7 +2708,7 @@
       cursor: pointer;
       flex-shrink: 0;
       transition: all 0.2s ease;
-      box-shadow: 0 0 16px rgba(212, 168, 83, 0.4);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
     }
 
     .btn-audio-play-round:hover {
@@ -2326,7 +2726,7 @@
     .radio-bar {
       width: 3px;
       height: 6px;
-      background: var(--cyan-beam);
+      background: #f59e0b;
       border-radius: 1px;
       transition: height 0.2s ease;
     }
@@ -2532,11 +2932,11 @@
       min-height: 420px;
       max-width: 92vw;
       max-height: 90vh;
-      border: 1.5px solid var(--brass-base);
-      border-radius: 8px;
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.95);
+      border: 2px solid #b45309;
+      border-radius: 10px;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.98), inset 0 0 40px rgba(0, 0, 0, 0.9);
       overflow: auto;
-      background: #04070e;
+      background: #080402;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2548,6 +2948,7 @@
       display: block;
       opacity: 0;
       transition: opacity 0.4s ease-in-out;
+      filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.95));
     }
 
     .lightbox-img-wrap.loaded img {
@@ -2557,7 +2958,7 @@
     .lightbox-skeleton {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(14, 22, 38, 0.98) 0%, rgba(3, 6, 12, 0.99) 100%);
+      background: radial-gradient(circle at center, rgba(35, 20, 11, 0.98) 0%, rgba(10, 5, 2, 0.99) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -2576,19 +2977,26 @@
       position: absolute;
       top: -16px;
       right: -16px;
-      background: #03050a;
-      border: 1.5px solid var(--brass-bright);
-      color: var(--brass-bright);
-      width: 38px;
-      height: 38px;
+      background: #1a0d06;
+      border: 2px solid #ffd580;
+      color: #ffd580;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       font-size: 1.4rem;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 0 18px rgba(0,0,0,0.9);
+      box-shadow: 0 0 20px rgba(0,0,0,0.95), 0 0 10px rgba(245, 158, 11, 0.4);
       z-index: 100000;
+      transition: all 0.2s ease;
+    }
+
+    .lightbox-close-btn:hover {
+      background: #ffd580;
+      color: #1a0d06;
+      transform: scale(1.1);
     }
 
     /* =========================================================================
@@ -3487,6 +3895,1797 @@
       border-color: var(--brass-bright);
       transform: translateY(-1px);
     }
+
+    .btn-dev-storm-toggle-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(35, 12, 5, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      border-radius: 6px;
+      color: #fde68a;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-dev-storm-toggle-header:hover {
+      background: rgba(70, 25, 10, 0.95);
+      border-color: #fbbf24;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* =========================================================================
+       CAMP MESSENGER (DISCREET HEADER TRIGGER & NOTIFICATIONS)
+       ========================================================================= */
+
+    .viewport-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-header-messenger {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      border-radius: 50%;
+      cursor: pointer;
+      color: #ffd885;
+      font-size: 1.18rem;
+      line-height: 1;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .btn-header-messenger:hover {
+      background: rgba(138, 150, 107, 0.22);
+      border-color: #a3ad82;
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 0 16px rgba(138, 150, 107, 0.35);
+    }
+
+    .btn-header-messenger:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .btn-header-messenger.active {
+      background: rgba(68, 77, 54, 0.55);
+      border-color: #a3ad82;
+      box-shadow: 0 0 16px rgba(138, 150, 107, 0.4), inset 0 0 8px rgba(138, 150, 107, 0.25);
+    }
+
+    .btn-header-messenger .messenger-btn-icon {
+      display: inline-block;
+      transition: transform 0.2s ease;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+    }
+
+    .btn-header-messenger:hover .messenger-btn-icon {
+      transform: scale(1.1);
+    }
+
+    .btn-header-messenger .messenger-btn-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 19px;
+      height: 19px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ef4444 0%, #ea580c 100%);
+      border: 2px solid #0d131f;
+      color: #ffffff;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.7);
+      animation: messengerBadgePulse 2.4s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes messengerBadgePulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.7);
+      }
+      50% {
+        transform: scale(1.14);
+        box-shadow: 0 0 14px rgba(239, 68, 68, 0.95);
+      }
+    }
+
+    /* =========================================================================
+       VIEW: THE CLIFFSIDE WORKSHOP (ARTISAN ROCK RELAY & SALVAGED MECHANICS)
+       ========================================================================= */
+    #view-field-wire {
+      position: relative;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0 0 50px;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    #view-field-wire::before {
+      display: none;
+    }
+
+    #view-field-wire > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    #view-field-wire .view-header {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    #view-field-wire .view-tagline {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: #dbe8c3;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding: 6px 22px;
+      background: rgba(18, 24, 17, 0.7);
+      border: 1px solid rgba(163, 179, 130, 0.4);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(163, 179, 130, 0.2);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 12px rgba(184, 199, 153, 0.4);
+    }
+
+    #view-field-wire .view-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2.35rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #f7f2e7;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 28px rgba(184, 199, 153, 0.35);
+      margin-bottom: 12px;
+    }
+
+    #view-field-wire .view-desc {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 1.06rem;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.68;
+      letter-spacing: 0.01em;
+      color: #faf5ed;
+      max-width: 840px;
+      margin: 0 auto;
+      padding: 0;
+      background: none;
+      border: none;
+      border-radius: 0;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: none;
+      text-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.98),
+        0 1px 2px rgba(0, 0, 0, 1),
+        0 0 16px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Messenger Main Container */
+    .camp-messenger-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    /* Handcrafted Rock Workshop Chassis - Outer Container Box Removed */
+    .rig-chassis-desert.rig-chassis-workshop {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Forged Iron Corner Brackets hidden since outer chassis box is removed */
+    .rig-corner-bracket {
+      display: none !important;
+    }
+
+    .screw-slot {
+      display: none !important;
+    }
+
+
+
+    /* Messenger Frame (The Display Viewport Screen) - Handcrafted Warm Artisan Brown Palette */
+    .messenger-app-window {
+      background: linear-gradient(180deg, rgba(30, 22, 16, 0.9) 0%, rgba(20, 14, 10, 0.94) 100%);
+      border: 1.5px solid rgba(196, 168, 138, 0.48);
+      border-radius: 16px;
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.78),
+        0 0 35px rgba(84, 58, 38, 0.35),
+        inset 0 1px 0 rgba(240, 222, 198, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: auto;
+      height: auto;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* Top Bar (Contact Info & Controls) */
+    .messenger-top-bar {
+      background: linear-gradient(180deg, rgba(48, 36, 26, 0.96) 0%, rgba(34, 25, 18, 0.96) 100%);
+      border-bottom: 1.5px solid rgba(196, 168, 138, 0.35);
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .messenger-contact-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .workshop-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #56412f, #261a12);
+      border: 2px solid #b89876;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fffaf0;
+      box-shadow: 0 0 14px rgba(184, 152, 118, 0.35);
+      position: relative;
+    }
+
+    .avatar-gear-ring {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(214, 188, 160, 0.7);
+      animation: gearSpinClockwise 24s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .messenger-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #483424, #261a12);
+      border: 2px solid #d4ba9f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(184, 152, 118, 0.35);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .messenger-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .messenger-online-badge {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #7e946a;
+      border: 2px solid #241912;
+      box-shadow: 0 0 6px rgba(126, 148, 106, 0.85);
+      z-index: 3;
+    }
+
+    .messenger-contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .messenger-contact-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fffef8;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .messenger-contact-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(184, 152, 118, 0.22);
+      color: #f5e4d3;
+      border: 1px solid rgba(214, 188, 160, 0.45);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Analog Signal Meter (Galvanometer / Brass Carrier Lock) */
+    .telegraph-signal-meter {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(20, 14, 10, 0.88);
+      border: 1.5px solid rgba(196, 168, 138, 0.42);
+      border-radius: 8px;
+      padding: 5px 14px;
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.35);
+      user-select: none;
+    }
+
+    .signal-gauge-housing {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .signal-indicator-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 14px;
+    }
+
+    .signal-indicator-bars .signal-bar {
+      width: 4px;
+      background: rgba(184, 152, 118, 0.25);
+      border-radius: 1px;
+    }
+
+    .signal-indicator-bars .signal-bar:nth-child(1) { height: 5px; }
+    .signal-indicator-bars .signal-bar:nth-child(2) { height: 8px; }
+    .signal-indicator-bars .signal-bar:nth-child(3) { height: 11px; }
+    .signal-indicator-bars .signal-bar:nth-child(4) { height: 14px; }
+    .signal-indicator-bars .signal-bar:nth-child(5) { height: 14px; }
+
+    .signal-indicator-bars .signal-bar.active {
+      background: linear-gradient(180deg, #f7d59b, #d4a76a);
+      box-shadow: 0 0 5px rgba(212, 167, 106, 0.6);
+    }
+
+    .signal-indicator-bars .signal-bar.pulse {
+      background: linear-gradient(180deg, #ffe0a3, #e59866);
+      animation: signalBarFlicker 2.5s infinite ease-in-out;
+    }
+
+    @keyframes signalBarFlicker {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 0.35; }
+    }
+
+    .signal-beacon-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #7e946a;
+      border: 1.5px solid #241912;
+      box-shadow: 0 0 7px rgba(126, 148, 106, 0.85);
+      animation: carrierPulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes carrierPulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 6px rgba(126, 148, 106, 0.85); }
+      50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px rgba(126, 148, 106, 1); }
+    }
+
+    .signal-meta-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: #dfcbba;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      flex-wrap: nowrap;
+    }
+
+    .signal-meta-text .signal-val {
+      color: #ffe8cc;
+      font-weight: 700;
+    }
+
+    .signal-meta-text .signal-heading {
+      color: #e5c5a1;
+      font-weight: 600;
+    }
+
+    .signal-meta-text .signal-status {
+      color: #9ab384;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .signal-meta-text .signal-sep {
+      color: rgba(184, 152, 118, 0.5);
+    }
+
+    @media (max-width: 860px) {
+      .messenger-top-bar {
+        flex-wrap: wrap;
+      }
+      .telegraph-signal-meter {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* Segmented Mode Switcher Keys */
+    .messenger-controls-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .messenger-mode-switcher {
+      display: inline-flex;
+      background: rgba(26, 19, 14, 0.92);
+      border: 1.5px solid rgba(184, 152, 118, 0.4);
+      border-radius: 999px;
+      padding: 3px;
+    }
+
+    .messenger-toggle-btn {
+      background: transparent;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #d9c5b2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .messenger-toggle-btn:hover {
+      color: #ffffff;
+    }
+
+    .messenger-toggle-btn.active {
+      background: linear-gradient(180deg, rgba(92, 70, 52, 0.95) 0%, rgba(68, 50, 36, 0.95) 100%);
+      color: #ffffff;
+      border: 1px solid #c9aa8b;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .messenger-btn-restart {
+      background: rgba(38, 28, 20, 0.9);
+      border: 1.5px solid rgba(184, 152, 118, 0.45);
+      color: #ebd8c5;
+      font-size: 1rem;
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+    }
+
+    .messenger-btn-restart:hover {
+      background: rgba(64, 48, 34, 0.98);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(229, 197, 161, 0.4), 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Chat Messages Canvas: Semi-transparent Textured Slate Gray (Natural Workshop Bedrock Relay) */
+    .messenger-chat-body {
+      flex: none;
+      padding: 26px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 280px;
+      height: auto;
+      max-height: none;
+      overflow: visible;
+      background-color: rgba(18, 22, 28, 0.65);
+      background-image:
+        radial-gradient(ellipse at 50% 8%, rgba(200, 215, 235, 0.08) 0%, rgba(10, 14, 20, 0.72) 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0px, rgba(255, 255, 255, 0.014) 1px, transparent 1px, transparent 4px),
+        linear-gradient(rgba(180, 195, 215, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(180, 195, 215, 0.035) 1px, transparent 1px);
+      background-size: 100% 100%, 4px 4px, 28px 28px, 28px 28px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: inset 0 2px 20px rgba(0, 0, 0, 0.65), inset 0 0 0 1px rgba(180, 195, 215, 0.08);
+    }
+
+    /* Ask Hermes Inquiries Chat: Clean Empty Standby State */
+    #wire-inquiries-stream:empty {
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #wire-inquiries-stream:empty::after {
+      content: '✦ Telegraph frequency ready · Tap any question below to ask Hermes ✦';
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      color: rgba(229, 197, 161, 0.42);
+      text-transform: uppercase;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    /* Date Separator: Natural Editorial Rule (De-encapsulated) */
+    .messenger-date-pill {
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 6px 0;
+      color: #b8aba0;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .messenger-date-pill::before,
+    .messenger-date-pill::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(196, 168, 138, 0.32), transparent);
+    }
+
+    /* Message Bubbles */
+    .chat-bubble-wrap {
+      display: flex;
+      flex-direction: column;
+      max-width: 84%;
+      animation: bubbleSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes bubbleSlideIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-bubble-wrap.incoming {
+      align-self: flex-start;
+    }
+
+    .chat-bubble-wrap.outgoing {
+      align-self: flex-end;
+    }
+
+    .chat-bubble-wrap.system-event {
+      align-self: center;
+      max-width: 92%;
+    }
+
+    /* Sender Name: Natural Calligraphic Label (No heavy capsule box) */
+    .chat-sender-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      padding: 0;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chat-bubble-wrap.incoming .chat-sender-name {
+      color: #e5c5a1;
+      align-self: flex-start;
+      margin-left: 2px;
+    }
+
+    .chat-bubble-wrap.outgoing .chat-sender-name {
+      color: #f0b594;
+      align-self: flex-end;
+      margin-right: 48px;
+    }
+
+    .chat-bubble {
+      padding: 16px 22px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.02rem;
+      font-style: normal;
+      font-weight: 450;
+      line-height: 1.7;
+      letter-spacing: -0.005em;
+      position: relative;
+      word-break: break-word;
+      -webkit-font-smoothing: antialiased;
+      border-radius: 8px;
+    }
+
+    /* Hermes Message: Natural Warm Slate-Parchment Draft with Fine Brass Trim */
+    .chat-bubble-wrap.incoming .chat-bubble {
+      background:
+        linear-gradient(180deg, rgba(30, 26, 22, 0.92) 0%, rgba(22, 19, 16, 0.94) 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 4px);
+      color: #fffef8;
+      border: 1px solid rgba(214, 185, 155, 0.38);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 240, 220, 0.16);
+    }
+
+    /* Silvia Message: Natural Terracotta-Copper Draft */
+    .chat-bubble-wrap.outgoing .chat-bubble {
+      background:
+        linear-gradient(135deg, rgba(54, 34, 24, 0.92) 0%, rgba(38, 24, 18, 0.94) 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0px, rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 4px);
+      color: #ffffff;
+      border: 1px solid rgba(240, 160, 120, 0.42);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 245, 235, 0.18);
+    }
+
+    .chat-bubble-wrap.system-event .chat-bubble {
+      background: linear-gradient(180deg, rgba(52, 40, 29, 0.94) 0%, rgba(36, 26, 18, 0.96) 100%);
+      border: 1.5px dashed rgba(214, 185, 155, 0.65);
+      border-radius: 10px;
+      text-align: center;
+      color: #faebd7;
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 11px 20px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    .chat-bubble-text p {
+      margin: 0 0 12px 0;
+    }
+
+    .chat-bubble-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .chat-bubble-time {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #d6beaa;
+      margin-top: 10px;
+    }
+
+    /* Message Row & Silvia Navigator Stamp */
+    .chat-bubble-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .chat-bubble-wrap.outgoing .chat-bubble-row {
+      justify-content: flex-end;
+    }
+
+    .silvia-avatar-stamp {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #8c4a2a, #3d1f11);
+      border: 2px solid #e59866;
+      box-shadow: 0 0 10px rgba(229, 152, 102, 0.45), 0 3px 8px rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      margin-bottom: 3px;
+      user-select: none;
+    }
+
+    .silvia-avatar-stamp::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(240, 180, 135, 0.55);
+      pointer-events: none;
+      animation: gearSpinClockwise 30s linear infinite;
+    }
+
+    .silvia-seal-glyph {
+      font-size: 1.15rem;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+    }
+
+    /* Physical Journal Callout: Natural Illuminated Manuscript Citation (De-encapsulated) */
+    .journal-ref-pill {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      background: rgba(229, 197, 161, 0.12);
+      border: none;
+      border-bottom: 1.5px solid #d4a76a;
+      color: #fff5e8;
+      font-family: inherit;
+      font-size: 0.98em;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin: 0 2px;
+      vertical-align: baseline;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      box-shadow: none;
+    }
+
+    .journal-ref-pill:hover {
+      background: rgba(229, 197, 161, 0.22);
+      border-bottom-color: #ffd8a8;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(229, 197, 161, 0.2);
+    }
+
+    .journal-ref-pill .pill-icon {
+      font-size: 0.92em;
+      margin-right: 2px;
+    }
+
+    /* Teletype Cursor */
+    .telegraph-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 14px;
+      background-color: #d4a76a;
+      margin-left: 3px;
+      vertical-align: middle;
+      box-shadow: 0 0 6px rgba(212, 167, 106, 0.8);
+      animation: telegraphBlink 0.5s infinite;
+    }
+
+    @keyframes telegraphBlink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* Soft Focus Accent Pulse */
+    @keyframes bubbleHighlightGlow {
+      0% {
+        box-shadow: 0 0 0 3px rgba(229, 197, 161, 0.95), 0 0 28px rgba(212, 168, 83, 0.75);
+        border-color: #eed6bf;
+      }
+      50% {
+        box-shadow: 0 0 0 2px rgba(229, 197, 161, 0.6), 0 0 16px rgba(212, 168, 83, 0.4);
+      }
+      100% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 18px rgba(184, 142, 98, 0.16);
+      }
+    }
+
+    .chat-bubble.highlight-pulse {
+      animation: bubbleHighlightGlow 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Typing Indicator Bar */
+    .messenger-typing-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      background: rgba(30, 22, 16, 0.96);
+      border-top: 1px solid rgba(196, 168, 138, 0.32);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #dfcbba;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c4ad94;
+      box-shadow: 0 0 6px #c4ad94;
+      animation: typingDotPulse 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typingDotPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* Bottom Reply Deck */
+    .messenger-reply-deck {
+      background: linear-gradient(180deg, rgba(32, 24, 18, 0.96) 0%, rgba(22, 16, 12, 0.98) 100%);
+      border-top: 1.5px solid rgba(196, 168, 138, 0.35);
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .messenger-reply-header {
+      font-family: 'Cinzel', serif;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f0decc;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .messenger-choices-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Choice Option: Natural Decision Row (De-encapsulated) */
+    .messenger-choice-pill {
+      background: rgba(28, 24, 20, 0.76);
+      border: 1px solid rgba(196, 168, 138, 0.35);
+      border-radius: 8px;
+      padding: 14px 20px;
+      color: #fffaf0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.01rem;
+      font-weight: 500;
+      line-height: 1.55;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+      position: relative;
+    }
+
+    .messenger-choice-pill:hover:not(:disabled) {
+      background: rgba(48, 38, 28, 0.92);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      transform: none !important;
+      box-shadow: inset 0 0 0 1px rgba(229, 197, 161, 0.3), 0 4px 14px rgba(0, 0, 0, 0.55);
+    }
+
+    .messenger-choice-pill:hover:not(:disabled) .messenger-choice-tag {
+      color: #fff5e8;
+    }
+
+    .messenger-choice-pill:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .messenger-choice-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      background: transparent;
+      color: #d4a76a;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+      flex-shrink: 0;
+      box-shadow: none;
+      letter-spacing: 0.05em;
+      transition: color 0.18s ease;
+    }
+
+    .messenger-choice-text {
+      flex: 1;
+    }
+
+    /* Waypoint Secured Card */
+    .messenger-waypoint-card {
+      background: linear-gradient(180deg, rgba(58, 44, 32, 0.88) 0%, rgba(38, 28, 20, 0.94) 100%);
+      border: 1.5px solid rgba(196, 168, 138, 0.5);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .messenger-waypoint-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .messenger-waypoint-icon {
+      font-size: 1.6rem;
+    }
+
+    .messenger-waypoint-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #fffaf0;
+      letter-spacing: 0.04em;
+    }
+
+    .messenger-waypoint-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      color: #d9c5b2;
+      margin-top: 2px;
+    }
+
+    .btn-messenger-to-map {
+      background: linear-gradient(135deg, #6b513a, #4a3726);
+      border: 1.5px solid #d4ba9f;
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease;
+    }
+
+    .btn-messenger-to-map:hover {
+      background: linear-gradient(135deg, #826348, #5c442f);
+      border-color: #eed6bf;
+      box-shadow: 0 0 16px rgba(196, 168, 138, 0.45);
+      transform: none;
+    }
+
+    /* Workshop Inquiries Grid Panel: Archival Tabs (De-encapsulated) */
+    .inquiry-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding: 2px 0 10px 0;
+      border-bottom: 1px solid rgba(196, 168, 138, 0.18);
+    }
+
+    .inquiry-filter-pill {
+      background: rgba(24, 20, 16, 0.68);
+      border: 1px solid rgba(184, 152, 118, 0.3);
+      color: #c9b49f;
+      font-family: 'Cinzel', serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .inquiry-filter-pill:hover {
+      background: rgba(42, 34, 26, 0.88);
+      border-color: #e5c5a1;
+      color: #ffffff;
+    }
+
+    .inquiry-filter-pill.active {
+      background: linear-gradient(180deg, rgba(72, 54, 38, 0.95) 0%, rgba(50, 36, 26, 0.98) 100%);
+      border-color: #d4a76a;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 240, 220, 0.18);
+    }
+
+    .messenger-faq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      max-height: none;
+      overflow: visible;
+      padding: 6px;
+    }
+
+    /* FAQ Chip: Natural Correspondence Cards (De-encapsulated) */
+    .messenger-faq-chip {
+      background: rgba(28, 23, 19, 0.76);
+      border: 1px solid rgba(196, 168, 138, 0.32);
+      border-radius: 8px;
+      padding: 13px 16px;
+      color: #fffaf0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.96rem;
+      font-weight: 500;
+      line-height: 1.45;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+      position: relative;
+    }
+
+    .messenger-faq-chip:hover {
+      background: rgba(48, 38, 30, 0.92);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      transform: none !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(229, 197, 161, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.55);
+    }
+
+    /* FAQ Chip Read State & Gold Ribete */
+    .messenger-faq-chip.is-read {
+      border-color: rgba(212, 168, 83, 0.75);
+      background: linear-gradient(180deg, rgba(46, 36, 26, 0.94) 0%, rgba(32, 24, 18, 0.96) 100%);
+      box-shadow: inset 0 0 14px rgba(212, 168, 83, 0.08), 0 3px 8px rgba(0, 0, 0, 0.45);
+    }
+
+    .messenger-faq-chip-title {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+    }
+
+    .messenger-faq-chip-cat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #d9c2ab;
+      opacity: 0.95;
+      margin-left: 17px;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: calc(100% - 17px);
+      gap: 8px;
+    }
+
+    .inquiry-read-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #f7d59b;
+      background: rgba(212, 168, 83, 0.16);
+      border: 1px solid rgba(212, 168, 83, 0.45);
+      border-radius: 4px;
+      padding: 1px 6px;
+      letter-spacing: 0.03em;
+      margin-left: auto;
+    }
+
+
+    /* Brass Astrolabe View */
+    .astrolabe-view-card {
+      background: rgba(10, 16, 28, 0.94);
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .astrolabe-bench-header {
+      background: rgba(4, 7, 12, 0.95);
+      border-bottom: 1px solid rgba(212, 168, 83, 0.25);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .astrolabe-bench-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.05em;
+    }
+
+    .astrolabe-bench-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      background: rgba(212, 168, 83, 0.15);
+      color: #ffd885;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .astrolabe-bench-content {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .astrolabe-bench-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .astrolabe-preview-container {
+      background: rgba(4, 6, 10, 0.9);
+      border: 1px solid rgba(212, 168, 83, 0.2);
+      border-radius: 8px;
+      min-height: 480px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .astrolabe-launch-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 480px;
+    }
+
+    .astrolabe-seal-img {
+      width: 120px;
+      height: 120px;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 16px rgba(212, 168, 83, 0.3));
+    }
+
+    .btn-astrolabe-engage-full {
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.35), rgba(122, 84, 28, 0.6));
+      border: 1px solid var(--brass-bright);
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 12px 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s ease;
+    }
+
+    .btn-astrolabe-engage-full:hover {
+      background: linear-gradient(135deg, rgba(255, 224, 153, 0.45), rgba(160, 110, 35, 0.7));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(212, 168, 83, 0.3);
+    }
+
+    .astrolabe-sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .star-pointers-card {
+      background: rgba(6, 10, 18, 0.8);
+      border: 1px solid rgba(212, 168, 83, 0.22);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .star-pointers-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.15);
+      padding-bottom: 6px;
+    }
+
+    .star-pointers-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .star-pointer-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--parchment-dim);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+      padding-bottom: 4px;
+    }
+
+    .star-pointer-item strong {
+      color: var(--brass-bright);
+    }
+
+    .astrolabe-warning-card {
+      background: rgba(246, 173, 85, 0.08);
+      border: 1px solid rgba(246, 173, 85, 0.3);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: #ffd885;
+    }
+
+    /* =========================================================================
+       🌪️ THE SHIFTING TEMPEST — CATACLYSMIC SANDSTORM LOCKDOWN (48-HOUR TIMEOUT)
+       ========================================================================= */
+    body.sandstorm-lockout-active {
+      overflow: hidden !important;
+      animation: stormRumble 6s infinite ease-in-out;
+    }
+
+    body.sandstorm-lockout-active .game-hub-container,
+    body.sandstorm-lockout-active #hub-dynamic-backdrop,
+    body.sandstorm-lockout-active #ambient-stars,
+    body.sandstorm-lockout-active .cosmic-nebula-layer {
+      filter: blur(6px) brightness(0.72) contrast(1.2) sepia(0.25) !important;
+      opacity: 0.88 !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      animation: hubGlitchTremor 4.5s infinite ease-in-out !important;
+    }
+
+    @keyframes hubGlitchTremor {
+      0%, 84%, 100% {
+        transform: translate(0, 0);
+        filter: blur(6px) brightness(0.72) contrast(1.2) sepia(0.25);
+      }
+      85% {
+        transform: translate(-3px, 1.5px);
+        filter: blur(5px) brightness(0.85) contrast(1.35) sepia(0.35);
+      }
+      86% {
+        transform: translate(3px, -2px);
+        filter: blur(8px) brightness(0.55) contrast(1.1) sepia(0.2);
+      }
+      87% {
+        transform: translate(-1.5px, 2px);
+        filter: blur(6px) brightness(0.75) contrast(1.25) sepia(0.3);
+      }
+      88% {
+        transform: translate(0, 0);
+        filter: blur(6px) brightness(0.72) contrast(1.2) sepia(0.25);
+      }
+    }
+
+    @keyframes stormRumble {
+      0%, 88%, 100% { transform: translate(0, 0); }
+      90% { transform: translate(-1.5px, 0.8px); }
+      92% { transform: translate(1.8px, -1.2px); }
+      94% { transform: translate(-1px, -0.6px); }
+      96% { transform: translate(1.2px, 1px); }
+    }
+
+    .sandstorm-lockout-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000020;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      padding: 24px;
+      box-sizing: border-box;
+      overflow: hidden;
+      background: radial-gradient(circle at center, rgba(30, 10, 3, 0.3) 0%, rgba(15, 5, 2, 0.55) 65%, rgba(6, 2, 1, 0.78) 100%);
+      backdrop-filter: blur(2px);
+      animation: stormFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes stormFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #sandstorm-lockout-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000021;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .storm-sky-gradient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000019;
+      background: radial-gradient(circle at 75% 20%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
+                  radial-gradient(circle at 20% 80%, rgba(185, 28, 28, 0.15) 0%, transparent 65%);
+      mix-blend-mode: screen;
+    }
+
+    .storm-crt-scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000022;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.4) 0px,
+        rgba(0, 0, 0, 0.4) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      opacity: 0.75;
+      animation: scanlineJitter 8s linear infinite;
+    }
+
+    @keyframes scanlineJitter {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 400px; }
+    }
+
+    .storm-static-noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000023;
+      background-image: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 80%);
+      mix-blend-mode: overlay;
+      opacity: 0.6;
+      animation: noiseFlicker 0.25s steps(3) infinite;
+    }
+
+    @keyframes noiseFlicker {
+      0% { opacity: 0.5; }
+      50% { opacity: 0.75; }
+      100% { opacity: 0.6; }
+    }
+
+    .storm-vignette-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000023;
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(5, 2, 1, 0.88) 100%),
+                  radial-gradient(ellipse at 50% 100%, rgba(153, 27, 27, 0.25) 0%, transparent 60%);
+    }
+
+    .storm-lightning-flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000024;
+      background: radial-gradient(circle at 60% 30%, rgba(254, 215, 170, 0.45) 0%, rgba(245, 158, 11, 0.2) 50%, transparent 80%);
+      opacity: 0;
+      transition: opacity 0.08s ease-out;
+    }
+
+    /* Floating Audio Toggle in Top Right */
+    .storm-audio-toggle-floating {
+      position: fixed;
+      top: 24px;
+      right: 28px;
+      z-index: 1000030;
+    }
+
+    .btn-storm-audio-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(25, 10, 4, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 30px;
+      color: #fef3c7;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: all 0.2s ease;
+    }
+
+    .btn-storm-audio-toggle:hover {
+      background: rgba(55, 22, 9, 0.95);
+      border-color: #f59e0b;
+      transform: translateY(-1px);
+    }
+
+    /* UNBOXED FLOATING CENTER ALERT */
+    .storm-unboxed-alert {
+      position: relative;
+      z-index: 1000025;
+      max-width: 820px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      pointer-events: auto;
+      animation: alertBreathe 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes alertBreathe {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .storm-status-beacon {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.22em;
+      color: #f87171;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 14px;
+      text-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+    }
+
+    .strobe-dot-red {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 14px #ef4444, 0 0 25px #dc2626;
+      animation: pulseRedStrobe 1s infinite alternate;
+    }
+
+    @keyframes pulseRedStrobe {
+      from { opacity: 0.4; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1.25); }
+    }
+
+    .storm-alert-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 1.1;
+      color: #ffffff;
+      background: linear-gradient(180deg, #ffffff 0%, #fee2e2 25%, #fca5a5 50%, #ef4444 85%, #991b1b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 35px rgba(239, 68, 68, 0.55));
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .storm-alert-message {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1.2rem, 2.1vw, 1.45rem);
+      line-height: 1.45;
+      color: #fbf5ed;
+      font-style: italic;
+      max-width: 660px;
+      margin: 0 auto 20px;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 0, 0, 0.9);
+      letter-spacing: 0.02em;
+    }
+
+    /* THE 48-HOUR LIVE COUNTDOWN READOUT */
+    .storm-countdown-readout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 110px;
+    }
+
+    .countdown-unit .digit-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.8rem, 6.5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1;
+      color: #fffbeb;
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.9), 0 0 45px rgba(245, 158, 11, 0.6), 0 0 70px rgba(217, 119, 6, 0.4);
+      letter-spacing: -0.02em;
+    }
+
+    .countdown-unit .digit-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      color: #f59e0b;
+      font-weight: 700;
+      margin-top: 8px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    }
+
+    .countdown-colon {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      color: #f59e0b;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: -16px;
+      text-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+      animation: pulseColon 1s infinite alternate;
+    }
+
+    @keyframes pulseColon {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+
+    .storm-progress-minimal {
+      width: 100%;
+      max-width: 440px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0 auto 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .storm-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #dc2626 0%, #f59e0b 50%, #fef08a 100%);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.9);
+      border-radius: 999px;
+      transition: width 1s linear;
+    }
+
+    .storm-timer-note {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: #d4a853;
+      text-transform: uppercase;
+      opacity: 0.9;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    /* EMERGENCY 24H TELEGRAPH BEACON CARD (ACTIVE AT <= 24H REMAINING) */
+    .storm-emergency-wire-card {
+      margin: 20px auto 75px;
+      max-width: 580px;
+      padding: 16px 24px;
+      background: radial-gradient(circle at 50% 0%, rgba(180, 83, 9, 0.42) 0%, rgba(28, 11, 4, 0.92) 100%);
+      border: 1.5px solid rgba(245, 158, 11, 0.75);
+      border-radius: 12px;
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.3), 0 10px 30px rgba(0, 0, 0, 0.85);
+      animation: wireCardPulse 3s ease-in-out infinite alternate;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @keyframes wireCardPulse {
+      from { border-color: rgba(245, 158, 11, 0.55); box-shadow: 0 0 25px rgba(245, 158, 11, 0.25); }
+      to { border-color: rgba(251, 191, 36, 0.95); box-shadow: 0 0 50px rgba(245, 158, 11, 0.5); }
+    }
+
+    .wire-card-beacon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.16em;
+      color: #fde68a;
+      text-transform: uppercase;
+    }
+
+    .strobe-dot-amber {
+      width: 9px;
+      height: 9px;
+      background: #f59e0b;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #f59e0b, 0 0 24px #f59e0b;
+      animation: amberStrobe 0.8s infinite alternate;
+    }
+
+    @keyframes amberStrobe {
+      from { opacity: 0.4; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1.2); }
+    }
+
+    .wire-card-desc {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.15rem;
+      line-height: 1.45;
+      color: #fef3c7;
+      font-style: italic;
+      margin: 0;
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+    }
+
+    .btn-storm-answer-wire {
+      position: relative;
+      z-index: 1000030;
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 26px;
+      background: linear-gradient(180deg, #d97706 0%, #b45309 60%, #92400e 100%);
+      color: #ffffff;
+      border: 1.5px solid #fbbf24;
+      border-radius: 30px;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.5), 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: all 0.25s ease;
+      margin-top: 4px;
+    }
+
+    .btn-storm-answer-wire:hover {
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(245, 158, 11, 0.8), 0 6px 20px rgba(0, 0, 0, 0.8);
+      color: #fffbeb;
+    }
+
+    /* Dedicated Dev Sandbox Controls */
+    .storm-dev-controls {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000030;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 6, 3, 0.9);
+      border: 1px dashed rgba(245, 158, 11, 0.35);
+      border-radius: 20px;
+      padding: 6px 14px;
+      backdrop-filter: blur(6px);
+    }
+
+    .storm-dev-controls .dev-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+
+    .btn-dev-storm {
+      padding: 4px 10px;
+      background: rgba(35, 14, 6, 0.9);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      color: #fde68a;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-dev-storm:hover {
+      background: rgba(70, 25, 10, 1);
+      border-color: #fbbf24;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -3539,10 +5738,104 @@
     </div>
   </div>
 
+  <!-- =====================================================================
+       🌪️ THE SHIFTING TEMPEST — CATACLYSMIC SANDSTORM LOCKDOWN (48-HOUR TIMEOUT)
+       ===================================================================== -->
+  <div class="sandstorm-lockout-overlay" id="sandstorm-lockout-overlay" style="display: none;" aria-hidden="true">
+    <!-- Particle Canvas for flying sand streaks and howling dust -->
+    <canvas id="sandstorm-lockout-canvas"></canvas>
+    
+    <!-- Atmospheric storm layers & static interference -->
+    <div class="storm-sky-gradient"></div>
+    <div class="storm-crt-scanlines"></div>
+    <div class="storm-static-noise"></div>
+    <div class="storm-vignette-layer"></div>
+    <div class="storm-lightning-flash" id="storm-lightning-flash"></div>
+
+    <!-- Floating Audio Toggle (Top Right) -->
+    <div class="storm-audio-toggle-floating">
+      <button type="button" class="btn-storm-audio-toggle" id="btn-storm-audio-toggle" title="Toggle Sandstorm Audio">
+        <span id="storm-audio-icon">🔊</span>
+        <span id="storm-audio-label">Storm Audio: ON</span>
+      </button>
+    </div>
+
+    <!-- UNBOXED FLOATING DISTRESS ALERT (CENTERED) -->
+    <div class="storm-unboxed-alert">
+      <div class="storm-status-beacon">
+        <span class="strobe-dot-red"></span>
+        <span>142.85 MHz // CARRIER SIGNAL LOST · CRITICAL INTERFERENCE</span>
+      </div>
+
+      <h1 class="storm-alert-title">CONNECTION FAILURE</h1>
+
+      <p class="storm-alert-message">
+        We cannot establish contact. Signal with the Hub has been completely severed due to the raging sandstorm.
+      </p>
+
+      <!-- 48-Hour Live Countdown Readout -->
+      <div class="storm-countdown-readout">
+        <div class="countdown-unit">
+          <span class="digit-value" id="storm-cd-hours">47</span>
+          <span class="digit-label">HOURS</span>
+        </div>
+        <span class="countdown-colon">:</span>
+        <div class="countdown-unit">
+          <span class="digit-value" id="storm-cd-minutes">59</span>
+          <span class="digit-label">MINUTES</span>
+        </div>
+        <span class="countdown-colon">:</span>
+        <div class="countdown-unit">
+          <span class="digit-value" id="storm-cd-seconds">58</span>
+          <span class="digit-label">SECONDS</span>
+        </div>
+      </div>
+
+      <!-- Minimal Progress Track -->
+      <div class="storm-progress-minimal">
+        <div class="storm-progress-fill" id="storm-progress-fill" style="width: 2%;"></div>
+      </div>
+      <span class="storm-timer-note" id="storm-progress-percent">ESTIMATED SIGNAL RE-ACQUISITION WINDOW · 48 HOURS</span>
+
+      <!-- Emergency 24h Telegraph Relay Card (Revealed when <= 24h remaining or via wire mode) -->
+      <div class="storm-emergency-wire-card" id="storm-emergency-wire-card" style="display: none;">
+        <div class="wire-card-beacon">
+          <span class="strobe-dot-amber"></span>
+          <span>EMERGENCY COPPER WIRE SIGNAL · 142.85 MHZ</span>
+        </div>
+        <p class="wire-card-desc">
+          A telegraph key is twitching through the sandstorm! Hermes is trapped under a cliff ledge and needs your guidance from Sheet 7B.
+        </p>
+        <button type="button" class="btn-storm-answer-wire" id="btn-storm-answer-wire">
+          ⚡ Answer Telegraph Line · Guide Hermes ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- Dedicated Dev Sandbox Controls (Exclusively for Carles / dev mode) -->
+    <div class="storm-dev-controls" id="storm-dev-controls" style="display: none;">
+      <span class="dev-tag">⚡ DEV:</span>
+      <button type="button" class="btn-dev-storm" id="btn-dev-toggle-storm">
+        Bypass Storm
+      </button>
+      <button type="button" class="btn-dev-storm" id="btn-dev-toggle-wire">
+        ⚡ 24h Wire Alert
+      </button>
+      <button type="button" class="btn-dev-storm" id="btn-dev-reset-storm-timer">
+        ↺ Reset 48h
+      </button>
+      <button type="button" class="btn-dev-storm" id="btn-dev-expire-storm-timer">
+        ⏩ Expire Timer
+      </button>
+    </div>
+  </div>
+
   <!-- Ambient Dynamic Stars Canvas & Cosmic Nebula -->
   <canvas id="ambient-stars"></canvas>
   <div class="cosmic-nebula-layer"></div>
   <div class="cosmic-vignette"></div>
+  <!-- Dynamic Environmental Backdrops for Each Tab -->
+  <div class="hub-dynamic-backdrop" id="hub-dynamic-backdrop"></div>
   <div class="game-hub-container">
 
     <!-- =====================================================================
@@ -3585,6 +5878,10 @@
             <span class="btn-icon">🗝️</span>
             <span>The Cipher Ledger</span>
           </button>
+          <button type="button" class="nav-menu-btn" data-view="view-astrolabe" id="nav-btn-astrolabe" style="display: none;">
+            <span class="btn-icon">🧭</span>
+            <span>The Brass Astrolabe</span>
+          </button>
         </nav>
       </div>
 
@@ -3608,15 +5905,20 @@
 
       <!-- Viewport Header Bar (In Natural Flow, not fixed to screen) -->
       <header class="hub-viewport-header">
-        <div class="viewport-header-status">
-          <span class="status-crest">✦</span>
-          <span>The Constellation Path · Active Expedition</span>
+        <div class="viewport-header-left">
+          <button type="button" class="btn-header-messenger" id="btn-header-messenger" data-view="view-field-wire" title="The Cliffside Workshop (Artisan Rock Relay)" aria-label="The Cliffside Workshop" style="display: none;">
+            <span class="messenger-btn-icon">💬</span>
+            <span class="messenger-btn-badge" id="messenger-counter-badge" style="display: none;">1</span>
+          </button>
         </div>
         <div class="viewport-header-user" id="viewport-header-user">
           <div class="seeker-pill" id="seeker-active-pill">
             <span class="seeker-dot"></span>
             <span id="seeker-name-display">Seeker: Silvia</span>
           </div>
+          <button type="button" class="btn-dev-storm-toggle-header" id="btn-dev-storm-toggle-header" title="Toggle Sandstorm Lockout Screen" style="display: none;">
+            <span>🌪️ Toggle Storm</span>
+          </button>
           <button type="button" class="btn-seeker-switch" id="btn-seeker-switch" title="Switch Seeker Profile">
             <span>⇥</span>
             <span>Switch Seeker</span>
@@ -4642,7 +6944,7 @@
                   </div>
                 </div>
 
-                <!-- Transmission 06 · Station 09 Climax (Dispatch 09-A: The Sandstorm Engulfs Icarus) -->
+                <!-- Transmission 06 · Station 09 Climax (Dispatch 09-A: The Sandstorm Engulfs Hermes) -->
                 <div class="tx-log-card tx-log-card-cipher" data-tx-href="./constellation/celestial-cipher/transmission.html" hidden>
                   <div class="tx-log-card-top">
                     <span class="dossier-card-tag tag-distress" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #fca5a5;">06 · SANDSTORM GALE</span>
@@ -4712,79 +7014,113 @@
       </section>
 
       <!-- ===================================================================
-           VIEW 3: THE ARCHIVES (REAL EMAIL PARCHMENT & DISPATCH VIEWER)
+           VIEW 3: THE SCRIPTORIUM & ANCIENT ARCHIVES (CODEX CUSTODIA)
            =================================================================== -->
       <section class="hub-view-section" id="view-archives">
         <header class="view-header">
-          <div class="view-tagline">✦ Intercepted Letters & Parchment Records ✦</div>
-          <h2 class="view-title">The Archives</h2>
+          <div class="view-tagline">✦ CODEX ARCHIVUM · THE SCHOLAR'S SCRIPTORIUM // REGISTRUM PRIMUM ✦</div>
+          <h2 class="view-title">The Ancient Archives</h2>
           <p class="view-desc">
-            The authentic physical dispatches and parchment fragments received by Silvia. Click any archive entry to inspect the original high-resolution parchment images and read their complete records.
+            The illuminated depository of physical folios, wax-sealed dispatches, and recorded field memoirs preserved across the mountain stations. Draw any accession call slip from the catalog drawers to inspect its folio upon the mahogany reading lectern.
           </p>
         </header>
 
+        <!-- Scriptorium Banner Strip -->
+        <div class="library-codex-strip">
+          <div class="codex-strip-left">
+            <span class="codex-strip-seal">📜</span>
+            <div class="codex-strip-meta">
+              <span class="codex-strip-title">SCRIPTORIUM VAULT REPOSITORY · CLASSIFICATION: FOLIO LIMEN</span>
+              <span class="codex-strip-sub">OFFICIAL ACCESSION REGISTRY · ALL PARCHMENT SPECIMENS RESTORED AT 1:1 RESOLUTION</span>
+            </div>
+          </div>
+          <div class="codex-strip-right">
+            <span class="codex-chip">CATALOG NO. MDCCCCXXVI</span>
+            <span class="codex-chip active">VAULT DEPOSITORY</span>
+          </div>
+        </div>
+
         <div class="archives-deck">
-          <!-- Left List of Dispatches -->
+          <!-- Left List of Dispatches (Catalog Drawers) -->
           <div class="archives-list">
-            <div class="archive-section-label">Dispatches</div>
+            <div class="library-drawer-head">
+              <div class="drawer-head-tag">
+                <span class="drawer-head-icon">🗄️</span>
+                <span>DRAWER I // ACCESSED FOLIOS</span>
+              </div>
+              <span class="drawer-head-latin">CODEX CATALOG</span>
+            </div>
+
+            <div class="archive-section-label">Dispatches & Epistles</div>
             <div class="archive-item-card active" data-doc="doc1">
               <div class="archive-item-top">
                 <span class="archive-item-date">1 Sep 2026 // 22:22</span>
-                <span class="archive-item-tag">PARCHMENT</span>
+                <span class="archive-item-tag tag-parchment">PARCHMENT</span>
               </div>
               <span class="archive-item-title">Dispatch I: The Initiation Parchment</span>
+              <div class="archive-item-callnum">CALL SLIP: ORD-1926-A // WAX SEAL PRESERVED</div>
             </div>
             <div class="archive-item-card" data-doc="doc2">
               <div class="archive-item-top">
                 <span class="archive-item-date">Fragment 1 // Cartographer</span>
-                <span class="archive-item-tag">LETTER</span>
+                <span class="archive-item-tag tag-letter">LETTER</span>
               </div>
               <span class="archive-item-title">Dispatch II: The Cartographer of Distant Light</span>
+              <div class="archive-item-callnum">CALL SLIP: OBS-1926-B // SCRIPT HANDWRITTEN</div>
             </div>
             <div class="archive-item-card" data-doc="doc3">
               <div class="archive-item-top">
                 <span class="archive-item-date">Dispatch III // Outpost</span>
-                <span class="archive-item-tag">DISPATCH</span>
+                <span class="archive-item-tag tag-dispatch">DISPATCH</span>
               </div>
               <span class="archive-item-title">Dispatch III: The Subterranean Outpost</span>
+              <div class="archive-item-callnum">CALL SLIP: DES-1926-C // CARRIER RECORD</div>
             </div>
             <div class="archive-item-card" data-doc="doc4" id="archive-item-doc4">
               <div class="archive-item-top">
                 <span class="archive-item-date">Folio Limen // Memoirs</span>
-                <span class="archive-item-tag" style="background: rgba(212, 175, 55, 0.15); border-color: #d4af37; color: #ffd580;">FOLIO</span>
+                <span class="archive-item-tag tag-folio">FOLIO</span>
               </div>
               <span class="archive-item-title">Record 09-A: The Man Behind the Maps</span>
+              <div class="archive-item-callnum">CALL SLIP: MEM-2026-D // BOUND FOLIO LIMEN</div>
             </div>
             <div id="archive-optical-logs" hidden>
-              <div class="archive-section-label">Optical Logs</div>
+              <div class="archive-section-label">Optical Logs & Zoetropes</div>
               <div class="archive-item-card" data-doc="vid1">
                 <div class="archive-item-top">
                   <span class="archive-item-date">Station 08 // 00:24</span>
-                  <span class="archive-item-tag">VIDEO</span>
+                  <span class="archive-item-tag tag-video">OPTICAL ROLL</span>
                 </div>
                 <span class="archive-item-title">Optical Log I: The Shifting Tempest</span>
+                <div class="archive-item-callnum">CALL SLIP: OPT-1080P // CELLULOID PROJECTION</div>
               </div>
             </div>
           </div>
 
-          <!-- Right Document Viewer Pane -->
+          <!-- Right Document Viewer Pane (Scholar's Mahogany Reading Lectern) -->
           <div class="archive-viewer-pane" id="archive-viewer">
+            <!-- Brass Corner Clasps on Lectern -->
+            <div class="lectern-bracket top-left"></div>
+            <div class="lectern-bracket top-right"></div>
+            <div class="lectern-bracket bottom-left"></div>
+            <div class="lectern-bracket bottom-right"></div>
+
             <div class="doc-viewer-meta">
               <span id="doc-meta-id">DISPATCH 01 // PARCHMENT IMAGE</span>
               <span id="doc-meta-date">1 SEP 2026 · 22:22 EXACT</span>
             </div>
 
             <!-- Clickable Image Frame with Loading Ghost & Zoom Hint -->
-            <div class="doc-viewer-image-frame loading" id="doc-image-frame" title="Click to view full-resolution image">
+            <div class="doc-viewer-image-frame loading" id="doc-image-frame" title="Click to inspect full-resolution archival plate">
               <div class="doc-image-skeleton" id="doc-image-skeleton">
                 <div class="skeleton-shimmer"></div>
                 <div class="skeleton-ghost-content">
                   <div class="skeleton-spinner"></div>
-                  <span class="skeleton-text">✦ Loading Archival Plate... ✦</span>
+                  <span class="skeleton-text">✦ Unrolling Archival Folio... ✦</span>
                 </div>
               </div>
               <img src="./assets/emails/email-01-parchment.webp" id="doc-view-img" alt="Order Dispatch Parchment">
-              <span class="image-zoom-hint">🔍 Click to Inspect High-Res</span>
+              <span class="image-zoom-hint">🔍 Inspect Archival Plate (Full Res)</span>
             </div>
 
             <div class="doc-viewer-video-frame" id="doc-video-frame" hidden>
@@ -4980,6 +7316,240 @@
             </div>
           </div>
 
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 6: THE CLIFFSIDE WORKSHOP (ARTISAN ROCK RELAY & SALVAGED MECHANICS)
+           =================================================================== -->
+      <section class="hub-view-section" id="view-field-wire">
+        <header class="view-header">
+          <div class="view-tagline">✦ DIRECT TELEGRAPH CHANNEL · GUIDE HERMES THROUGH THE DESERT EXPEDITION ✦</div>
+          <h2 class="view-title">The Cliffside Workshop</h2>
+          <p class="view-desc">
+            A handmade telegraph built from brass gears and copper wire inside a cliffside workshop. Hermes assembled it from salvaged parts to stay in touch with Silvia across the canyon.
+          </p>
+        </header>
+
+        <div class="camp-messenger-container">
+
+          <!-- Handcrafted Rock Workshop Chassis (Forged Iron, Stone & Salvaged Brass) -->
+          <div class="rig-chassis-desert rig-chassis-workshop">
+            <div class="rig-corner-bracket top-left"><span class="screw-slot"></span></div>
+            <div class="rig-corner-bracket top-right"><span class="screw-slot"></span></div>
+            <div class="rig-corner-bracket bottom-left"><span class="screw-slot"></span></div>
+            <div class="rig-corner-bracket bottom-right"><span class="screw-slot"></span></div>
+
+
+
+            <!-- The Inset Messenger Display Viewport -->
+            <div class="messenger-app-window">
+
+              <!-- Top Contact Bar -->
+              <div class="messenger-top-bar">
+                <div class="messenger-contact-meta">
+                  <div class="messenger-avatar workshop-avatar">
+                    <div class="avatar-gear-ring"></div>
+                    <img src="assets/cartographer_distant_light_elder.jpg" alt="The Cartographer of Distant Light" class="messenger-avatar-img">
+                    <span class="messenger-online-badge"></span>
+                  </div>
+                  <div class="messenger-contact-info">
+                    <div class="messenger-contact-name">
+                      <span>The Cartographer of Distant Light</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Analog Signal Meter -->
+                <div class="telegraph-signal-meter" title="Galvanic Telegraph Carrier Lock · 112° E">
+                  <div class="signal-gauge-housing">
+                    <div class="signal-indicator-bars">
+                      <span class="signal-bar active"></span>
+                      <span class="signal-bar active"></span>
+                      <span class="signal-bar active"></span>
+                      <span class="signal-bar active"></span>
+                      <span class="signal-bar pulse"></span>
+                    </div>
+                    <span class="signal-beacon-dot"></span>
+                  </div>
+                  <div class="signal-meta-text">
+                    <span class="signal-label">SIGNAL: <strong class="signal-val">94%</strong></span>
+                    <span class="signal-sep">·</span>
+                    <span class="signal-heading">112° E</span>
+                    <span class="signal-sep">·</span>
+                    <span class="signal-status">CARRIER LOCK</span>
+                  </div>
+                </div>
+
+                <!-- Mode Controls & Restart -->
+                <div class="messenger-controls-group">
+                  <div class="messenger-mode-switcher">
+                    <button type="button" class="messenger-toggle-btn active" id="tab-wire-expedition" data-wire-tab="expedition">
+                      <span>🗺️</span>
+                      <span>Expedition</span>
+                    </button>
+                    <button type="button" class="messenger-toggle-btn" id="tab-wire-inquiries" data-wire-tab="inquiries">
+                      <span>❓</span>
+                      <span>Ask Hermes</span>
+                    </button>
+                  </div>
+                  <button type="button" class="messenger-btn-restart" id="btn-wire-replay" title="Reset Rig" aria-label="Reset Rig">
+                    <span>↺</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Chat Messages Area: Expedition Stream -->
+              <div class="messenger-chat-body" id="wire-messages-stream">
+                <div class="messenger-date-pill">Today · The Desert Frontier (112° E)</div>
+                <!-- Dynamic Chat Messages from Hermes and Silvia -->
+              </div>
+
+              <!-- Chat Messages Area: Ask Hermes Inquiries Stream -->
+              <div class="messenger-chat-body" id="wire-inquiries-stream" style="display: none;">
+                <!-- Dedicated Inquiries chat: isolated from Expedition -->
+              </div>
+
+              <!-- Typing Indicator (hidden by default) -->
+              <div class="messenger-typing-bar" id="messenger-typing-bar" style="display: none;">
+                <span class="typing-name">The Cartographer is operating the telegraph coils</span>
+                <span class="typing-dots">
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                </span>
+              </div>
+
+              <!-- Bottom Reply & Decision Deck -->
+              <div class="messenger-reply-deck">
+
+                <!-- PANEL A: Active Expedition Responses -->
+                <div class="messenger-deck-panel" id="wire-expedition-panel">
+                  <div class="messenger-prompt-header" id="wire-prompt-box">
+                    <div class="messenger-reply-header">
+                      <span>⚙</span>
+                      <span id="wire-prompt-header-text">Choose your reply to Hermes:</span>
+                    </div>
+                    <div class="messenger-choices-list" id="wire-choices-grid">
+                      <!-- Tactical choices injected here -->
+                    </div>
+                  </div>
+
+                  <!-- Waypoint Completed Banner -->
+                  <div class="messenger-waypoint-card" id="wire-completed-bar" style="display: none;">
+                    <div class="messenger-waypoint-info">
+                      <span class="messenger-waypoint-icon">🧭</span>
+                      <div>
+                        <div class="messenger-waypoint-title">Waypoint Reached · Safe Shelter at Watchtower VI</div>
+                        <div class="messenger-waypoint-desc">You reached Watchtower VI at 112° East. The telegraph connection is ready.</div>
+                      </div>
+                    </div>
+                    <button type="button" class="btn-messenger-to-map" id="btn-wire-to-map">
+                      <span>🗺️</span>
+                      <span>Open the Grand Desert Map ➔</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- PANEL B: Workshop Inquiries / Lore Q&A -->
+                <div class="messenger-deck-panel" id="wire-inquiries-panel" style="display: none;">
+                  <div class="messenger-reply-header">
+                    <span>❓</span>
+                    <span>Tap any question to ask Hermes across the telegraph:</span>
+                  </div>
+                  <div class="inquiry-filter-bar" id="inquiry-filter-bar">
+                    <button type="button" class="inquiry-filter-pill active" data-filter="all">All Questions (9)</button>
+                    <button type="button" class="inquiry-filter-pill" data-filter="desert">The Desert (4)</button>
+                    <button type="button" class="inquiry-filter-pill" data-filter="astrolabe">The Astrolabe (2)</button>
+                    <button type="button" class="inquiry-filter-pill" data-filter="workshop">The Workshop (3)</button>
+                  </div>
+                  <div class="messenger-faq-grid" id="inquiries-questions-grid">
+                    <!-- Category questions injected here -->
+                  </div>
+                </div>
+
+              </div>
+
+            </div> <!-- .messenger-app-window -->
+
+          </div> <!-- .rig-chassis-workshop -->
+
+        </div> <!-- .camp-messenger-container -->
+      </section>
+
+      <!-- ===================================================================
+           VIEW 7: THE BRASS ASTROLABE (RESERVE FIELD RIG)
+           =================================================================== -->
+      <section class="hub-view-section" id="view-astrolabe">
+        <header class="view-header">
+          <div class="view-tagline">✦ Handcrafted Field Instrument · The Cartographer's Workshop ✦</div>
+          <h2 class="view-title">The Brass Astrolabe</h2>
+          <p class="view-desc">
+            The reserve astrolabe fashioned by Hermes from hammered sheet brass following the sack of the Alpine Sanctuary. While imperfect compared to the ancient master astrolabe seized by the raiders, its graduated rete and sighted alidade remain vital for measuring meridian altitudes.
+          </p>
+        </header>
+
+        <div class="astrolabe-view-card">
+          <div class="astrolabe-bench-header">
+            <span class="astrolabe-bench-title">Field Astrolabe Rig // Sighted Limbo 360°</span>
+            <span class="astrolabe-bench-badge">RESERVE SPECIMEN · REPLICA FLUID LATIN RATIO</span>
+          </div>
+
+          <div class="astrolabe-bench-content">
+            <!-- Left Preview & Launcher Frame -->
+            <div class="astrolabe-preview-container">
+              <div class="astrolabe-launch-banner">
+                <img src="./constellation/midnight-calibration/logo-path-constellation.png" alt="Order Seal" class="astrolabe-seal-img">
+                <h3 style="font-family:'Cinzel', serif; font-size:1.3rem; color:var(--brass-bright); margin-bottom:8px;">The Meridian Calibration Table</h3>
+                <p style="font-family:'EB Garamond', serif; font-size:1.05rem; color:var(--parchment-dim); line-height:1.5; margin-bottom:20px;">
+                  Access the interactive brass workbench to rotate the cutwork rete, align the double-sighted alidade with Polaris and Vega, or study the celestial coordinates.
+                </p>
+                <a href="./constellation/midnight-calibration/index.html" class="btn-astrolabe-engage-full" target="_self">
+                  <span>✦ OPEN INTERACTIVE ASTROLABE RIG ➔</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Right Sidebar: Master Star Pointers & Critical Lore Note -->
+            <div class="astrolabe-sidebar-panel">
+              <div class="star-pointers-card">
+                <div class="star-pointers-title">✦ Master Star Pointers (Rete)</div>
+                <ul class="star-pointers-list">
+                  <li class="star-pointer-item">
+                    <span><strong>Vega</strong> (Lyra)</span>
+                    <span>RA 18h 36m · +38° 47'</span>
+                  </li>
+                  <li class="star-pointer-item">
+                    <span><strong>Polaris</strong> (Ursa Min.)</span>
+                    <span>RA 02h 31m · +89° 15'</span>
+                  </li>
+                  <li class="star-pointer-item">
+                    <span><strong>Deneb</strong> (Cygnus)</span>
+                    <span>RA 20h 41m · +45° 16'</span>
+                  </li>
+                  <li class="star-pointer-item">
+                    <span><strong>Arcturus</strong> (Boötes)</span>
+                    <span>RA 14h 15m · +19° 10'</span>
+                  </li>
+                  <li class="star-pointer-item">
+                    <span><strong>Aldebaran</strong> (Taurus)</span>
+                    <span>RA 04h 35m · +16° 30'</span>
+                  </li>
+                  <li class="star-pointer-item">
+                    <span><strong>Altair</strong> (Aquila)</span>
+                    <span>RA 19h 50m · +08° 52'</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="astrolabe-warning-card">
+                <strong>⚔️ Relic Notice:</strong>
+                <p style="margin-top: 6px;">
+                  The ancient <em>Master Astrolabe</em> held by the raiders is the only artifact whose gear teeth natively mesh with the meridian sockets of the Three Ancient Towers. Reclaiming it from the raiders' disabled wagons in the sand chasm remains essential to unlocking the final sanctuary.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -5280,9 +7850,36 @@
       }
 
       function activateHubView(targetView) {
+        const isCarles = (currentSeeker || 'Silvia').toLowerCase() === 'carles';
+        const isCipherCompleted = getSeekerCipherCompleted();
+
+        // Access guard: The Brass Astrolabe is strictly for Carles (sandbox/dev)
+        if (targetView === 'view-astrolabe' && !isCarles) {
+          targetView = 'view-trail';
+        }
+
+        // Access guard: Silvia accesses Cliffside Workshop after Game 9 or during emergency wire
+        const isEmergencyWire = localStorage.getItem('seeker_silvia_sandstorm_active') === 'true' ||
+                                new URLSearchParams(window.location.search).get('wire') === '1' ||
+                                window.forceWireAlert;
+        if (targetView === 'view-field-wire' && !isCarles && !isCipherCompleted && !isEmergencyWire) {
+          targetView = 'view-trail';
+        }
+
+        document.body.setAttribute('data-active-view', targetView);
         document.body.classList.toggle('constellation-trail', targetView === 'view-trail');
         navButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === targetView));
         viewSections.forEach(s => s.classList.toggle('active', s.id === targetView));
+
+        const btnHeaderMessenger = document.getElementById('btn-header-messenger');
+        if (btnHeaderMessenger) {
+          btnHeaderMessenger.classList.toggle('active', targetView === 'view-field-wire');
+        }
+
+        if (targetView === 'view-field-wire') {
+          if (typeof renderWireExpedition === 'function') renderWireExpedition();
+          if (typeof markMessengerAsRead === 'function') markMessengerAsRead();
+        }
 
         // On-Demand Fast Loading & Ghost Skeleton: Archives Parchment
         if (targetView === 'view-archives') {
@@ -5330,6 +7927,7 @@
           }
         }
       }
+      window.activateHubView = activateHubView;
 
       // Nav menu button click handlers
       navButtons.forEach(btn => {
@@ -5381,6 +7979,10 @@
           activateHubView('view-trail');
         } else if (targetViewId === 'cipher') {
           activateHubView('view-cipher');
+        } else if (targetViewId === 'wire' || targetViewId === 'teletype' || targetViewId === 'field-wire' || targetViewId === 'messenger' || targetViewId === 'chat' || targetViewId === 'camp-messenger' || targetViewId === 'workshop' || targetViewId === 'cliffside-workshop') {
+          activateHubView('view-field-wire');
+        } else if (targetViewId === 'astrolabe' || targetViewId === 'brass-astrolabe') {
+          activateHubView('view-astrolabe');
         }
       }
 
@@ -5417,8 +8019,16 @@
         'carles': { name: 'Carles', pass: 'Carles', role: '' }
       };
 
-      // Active Seeker State (Defaults to Silvia if previous session existed)
-      let currentSeeker = localStorage.getItem('the_eclipse_active_seeker') || 'Silvia';
+      // Active Seeker State (Defaults to Carles if local environment, otherwise Silvia)
+      const isLocalHost = window.location.protocol === 'file:' || 
+                          window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
+      const urlSeekerOverride = new URLSearchParams(window.location.search).get('seeker');
+      let currentSeeker = urlSeekerOverride || (isLocalHost ? 'Carles' : (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia'));
+      if (isLocalHost && !urlSeekerOverride) {
+        localStorage.setItem('the_eclipse_active_seeker', 'Carles');
+        sessionStorage.setItem('the_eclipse_session_authenticated', 'true');
+      }
 
       function getSeekerKey(suffix) {
         const u = (currentSeeker || 'Silvia').toLowerCase();
@@ -5426,10 +8036,17 @@
       }
 
       // Seeker progression defaults:
-      // Silvia has NOT completed Game 8 yet; Carles (tester) has completed Game 8.
+      // Both Silvia and Carles have completed Game 8 (Midnight Calibration).
+      // Carles has Game 9 completed by default for testing; Silvia has NOT yet completed Game 9.
       try {
         if (localStorage.getItem('seeker_carles_midnight_completed') === null) {
           localStorage.setItem('seeker_carles_midnight_completed', 'true');
+        }
+        if (localStorage.getItem('seeker_silvia_midnight_completed') === null) {
+          localStorage.setItem('seeker_silvia_midnight_completed', 'true');
+        }
+        if (localStorage.getItem('seeker_carles_cipher_completed') === null) {
+          localStorage.setItem('seeker_carles_cipher_completed', 'true');
         }
       } catch (e) {}
 
@@ -5438,10 +8055,8 @@
         const key = `seeker_${u}_midnight_completed`;
         const val = localStorage.getItem(key);
         if (val !== null) return val === 'true';
-        // Carles is tester (has completed Game 8)
-        if (u === 'carles') return true;
-        // Silvia has NOT yet completed Game 8
-        return false;
+        // Both Silvia and Carles have completed Game 8
+        return true;
       }
 
       function getSeekerCipherCompleted() {
@@ -5449,6 +8064,9 @@
         const key = `seeker_${u}_cipher_completed`;
         const val = localStorage.getItem(key);
         if (val !== null) return val === 'true';
+        // Carles is tester sandbox: defaults to true if not explicitly set
+        if (u === 'carles') return true;
+        // Silvia has NOT yet completed Game 9
         return false;
       }
 
@@ -5637,24 +8255,7 @@
           };
         },
         9: () => {
-          const isCarles = (currentSeeker || 'Silvia').toLowerCase() === 'carles';
           const isCipherDone = getSeekerCipherCompleted();
-
-          if (!isCarles) {
-            return {
-              badge: 'STATION 09 // UNKNOWN HORIZON',
-              status: 'INCÓGNITA ⏳',
-              statusClass: 'status-live-badge',
-              title: 'Station 09 · [ Incógnita ]',
-              thumb: './assets/thumbnails/chronicle_station8_locked.webp',
-              lore: 'The path beyond the midnight meridian leads into uncharted territory. The next celestial coordinates remain veiled under the Order\'s nocturnal veil until the next dispatch is broadcast.',
-              rewards: [],
-              btnText: '⏳ Station Veiled // Incógnita',
-              action: () => {
-                alert('Station 09 remains veiled under the Order\'s nocturnal seal.');
-              }
-            };
-          }
 
           if (isCipherDone) {
             return {
@@ -5663,10 +8264,10 @@
               statusClass: 'status-done-badge',
               title: 'The Celestial Cipher',
               thumb: './assets/thumbnails/desert_frontier_preview.webp',
-              lore: 'Reading the folio of Deserti Limen, Silvia uncovered the Cartographer\'s true name—Icarus—and transmitted his sacred vow: \'You were always the treasure\'. As the signal cleared, the southern sandstorm broke, sealing the Constellation Path forever.',
+              lore: 'Reading the folio of Deserti Limen, Silvia uncovered the Cartographer\'s true name—Hermes—and transmitted his sacred vow: \'You were always the treasure\'. As the signal cleared, the southern sandstorm broke, sealing the Constellation Path forever.',
               rewards: [
-                { icon: '📜', label: "Icarus's Celestial Vow", desc: '"YOU WERE ALWAYS THE TREASURE"' },
-                { icon: '★', label: "The True Name Revealed", desc: 'Icarus · The Cartographer of Distant Light' },
+                { icon: '📜', label: "Hermes's Celestial Vow", desc: '"YOU WERE ALWAYS THE TREASURE"' },
+                { icon: '★', label: "The True Name Revealed", desc: 'Hermes · The Cartographer of Distant Light' },
                 { icon: '🏜️', label: 'Threshold to Desert Path', desc: 'Gateway to the Great Dunes & Desert Oracle' }
               ],
               btnText: 'Read "The Man Behind the Maps" ➔',
@@ -5684,7 +8285,7 @@
             thumb: './assets/thumbnails/desert_frontier_preview.webp',
             lore: 'At the southern cliff where the alpine rocks meet the burning sands, Silvia reaches the threshold of Deserti Limen. Here lies the sacred record of the Cartographer: the confession he carved into brass for Aurelia before the world broke. Beyond this threshold, the stars give way to the shifting sands of the Desert Path and the search for the Desert Oracle.',
             rewards: [
-              { icon: '📜', label: "Icarus's Celestial Vow", desc: '"YOU WERE ALWAYS THE TREASURE"' },
+              { icon: '📜', label: "Hermes's Celestial Vow", desc: '"YOU WERE ALWAYS THE TREASURE"' },
               { icon: '★', label: "The Secret Behind the Maps", desc: 'The real name and lost love of the Cartographer' },
               { icon: '🏜️', label: 'Threshold to Desert Path', desc: 'Gateway to the Great Dunes and the First Tower' }
             ],
@@ -5856,12 +8457,12 @@
         },
         doc4: {
           metaId: 'RECORD 09-A // THE MAN BEHIND THE MAPS',
-          metaDate: 'FOLIO LIMEN · MEMOIRS OF ICARUS (ANNO 1970–2026)',
+          metaDate: 'FOLIO LIMEN · MEMOIRS OF HERMES (ANNO 1970–2026)',
           imgSrc: './constellation/celestial-cipher/assets/distant-light-precipice.jpg',
           fullImgSrc: './constellation/celestial-cipher/assets/distant-light-precipice.jpg',
           bodyHtml: `
             <p class="archive-record-note">
-              <strong>Folio Limen · The Man Behind the Maps (Anno 1970–2026):</strong> The recovered personal memoirs of Icarus, the Cartographer of Distant Light. Documents the fall of the Southern Bridge in 1970, twenty-seven years of rebuilding the Alpine Observatory stone by stone, the grueling 1998 frontier survey along the gorge precipice, and the midnight beacon of 2016 that reignited his lifelong search for Aurelia.
+              <strong>Folio Limen · The Man Behind the Maps (Anno 1970–2026):</strong> The recovered personal memoirs of Hermes, the Cartographer of Distant Light. Documents the fall of the Southern Bridge in 1970, twenty-seven years of rebuilding the Alpine Observatory stone by stone, the grueling 1998 frontier survey along the gorge precipice, and the midnight beacon of 2016 that reignited his lifelong search for Aurelia.
             </p>
             <div style="margin-top: 14px;">
               <a href="./constellation/celestial-cipher/index.html" class="btn-historical-web" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 8px 16px; font-size: 0.85rem; cursor: pointer;">
@@ -6208,7 +8809,7 @@
         }
         const relic9Art = document.getElementById('relic-9-art');
         if (relic9Art) {
-          relic9Art.style.display = (isCarles && isMidnightCompleted) ? '' : 'none';
+          relic9Art.style.display = isMidnightCompleted ? '' : 'none';
         }
 
         // 4. Celestial Route Map (Node 8, Node 9 & Filaments)
@@ -6256,64 +8857,39 @@
           }
           if (fadeFil) fadeFil.style.display = 'none';
 
-          if (!isCarles && !isCipherCompleted) {
-            // Silvia: Station 09 appears as an INCÓGNITA (? / mystery)
+          // Node 9 is visible and interactive for both Silvia and Carles
+          if (n9Gear) n9Gear.style.opacity = '0.85';
+          if (n9Ring) n9Ring.style.opacity = '0.85';
+          if (n9Glow) n9Glow.style.opacity = '0.7';
+          if (n9Icon) n9Icon.style.display = 'none';
+
+          if (isCipherCompleted) {
             if (n9Beacon) n9Beacon.style.display = 'none';
-            if (n9Gear) n9Gear.style.opacity = '0.35';
-            if (n9Ring) n9Ring.style.opacity = '0.35';
-            if (n9Glow) n9Glow.style.opacity = '0.2';
             if (n9Dot) {
-              n9Dot.className.baseVal = 'node-dot-veiled';
+              n9Dot.className.baseVal = 'node-dot-completed';
               n9Dot.removeAttribute('fill');
             }
-            if (n9Icon) {
-              n9Icon.style.display = 'block';
-              n9Icon.textContent = '?';
-              n9Icon.setAttribute('fill', '#94a3b8');
-            }
             if (n9Tag) {
-              n9Tag.textContent = '09 · [ ??? ]';
-              n9Tag.style.fill = '#94a3b8';
+              n9Tag.textContent = '09 · DECRYPTED ✓';
+              n9Tag.style.fill = 'var(--brass-bright)';
             }
             if (n9Title) {
-              n9Title.textContent = '[ Incógnita ]';
-              n9Title.style.fill = '#94a3b8';
+              n9Title.textContent = 'The Celestial Cipher';
+              n9Title.style.fill = '#ffffff';
             }
           } else {
-            // Carles or Silvia completed: Game 09 is visible and interactive
-            if (n9Gear) n9Gear.style.opacity = '0.85';
-            if (n9Ring) n9Ring.style.opacity = '0.85';
-            if (n9Glow) n9Glow.style.opacity = '0.7';
-            if (n9Icon) n9Icon.style.display = 'none';
-
-            if (isCipherCompleted) {
-              if (n9Beacon) n9Beacon.style.display = 'none';
-              if (n9Dot) {
-                n9Dot.className.baseVal = 'node-dot-completed';
-                n9Dot.removeAttribute('fill');
-              }
-              if (n9Tag) {
-                n9Tag.textContent = '09 · DECRYPTED ✓';
-                n9Tag.style.fill = 'var(--brass-bright)';
-              }
-              if (n9Title) {
-                n9Title.textContent = 'The Celestial Cipher';
-                n9Title.style.fill = '#ffffff';
-              }
-            } else {
-              if (n9Beacon) n9Beacon.style.display = 'block';
-              if (n9Dot) {
-                n9Dot.className.baseVal = 'node-dot-active';
-                n9Dot.removeAttribute('fill');
-              }
-              if (n9Tag) {
-                n9Tag.textContent = '09 · ACTIVE OBJECTIVE ✦';
-                n9Tag.style.fill = '#fde68a';
-              }
-              if (n9Title) {
-                n9Title.textContent = 'The Celestial Cipher';
-                n9Title.style.fill = '#ffffff';
-              }
+            if (n9Beacon) n9Beacon.style.display = 'block';
+            if (n9Dot) {
+              n9Dot.className.baseVal = 'node-dot-active';
+              n9Dot.removeAttribute('fill');
+            }
+            if (n9Tag) {
+              n9Tag.textContent = '09 · ACTIVE OBJECTIVE ✦';
+              n9Tag.style.fill = '#fde68a';
+            }
+            if (n9Title) {
+              n9Title.textContent = 'The Celestial Cipher';
+              n9Title.style.fill = '#ffffff';
             }
           }
         } else {
@@ -6418,74 +8994,48 @@
             const chron9Thumb = document.getElementById('chronicle-9-thumb') || chronCard9.querySelector('img');
             const chron9Btn = document.getElementById('chronicle-9-btn');
 
-            if (!isCarles && !isCipherCompleted) {
-              chronCard9.className = 'chronicle-card chronicle-locked-card';
+            chronCard9.className = 'chronicle-card';
+            if (chron9Thumb) {
+              chron9Thumb.src = './assets/thumbnails/desert_frontier_preview.webp';
+              chron9Thumb.alt = 'The Celestial Cipher';
+            }
+            if (isCipherCompleted) {
               if (chron9Tag) {
-                chron9Tag.textContent = 'Station 09 · Unknown Horizon ⏳';
-                chron9Tag.style.color = '#94a3b8';
+                chron9Tag.textContent = 'Game 09 · Constellation Finale Decrypted ✓';
+                chron9Tag.style.color = 'var(--brass-base)';
               }
               if (chron9Title) {
-                chron9Title.textContent = 'Station 09 · [ Incógnita ]';
-                chron9Title.style.color = '#e2b069';
+                chron9Title.textContent = 'The Celestial Cipher';
+                chron9Title.style.color = 'var(--brass-bright)';
               }
               if (chron9Text) {
-                chron9Text.textContent = 'The path beyond the midnight meridian leads into uncharted territory. The next celestial coordinates remain veiled in the nocturnal haze until unsealed by the Order.';
-              }
-              if (chron9Thumb) {
-                chron9Thumb.src = './assets/thumbnails/chronicle_station8_locked.webp';
-                chron9Thumb.alt = 'Station 09 Incógnita';
+                chron9Text.textContent = 'Reading the folio of Deserti Limen, Silvia uncovered the Cartographer\'s true name and spoke his sacred vow across 142.85 MHz: \'You were always the treasure\'. As the transmission ended, the great sandstorm broke, sealing the Constellation Path forever.';
               }
               if (chron9Btn) {
-                chron9Btn.className = 'btn-chronicle-locked';
-                chron9Btn.removeAttribute('href');
-                chron9Btn.onclick = (e) => { e.preventDefault(); alert('Station 09 remains veiled under the Order\'s nocturnal seal.'); };
+                chron9Btn.className = 'btn-historical-web';
+                chron9Btn.href = './constellation/celestial-cipher/index.html';
+                chron9Btn.onclick = null;
                 const span = chron9Btn.querySelector('span');
-                if (span) span.textContent = '⏳ Station Sealed · Incógnita';
+                if (span) span.textContent = '↺ Re-read Chapter ➔';
               }
             } else {
-              chronCard9.className = 'chronicle-card';
-              if (chron9Thumb) {
-                chron9Thumb.src = './assets/thumbnails/desert_frontier_preview.webp';
-                chron9Thumb.alt = 'The Celestial Cipher';
+              if (chron9Tag) {
+                chron9Tag.textContent = 'Game 09 · Active Objective ✦';
+                chron9Tag.style.color = 'var(--brass-bright)';
               }
-              if (isCipherCompleted) {
-                if (chron9Tag) {
-                  chron9Tag.textContent = 'Game 09 · Constellation Finale Decrypted ✓';
-                  chron9Tag.style.color = 'var(--brass-base)';
-                }
-                if (chron9Title) {
-                  chron9Title.textContent = 'The Celestial Cipher';
-                  chron9Title.style.color = 'var(--brass-bright)';
-                }
-                if (chron9Text) {
-                  chron9Text.textContent = 'Reading the folio of Deserti Limen, Silvia uncovered the Cartographer\'s true name and spoke his sacred vow across 142.85 MHz: \'You were always the treasure\'. As the transmission ended, the great sandstorm broke, sealing the Constellation Path forever.';
-                }
-                if (chron9Btn) {
-                  chron9Btn.className = 'btn-historical-web';
-                  chron9Btn.href = './constellation/celestial-cipher/index.html';
-                  chron9Btn.onclick = null;
-                  const span = chron9Btn.querySelector('span');
-                  if (span) span.textContent = '↺ Re-read Chapter ➔';
-                }
-              } else {
-                if (chron9Tag) {
-                  chron9Tag.textContent = 'Game 09 · Active Objective ✦';
-                  chron9Tag.style.color = 'var(--brass-bright)';
-                }
-                if (chron9Title) {
-                  chron9Title.textContent = 'The Celestial Cipher';
-                  chron9Title.style.color = 'var(--brass-bright)';
-                }
-                if (chron9Text) {
-                  chron9Text.textContent = 'At the southern precipice where the Shifting Tempest begins to scour the mountain passes, Silvia reaches the final station of the Constellation Path: Deserti Limen. Here lies the sacred record of the Cartographer: the confession he carved into brass for Aurelia before the world broke. Beyond this threshold, the stars give way to the shifting sands of the Desert Path and the search for the Desert Oracle.';
-                }
-                if (chron9Btn) {
-                  chron9Btn.className = 'btn-historical-web';
-                  chron9Btn.href = './constellation/celestial-cipher/index.html';
-                  chron9Btn.onclick = null;
-                  const span = chron9Btn.querySelector('span');
-                  if (span) span.textContent = '✦ ENTER CELESTIAL CIPHER ➔';
-                }
+              if (chron9Title) {
+                chron9Title.textContent = 'The Celestial Cipher';
+                chron9Title.style.color = 'var(--brass-bright)';
+              }
+              if (chron9Text) {
+                chron9Text.textContent = 'At the southern precipice where the Shifting Tempest begins to scour the mountain passes, Silvia reaches the final station of the Constellation Path: Deserti Limen. Here lies the sacred record of the Cartographer: the confession he carved into brass for Aurelia before the world broke. Beyond this threshold, the stars give way to the shifting sands of the Desert Path and the search for the Desert Oracle.';
+              }
+              if (chron9Btn) {
+                chron9Btn.className = 'btn-historical-web';
+                chron9Btn.href = './constellation/celestial-cipher/index.html';
+                chron9Btn.onclick = null;
+                const span = chron9Btn.querySelector('span');
+                if (span) span.textContent = '✦ ENTER CELESTIAL CIPHER ➔';
               }
             }
           }
@@ -6496,6 +9046,19 @@
           selectMapNode(8, false);
         } else {
           selectMapNode(9, false);
+        }
+
+        // 7. Navigation items visibility
+        // The Brass Astrolabe: ONLY visible in Carles' developer sandbox; hidden for Silvia
+        const navBtnAstrolabe = document.getElementById('nav-btn-astrolabe');
+        if (navBtnAstrolabe) {
+          navBtnAstrolabe.style.display = isCarles ? '' : 'none';
+        }
+
+        // Cliffside Workshop Chat: visible for Carles, and for Silvia ONLY once Game 9 is completed
+        const btnHeaderMessenger = document.getElementById('btn-header-messenger');
+        if (btnHeaderMessenger) {
+          btnHeaderMessenger.style.display = (isCarles || isCipherCompleted) ? '' : 'none';
         }
       }
 
@@ -6791,14 +9354,26 @@
         const seekerActivePill = document.getElementById('seeker-active-pill');
         const seekerNameDisplay = document.getElementById('seeker-name-display');
         const isCarles = (currentSeeker.toLowerCase() === 'carles');
+        const btnHeaderStormToggle = document.getElementById('btn-dev-storm-toggle-header');
+
+        if (btnHeaderStormToggle) {
+          btnHeaderStormToggle.style.display = isCarles ? 'inline-flex' : 'none';
+        }
 
         if (seekerActivePill && seekerNameDisplay) {
           if (isCarles) {
             seekerActivePill.classList.add('is-carles');
             seekerNameDisplay.textContent = 'Carles (Test Sandbox)';
+            const urlForce = new URLSearchParams(window.location.search).get('storm') === '1';
+            if (window.SandstormLockdown && !urlForce) {
+              window.SandstormLockdown.deactivate();
+            }
           } else {
             seekerActivePill.classList.remove('is-carles');
             seekerNameDisplay.textContent = 'Seeker: Silvia';
+            if (window.SandstormLockdown && (localStorage.getItem('seeker_silvia_sandstorm_active') === 'true' || localStorage.getItem('order_sandstorm_active') === 'true')) {
+              window.SandstormLockdown.activate();
+            }
           }
         }
 
@@ -7408,13 +9983,20 @@
 
       // Check Session Authentication on Arrival
       const urlAuthParams = new URLSearchParams(window.location.search);
-      if (urlAuthParams.get('auth') === '1' || urlAuthParams.get('seeker')) {
+      const isLocalHostEnvironment = window.location.protocol === 'file:' || 
+                                     window.location.hostname === 'localhost' || 
+                                     window.location.hostname === '127.0.0.1';
+      if (urlAuthParams.get('auth') === '1' || urlAuthParams.get('seeker') || isLocalHostEnvironment) {
         sessionStorage.setItem('the_eclipse_session_authenticated', 'true');
         if (urlAuthParams.get('seeker')) {
           localStorage.setItem('the_eclipse_active_seeker', urlAuthParams.get('seeker'));
+          currentSeeker = urlAuthParams.get('seeker');
+        } else if (isLocalHostEnvironment) {
+          localStorage.setItem('the_eclipse_active_seeker', 'Carles');
+          currentSeeker = 'Carles';
         }
       }
-      const isSessionAuth = (sessionStorage.getItem('the_eclipse_session_authenticated') === 'true');
+      const isSessionAuth = (sessionStorage.getItem('the_eclipse_session_authenticated') === 'true') || isLocalHostEnvironment;
       if (isSessionAuth && gateOverlay) {
         gateOverlay.classList.add('gate-hidden');
       } else if (gateOverlay) {
@@ -7473,8 +10055,13 @@
         });
       }
 
-      // 7. Multi-Layered Cosmic Starfield & Shooting Stars Canvas (Lightweight & Smooth)
-      if (document.getElementById('view-trail')?.classList.contains('active')) {
+      // 7. Multi-Layered Cosmic Starfield & Dynamic Weather Canvas
+      const initialActiveSec = document.querySelector('.hub-view-section.active');
+      const initialActiveId = initialActiveSec ? initialActiveSec.id : 'view-trail';
+      if (!document.body.getAttribute('data-active-view')) {
+        document.body.setAttribute('data-active-view', initialActiveId);
+      }
+      if (initialActiveId === 'view-trail') {
         document.body.classList.add('constellation-trail');
       }
       const canvas = document.getElementById('ambient-stars');
@@ -7581,7 +10168,34 @@
 
           ctx.clearRect(0, 0, w, h);
           const t = timestamp * 0.001;
-          const onTrail = trailIsActive();
+          const activeView = document.body.getAttribute('data-active-view') || (trailIsActive() ? 'view-trail' : '');
+          const onTrail = activeView === 'view-trail';
+          const onMessenger = activeView === 'view-field-wire';
+          const onTransmissions = activeView === 'view-transmissions';
+          const onArchives = activeView === 'view-archives';
+
+          if (onMessenger) {
+            // The Cliffside Workshop: Warm artisan forge embers & floating candlelight dust motes
+            for (let i = 0; i < sand.length; i++) {
+              const g = sand[i];
+              g.x += Math.sin(t * 0.8 + i) * 0.45;
+              g.y -= (g.vy * 0.4 + 0.35); // drift gently upward like warm hearth heat
+              if (g.y < -8) {
+                g.y = h + 8;
+                g.x = Math.random() * w;
+              }
+              if (g.x < -8) g.x = w + 8;
+              if (g.x > w + 8) g.x = -8;
+              const flicker = 0.55 + 0.45 * Math.sin(t * 2.5 + i * 0.7);
+              ctx.fillStyle = 'rgba(251, 191, 36, ' + (g.a * 0.85 * flicker) + ')';
+              ctx.fillRect(g.x, g.y, g.r * 1.2, g.r * 1.2);
+            }
+            return; // Pure workshop ambiance, no lightning or cold celestial stars
+          }
+
+          if (onTransmissions || onArchives) {
+            return; // Clean, authentic environmental backdrops
+          }
 
           if (onTrail) {
             ctx.fillStyle = 'rgba(62, 40, 16, 0.07)';
@@ -7590,7 +10204,7 @@
 
           // Render Calm Twinkling Stars (No mouse lag or parallax)
           const starStep = onTrail ? 3 : 1;
-          const starDim = onTrail ? 0.28 : 1;
+          const starDim = onTrail ? 0.28 : 0.8;
           for (let i = 0; i < stars.length; i += starStep) {
             const s = stars[i];
             const a = (s.a + Math.sin(t * s.speed + s.phase) * 0.3) * starDim;
@@ -7664,6 +10278,1128 @@
         requestAnimationFrame(renderStars);
       }
 
+      // =======================================================================
+      // THE FIELD WIRE (CAMP TELETYPE CONTROLLER)
+      // =======================================================================
+      const btnHeaderMessenger = document.getElementById('btn-header-messenger');
+      const tabWireExpedition = document.getElementById('tab-wire-expedition');
+      const tabWireInquiries = document.getElementById('tab-wire-inquiries');
+      const wireExpeditionPanel = document.getElementById('wire-expedition-panel');
+      const wireInquiriesPanel = document.getElementById('wire-inquiries-panel');
+      const wireMessagesStream = document.getElementById('wire-messages-stream');
+      const wireInquiriesStream = document.getElementById('wire-inquiries-stream');
+      let currentWireTab = 'expedition';
+      const wirePromptBox = document.getElementById('wire-prompt-box');
+      const wireChoicesGrid = document.getElementById('wire-choices-grid');
+      const wireCompletedBar = document.getElementById('wire-completed-bar');
+      const btnWireReplay = document.getElementById('btn-wire-replay');
+      const btnWireToMap = document.getElementById('btn-wire-to-map');
+      const inquiriesQuestionsGrid = document.getElementById('inquiries-questions-grid');
+      const inquiryDisplayPanel = document.getElementById('inquiry-display-panel');
+      const inquirySelectedQ = document.getElementById('inquiry-selected-q');
+      const inquirySelectedA = document.getElementById('inquiry-selected-a');
+
+      const EXPEDITION_THREAD = [
+        {
+          step: 0,
+          hermesInitial: "Silvia, I hope you hear this. If this copper needle twitches on your end, my signal got through the storm.\n\nRed sand is hitting the cliff like broken glass. An hour after reaching the desert border, the sky turned dark. The raiders' tracks are gone under the dust, and mine are gone too. I had to scramble under a rock shelf to keep from being blown away.\n\nI rigged this wire using an old telegraph repeater. Tell me... is the signal working? Are you there?",
+          choices: [
+            {
+              id: "choice-0-grounded",
+              text: "I'm here, Hermes. The signal is crystal clear. Catch your breath—we are connected.",
+              silviaMsg: "I'm here, Hermes. The signal is coming through crystal clear. Catch your breath—we are connected across the canyon.",
+              hermesReply: "Thank heavens. Hearing the key click under your hand brings warmth into this cold shelter... Knowing you are listening across the canyon changes everything.\n\nBefore the dust blinded the valley, I looked through my spyglass. The raiders drove their heavy wagons into the sand dunes. Their axles broke under the heavy stolen boxes, and their animals cannot pull them. They are stuck in the storm three leagues south.\n\nStill, the storm is getting worse. Visibility is near zero, and the wind erased every footstep. How should we proceed from where you stand?"
+            },
+            {
+              id: "choice-0-protective",
+              text: "The wire is working, Hermes! Find secure cover. How bad is the storm, and are you safe from rockfall?",
+              silviaMsg: "The wire is working, Hermes! Find secure cover immediately. How strong is the storm, and are you safe from falling rocks?",
+              hermesReply: "I'm tucked beneath a deep shelf of solid granite—the stone above is ancient and sturdy, though red dust is pouring over the ledge like water. Your concern warms an old man's heart.\n\nThe raiders ahead have it far worse. Just before the dust choked out the daylight, I saw their wagons sink into the sand dunes. Their heavy wheels are buried to the hubs. But if this storm lasts through the night, they might abandon their carts and run into the desert with the Master Astrolabe.\n\nWe cannot lose them, but walking blind into this wind is impossible. What do your instincts tell you?"
+            },
+            {
+              id: "choice-0-cipher",
+              text: "Loud and clear. I solved your celestial cipher at the cliff, Hermes. The storm won't stop us—what is your situation?",
+              silviaMsg: "Loud and clear, Hermes. I solved your celestial cipher at the southern cliff. The storm won't stop us—what is your situation out there?",
+              hermesReply: "You solved the cipher already? You have your mother's brilliant mind, Silvia. When I carved those letters into the brass plate at the cliff edge, I wondered if anyone would ever read my heart again. Knowing you deciphered it gave me strength to scramble through these rocks.\n\nThe raiders are in disarray ahead. Their heavy wagons broke down in the shifting sands when the storm struck. They are bogged down in the dune fields three leagues south. But the wind is howling harder, and neither they nor I can see five steps ahead.\n\nEvery path has been wiped clean by the gale. How should we navigate through this dust?"
+            }
+          ]
+        },
+        {
+          step: 1,
+          choices: [
+            {
+              id: "choice-1-tactical",
+              text: "If their wagons are stuck, they can't escape. Prioritize finding safe shelter before hunting them down.",
+              silviaMsg: "If their wagons are stuck, they cannot flee with the Astrolabe. We must prioritize securing your shelter before hunting them through the storm.",
+              hermesReply: "Good thinking, Silvia. Heavy wagons do not disappear into thin air, and thieves have to hide from the wind just like us. First, we secure our own footing.\n\nAnd you are right about the terrain: sand shifts with every gale, but the ancient bones of this canyon never change. In the autumn of 1998, I explored this exact frontier with Aurelia and mapped every stone.\n\nPlease open your physical journal to Sheet 7 · Side B. What notes did I leave about crossing this windy canyon when dust blinds the eyes?"
+            },
+            {
+              id: "choice-1-landmarks",
+              text: "The storm wipes out dunes, but not stone. Look for permanent geological landmarks in the gorge.",
+              silviaMsg: "The storm wipes out sand dunes, but not stone. Look for permanent stone landmarks in this gorge that the wind cannot erase.",
+              hermesReply: "Exactly so! You think like a true cartographer. Wind shifts the dunes overnight, but the ancient dry riverbeds and granite rocks remain untouched for centuries.\n\nIn the autumn of 1998, when I was young, I spent three weeks surveying this exact gorge. I marked the safest path in my personal field notes and built permanent stone markers along the rock.\n\nPlease check your physical journal, Silvia. Open Sheet 7 · Side B: what did my younger self record about navigating this canyon?"
+            },
+            {
+              id: "choice-1-concern",
+              text: "Don't push into the dark, Hermes. The Astrolabe can be tracked later; staying alive tonight comes first.",
+              silviaMsg: "Don't push into the dark, Hermes. The Astrolabe can be tracked when the wind dies down. Staying alive and warm through tonight comes first.",
+              hermesReply: "Your words mean more to me than you know, Silvia. It has been many years since anyone cared whether this old stargazer made it through the cold.\n\nYou are wise: we need solid shelter immediately. And fortunately, I have been in this tight spot before. Back in 1998, when I first surveyed this canyon, I found the only reliable route out of the storm.\n\nPlease look at your journal, Silvia. Open Sheet 7 · Side B. What did I write about crossing this windy canyon?"
+            }
+          ]
+        },
+        {
+          step: 2,
+          choices: [
+            {
+              id: "choice-2-riverbed",
+              text: "Check Sheet 7B: Follow the dry gravel riverbed, staying far away from the loose sand dunes.",
+              silviaMsg: "I'm checking Sheet 7B: your notes say to follow the dry gravel riverbed, staying far away from the shifting sand dunes.",
+              hermesReply: "The dry riverbed! Yes—the hard gravel gives firm footing, while the dunes would swallow a traveler's boots in seconds.\n\nI scrambled down the rock ledge onto the canyon floor. The wind is still howling overhead, but down between the stone walls, the dust stays low. And Silvia... look through the dust ahead! I see them: one, two... three piles of stacked stones! The Three Cairns of 1998 are still standing after thirty years.\n\nI reached Cairn III, the southernmost tower. There is a flat sandstone slab half-buried under the sand, just as I recorded. Underneath is a stamped copper plate with the exact compass bearing to the shelter.\n\nCheck your notes on Sheet 7B: what heading did I stamp on the copper plate to reach Watchtower VI?"
+            },
+            {
+              id: "choice-2-cairns",
+              text: "Sheet 7B shows Three Cairns along the canyon wash. Did you build them yourself thirty years ago?",
+              silviaMsg: "Sheet 7B shows three stone cairns built along the solid canyon wash. Did you build those stone towers thirty years ago with your own hands?",
+              hermesReply: "The Three Cairns! I built those stones with my own hands when I was half the age I am now. To think they still endure against thirty years of desert storms... It feels like meeting an old friend in the dark.\n\nI dropped down into the gravel wash and followed the line of boulders. Yes! Fifty steps ahead, three stone towers rise through the swirl of red dust. The landmark holds true!\n\nI'm standing at Cairn III now. Underneath the base slab is the copper reference plate I buried in the autumn of 1998, pointing the way to the watchtower.\n\nLook at Sheet 7B in your journal: what compass direction was stamped on that plate?"
+            },
+            {
+              id: "choice-2-windbreak",
+              text: "Sheet 7B notes the canyon floor breaks the gale. The Three Cairns mark the safe line.",
+              silviaMsg: "Sheet 7B explains that the canyon floor breaks the wind, while the ridge collapses. The Three Cairns mark the only safe path through.",
+              hermesReply: "You understand the physics of this desert so well, Silvia. The high canyon walls act as a natural windbreak. Down here on the gravel, the fury of the gale passes over our heads.\n\nI made my way down the wash. Through the reddish dust, three shapes emerged from the shadows: the Three Cairns! Still standing after all these years.\n\nI reached the third cairn. At its foot lies the flat foundation stone concealing the surveyor's plate.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on the copper plate to reach the watchtower gate?"
+            }
+          ]
+        },
+        {
+          step: 3,
+          choices: [
+            {
+              id: "choice-3-bearing-direct",
+              text: "Check Sheet 7B: The copper plate points 112° East toward Outer Watchtower VI.",
+              silviaMsg: "Under the third cairn, your notes indicate a copper plate pointing 112° East toward Outer Watchtower VI.",
+              hermesReply: "112 degrees East... I cleared away the drifted sand with my knife, and the green metal showed the letters: '112° E // WATCHTOWER VI'.\n\nI aligned my field compass, fixed my eyes on the heading, and followed the base of the bluff. Through the swirling dust, a heavy wooden door appeared in the rock! The lock was stiff, but the old key turned with a loud click."
+            },
+            {
+              id: "choice-3-bearing-encouraging",
+              text: "Set compass to 112° East! Keep the rock wall to your left and you will walk straight to the shelter.",
+              silviaMsg: "Set your compass to 112° East! Keep the rock wall to your left, Hermes, and you will walk straight to the shelter door.",
+              hermesReply: "112° East! I held the needle steady against the wind and kept my left shoulder to the cliff face just as you said.\n\nTwenty steps... forty steps... and suddenly the canyon opened to a stone arch! The timber gate of Watchtower VI was standing shut against the storm. I lifted the heavy latch and pushed through!"
+            },
+            {
+              id: "choice-3-bearing-cautious",
+              text: "It is 112° East. Watch your footing on the loose stones—the watchtower gate is cut into the cliff.",
+              silviaMsg: "It is 112° East. Watch your footing along the loose stones—the watchtower gate is cut directly into the canyon wall.",
+              hermesReply: "112° East! Good caution on the loose stones—the rocks were uneven, but staying close to the rock base kept me from slipping.\n\nThe compass brought me directly to the gate. Heavy stone walls, completely untouched by the storm. I pulled the heavy latch, stepped inside, and dropped the crossbeam."
+            }
+          ]
+        },
+        {
+          step: 4,
+          completed: true,
+          hermesFinal: "Silvia... the door is barred shut! The wind is howling outside, but inside these thick stone walls, the air is completely calm.\n\nI found dry cedar wood in the corner and lit a spark in the fireplace. The hearth is glowing warm, casting light across an old wooden table.\n\nWe did it, Silvia. We crossed the threshold into the desert together. When the storm calms down, open your journal to the Grand Desert Map. We will plot the raiders' path and find the Desert Oracle together."
+        }
+      ];
+
+      const FIELD_INQUIRIES = [
+        {
+          id: "inq-shelter",
+          title: "Where is this cliffside workshop?",
+          category: "The Workshop",
+          group: "workshop",
+          answer: "I set up camp inside an old stone shelter at Watchtower VI, right against the canyon wall. There is an ancient fireplace, a stone workbench, and old tools left behind. That's where I put this telegraph together from spare brass gears and copper wire."
+        },
+        {
+          id: "inq-map-quadrants",
+          title: "Why is the desert map split into four pages?",
+          category: "The Grand Map",
+          group: "desert",
+          answer: "The desert is huge! It was too large to fit on a single page, so I drew it across four journal leaves: Northwest, Northeast, Southwest, and Southeast. Together, they show the solid rocky ground that sandstorms can't wash away."
+        },
+        {
+          id: "inq-raiders-astrolabe",
+          title: "What happened to the real Astrolabe?",
+          category: "The Stolen Relic",
+          group: "astrolabe",
+          answer: "Ten nights ago, raiders broke into the mountain sanctuary and stole the original brass Astrolabe. The one I have with me is just a backup copy I made from scrap metal. The raiders headed south into the desert, but their heavy wagons broke down in the storm. They are stuck somewhere ahead, and we need to get the real Astrolabe back."
+        },
+        {
+          id: "inq-desert-oracle",
+          title: "Who is the Desert Oracle?",
+          category: "Guardians",
+          group: "desert",
+          answer: "She is the second guardian of the Order, living at Tower II in the desert. While I study the stars in the night sky, she understands the desert earth and sun shadows. She will help us find the secret fourth location."
+        },
+        {
+          id: "inq-dust-navigation",
+          title: "How do we find our way through dust and storms?",
+          category: "Navigation",
+          group: "desert",
+          answer: "Never walk over soft sand dunes that shift in the wind. Always follow dry, rocky riverbeds where your footing is solid, check shadows at noon to find north, and look for stone markers buried along the path."
+        },
+        {
+          id: "inq-teletype-wire",
+          title: "How does this telegraph work?",
+          category: "The Telegraph",
+          group: "workshop",
+          answer: "The howling gales severed the old copper lines along the high ridge, so I salvaged clock gears, a copper coil, and a battery cell here in the shelter to rig this direct telegraph wire. It sends electrical pulses along the canyon wall straight to your console, entirely sheltered from the storm."
+        },
+        {
+          id: "inq-three-laws",
+          title: "What are the rules for surviving the desert?",
+          category: "Desert Rules",
+          group: "desert",
+          answer: "Three simple rules: 1. At noon, your shadow points north. 2. Walk on hard riverbeds, never loose sand dunes. 3. Look for stone piles and buried metal markers to stay on course."
+        },
+        {
+          id: "inq-1998-log",
+          title: "What is the Autumn 1998 Field Log?",
+          category: "Old Journal",
+          group: "astrolabe",
+          answer: "Nearly thirty years ago, when I was young, I explored this desert for the first time. I built the three stone cairns and buried the 112° compass marker so that someone could follow my trail years later. That someone is you, Silvia."
+        },
+        {
+          id: "inq-languages",
+          title: "Why are notes written in different languages?",
+          category: "Languages",
+          group: "workshop",
+          answer: "Travelers and merchants from all over the world have crossed this desert for centuries, and the raiders come from different places too. That's why you'll find notes in English, Spanish, French, and Catalan throughout the journal."
+        }
+      ];
+
+      let wireCurrentStep = 0;
+      let wireHistory = [];
+      try {
+        const savedStep = localStorage.getItem('order_field_wire_step');
+        if (savedStep !== null) wireCurrentStep = parseInt(savedStep, 10);
+        const savedHistory = localStorage.getItem('order_field_wire_choices');
+        if (savedHistory) {
+          const parsed = JSON.parse(savedHistory);
+          if (Array.isArray(parsed)) wireHistory = parsed;
+        }
+      } catch (e) {}
+
+      if (wireCurrentStep > 4) wireCurrentStep = 4;
+      while (wireHistory.length < wireCurrentStep) {
+        wireHistory.push(0);
+      }
+
+      // Persistent Read Inquiries Tracking
+      let readInquiriesSet = new Set();
+      try {
+        const savedInq = localStorage.getItem('order_field_inquiries_read');
+        if (savedInq) {
+          const arr = JSON.parse(savedInq);
+          if (Array.isArray(arr)) readInquiriesSet = new Set(arr);
+        }
+      } catch (e) {}
+
+      let currentInquiryFilter = 'all';
+
+      // Physical Journal Callout Highlight Helper: Natural Illuminated Citation
+      function formatJournalCallouts(text) {
+        if (!text) return '';
+        return text.replace(/\b(?:Sheet|Hoja)\s+([0-9]+[A-Za-z]?)\b/gi, (match, sheet) => {
+          return `<span class="journal-ref-pill" title="Check your physical journal (${match})"><span class="pill-icon">📖</span> Sheet ${sheet.toUpperCase()}</span>`;
+        });
+      }
+
+      // Notification Badge System
+      function getMessengerUnreadCount() {
+        const customUnread = localStorage.getItem('order_messenger_unread_count');
+        if (customUnread !== null) {
+          return parseInt(customUnread, 10) || 0;
+        }
+        const lastRead = localStorage.getItem('order_messenger_last_read_step');
+        if (lastRead === null) {
+          return 1; // 1 initial incoming transmission from Hermes
+        }
+        const lastReadStep = parseInt(lastRead, 10);
+        return Math.max(0, wireCurrentStep - lastReadStep);
+      }
+
+      function updateMessengerBadge() {
+        const badge = document.getElementById('messenger-counter-badge');
+        if (!badge) return;
+        const currentView = document.body.getAttribute('data-active-view');
+        if (currentView === 'view-field-wire') {
+          markMessengerAsRead();
+          return;
+        }
+        const count = getMessengerUnreadCount();
+        if (count > 0) {
+          badge.textContent = count > 9 ? '9+' : count.toString();
+          badge.style.display = 'flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      function markMessengerAsRead() {
+        try {
+          localStorage.removeItem('order_messenger_unread_count');
+          localStorage.setItem('order_messenger_last_read_step', wireCurrentStep.toString());
+        } catch (e) {}
+        const badge = document.getElementById('messenger-counter-badge');
+        if (badge) {
+          badge.style.display = 'none';
+          badge.textContent = '0';
+        }
+      }
+
+      function setMessengerUnreadCount(count) {
+        try {
+          if (count <= 0) {
+            markMessengerAsRead();
+          } else {
+            localStorage.setItem('order_messenger_unread_count', count.toString());
+          }
+        } catch(e) {}
+        updateMessengerBadge();
+      }
+
+      // Expose helpers globally
+      window.setMessengerUnread = setMessengerUnreadCount;
+      window.markMessengerAsRead = markMessengerAsRead;
+      window.updateMessengerBadge = updateMessengerBadge;
+
+      const messengerTypingBar = document.getElementById('messenger-typing-bar');
+
+      function getWireTimestamp(offsetMinutes = 0) {
+        const d = new Date(Date.now() - offsetMinutes * 60000);
+        return d.toTimeString().slice(0, 5) + ' CEST';
+      }
+
+      function showTyping(show = true) {
+        if (!messengerTypingBar) return;
+        messengerTypingBar.style.display = show ? 'flex' : 'none';
+        const stream = currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream;
+        if (show && stream) {
+          stream.scrollTop = stream.scrollHeight;
+        }
+      }
+
+      function appendWireMessage(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null) {
+        const stream = targetStream || (currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream);
+        if (!stream) return null;
+        const msgEl = document.createElement('div');
+        const isSilvia = sender.toLowerCase().includes('silvia');
+
+        if (isSystem) {
+          msgEl.className = 'chat-bubble-wrap system-event';
+          msgEl.innerHTML = `
+            <div class="chat-bubble">
+              <span>${text}</span>
+            </div>
+          `;
+          stream.appendChild(msgEl);
+          msgEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (typeof onComplete === 'function') onComplete();
+          return msgEl;
+        }
+
+        const senderDisplay = isSilvia ? 'Silvia (Navigator)' : 'The Cartographer of Distant Light';
+        const checks = isSilvia ? ' ✓✓' : '';
+
+        if (isSilvia) {
+          msgEl.className = 'chat-bubble-wrap outgoing';
+          const formattedText = formatJournalCallouts(text).split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+          msgEl.innerHTML = `
+            <div class="chat-sender-name">${senderDisplay}</div>
+            <div class="chat-bubble-row">
+              <div class="chat-bubble">
+                <div class="chat-bubble-text">${formattedText}</div>
+                <span class="chat-bubble-time">${getWireTimestamp()}${checks}</span>
+              </div>
+              <div class="silvia-avatar-stamp" title="Silvia · Master Navigator" aria-label="Silvia Navigator Stamp">
+                <span class="silvia-seal-glyph">🧭</span>
+              </div>
+            </div>
+          `;
+          stream.appendChild(msgEl);
+          msgEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if (typeof onComplete === 'function') onComplete();
+          return msgEl;
+        }
+
+        // Incoming message from Hermes
+        msgEl.className = 'chat-bubble-wrap incoming';
+
+        if (!isLive) {
+          const formattedText = formatJournalCallouts(text).split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+          msgEl.innerHTML = `
+            <div class="chat-sender-name">${senderDisplay}</div>
+            <div class="chat-bubble">
+              <div class="chat-bubble-text">${formattedText}</div>
+              <span class="chat-bubble-time">${getWireTimestamp()}</span>
+            </div>
+          `;
+          stream.appendChild(msgEl);
+          if (typeof onComplete === 'function') onComplete();
+          return msgEl;
+        }
+
+        // Live typewriter effect for new incoming Hermes dispatch
+        msgEl.innerHTML = `
+          <div class="chat-sender-name">${senderDisplay}</div>
+          <div class="chat-bubble highlight-pulse">
+            <div class="chat-bubble-text"><span class="telegraph-typewriter-target"></span><span class="telegraph-cursor"></span></div>
+            <span class="chat-bubble-time">${getWireTimestamp()}</span>
+          </div>
+        `;
+        stream.appendChild(msgEl);
+
+        // Smooth scroll to focus on newly arriving dispatch
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const targetSpan = msgEl.querySelector('.telegraph-typewriter-target');
+        const cursorSpan = msgEl.querySelector('.telegraph-cursor');
+        const bubble = msgEl.querySelector('.chat-bubble');
+
+        let charIdx = 0;
+        const totalChars = text.length;
+        let lastSoundTime = 0;
+
+        function typeTick() {
+          if (!targetSpan) return;
+          const chunk = Math.min(Math.max(5, Math.ceil(totalChars / 70)), totalChars - charIdx);
+          charIdx += chunk;
+          const currentSub = text.substring(0, charIdx);
+
+          targetSpan.innerHTML = currentSub.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+
+          const now = Date.now();
+          if (now - lastSoundTime > 65) {
+            if (sfx && typeof sfx.playMechanicalClick === 'function') {
+              try { sfx.playMechanicalClick(); } catch(e) {}
+            }
+            lastSoundTime = now;
+          }
+
+          if (charIdx < totalChars) {
+            setTimeout(typeTick, 16);
+          } else {
+            if (cursorSpan) cursorSpan.remove();
+            const finalFormatted = formatJournalCallouts(text).split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+            if (bubble) {
+              const textContainer = bubble.querySelector('.chat-bubble-text');
+              if (textContainer) textContainer.innerHTML = finalFormatted;
+            }
+            if (typeof onComplete === 'function') onComplete();
+          }
+        }
+
+        typeTick();
+        return msgEl;
+      }
+
+      function renderWireExpedition() {
+        if (!wireMessagesStream) return;
+        wireMessagesStream.innerHTML = `
+          <div class="messenger-date-pill">Today · The Desert Frontier (112° E)</div>
+        `;
+
+        // 1. Initial Hermes opening transmission
+        appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[0].hermesInitial);
+
+        // 2. Render previous conversation steps from history
+        for (let s = 0; s < wireCurrentStep; s++) {
+          const stepData = EXPEDITION_THREAD[s];
+          if (!stepData || !stepData.choices) continue;
+          const choiceIdx = (wireHistory[s] !== undefined && stepData.choices[wireHistory[s]]) ? wireHistory[s] : 0;
+          const choice = stepData.choices[choiceIdx];
+          if (choice) {
+            appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+            if (choice.hermesReply) {
+              appendWireMessage('HERMES · CARTOGRAPHER', choice.hermesReply);
+            }
+          }
+        }
+
+        // 3. If reached completion step (step 4)
+        if (wireCurrentStep >= 4) {
+          appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[4].hermesFinal);
+          appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
+        }
+
+        renderWireChoices();
+      }
+
+      function renderWireChoices() {
+        if (!wireChoicesGrid || !wirePromptBox || !wireCompletedBar) return;
+
+        if (wireCurrentStep >= 4) {
+          wirePromptBox.style.display = 'none';
+          wireCompletedBar.style.display = 'flex';
+          try {
+            localStorage.setItem('order_field_wire_completed', 'true');
+            localStorage.setItem('order_field_wire_step', '4');
+          } catch(e) {}
+          return;
+        }
+
+        const currentData = EXPEDITION_THREAD[wireCurrentStep];
+        if (!currentData || !currentData.choices) {
+          wirePromptBox.style.display = 'none';
+          wireCompletedBar.style.display = 'flex';
+          return;
+        }
+
+        wirePromptBox.style.display = 'block';
+        wireCompletedBar.style.display = 'none';
+        wireChoicesGrid.innerHTML = '';
+
+        currentData.choices.forEach((choice, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'messenger-choice-pill';
+          btn.innerHTML = `
+            <span class="messenger-choice-tag">0${idx + 1}</span>
+            <span class="messenger-choice-text">${formatJournalCallouts(choice.text)}</span>
+          `;
+          btn.addEventListener('click', () => {
+            handleWireChoiceSelection(choice, idx);
+          });
+          wireChoicesGrid.appendChild(btn);
+        });
+      }
+
+      function handleWireChoiceSelection(choice, choiceIdx) {
+        if (sfx) sfx.playMechanicalClick();
+        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+
+        // Temporarily disable buttons in grid
+        const allBtns = wireChoicesGrid.querySelectorAll('button');
+        allBtns.forEach(b => b.disabled = true);
+
+        // Record history and advance step
+        wireHistory[wireCurrentStep] = choiceIdx;
+        wireCurrentStep++;
+
+        try {
+          localStorage.setItem('order_field_wire_step', wireCurrentStep.toString());
+          localStorage.setItem('order_field_wire_choices', JSON.stringify(wireHistory));
+        } catch(e) {}
+
+        showTyping(true);
+
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playChimeHover();
+
+          appendWireMessage('HERMES · CARTOGRAPHER', choice.hermesReply, false, true, () => {
+            if (wireCurrentStep >= 4) {
+              setTimeout(() => {
+                showTyping(true);
+                setTimeout(() => {
+                  showTyping(false);
+                  if (sfx) sfx.playCelestialChime();
+                  appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[4].hermesFinal, false, true, () => {
+                    appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
+                    renderWireChoices();
+                    updateMessengerBadge();
+                  });
+                }, 600);
+              }, 400);
+            } else {
+              renderWireChoices();
+              updateMessengerBadge();
+            }
+          });
+        }, 650);
+      }
+
+      function switchWireTab(tab) {
+        if (sfx) sfx.playMechanicalClick();
+        currentWireTab = tab;
+        if (tab === 'expedition') {
+          if (tabWireExpedition) tabWireExpedition.classList.add('active');
+          if (tabWireInquiries) tabWireInquiries.classList.remove('active');
+          if (wireExpeditionPanel) wireExpeditionPanel.style.display = 'block';
+          if (wireInquiriesPanel) wireInquiriesPanel.style.display = 'none';
+          if (wireMessagesStream) wireMessagesStream.style.display = 'flex';
+          if (wireInquiriesStream) wireInquiriesStream.style.display = 'none';
+        } else {
+          if (tabWireExpedition) tabWireExpedition.classList.remove('active');
+          if (tabWireInquiries) tabWireInquiries.classList.add('active');
+          if (wireExpeditionPanel) wireExpeditionPanel.style.display = 'none';
+          if (wireInquiriesPanel) wireInquiriesPanel.style.display = 'block';
+          if (wireMessagesStream) wireMessagesStream.style.display = 'none';
+          if (wireInquiriesStream) wireInquiriesStream.style.display = 'flex';
+          renderInquiriesGrid();
+        }
+      }
+
+      if (tabWireExpedition) tabWireExpedition.addEventListener('click', () => switchWireTab('expedition'));
+      if (tabWireInquiries) tabWireInquiries.addEventListener('click', () => switchWireTab('inquiries'));
+
+      function renderInquiriesGrid(filter = currentInquiryFilter) {
+        if (!inquiriesQuestionsGrid) return;
+        currentInquiryFilter = filter;
+        inquiriesQuestionsGrid.innerHTML = '';
+
+        const filtered = filter === 'all'
+          ? FIELD_INQUIRIES
+          : FIELD_INQUIRIES.filter(inq => inq.group === filter);
+
+        filtered.forEach(inq => {
+          const isRead = readInquiriesSet.has(inq.id);
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'messenger-faq-chip' + (isRead ? ' is-read' : '');
+          card.id = `inq-card-${inq.id}`;
+          card.innerHTML = `
+            <div class="messenger-faq-chip-title">
+              <span>✦</span>
+              <span>${inq.title}</span>
+            </div>
+            <div class="messenger-faq-chip-cat">
+              <span>${inq.category}</span>
+              ${isRead ? '<span class="inquiry-read-badge">✓ Answered</span>' : ''}
+            </div>
+          `;
+          card.addEventListener('click', () => {
+            handleInquiryClick(inq);
+          });
+          inquiriesQuestionsGrid.appendChild(card);
+        });
+
+        // Sync active pill in filter bar
+        const filterBar = document.getElementById('inquiry-filter-bar');
+        if (filterBar) {
+          const pills = filterBar.querySelectorAll('.inquiry-filter-pill');
+          pills.forEach(p => {
+            p.classList.toggle('active', p.getAttribute('data-filter') === filter);
+          });
+        }
+      }
+
+      function initInquiryFilters() {
+        const filterBar = document.getElementById('inquiry-filter-bar');
+        if (!filterBar) return;
+        const pills = filterBar.querySelectorAll('.inquiry-filter-pill');
+        pills.forEach(pill => {
+          pill.addEventListener('click', () => {
+            if (sfx) sfx.playMechanicalClick();
+            const filter = pill.getAttribute('data-filter') || 'all';
+            renderInquiriesGrid(filter);
+          });
+        });
+      }
+
+      function handleInquiryClick(inq) {
+        if (sfx) sfx.playMechanicalClick();
+
+        // 1. Persist read state
+        readInquiriesSet.add(inq.id);
+        try {
+          localStorage.setItem('order_field_inquiries_read', JSON.stringify([...readInquiriesSet]));
+        } catch(e) {}
+
+        // 2. Mark card visually with gold ribete and Answered badge
+        const card = document.getElementById(`inq-card-${inq.id}`);
+        if (card) {
+          card.classList.add('is-read');
+          const catEl = card.querySelector('.messenger-faq-chip-cat');
+          if (catEl && !catEl.querySelector('.inquiry-read-badge')) {
+            const badge = document.createElement('span');
+            badge.className = 'inquiry-read-badge';
+            badge.innerHTML = '✓ Answered';
+            catEl.appendChild(badge);
+          }
+        }
+
+        // 3. Silvia posts question into inquiries stream
+        appendWireMessage('SILVIA · NAVIGATOR', inq.title, false, false, null, wireInquiriesStream);
+        showTyping(true);
+
+        // 4. Hermes telegraph answer with live typewriter effect and smooth focus
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playChimeHover();
+          appendWireMessage('HERMES · CARTOGRAPHER', inq.answer, false, true, null, wireInquiriesStream);
+        }, 550);
+      }
+
+      if (btnWireReplay) {
+        btnWireReplay.addEventListener('click', () => {
+          if (sfx) sfx.playMechanicalClick();
+          wireCurrentStep = 0;
+          wireHistory = [];
+          try {
+            localStorage.removeItem('order_field_wire_step');
+            localStorage.removeItem('order_field_wire_choices');
+            localStorage.removeItem('order_field_wire_completed');
+            localStorage.removeItem('order_messenger_unread_count');
+            localStorage.removeItem('order_messenger_last_read_step');
+          } catch(e) {}
+          if (wireInquiriesStream) wireInquiriesStream.innerHTML = '';
+          renderWireExpedition();
+          renderInquiriesGrid();
+          markMessengerAsRead();
+        });
+      }
+
+      if (btnWireToMap) {
+        btnWireToMap.addEventListener('click', () => {
+          if (sfx) sfx.playCelestialChime();
+          activateHubView('view-trail');
+        });
+      }
+
+      if (btnHeaderMessenger) {
+        btnHeaderMessenger.addEventListener('click', () => {
+          if (sfx) sfx.playMechanicalClick();
+          activateHubView('view-field-wire');
+        });
+      }
+
+      // Initial boot
+      renderWireExpedition();
+      renderInquiriesGrid();
+      initInquiryFilters();
+      updateMessengerBadge();
+
+    })();
+
+    // =========================================================================
+    // 🌪️ THE SHIFTING TEMPEST — CATACLYSMIC SANDSTORM LOCKDOWN ENGINE (48H TIMEOUT)
+    // =========================================================================
+    (function initSandstormLockdown() {
+      const overlay = document.getElementById('sandstorm-lockout-overlay');
+      if (!overlay) return;
+
+      const canvas = document.getElementById('sandstorm-lockout-canvas');
+      const hoursEl = document.getElementById('storm-cd-hours');
+      const minsEl = document.getElementById('storm-cd-minutes');
+      const secsEl = document.getElementById('storm-cd-seconds');
+      const progressFill = document.getElementById('storm-progress-fill');
+      const progressPercent = document.getElementById('storm-progress-percent');
+      const windSpeedEl = document.getElementById('tel-wind-speed');
+      const barometerEl = document.getElementById('tel-barometer');
+      const audioToggleBtn = document.getElementById('btn-storm-audio-toggle');
+      const audioIcon = document.getElementById('storm-audio-icon');
+      const audioLabel = document.getElementById('storm-audio-label');
+      const lightningFlash = document.getElementById('storm-lightning-flash');
+      const devControls = document.getElementById('storm-dev-controls');
+      const btnDevToggle = document.getElementById('btn-dev-toggle-storm');
+      const btnDevReset = document.getElementById('btn-dev-reset-storm-timer');
+      const btnDevExpire = document.getElementById('btn-dev-expire-storm-timer');
+      const btnStormOpenLedger = document.getElementById('btn-storm-open-ledger');
+      const emergencyWireCard = document.getElementById('storm-emergency-wire-card');
+      const btnStormAnswerWire = document.getElementById('btn-storm-answer-wire');
+      const btnDevToggleWire = document.getElementById('btn-dev-toggle-wire');
+      const statusBeaconText = document.querySelector('.storm-status-beacon span:nth-child(2)');
+
+      const DURATION_48H_MS = 48 * 60 * 60 * 1000; // 172,800,000 ms (48 Hours)
+      const urlParams = new URLSearchParams(window.location.search);
+      const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || (typeof currentSeeker !== 'undefined' ? currentSeeker : 'Silvia') || 'Silvia').toLowerCase();
+
+      // Check URL parameters for explicit overrides
+      const forceStorm = urlParams.get('storm') === '1';
+      const bypassStorm = urlParams.get('storm') === '0' || urlParams.get('bypass') === '1';
+
+      // Carles Dev Mode check
+      const isLocalHostEnvironment = window.location.protocol === 'file:' || 
+                                     window.location.hostname === 'localhost' || 
+                                     window.location.hostname === '127.0.0.1';
+      const isCarles = activeSeeker === 'carles' || urlParams.get('dev') === '1' || isLocalHostEnvironment;
+      if (isCarles && devControls) {
+        devControls.style.display = 'flex';
+      }
+
+      function getStormTargetTime() {
+        let target = parseInt(localStorage.getItem('order_sandstorm_target_time'), 10);
+        if (!target || isNaN(target)) {
+          // 48 hours starting from today at 20:00:00 (8:00 PM)
+          const today8pm = new Date();
+          today8pm.setHours(20, 0, 0, 0);
+          target = today8pm.getTime() + (48 * 60 * 60 * 1000);
+          localStorage.setItem('order_sandstorm_target_time', target.toString());
+        }
+        return target;
+      }
+
+      function getRemainingTime() {
+        return Math.max(0, getStormTargetTime() - Date.now());
+      }
+
+      function isStormActive() {
+        if (bypassStorm) return false;
+        if (forceStorm) return true;
+
+        // When Carles is the seeker or in local environment, NEVER lock out by default!
+        if (isCarles && !forceStorm) {
+          return false;
+        }
+
+        const isMarked = localStorage.getItem('seeker_silvia_sandstorm_active') === 'true' ||
+                         (activeSeeker === 'silvia' && localStorage.getItem('order_sandstorm_active') === 'true');
+
+        if (!isMarked) return false;
+
+        return getRemainingTime() > 0;
+      }
+
+      // Procedural Web Audio Ambient Wind Synthesizer
+      let audioCtx = null;
+      let windGain = null;
+      let windFilter = null;
+      let isAudioMuted = false;
+      let windInitialized = false;
+
+      function initWindAudio() {
+        if (windInitialized) return;
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+          audioCtx = new AudioContextClass();
+
+          // Create 3 seconds of white/pink noise buffer
+          const bufferSize = audioCtx.sampleRate * 3;
+          const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const output = noiseBuffer.getChannelData(0);
+          let b0 = 0, b1 = 0, b2 = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            output[i] = (b0 + b1 + b2) * 0.35;
+          }
+
+          const whiteNoise = audioCtx.createBufferSource();
+          whiteNoise.buffer = noiseBuffer;
+          whiteNoise.loop = true;
+
+          // Bandpass filter for wind howling frequencies
+          windFilter = audioCtx.createBiquadFilter();
+          windFilter.type = 'bandpass';
+          windFilter.frequency.setValueAtTime(380, audioCtx.currentTime);
+          windFilter.Q.setValueAtTime(2.2, audioCtx.currentTime);
+
+          // LFO to modulate filter frequency (wind gusts)
+          const lfo = audioCtx.createOscillator();
+          lfo.frequency.setValueAtTime(0.18, audioCtx.currentTime); // 0.18 Hz slow gusts
+          const lfoGain = audioCtx.createGain();
+          lfoGain.gain.setValueAtTime(220, audioCtx.currentTime);
+          lfo.connect(lfoGain);
+          lfoGain.connect(windFilter.frequency);
+          lfo.start();
+
+          // Master wind gain
+          windGain = audioCtx.createGain();
+          windGain.gain.setValueAtTime(isAudioMuted ? 0 : 0.16, audioCtx.currentTime);
+
+          whiteNoise.connect(windFilter);
+          windFilter.connect(windGain);
+          windGain.connect(audioCtx.destination);
+
+          whiteNoise.start();
+          windInitialized = true;
+        } catch(e) {
+          console.warn('Sandstorm audio initialization deferred:', e);
+        }
+      }
+
+      function toggleAudio() {
+        isAudioMuted = !isAudioMuted;
+        if (!windInitialized) {
+          initWindAudio();
+        }
+        if (windGain && audioCtx) {
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          windGain.gain.setValueAtTime(isAudioMuted ? 0 : 0.16, audioCtx.currentTime);
+        }
+        if (audioIcon && audioLabel) {
+          audioIcon.textContent = isAudioMuted ? '🔇' : '🔊';
+          audioLabel.textContent = isAudioMuted ? 'Storm Audio: Muted' : 'Storm Audio: ON';
+        }
+      }
+
+      if (audioToggleBtn) {
+        audioToggleBtn.addEventListener('click', toggleAudio);
+      }
+
+      // High-DPI Canvas Particle Engine for Sand & Dust
+      let animationFrameId = null;
+      let particles = [];
+      let canvasWidth = window.innerWidth;
+      let canvasHeight = window.innerHeight;
+
+      function setupCanvas() {
+        if (!canvas) return;
+        canvas.width = canvasWidth = window.innerWidth;
+        canvas.height = canvasHeight = window.innerHeight;
+
+        const PARTICLE_COUNT = 240;
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push({
+            x: Math.random() * canvasWidth,
+            y: Math.random() * canvasHeight,
+            vx: -(Math.random() * 12 + 8), // High horizontal wind speed
+            vy: (Math.random() - 0.35) * 3,
+            length: Math.random() * 22 + 4, // Sand streaks
+            size: Math.random() * 2.2 + 0.6,
+            alpha: Math.random() * 0.6 + 0.25,
+            color: Math.random() < 0.2 ? '#f59e0b' : (Math.random() < 0.6 ? '#d97706' : '#ef4444')
+          });
+        }
+      }
+
+      let lastLightning = Date.now();
+      function renderStormParticles() {
+        if (!canvas || !overlay || overlay.style.display === 'none') return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        // Rare sheet lightning in the dust clouds
+        const now = Date.now();
+        if (now - lastLightning > 8000 + Math.random() * 9000) {
+          lastLightning = now;
+          if (lightningFlash) {
+            lightningFlash.style.opacity = '0.7';
+            setTimeout(() => { lightningFlash.style.opacity = '0'; }, 90);
+            setTimeout(() => { lightningFlash.style.opacity = '0.4'; }, 160);
+            setTimeout(() => { lightningFlash.style.opacity = '0'; }, 240);
+          }
+        }
+
+        for (let p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < -40) {
+            p.x = canvasWidth + Math.random() * 60;
+            p.y = Math.random() * canvasHeight;
+          }
+          if (p.y < 0) p.y = canvasHeight;
+          if (p.y > canvasHeight) p.y = 0;
+
+          // Draw wind streak
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x + p.length, p.y - p.vy * 2);
+          ctx.strokeStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.lineWidth = p.size;
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1.0;
+
+        animationFrameId = requestAnimationFrame(renderStormParticles);
+      }
+
+      // Live 48-Hour Countdown Ticker
+      let timerInterval = null;
+      let telemetryInterval = null;
+
+      function updateCountdown() {
+        const remaining = getRemainingTime();
+        const targetTime = getStormTargetTime();
+
+        if (remaining <= 0) {
+          // Storm subsided!
+          clearInterval(timerInterval);
+          if (progressFill) progressFill.style.width = '100%';
+          if (progressPercent) progressPercent.textContent = '100% · Storm Subsided · Carrier Signal Restored';
+          if (hoursEl) hoursEl.textContent = '00';
+          if (minsEl) minsEl.textContent = '00';
+          if (secsEl) secsEl.textContent = '00';
+          setTimeout(() => {
+            deactivateStormLockout();
+          }, 1500);
+          return;
+        }
+
+        const hrs = Math.floor(remaining / (1000 * 60 * 60));
+        const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+
+        if (hoursEl) hoursEl.textContent = String(hrs).padStart(2, '0');
+        if (minsEl) minsEl.textContent = String(mins).padStart(2, '0');
+        if (secsEl) secsEl.textContent = String(secs).padStart(2, '0');
+
+        let startTime = parseInt(localStorage.getItem('order_sandstorm_start_time'), 10);
+        if (!startTime || isNaN(startTime)) {
+          startTime = Date.now();
+          localStorage.setItem('order_sandstorm_start_time', startTime.toString());
+        }
+        const totalDuration = Math.max(1, targetTime - startTime);
+        const elapsed = Math.max(0, Date.now() - startTime);
+        const pct = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+
+        if (progressFill) progressFill.style.width = pct.toFixed(2) + '%';
+        if (progressPercent) progressPercent.textContent = `ESTIMATED SIGNAL RE-ACQUISITION WINDOW · ${pct.toFixed(1)}% ELAPSED`;
+
+        // Emergency 24-Hour Wire Detection (Triggers when remaining time is <= 24 hours)
+        const is24hWire = remaining <= (24 * 60 * 60 * 1000) || urlParams.get('wire') === '1' || window.forceWireAlert === true;
+        if (emergencyWireCard) {
+          emergencyWireCard.style.display = is24hWire ? 'flex' : 'none';
+        }
+        if (statusBeaconText) {
+          if (is24hWire) {
+            statusBeaconText.textContent = '142.85 MHz // EMERGENCY COPPER WIRE DETECTED · INCOMING SIGNAL';
+          } else {
+            statusBeaconText.textContent = '142.85 MHz // CARRIER SIGNAL LOST · CRITICAL INTERFERENCE';
+          }
+        }
+      }
+
+      function updateTelemetry() {
+        // Natural micro-fluctuations in gale telemetry
+        if (windSpeedEl) {
+          const speed = 120 + Math.floor(Math.sin(Date.now() / 4000) * 12 + Math.random() * 6);
+          windSpeedEl.textContent = `${speed} km/h`;
+        }
+        if (barometerEl) {
+          const baro = 880 + Math.floor(Math.cos(Date.now() / 6000) * 3 + Math.random() * 2);
+          barometerEl.textContent = `${baro} hPa`;
+        }
+      }
+
+      function activateStormLockout() {
+        document.body.classList.add('sandstorm-lockout-active');
+        overlay.style.display = 'flex';
+        overlay.setAttribute('aria-hidden', 'false');
+
+        setupCanvas();
+        if (!animationFrameId) {
+          renderStormParticles();
+        }
+
+        updateCountdown();
+        clearInterval(timerInterval);
+        timerInterval = setInterval(updateCountdown, 1000);
+
+        updateTelemetry();
+        clearInterval(telemetryInterval);
+        telemetryInterval = setInterval(updateTelemetry, 2500);
+
+        // User gesture listener to start ambient wind sound
+        const startAudioOnFirstInteract = () => {
+          initWindAudio();
+          window.removeEventListener('click', startAudioOnFirstInteract);
+          window.removeEventListener('keydown', startAudioOnFirstInteract);
+        };
+        window.addEventListener('click', startAudioOnFirstInteract, { once: true });
+        window.addEventListener('keydown', startAudioOnFirstInteract, { once: true });
+      }
+
+      function deactivateStormLockout() {
+        document.body.classList.remove('sandstorm-lockout-active');
+        overlay.style.display = 'none';
+        overlay.setAttribute('aria-hidden', 'true');
+
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+        clearInterval(timerInterval);
+        clearInterval(telemetryInterval);
+
+        if (windGain && audioCtx) {
+          try {
+            windGain.gain.setValueAtTime(0, audioCtx.currentTime);
+          } catch(e) {}
+        }
+      }
+
+      // Dev Sandbox Control Actions & Global Interface
+      window.SandstormLockdown = {
+        activate: activateStormLockout,
+        deactivate: deactivateStormLockout,
+        toggle: () => {
+          if (overlay.style.display === 'none') {
+            activateStormLockout();
+          } else {
+            deactivateStormLockout();
+          }
+        }
+      };
+
+      const btnHeaderStormToggle = document.getElementById('btn-dev-storm-toggle-header');
+      if (btnHeaderStormToggle) {
+        if (isCarles) btnHeaderStormToggle.style.display = 'inline-flex';
+        btnHeaderStormToggle.addEventListener('click', () => {
+          window.SandstormLockdown.toggle();
+        });
+      }
+
+      if (btnDevToggle) {
+        btnDevToggle.addEventListener('click', () => {
+          deactivateStormLockout();
+        });
+      }
+
+      if (btnDevReset) {
+        btnDevReset.addEventListener('click', () => {
+          const today8pm = new Date();
+          today8pm.setHours(20, 0, 0, 0);
+          const target = today8pm.getTime() + (48 * 60 * 60 * 1000);
+          localStorage.setItem('order_sandstorm_target_time', target.toString());
+          localStorage.setItem('order_sandstorm_start_time', Date.now().toString());
+          updateCountdown();
+        });
+      }
+
+      if (btnDevExpire) {
+        btnDevExpire.addEventListener('click', () => {
+          const past = Date.now() - 1000;
+          localStorage.setItem('order_sandstorm_target_time', past.toString());
+          updateCountdown();
+        });
+      }
+
+      if (btnDevToggleWire) {
+        btnDevToggleWire.addEventListener('click', () => {
+          window.forceWireAlert = !window.forceWireAlert;
+          updateCountdown();
+        });
+      }
+
+      if (btnStormAnswerWire) {
+        btnStormAnswerWire.addEventListener('click', () => {
+          if (typeof sfx !== 'undefined' && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          deactivateStormLockout();
+          if (typeof activateHubView === 'function') {
+            activateHubView('view-field-wire');
+          }
+        });
+      }
+
+      if (btnStormOpenLedger) {
+        btnStormOpenLedger.addEventListener('click', () => {
+          // Smoothly switch view to Cipher Ledger beneath the overlay
+          if (typeof activateHubView === 'function') {
+            activateHubView('view-cipher');
+          }
+          // Temporarily hide the overlay so she can work on cipher ledger, but with storm body class active!
+          overlay.style.display = 'none';
+          // Add a floating return button
+          let returnBtn = document.getElementById('btn-return-to-storm-banner');
+          if (!returnBtn) {
+            returnBtn = document.createElement('button');
+            returnBtn.id = 'btn-return-to-storm-banner';
+            returnBtn.innerHTML = '🌪️ Return to Storm Signal Alert';
+            returnBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:999999;padding:12px 20px;background:#b45309;color:#fff;border:1.5px solid #f59e0b;border-radius:30px;font-family:Cinzel,serif;font-weight:700;font-size:0.85rem;cursor:pointer;box-shadow:0 0 20px rgba(0,0,0,0.8);';
+            returnBtn.onclick = () => {
+              overlay.style.display = 'flex';
+              returnBtn.remove();
+            };
+            document.body.appendChild(returnBtn);
+          }
+        });
+      }
+
+      window.addEventListener('resize', () => {
+        if (overlay.style.display !== 'none') setupCanvas();
+      });
+
+      // Master Evaluation on Page Load
+      if (isStormActive()) {
+        activateStormLockout();
+      }
     })();
   </script>
 
