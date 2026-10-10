@@ -80,15 +80,22 @@ Este documento recoge de forma vinculante el estilo de trabajo, preferencias est
 - **Simulación Celeste**: Los juegos del diario permiten reconstruir o *"simular"* alineaciones celestes adicionales más allá de las 6 estrellas originales.
 - **Las Tres Antiguas Torres & El Cuarto Lugar Secreto (Misión Final)**:
   - En el diario se documentan tres antiguas torres de la Orden del Eclipse:
-    1. **Torre 1: El Observatorio** (en las cumbres / Constellation Path / origen del Cartógrafo).
-    2. **Torre 2: La Torre del Desierto** (en las dunas / Desert Path / refugio del eremita).
-    3. **Torre 3: La Torre del Escenario / Teatro** (Stage Path / tercer personaje).
-  - Al recuperar el Astrolabio, traducir el alfabeto secreto completo y alinear el instrumento con los tres vectores de las Antiguas Torres, se revelará un **CUARTO LUGAR SECRETO** (un santuario nunca antes nombrado), donde tendrá lugar el clímax y la misión final.
+    1. **Torre 1: The Alpine Observatory** (en las cumbres nevadas / Constellation Path / origen de Hermes).
+    2. **Torre 2: The Sandstone Tower / The Sandstone Sanctuary** (en las dunas / Desert Path / santuario de The Oracle).
+    3. **Torre 3: The Stage Tower / The Mirror Sanctuary** (Stage Path / santuario de The Mirror Speaker).
+  - Al recuperar el Astrolabio, traducir el alfabeto secreto completo y alinear el instrumento con los tres vectores de las Antiguas Torres, se revelará un **CUARTO LUGAR SECRETO** (**The Vault of the Grand Eclipse**), donde tendrá lugar el clímax y la revelación del regalo (las 2 entradas de ballet).
 
 ---
 
 ## 9. Notación Uniforme: Uso Exclusivo del Alfabeto Normal en Juegos y Coordenadas
 - **Regla vinculante**: En todas las interfaces web, fórmulas de coordenadas astronómicas (Latitude, Longitude, Differential), pizarras de recompensa y pistas cripto-aritméticas, se deben utilizar SIEMPRE las letras estándar de nuestro alfabeto latino ($K, G, A, O, B, P, E, V, F, T$, etc.), NUNCA glifos inventados o símbolos crípticos extraños.
 - **Coherencia con The Cipher Ledger**: El Cuaderno de Cifrado (*The Cipher Ledger*) y todos los juegos deben compartir exactamente la misma notación con letras claras y legibles, garantizando que Silvia pueda operar, trasladar valores y resolver las ecuaciones sin ninguna confusión ni ambigüedad visual.
+
+---
+
+## 10. Consulta Obligatoria de la Biblia Maestra
+Cualquier agente debe consultar antes de cada sesión el documento maestro:
+**[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](../../docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)**.
+
 
 

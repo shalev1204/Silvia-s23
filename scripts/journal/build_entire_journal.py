@@ -263,7 +263,7 @@ def create_pencil_emblem(diameter: int = 84, gc: tuple = GRAPHITE_COLOR) -> np.n
 
 
 def render_colophon(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
-    """Sheet 12 · Cara B (Page 24 — Epilogue Lore: The Desert Oracle & The Hermit Outpost)."""
+    """Sheet 16 · Cara B (Epilogue Lore: The Desert Oracle & The Sandstone Outpost)."""
     canvas = np.zeros((CANVAS_HEIGHT_PX, CANVAS_WIDTH_PX, 4), dtype=np.uint8)
     x_left = 180
     x_right = 1480
@@ -302,7 +302,7 @@ def render_colophon(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
         cur_y += 750
 
     # 4. Section II: Story of discovering the outpost & observing him
-    p2 = "Past the red pillars, following a dry salt riverbed, I caught the scent of burning cedar. Hidden beneath a massive sandstone overhang was his base: a stone hermitage sheltered by coarse canvas, flanked by stone cairns and alignment stakes driven into the dust."
+    p2 = "Past the red pillars, following a dry salt riverbed, I caught the scent of burning cedar. Hidden beneath a massive sandstone overhang was his base: a stone sanctuary sheltered by coarse canvas, flanked by stone cairns and alignment stakes driven into the dust."
     p3 = "From the ridge above, I watched him for hours. He ignored the constellations, instead pouring red sand through his palms and arranging black river stones upon a weathered table. When he turned, his face was entirely lost within his cowl, yet he looked straight toward my perch. He knew I was there before my boots touched the stone."
 
     lines_p2 = wrap_text(p2, FONT_PATH, body_fs, max_w - 20)
@@ -337,8 +337,8 @@ def render_colophon(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 
             # Text on the left side with generous 50px gutter
             left_text_w = art2_x - x_left - 50
-            p4 = "My judgment of this hermit is unequivocal: he is unsettling and secretive, yet utterly indispensable. He guards the terrestrial coordinates lost to our Order — the buried anchor required to unlock the Astrolabe."
-            p5 = "I cannot approach him; my tools belong to the stars. But you, Silvia, who unraveled the eight seals of this journal, possess eyes that see both sky and dust. Seek his outpost when shadows lengthen. The Desert Path is yours."
+            p4 = "My judgment of The Oracle is unequivocal: he is unsettling and secretive, yet utterly indispensable. He guards the terrestrial coordinates lost to our Order — the buried anchor required to unlock the Astrolabe."
+            p5 = "I cannot approach him; my tools belong to the stars. But you, Silvia, who unraveled the eight seals of this journal, possess eyes that see both sky and dust. Seek The Oracle when shadows lengthen. The Desert Path is yours."
 
             cur_left_y = cur_y + 15
             lines_p4 = wrap_text(p4, FONT_PATH, 34, left_text_w)

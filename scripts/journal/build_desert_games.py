@@ -252,7 +252,7 @@ def render_game_d1(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     t_ent, b_ent = render_pencil_text("North Portal ->", FONT_PATH, font_size=22, gc=gc, seed=501)
     blit_rgba(canvas, t_ent, mx0 - t_ent.shape[1] - 16, int(my0 + cell_h * 1.5 - b_ent // 2))
 
-    t_ext, b_ext = render_pencil_text("-> Sunken Oasis", FONT_PATH, font_size=22, gc=gc, seed=502)
+    t_ext, b_ext = render_pencil_text("-> Desert Oasis", FONT_PATH, font_size=22, gc=gc, seed=502)
     blit_rgba(canvas, t_ext, mx0 + mw + 16, int(my0 + cell_h * (h_cells - 1.5) - b_ext // 2))
 
     # 4. Inscribed Relic Cairns
@@ -462,7 +462,7 @@ def render_game_d2(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
         p2 = (int(round(dec_cx + r_out * np.cos(rad))), int(round(dec_cy + r_out * np.sin(rad))))
         cv2.line(canvas, p1, p2, (*gc, 140 if a % 45 == 0 else 80), 1, cv2.LINE_AA)
 
-    t_dec_lbl, _ = render_pencil_text("Al-Qibla & Desert Azimuth", FONT_PATH, font_size=20, gc=gc, seed=399)
+    t_dec_lbl, _ = render_pencil_text("Al-Qibla & Desert Bearing", FONT_PATH, font_size=20, gc=gc, seed=399)
     blit_rgba(canvas, t_dec_lbl, dec_cx - t_dec_lbl.shape[1] // 2, dec_cy + 205)
 
     # 3. Clues Section

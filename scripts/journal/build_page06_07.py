@@ -626,7 +626,7 @@ def render_spread2(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     """Renders the continuous 100% full-bleed double-page masterwork Spread 2 (3496 x 2480 px).
 
     Left half (0..1748 px): Hoja 7 · Cara B (The Whispering Chasm & Lower Wash).
-    Right half (1748..3496 px): Hoja 8 · Cara A (The Sunken Sanctuary & Southern Spires).
+    Right half (1748..3496 px): Hoja 8 · Cara A (The Sandstone Sanctuary & Southern Spires).
     Fills 100% of the surface continuously edge-to-edge, across the binder holes.
     Zero collisions between handwriting and drawing strokes.
     """
@@ -665,7 +665,7 @@ def render_spread2(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     # 3. Callouts on Right Page (Hoja 8 · Cara A — 1748..3496 px)
     # Binder rings are on the LEFT edge (X in [1748..1913] px). All text strictly X > 1940 px.
     dilate_clear_and_blit(spread_canvas, "Cairn V  (The Final Marker)", 2340, 280, font_size=25, pad=6, feather=6, seed=881)
-    dilate_clear_and_blit(spread_canvas, "The Sunken Sanctuary of the Oracle", 2480, 880, font_size=27, pad=6, feather=6, seed=882)
+    dilate_clear_and_blit(spread_canvas, "The Sandstone Sanctuary of the Oracle", 2480, 880, font_size=27, pad=6, feather=6, seed=882)
     dilate_clear_and_blit(spread_canvas, "The Solar Altar", 2700, 1260, font_size=24, pad=6, feather=6, seed=883)
     dilate_clear_and_blit(spread_canvas, "Arch of the Solstice", 2050, 1520, font_size=25, pad=6, feather=6, seed=884)
     dilate_clear_and_blit(spread_canvas, "The Salt Playa  (Dry Basin)", 2020, 2120, font_size=25, pad=6, feather=6, seed=885)
@@ -688,7 +688,7 @@ def render_spread2(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     dilate_clear_and_blit(spread_canvas, "Bearing 163* True South-Southeast", 2680, 750, font_size=23, pad=6, feather=6, seed=887)
 
     notes_8a = [
-        "In the vast basin of shifting dunes lies the sunken temple. At high noon,",
+        "In the vast basin of shifting dunes lies the sandstone temple. At high noon,",
         "the stone portal aligns with the solstice sun, casting light upon the altar."
     ]
     dilate_clear_and_blit_multiline(spread_canvas, notes_8a, 1960, 2340, line_h=38, font_size=28, pad=6, feather=6, seed_base=890)
@@ -748,7 +748,7 @@ def build_pages06_07(
         ("Hoja 6 · Cara B (Page 11 — The Desert Frontier: Map West / Top-Left)", render_face_6b, p6_dir, "page06_back", True, False),
         ("Hoja 7 · Cara A (Page 12 — The Sandstone Labyrinth: Map East / Top-Right)", render_face_7a, p7_dir, "page07_front", False, False),
         ("Hoja 7 · Cara B (Page 13 — The Lower Wash: Map West / Bottom-Left)", render_face_7b, p7_dir, "page07_back", True, False),
-        ("Hoja 8 · Cara A (Page 14 — The Sunken Sanctuary: Map East / Bottom-Right)", render_face_8a, p8_dir, "page08_front", False, False),
+        ("Hoja 8 · Cara A (Page 14 — The Sandstone Sanctuary: Map East / Bottom-Right)", render_face_8a, p8_dir, "page08_front", False, False),
     ]
 
     rendered_canvases = {}

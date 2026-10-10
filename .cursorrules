@@ -1,0 +1,16 @@
+# .cursorrules — Reglas Obligatorias para Cursor AI
+
+## 🚨 MANDATORY ONBOARDING PROTOCOL (FIRST STEP)
+
+Al iniciar una nueva sesión en este repositorio, **TODO AGENTE DE CURSOR DEBE LEER Y CONSULTAR OBLIGATORIAMENTE** antes de realizar cualquier acción:
+
+1. `docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md`:
+   - La Biblia Maestra Canónica (Versión 6.0).
+   - Contiene el 100% del lore cronológico, los correos enviados, las transcripciones palabra por palabra de las 6 transmisiones de audio, las estaciones 01 a 09, el bloqueo de 48h del Hub Central por la tormenta de arena roja, la criptografía de The Cipher Ledger y el vocabulario canónico blindado.
+   - Prohibido terminantemente inventar o modificar nombres canónicos ("Sunken", "Coastal", "Coast", "Hermit", "Stage Mistress").
+2. `AGENTS.md`:
+   - Reglas y preferencias del proyecto (Capa 2).
+3. `docs/lore_and_puzzle_bible.md`:
+   - Biblia de lore y mecánicas de puzles.
+4. `.agents/rules/user-preferences.md`:
+   - Estándar estético renacentista ("currado", estilo Da Vinci/Kepler/Dürer) y cero colisiones texto-dibujo.

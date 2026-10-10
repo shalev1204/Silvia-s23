@@ -65,7 +65,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 1. **Las Tres Antiguas Torres de la Orden del Eclipse**:
    - En el diario se hace mención a tres baluartes ancestrales erigidos en la antigüedad, asociados a cada senda y personaje:
      - **Torre 1 (Las Cumbres)**: El Observatorio Alpino (*Constellation Path* · El Cartógrafo).
-     - **Torre 2 (Las Dunas)**: La Torre de Piedra Arenisca (*Desert Path* · El Eremita/Nómada del Desierto).
+     - **Torre 2 (Las Dunas)**: La Torre de Piedra Arenisca (*Desert Path* · El Oráculo del Desierto / The Desert Oracle).
      - **Torre 3 (La Escena)**: La Torre del Escenario / Teatro (*Stage Path* · El Tercer Personaje).
 2. **El Cuarto Lugar Secreto (Misión Final)**:
    - Una vez que Silvia recupere el Astrolabio robado, complete la traducción del alfabeto secreto y obtenga las lecturas de las 3 torres, el Astrolabio se alineará simultáneamente con los tres vértices.
@@ -465,8 +465,8 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
   5. Silvia selecciona las claves del diario: orientarlo hacia los **Tres Mojones**, seguir el **Cauce Seco** y fijar la mira a **112° hacia el Este** bajo la losa de **Cairn III**.
   6. Esta primera triangulación permite al Cartógrafo encontrar el primer refugio de piedra, despejar la arena de su equipo de campaña y desbloquear la visualización del primer cuadrante del **Gran Mapa del Desierto**.
 
-### 4. Biblia Exhaustiva del Camino del Desierto (Estaciones 11 a 17)
-- Para la guía completa y canónica de todos los puzzles, mecánicas, lore, matrices de deducción y triangulación de las Tres Antiguas Torres del Desert Path, consulte el documento maestro:
+### 4. Comprehensive Desert Odyssey Bible (Stations 11 to 17)
+- For the complete canonical guide to all puzzles, mechanics, lore, deduction matrices, and triangulation of the Three Ancient Towers, consult the master document:
   👉 **[`docs/DESERT_ODYSSEY_BIBLE.md`](DESERT_ODYSSEY_BIBLE.md)**.
 
 

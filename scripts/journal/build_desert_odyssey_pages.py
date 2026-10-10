@@ -321,7 +321,7 @@ def render_sheet09_back_lore(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 
     p1 = ("Across these elevated tablelands, the northern wind never ceases. It shears through the red rock at "
           "exactly 348 degrees North-Northwest, whistling across the open plains like an ancient subterranean flute. "
-          "In my topographical survey, every weathered juniper and desert cedar bends in strict obedience to this single azimuth.")
+          "In my topographical survey, every weathered juniper and desert cedar bends in strict obedience to this single heading.")
     for line in wrap_text(p1, FONT_PATH, body_fs, max_w - 20):
         t_l, b_l = render_pencil_text(line, FONT_PATH, font_size=body_fs, gc=gc, seed=915 + cur_y)
         blit_rgba(canvas, t_l, x_left + 15, cur_y - b_l)
@@ -558,7 +558,7 @@ def render_sheet10_front_d1(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     rules = [
         "Follow the wagon wheel-ruts through the sandstone corridors without doubling back across loose scree.",
         "Each archway passed yields a directional glyph: record their sequence in your Cipher Ledger.",
-        "The true exit aligns precisely with Cairn II and the 348° NNW solar azimuth of the northern tableland."
+        "The true exit aligns precisely with Cairn II and the 348° NNW solar heading of the northern tableland."
     ]
     rule_y = cur_y
     for r in rules:
@@ -1157,7 +1157,7 @@ def render_sheet12_front_d4(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     # 1. Header
     t_title, b_t = render_pencil_text("The Sun Monolith", FONT_PATH, font_size=64, gc=gc, seed=4101)
     blit_rgba(canvas, t_title, x_left + 10, 80 - b_t)
-    t_sub, b_s = render_pencil_text("Game D4 · Solar Azimuth Alignment & Stargazer Equations", FONT_PATH, font_size=28, gc=gc, seed=4102)
+    t_sub, b_s = render_pencil_text("Game D4 · Solar Alignment & Stargazer Equations", FONT_PATH, font_size=28, gc=gc, seed=4102)
     blit_rgba(canvas, t_sub, x_left + 12, 140 - b_s)
     draw_sketchy_line(canvas, (x_left, 165), (x_right, 165), gc=gc, alpha_base=160, passes=2, seed=4103)
 
@@ -1415,7 +1415,7 @@ def render_sheet12_back_lore(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     draw_sketchy_line(canvas, (x_left + 10, cur_y - 8), (x_left + 440, cur_y - 8), gc=gc, alpha_base=130, passes=1, seed=1551)
 
     p3 = ("Look across the gulf, Silvia: Sheet 13B and 14A form the great subterranean floor of the desert. "
-          "Beyond the acoustic maze of the canyon lies the Sunken Oasis and Tower II. Step boldly down the scree.")
+          "Beyond the acoustic maze of the canyon lies the Desert Oasis and Tower II. Step boldly down the scree.")
     for line in wrap_text(p3, FONT_PATH, body_fs, max_w - 20):
         t_l, b_l = render_pencil_text(line, FONT_PATH, font_size=body_fs, gc=gc, seed=1555 + cur_y)
         blit_rgba(canvas, t_l, x_left + 15, cur_y - b_l)
@@ -1540,7 +1540,7 @@ def render_sheet15_front_lore(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     # 1. Header
     t_title, b_t = render_pencil_text("The Salt Playa & Vaults", FONT_PATH, font_size=64, gc=gc, seed=1701)
     blit_rgba(canvas, t_title, x_left + 10, 80 - b_t)
-    t_sub, b_s = render_pencil_text("Hydraulics of the Ancient Engineers · The Sunken Oasis", FONT_PATH, font_size=28, gc=gc, seed=1702)
+    t_sub, b_s = render_pencil_text("Hydraulics of the Ancient Engineers · The Desert Oasis", FONT_PATH, font_size=28, gc=gc, seed=1702)
     blit_rgba(canvas, t_sub, x_left + 12, 140 - b_s)
     draw_sketchy_line(canvas, (x_left, 165), (x_right, 165), gc=gc, alpha_base=160, passes=2, seed=1703)
 
@@ -1626,7 +1626,7 @@ def render_sheet15_front_lore(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     cur_y += 46
     draw_sketchy_line(canvas, (x_left + 10, cur_y - 8), (x_left + 460, cur_y - 8), gc=gc, alpha_base=130, passes=1, seed=1751)
 
-    p3 = ("Before Hermes can cross the salt flats to the Sunken Sanctuary, all four water vessels must be filled. "
+    p3 = ("Before Hermes can cross the salt flats to the Sandstone Sanctuary, all four water vessels must be filled. "
           "Inspect the logic matrix on Sheet 15B: solve the seekers' puzzle and enter Key XXX into the Clepsydra dial.")
     for line in wrap_text(p3, FONT_PATH, body_fs, max_w - 20):
         t_l, b_l = render_pencil_text(line, FONT_PATH, font_size=body_fs, gc=gc, seed=1755 + cur_y)
@@ -1751,7 +1751,7 @@ def render_sheet14_back_d5(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     t_ent, b_ent = render_pencil_text("North Portal ->", FONT_PATH, font_size=21, gc=gc, seed=2501)
     blit_rgba(canvas, t_ent, mx0 - t_ent.shape[1] - 14, int(my0 + cell_h * 1.5 - b_ent // 2))
 
-    t_ext, b_ext = render_pencil_text("-> Sunken Oasis", FONT_PATH, font_size=21, gc=gc, seed=2502)
+    t_ext, b_ext = render_pencil_text("-> Desert Oasis", FONT_PATH, font_size=21, gc=gc, seed=2502)
     blit_rgba(canvas, t_ext, mx0 + mw + 14, int(my0 + cell_h * (h_cells - 1.5) - b_ext // 2))
 
     # Inscribed Relic Cairns
@@ -1895,7 +1895,7 @@ def render_sheet15_back_d6(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     blit_rgba(canvas, t_clep_sub, clep_x + 150, 220)
 
     # Narrative intro
-    p_intro = ("Four ancient cisterns sustain the Sunken Oasis, each calibrated to an artesian water clock. "
+    p_intro = ("Four ancient cisterns sustain the Desert Oasis, each calibrated to an artesian water clock. "
                "Four seekers arrived from the dunes bearing sacred instruments. Correlate their testimonies to "
                "deduce who came to each well and at what hour.")
     for l_idx, line in enumerate(wrap_text(p_intro, FONT_PATH, 24, x_right - clep_x - 150)):
@@ -2035,7 +2035,7 @@ def render_sheet15_back_d6(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
         kx = k_x0 + ki * (k_sz + k_gap)
         draw_sketchy_rect(canvas, (kx, k_y0, kx + k_sz, k_y0 + k_h), gc=gc, alpha_base=180, passes=2, seed=3620 + ki)
 
-    t_c_note, _ = render_pencil_text("✦ Key II of the Sunken Oracle Portal · Unlocks Dial II on Sheet 16A ✦", FONT_PATH, font_size=22, gc=gc, seed=3630)
+    t_c_note, _ = render_pencil_text("✦ Key II of the Sandstone Oracle Portal · Unlocks Dial II on Sheet 16A ✦", FONT_PATH, font_size=22, gc=gc, seed=3630)
     blit_rgba(canvas, t_c_note, (x_left + x_right - t_c_note.shape[1]) // 2, 2225)
 
     draw_sketchy_line(canvas, (x_left, 2370), (x_right, 2370), gc=gc, alpha_base=145, passes=2, seed=3699)
@@ -2066,8 +2066,8 @@ def render_sheet16_front_oracle(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     cur_y += 46
     draw_sketchy_line(canvas, (x_left + 10, cur_y - 8), (x_left + 420, cur_y - 8), gc=gc, alpha_base=130, passes=1, seed=4811)
 
-    obj = ("Unseal the great bronze and sandstone portal of Tower II, the Sunken Sanctuary of the Desert Oracle. "
-           "Insert the three master keys deduced from the desert journey to align the ancient gears and awaken the Hermit.")
+    obj = ("Unseal the great bronze and sandstone portal of Tower II, the Sandstone Sanctuary of the Desert Oracle. "
+           "Insert the three master keys deduced from the desert journey to align the ancient gears and awaken The Oracle.")
     for line in wrap_text(obj, FONT_PATH, 35, max_w - 20):
         t_l, b_l = render_pencil_text(line, FONT_PATH, font_size=35, gc=gc, seed=4815 + cur_y)
         blit_rgba(canvas, t_l, x_left + 15, cur_y - b_l)
@@ -2127,7 +2127,7 @@ def render_sheet16_front_oracle(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     # 3 Towers positions
     t1 = (tri_cx, tri_cy - 160)               # Tower I: Observatory
     t2 = (tri_cx - 150, tri_cy + 120)          # Tower II: Desert Oracle
-    t3 = (tri_cx + 150, tri_cy + 120)          # Tower III: Coastal Stage
+    t3 = (tri_cx + 150, tri_cy + 120)          # Tower III: The Stage Tower
 
     draw_sketchy_line(canvas, t1, t2, gc=gc, alpha_base=190, passes=2, seed=4830)
     draw_sketchy_line(canvas, t2, t3, gc=gc, alpha_base=190, passes=2, seed=4831)
@@ -2136,7 +2136,7 @@ def render_sheet16_front_oracle(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     towers = [
         (t1, "TOWER I · OBSERVATORY"),
         (t2, "TOWER II · DESERT ORACLE"),
-        (t3, "TOWER III · COASTAL STAGE")
+        (t3, "TOWER III · THE STAGE TOWER")
     ]
     for (tx, ty), tname in towers:
         cv2.circle(canvas, (tx, ty), 10, (*gc, 220), -1)
@@ -2164,7 +2164,7 @@ def render_sheet16_front_oracle(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     key_prompts = [
         ("Dial I (Desert Sigil)", "The 7-letter sacred keyword discovered across the Northern sands (Game D2 & Cairn III):", "Insert Sigil I: [ __________________________________ ]"),
         ("Dial II (Hydraulic Key)", "The total arrival hours of the Four Seekers in Roman numerals (Game D6):", "Insert Key II:  [ __________________________________ ]"),
-        ("Dial III (Geodetic Vector)", "The true azimuth bearing vector triangulated from the Sun Monolith (Game D4):", "Insert Vector III: [ __________________________________ ]")
+        ("Dial III (Geodetic Vector)", "The true geodetic bearing vector triangulated from the Sun Monolith (Game D4):", "Insert Vector III: [ __________________________________ ]")
     ]
     for kp_name, kp_desc, kp_field in key_prompts:
         t_pn, _ = render_pencil_text(f"✦  {kp_name}: {kp_desc}", FONT_PATH, font_size=25, gc=gc, seed=4870 + cur_y)

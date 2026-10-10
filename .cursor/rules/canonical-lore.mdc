@@ -1,0 +1,20 @@
+---
+description: Protocolo obligatorio de onboarding e invariantes canónicos de Silvia's 23
+globs: *
+alwaysApply: true
+---
+
+# Protocolo Obligatorio de Inicio de Sesión — Silvia's 23
+
+Al iniciar cualquier tarea o responder a cualquier consulta sobre este repositorio, el agente **DEBE CONSULTAR OBLIGATORIAMENTE**:
+
+1. `docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md`:
+   - La Biblia Maestra Canónica (Versión 6.0).
+   - Contiene el 100% del lore cronológico, los correos enviados, las transcripciones completas de las 6 transmisiones de audio, las estaciones 01 a 09, el bloqueo de 48h del Hub Central por la tormenta de arena roja, la criptografía de The Cipher Ledger y el vocabulario canónico blindado.
+   - **Prohibición**: Queda terminantemente prohibido inventar o alterar nombres propios, lugares o derivas terminológicas (`The Sunken Sanctuary`, `The Coastal Amphitheater`, `The Hermit`, `The Stage Mistress`).
+2. `AGENTS.md`:
+   - Reglas de trabajo del proyecto (Capa 2), troquelado A5 y reglas de vocabulario accesible en inglés.
+3. `docs/lore_and_puzzle_bible.md`:
+   - Biblia de lore y mecánicas de puzles.
+4. `.agents/rules/user-preferences.md`:
+   - Preferencias de diseño, estética renacentista ("currado", estilo Da Vinci/Kepler/Dürer) y cero colisiones texto-dibujo.
