@@ -465,5 +465,9 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
   5. Silvia selecciona las claves del diario: orientarlo hacia los **Tres Mojones**, seguir el **Cauce Seco** y fijar la mira a **112° hacia el Este** bajo la losa de **Cairn III**.
   6. Esta primera triangulación permite al Cartógrafo encontrar el primer refugio de piedra, despejar la arena de su equipo de campaña y desbloquear la visualización del primer cuadrante del **Gran Mapa del Desierto**.
 
+### 4. Biblia Exhaustiva del Camino del Desierto (Estaciones 11 a 17)
+- Para la guía completa y canónica de todos los puzzles, mecánicas, lore, matrices de deducción y triangulación de las Tres Antiguas Torres del Desert Path, consulte el documento maestro:
+  👉 **[`docs/DESERT_ODYSSEY_BIBLE.md`](DESERT_ODYSSEY_BIBLE.md)**.
+
 
 
