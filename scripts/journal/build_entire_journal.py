@@ -6,9 +6,9 @@ strictly preserving:
 2. Sheets 2 & 3: The Celestial Alphabet (4 uninterrupted faces).
 3. Sheets 4, 5, 6, 7: The Constellation Path & Astrolabe Codex intertwined with Games C1-C4,
    concluding with the Field Log & Dual Wax Seals transition (7B).
-4. Sheets 8, 9, 10: The Desert Frontier Lore & The Grand Desert Map (4 uninterrupted quadrants,
-   forming continuous Double-Page Spreads 1 & 2), followed by Game D1 (10B).
-5. Sheets 11 & 12: The Desert Enigmas (D2, D3, D4) and The Cartographer's Colophon (12B).
+4. Sheets 8, 9, 10, 11: The Desert Frontier Lore & The Grand Desert Map (4 uninterrupted quadrants,
+   forming continuous Double-Page Spreads 1 & 2), followed by Game D1 (09B).
+5. Sheets 10, 11 & 12: The Desert Enigmas (D2, D3, D4) and The Cartographer's Colophon (12B).
 
 Strictly enforces A5 6-ring binder punch hole margins (0 non-zero alpha pixels):
 - Cara A (Front): X < 165 px has 0 pixels.
@@ -57,30 +57,36 @@ from scripts.journal.build_constellation_games import (
     render_game_c3,
     render_game_c4,
 )
-from scripts.journal.build_desert_odyssey_pages import (
-    render_sheet09_back_lore,
-    render_sheet10_front_d1,
-    render_sheet10_back_lore,
-    render_sheet11_front_d2,
-    render_sheet11_back_d3,
-    render_sheet12_front_d4,
-    render_sheet12_back_lore,
-    render_sheet13_front_lore,
-    render_sheet14_back_d5,
-    render_sheet15_front_lore,
-    render_sheet15_back_d6,
-    render_sheet16_front_oracle,
+from scripts.journal.build_desert_games import (
+    render_game_d1,
+    render_game_d2,
+    render_game_d3,
+    render_game_d4,
 )
-
-
+from scripts.journal.build_desert_odyssey_expanded import (
+    render_game_d2_salt_playa,
+    render_lore_10b_salt_playa_study,
+    render_lore_13a_sanctuary_servant,
+    render_game_d5_sun_monolith,
+    render_lore_14a_cairns_survey,
+    render_game_d6_sandstone_labyrinth,
+    render_game_d7_cairn_iv_sentry,
+    render_zoom_bridge_left,
+    render_zoom_bridge_right,
+    render_game_d8_arch_solstice_altar,
+    render_game_d10_oracle_horizon,
+    render_art_18b_stage_path_transition,
+)
 
 GRAPHITE_COLOR = (46, 42, 38)
 FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "Fondamento.ttf")
 SHIELD_PATH = os.path.join(PROJECT_ROOT, "journal", "page01", "assets", "mini_journal_eclipse_shield.png")
 REAL_PAPER_PATH = os.path.join(PROJECT_ROOT, "journal", "page01", "real_paper_300dpi.png")
 JOURNAL_DIR = os.path.join(PROJECT_ROOT, "journal")
-ORACLE_ARTWORK_PATH = os.path.join(JOURNAL_DIR, "page12", "assets", "oracle_desert_master_alpha.png")
-ORACLE_BASE_ARTWORK_PATH = os.path.join(JOURNAL_DIR, "page12", "assets", "oracle_base_master_alpha.png")
+_p17_art = os.path.join(JOURNAL_DIR, "page17", "assets", "oracle_desert_master_alpha.png")
+ORACLE_ARTWORK_PATH = _p17_art if os.path.exists(_p17_art) else os.path.join(JOURNAL_DIR, "page12", "assets", "oracle_desert_master_alpha.png")
+_p17_base = os.path.join(JOURNAL_DIR, "page17", "assets", "oracle_base_master_alpha.png")
+ORACLE_BASE_ARTWORK_PATH = _p17_base if os.path.exists(_p17_base) else os.path.join(JOURNAL_DIR, "page12", "assets", "oracle_base_master_alpha.png")
 
 
 # -------------------------------------------------------------------------
@@ -263,10 +269,10 @@ def create_pencil_emblem(diameter: int = 84, gc: tuple = GRAPHITE_COLOR) -> np.n
 
 
 def render_colophon(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
-    """Sheet 16 · Cara B (Epilogue Lore: The Desert Oracle & The Sandstone Outpost)."""
+    """Sheet 12 · Cara B (Page 24 — Epilogue Lore: The Desert Oracle & The Outpost)."""
     canvas = np.zeros((CANVAS_HEIGHT_PX, CANVAS_WIDTH_PX, 4), dtype=np.uint8)
-    x_left = 180
-    x_right = 1480
+    x_left = 150
+    x_right = 1490
     max_w = x_right - x_left
     body_fs = 35  # Increased by 2 points for maximum legibility and page utilization
     line_spacing = 54
@@ -302,7 +308,7 @@ def render_colophon(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
         cur_y += 750
 
     # 4. Section II: Story of discovering the outpost & observing him
-    p2 = "Past the red pillars, following a dry salt riverbed, I caught the scent of burning cedar. Hidden beneath a massive sandstone overhang was his base: a stone sanctuary sheltered by coarse canvas, flanked by stone cairns and alignment stakes driven into the dust."
+    p2 = "Past the red pillars, following a dry salt riverbed, I caught the scent of burning cedar. Hidden beneath a massive sandstone overhang was his base: a stone sanctuary dwelling sheltered by coarse canvas, flanked by stone cairns and alignment stakes driven into the dust."
     p3 = "From the ridge above, I watched him for hours. He ignored the constellations, instead pouring red sand through his palms and arranging black river stones upon a weathered table. When he turned, his face was entirely lost within his cowl, yet he looked straight toward my perch. He knew I was there before my boots touched the stone."
 
     lines_p2 = wrap_text(p2, FONT_PATH, body_fs, max_w - 20)
@@ -337,8 +343,8 @@ def render_colophon(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 
             # Text on the left side with generous 50px gutter
             left_text_w = art2_x - x_left - 50
-            p4 = "My judgment of The Oracle is unequivocal: he is unsettling and secretive, yet utterly indispensable. He guards the terrestrial coordinates lost to our Order — the buried anchor required to unlock the Astrolabe."
-            p5 = "I cannot approach him; my tools belong to the stars. But you, Silvia, who unraveled the eight seals of this journal, possess eyes that see both sky and dust. Seek The Oracle when shadows lengthen. The Desert Path is yours."
+            p4 = "My judgment of this Oracle is unequivocal: he is unsettling and secretive, yet utterly indispensable. He guards the terrestrial coordinates lost to our Order — the buried anchor required to unlock the Astrolabe."
+            p5 = "I cannot approach him; my tools belong to the stars. But you, Silvia, who unraveled the eight seals of this journal, possess eyes that see both sky and dust. Seek his outpost when shadows lengthen. The Desert Path is yours."
 
             cur_left_y = cur_y + 15
             lines_p4 = wrap_text(p4, FONT_PATH, 34, left_text_w)
@@ -420,26 +426,12 @@ def render_sheet01_back() -> np.ndarray:
 
 
 # -------------------------------------------------------------------------
-# RENAISSANCE LORE & PUZZLE PAGES (IMPORTED FROM build_desert_odyssey_pages)
-# -------------------------------------------------------------------------
-# Sheet 09 · Cara B: render_sheet09_back_lore (High Plateaus & Wind Bearings)
-# Sheet 10 · Cara A: render_sheet10_front_d1 (Game D1: Sandstone Labyrinth)
-# Sheet 10 · Cara B: render_sheet10_back_lore (Solstice Horizon & Solar Noon)
-# Sheet 12 · Cara A: render_sheet12_front_d4 (Game D4: Sun Monolith Alignment)
-# Sheet 12 · Cara B: render_sheet12_back_lore (Brink of the Great Fault)
-# Sheet 13 · Cara A: render_sheet13_front_lore (The Deep Wash & Sentry Mesa)
-# Sheet 15 · Cara A: render_sheet15_front_lore (The Salt Playa & Subterranean Vaults)
-# Sheet 16 · Cara A: render_sheet16_front_oracle (Game D7: Gates of the Oracle)
-
-
-
-# -------------------------------------------------------------------------
-# MASTER BUILD ORCHESTRATOR (16 SHEETS / 32 FACES)
+# MASTER BUILD ORCHESTRATOR (12 SHEETS / 24 FACES)
 # -------------------------------------------------------------------------
 
 def build_entire_journal() -> None:
     print("==========================================================================")
-    print("=== BUILDING COMPLETE 16-SHEET / 32-PAGE JOURNAL (TWO-ACT DESERT ODYSSEY) ===")
+    print("=== BUILDING COMPLETE 12-SHEET / 24-PAGE JOURNAL (ORGANIC LORE & GAMES) ===")
     print("==========================================================================")
 
     bg_raw = None
@@ -448,7 +440,7 @@ def build_entire_journal() -> None:
         if bg_raw is not None:
             bg_raw = cv2.resize(bg_raw, (CANVAS_WIDTH_PX, CANVAS_HEIGHT_PX), interpolation=cv2.INTER_LANCZOS4)
 
-    # 16 Sheets definition: (sheet_num, face_a_tuple, face_b_tuple)
+    # 18 Sheets definition: (sheet_num, face_a_tuple, face_b_tuple)
     # Face tuple: (label, renderer_fn, stem, is_back, is_fullbleed)
     sheets = [
         # Sheet 1: Prologue
@@ -486,59 +478,60 @@ def build_entire_journal() -> None:
          ("Hoja 7 · Cara A (Game C4: The Celestial Cipher)", render_sheet07_front_c4, "page07_front", False, False),
          ("Hoja 7 · Cara B (Lore: Field Log - The Desert Frontier & Dual Seals)", render_face_5b, "page07_back", True, False)),
 
-        # =====================================================================
-        # ACT I: NORTHERN HIGHLANDS & PLATEAUS (Sheets 8 to 12)
-        # =====================================================================
-
-        # Sheet 8: Desert Lore & Grand Map Q1 (NW)
+        # Sheet 8: Desert Lore & Grand Map Q1
         (8,
-         ("Hoja 8 · Cara A (Lore: The Desert Frontier / The Great Silence)", render_face_6a, "page08_front", False, False),
-         ("Hoja 8 · Cara B (Map: Grand Desert Map - NW Top-Left / Spread 1 Left)", render_face_6b, "page08_back", True, True)),
+         ("Hoja 8 · Cara A (Lore: The Desert Frontier & The River Hunch)", render_face_6a, "page08_front", False, False),
+         ("Hoja 8 · Cara B (Map: Grand Desert Map - NW Top-Left / Spread 1)", render_face_6b, "page08_back", True, True)),
 
-        # Sheet 9: Grand Map Q2 (NE) & High Plateaus Lore
+        # Sheet 9: Grand Map Q2 & Game D1 (Chasm Maze)
         (9,
-         ("Hoja 9 · Cara A (Map: Grand Desert Map - NE Top-Right / Spread 1 Right)", render_face_7a, "page09_front", False, True),
-         ("Hoja 9 · Cara B (Lore: High Plateaus & Wind Bearings)", render_sheet09_back_lore, "page09_back", True, False)),
+         ("Hoja 9 · Cara A (Map: Grand Desert Map - NE Top-Right / Spread 1)", render_face_7a, "page09_front", False, True),
+         ("Hoja 9 · Cara B (Game D1: The Whispering Chasm Maze)", render_game_d1, "page09_back", True, False)),
 
-        # Sheet 10: Game D1 (Sandstone Labyrinth) & Solstice Horizon Lore
+        # Sheet 10: Game D2 (Salt Playa) & Salt Playa Study
         (10,
-         ("Hoja 10 · Cara A (Game D1: The Sandstone Labyrinth)", render_sheet10_front_d1, "page10_front", False, False),
-         ("Hoja 10 · Cara B (Lore: Solstice Horizon & Solar Noon)", render_sheet10_back_lore, "page10_back", True, False)),
+         ("Hoja 10 · Cara A (Game D2: The Salt Playa Navigation)", render_game_d2_salt_playa, "page10_front", False, False),
+         ("Hoja 10 · Cara B (Lore: Study on the Dry Salt Playa Formation)", render_lore_10b_salt_playa_study, "page10_back", True, False)),
 
-        # Sheet 11: Game D2 (Desert Lexicon) & Game D3 (Polybius Stele of Cairn III)
+        # Sheet 11: Game D3 (Desert Lexicon - BC Ashes) & Grand Map Q3 (Map SW)
         (11,
-         ("Hoja 11 · Cara A (Game D2: The Desert Lexicon & Al-Qibla)", render_sheet11_front_d2, "page11_front", False, False),
-         ("Hoja 11 · Cara B (Game D3: The Polybius Stele of Cairn III)", render_sheet11_back_d3, "page11_back", True, False)),
+         ("Hoja 11 · Cara A (Game D3: The Desert Lexicon & BC Ashes)", render_game_d2, "page11_front", False, False),
+         ("Hoja 11 · Cara B (Map: Grand Desert Map - SW Bottom-Left / Spread 2)", render_face_7b, "page11_back", True, True)),
 
-
-        # Sheet 12: Game D4 (Sun Monolith Alignment) & Lore (Brink of the Great Fault)
+        # Sheet 12: Grand Map Q4 (Map SE) & Game D4 (Oasis Clepsydra - Mirage)
         (12,
-         ("Hoja 12 · Cara A (Game D4: The Sun Monolith Alignment)", render_sheet12_front_d4, "page12_front", False, False),
-         ("Hoja 12 · Cara B (Lore: Brink of the Great Fault - The Broken Wagons)", render_sheet12_back_lore, "page12_back", True, False)),
+         ("Hoja 12 · Cara A (Map: Grand Desert Map - SE Bottom-Right / Spread 2)", render_face_8a, "page12_front", False, True),
+         ("Hoja 12 · Cara B (Game D4: The Oasis Clepsydra - Feverish Mirage)", render_game_d3, "page12_back", True, False)),
 
-        # =====================================================================
-        # ACT II: THE GREAT CANYON, OASIS & THE SANCTUARY (Sheets 13 to 16)
-        # =====================================================================
-
-        # Sheet 13: Lore (The Deep Wash) & Grand Map Q3 (SW)
+        # Sheet 13: Sanctuary Servant Lore & Game D5 (Sun Monolith - Cairn II)
         (13,
-         ("Hoja 13 · Cara A (Lore: The Deep Wash & The Sentry Mesa)", render_sheet13_front_lore, "page13_front", False, False),
-         ("Hoja 13 · Cara B (Map: Grand Desert Map - SW Bottom-Left / Spread 2 Left)", render_face_7b, "page13_back", True, True)),
+         ("Hoja 13 · Cara A (Lore: At the Gates of Tower II & Servant's Demand)", render_lore_13a_sanctuary_servant, "page13_front", False, False),
+         ("Hoja 13 · Cara B (Game D5: The Sun Monolith & Cairn II)", render_game_d5_sun_monolith, "page13_back", True, False)),
 
-        # Sheet 14: Grand Map Q4 (SE) & Game D5 (Whispering Chasm Maze)
+        # Sheet 14: The 5 Cairns Survey Lore & Game D6 (Sandstone Labyrinth - Cairn III)
         (14,
-         ("Hoja 14 · Cara A (Map: Grand Desert Map - SE Bottom-Right / Spread 2 Right)", render_face_8a, "page14_front", False, True),
-         ("Hoja 14 · Cara B (Game D5: The Whispering Chasm Maze)", render_sheet14_back_d5, "page14_back", True, False)),
+         ("Hoja 14 · Cara A (Lore: The Five Geodetic Cairns Survey)", render_lore_14a_cairns_survey, "page14_front", False, False),
+         ("Hoja 14 · Cara B (Game D6: The Sandstone Labyrinth & Cairn III)", render_game_d6_sandstone_labyrinth, "page14_back", True, False)),
 
-        # Sheet 15: Lore (Salt Playa & Vaults) & Game D6 (Oasis Clepsydra)
+        # Sheet 15: Game D7 (Cairn IV Sentry) & Zoom Bridge Left (Spread 3 Left)
         (15,
-         ("Hoja 15 · Cara A (Lore: The Salt Playa & Subterranean Vaults)", render_sheet15_front_lore, "page15_front", False, False),
-         ("Hoja 15 · Cara B (Game D6: The Oasis Clepsydra & 4 Wells)", render_sheet15_back_d6, "page15_back", True, False)),
+         ("Hoja 15 · Cara A (Game D7: Cairn IV Sentry of the Canyon)", render_game_d7_cairn_iv_sentry, "page15_front", False, False),
+         ("Hoja 15 · Cara B (Map Zoom: Natural Bridge & Sentinel Mesa - Left Panel)", render_zoom_bridge_left, "page15_back", True, True)),
 
-        # Sheet 16: Game D7 (Gates of the Oracle) & Epilogue Lore
+        # Sheet 16: Zoom Bridge Right (Spread 3 Right) & Game D8 (Solstice Arch / Altar - Cairn V)
         (16,
-         ("Hoja 16 · Cara A (Game D7: Gates of the Oracle - Tower II)", render_sheet16_front_oracle, "page16_front", False, False),
-         ("Hoja 16 · Cara B (Epilogue Lore: The Desert Oracle & 3 Towers)", render_colophon, "page16_back", True, False)),
+         ("Hoja 16 · Cara A (Map Zoom: Natural Bridge & Lower Wash - Right Panel)", render_zoom_bridge_right, "page16_front", False, True),
+         ("Hoja 16 · Cara B (Game D8: Arch of the Solstice & Cairn V Altar)", render_game_d8_arch_solstice_altar, "page16_back", True, False)),
+
+        # Sheet 17: Game D9 (Polybius Stele - Servant's Trial) & Audience with Oracle
+        (17,
+         ("Hoja 17 · Cara A (Game D9: The Polybius Stele - Servant's Trial)", render_game_d4, "page17_front", False, False),
+         ("Hoja 17 · Cara B (Lore: Audience with The Desert Oracle)", render_colophon, "page17_back", True, False)),
+
+        # Sheet 18: Game D10 (Oracle Climax) & Transition Art to Stage Path
+        (18,
+         ("Hoja 18 · Cara A (Game D10: The Oracle's Horizon & Triple Triangulation)", render_game_d10_oracle_horizon, "page18_front", False, False),
+         ("Hoja 18 · Cara B (Art: Transition to the Stage Path)", render_art_18b_stage_path_transition, "page18_back", True, False)),
     ]
 
     all_canvases = {}
@@ -601,8 +594,9 @@ def build_entire_journal() -> None:
     # ---------------------------------------------------------------------
     # ASSEMBLE CONTINUOUS DOUBLE-PAGE SPREADS FOR THE GRAND DESERT MAP
     # ---------------------------------------------------------------------
+    # Spread 1: North Half (Page 08B + Page 09A)
     if bg_raw is not None and "page08_back" in all_canvases and "page09_front" in all_canvases:
-        print("\n=== Generating Continuous Double-Page Spread 1 (Act I: Page 08B + Page 09A) ===")
+        print("\n=== Generating Continuous Double-Page Spread 1 (North Half: Page 08B + Page 09A) ===")
         c8b = all_canvases["page08_back"]
         c9a = all_canvases["page09_front"]
 
@@ -624,39 +618,64 @@ def build_entire_journal() -> None:
         cv2.imwrite(sp1_p9, spread1_mockup, [cv2.IMWRITE_JPEG_QUALITY, 95])
         print(f"  -> Saved Continuous Spread 1 Mockup: {sp1_p8}")
 
-    if bg_raw is not None and "page13_back" in all_canvases and "page14_front" in all_canvases:
-        print("\n=== Generating Continuous Double-Page Spread 2 (Act II: Page 13B + Page 14A) ===")
-        c13b = all_canvases["page13_back"]
-        c14a = all_canvases["page14_front"]
+    # Spread 2: South Half (Page 11B + Page 12A)
+    if bg_raw is not None and "page11_back" in all_canvases and "page12_front" in all_canvases:
+        print("\n=== Generating Continuous Double-Page Spread 2 (South Half: Page 11B + Page 12A) ===")
+        c11b = all_canvases["page11_back"]
+        c12a = all_canvases["page12_front"]
 
         bg_b = cv2.flip(bg_raw, 1)
         bg_a = bg_raw
 
-        fg_l = c13b[:, :, :3].astype(np.float32)
-        al_l = (c13b[:, :, 3].astype(np.float32) / 255.0)[:, :, np.newaxis]
+        fg_l = c11b[:, :, :3].astype(np.float32)
+        al_l = (c11b[:, :, 3].astype(np.float32) / 255.0)[:, :, np.newaxis]
         mockup_l = (fg_l * al_l + bg_b.astype(np.float32) * (1.0 - al_l)).astype(np.uint8)
 
-        fg_r = c14a[:, :, :3].astype(np.float32)
-        al_r = (c14a[:, :, 3].astype(np.float32) / 255.0)[:, :, np.newaxis]
+        fg_r = c12a[:, :, :3].astype(np.float32)
+        al_r = (c12a[:, :, 3].astype(np.float32) / 255.0)[:, :, np.newaxis]
         mockup_r = (fg_r * al_r + bg_a.astype(np.float32) * (1.0 - al_r)).astype(np.uint8)
 
         spread2_mockup = np.hstack([mockup_l, mockup_r])
-        sp2_p13 = os.path.join(JOURNAL_DIR, "page13", "mockups", "spread02_desert_map_continuous_mockup.jpg")
-        sp2_p14 = os.path.join(JOURNAL_DIR, "page14", "mockups", "spread02_desert_map_continuous_mockup.jpg")
-        cv2.imwrite(sp2_p13, spread2_mockup, [cv2.IMWRITE_JPEG_QUALITY, 95])
-        cv2.imwrite(sp2_p14, spread2_mockup, [cv2.IMWRITE_JPEG_QUALITY, 95])
-        print(f"  -> Saved Continuous Spread 2 Mockup: {sp2_p13}")
+        sp2_p11 = os.path.join(JOURNAL_DIR, "page11", "mockups", "spread02_desert_map_continuous_mockup.jpg")
+        sp2_p12 = os.path.join(JOURNAL_DIR, "page12", "mockups", "spread02_desert_map_continuous_mockup.jpg")
+        cv2.imwrite(sp2_p11, spread2_mockup, [cv2.IMWRITE_JPEG_QUALITY, 95])
+        cv2.imwrite(sp2_p12, spread2_mockup, [cv2.IMWRITE_JPEG_QUALITY, 95])
+        print(f"  -> Saved Continuous Spread 2 Mockup: {sp2_p11}")
+
+    # Spread 3: Zoom Topográfico al Puente Natural de la Mesa Centinela (Page 15B + Page 16A)
+    if bg_raw is not None and "page15_back" in all_canvases and "page16_front" in all_canvases:
+        print("\n=== Generating Continuous Spread 3: Zoom al Puente Natural (Page 15B + Page 16A) ===")
+        c15b = all_canvases["page15_back"]
+        c16a = all_canvases["page16_front"]
+
+        bg_b = cv2.flip(bg_raw, 1)
+        bg_a = bg_raw
+
+        fg_l = c15b[:, :, :3].astype(np.float32)
+        al_l = (c15b[:, :, 3].astype(np.float32) / 255.0)[:, :, np.newaxis]
+        mockup_l = (fg_l * al_l + bg_b.astype(np.float32) * (1.0 - al_l)).astype(np.uint8)
+
+        fg_r = c16a[:, :, :3].astype(np.float32)
+        al_r = (c16a[:, :, 3].astype(np.float32) / 255.0)[:, :, np.newaxis]
+        mockup_r = (fg_r * al_r + bg_a.astype(np.float32) * (1.0 - al_r)).astype(np.uint8)
+
+        spread3_mockup = np.hstack([mockup_l, mockup_r])
+        sp3_p15 = os.path.join(JOURNAL_DIR, "page15", "mockups", "spread03_bridge_zoom_continuous_mockup.jpg")
+        sp3_p16 = os.path.join(JOURNAL_DIR, "page16", "mockups", "spread03_bridge_zoom_continuous_mockup.jpg")
+        cv2.imwrite(sp3_p15, spread3_mockup, [cv2.IMWRITE_JPEG_QUALITY, 95])
+        cv2.imwrite(sp3_p16, spread3_mockup, [cv2.IMWRITE_JPEG_QUALITY, 95])
+        print(f"  -> Saved Continuous Spread 3 (Bridge Zoom) Mockup: {sp3_p15}")
 
     # Assemble complete 4-quadrant overview
-    if bg_raw is not None and "page08_back" in all_canvases and "page09_front" in all_canvases and "page13_back" in all_canvases and "page14_front" in all_canvases:
-        print("\n=== Generating 4-Quadrant Complete Desert Map Overview ===")
+    if bg_raw is not None and "page08_back" in all_canvases and "page09_front" in all_canvases and "page11_back" in all_canvases and "page12_front" in all_canvases:
+        print("\n=== Generating 4-Quadrant Complete Desert Map Overview (2x2) ===")
         c8b = all_canvases["page08_back"]
         c9a = all_canvases["page09_front"]
-        c13b = all_canvases["page13_back"]
-        c14a = all_canvases["page14_front"]
+        c11b = all_canvases["page11_back"]
+        c12a = all_canvases["page12_front"]
 
         spread1_rgba = np.hstack([c8b, c9a])
-        spread2_rgba = np.hstack([c13b, c14a])
+        spread2_rgba = np.hstack([c11b, c12a])
         full_rgba = np.vstack([spread1_rgba, spread2_rgba])
 
         bg_spread_top = np.hstack([cv2.flip(bg_raw, 1), bg_raw])
@@ -667,14 +686,32 @@ def build_entire_journal() -> None:
         al = (full_rgba[:, :, 3].astype(float) / 255.0)[:, :, np.newaxis]
         panorama_4quad = (fg * al + bg_4quad.astype(float) * (1.0 - al)).astype(np.uint8)
 
-        ov_p13 = os.path.join(JOURNAL_DIR, "page13", "mockups", "grand_desert_map_4quadrants_overview.jpg")
-        ov_p14 = os.path.join(JOURNAL_DIR, "page14", "mockups", "grand_desert_map_4quadrants_overview.jpg")
-        cv2.imwrite(ov_p13, panorama_4quad, [cv2.IMWRITE_JPEG_QUALITY, 94])
-        cv2.imwrite(ov_p14, panorama_4quad, [cv2.IMWRITE_JPEG_QUALITY, 94])
-        print(f"  -> Complete 4-Quadrant Desert Map: {ov_p13}")
+        ov_p11 = os.path.join(JOURNAL_DIR, "page11", "mockups", "grand_desert_map_4quadrants_overview.jpg")
+        ov_p12 = os.path.join(JOURNAL_DIR, "page12", "mockups", "grand_desert_map_4quadrants_overview.jpg")
+        cv2.imwrite(ov_p11, panorama_4quad, [cv2.IMWRITE_JPEG_QUALITY, 94])
+        cv2.imwrite(ov_p12, panorama_4quad, [cv2.IMWRITE_JPEG_QUALITY, 94])
+        print(f"  -> Complete 4-Quadrant Desert Map: {ov_p11}")
+
+        # Sync web assets
+        web_maps_dir = os.path.join(PROJECT_ROOT, "web", "assets", "maps")
+        if os.path.exists(web_maps_dir):
+            web_ov = os.path.join(web_maps_dir, "grand_desert_map_overview.webp")
+            cv2.imwrite(web_ov, cv2.resize(panorama_4quad, (1748, 2480), interpolation=cv2.INTER_AREA), [cv2.IMWRITE_WEBP_QUALITY, 90])
+            print(f"  -> Synced Web Desert Map Overview: {web_ov}")
+
+            # Also sync the 4 quadrants to web
+            web_q1 = os.path.join(web_maps_dir, "desert_quadrant_1_nw.webp")
+            web_q2 = os.path.join(web_maps_dir, "desert_quadrant_2_ne.webp")
+            web_q3 = os.path.join(web_maps_dir, "desert_quadrant_3_sw.webp")
+            web_q4 = os.path.join(web_maps_dir, "desert_quadrant_4_se.webp")
+            cv2.imwrite(web_q1, cv2.imread(os.path.join(JOURNAL_DIR, "page08", "mockups", "page08_back_real_paper_mockup.jpg")), [cv2.IMWRITE_WEBP_QUALITY, 90])
+            cv2.imwrite(web_q2, cv2.imread(os.path.join(JOURNAL_DIR, "page09", "mockups", "page09_front_real_paper_mockup.jpg")), [cv2.IMWRITE_WEBP_QUALITY, 90])
+            cv2.imwrite(web_q3, cv2.imread(os.path.join(JOURNAL_DIR, "page11", "mockups", "page11_back_real_paper_mockup.jpg")), [cv2.IMWRITE_WEBP_QUALITY, 90])
+            cv2.imwrite(web_q4, cv2.imread(os.path.join(JOURNAL_DIR, "page12", "mockups", "page12_front_real_paper_mockup.jpg")), [cv2.IMWRITE_WEBP_QUALITY, 90])
+            print(f"  -> Synced 4 Web Quadrants: Q1(08B), Q2(09A), Q3(11B), Q4(12A)")
 
     print("\n==========================================================================")
-    print("=== SUCCESS: COMPLETE 16-SHEET JOURNAL (32 FACES) BUILT FLAWLESSLY! ===")
+    print("=== SUCCESS: COMPLETE 18-SHEET JOURNAL (36 FACES) BUILT FLAWLESSLY! ===")
     print("==========================================================================")
 
 

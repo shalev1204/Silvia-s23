@@ -598,7 +598,13 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 4. **The Mirror Speaker (El Portavoz del Espejo)**:
    - Guardián solemne y ceremonial de **Tower III (The Stage Tower / The Mirror Sanctuary)**.
    - Maestro de la simetría, la luz, el reflejo y la danza. *(Queda terminantemente prohibido llamarlo "Stage Mistress")*.
-5. **Carles (The Petitioner / Seeker Companion)**:
+5. **The Sanctuary Servant (El Sirviente del Santuario)**:
+   - Guardián ceremonial y heraldo del atrio en **Tower II (The Sandstone Sanctuary)**.
+   - Exige la presentación de los 4 mojones sagrados de la peregrinación (Cairns II, III, IV y V) y supervisa la prueba de la Estela de Polibio previa a la apertura del sanctasanctórum.
+6. **The BC Ashes (Los Asaltantes de la Ceniza)**:
+   - Facción de saqueadores y forajidos del desierto que asaltó el Observatorio Alpino en la noche del solsticio y robó el cofre con el Astrolabio de Latón.
+   - Su identidad y enseña son descubiertas por Hermes en *The Desert Lexicon* (Hoja 11A) tras eludir una emboscada en los laberintos de piedra.
+7. **Carles (The Petitioner / Seeker Companion)**:
    - Quien solicitó la aventura a la Orden del Eclipse para el 23º cumpleaños de Silvia.
 
 ---
@@ -650,13 +656,93 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 
 ---
 
-## 9. PROYECCIÓN CONTINUA: EL CAMINO DEL DESIERTO (STATIONS 10–17)
+## 9. PROYECCIÓN CONTINUA: EL CAMINO DEL DESIERTO EN EL DIARIO DE 18 HOJAS (HOJAS 08 A 18 · 10 JUEGOS)
 
-- **Station 10**: **Outer Watchtower VI** (Riscos septentrionales a $112^\circ\text{ E}$; Hermes opera el telégrafo artesanal de campaña).
-- **Station 11**: **The Sandstone Labyrinth** (Rastreo de las rodadas de las carretas de los asaltantes por los arcos de la Hoja 10A; secuencia $[M, A, Z, E]$; rumbo de salida $042^\circ\text{ NE}$).
-- **Station 12**: **The Desert Lexicon & Al-Qibla** (Estelas de arenisca en la Hoja 11A; Sigil solar **`PHOENIX`**; rumbo Al-Qibla **$194^\circ\text{ SSW}$** hacia la Torre II; ecuación $[R] \times 2 = [F]$).
-- **Station 13**: **The Polybius Stele of Cairn III** (Hoja 11B: rejilla cifrada 5×5; cota de referencia $348^\circ\text{ NNW}$; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*).
-- **Station 14**: **The Sun Monolith Alignment** (Hoja 12A: obelisco de la Mesa del Sol; carretas abandonadas en la Falla Mayor; rumbo **`348° NNW`**).
-- **Station 15**: **The Whispering Chasm** (Hoja 14B: laberinto de cañones de 25×25; 6 mojones de reliquias en 231 pasos; santo y seña **`MIRAGE`**; llegada al Oasis del Desierto).
-- **Station 16**: **The Oasis Clepsydra** (Hoja 15B: los cuatro pozos: Halcón, Chacal, Escarabajo y Serpiente; 4 buscadores × 4 horas × 4 reliquias; clave hidráulica **`XXX`**; ecuación del vertedero del Halcón $[P] - [A] = 12$).
-- **Station 17**: **Gates of the Oracle** (Hoja 16A: desprecinto de **Tower II — The Sandstone Sanctuary** con las tres llaves: `PHOENIX`, `XXX`, `348° NNW`; recuperación de **The Astrolabe of Distant Light** de las carretas averiadas; audiencia con **The Oracle**; entrega de la pista **WHERE** y el rumbo este hacia **Tower III — The Stage Tower**).
+El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Acto II (The Desert Path) abarca las Hojas 08 a 18 (22 caras) con 10 juegos y el spread de zoom al puente natural:
+
+- **Hoja 08**:
+  - **Cara A (08A · Lore)**: *The Desert Frontier, The River Hunch & The Great Silence*. Hermes sigue el río seco (*Wadi al-Hajar*) por una corazonada; junto a Silvia descifran y obtienen el **Sello de Cairn I** como misión previa antes de entrar al desfiladero.
+  - **Cara B (08B · Mapa)**: **Gran Mapa · Cuadrante NO** (*Spread 1 Izq*).
+- **Hoja 09**:
+  - **Cara A (09A · Mapa)**: **Gran Mapa · Cuadrante NE** (*Spread 1 Der*).
+  - **Cara B (09B · Juego D1)**: **The Whispering Chasm**. Con el Sello de Cairn I a buen recaudo, descenso a la garganta laberíntica de $25 \times 25$; santo y seña **`MIRAGE`**; deducción $[R] = 3$.
+- **Hoja 10**:
+  - **Cara A (10A · Juego D2)**: **The Salt Playa (Dry Basin)**. Navegación sobre la corteza salina quebradiza y simas de salmuera.
+  - **Cara B (10B · Lore/Estudio)**: **Estudio Da Vinci: The Salt Playa Basin**. Morfología de la cristalización salina y estratos sedimentarios.
+- **Hoja 11**:
+  - **Cara A (11A · Juego D3)**: **The Desert Lexicon & Al-Qibla**. Emboscada de forajidos eludida; descubrimiento del nombre de los raiders: **Los BC Ashes**; Sigil solar **`PHOENIX`**; rumbo **$194^\circ\text{ SSW}$**; deducción $[R] \times 2 = [F] \implies F = 6, T = 16$.
+  - **Cara B (11B · Mapa)**: **Gran Mapa · Cuadrante SO** (*Spread 2 Izq*).
+- **Hoja 12**:
+  - **Cara A (12A · Mapa)**: **Gran Mapa · Cuadrante SE** (*Spread 2 Der*).
+  - **Cara B (12B · Juego D4)**: **The Oasis Clepsydra (Espejismo)**. Alucinación febril por calor y deshidratación que mantiene cuerdo a Hermes y permite hallar provisiones; clave hidráulica **`XXX`**; ecuación $[P] - [A] = 14$.
+- **Hoja 13**:
+  - **Cara A (13A · Lore)**: **Llegada al Santuario & El Sirviente**. Demanda de los 5 Cairns Sagrados; Hermes muestra que ya posee Cairn I (del río), pero debe buscar los 4 restantes (II, III, IV, V).
+  - **Cara B (13B · Juego D5)**: **The Sun Monolith**. Alineación y obtención del **Sello de Cairn II**.
+- **Hoja 14**:
+  - **Cara A (14A · Lore)**: **Los 5 Cairns de Peregrinación**. Estudio cartográfico y marcas geodésicas.
+  - **Cara B (14B · Juego D6)**: **The Sandstone Labyrinth**. Senda entre arcos y fisuras para conseguir el **Sello de Cairn III**.
+- **Hoja 15**:
+  - **Cara A (15A · Juego D7)**: **Cairn IV (Sentry of the Canyon)**. Custodia de la garganta acústica; obtención del **Sello de Cairn IV**.
+  - **Cara B (15B · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Izq · Spread 3)**. Elev. 980 varas, arco de roca y desfiladero en alta definición.
+- **Hoja 16**:
+  - **Cara A (16A · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Der · Spread 3)**.
+  - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
+- **Hoja 17**:
+  - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$.
+  - **Cara B (17B · Lore)**: **Audiencia con El Oráculo del Desierto**. Apertura de la Torre II; revelación de la pista **WHERE**; estrella maestra **Vega**.
+- **Hoja 18**:
+  - **Cara A (18A · Juego D10)**: **Clímax con El Oráculo**. Triangulación de horizontes y desbloqueo del camino a la Torre III.
+  - **Cara B (18B · Arte de Transición)**: **Dibujo de Transición al Stage Path**. Obra estética inspirada en el boceto artístico (pliegues teatrales violetas, columnas chevron en perspectiva, espirales, estrellas y malla geométrica escénica).
+
+---
+
+## 10. TOPOGRAFÍA OFICIAL DEL GRAN MAPA DEL DESIERTO (LAS 22 LOCALIZACIONES CANÓNICAS EN LOS 4 CUADRANTES)
+
+El Gran Mapa del Desierto de 4 cuadrantes (Spreads 1 y 2 del diario, dispuestos en 2 columnas × 2 filas) contiene exactamente **22 accidentes geográficos y cotas topográficas rotuladas en el lienzo**. Los nombres de los juegos y misiones del desierto proceden directamente de estas localizaciones reales:
+
+### A. Cuadrante Noroeste · Q1 (Hoja 8B · Spread 1 Izquierda)
+1. **The Desert Frontier**: Título cartográfico del umbral septentrional (*Northern Approaches & The Red Ridge · Latitude 30° 00' N*).
+2. **The Red Ridge**: Cadena de riscos escarpados de arenisca bermeja (*The Red Ridge — Precipitous Sandstone*).
+3. **Outer Watchtower VI**: Atalaya vigía exterior en la cota de elevación de 1.240 varas castellanas (*Elev. 1,240 varas*; rumbo inicial $112^\circ\text{ E}$).
+4. **Dry Canyon Wash (Wadi al-Hajar)**: Lecho seco y pedregoso de la rambla por donde discurren las torrenteras estacionales hacia el sur.
+5. **The Great Mesa (Mesa del Sol)**: Altiplano imponente que corona el horizonte occidental (*The Great Mesa · Mesa del Sol*).
+6. **Cairn I**: Primer mojón de piedra que señaliza el acceso a la rambla del cañón.
+
+### B. Cuadrante Noreste · Q2 (Hoja 9A · Spread 1 Derecha)
+7. **The Sun Monolith**: Gran obelisco monolítico de arenisca que proyecta la sombra gnomónica del mediodía solar.
+8. **Arches of the West Wind**: Laberinto de arcos naturales de piedra esculpidos por los vientos dominantes de poniente.
+9. **The Sandstone Labyrinth**: Dédalo de pilares y estrechas fisuras de arenisca donde huyeron las carretas de los asaltantes.
+10. **Cairn II**: Segundo mojón de piedra; asiento de las estelas con inscripciones del desierto (*The Desert Lexicon & Al-Qibla*).
+11. **Cairn III (Copper Benchmark Plate)**: Tercer mojón de piedra con la placa de latón/cobre fijada a la roca viva.
+    - *Visual astronómica grabada en el mapa*: Línea discontinua con la inscripción `"Bearing 348* True North-Northwest"` apuntando a *The Sun Monolith*.
+12. **The Sinking Peaks**: Cordillera lejana en el horizonte brumoso oriental (*The Sinking Peaks · Distant Horizon*).
+
+### C. Cuadrante Suroeste · Q3 (Hoja 10B · Spread 2 Izquierda)
+13. **The Whispering Chasm**: Desfiladero acústico y laberinto subterráneo de 25×25 (Misión 1 de Silvia).
+14. **The Lower Wash (Wadi al-Hajar South)**: Garganta meridional inferior del lecho de grava aluvial.
+15. **The Terraces of the Jackal**: Terrazas escalonadas de arenisca en la pared occidental del cañón.
+16. **The Sentinel Mesa**: Meseta centinela a una cota de 980 varas castellanas (*Elev. 980 varas*).
+17. **Cairn IV (Sentry of the Canyon)**: Cuarto mojón de piedra que vigila la boca de salida del cañón hacia las dunas abiertas.
+
+### D. Cuadrante Sureste · Q4 (Hoja 11A · Spread 2 Derecha)
+18. **The Sandstone Sanctuary of the Oracle**: Templo milenario de la Torre II custodiado por El Oráculo del Desierto.
+19. **The Solar Altar**: Altar solar en el sanctasanctórum del templo donde converge la luz del cenit.
+20. **Arch of the Solstice**: Gran arco pétreo ceremonial que enmarca la entrada monumental.
+21. **The Salt Playa (Dry Basin)**: Inmensa cuenca salina blanca y seca (*Dry Basin*) que precede al oasis y al santuario.
+22. **Cairn V (The Final Marker)**: Quinto y último mojón de piedra de la peregrinación del desierto.
+    - *Visual astronómica grabada en el mapa*: Línea discontinua con la inscripción `"Bearing 163* True South-Southeast"` que conecta Cairn V con el Altar Solar.
+
+---
+
+### E. Blindaje de Términos: Mapas Topográficos vs. Títulos de Juegos
+
+Queda establecido como invariante de lore la distinción entre nombres físicos del terreno y títulos de juegos:
+
+| Nombre Analizado | ¿Existe rotulado dentro del Gran Mapa de 4 cuadrantes? | Naturaleza Canónica Real |
+| :--- | :---: | :--- |
+| **Oasis Clepsydra** | **NO** | Es exclusivamente el título del **Juego D3** (Hoja 11B). En el mapa (Hoja 11A) la zona física está rotulada como *The Salt Playa*, *The Solar Altar* y *The Sandstone Sanctuary*. |
+| **Polybius Stele** | **NO** | Es exclusivamente el título del **Juego D4** (Hoja 12A). En el mapa (Hoja 9A) el punto físico es **Cairn III (Copper Benchmark Plate)** con el rumbo $348^\circ\text{ NNW}$. |
+| **Desert Lexicon** | **NO** | Es exclusivamente el título del **Juego D2** (Hoja 10A). En el mapa (Hoja 9A) el punto físico es **Cairn II** y *The Sandstone Labyrinth*. |
+| **The Whispering Chasm** | **SÍ** | Es tanto la localización física rotulada en el Cuadrante SO (Hoja 10B) como el título del **Juego D1** (Hoja 09B). |
+
+

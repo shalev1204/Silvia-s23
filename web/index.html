@@ -8568,20 +8568,30 @@
             
             <!-- Atmospheric Desert Act Selector Bar -->
             <div class="desert-act-selector-bar" id="desert-act-selector-bar">
-              <button type="button" class="desert-act-btn active" id="btn-desert-act1" onclick="switchDesertAct('act1')">
-                <span class="act-badge">SPREAD 1 · NORTH</span>
-                <span class="act-title">Act I: Northern Highlands</span>
-                <span class="act-landmarks">Watchtower VI · Sandstone Labyrinth · Polybius Stele · Sun Monolith</span>
+              <button type="button" class="desert-act-btn" id="btn-desert-q1" onclick="switchDesertMapPhase('q1')">
+                <span class="act-badge">FASE 1 · HOJA 8B (NO)</span>
+                <span class="act-title">The Desert Frontier</span>
+                <span class="act-landmarks">Outer Watchtower VI · Red Ridge</span>
               </button>
-              <button type="button" class="desert-act-btn" id="btn-desert-act2" onclick="switchDesertAct('act2')">
-                <span class="act-badge">SPREAD 2 · SOUTH</span>
-                <span class="act-title">Act II: The Great Canyon & Sanctuary</span>
-                <span class="act-landmarks">The Whispering Chasm · Oasis Clepsydra · Tower II Sanctuary</span>
+              <button type="button" class="desert-act-btn" id="btn-desert-q2" onclick="switchDesertMapPhase('q2')">
+                <span class="act-badge">FASE 2 · HOJA 9A (NE)</span>
+                <span class="act-title">The Sandstone Labyrinth</span>
+                <span class="act-landmarks">Cairn II (Lexicon) · Sun Monolith</span>
               </button>
-              <button type="button" class="desert-act-btn" id="btn-desert-overview" onclick="switchDesertAct('overview')">
-                <span class="act-badge">4-QUADRANTS · 2×2</span>
+              <button type="button" class="desert-act-btn active" id="btn-desert-q3" onclick="switchDesertMapPhase('q3')">
+                <span class="act-badge">FASE 3 · HOJA 10B (SO) ✦ MISIÓN 1</span>
+                <span class="act-title">The Whispering Chasm</span>
+                <span class="act-landmarks">Lower Wash · Sentinel Mesa · Cairn IV</span>
+              </button>
+              <button type="button" class="desert-act-btn" id="btn-desert-q4" onclick="switchDesertMapPhase('q4')">
+                <span class="act-badge">FASE 4 · HOJA 11A (SE)</span>
+                <span class="act-title">The Sandstone Sanctuary</span>
+                <span class="act-landmarks">Solar Altar · Salt Playa · Tower II</span>
+              </button>
+              <button type="button" class="desert-act-btn" id="btn-desert-overview" onclick="switchDesertMapPhase('overview')">
+                <span class="act-badge">MAPA COMPLETO · 2×2</span>
                 <span class="act-title">Topographical Survey</span>
-                <span class="act-landmarks">Full 2×2 Topographical Panorama & Canyon Descent</span>
+                <span class="act-landmarks">Mosaico General de los 4 Cuadrantes</span>
               </button>
             </div>
 
@@ -8589,239 +8599,107 @@
             <div class="desert-map-layers-frame" id="desert-map-layers-frame">
 
               <!-- ==============================================================
-                   LAYER 1: ACT I — NORTHERN HIGHLANDS (SPREAD 1)
+                   LAYER 1: FASE 1 — CUADRANTE NOROESTE (HOJA 8B)
                    ============================================================== -->
-              <div class="desert-map-layer" id="desert-layer-act1">
-                <img src="./assets/maps/grand_desert_map_spread1.webp" alt="The Grand Desert Map (Act I: Northern Highlands)" class="desert-map-base-img" width="1920" height="1362">
-                <svg class="desert-map-svg-overlay" viewBox="0 0 1920 1362" id="desert-map-svg-act1">
+              <div class="desert-map-layer" id="desert-layer-q1" style="display: none;">
+                <img src="./assets/maps/desert_quadrant_1_nw.webp" alt="The Desert Frontier (Hoja 8B)" class="desert-map-base-img" width="1748" height="2480">
+                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q1">
+                  <!-- Outer Watchtower VI & Red Ridge -->
+                  <g class="desert-station-node" transform="translate(440, 1370)">
+                    <circle cx="0" cy="0" r="22" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
+                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">🔭</text>
+                    <rect x="-130" y="-45" width="260" height="26" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.95" />
+                    <text x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">OUTER WATCHTOWER VI [112° E]</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- ==============================================================
+                   LAYER 2: FASE 2 — CUADRANTE NORESTE (HOJA 9A)
+                   ============================================================== -->
+              <div class="desert-map-layer" id="desert-layer-q2" style="display: none;">
+                <img src="./assets/maps/desert_quadrant_2_ne.webp" alt="The Sandstone Labyrinth & Cairn II (Hoja 9A)" class="desert-map-base-img" width="1748" height="2480">
+                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q2">
+                  <!-- Cairn II & Stele Marker -->
+                  <g class="desert-station-node" id="node-11-trigger" transform="translate(322, 2150)" onclick="selectDesertStation(11)" style="cursor: pointer;">
+                    <circle cx="0" cy="0" r="24" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
+                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">📜</text>
+                    <rect x="-140" y="-46" width="280" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
+                    <text x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a">✦ 11 · CAIRN II (DESERT LEXICON) ➔</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- ==============================================================
+                   LAYER 3: FASE 3 — CUADRANTE SUROESTE (HOJA 10B) ✦ MISIÓN 1
+                   ============================================================== -->
+              <div class="desert-map-layer" id="desert-layer-q3">
+                <img src="./assets/maps/desert_quadrant_3_sw.webp" alt="The Whispering Chasm (Hoja 10B)" class="desert-map-base-img" width="1748" height="2480">
+                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q3">
                   <defs>
+                    <radialGradient id="chasmVortexGlow" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.9" />
+                      <stop offset="40%" stop-color="#ea580c" stop-opacity="0.4" />
+                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+                    </radialGradient>
                     <radialGradient id="hermesGlow" cx="50%" cy="50%" r="50%">
                       <stop offset="0%" stop-color="#ffe099" stop-opacity="0.95" />
                       <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.45" />
                       <stop offset="100%" stop-color="transparent" stop-opacity="0" />
                     </radialGradient>
-                    <radialGradient id="act1LabyrinthGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.85" />
-                      <stop offset="40%" stop-color="#ea580c" stop-opacity="0.35" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                    <radialGradient id="act1LexiconGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.85" />
-                      <stop offset="50%" stop-color="#0284c7" stop-opacity="0.3" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                    <radialGradient id="act1PolybiusGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.85" />
-                      <stop offset="50%" stop-color="#d97706" stop-opacity="0.35" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                    <radialGradient id="act1MonolithGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.95" />
-                      <stop offset="50%" stop-color="#eab308" stop-opacity="0.45" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                    <radialGradient id="incognitaGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#78716c" stop-opacity="0.5" />
-                      <stop offset="50%" stop-color="#44403c" stop-opacity="0.2" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
                   </defs>
 
-                  <!-- Overland Trails in Northern Highlands -->
-                  <path id="act1-trail-1" d="M 241 752 C 450 720, 650 620, 860 520" fill="none" stroke="rgba(245, 158, 11, 0.75)" stroke-width="3.5" stroke-dasharray="6, 6" />
-                  <path id="act1-trail-2" d="M 860 520 C 1050 650, 1200 820, 1350 960" fill="none" stroke="rgba(56, 189, 248, 0.75)" stroke-width="3.5" stroke-dasharray="6, 6" />
-                  <path id="act1-trail-3" d="M 1350 960 C 1420 990, 1480 1020, 1540 1060" fill="none" stroke="rgba(251, 191, 36, 0.75)" stroke-width="3.5" stroke-dasharray="6, 6" />
-                  <path id="act1-trail-4" d="M 1540 1060 C 1580 820, 1520 580, 1380 420" fill="none" stroke="rgba(254, 240, 138, 0.85)" stroke-width="4" stroke-dasharray="8, 6" />
-
-                  <!-- Hermes Expedition Marker (Act I) -->
-                  <g class="hermes-map-marker" id="hermes-map-token-act1" transform="translate(241, 752)" onclick="selectDesertStation(10)" style="cursor: pointer;">
-                    <circle class="hermes-beacon-ring" cx="0" cy="0" r="32" stroke="#f59e0b" stroke-width="2" fill="none" />
+                  <!-- Hermes Expedition Camp at Canyon Head -->
+                  <g class="hermes-map-marker" id="hermes-map-token-q3" transform="translate(480, 1150)" onclick="selectDesertStation(10)" style="cursor: pointer;">
+                    <circle class="hermes-beacon-ring" cx="0" cy="0" r="34" stroke="#f59e0b" stroke-width="2.2" fill="none" />
                     <circle cx="0" cy="0" r="22" fill="url(#hermesGlow)" />
                     <circle cx="0" cy="0" r="14" fill="#201107" stroke="#d4a853" stroke-width="2" />
                     <text x="0" y="5" text-anchor="middle" font-size="14" fill="#ffe099">⛺</text>
-                    <rect x="-115" y="24" width="230" height="26" rx="4" fill="#140f0a" stroke="#d4a853" stroke-width="1.2" opacity="0.95" />
-                    <text id="hermes-banner-text-act1" x="0" y="41" text-anchor="middle" font-family="'Cinzel', serif" font-size="10.5" font-weight="700" fill="#ffe099">HERMES · WATCHTOWER VI [112° E]</text>
+                    <rect x="-130" y="24" width="260" height="26" rx="4" fill="#140f0a" stroke="#d4a853" stroke-width="1.2" opacity="0.95" />
+                    <text x="0" y="41" text-anchor="middle" font-family="'Cinzel', serif" font-size="10.5" font-weight="700" fill="#ffe099">HERMES · ENTRADA DEL CAÑÓN</text>
                   </g>
 
-                  <!-- STATION 10: OUTER WATCHTOWER VI (241, 752) -->
-                  <g class="desert-station-node" id="node-10-trigger" transform="translate(241, 752)" onclick="selectDesertStation(10)">
-                    <circle class="chasm-vortex-ring" cx="0" cy="0" r="36" stroke="#f59e0b" stroke-width="2.2" stroke-dasharray="5, 4" fill="none" />
-                    <circle cx="0" cy="0" r="24" fill="url(#hermesGlow)" />
-                    <circle cx="0" cy="0" r="15" fill="#2d1507" stroke="#fbbf24" stroke-width="2" />
-                    <text x="0" y="5" text-anchor="middle" font-size="13" fill="#fbbf24">🔭</text>
-                    <rect x="-120" y="-48" width="240" height="26" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
-                    <text x="0" y="-31" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">✦ 10 · OUTER WATCHTOWER VI ➔</text>
-                  </g>
-
-                  <!-- STATION 11: THE SANDSTONE LABYRINTH (860, 520) -->
-                  <g class="desert-station-node" id="node-11-trigger" transform="translate(860, 520)" onclick="selectDesertStation(11)">
-                    <circle class="active-ring" id="node-11-ring" cx="0" cy="0" r="38" stroke="#f59e0b" stroke-width="2.4" stroke-dasharray="5, 4" fill="none" />
-                    <circle id="node-11-glow" cx="0" cy="0" r="26" fill="url(#act1LabyrinthGlow)" />
-                    <circle id="node-11-core" cx="0" cy="0" r="16" fill="#2d1507" stroke="#fbbf24" stroke-width="2" />
-                    <text id="node-11-icon" x="0" y="5" text-anchor="middle" font-size="14" fill="#fbbf24">🧭</text>
-                    <rect id="node-11-banner-rect" x="-135" y="-50" width="270" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
-                    <text id="node-11-banner-text" x="0" y="-32" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">✦ 11 · SANDSTONE LABYRINTH ➔</text>
-                    <text id="node-11-subtext" x="0" y="52" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="600" fill="#fbbf24" filter="drop-shadow(0 2px 4px #000)">[ CARAVAN TRACKS OF SHEET 10A ]</text>
-                  </g>
-
-                  <!-- STATION 12: THE DESERT LEXICON & AL-QIBLA (1350, 960) -->
-                  <g class="desert-station-node" id="node-12-trigger" transform="translate(1350, 960)" onclick="selectDesertStation(12)">
-                    <circle class="active-ring" id="node-12-ring" cx="0" cy="0" r="38" stroke="#38bdf8" stroke-width="2.4" stroke-dasharray="5, 4" fill="none" />
-                    <circle id="node-12-glow" cx="0" cy="0" r="26" fill="url(#act1LexiconGlow)" />
-                    <circle id="node-12-core" cx="0" cy="0" r="16" fill="#091b1e" stroke="#38bdf8" stroke-width="2" />
-                    <text id="node-12-icon" x="0" y="5" text-anchor="middle" font-size="14" fill="#38bdf8">📜</text>
-                    <rect id="node-12-banner-rect" x="-140" y="-50" width="280" height="28" rx="4" fill="#0c1f24" stroke="#38bdf8" stroke-width="1.3" opacity="0.96" />
-                    <text id="node-12-banner-text" x="0" y="-32" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#bae6fd">✦ 12 · DESERT LEXICON & AL-QIBLA ➔</text>
-                    <text id="node-12-subtext" x="0" y="52" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="600" fill="#38bdf8" filter="drop-shadow(0 2px 4px #000)">[ TRANSCRIBE STELES & COMPASS ]</text>
-                  </g>
-
-                  <!-- STATION 13: THE POLYBIUS STELE OF CAIRN III (1540, 1060) -->
-                  <g class="desert-station-node" id="node-13-trigger" transform="translate(1540, 1060)" onclick="selectDesertStation(13)">
-                    <circle class="active-ring" id="node-13-ring" cx="0" cy="0" r="38" stroke="#fbbf24" stroke-width="2.4" stroke-dasharray="5, 4" fill="none" />
-                    <circle id="node-13-glow" cx="0" cy="0" r="26" fill="url(#act1PolybiusGlow)" />
-                    <circle id="node-13-core" cx="0" cy="0" r="16" fill="#201107" stroke="#fbbf24" stroke-width="2" />
-                    <text id="node-13-icon" x="0" y="5" text-anchor="middle" font-size="14" fill="#fbbf24">🏛️</text>
-                    <rect id="node-13-banner-rect" x="-140" y="-50" width="280" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
-                    <text id="node-13-banner-text" x="0" y="-32" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">✦ 13 · POLYBIUS STELE · CAIRN III ➔</text>
-                    <text id="node-13-subtext" x="0" y="52" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="600" fill="#fbbf24" filter="drop-shadow(0 2px 4px #000)">[ BENCHMARK PLATE 348° NNW ]</text>
-                  </g>
-
-                  <!-- STATION 14: THE SUN MONOLITH (1380, 420) -->
-                  <g class="desert-station-node" id="node-14-trigger" transform="translate(1380, 420)" onclick="selectDesertStation(14)">
-                    <circle class="active-ring" id="node-14-ring" cx="0" cy="0" r="38" stroke="#fef08a" stroke-width="2.6" stroke-dasharray="5, 4" fill="none" />
-                    <circle id="node-14-glow" cx="0" cy="0" r="26" fill="url(#act1MonolithGlow)" />
-                    <circle id="node-14-core" cx="0" cy="0" r="16" fill="#221503" stroke="#fef08a" stroke-width="2" />
-                    <text id="node-14-icon" x="0" y="5" text-anchor="middle" font-size="14" fill="#fef08a">☀️</text>
-                    <rect id="node-14-banner-rect" x="-135" y="-50" width="270" height="28" rx="4" fill="#180f05" stroke="#fef08a" stroke-width="1.3" opacity="0.96" />
-                    <text id="node-14-banner-text" x="0" y="-32" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fef08a">✦ 14 · THE SUN MONOLITH ➔</text>
-                    <text id="node-14-subtext" x="0" y="52" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="600" fill="#fef08a" filter="drop-shadow(0 2px 4px #000)">[ SOLSTICE ALIGNMENT & FAULT BRINK ]</text>
+                  <!-- STATION 10: THE WHISPERING CHASM (480, 1280) -->
+                  <g class="desert-station-node" id="node-10-trigger" transform="translate(480, 1280)" onclick="selectDesertStation(10)" style="cursor: pointer;">
+                    <circle class="chasm-vortex-ring" id="node-10-ring" cx="0" cy="0" r="48" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6, 5" fill="none" />
+                    <circle id="node-10-glow" cx="0" cy="0" r="32" fill="url(#chasmVortexGlow)" />
+                    <circle id="node-10-core" cx="0" cy="0" r="18" fill="#2d1507" stroke="#fbbf24" stroke-width="2.5" />
+                    <text id="node-10-icon" x="0" y="6" text-anchor="middle" font-size="15" fill="#fbbf24">🧭</text>
+                    <rect id="node-10-banner-rect" x="-180" y="-62" width="360" height="32" rx="5" fill="#180e07" stroke="#fbbf24" stroke-width="1.6" opacity="0.97" />
+                    <text id="node-10-banner-text" x="0" y="-41" text-anchor="middle" font-family="'Cinzel', serif" font-size="13" font-weight="700" fill="#fde68a" letter-spacing="0.05em">✦ 10 · THE WHISPERING CHASM ➔</text>
+                    <text id="node-10-subtext" x="0" y="76" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#fbbf24" filter="drop-shadow(0 2px 4px #000)">[ DESCENDER AL CAÑÓN · CONSULTAR HOJA 9B ]</text>
                   </g>
                 </svg>
               </div>
 
               <!-- ==============================================================
-                   LAYER 2: ACT II — THE GREAT CANYON & SANCTUARY (SPREAD 2)
+                   LAYER 4: FASE 4 — CUADRANTE SURESTE (HOJA 11A)
                    ============================================================== -->
-              <div class="desert-map-layer" id="desert-layer-act2" style="display: none;">
-                <img src="./assets/maps/grand_desert_map_spread2.webp" alt="The Grand Desert Map (Act II: The Great Canyon & Sanctuary)" class="desert-map-base-img" width="1920" height="1362">
-                <svg class="desert-map-svg-overlay" viewBox="0 0 1920 1362" id="desert-map-svg-act2">
-                  <defs>
-                    <radialGradient id="hermesGlowAct2" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#ffe099" stop-opacity="0.95" />
-                      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.45" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                    <radialGradient id="chasmVortexGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.85" />
-                      <stop offset="40%" stop-color="#ea580c" stop-opacity="0.35" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                    <radialGradient id="clepsydraGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.9" />
-                      <stop offset="50%" stop-color="#2563eb" stop-opacity="0.35" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                    <radialGradient id="oracleGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.95" />
-                      <stop offset="50%" stop-color="#eab308" stop-opacity="0.45" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
-                  </defs>
-
-                  <!-- Trails in Canyon and Subterranean Basin -->
-                  <path id="act2-trail-1" d="M 360 640 C 620 780, 900 880, 1180 980" fill="none" stroke="rgba(96, 165, 250, 0.75)" stroke-width="3.5" stroke-dasharray="8, 6" />
-                  <path id="act2-trail-2" d="M 1180 980 C 1360 820, 1460 620, 1560 420" fill="none" stroke="rgba(251, 191, 36, 0.85)" stroke-width="4" stroke-dasharray="8, 6" />
-
-                  <!-- Hermes Expedition Marker (Act II) -->
-                  <g class="hermes-map-marker" id="hermes-map-token-act2" transform="translate(360, 640)" onclick="selectDesertStation(15)" style="cursor: pointer;">
-                    <circle class="hermes-beacon-ring" cx="0" cy="0" r="32" stroke="#f59e0b" stroke-width="2" fill="none" />
-                    <circle cx="0" cy="0" r="22" fill="url(#hermesGlowAct2)" />
-                    <circle cx="0" cy="0" r="14" fill="#201107" stroke="#d4a853" stroke-width="2" />
-                    <text x="0" y="5" text-anchor="middle" font-size="14" fill="#ffe099">⛺</text>
-                    <rect x="-115" y="24" width="230" height="26" rx="4" fill="#140f0a" stroke="#d4a853" stroke-width="1.2" opacity="0.95" />
-                    <text id="hermes-banner-text-act2" x="0" y="41" text-anchor="middle" font-family="'Cinzel', serif" font-size="10.5" font-weight="700" fill="#ffe099">HERMES · THE WHISPERING CHASM</text>
-                  </g>
-
-                  <!-- STATION 15: THE WHISPERING CHASM (360, 640) -->
-                  <g class="desert-station-node" id="node-15-trigger" transform="translate(360, 640)" onclick="selectDesertStation(15)">
-                    <circle class="chasm-vortex-ring" id="node-15-ring" cx="0" cy="0" r="38" stroke="#f59e0b" stroke-width="2.6" stroke-dasharray="5, 4" fill="none" />
-                    <circle id="node-15-glow" cx="0" cy="0" r="26" fill="url(#chasmVortexGlow)" />
-                    <circle id="node-15-core" cx="0" cy="0" r="16" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
-                    <text id="node-15-icon" x="0" y="5" text-anchor="middle" font-size="14" fill="#fbbf24">🧭</text>
-                    <rect id="node-15-banner-rect" x="-135" y="-52" width="270" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.4" opacity="0.96" />
-                    <text id="node-15-banner-text" x="0" y="-34" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a" letter-spacing="0.05em">✦ 15 · THE WHISPERING CHASM ➔</text>
-                    <text id="node-15-subtext" x="0" y="54" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="600" fill="#fbbf24" filter="drop-shadow(0 2px 4px #000)">[ CLICK TO DESCEND & GUIDE HERMES ]</text>
-                  </g>
-
-                  <!-- STATION 16: THE OASIS CLEPSYDRA (4 WELLS) (1180, 980) -->
-                  <g class="desert-station-node" id="node-16-trigger" transform="translate(1180, 980)" onclick="selectDesertStation(16)">
-                    <circle class="active-ring" id="node-16-ring" cx="0" cy="0" r="38" stroke="#60a5fa" stroke-width="2.4" stroke-dasharray="5, 4" fill="none" />
-                    <circle id="node-16-glow" cx="0" cy="0" r="26" fill="url(#clepsydraGlow)" />
-                    <circle id="node-16-core" cx="0" cy="0" r="16" fill="#0c1d2e" stroke="#60a5fa" stroke-width="2" />
-                    <text id="node-16-icon" x="0" y="5" text-anchor="middle" font-size="14" fill="#60a5fa">⏳</text>
-                    <rect id="node-16-banner-rect" x="-135" y="-52" width="270" height="28" rx="4" fill="#0d1c28" stroke="#60a5fa" stroke-width="1.3" opacity="0.95" />
-                    <text id="node-16-banner-text" x="0" y="-34" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#bfdbfe">✦ 16 · OASIS CLEPSYDRA (4 WELLS) ➔</text>
-                    <text id="node-16-subtext" x="0" y="54" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="600" fill="#60a5fa" filter="drop-shadow(0 2px 4px #000)">[ WATER SIPHON DEDUCTION WORKBENCH ]</text>
-                  </g>
-
-                  <!-- STATION 17: THE SANDSTONE SANCTUARY · TOWER II (1560, 420) -->
-                  <g class="desert-station-node" id="node-17-trigger" transform="translate(1560, 420)" onclick="selectDesertStation(17)">
-                    <circle class="active-ring" id="node-17-ring" cx="0" cy="0" r="38" stroke="#fef08a" stroke-width="2.6" stroke-dasharray="5, 4" fill="none" />
-                    <circle id="node-17-glow" cx="0" cy="0" r="26" fill="url(#oracleGlow)" />
-                    <circle id="node-17-core" cx="0" cy="0" r="16" fill="#1c1404" stroke="#fef08a" stroke-width="2" />
-                    <text id="node-17-icon" x="0" y="5" text-anchor="middle" font-size="14" fill="#fef08a">🏛️</text>
-                    <rect id="node-17-banner-rect" x="-140" y="-52" width="280" height="28" rx="4" fill="#140f03" stroke="#fef08a" stroke-width="1.3" opacity="0.95" />
-                    <text id="node-17-banner-text" x="0" y="-34" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fef08a">✦ 17 · SANDSTONE SANCTUARY (TOWER II) ➔</text>
-                    <text id="node-17-subtext" x="0" y="54" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="600" fill="#fef08a" filter="drop-shadow(0 2px 4px #000)">[ ORACLE GATES & 3 TOWERS TRIANGULATION ]</text>
+              <div class="desert-map-layer" id="desert-layer-q4" style="display: none;">
+                <img src="./assets/maps/desert_quadrant_4_se.webp" alt="The Sandstone Sanctuary & Solar Altar (Hoja 11A)" class="desert-map-base-img" width="1748" height="2480">
+                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q4">
+                  <g class="desert-station-node" id="node-14-trigger" transform="translate(732, 880)" onclick="selectDesertStation(14)" style="cursor: pointer;">
+                    <circle cx="0" cy="0" r="22" fill="#1c1404" stroke="#fef08a" stroke-width="2" />
+                    <text x="0" y="5" text-anchor="middle" font-size="13" fill="#fef08a">🏛️</text>
+                    <rect x="-140" y="-42" width="280" height="26" rx="4" fill="#140f03" stroke="#fef08a" stroke-width="1.3" opacity="0.95" />
+                    <text x="0" y="-25" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">✦ 14 · SANDSTONE SANCTUARY (TOWER II) ➔</text>
                   </g>
                 </svg>
               </div>
 
               <!-- ==============================================================
-                   LAYER 3: 4-QUADRANT COMPLETE TOPOGRAPHICAL SURVEY
+                   LAYER 5: MAPA COMPLETO — 4-QUADRANT COMPLETE TOPOGRAPHICAL SURVEY
                    ============================================================== -->
               <div class="desert-map-layer" id="desert-layer-overview" style="display: none;">
-                <img src="./assets/maps/grand_desert_map_overview.webp" alt="The Grand Desert Map (4-Quadrant Complete Overview)" class="desert-map-base-img" width="1920" height="2724">
+                <img src="./assets/maps/grand_desert_map_overview.webp" alt="The Grand Desert Map (4-Quadrant Overview)" class="desert-map-base-img" width="1920" height="2724">
                 <svg class="desert-map-svg-overlay" viewBox="0 0 1920 2724" id="desert-map-svg-overview">
-                  <!-- Complete Trail across Highlands, Fault Descent, and Subterranean Canyon -->
-                  <path d="M 241 752 C 450 720, 650 620, 860 520 C 1050 650, 1200 820, 1350 960 C 1420 990, 1480 1020, 1540 1060 C 1580 820, 1520 580, 1380 420" fill="none" stroke="rgba(245, 158, 11, 0.7)" stroke-width="3.5" stroke-dasharray="6, 6" />
-                  <!-- Descent down the Great Fault -->
-                  <path d="M 1380 420 C 1440 850, 1200 1350, 360 2002" fill="none" stroke="rgba(234, 88, 12, 0.85)" stroke-width="4" stroke-dasharray="10, 6" />
-                  <!-- Subterranean Canyon to Sanctuary -->
-                  <path d="M 360 2002 C 620 2142, 900 2242, 1180 2342 C 1360 2182, 1460 1982, 1560 1782" fill="none" stroke="rgba(251, 191, 36, 0.85)" stroke-width="4" stroke-dasharray="8, 6" />
-
-                  <!-- Markers for all 8 stations in overview -->
-                  <g class="desert-station-node" onclick="switchDesertAct('act1'); selectDesertStation(10);" transform="translate(241, 752)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#2d1507" stroke="#fbbf24" stroke-width="2" />
+                  <!-- Node for Phase 3 Whispering Chasm (SW) -->
+                  <g class="desert-station-node" onclick="switchDesertMapPhase('q3'); selectDesertStation(10);" transform="translate(360, 2002)" style="cursor:pointer;">
+                    <circle class="chasm-vortex-ring" cx="0" cy="0" r="32" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5, 4" fill="none" />
+                    <circle cx="0" cy="0" r="18" fill="#2d1507" stroke="#fbbf24" stroke-width="2" />
                     <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">10</text>
-                  </g>
-                  <g class="desert-station-node" onclick="switchDesertAct('act1'); selectDesertStation(11);" transform="translate(860, 520)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#2d1507" stroke="#fbbf24" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">11</text>
-                  </g>
-                  <g class="desert-station-node" onclick="switchDesertAct('act1'); selectDesertStation(12);" transform="translate(1350, 960)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#091b1e" stroke="#38bdf8" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#38bdf8">12</text>
-                  </g>
-                  <g class="desert-station-node" onclick="switchDesertAct('act1'); selectDesertStation(13);" transform="translate(1540, 1060)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#201107" stroke="#fbbf24" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">13</text>
-                  </g>
-                  <g class="desert-station-node" onclick="switchDesertAct('act1'); selectDesertStation(14);" transform="translate(1380, 420)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#221503" stroke="#fef08a" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#fef08a">14</text>
-                  </g>
-                  <g class="desert-station-node" onclick="switchDesertAct('act2'); selectDesertStation(15);" transform="translate(360, 2002)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#2d1507" stroke="#fbbf24" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">15</text>
-                  </g>
-                  <g class="desert-station-node" onclick="switchDesertAct('act2'); selectDesertStation(16);" transform="translate(1180, 2342)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#0c1d2e" stroke="#60a5fa" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#60a5fa">16</text>
-                  </g>
-                  <g class="desert-station-node" onclick="switchDesertAct('act2'); selectDesertStation(17);" transform="translate(1560, 1782)" style="cursor:pointer;">
-                    <circle cx="0" cy="0" r="16" fill="#1c1404" stroke="#fef08a" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#fef08a">17</text>
+                    <rect x="-120" y="-36" width="240" height="22" rx="3" fill="#180e07" stroke="#fbbf24" stroke-width="1.2" opacity="0.95" />
+                    <text x="0" y="-21" text-anchor="middle" font-family="'Cinzel', serif" font-size="9.5" font-weight="700" fill="#fde68a">10 · WHISPERING CHASM (HOJA 10B) ➔</text>
                   </g>
                 </svg>
               </div>
@@ -11093,90 +10971,115 @@
           };
         },
         10: () => {
-          return {
-            badge: 'STATION 10 // EXPEDITION BASE',
-            status: 'WATCHTOWER SECURED ✓',
-            statusClass: 'status-done-badge',
-            title: 'Outer Watchtower VI',
-            thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-            lore: 'Standing at Outer Watchtower VI at 112° East, Hermes surveyed the vast northern sandstone plateaus. Below lie the faint wheel-ruts of the raiders who fled with the stolen Astrolabe. The expedition begins across the northern tablelands.',
-            rewards: [
-              { icon: '🔭', label: 'Watchtower Survey [112° E]', desc: 'Base camp overlooking the northern plateaus' },
-              { icon: '⛺', label: 'Hermes Base Camp', desc: 'Starting post for the desert expedition' }
-            ],
-            btnText: 'Inspect Base Camp ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Station 10: Outer Watchtower VI · Survey verified.') : null)
-          };
-        },
-        11: () => {
-          const isLabyrinthDone = localStorage.getItem('order_sandstone_labyrinth_completed') === 'true';
-          if (isLabyrinthDone) {
+          const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+          if (isChasmDone) {
             return {
-              badge: 'STATION 11 // FISSURES CLEARED',
-              status: 'CARAVAN TRACKS RECOVERED ✓',
+              badge: 'STATION 10 // CANYON CLEARED',
+              status: 'OASIS REACHED · MIRAGE SOLVED ✓',
               statusClass: 'status-done-badge',
-              title: 'The Sandstone Labyrinth',
+              title: 'The Whispering Chasm',
               thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-              lore: 'Following the frantic wagon ruts through the towering sandstone arches of Sheet 10A, Silvia mapped the raiders\' trail across the northern tablelands toward the ancient inscription steles.',
+              lore: 'Guiando a Hermes con la Ley de los Caminantes del Cañón y la Hoja 9B de tu diario físico, Silvia atravesó con éxito el laberinto de arenisca 25×25, descubrió los seis mojones sagrados (M-I-R-A-G-E) y desbloqueó el valor R = 3 para el Cipher Ledger.',
               rewards: [
-                { icon: '🏜️', label: 'Sandstone Corridor Trail', desc: 'Caravan ruts traced without doubling back' },
-                { icon: '🧭', label: 'Directional Glyphs', desc: 'Exit bearing aligned with Cairn II' }
+                { icon: '🏜️', label: 'Laberinto del Cañón Superado', desc: '6 mojones sagrados en estricta secuencia' },
+                { icon: '🗝️', label: 'Contraseña Verificada: MIRAGE', desc: 'La clave de los nómadas del desierto' },
+                { icon: '📐', label: 'Constante Ledger: [R] = 3', desc: 'El 3.er mojón revela la letra R en el Ledger' },
+                { icon: '🌴', label: 'Oasis Descubierto', desc: 'Agua fresca asegurada al final del cañón' }
               ],
-              btnText: 'Inspect Labyrinth Trail ➔',
-              action: () => (window.showDesertToast ? window.showDesertToast('Station 11: Sandstone Labyrinth cleared.') : null)
+              btnText: 'Inspeccionar Ruta del Cañón ➔',
+              action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
             };
           }
 
           return {
-            badge: 'STATION 11 // ACTIVE EXPEDITION',
-            status: 'NORTHERN FISSURES READY ✦',
+            badge: 'STATION 10 // MISIÓN 1 · DESERT PATH',
+            status: 'DESCENSO AL CAÑÓN LISTO ✦',
             statusClass: 'status-live-badge',
-            title: 'The Sandstone Labyrinth',
+            title: 'The Whispering Chasm',
             thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-            lore: 'A maze of towering sandstone pillars and narrow fissures cutting through the northern plateau. Following the raiders\' wheel-ruts between natural arches reveals their frantic retreat toward the eastern benchmark.',
+            lore: 'Primera misión en el Gran Desierto: Hermes ha alcanzado la entrada del Whispering Chasm en el Cuadrante Suroeste del mapa (Hoja 10B). Para guiarlo a través del desfiladero acústico de 25×25, abre la Hoja 9B de tu diario manuscrito ("The Whispering Chasm"), sigue las reglas de los caminantes y descifra los seis mojones de piedra.',
             rewards: [
-              { icon: '🏜️', label: 'Sandstone Corridors', desc: 'Tracking wheel-ruts across Sheet 10A' },
-              { icon: '🧭', label: 'Directional Sequence', desc: 'Key directional sequence unlocked' }
+              { icon: '🧭', label: 'Hoja 9B del Diario Manuscrito', desc: 'Puzle del laberinto de arenisca 25×25' },
+              { icon: '🗺️', label: 'Cuadrante Suroeste (Hoja 10B)', desc: 'Localización topográfica en el mapa' },
+              { icon: '🗝️', label: 'Palabra de Paso: M-I-R-A-G-E', desc: '6 mojones de reliquias' },
+              { icon: '📐', label: 'Valor para el Ledger: [R] = 3', desc: 'Clave criptográfica para deducir letras' }
             ],
-            btnText: 'Inspect Sheet 10A in Journal ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Station 11: Consult Sheet 10A (The Sandstone Labyrinth) in your physical journal.') : null)
+            btnText: '✦ DESCENDER AL CAÑÓN Y GUIAR A HERMES ➔',
+            action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
           };
         },
-        12: () => {
+        11: () => {
           const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
 
           if (isLexiconDone) {
             return {
-              badge: 'STATION 12 // AL-QIBLA BEARING LOCKED',
-              status: 'SANCTUARY BEARING 194° SSW ✓',
+              badge: 'STATION 11 // AL-QIBLA BEARING LOCKED',
+              status: 'RUMBO AL SANTUARIO 194° SSW ✓',
               statusClass: 'status-done-badge',
               title: 'The Desert Lexicon & Al-Qibla',
               thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-              lore: 'Translating the ten ancient pilgrim words carved on the desert steles, Silvia assembled the sacred Desert Sigil (PHOENIX) and aligned the Al-Qibla sun compass to 194° South-Southwest—the true heading towards Tower II and the Desert Oracle.',
+              lore: 'Traduciendo las diez palabras talladas en las estelas de Cairn II (Hoja 10A), Silvia formó el Sigilo PHOENIX y calibró la brújula solar Al-Qibla a 194° SSW hacia la Torre II.',
               rewards: [
-                { icon: '🦅', label: 'The Desert Sigil: PHOENIX', desc: 'Master key for the Polybius Stele (Sheet 11B)' },
-                { icon: '🧭', label: 'Al-Qibla Bearing: 194° SSW', desc: 'Sanctuary heading across the Great Erg' },
-                { icon: '📐', label: 'Stargazer Equation: [R] × 2 = [F]', desc: 'Cipher Ledger: F=6, T=16 deduced' }
+                { icon: '🦅', label: 'El Sigilo del Desierto: PHOENIX', desc: 'Clave maestra de 7 letras circuladas' },
+                { icon: '🧭', label: 'Rumbo Al-Qibla: 194° SSW', desc: 'Rumbo directo a la Torre II' },
+                { icon: '📐', label: 'Ecuación Stargazer: [R] × 2 = [F]', desc: 'Cipher Ledger: F=6, T=16 deducidos' }
               ],
-              btnText: 'Inspect Lexicon & Compass ➔',
+              btnText: 'Inspeccionar Léxico y Brújula ➔',
               action: () => (window.openDesertLexiconModal ? window.openDesertLexiconModal() : null)
             };
           }
 
           return {
-            badge: 'STATION 12 // ACTIVE EXPEDITION',
-            status: 'DESERT STELES UNCOVERED ✦',
+            badge: 'STATION 11 // MISIÓN 2 · DESERT PATH',
+            status: 'ESTELAS DE CAIRN II DESCUBIERTAS ✦',
             statusClass: 'status-live-badge',
             title: 'The Desert Lexicon & Al-Qibla',
             thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-            lore: 'At the stone markers of the northern tableland, Hermes discovered three sandstone steles inscribed with ancient nomadic words and a sun compass. Only by solving the crossword and assembling the 7 circled letters (PHOENIX) can Silvia calculate the Al-Qibla bearing across the Great Erg toward the Desert Oracle.',
+            lore: 'Segunda misión del desierto: En el Cairn II (Cuadrante Noreste, Hoja 9A del mapa), Hermes ha encontrado las estelas del desierto. Consulta la Hoja 10A de tu diario manuscrito ("The Desert Lexicon & Al-Qibla"), resuelve el crucigrama y orienta la brújula solar.',
             rewards: [
-              { icon: '📜', label: 'The 10-Word Sandstone Stele', desc: 'Ancient pilgrim lexicon' },
-              { icon: '🦅', label: 'The Desert Sigil (PHOENIX)', desc: '7 circled letters assembled' },
-              { icon: '🧭', label: 'The Al-Qibla Compass', desc: 'True solar bearing toward Tower II' }
+              { icon: '📜', label: 'Hoja 10A del Diario Manuscrito', desc: '10 palabras de peregrinos nómadas' },
+              { icon: '🦅', label: 'Sigilo PHOENIX', desc: '7 letras circuladas' },
+              { icon: '🧭', label: 'Brújula Solar Al-Qibla', desc: 'Rumbo directo a la Torre II' }
             ],
-            btnText: '✦ TRANSCRIBE STELES & ALIGN COMPASS ➔',
+            btnText: '✦ TRANSCRIBIR ESTELAS Y ALINEAR BRÚJULA ➔',
             action: () => (window.openDesertLexiconModal ? window.openDesertLexiconModal() : null)
+          };
+        },
+        12: () => {
+          const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+
+          if (isClepsydraDone) {
+            return {
+              badge: 'STATION 12 // EXPEDITION COMPLETE',
+              status: '4 POZOS HIDRÁULICOS EQUILIBRADOS ✓',
+              statusClass: 'status-done-badge',
+              title: 'The Oasis Clepsydra (4 Wells)',
+              thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
+              lore: 'Los cuatro buscadores han sido emparejados con sus horas de llegada y reliquias en la Hoja 11B. Los sifones liberaron agua pura mineral, llenando las cuatro cantimploras con la Llave XXX (30 Horas).',
+              rewards: [
+                { icon: '⏳', label: '4 Pozos Equilibrados', desc: 'Falcon, Jackal, Scarab, Serpent' },
+                { icon: '💧', label: '4 Cantimploras Llenas', desc: 'Cruce del Gran Erg asegurado' },
+                { icon: '📐', label: 'Ecuación Ledger: [P] - [A] = 12', desc: 'Inscripción del vertedero Falcon' }
+              ],
+              btnText: 'Inspeccionar Clepsydra Equilibrada ➔',
+              action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
+            };
+          }
+
+          return {
+            badge: 'STATION 12 // MISIÓN 3 · DESERT PATH',
+            status: 'LOS CUATRO POZOS DESCUBIERTOS ✦',
+            statusClass: 'status-live-badge',
+            title: 'The Oasis Clepsydra (4 Wells)',
+            thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
+            lore: 'En la cuenca del Oasis del Desierto (Cuadrante Sureste, Hoja 11A del mapa), Hermes llegó a los Cuatro Pozos. Consulta la Hoja 11B de tu diario manuscrito ("The Oasis Clepsydra"), equilibra los sifones hidráulicos y llena tus cantimploras.',
+            rewards: [
+              { icon: '⏳', label: 'Hoja 11B del Diario Manuscrito', desc: 'Deducción lógica de los 4 Buscadores' },
+              { icon: '💧', label: '4 Cantimploras de Agua', desc: 'Suministros vitales para el desierto' },
+              { icon: '📐', label: 'Llave Clepsydra: XXX (30)', desc: 'Combinación hidráulica' }
+            ],
+            btnText: '✦ ABRIR TALLER DE LA CLEPSYDRA ➔',
+            action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
           };
         },
         13: () => {
@@ -11185,165 +11088,55 @@
           if (isPolybiusDone) {
             return {
               badge: 'STATION 13 // EXPEDITION COMPLETE',
-              status: 'BENCHMARK CIPHER DECODED ✓',
+              status: 'CIFRADO DE POLIBIO DECODIFICADO ✓',
               statusClass: 'status-done-badge',
               title: 'The Polybius Stele of Cairn III',
               thumb: './assets/thumbnails/polybius_stele_preview.webp',
-              lore: 'The keyed 5×5 Polybius cipher has been decoded using the Desert Sigil PHOENIX and Benchmark 348° NNW, revealing the solar degree offsets needed for the Sun Monolith.',
+              lore: 'El cifrado 5×5 Polybius ha sido decodificado con el sigilo PHOENIX de la Hoja 12A, revelando la alineación final hacia el Santuario.',
               rewards: [
-                { icon: '🏛️', label: 'Cairn III Benchmark Plate', desc: '348° NNW solar alignment plate' },
-                { icon: '🗝️', label: 'Decoded Nomadic Stele', desc: 'Solar degree offsets unlocked' }
+                { icon: '🏛️', label: 'Placa de Referencia Cairn III', desc: 'Alineación 348° NNW' },
+                { icon: '🗝️', label: 'Estela Nómada Decodificada', desc: 'Grados de compensación solar' }
               ],
-              btnText: 'Inspect Decoded Stele ➔',
-              action: () => (window.showDesertToast ? window.showDesertToast('Station 13: Polybius Stele of Cairn III decoded.') : null)
+              btnText: 'Inspeccionar Estela Decodificada ➔',
+              action: () => (window.showDesertToast ? window.showDesertToast('Station 13: Polybius Stele de Cairn III decodificada.') : null)
             };
           }
 
           return {
-            badge: 'STATION 13 // ACTIVE EXPEDITION',
-            status: 'BENCHMARK MONUMENT REACHED ✦',
+            badge: 'STATION 13 // MISIÓN 4 · DESERT PATH',
+            status: 'MONUMENTO DE REFERENCIA ALCANZADO ✦',
             statusClass: 'status-live-badge',
             title: 'The Polybius Stele of Cairn III',
             thumb: './assets/thumbnails/polybius_stele_preview.webp',
-            lore: 'At the eastern promontory of the northern bluff, Cairn III guards a brass benchmark plate cemented into the bedrock. Its 5×5 grid keyed with the desert sigil PHOENIX holds the nomadic cipher needed to calibrate the Sun Monolith.',
+            lore: 'En el promontorio oriental, Cairn III custodia una placa de latón de referencia. Su cuadrícula 5×5 keyed en la Hoja 12A del diario manuscrito guarda el cifrado nómada.',
             rewards: [
-              { icon: '🏛️', label: 'Cairn III Benchmark Plate', desc: '348° NNW solar alignment' },
-              { icon: '📜', label: '5×5 Polybius Grid', desc: 'Keyed with Desert Sigil PHOENIX' }
+              { icon: '🏛️', label: 'Hoja 12A del Diario Manuscrito', desc: 'Cifrado de Polibio 5×5' },
+              { icon: '📜', label: 'Placa Cairn III', desc: 'Alineación 348° NNW' }
             ],
-            btnText: 'Inspect Sheet 11B in Journal ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Station 13: Consult Sheet 11B (Cairn III Polybius Stele) in your physical journal.') : null)
+            btnText: 'Consultar Hoja 12A en el Diario ➔',
+            action: () => (window.showDesertToast ? window.showDesertToast('Station 13: Consulta la Hoja 12A (The Polybius Stele) en tu diario físico.') : null)
           };
         },
         14: () => {
-          const isMonolithDone = localStorage.getItem('order_sun_monolith_completed') === 'true';
-
-          if (isMonolithDone) {
-            return {
-              badge: 'STATION 14 // FAULT DESCENT REVEALED',
-              status: 'SOLSTICE BEARING LOCKED ✓',
-              statusClass: 'status-done-badge',
-              title: 'The Sun Monolith Alignment',
-              thumb: './assets/thumbnails/polybius_stele_preview.webp',
-              lore: 'Calibrating the solar gnomon shadow atop Mesa del Sol revealed the raiders\' broken wagons at the brink of the Great Fault, and the scree descent into the Whispering Chasm (Act II).',
-              rewards: [
-                { icon: '☀️', label: 'Solstice Shadow Vector', desc: 'Mesa del Sol meridian intersection' },
-                { icon: '📉', label: 'Brink of the Great Fault', desc: 'Descent into Act II unlocked' }
-              ],
-              btnText: 'Inspect Fault Descent ➔',
-              action: () => {
-                if (typeof window.switchDesertAct === 'function') window.switchDesertAct('act2');
-                if (typeof window.selectDesertStation === 'function') window.selectDesertStation(15);
-              }
-            };
-          }
-
           return {
-            badge: 'STATION 14 // ACTIVE EXPEDITION',
-            status: 'SOLAR NOON CALIBRATION ✦',
-            statusClass: 'status-live-badge',
-            title: 'The Sun Monolith Alignment',
-            thumb: './assets/thumbnails/polybius_stele_preview.webp',
-            lore: 'A solitary sandstone obelisk crowning the Mesa del Sol. At solar noon, its gnomon shadow intersects the 348° bearing from Cairn III, pinpointing the abandoned raider wagons at the brink of the Great Fault and the fissure descending into the abyss.',
-            rewards: [
-              { icon: '☀️', label: 'The Sun Monolith', desc: 'Solar gnomon atop Mesa del Sol' },
-              { icon: '📉', label: 'Brink of the Great Fault', desc: 'The secret descent to the canyon' }
-            ],
-            btnText: 'Inspect Sheet 12A in Journal ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Station 14: Consult Sheet 12A (The Sun Monolith) in your physical journal.') : null)
-          };
-        },
-        15: () => {
-          const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-          if (isChasmDone) {
-            return {
-              badge: 'STATION 15 // ACT II · CANYON CLEARED',
-              status: 'OASIS REACHED ✓',
-              statusClass: 'status-done-badge',
-              title: 'The Whispering Chasm',
-              thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-              lore: 'Using the Law of the Canyon Walkers and Sheet 14B, Silvia guided Hermes through the 25×25 sandstone labyrinth, uncovering the six sacred relic cairns (M-I-R-A-G-E) and leading the expedition safely into the Desert Oasis.',
-              rewards: [
-                { icon: '🏜️', label: 'Canyon Labyrinth Navigated', desc: '6 relic cairns verified in strict sequence' },
-                { icon: '🗝️', label: 'Passphrase Verified: MIRAGE', desc: 'The Nomad\'s canyon passphrase' },
-                { icon: '📐', label: 'Cairn Marker: [R] = 3', desc: 'The 3rd cairn reveals letter R in Ledger' },
-                { icon: '🌴', label: 'Desert Oasis Discovered', desc: 'Fresh water & Oasis Clepsydra found' }
-              ],
-              btnText: 'Inspect Canyon Route ➔',
-              action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
-            };
-          }
-
-          return {
-            badge: 'STATION 15 // ACT II · CANYON DESCENT',
-            status: 'CANYON DESCENT READY ✦',
-            statusClass: 'status-live-badge',
-            title: 'The Whispering Chasm',
-            thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-            lore: 'Descending through the broken scree at the Great Fault into the subterranean gorge of Sheet 13B. The raiders fled on foot with the stolen Astrolabe; only the six sacred relic cairns (M-I-R-A-G-E) can guide Hermes through the acoustic canyon maze.',
-            rewards: [
-              { icon: '🏜️', label: 'The Canyon Labyrinth', desc: '25×25 sandstone gorge navigation' },
-              { icon: '🗝️', label: 'The Nomad\'s Passphrase', desc: 'Six sacred relic cairns in sequence' },
-              { icon: '📐', label: 'Cairn Marker [R] = 3', desc: 'Key constant for the Oasis Stele' }
-            ],
-            btnText: '✦ ENTER CANYON & GUIDE HERMES ➔',
-            action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
-          };
-        },
-        16: () => {
-          const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
-
-          if (isClepsydraDone) {
-            return {
-              badge: 'STATION 16 // EXPEDITION COMPLETE',
-              status: '4 HYDRAULIC WELLS BALANCED ✓',
-              statusClass: 'status-done-badge',
-              title: 'The Oasis Clepsydra (4 Wells)',
-              thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
-              lore: 'The four seekers have been matched with their arrival hours and sacred relics. The water siphons released pure mineral water, filling all four canteens with Key XXX (30 Hours).',
-              rewards: [
-                { icon: '⏳', label: '4 Balanced Wells', desc: 'Falcon, Jackal, Scarab, Serpent' },
-                { icon: '💧', label: '4 Full Water Skins', desc: 'Great Erg crossing unlocked' },
-                { icon: '📐', label: 'Ledger Equation: [P] - [A] = 12', desc: 'Falcon weir inscription' }
-              ],
-              btnText: 'Inspect Balanced Clepsydra ➔',
-              action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
-            };
-          }
-
-          return {
-            badge: 'STATION 16 // EXPEDITION UNLOCKED',
-            status: 'THE FOUR WELLS DISCOVERED ✦',
-            statusClass: 'status-live-badge',
-            title: 'The Oasis Clepsydra (4 Wells)',
-            thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
-            lore: 'At the basin of the Desert Oasis, Hermes reached the Four Wells (Falcon, Jackal, Scarab, Serpent). Balancing the four seekers, arrival hours, and relics from Sheet 15B activates the subterranean siphons to replenish your canteens before crossing the salt flats.',
-            rewards: [
-              { icon: '⏳', label: 'The 4-Well Clepsydra', desc: '4 Seekers × 4 Wells logic deduction' },
-              { icon: '💧', label: '4 Filled Water Skins', desc: 'Essential supplies for the Great Erg trek' },
-              { icon: '📐', label: 'Clepsydra Key: XXX (30)', desc: 'Hydraulic lock combination' },
-              { icon: '🗝️', label: 'Falcon Weir: [P] - [A] = 12', desc: 'Cipher Ledger deduction' }
-            ],
-            btnText: '✦ OPEN OASIS CLEPSYDRA WORKBENCH ➔',
-            action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
-          };
-        },
-        17: () => {
-          return {
-            badge: 'STATION 17 // TOWER II SANCTUARY',
-            status: 'SANCTUARY THRESHOLD REACHED ✦',
+            badge: 'STATION 14 // TOWER II · SANCTUARY',
+            status: 'UMBRAL DEL SANTUARIO ALCANZADO ✦',
             statusClass: 'status-live-badge',
             title: 'The Sandstone Sanctuary of the Oracle',
             thumb: './assets/thumbnails/polybius_stele_preview.webp',
-            lore: 'Tower II — The Sandstone Sanctuary of the Desert Oracle. The ultimate destination of the desert pilgrimage, guarded by ancient trials. Hermes stands before the great bronze gates, ready to triangulate the Three Ancient Towers.',
+            lore: 'Torre II — The Sandstone Sanctuary of the Desert Oracle (Hoja 12B del diario físico). Destino final del camino del desierto. Hermes se encuentra ante las grandes puertas de bronce, listo para triangular las Tres Antiguas Torres.',
             rewards: [
-              { icon: '🏛️', label: 'Tower II Sanctuary Gates', desc: 'The Second Ancient Tower unsealed' },
-              { icon: '☀️', label: 'Meeting The Desert Oracle', desc: 'Terrestrial coordinates revealed' },
-              { icon: '🗝️', label: 'The Second Master Key', desc: 'Unlocks the Grand Convergence' }
+              { icon: '🏛️', label: 'Puertas de la Torre II', desc: 'El Segundo Santuario desvelado' },
+              { icon: '☀️', label: 'The Desert Oracle', desc: 'Encuentro profético y coordenadas secretas' },
+              { icon: '🗝️', label: 'Segunda Llave Maestra', desc: 'Hacia la Bóveda del Gran Eclipse' }
             ],
-            btnText: 'Enter Tower II Sanctuary ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Tower II: The Sandstone Sanctuary of the Desert Oracle awaits at Sheet 16.') : null)
+            btnText: 'Entrar al Santuario de la Torre II ➔',
+            action: () => (window.showDesertToast ? window.showDesertToast('Torre II: The Sandstone Sanctuary of the Desert Oracle aguarda en la Hoja 12B.') : null)
           };
         },
+        15: () => nodesData[10](),
+        16: () => nodesData[12](),
+        17: () => nodesData[14]()
       };
 
       const inspBadge = document.getElementById('insp-badge');
@@ -14293,60 +14086,88 @@
         if (savedPath === 'desert') currentMapPath = 'desert';
       } catch (e) {}
 
-      let currentDesertAct = 'act1';
+      let currentDesertPhase = 'q3';
       try {
-        const savedAct = localStorage.getItem('order_active_desert_act');
-        if (savedAct && ['act1', 'act2', 'overview'].includes(savedAct)) {
-          currentDesertAct = savedAct;
+        const savedPhase = localStorage.getItem('order_active_desert_phase');
+        if (savedPhase && ['q1', 'q2', 'cw', 'ce', 'q3', 'q4', 'overview'].includes(savedPhase)) {
+          currentDesertPhase = savedPhase;
+        } else {
+          const legacyAct = localStorage.getItem('order_active_desert_act');
+          if (legacyAct === 'act1') currentDesertPhase = 'q1';
+          else if (legacyAct === 'act2') currentDesertPhase = 'q3';
+          else if (legacyAct === 'overview') currentDesertPhase = 'overview';
         }
       } catch (e) {}
 
-      function switchDesertAct(actId, autoSelect = false) {
-        currentDesertAct = actId;
-        try { localStorage.setItem('order_active_desert_act', actId); } catch (e) {}
+      function switchDesertMapPhase(phaseId, autoSelect = false) {
+        currentDesertPhase = phaseId;
+        try {
+          localStorage.setItem('order_active_desert_phase', phaseId);
+          if (phaseId === 'q1' || phaseId === 'q2') localStorage.setItem('order_active_desert_act', 'act1');
+          else if (phaseId === 'q3' || phaseId === 'q4') localStorage.setItem('order_active_desert_act', 'act2');
+          else localStorage.setItem('order_active_desert_act', 'overview');
+        } catch (e) {}
 
-        const btnAct1 = document.getElementById('btn-desert-act1');
-        const btnAct2 = document.getElementById('btn-desert-act2');
+        const btnQ1 = document.getElementById('btn-desert-q1');
+        const btnQ2 = document.getElementById('btn-desert-q2');
+        const btnQ3 = document.getElementById('btn-desert-q3');
+        const btnQ4 = document.getElementById('btn-desert-q4');
         const btnOverview = document.getElementById('btn-desert-overview');
-        const layerAct1 = document.getElementById('desert-layer-act1');
-        const layerAct2 = document.getElementById('desert-layer-act2');
+
+        const layerQ1 = document.getElementById('desert-layer-q1');
+        const layerQ2 = document.getElementById('desert-layer-q2');
+        const layerQ3 = document.getElementById('desert-layer-q3');
+        const layerQ4 = document.getElementById('desert-layer-q4');
         const layerOverview = document.getElementById('desert-layer-overview');
 
-        if (btnAct1) btnAct1.classList.toggle('active', actId === 'act1');
-        if (btnAct2) btnAct2.classList.toggle('active', actId === 'act2');
-        if (btnOverview) btnOverview.classList.toggle('active', actId === 'overview');
+        if (btnQ1) btnQ1.classList.toggle('active', phaseId === 'q1');
+        if (btnQ2) btnQ2.classList.toggle('active', phaseId === 'q2');
+        if (btnQ3) btnQ3.classList.toggle('active', phaseId === 'q3');
+        if (btnQ4) btnQ4.classList.toggle('active', phaseId === 'q4');
+        if (btnOverview) btnOverview.classList.toggle('active', phaseId === 'overview');
 
-        if (layerAct1) layerAct1.style.display = actId === 'act1' ? 'block' : 'none';
-        if (layerAct2) layerAct2.style.display = actId === 'act2' ? 'block' : 'none';
-        if (layerOverview) layerOverview.style.display = actId === 'overview' ? 'block' : 'none';
+        if (layerQ1) layerQ1.style.display = phaseId === 'q1' ? 'block' : 'none';
+        if (layerQ2) layerQ2.style.display = phaseId === 'q2' ? 'block' : 'none';
+        if (layerQ3) layerQ3.style.display = phaseId === 'q3' ? 'block' : 'none';
+        if (layerQ4) layerQ4.style.display = phaseId === 'q4' ? 'block' : 'none';
+        if (layerOverview) layerOverview.style.display = phaseId === 'overview' ? 'block' : 'none';
 
         if (viewDesc) {
-          if (actId === 'act1') {
-            viewDesc.textContent = 'Act I · Northern Highlands: Track the raiders across sandstone arches (Sheet 10A), translate the Desert Lexicon (Sheet 11A), calibrate the Polybius Stele (Sheet 11B), and calculate the Solstice Meridian at the Sun Monolith (Sheet 12A).';
-          } else if (actId === 'act2') {
-            viewDesc.textContent = 'Act II · The Great Canyon & Sanctuary: Descend the Great Fault into the subterranean Whispering Chasm (Sheet 13B & 14B), balance the 4 Wells at the Oasis Clepsydra (Sheet 15B), and unseal the Sandstone Sanctuary of Tower II (Sheet 16).';
+          if (phaseId === 'q1') {
+            viewDesc.textContent = 'Fase 1 · Cuadrante Noroeste (Hoja 8B): The Desert Frontier. Outer Watchtower VI, Red Ridge, Mesa del Sol, Cairn I.';
+          } else if (phaseId === 'q2') {
+            viewDesc.textContent = 'Fase 2 · Cuadrante Noreste (Hoja 9A): The Sandstone Labyrinth. Cairn II (The Desert Lexicon & Al-Qibla), Cairn III (Copper Benchmark), Sun Monolith.';
+          } else if (phaseId === 'q3') {
+            viewDesc.textContent = 'Fase 3 · Cuadrante Suroeste (Hoja 10B) ✦ Misión 1 Activa: The Whispering Chasm. Desciende al cañón y consulta la Hoja 9B de tu diario físico para guiar a Hermes hasta el Oasis.';
+          } else if (phaseId === 'q4') {
+            viewDesc.textContent = 'Fase 4 · Cuadrante Sureste (Hoja 11A): The Sandstone Sanctuary. Solar Altar, Salt Playa, Tower II (The Sandstone Sanctuary), Cairn V.';
           } else {
-            viewDesc.textContent = 'Full Topographical Survey: 4-Quadrant master mosaic combining Spread 1 (Highlands) and Spread 2 (Canyon & Subterranean Sanctuary) into a complete 2×2 desert panorama.';
+            viewDesc.textContent = 'Visión Topográfica General: Mosaico continuo de los 4 Cuadrantes (2×2) del Gran Mapa del Desierto.';
           }
         }
 
         updateDesertMapMarkers();
 
         if (autoSelect && typeof window.selectMapNode === 'function') {
-          if (actId === 'act1') {
-            const isMonolithDone = localStorage.getItem('order_sun_monolith_completed') === 'true';
-            const isPolyDone = localStorage.getItem('order_polybius_stele_completed') === 'true';
-            const isLexDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
-            const isLabDone = localStorage.getItem('order_sandstone_labyrinth_completed') === 'true';
-            const activeId = isMonolithDone ? 14 : (isPolyDone ? 14 : (isLexDone ? 13 : (isLabDone ? 12 : 11)));
-            window.selectMapNode(activeId, false);
-          } else if (actId === 'act2') {
-            const isClepDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
-            const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-            const activeId = isClepDone ? 17 : (isChasmDone ? 16 : 15);
-            window.selectMapNode(activeId, false);
+          if (phaseId === 'q3') {
+            window.selectMapNode(10, false);
+          } else if (phaseId === 'q2') {
+            window.selectMapNode(11, false);
+          } else if (phaseId === 'q4') {
+            window.selectMapNode(14, false);
+          } else if (phaseId === 'q1') {
+            window.selectMapNode(10, false);
           }
         }
+      }
+      window.switchDesertMapPhase = switchDesertMapPhase;
+
+      function switchDesertAct(actId, autoSelect = false) {
+        let phase = 'q3';
+        if (actId === 'act1') phase = 'q1';
+        else if (actId === 'act2') phase = 'q3';
+        else if (actId === 'overview') phase = 'overview';
+        switchDesertMapPhase(phase, autoSelect);
       }
       window.switchDesertAct = switchDesertAct;
 
@@ -14364,28 +14185,26 @@
           if (viewTagline) viewTagline.textContent = '✦ Desert Progression · Terra Deserta ✦';
           if (viewTitle) viewTitle.textContent = 'The Grand Desert Map';
 
-          switchDesertAct(currentDesertAct, false);
+          const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+          const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
+
+          let initialPhase = 'q3';
+          let activeId = 10;
+
+          if (!isChasmDone) {
+            initialPhase = 'q3';
+            activeId = 10;
+          } else if (!isLexiconDone) {
+            initialPhase = 'q2';
+            activeId = 11;
+          } else {
+            initialPhase = currentDesertPhase || 'q3';
+            activeId = 12;
+          }
+
+          switchDesertMapPhase(initialPhase, false);
 
           if (autoSelectNode && typeof window.selectMapNode === 'function') {
-            const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
-            const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-            const isMonolithDone = localStorage.getItem('order_sun_monolith_completed') === 'true';
-            const isPolybiusDone = localStorage.getItem('order_polybius_stele_completed') === 'true';
-            const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
-            const isLabyrinthDone = localStorage.getItem('order_sandstone_labyrinth_completed') === 'true';
-
-            let activeId = 10;
-            if (isClepsydraDone) activeId = 17;
-            else if (isChasmDone) activeId = 16;
-            else if (isMonolithDone) activeId = 15;
-            else if (isPolybiusDone) activeId = 14;
-            else if (isLexiconDone) activeId = 13;
-            else if (isLabyrinthDone) activeId = 12;
-            else activeId = 11;
-
-            if (activeId >= 15 && currentDesertAct === 'act1') {
-              switchDesertAct('act2', false);
-            }
             window.selectMapNode(activeId, false);
           }
         } else {
@@ -14423,192 +14242,79 @@
       function selectDesertStation(id) {
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
 
-        if (id <= 14 && currentDesertAct === 'act2') {
-          switchDesertAct('act1', false);
-        } else if (id >= 15 && currentDesertAct === 'act1') {
-          switchDesertAct('act2', false);
-        }
-
-        const isLabyrinthDone = localStorage.getItem('order_sandstone_labyrinth_completed') === 'true';
-        const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
-        const isPolybiusDone = localStorage.getItem('order_polybius_stele_completed') === 'true';
-        const isMonolithDone = localStorage.getItem('order_sun_monolith_completed') === 'true';
         const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-        const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
 
-        if (id === 10) {
+        let targetId = id;
+        if (id === 15) targetId = 10;
+        else if (id === 16) targetId = 12;
+        else if (id === 17) targetId = 14;
+
+        if (targetId === 10) {
+          switchDesertMapPhase('q3', false);
           window.selectMapNode(10, true);
-          showDesertToast('Station 10: Outer Watchtower VI · Survey verified overlooking northern tablelands.');
-        } else if (id === 11) {
-          window.selectMapNode(11, true);
-          showDesertToast('Station 11: The Sandstone Labyrinth · Consult Sheet 10A in your physical journal.');
-        } else if (id === 12) {
-          window.selectMapNode(12, true);
-          if (window.openDesertLexiconModal) {
-            window.openDesertLexiconModal();
-          } else {
-            showDesertToast('Station 12: The Desert Lexicon & Al-Qibla Sun Compass.');
-          }
-        } else if (id === 13) {
-          window.selectMapNode(13, true);
-          if (!isLexiconDone) {
-            showDesertToast('✦ TERRA INCOGNITA ✦ Solve the Desert Lexicon (Station 12) before calibrating Cairn III.');
-          } else {
-            showDesertToast('Station 13: Consult Sheet 11B (Cairn III Polybius Stele) in your physical journal.');
-          }
-        } else if (id === 14) {
-          window.selectMapNode(14, true);
-          if (!isPolybiusDone) {
-            showDesertToast('✦ TERRA INCOGNITA ✦ Decipher the Polybius Stele (Station 13) to unlock the Sun Monolith.');
-          } else {
-            showDesertToast('Station 14: Consult Sheet 12A (The Sun Monolith Alignment) atop Mesa del Sol.');
-          }
-        } else if (id === 15) {
-          window.selectMapNode(15, true);
           if (window.openWhisperingChasmModal) {
             window.openWhisperingChasmModal();
           } else {
-            showDesertToast('Station 15: The Whispering Chasm · Acoustic Gorge Labyrinth.');
+            showDesertToast('Misión 1: The Whispering Chasm · Abre la Hoja 9B de tu diario físico.');
           }
-        } else if (id === 16) {
-          window.selectMapNode(16, true);
+        } else if (targetId === 11) {
+          switchDesertMapPhase('q2', false);
+          window.selectMapNode(11, true);
+          if (window.openDesertLexiconModal) {
+            window.openDesertLexiconModal();
+          } else {
+            showDesertToast('Misión 2: The Desert Lexicon & Al-Qibla · Consulta la Hoja 10A de tu diario físico.');
+          }
+        } else if (targetId === 12) {
+          window.selectMapNode(12, true);
           if (!isChasmDone) {
-            showDesertToast('✦ TERRA INCOGNITA ✦ Guide Hermes through the Whispering Chasm (Station 15) before reaching the Oasis Clepsydra.');
+            showDesertToast('✦ TERRA INCOGNITA ✦ Guía a Hermes por el Whispering Chasm (Misión 1) antes de acceder a la Clepsydra.');
           } else {
             if (window.openOasisClepsydraModal) {
               window.openOasisClepsydraModal();
             } else {
-              showDesertToast('Station 16: The Oasis Clepsydra · Consult Sheet 15B in your physical journal.');
+              showDesertToast('Misión 3: The Oasis Clepsydra · Consulta la Hoja 11B de tu diario físico.');
             }
           }
-        } else if (id === 17) {
-          window.selectMapNode(17, true);
-          if (!isClepsydraDone) {
-            showDesertToast('✦ TERRA INCOGNITA ✦ Balance the 4 Wells at the Oasis Clepsydra (Station 16) before entering the Sanctuary.');
-          } else {
-            showDesertToast('Tower II: The Sandstone Sanctuary of the Desert Oracle awaits at Sheet 16.');
-          }
+        } else if (targetId === 13) {
+          window.selectMapNode(13, true);
+          showDesertToast('Misión 4: The Polybius Stele · Consulta la Hoja 12A de tu diario físico.');
+        } else if (targetId === 14) {
+          switchDesertMapPhase('q4', false);
+          window.selectMapNode(14, true);
+          showDesertToast('Torre II: The Sandstone Sanctuary of the Desert Oracle · Hoja 13A del diario.');
         }
       }
       window.selectDesertStation = selectDesertStation;
 
       function updateDesertMapMarkers() {
-        const isLabyrinthDone = localStorage.getItem('order_sandstone_labyrinth_completed') === 'true';
-        const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
-        const isPolybiusDone = localStorage.getItem('order_polybius_stele_completed') === 'true';
-        const isMonolithDone = localStorage.getItem('order_sun_monolith_completed') === 'true';
         const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-        const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+        const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
 
-        // 1. Act I Hermes Token & Banner
-        const hermesMarkerAct1 = document.getElementById('hermes-map-token-act1');
-        const hermesBannerAct1 = document.getElementById('hermes-banner-text-act1');
-        if (hermesMarkerAct1) {
-          if (isMonolithDone) {
-            hermesMarkerAct1.setAttribute('transform', 'translate(1380, 420)');
-            if (hermesBannerAct1) hermesBannerAct1.textContent = 'HERMES · BRINK OF GREAT FAULT [DESCENT READY]';
-          } else if (isPolybiusDone) {
-            hermesMarkerAct1.setAttribute('transform', 'translate(1540, 1060)');
-            if (hermesBannerAct1) hermesBannerAct1.textContent = 'HERMES · CAIRN III [348° NNW CALIBRATED]';
-          } else if (isLexiconDone) {
-            hermesMarkerAct1.setAttribute('transform', 'translate(1350, 960)');
-            if (hermesBannerAct1) hermesBannerAct1.textContent = 'HERMES · CAMP VIII [194° SSW LOCKED]';
-          } else if (isLabyrinthDone) {
-            hermesMarkerAct1.setAttribute('transform', 'translate(860, 520)');
-            if (hermesBannerAct1) hermesBannerAct1.textContent = 'HERMES · LABYRINTH ARCHES [MAPPED]';
-          } else {
-            hermesMarkerAct1.setAttribute('transform', 'translate(241, 752)');
-            if (hermesBannerAct1) hermesBannerAct1.textContent = 'HERMES · WATCHTOWER VI [112° E]';
-          }
+        // 1. Phase 5 (Cuadrante Suroeste - Sheet 12B)
+        const node10Subtext = document.getElementById('node-10-subtext');
+        const node10Banner = document.getElementById('node-10-banner-text');
+
+        if (node10Subtext) {
+          node10Subtext.textContent = isChasmDone
+            ? '[ CAÑÓN SUPERADO · OASIS ALCANZADO ✓ ]'
+            : '[ DESCENDER AL CAÑÓN · CONSULTAR HOJA 9B ]';
+          node10Subtext.setAttribute('fill', isChasmDone ? '#34d399' : '#fbbf24');
+        }
+        if (node10Banner) {
+          node10Banner.textContent = isChasmDone
+            ? '✓ 10 · THE WHISPERING CHASM (RESUELTO)'
+            : '✦ 10 · THE WHISPERING CHASM ➔';
+          node10Banner.setAttribute('fill', isChasmDone ? '#a7f3d0' : '#fde68a');
         }
 
-        // 2. Act I Trails
-        const trail1 = document.getElementById('act1-trail-1');
-        const trail2 = document.getElementById('act1-trail-2');
-        const trail3 = document.getElementById('act1-trail-3');
-        const trail4 = document.getElementById('act1-trail-4');
-        if (trail1) {
-          trail1.setAttribute('stroke', isLabyrinthDone ? 'rgba(52, 211, 153, 0.85)' : 'rgba(245, 158, 11, 0.75)');
-          trail1.setAttribute('stroke-dasharray', isLabyrinthDone ? 'none' : '6, 6');
-        }
-        if (trail2) {
-          trail2.setAttribute('stroke', isLexiconDone ? 'rgba(52, 211, 153, 0.85)' : (isLabyrinthDone ? 'rgba(56, 189, 248, 0.75)' : 'rgba(120, 113, 108, 0.3)'));
-          trail2.setAttribute('stroke-dasharray', isLexiconDone ? 'none' : '6, 6');
-        }
-        if (trail3) {
-          trail3.setAttribute('stroke', isPolybiusDone ? 'rgba(52, 211, 153, 0.85)' : (isLexiconDone ? 'rgba(251, 191, 36, 0.75)' : 'rgba(120, 113, 108, 0.25)'));
-          trail3.setAttribute('stroke-dasharray', isPolybiusDone ? 'none' : '6, 6');
-        }
-        if (trail4) {
-          trail4.setAttribute('stroke', isMonolithDone ? 'rgba(52, 211, 153, 0.85)' : (isPolybiusDone ? 'rgba(254, 240, 138, 0.85)' : 'rgba(120, 113, 108, 0.2)'));
-          trail4.setAttribute('stroke-dasharray', isMonolithDone ? 'none' : '8, 6');
-        }
-
-        // 3. Act I Node Subtexts
-        const sub11 = document.getElementById('node-11-subtext');
-        if (sub11) {
-          sub11.textContent = isLabyrinthDone ? '[ CARAVAN TRACKS MAPPED ✓ ]' : '[ CARAVAN TRACKS OF SHEET 10A ]';
-          sub11.setAttribute('fill', isLabyrinthDone ? '#34d399' : '#fbbf24');
-        }
-        const sub12 = document.getElementById('node-12-subtext');
-        if (sub12) {
-          sub12.textContent = isLexiconDone ? '[ 194° SSW LOCKED · PHOENIX SOLVED ✓ ]' : '[ TRANSCRIBE STELES & COMPASS ]';
-          sub12.setAttribute('fill', isLexiconDone ? '#34d399' : '#38bdf8');
-        }
-        const sub13 = document.getElementById('node-13-subtext');
-        if (sub13) {
-          sub13.textContent = isPolybiusDone ? '[ BENCHMARK 348° NNW CALIBRATED ✓ ]' : (isLexiconDone ? '[ BENCHMARK PLATE 348° NNW ]' : '[ LOCKED · LEXICON SIGIL REQUIRED ]');
-          sub13.setAttribute('fill', isPolybiusDone ? '#34d399' : (isLexiconDone ? '#fbbf24' : '#78716c'));
-        }
-        const sub14 = document.getElementById('node-14-subtext');
-        if (sub14) {
-          sub14.textContent = isMonolithDone ? '[ SOLSTICE MERIDIAN LOCKED ✓ ]' : (isPolybiusDone ? '[ SOLSTICE ALIGNMENT & FAULT BRINK ]' : '[ LOCKED · BENCHMARK BEARING REQUIRED ]');
-          sub14.setAttribute('fill', isMonolithDone ? '#34d399' : (isPolybiusDone ? '#fef08a' : '#78716c'));
-        }
-
-        // 4. Act II Hermes Token & Banner
-        const hermesMarkerAct2 = document.getElementById('hermes-map-token-act2');
-        const hermesBannerAct2 = document.getElementById('hermes-banner-text-act2');
-        if (hermesMarkerAct2) {
-          if (isClepsydraDone) {
-            hermesMarkerAct2.setAttribute('transform', 'translate(1560, 420)');
-            if (hermesBannerAct2) hermesBannerAct2.textContent = 'HERMES · TOWER II [SANCTUARY GATES]';
-          } else if (isChasmDone) {
-            hermesMarkerAct2.setAttribute('transform', 'translate(1180, 980)');
-            if (hermesBannerAct2) hermesBannerAct2.textContent = 'HERMES · DESERT OASIS [4 WELLS]';
-          } else {
-            hermesMarkerAct2.setAttribute('transform', 'translate(360, 640)');
-            if (hermesBannerAct2) hermesBannerAct2.textContent = 'HERMES · THE WHISPERING CHASM';
-          }
-        }
-
-        // 5. Act II Trails
-        const trailAct2_1 = document.getElementById('act2-trail-1');
-        const trailAct2_2 = document.getElementById('act2-trail-2');
-        if (trailAct2_1) {
-          trailAct2_1.setAttribute('stroke', isChasmDone ? 'rgba(52, 211, 153, 0.85)' : 'rgba(96, 165, 250, 0.75)');
-          trailAct2_1.setAttribute('stroke-dasharray', isChasmDone ? 'none' : '8, 6');
-        }
-        if (trailAct2_2) {
-          trailAct2_2.setAttribute('stroke', isClepsydraDone ? 'rgba(52, 211, 153, 0.85)' : (isChasmDone ? 'rgba(251, 191, 36, 0.85)' : 'rgba(120, 113, 108, 0.25)'));
-          trailAct2_2.setAttribute('stroke-dasharray', isClepsydraDone ? 'none' : '8, 6');
-        }
-
-        // 6. Act II Node Subtexts
-        const sub15 = document.getElementById('node-15-subtext');
-        if (sub15) {
-          sub15.textContent = isChasmDone ? '[ CANYON CLEARED · OASIS REACHED ✓ ]' : '[ CLICK TO DESCEND & GUIDE HERMES ]';
-          sub15.setAttribute('fill', isChasmDone ? '#34d399' : '#fbbf24');
-        }
-        const sub16 = document.getElementById('node-16-subtext');
-        if (sub16) {
-          sub16.textContent = isClepsydraDone ? '[ 4 WELLS BALANCED · WATER SECURED ✓ ]' : (isChasmDone ? '[ WATER SIPHON DEDUCTION WORKBENCH ]' : '[ LOCKED · CHASM PASSAGE REQUIRED ]');
-          sub16.setAttribute('fill', isClepsydraDone ? '#34d399' : (isChasmDone ? '#60a5fa' : '#78716c'));
-        }
-        const sub17 = document.getElementById('node-17-subtext');
-        if (sub17) {
-          sub17.textContent = isClepsydraDone ? '[ ORACLE GATES UNSEALED · TOWER II ✦ ]' : '[ LOCKED · CLEPSYDRA ACCESS REQUIRED ]';
-          sub17.setAttribute('fill', isClepsydraDone ? '#fef08a' : '#78716c');
+        // 2. Phase 2 (Cuadrante Noreste - Sheet 9A)
+        const node11Subtext = document.getElementById('node-11-subtext');
+        if (node11Subtext) {
+          node11Subtext.textContent = isLexiconDone
+            ? '[ 194° SSW FIJADO · PHOENIX RESUELTO ✓ ]'
+            : '[ TRANSCRIBIR ESTELAS Y BRÚJULA · HOJA 12A ]';
+          node11Subtext.setAttribute('fill', isLexiconDone ? '#34d399' : '#38bdf8');
         }
       }
       window.updateDesertMapMarkers = updateDesertMapMarkers;
@@ -14903,18 +14609,18 @@
                   if (telemTime) telemTime.textContent = '0h 00m';
                   if (telemWaypoint) telemWaypoint.textContent = 'Desert Oasis (Arrived)';
                   if (dispatchText) {
-                    dispatchText.textContent = '"Silvia, we made it! I am standing beneath the palm trees of the Desert Oasis. The spring water is fresh and cool. Look what I found resting against the ancient well curb: four hydraulic wells and bronze siphons... Look at Sheet 15B of your journal: The Oasis Clepsydra!"';
+                    dispatchText.textContent = '"Silvia, we made it! I am standing beneath the palm trees of the Desert Oasis. The spring water is fresh and cool. Look what I found resting against the ancient well curb: sandstone tablets carved with desert riddles... Look at Sheet 10A of your journal: The Desert Lexicon & Al-Qibla!"';
                   }
                   if (victoryCard) victoryCard.style.display = 'block';
 
                   try {
                     localStorage.setItem('order_whispering_chasm_completed', 'true');
-                    localStorage.setItem('order_desert_station_active', '16');
+                    localStorage.setItem('order_desert_station_active', '11');
                   } catch (e) {}
 
                   updateDesertMapMarkers();
                   if (typeof window.selectMapNode === 'function') {
-                    window.selectMapNode(16, false);
+                    window.selectMapNode(11, false);
                   }
                 });
               }, 400);
@@ -14989,7 +14695,7 @@
           if (telemWaypoint) telemWaypoint.textContent = 'Desert Oasis (Arrived)';
           if (victoryCard) victoryCard.style.display = 'block';
           if (dispatchText) {
-            dispatchText.textContent = '"Silvia, we made it! I am standing beneath the palm trees of the Desert Oasis. The spring water is fresh and cool. Look what I found resting against the ancient well curb: four hydraulic wells and bronze siphons... Look at Sheet 15B of your journal: The Oasis Clepsydra!"';
+            dispatchText.textContent = '"Silvia, we made it! I am standing beneath the palm trees of the Desert Oasis. The spring water is fresh and cool. Look what I found resting against the ancient well curb: sandstone tablets carved with desert riddles... Look at Sheet 10A of your journal: The Desert Lexicon & Al-Qibla!"';
           }
         } else {
           if (chasmStepIndex === 0) {
@@ -15270,7 +14976,7 @@
 
         try {
           localStorage.setItem('order_desert_lexicon_completed', 'true');
-          localStorage.setItem('order_desert_station_active', '13');
+          localStorage.setItem('order_desert_station_active', '12');
         } catch (e) {}
 
         updateDesertMapMarkers();

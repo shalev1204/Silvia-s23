@@ -359,10 +359,13 @@ def render_game_d2(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     canvas = np.zeros((CANVAS_HEIGHT_PX, CANVAS_WIDTH_PX, 4), dtype=np.uint8)
 
     # 1. Header (Cara A: left margin safe, starts at X >= 220)
-    t_title, _ = render_pencil_text("The Desert Lexicon", FONT_PATH, font_size=58, gc=gc, seed=101)
+    t_title, _ = render_pencil_text("The Desert Lexicon", FONT_PATH, font_size=56, gc=gc, seed=101)
     blit_rgba(canvas, t_title, 230, 80)
 
-    draw_sketchy_line(canvas, (230, 180), (1550, 180), gc=gc, alpha_base=160, passes=2, seed=103)
+    t_sub, _ = render_pencil_text("Inscriptions from the Bivouac of The BC Ashes · Al-Qibla Vector 194* SSW", FONT_PATH, font_size=23, gc=gc, seed=102)
+    blit_rgba(canvas, t_sub, 234, 148)
+
+    draw_sketchy_line(canvas, (230, 185), (1550, 185), gc=gc, alpha_base=160, passes=2, seed=103)
 
     # 2. Crossword Grid (10 words: 5 Across, 5 Down, 15 rows x 12 cols)
     across_words = [
@@ -541,10 +544,13 @@ def render_game_d3(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     canvas = np.zeros((CANVAS_HEIGHT_PX, CANVAS_WIDTH_PX, 4), dtype=np.uint8)
 
     # 1. Header (Cara B: right margin safe, stops at X <= 1520)
-    t_title, _ = render_pencil_text("The Oasis Clepsydra", FONT_PATH, font_size=58, gc=gc, seed=101)
+    t_title, _ = render_pencil_text("The Oasis Clepsydra", FONT_PATH, font_size=56, gc=gc, seed=101)
     blit_rgba(canvas, t_title, 200, 80)
 
-    draw_sketchy_line(canvas, (200, 180), (1520, 180), gc=gc, alpha_base=160, passes=2, seed=103)
+    t_sub, _ = render_pencil_text("Feverish Mirage of the Siphons — Maintaining Lucidity across the Salt Basin", FONT_PATH, font_size=23, gc=gc, seed=102)
+    blit_rgba(canvas, t_sub, 204, 148)
+
+    draw_sketchy_line(canvas, (200, 190), (1520, 190), gc=gc, alpha_base=160, passes=2, seed=103)
 
     # 2. Grand Full-Width Logic Deduction Matrix (200..1516, 240..630)
     # 4 Seekers x (4 Wells + 4 Hours + 4 Relics) = 12 wide columns across the entire page
@@ -674,10 +680,13 @@ def render_game_d4(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     canvas = np.zeros((CANVAS_HEIGHT_PX, CANVAS_WIDTH_PX, 4), dtype=np.uint8)
 
     # 1. Header (Cara A: left margin safe, starts at X >= 220)
-    t_title, _ = render_pencil_text("The Polybius Stele", FONT_PATH, font_size=64, gc=gc, seed=101)
+    t_title, _ = render_pencil_text("The Polybius Stele", FONT_PATH, font_size=58, gc=gc, seed=101)
     blit_rgba(canvas, t_title, 230, 75)
 
-    draw_sketchy_line(canvas, (230, 160), (1550, 160), gc=gc, alpha_base=160, passes=2, seed=103)
+    t_sub, _ = render_pencil_text("Trial of the Sanctuary Servant — The Cipher of Cairn III (348* NNW)", FONT_PATH, font_size=23, gc=gc, seed=102)
+    blit_rgba(canvas, t_sub, 234, 142)
+
+    draw_sketchy_line(canvas, (230, 180), (1550, 180), gc=gc, alpha_base=160, passes=2, seed=103)
 
     # 2. Engraved Sandstone Stele Monument (Centered on X=900, spanning 340..1460)
     st_x1, st_y1, st_x2, st_y2 = 340, 185, 1460, 825

@@ -1,307 +1,222 @@
 # THE DESERT ODYSSEY — OFFICIAL LORE, PUZZLE & GAMEPLAY BIBLE
-**Version**: 2.0 · **Status**: Official Canon · **Date**: October 2026  
-**Ecosystem**: *Silvia's 23rd Birthday · 16-Sheet Journal & Web Hub*
+**Version**: 5.0 · **Status**: Official Canon · **Date**: October 2026  
+**Ecosystem**: *Silvia's 23rd Birthday · 18-Sheet Physical Journal & Web Hub (The Complete Desert Path)*
 
 ---
 
-## 1. INTRODUCTION & CARDINAL PRINCIPLES
+## 1. INTRODUCCIÓN Y ARQUITECTURA GENERAL DEL CAMINO DEL DESIERTO
 
-This document establishes the complete architecture, narrative progression, mechanics, and solutions for **The Desert Odyssey**, encompassing the two main acts of the terrestrial expedition following the escape from the Observatory:
-- **Act I (Sheets 09 to 12)**: *The Northern Highlands & The Great Fault* (Sheets 09B, 10A, 10B, 11A, 11B, 12A, 12B).
-- **Act II (Sheets 13 to 16)**: *The Deep Wash, Salt Basin & The Sandstone Sanctuary of Tower II* (Sheets 13A, 13B, 14A, 14B, 15A, 15B, 16A, 16B).
+Este documento establece la arquitectura completa, progresión narrativa, mecánicas de juego, topografía y resoluciones del **Camino del Desierto (The Desert Path)**. Abarca desde el refugio inicial del Cartógrafo tras escapar del Observatorio Alpino (Torre I) hasta la audiencia con El Oráculo en el Santuario de Arenisca (Torre II) y la transición hacia el Camino del Escenario (Torre III).
 
-### Core Design Rules
-1. **Silvia's Absolute Agency (Protagonist & Investigator)**: Silvia investigates, calculates, deduces, and operates all consoles. The Cartographer (Hermes) is an isolated companion in danger who provides atmospheric narrative and requests aid, but NEVER solves puzzles or spoils solutions.
-2. **Zero Initial Numeric Spoilers (Rule 9)**: Silvia begins with zero numbers assigned to letters. All interfaces (*The Cipher Ledger* and physical journal sheets) present empty fields (`—` or `[   ]`) so Silvia investigates and deduces values autonomously.
-3. **Exclusive Use of Standard Latin Alphabet (Rule 10)**: All coordinate formulas, ciphers, and boards strictly use standard Latin letters ($A–Z$), ensuring seamless consistency between the paper manuscript and the web hub.
-4. **Accessible Vocabulary ("SIMPLIFIED VOCABULARY")**: Direct, natural, evocative English free of obscure astronomical jargon or medieval archaisms.
-5. **Renaissance Da Vinci / Kepler Aesthetic**: Intricate graphite draftsmanship, authentic mechanical/hydraulic studies, and clear margins guaranteeing zero punch hole collisions on real A5 binder paper.
-
----
-
-## 2. PHYSICAL JOURNAL ARCHITECTURE: THE CONTINUOUS TWO-ACT DESERT MAP
-
-The Desert Map is a continuous four-quadrant mosaic spanning across the 16-sheet manuscript journal:
+El diario manuscrito físico comprende un total de **18 hojas dobles (36 caras)**, de las cuales las **Hojas 08 a 18 (22 caras)** conforman la gran epopeya del desierto:
 
 ```
-+------------------------------------+------------------------------------+
-|                                    |                                    |
-|   QUADRANT 1 (Northwest · Q1)      |   QUADRANT 2 (Northeast · Q2)      |
-|   Sheet 08 · Cara B (Page 08 Back) |   Sheet 09 · Cara A (Page 09 Front)|
-|   - Outer Watchtower VI            |   - Sun Mesa (Mesa del Sol)        |
-|   - Plateau Entrance               |   - The Sun Monolith               |
-|   - The Three Cairns Bearing       |   - The Broken Mechanical Wheel    |
-|                                    |                                    |
-|         [ CONTINUOUS SPREAD 1 · ACT I: THE NORTHERN HIGHLANDS ]         |
-+------------------------------------+------------------------------------+
-|                                    |                                    |
-|   QUADRANT 3 (Southwest · Q3)      |   QUADRANT 4 (Southeast · Q4)      |
-|   Sheet 13 · Cara B (Page 13 Back) |   Sheet 14 · Cara A (Page 14 Front)|
-|   - Descent into the Great Fault   |   - White Salt Basin (Playa)       |
-|   - Terraces of the Jackal         |   - The Four Subterranean Cisterns |
-|   - Whispering Chasm Entrance      |   - Sandstone Sanctuary of Tower II|
-|                                    |                                    |
-|           [ CONTINUOUS SPREAD 2 · ACT II: THE GREAT CANYON ]            |
-+------------------------------------+------------------------------------+
++==================================================================================================+
+|                        ARQUITECTURA DE LAS 18 HOJAS DEL DIARIO MANUSCRITO                        |
++==================================================================================================+
+|  ACTO I: EL CAMINO DE LAS CONSTELACIONES (HOJAS 01 A 07 · 14 CARAS)                              |
+|  - Hoja 01: Cubierta Da Vinci (01A) & Carta del Cartógrafo (01B)                                  |
+|  - Hojas 02 & 03: El Alfabeto Celeste (4 caras continuas, 26 glifos)                             |
+|  - Hojas 04 a 07: Códice del Astrolabio & Juegos Celestes C1-C4 (Planisferio, Zodíaco, etc.)    |
++--------------------------------------------------------------------------------------------------+
+|  ACTO II: EL CAMINO DEL DESIERTO (HOJAS 08 A 18 · 22 CARAS)                                      |
+|  - Hoja 08: Lore del Umbral (08A) & Gran Mapa Cuadrante NO (08B · Spread 1 Izq)                   |
+|  - Hoja 09: Gran Mapa Cuadrante NE (09A · Spread 1 Der) & Juego D1: The Whispering Chasm (09B)   |
+|  - Hoja 10: Juego D2: The Salt Playa (10A) & Lore/Estudio: The Salt Playa Basin (10B)            |
+|  - Hoja 11: Juego D3: The Desert Lexicon (11A · Raiders BC Ashes) & Gran Mapa Cuadrante SO (11B) |
+|  - Hoja 12: Gran Mapa Cuadrante SE (12A) & Juego D4: The Oasis Clepsydra (12B · Alucinación)    |
+|  - Hoja 13: Lore: Sirviente del Santuario & Petición de Cairns (13A) & Juego D5: Sun Monolith (13B)|
+|  - Hoja 14: Lore: Los 4 Cairns de Peregrinación (14A) & Juego D6: Sandstone Labyrinth (14B)      |
+|  - Hoja 15: Juego D7: Cairn IV Chasm Sentry (15A) & Zoom al Puente Natural - Panel Izq (15B)     |
+|  - Hoja 16: Zoom al Puente Natural - Panel Der (16A) & Juego D8: Arch of Solstice / Altar (16B)  |
+|  - Hoja 17: Juego D9: The Polybius Stele (17A · Prueba del Sirviente) & Lore del Oráculo (17B)   |
+|  - Hoja 18: Juego D10: Clímax con El Oráculo (18A) & Arte de Transición al Stage Path (18B)      |
++==================================================================================================+
 ```
 
-- **Continuous Spread 1**: Opens between `page08_back` (left) and `page09_front` (right), displaying the sandstone tablelands and Sun Mesa.
-- **Continuous Spread 2**: Opens between `page13_back` (left) and `page14_front` (right), depicting the deep fault canyon and the sandstone salt playa.
+---
+
+## 2. EL GRAN MAPA DEL DESIERTO (4 CUADRANTES $2 \times 2$) Y EL SPREAD DE ZOOM
+
+El Gran Mapa del Desierto permanece estrictamente en sus **4 cuadrantes macro ($2 \times 2$)**, complementado por un **Spread de Zoom en alta definición** dedicado al puente natural de roca:
+
+### A. Los Dos Spreads del Gran Mapa Macro
+1. **Spread 1 (Norte)**: 
+   - Panel Izquierdo: **Hoja 08 · Cara B** (*Cuadrante NO · The Desert Frontier*).
+   - Panel Derecho: **Hoja 09 · Cara A** (*Cuadrante NE · The Sandstone Labyrinth*).
+2. **Spread 2 (Sur)**:
+   - Panel Izquierdo: **Hoja 11 · Cara B** (*Cuadrante SO · The Whispering Chasm & Sentinel Mesa*).
+   - Panel Derecho: **Hoja 12 · Cara A** (*Cuadrante SE · The Sandstone Sanctuary & Solar Altar*).
+
+### B. Spread 3: Zoom Topográfico al Puente Natural de la Mesa Centinela
+- **Ubicación física**: **Hoja 15 · Cara B (Panel Izquierdo)** y **Hoja 16 · Cara A (Panel Derecho)**.
+- **Enfoque cartográfico**: Ampliación a escala $1:250$ del arco natural de roca y la garganta profunda bajo *The Sentinel Mesa (Elev. 980 varas)*.
+- **Detalle visual**: Estratos verticales de arenisca bermeja, derrubios de ladera, contrafuertes pétreos y el paso de la antigua senda de carretas que cruza el abismo.
 
 ---
 
-## 3. STATION-BY-STATION BREAKDOWN: LORE, PUZZLES, SOLUTIONS & REWARDS
+## 3. LOS 5 CAIRNS DEL DESIERTO: TOPOGRAFÍA Y DISTRIBUCIÓN
+
+Existen exactamente **5 mojones (Cairns)** rotulados en la cartografía original del desierto:
+
+1. **Cairn I (The Wash River Marker · Misión Previa del Presentimiento)**:
+   - **Ubicación en el mapa**: Hoja 08B (Cuadrante NO), coordenadas $(980, 2190)$ en el lecho de *Wadi al-Hajar*.
+   - **Misión Previa de Hermes y Silvia**: Antes de descender al Whispering Chasm, Hermes le dice a Silvia por la radio: *«Voy a seguir el río, tengo un presentimiento...»*. Siguiendo el cauce pedregoso del uadi, encuentran por accidente Cairn I semioculto en los sedimentos. Juegan y resuelven juntos un enigma preliminar para desbloquear y extraer el primer talismán/sello de piedra: **El Sello de Cairn I**. Con este artefacto en las alforjas, sin saber aún para qué servirá, se dirigen de inmediato a *The Whispering Chasm* como antesala a la primera misión oficial.
+2. **Cairn II (The Nomad Marker)**:
+   - **Ubicación en el mapa**: Hoja 09A (Cuadrante NE), coordenadas $(2070, 2150)$.
+   - **Desafío asociado**: Juego D5 (*The Sun Monolith Alignment*).
+3. **Cairn III (Copper Benchmark Plate)**:
+   - **Ubicación en el mapa**: Hoja 09A (Cuadrante NE), coordenadas $(2750, 2150)$.
+   - **Desafío asociado**: Juego D6 (*The Sandstone Labyrinth*). Línea visual grabada con rumbo $348^\circ\text{ NNW}$ hacia el Monolito.
+4. **Cairn IV (Sentry of the Canyon)**:
+   - **Ubicación en el mapa**: Hoja 11B (Cuadrante SO), coordenadas $(220, 1750)$.
+   - **Desafío asociado**: Juego D7 (*Cairn IV Chasm Sentry*), que custodia la salida del desfiladero acústico.
+5. **Cairn V (The Final Marker)**:
+   - **Ubicación en el mapa**: Hoja 12A (Cuadrante SE), coordenadas $(2340, 280)$.
+   - **Desafío asociado**: Juego D8 (*Arch of the Solstice & The Solar Altar*). Línea visual con rumbo $163^\circ\text{ SSE}$ hacia el Altar Solar.
 
 ---
 
-### STATION 11 · THE SANDSTONE LABYRINTH
-- **Physical Sheet**: **Sheet 10 · Cara A** (`page10_front`).
-- **Narrative Lore**:
-  Hermes tracks the dust plume left by the raiders as they advance across the fractured northern highlands. Overburdened by the heavy bronze instruments looted from the Observatory, the enemy wagons left deep ruts in the sandstone bedrock. Two wagons diverged to mislead pursuers among an intricate network of stone archways. Hermes discovers a shattered segment of an iron-rimmed wheel (*Rota Ferrata*) with its wedge brake broken, confirming that the wagon carrying the stolen Astrolabe crate suffered mechanical failure here.
-- **Manuscript Elements**:
-  - A 15×13 stone archway grid with authentic 2B graphite ashlar textures.
-  - Four carved stone medallions bearing the letters $[M, A, Z, E]$.
-  - Dual wagon rut trajectories.
-  - Da Vinci mechanical study of the *Rota Ferrata* (escapement gear wheel with ratchet stop).
-  - Track deduction ledger.
-- **Solving Mechanics**:
-  Silvia traces the continuous path connecting the northwest entrance portal to the northeast exit toward Sun Mesa. The valid trajectory traverses all medallion archways in strict order without crossing secondary ruts.
-- **Canonical Solution**:
-  - Medallion Sequence: **`M` ➔ `A` ➔ `Z` ➔ `E`** (Keyword: `MAZE`).
-  - True Exit Bearing: **$042^\circ\text{ NE}$**.
-- **Awarded Reward**:
-  - Safe passage unlocked toward the Central Highlands on the navigation map.
-  - Initial evidence of the convoy's mechanical breakdown: the raiders cannot outrun pursuit.
+## 4. DESGLOSE HOJA A HOJA: LORE, JUEGOS Y MECÁNICAS (HOJAS 08 A 18)
 
 ---
 
-### STATION 12 · THE DESERT LEXICON & AL-QIBLA SUN COMPASS
-- **Physical Sheet**: **Sheet 11 · Cara A** (`page11_front`).
-- **Narrative Lore**:
-  Hermes discovers a hastily abandoned rear camp near the solstice horizon. By cold campfire rings lie carved limestone blocks bearing ancient nomadic inscriptions. At the center of the camp stands a Renaissance brass sun compass (*Al-Qibla*), oriented with a vertical gnomon whose shadow casts a directional vector toward hidden desert water sources.
-- **Manuscript Elements**:
-  - A 10-word crossword puzzle inscribed upon carved stone ashlars (Across & Down):
-    * `DUNE`, `MIRAGE`, `BEDOUIN`, `OASIS`, `CARAVAN`, `ASTRONOMY`, `SHADOW`, `COMPASS`, `GNOMON`, `HORIZON`.
-  - Seven highlighted double-ringed cells containing the master key letters.
-  - Renaissance sketch of the *Al-Qibla* brass sun compass with a 16-point wind rose, shadow alidade, and solar vector pointing to **$194^\circ\text{ SSW}$**.
-- **Solving Mechanics**:
-  Silvia solves the crossword using evocative English clues, extracts the 7 circled letters, and arranges them according to the compass index.
-- **Canonical Solution**:
-  - Extracted Master Word: **`P H O E N I X`** (The Desert Sigil).
-  - Solar Shadow Vector: **$194^\circ\text{ SSW}$**.
-- **Awarded Reward**:
-  - **Master Key I for Tower II**: Sigil **`PHOENIX`**.
-  - Angular orientation for solar noon alignment at the next station.
+### HOJA 08 · EL UMBRAL DEL DESIERTO Y CUADRANTE NOROESTE
+- **Cara A (Anverso · Lore)**: *The Desert Frontier, The River Hunch & The Great Silence*.
+  - **Narrativa**: Hermes narra la huida desde la Atalaya VI (*Outer Watchtower VI*, cota 1.240 varas). Antes de entrar al cañón, sigue el cauce del río seco por una corazonada (*«Voy a seguir el río, tengo un presentimiento...»*). Junto a Silvia descifran el enigma oculto en **Cairn I**, obteniendo su misterioso sello de arenisca antes de poner rumbo a la entrada de *The Whispering Chasm*.
+- **Cara B (Reverso · Mapa)**: **Gran Mapa del Desierto · Cuadrante NO** (*Spread 1 Izquierda*).
+  - Accidentes: *The Desert Frontier*, *The Red Ridge*, *Outer Watchtower VI*, *Dry Canyon Wash (Wadi al-Hajar)*, *The Great Mesa (Mesa del Sol)*, *Cairn I*.
 
 ---
 
-### STATION 13 · THE POLYBIUS STELE OF CAIRN III
-- **Physical Sheet**: **Sheet 11 · Cara B** (`page11_back`).
-- **Narrative Lore**:
-  At the foundation stones of Cairn III, erected along the dry wash, stands a round-arched sandstone stele. Ancient order sentinels carved a dual-sight cipher across its face, modulated by the sacred desert sigil. This stele was used to transmit orders between alpine watchtowers and desert wardens across the wastes.
-- **Manuscript Elements**:
-  - Round-arched monument with inner stone molding.
-  - A 5×5 Polybius grid indexed from 1 to 5, generated with the keyword `PHOENIX` (strictly no I/J combining; 25 letters excluding Z):
-    ```
-        1   2   3   4   5
-    1   P   H   O   E   N
-    2   I   X   A   B   C
-    3   D   F   G   K   L
-    4   M   Q   R   S   T
-    5   U   V   W   Y   Z
-    ```
-  - Six poetic double-sight stanzas with coordinate number pairs.
-- **Solving Mechanics**:
-  Silvia translates the coordinate pairs from the poem using the Polybius grid to recover the ancient sentry aphorism.
-- **Canonical Solution**:
-  - Revealed Aphorism: **`"STARS GUIDE THOSE WHO SEEK TRUTH"`**.
-- **Awarded Reward**:
-  - Confirmation of the geodetic link between celestial stars and terrestrial stones.
-  - Passage unsealed toward Sun Mesa.
+### HOJA 09 · CUADRANTE NORESTE Y JUEGO 1 (THE WHISPERING CHASM)
+- **Cara A (Anverso · Mapa)**: **Gran Mapa del Desierto · Cuadrante NE** (*Spread 1 Derecha*).
+  - Accidentes: *The Sun Monolith*, *Arches of the West Wind*, *The Sandstone Labyrinth*, *Cairn II*, *Cairn III (Copper Benchmark)*, *The Sinking Peaks*.
+- **Cara B (Reverso · Juego D1)**: **Juego 1: The Whispering Chasm**.
+  - **Ubicación**: Con el Sello de Cairn I a buen recaudo en la faltriquera, Hermes desciende a la sombría garganta acústica.
+  - **Mecánica**: Laberinto topográfico de $25 \times 25$ celdas con 6 mojones de reliquias en estricto orden.
+  - **Solución Canónica**: Santo y seña nómada **`M I R A G E`** (Mirage). Deducción: $[R] = 3$.
 
 ---
 
-### STATION 14 · THE SUN MONOLITH ALIGNMENT
-- **Physical Sheet**: **Sheet 12 · Cara A** (`page12_front`) & **Sheet 12 · Cara B** (`page12_back`).
-- **Narrative Lore**:
-  High upon Sun Mesa, a colossal red sandstone obelisk crowns the ridge. At its base lie the remnants of the raiders' breakdown site: an overturned wagon with broken axles and smashed crates. Abandoning their wheeled transport, the raiders carried the Astrolabe on pack mules and foot down into the Great Fault canyon. At true solar noon, the monolith casts a shadow alidade across the wastes.
-- **Manuscript Elements**:
-  - Architectural elevation of the Sun Monolith upon a stepped plinth.
-  - Kepler geodetic quadrant study showing the solar meridian and dual reciprocal vectors:
-    * Northern Meridian (toward Observatory / Tower I): **$348^\circ\text{ NNW}$**.
-    * Southern Meridian (toward Desert / Tower II): **$194^\circ\text{ SSW}$**.
-  - Harmonic crypto-arithmetic proportion:
-    $$\mathbf{[R] \times 2 = [F]}$$
-    *(No numbers printed: Silvia deduces values from prior discoveries: $R=3 \implies F=6$).*
-- **Solving Mechanics**:
-  Silvia uses solar shadow data and Kepler's geodetic quadrant to triangulate the exact bearing from the monolith to the sandstone sanctuary.
-- **Canonical Solution**:
-  - True Geodetic Vector: **`348° NNW`** (348 degrees North-Northwest).
-  - Crypto-Arithmetic Discovery: **`R = 3`**, **`F = 6`** for *The Cipher Ledger*.
-- **Awarded Reward**:
-  - **Master Key III for Tower II**: Vector **`348° NNW`**.
-  - Act I conclusion: Hermes begins foot descent into the canyon.
+### HOJA 10 · JUEGO 2 (THE SALT PLAYA) Y ESTUDIO DE LA CUENCA SECA
+- **Cara A (Anverso · Juego D2)**: **Juego 2: The Salt Playa (Dry Basin)**.
+  - **Ubicación**: Tras salir del cañón, Hermes desciende a la inmensa cuenca salina blanca (*The Salt Playa*).
+  - **Mecánica**: Enigma de navegación sobre la corteza salina quebradiza. Triangulación de pasos entre costras de sal sólida y simas de salmuera subterránea mediante cálculo de presiones y densidades salinas.
+- **Cara B (Reverso · Lore/Estudio)**: **Estudio Renacentista: The Salt Playa Basin**.
+  - **Estética Da Vinci**: Estudio morfológico de la evaporación salina, formación geométrica de prismas de cloruro, perfiles estratigráficos del lecho sedimentario y agrimensura de la cuenca seca.
 
 ---
 
-### STATION 15 · THE WHISPERING CHASM MAZE
-- **Physical Sheet**: **Sheet 13 · Cara A** (Lore) & **Sheet 14 · Cara B** (Game · `page14_back`).
-- **Narrative Lore**:
-  Hermes descends into the shadowy chasm of the Great Fault (*The Deep Wash*). Sandstone cliffs tower hundreds of paces high, shutting out the desert wind and creating a cold acoustic chamber. Downward gusts produce resonance vortices (*Vortex Acusticus in Muris*), whispering words into the porous rock. Cairn IV guards the entrance choke point where the raiders scattered on foot. Silvia must guide Hermes through the labyrinth following the Law of the Canyon Walkers.
-- **Manuscript Elements**:
-  - Topographical 25×25 cell labyrinth with shaded cliff hachures.
-  - North Portal entrance and South Portal exit toward the Desert Oasis.
-  - 6 True Relic Cairns on the 231-step master path:
-    1. Step 31: Cell $(7, 9)$ ➔ Rune **`M`**
-    2. Step 71: Cell $(9, 23)$ ➔ Rune **`I`**
-    3. Step 111: Cell $(11, 13)$ ➔ Rune **`R`**
-    4. Step 151: Cell $(7, 1)$ ➔ Rune **`A`**
-    5. Step 191: Cell $(15, 13)$ ➔ Rune **`G`**
-    6. Step 215: Cell $(21, 15)$ ➔ Rune **`E`**
-  - 3 Decoy Cairns in dead-end forks: **`T`**, **`K`**, **`S`**.
-  - Hazard inscriptions: *"Sands of Thirst"*, *"Blind Chasm"*, *"The Dry Well"*.
-  - The Four Laws of the Canyon Walkers.
-  - Six answer boxes numbered 1 to 6.
-- **Solving Mechanics**:
-  Silvia charts the route without crossing or repeating passages, recording the runes in order of encounter.
-- **Canonical Solution**:
-  - The Nomad's Passphrase: **`M I R A G E`** (Mirage).
-- **Awarded Reward**:
-  - Safe canyon passage unlocked.
-  - Exit into the Salt Basin of the Desert Oasis.
+### HOJA 11 · JUEGO 3 (THE DESERT LEXICON) Y CUADRANTE SUROESTE
+- **Cara A (Anverso · Juego D3)**: **Juego 3: The Desert Lexicon & Al-Qibla (Los Asaltantes BC Ashes)**.
+  - **Narrativa**: Hermes cae en una emboscada de forajidos en las ruinas nómadas. Al descifrar las inscripciones en los sillares de piedra, logra despistar a los perseguidores y descubre en los estandartes y marcas de fuego el nombre de la banda que saqueó el Observatorio: **Los BC Ashes**.
+  - **Mecánica**: Crucigrama nómada de 10 palabras y brújula solar *Al-Qibla*.
+  - **Solución Canónica**: Sigil solar **`P H O E N I X`**, rumbo **$194^\circ\text{ SSW}$**. Deducción cripto-aritmética: $[R] \times 2 = [F] \implies F = 6, T = 16$.
+- **Cara B (Reverso · Mapa)**: **Gran Mapa del Desierto · Cuadrante SO** (*Spread 2 Izquierda*).
+  - Accidentes: *The Whispering Chasm*, *The Lower Wash*, *The Terraces of the Jackal*, *The Sentinel Mesa (Elev. 980 varas)*, *Cairn IV (Sentry of the Canyon)*.
 
 ---
 
-### STATION 16 · THE OASIS CLEPSYDRA & 4 WELLS
-- **Physical Sheet**: **Sheet 15 · Cara A** (Lore) & **Sheet 15 · Cara B** (Game · `page15_back`).
-- **Narrative Lore**:
-  Emerging from the chasm, the desert opens into a blinding white salt playa. Beneath the crystalline crust lies an ancient hydraulic network: four bedrock cisterns connected by balanced lead siphons, guarded by four totems: Falcon (Air), Jackal (Dunes), Scarab (Earth), and Serpent (Water). Four ancient seekers (Cartographer, Alchemist, Nomad, Astronomer) arrived carrying sacred instruments. Only by harmonizing all four cisterns will water flow to drain the moat surrounding Tower II.
-- **Manuscript Elements**:
-  - Da Vinci hydraulic study of the clepsydra: cylindrical bronze tank, spherical float with vertical gear rack, escapement wheel, and U-siphon tube with steady drip rate.
-  - A 12-column logic deduction matrix:
-    * 4 Seekers: *Cartographer, Alchemist, Nomad, Astronomer*.
-    * 4 Wells: *Falcon, Jackal, Scarab, Serpent*.
-    * 4 Arrival Hours: *Hr III, Hr VI, Hr IX, Hr XII*.
-    * 4 Relics: *Astrolabe, Sandglass, Scarab, Dagger*.
-  - The Five Testimonies of the Shadow Index.
-  - The Oasis Registry with four empty profile rows.
-  - The Clepsydra Constant formula.
-- **Solving Mechanics**:
-  Silvia applies pure logic to the five testimonies:
-  1. *The traveler bearing the Brass Astrolabe arrived 3 hours before the Nomad.*
-  2. *The seeker at the Well of the Jackal arrived earlier than the Cartographer, but lacked the Dagger.*
-  3. *Arrival at the Well of the Falcon was later than at the Well of the Scarab, but neither occurred at Hour XII.*
-  4. *The Astronomer carried the Gold Scarab and reached the Well of the Serpent at Hour IX or later.*
-  5. *The Alchemist possessed the Silver Sandglass and arrived earlier than the Astrolabe bearer.*
-- **Canonical Solution**:
-  - **The Cartographer**: Relic = **Brass Astrolabe** | Well = **Falcon** | Arrival = **Hr IX (9:00h)**
-  - **The Alchemist**: Relic = **Silver Sandglass** | Well = **Jackal** | Arrival = **Hr III (3:00h)**
-  - **The Nomad**: Relic = **Obsidian Dagger** | Well = **Scarab** | Arrival = **Hr XII (12:00h)**
-  - **The Astronomer**: Relic = **Gold Scarab** | Well = **Serpent** | Arrival = **Hr VI (6:00h)**
-  - **Hydraulic Constant Calculation**:
-    $$\text{Sum of Hours} = 3 + 6 + 9 + 12 = 30\text{ hours}$$
-    $$30\text{ in Roman Numerals} = \mathbf{X X X}$$
-- **Awarded Reward**:
-  - **Master Key II for Tower II**: Constant **`X X X`**.
-  - Moat drained, revealing the submerged sandstone causeway to Tower II.
+### HOJA 12 · CUADRANTE SURESTE Y JUEGO 4 (THE OASIS CLEPSYDRA)
+- **Cara A (Anverso · Mapa)**: **Gran Mapa del Desierto · Cuadrante SE** (*Spread 2 Derecha*).
+  - Accidentes: *The Sandstone Sanctuary of the Oracle*, *The Solar Altar*, *Arch of the Solstice*, *The Salt Playa*, *Cairn V (The Final Marker)*.
+- **Cara B (Reverso · Juego D4)**: **Juego 4: The Oasis Clepsydra (El Espejismo de la Supervivencia)**.
+  - **Narrativa**: Abrasado por el calor implacable y al borde del delirio por la sed, Hermes sufre una vívida alucinación de cuatro pozos monumentales y clepsidras que gotean agua cristalina. Resolver este intrincado sistema lógico en su cuaderno es lo que le mantiene cuerdo y concentrado; gracias a esa lucidez deductiva, identifica una verdadera grieta en la roca donde halla agua y provisiones de emergencia abandonadas.
+  - **Mecánica**: Matriz lógica $4 \times 4 \times 4$ (4 buscadores, 4 pozos, 4 horas, 4 reliquias).
+  - **Solución Canónica**: Constante hidráulica **`X X X`** ($30\text{ horas}$). Ecuación: $[P] - [A] = 14$.
 
 ---
 
-### STATION 17 · GATES OF THE ORACLE & EPILOGUE
-- **Physical Sheet**: **Sheet 16 · Cara A** (Game · `page16_front`) & **Sheet 16 · Cara B** (Epilogue · `page16_back`).
-- **Narrative Lore**:
-  Hermes and Silvia stand before the monumental sandstone portal of Tower II: fluted columns, round arch vault, and three concentric bronze dial rings. Inside resides **The Desert Oracle (The Oracle)**, keeper of lost terrestrial anchors. The fleeing raiders abandoned the stolen Astrolabe at the portal steps when they failed to unseal the three locks.
-- **Manuscript Elements**:
-  - Architectural elevation of the Sanctuary Portal with its three notched dial rings.
-  - Kepler geodetic triangulation chart of the Three Ancient Towers (Tower I, Tower II, Tower III) and the **4th Convergence Point**.
-  - Key insertion ledger with empty transcription fields.
-- **Solving Mechanics**:
-  Silvia aligns the three master keys into their respective portal dials:
-  1. **Dial I (Desert Sigil)**: The 7-letter keyword from the Oasis ➔ **`P H O E N I X`**.
-  2. **Dial II (Hydraulic Key)**: The 30-hour clepsydra constant in Roman numerals ➔ **`X X X`**.
-  3. **Dial III (Geodetic Vector)**: The true azimuth bearing from Sun Mesa ➔ **`3 4 8 °   N N W`**.
-- **Canonical Solution**:
-  - `Dial I: PHOENIX`  ·  `Dial II: XXX`  ·  `Dial III: 348° NNW`.
-- **Narrative Climax & Epilogue (Sheet 16 Cara B)**:
-  - Massive stone counterweights shift and the portal unseals.
-  - Hermes recovers the **Astrolabe of Distant Light**, cleansed in desert dust.
-  - Hermes and Silvia meet **The Desert Oracle** under the stone overhang:
-    * The Oracle verifies Silvia as the true heir of the Order.
-    * Reveals the **Second Master Star**: **`Vega`** (anchored with **`Deneb`**).
-    * Delivers the terrestrial coordinates for **Tower II**.
-    * Points eastward past the canyons toward the grand auditorium where **Tower III: The Stage Tower** / **The Mirror Sanctuary** (*The Stage Path*) awaits.
+### HOJA 13 · LORE DEL SANTUARIO Y JUEGO 5 (THE SUN MONOLITH)
+- **Cara A (Anverso · Lore)**: **Llegada al Sandstone Sanctuary & La Demanda de los 5 Cairns**.
+  - **Narrativa**: Hermes llega ante las puertas colosales de la Torre II (*The Sandstone Sanctuary of the Oracle*). Un anciano guardián y sirviente ceremonial del Oráculo le intercepta en el atrio. El sirviente le exige presentar los **5 Cairns Sagrados de la Orden (Cairns I, II, III, IV y V)** para abrir el templo. Hermes abre su alforja y muestra con asombro que **ya posee el Sello de Cairn I** (obtenido gracias a su presentimiento en el río), pero el sirviente le advierte: *«Te faltan cuatro. Sin los sellos de Cairn II, III, IV y V, las puertas permanecerán selladas»*. Hermes debe regresar al desierto a completar la peregrinación.
+- **Cara B (Reverso · Juego D5)**: **Juego 5: The Sun Monolith & Cairn II**.
+  - **Ubicación**: Hermes viaja al norte, hasta *The Sun Monolith* en las cercanías de Cairn II.
+  - **Mecánica**: Calibración gnomónica de la sombra solar proyectada por el obelisco monolítico sobre el cuadrante geodésico de Cairn II.
+  - **Recompensa**: Obtención del primer sello de peregrinación: **Sello de Cairn II**.
 
 ---
 
-## 4. THE TRIANGULATION OF THE THREE ANCIENT TOWERS & THE SECRET 4TH SANCTUARY
-
-The entire lore of *Silvia's 23* converges upon the Three Ancient Towers built by the Order's founders:
-
-```
-                        ▲ TOWER I: THE ALPINE OBSERVATORY
-                       / \  (Snowy Peaks · Hermes · Constellation Path)
-                      /   \
-                     /  ✦  \   <--- [ THE SECRET 4TH CONVERGENCE POINT ]
-                    /   |   \       (Forgotten Vault of the Grand Eclipse)
-                   /    |    \
-                  /     |     \
-  TOWER II:      ▼------|------▼  TOWER III:
-  THE DESERT ORACLE               THE STAGE TOWER
-  (Sandstone Sanctuary ·          (The Mirror Sanctuary ·
-   The Oracle · Desert Path)       Music & Dance · Stage Path)
-```
-
-1. **Tower I (The Alpine Observatory · Peaks)**:
-   - Keeper of **Celestial Geometry**, optics, and circumpolar alignments.
-   - Character: Hermes (The Cartographer).
-   - Master Stars: *Polaris* & *Aldebaran*.
-2. **Tower II (The Sandstone Sanctuary · Desert)**:
-   - Keeper of **Terrestrial Memory**, acoustic echoes, and subterranean hydraulics.
-   - Character: The Desert Oracle (The Oracle).
-   - Master Stars: *Vega* & *Deneb*.
-3. **Tower III (The Stage Tower / The Mirror Sanctuary · Theater)**:
-   - Keeper of **Harmony, Rhythm, and Stagecraft** (Music of the Spheres, Reflection, Symmetry).
-   - Character: The Mirror Speaker (Ballet & Theatre).
-   - Master Stars: *Altair* & *Arcturus*.
-4. **The Secret 4th Convergence Point (The Final Birthday Revelation)**:
-   - When the Astrolabe is aligned with all three tower coordinates simultaneously, its six master star pointers (*Ald, Pol, Veg, Den, Alt, Arc*) intersect at a single geodetic coordinate.
-   - This reveals the **Vault of the Grand Eclipse**, containing Silvia's real-world 23rd birthday ballet tickets and fulfilling the ancient prophecy:
-     > *«YOU WERE NEVER ONLY THE SEEKER. YOU WERE ALWAYS THE TREASURE.»*
+### HOJA 14 · LORE DE LOS CAIRNS Y JUEGO 6 (SANDSTONE LABYRINTH)
+- **Cara A (Anverso · Lore)**: **Los Cuatro Mojones de la Peregrinación Solar**.
+  - **Narrativa y bocetos**: Estudio manuscrito de los 4 mojones sagrados de la Orden (II, III, IV, V), sus coordenadas angulares, marcas heráldicas talladas en cobre y piedra, y su relación con las líneas de horizonte.
+- **Cara B (Reverso · Juego D6)**: **Juego 6: The Sandstone Labyrinth & Cairn III**.
+  - **Ubicación**: *The Sandstone Labyrinth* en dirección a Cairn III.
+  - **Mecánica**: Trazado de trayectorias a través de los arcos de arenisca y fisuras de roca guiándose por la placa de bronce del mojón Cairn III.
+  - **Recompensa**: Obtención del segundo sello de peregrinación: **Sello de Cairn III**.
 
 ---
 
-## 5. MASTER PROGRESSION & REWARD TABLE
-
-| Station | Sheet | Challenge / Puzzle | Key Input | Lore Reward | Crypto-Arithmetic Deduction |
-|---|---|---|---|---|---|
-| **06** | Sheet 04B | The Planisphere | 16 Celestial Words | Glyph `P` decoded | Vector I: $[K]+[G]=48$, $[A]+[O]=30$, $[B]+[P]=38$ |
-| **07** | Sheet 05B | The Zodiacal Engine | `ECLIPSE` + 3 Obelisks | Glyph `K` decoded | Equation: $[O]-[A]=16 \implies \mathbf{O=23, A=7}$ |
-| **08** | Sheet 06A/B | The Midnight Transit | $97^\circ$ + 2090 ly + Hexagon | Tempest halted | Achernar-Polaris baseline |
-| **09** | Sheet 07A | The Celestial Cipher | 24 Angular Coordinates | Hermes' vow recovered | *"YOU WERE ALWAYS THE TREASURE"* |
-| **10** | Sheet 07B/08A | The Desert Frontier | Bearing $112^\circ$ + Cairn III | Entry to Highlands | Desert Wax Seal |
-| **11** | Sheet 10A | Sandstone Labyrinth | Path $[M, A, Z, E]$ | Bearing $042^\circ\text{ NE}$ | Access to Sun Mesa |
-| **12** | Sheet 11A | Desert Lexicon & Qibla | Crossword + $194^\circ\text{ SSW}$ | Key I: **`PHOENIX`** | Solstice Shadow Vector |
-| **13** | Sheet 11B | Polybius Stele | 6 Cipher Stanzas | Sentry Aphorism | `"STARS GUIDE THOSE WHO SEEK TRUTH"` |
-| **14** | Sheet 12A/B | Sun Monolith Alignment | Kepler Quadrant | Key III: **`348° NNW`** | Proportion: $[R] \times 2 = [F] \implies \mathbf{R=3, F=6}$ |
-| **15** | Sheet 14B | Whispering Chasm Maze | 6 Cairns on 231p path | Passphrase: **`MIRAGE`** | Canyon crossing secured |
-| **16** | Sheet 15B | Oasis Clepsydra | 4×4×4 Logic Matrix | Key II: **`XXX`** ($30\text{ h}$) | Moat drained |
-| **17** | Sheet 16A/B | Gates of the Oracle | 3 Keys Aligned | **Tower II Unsealed** | Astrolabe recovered + Vega star + Tower III bearing |
+### HOJA 15 · JUEGO 7 (CAIRN IV) Y ZOOM AL PUENTE NATURAL (PARTE 1)
+- **Cara A (Anverso · Juego D7)**: **Juego 7: Cairn IV (Sentry of the Canyon)**.
+  - **Ubicación**: La boca meridional del desfiladero, donde se erige Cairn IV custodiando el paso hacia la Mesa Centinela.
+  - **Mecánica**: Acertijo de resonancia acústica y perspectiva visual sobre las grietas del cañón.
+  - **Recompensa**: Obtención del tercer sello de peregrinación: **Sello de Cairn IV**.
+- **Cara B (Reverso · Zoom Mapa)**: **Zoom Topográfico: El Puente Natural y la Garganta (Panel Izquierdo · Spread 3)**.
+  - **Contenido Cartográfico**: Vista en primer plano a escala grande del puente de roca natural que conecta la meseta con la mole de *The Sentinel Mesa (Elev. 980 varas)*. Detalle de estratos de arenisca, fisuras de falla y cotas de nivel. Conexión continua con la Hoja 16A.
 
 ---
 
-## 6. TECHNICAL ECOSYSTEM & WEB INTEGRATION
+### HOJA 16 · ZOOM AL PUENTE (PARTE 2) Y JUEGO 8 (SOLAR ALTAR & CAIRN V)
+- **Cara A (Anverso · Zoom Mapa)**: **Zoom Topográfico: El Puente Natural y la Garganta (Panel Derecho · Spread 3)**.
+  - **Contenido Cartográfico**: Panel derecho del spread continuo. Muestra el estribo oriental del puente de roca, el descenso hacia la rambla pedregosa inferior (*Lower Wash*), cantos rodados caídos y notas de campo manuscritas de Hermes.
+- **Cara B (Reverso · Juego D8)**: **Juego 8: Arch of the Solstice & The Solar Altar (Cairn V)**.
+  - **Ubicación**: En las inmediaciones del santuario, donde se alza el gran Arco del Solsticio y el Altar Solar frente a Cairn V.
+  - **Mecánica**: Alineación óptica y astronómica del rayo del solsticio cruzando el vano del arco pétreo para iluminar el foco del altar en Cairn V.
+  - **Recompensa**: Obtención del cuarto sello de peregrinación: **Sello de Cairn V**. ¡Los 4 Cairns están completos!
 
-1. **Unified Storage (`localStorage`)**:
-   - `order_desert_labyrinth_completed`: Validates Sandstone Maze D1.
-   - `order_desert_lexicon_completed`: Validates Sigil `PHOENIX` and bearing $194^\circ$.
-   - `order_polybius_stele_completed`: Validates Polybius Stele D3.
-   - `order_sun_monolith_completed`: Validates Monolith Bearing $348^\circ\text{ NNW}$.
-   - `order_whispering_chasm_completed`: Validates Chasm Passphrase `MIRAGE`.
-   - `order_clepsydra_completed`: Validates Clepsydra Matrix and Key `XXX`.
-   - `order_tower2_oracle_unsealed`: Unlocks Tower II victory and enables transition to Tower III.
-2. **The Cipher Ledger**:
-   - Always accessible from the web navigation header.
-   - Starts with all 26 letters blank (`—`). As Silvia deduces letter values ($A=7, O=23, R=3, F=6, P=21, K=26$, etc.), she records them to verify the celestial coordinate equations.
-3. **The Cliffside Telegraph**:
-   - Enables continuous telegraphic communication between Silvia and Hermes across mineral ground currents.
-   - Includes *Field Inquiries* so Silvia can clarify lore and mechanics at any point without breaking immersion.
+---
+
+### HOJA 17 · JUEGO 9 (THE POLYBIUS STELE) Y AUDIENCIA CON EL ORÁCULO
+- **Cara A (Anverso · Juego D9)**: **Juego 9: The Polybius Stele (La Prueba del Sirviente)**.
+  - **Narrativa**: Hermes regresa ante las puertas del santuario y presenta los 4 sellos de los Cairns. El sirviente asiente, pero impone una última prueba de verificación para demostrar que el viajero comprende la lengua cifrada de los fundadores: descifrar la estela de Polibio grabada en el atrio del templo.
+  - **Mecánica**: Cuadrícula de Polibio $5 \times 5$ modulada con la palabra clave `PHOENIX` y seis estrofas de coordenadas numéricas.
+  - **Solución Canónica**: Aforismo: **`"STARS GUIDE THOSE WHO SEEK TRUTH"`**, rumbo **`348° NNW`**.
+- **Cara B (Reverso · Lore)**: **Audiencia con El Oráculo del Desierto**.
+  - **Narrativa**: Las pesadas puertas de bronce y arenisca se abren solemnemente. Hermes es conducido ante **El Oráculo del Desierto (The Oracle)**. El Oráculo reconoce a Silvia como la buscadora predestinada, le entrega la revelación **WHERE** (la ciudad europea y el teatro histórico de la gala de ballet) y revela la posición de la segunda estrella maestra: **Vega** (anclada con **Deneb**).
+
+---
+
+### HOJA 18 · JUEGO 10 (CLÍMAX DEL ORÁCULO) Y TRANSICIÓN AL STAGE PATH
+- **Cara A (Anverso · Juego D10)**: **Juego 10: The Oracle's Horizon & The Triangulation Climax**.
+  - **Mecánica**: Enigma final de convergencia. El Oráculo presenta un diagrama interactivo con los tres espejos del horizonte que alinean la Torre I (Observatorio Alpino) y la Torre II (Santuario de Arenisca) proyectando un vector de rumbo hacia el oriente.
+  - **Lore Web**: En la plataforma web se despliega el clímax sonoro y telemétrico que desbloquea la transición al siguiente acto.
+- **Cara B (Reverso · Arte de Transición)**: **Dibujo de Transición: Del Desierto al Escenario**.
+  - **Inspiración Artística**: Basado fielmente en la composición de boceto del cuaderno de arte:
+    * Cortinajes y pliegues teatrales ondulados en tonos violetas y lavanda.
+    * Estrellas de cuatro puntas y motivos en espiral/rosa.
+    * Cenefa trenzada vertical que actúa como columna vertebral de la composición.
+    * Columnas arquitectónicas con trama en espiga/chevron en fuga de perspectiva.
+    * Malla geométrica de cuadrícula (perspectiva de suelo de escenario) sobre la que fluyen ondas orgánicas estilizadas.
+  - **Función Simbólica**: Anuncia formalmente el paso del mundo mineral y silencioso del desierto al universo de la danza, el teatro, la simetría y los espejos: **Tower III — The Stage Tower / The Mirror Sanctuary (The Stage Path)**.
+
+---
+
+## 5. TABLA MAESTRA DE LAS 18 HOJAS Y 10 JUEGOS DEL DESIERTO
+
+| Hoja | Cara A (Anverso · Margen Izq Libre) | Cara B (Reverso · Margen Der Libre) | Tipo de Contenido |
+| :---: | :--- | :--- | :--- |
+| **08** | Lore: The Desert Frontier (08A) | **Gran Mapa: Cuadrante NO (08B)** | Lore + Spread 1 Izq |
+| **09** | **Gran Mapa: Cuadrante NE (09A)** | **Juego D1: The Whispering Chasm (09B)** | Spread 1 Der + Laberinto |
+| **10** | **Juego D2: The Salt Playa (10A)** | Lore/Estudio: The Salt Playa Basin (10B) | Enigma Salar + Da Vinci |
+| **11** | **Juego D3: Desert Lexicon - BC Ashes (11A)**| **Gran Mapa: Cuadrante SO (11B)** | Crucigrama + Spread 2 Izq |
+| **12** | **Gran Mapa: Cuadrante SE (12A)** | **Juego D4: Oasis Clepsydra - Espejismo (12B)** | Spread 2 Der + Lógica |
+| **13** | Lore: Demanda del Sirviente (13A) | **Juego D5: The Sun Monolith (13B)** | Lore + Cairn II |
+| **14** | Lore: Los 4 Cairns Sagrados (14A) | **Juego D6: Sandstone Labyrinth (14B)** | Lore + Cairn III |
+| **15** | **Juego D7: Cairn IV Chasm Sentry (15A)** | **Zoom Mapa: Puente Natural - Panel Izq (15B)**| Enigma + Spread 3 Izq |
+| **16** | **Zoom Mapa: Puente Natural - Panel Der (16A)**| **Juego D8: Solstice Arch / Altar (16B)** | Spread 3 Der + Cairn V |
+| **17** | **Juego D9: The Polybius Stele (17A)** | Lore: Audiencia con El Oráculo (17B) | Prueba Sirviente + WHERE |
+| **18** | **Juego D10: Clímax con El Oráculo (18A)** | **Arte: Transición al Stage Path (18B)** | Clímax Final + Dibujo Danza |
+
+---
+
+## 6. INVARIANTES DE PRODUCCIÓN Y REGLAS TÉCNICAS
+
+1. **Márgenes de Troquelado A5**:
+   - Cara A (Front): $X < 165$ px con 0 píxeles no-cero.
+   - Cara B (Back): $X > 1583$ px con 0 píxeles no-cero (salvo en los spreads continuos full-bleed 08B+09A, 11B+12A y 15B+16A).
+2. **Cero Spoilers Numéricos (Regla 9)**: Silvia deduce los valores de las letras por sí misma en *The Cipher Ledger*.
+3. **Uso Exclusivo del Alfabeto Estándar (Regla 10)**: Letras $A-Z$ latinas normales en todas las ecuaciones y cuadrículas.
+4. **Agencia de Silvia**: Silvia juega, descifra y resuelve; Hermes es el narrador atmosférico en apuros.
+5. **Alineación de Lore**: Los raiders se llaman canónicamente **The BC Ashes**.
