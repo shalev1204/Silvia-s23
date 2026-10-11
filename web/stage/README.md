@@ -1,6 +1,6 @@
-# The Stage Path · Archivo Web
+# The Stage Path · Web Archive
 
-Este directorio albergará las experiencias interactivas y puzzles web de **The Stage Path** (custodiado por *The Mirror Speaker*).
+This directory will hold the interactive experiences and web puzzles of **The Stage Path** (guarded by *The Mirror Speaker*).
 
-Estructura prevista para futuros juegos:
-- `web/stage/01-[nombre-del-juego]/index.html`
+Planned structure for future games:
+- `web/stage/01-[game-name]/index.html`

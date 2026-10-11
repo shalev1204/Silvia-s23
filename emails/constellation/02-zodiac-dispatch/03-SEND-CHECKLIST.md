@@ -11,7 +11,7 @@
 ## 1. Archivo de Imagen Generado para el Correo 🖼️
 
 Siguiendo el mismo formato visual que las dos primeras interacciones:
-- **Archivo JPEG listo para enviar:** [`email-03-outpost.jpg`](file:///path/to/Silvia's23/emails/constellation/02-zodiac-dispatch/email-03-outpost.jpg)
+- **Archivo JPEG listo para enviar:** [`email-03-outpost.jpg`](email-03-outpost.jpg)
 - **Dimensiones:** 3508 × 2480 px (Ultra Alta Resolución)
 - **Contenido:** Tarjeta celestial orlada con el sello ◐ de la Orden, las coordenadas del puesto en las estribaciones desérticas (`142.85 MHz`), la pintura al óleo del Cartógrafo vigilando la entrada subterránea bajo la Vía Láctea, el texto de lore y las instrucciones para la Hoja 5 del diario.
 
@@ -21,10 +21,10 @@ Siguiendo el mismo formato visual que las dos primeras interacciones:
 
 ### Opción A: Correo Oficial con Imagen Embebida (Recomendado)
 - **Asunto:** `[Dispatch III] · The Zodiacal Outpost & The Dust of the Mainframe`
-- **Cuerpo HTML:** Usar [`03-zodiac-dispatch.html`](file:///path/to/Silvia's23/emails/constellation/02-zodiac-dispatch/03-zodiac-dispatch.html) adjuntando la imagen [`email-03-outpost.jpg`](file:///path/to/Silvia's23/emails/constellation/02-zodiac-dispatch/email-03-outpost.jpg) como inline `cid:dispatch_card` (o subiéndola a tu servidor de correo).
+- **Cuerpo HTML:** Usar [`03-zodiac-dispatch.html`](03-zodiac-dispatch.html) adjuntando la imagen [`email-03-outpost.jpg`](email-03-outpost.jpg) como inline `cid:dispatch_card` (o subiéndola a tu servidor de correo).
 
 ### Opción B: Mensaje Directo con Imagen Adjunta (WhatsApp / Telegram)
-Envía la imagen [`email-03-outpost.jpg`](file:///path/to/Silvia's23/emails/constellation/02-zodiac-dispatch/email-03-outpost.jpg) acompañada de este texto:
+Envía la imagen [`email-03-outpost.jpg`](email-03-outpost.jpg) acompañada de este texto:
 
 ```text
 📻 [INTERCEPTED TRANSMISSION // THE ECLIPSE ORDER]

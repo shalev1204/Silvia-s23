@@ -1,6 +1,25 @@
 # Timeline — Silvia's 23
 
-> Calendario del juego. Ajustable según ritmo real.
+> Calendario del juego. Ajustable según ritmo real.  
+> ⚠️ Las tablas «Semanas (borrador)» y «Alfabeto» son el **plan original** (1 sep 2026). El estado real y las fechas de cada despacho están en la sección siguiente y en la Biblia Maestra 6.0 ([CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)).
+
+---
+
+## Estado real (octubre 2026)
+
+| Fecha | Evento |
+|-------|--------|
+| 1 sep 22:22 | Email 1 · *Something shifted*. Silvia elige `THE CONSTELLATION PATH`. |
+| 2 sep 22:22 | Email 2 · Fragment 1 (The Celestial Flower). |
+| 5 sep 22:22 | Email 3 · Intercepted Transmission (The Celestial Matrix). |
+| 8 sep 22:22 | Email 4 · The Zodiacal Outpost (Estación 07). |
+| 11 sep | Entrega del diario físico en Italia. |
+| 12 sep 20:00 | Email 5 · Emergency Carrier 142.85 MHz. Tormenta de arena y bloqueo de 48 h del Hub. |
+| 28 sep 00:00 (CEST) | Ventana de medianoche de la Estación 08 (Midnight Calibration). |
+| En curso | Desert Path (Estaciones 10–19, Hojas 08–18). Estaciones 10 a 13 ya jugables en el Hub. |
+| Día final | **Cumpleaños (23)**: revelación final y entradas de ballet. |
+
+Pendiente: Estaciones 14–19 del Desert Path, el Stage Path (Torre III) y la Bóveda del Gran Eclipse.
 
 ---
 

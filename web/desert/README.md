@@ -1,6 +1,5 @@
-# The Desert Path · Archivo Web
+# web/desert
 
-Este directorio albergará las experiencias interactivas y puzzles web de **The Desert Path** (custodiado por *The Oracle*).
+Reserved for **The Desert Path**. Its games (Stations 10 to 13) currently live as modules inside `web/index.html`. If they are extracted, use `web/desert/<game-name>/index.html`.
 
-Estructura prevista para futuros juegos:
-- `web/desert/01-[nombre-del-juego]/index.html`
+Station 07 (The Zodiacal Engine) belongs to the Constellation Path and lives in `web/constellation/zodiac-engine/`.

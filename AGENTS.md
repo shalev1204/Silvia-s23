@@ -8,16 +8,16 @@ Este repositorio contiene el diario manuscrito, puzzles y ecosistema narrativo p
 
 Al iniciar una nueva sesión en este repositorio, **TODO AGENTE DE IA (Cursor, Claude Code, Antigravity o cualquier LLM asistente) TIENE LA OBLIGACIÓN ESTRICTA DE LEER Y CONSULTAR** los siguientes documentos antes de planificar, responder o realizar cualquier modificación de código o texto:
 
-1. **[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](file:///path/to/Silvia's23/docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)**:
+1. **[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)**:
    - **La Biblia Maestra Canónica (Versión 6.0)**: Fuente de verdad absoluta e inmutable.
    - Contiene el 100% de la historia cronológica (1970 a la fecha), el registro íntegro de todos los correos enviados, las transcripciones literales (palabra por palabra con marcas de tiempo) de las 6 transmisiones de audio, el desglose de las estaciones 01 a 09, la arquitectura completa del bloqueo de 48h del Hub Central por la gran tormenta de arena, la biblia criptográfica de *The Cipher Ledger* (deducciones algebraicas paso a paso) y el directorio de personajes y lugares.
    - **Invariante**: Queda terminantemente prohibido inventar o alterar nombres propios, lugares o derivas terminológicas (*"Sunken"*, *"Coastal"*, *"Coast"*, *"Hermit"*, *"Stage Mistress"*).
-2. **[docs/lore_and_puzzle_bible.md](file:///path/to/Silvia's23/docs/lore_and_puzzle_bible.md)**:
+2. **[docs/lore_and_puzzle_bible.md](docs/lore_and_puzzle_bible.md)**:
    - Biblia de diseño de puzzles, astronomía y lore del ecosistema.
-3. **[.agents/rules/user-preferences.md](file:///path/to/Silvia's23/.agents/rules/user-preferences.md)**:
+3. **[.agents/rules/user-preferences.md](.agents/rules/user-preferences.md)**:
    - Estándar estético renacentista ("currado", Da Vinci/Kepler/Dürer), márgenes obligatorios de troquelado A5 ($X < 165$ px en Cara A y $X > 1583$ px en Cara B), espaciados mínimos y cero colisiones texto-dibujo.
-4. **[docs/DESERT_ODYSSEY_BIBLE.md](file:///path/to/Silvia's23/docs/DESERT_ODYSSEY_BIBLE.md)**:
-   - Especificaciones para la continuidad de las Estaciones 10 a 17 (The Desert Path).
+4. **[docs/DESERT_ODYSSEY_BIBLE.md](docs/DESERT_ODYSSEY_BIBLE.md)**:
+   - Especificaciones para la continuidad de las Estaciones 10 a 19 (The Desert Path), con la tabla Estación ↔ Juego ↔ Hoja.
 
 ---
 

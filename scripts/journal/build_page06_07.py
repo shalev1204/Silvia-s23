@@ -336,7 +336,7 @@ def render_face_6a(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
         )),
         ("3. The Benchmark Plate", (
             "Three cairns of dry stone mark the southern turn into the wash. Beneath the foundation slab "
-            "of the third lies the copper plate, aligned to the azimuth of one hundred and twelve degrees."
+            "of the third lies the copper plate, aligned to the bearing of one hundred and twelve degrees."
         ))
     ]
 

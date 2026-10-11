@@ -1,11 +1,14 @@
 # Silvia's 23 — Índice maestro del proyecto
 
 > **SSOT (Single Source of Truth):** este archivo + los documentos enlazados abajo.  
-> **Última actualización:** 1 de septiembre de 2026, ~21:15  
+> **Última actualización:** octubre 2026 (estado del juego y mapa de documentación). El detalle del 1 sep 2026 se conserva abajo como histórico.  
+> **Fuente de verdad del lore:** [docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md) (Biblia 6.0)  
 > **Operador:** Carles · **Herramientas:** Cursor + Claude Code  
 > **Idioma del juego:** Inglés (mayoría del contenido)
 
 ---
+
+> ℹ️ Las secciones «Fase I», «Entrega 2» y el registro de decisiones reflejan el **1 sep 2026**. Para el estado vigente, ver «Estado actual del juego» más abajo.
 
 ## En una frase
 
@@ -29,6 +32,10 @@ Caza del tesoro no lineal de ~56 días para el 23.º cumpleaños de Silvia. Rega
 | **[emails/general/01-opening-dispatch/](emails/general/01-opening-dispatch/)** | Email 1: texto pergamino, checklist 22:22 |
 | **[emails/constellation/01-cartographer-dispatch/](emails/constellation/01-cartographer-dispatch/)** | Email 2: fragmento 1, checklist |
 | **[docs/ASSETS.md](docs/ASSETS.md)** | Todos los archivos generados y cómo regenerarlos |
+| **[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)** | Biblia Maestra 6.0: lore, emails, transmisiones, estaciones 01–09, tormenta, Cipher Ledger |
+| **[docs/DESERT_ODYSSEY_BIBLE.md](docs/DESERT_ODYSSEY_BIBLE.md)** | Desert Path: hojas 08–18, juegos, Cairns y Estaciones 10–19 |
+| **[docs/lore_and_puzzle_bible.md](docs/lore_and_puzzle_bible.md)** | Diseño de puzzles, astronomía y mecánicas |
+| **[AGENTS.md](AGENTS.md)** | Reglas de trabajo del Operador (Capa 2) |
 
 ---
 
@@ -100,6 +107,16 @@ YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.
   - Juego original preservado (Fase 1): `web/constellation/celestial-flower/index.html` (Intacto para archivo histórico).
 - **Giro Narrativo Mayor:** El despertar de la flor alertó a fuerzas hostiles. El observatorio ha sido asaltado y han robado **The Astrolabe of Distant Light**. El Cartógrafo ha sobrevivido y ahora es aliado activo de Silvia.
 - **Misión del Constellation Path:** Recuperar el Astrolabio antes de que los asaltantes lo descifren. Los protocolos de recuperación están codificados en el **Grimoire físico** que viajará a Italia el 11 de septiembre.
+
+---
+
+## Estado actual del juego (octubre 2026)
+
+- **Constellation Path (Estaciones 01–09):** completado. La Estación 09 terminó con el voto de Hermes y la gran tormenta de arena (Hub bloqueado 48 h; después, el telégrafo *Ask Hermes*).
+- **Desert Path (Estaciones 10–19, Hojas 08–18):** en curso. Jugables en el Hub, en orden estricto: Estación 10 (The Whispering Chasm), 11 (The Salt Playa), 12 (The Desert Lexicon) y 13 (The Oasis Clepsydra). Pendientes: 14–19.
+- **Stage Path (Torre III):** pendiente.
+- **Final:** alinear las tres torres abre *The Vault of the Grand Eclipse* (entradas de ballet).
+- **Web:** Hub en `web/index.html`; mapa completo en [docs/WEB_ECOSYSTEM.md](docs/WEB_ECOSYSTEM.md).
 
 ---
 

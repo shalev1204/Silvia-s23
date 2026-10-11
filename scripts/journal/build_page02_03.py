@@ -310,7 +310,7 @@ def place_glyph_in_elongated_box(
 def sketch_page02_accompanying_studies(canvas: np.ndarray, gc: tuple = GRAPHITE_COLOR) -> None:
     """
     Renders rich accompanying cartographic studies in the right margin of Page 2 (X in [1080, 1540]):
-    - Upper Right: Celestial Azimuth Sighting Ring with polar axis and diagonal ray/text.
+    - Upper Right: Celestial Bearing Sighting Ring with polar axis and diagonal ray/text.
     - Mid Right: Discarded spurious glyph with vigorous graphite cross-out and '?'.
     - Lower Right: Sighting elevation baseline and desert horizon contour.
     """

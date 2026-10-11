@@ -61,6 +61,12 @@ El propósito de esta versión 6.0 es blindar el proyecto al 100%:
 
 ---
 
+### D.2 Los Tres Mojones de 1998 (Hoja 7 · Cara B)
+- Durante esa expedición Hermes levantó con sus manos **tres montones de piedra seca** a lo largo del cauce seco (rumbo SSE) y enterró bajo el tercero la *primera* placa de referencia de cobre (112° E hacia Outer Watchtower VI), «para el buscador que algún día siga mis pasos». **Invariante**: ese texto de 1998 no se modifica.
+- Lo que Hermes ignoraba (el terremoto de 1971 había derribado los tres primeros Cairns de la Orden y él alzó los suyos sobre sus cimientos) se explica en `docs/DESERT_ODYSSEY_BIBLE.md`, apartado «Historia de los Cairns».
+
+---
+
 ### E. El Haz de Medianoche: « The Cartographer of Distant Light » (Otoño de 2016)
 - **El Pulso de Oro**: En una noche gélida y cristalina de otoño de 2016 (exactamente diez años antes de la llamada de Silvia), el Cartógrafo observaba el horizonte desértico desde su telescopio en Deserti Limen. De pronto, entre las ruinas de piedra arenisca a kilómetros de distancia en las dunas, detectó un pulso rítmico de luz dorada.
 - **El Código del Disco**: Aquel destello no era una fogata ni una estrella: parpadeaba con una cadencia artificial inconfundible: **tres pulsos cortos, pausa, dos pulsos largos** —la clave matemática grabada en el disco de Aurelia.
@@ -346,7 +352,7 @@ A continuación se recoge la transcripción íntegra, palabra por palabra, con m
 ---
 
 ### Transmisión 4: Intercepted Field Relay & Motive (Estación 07 · 142.85 MHz)
-- **Contexto**: En la pantalla de victoria de la patrulla 3D (`web/desert/zodiac-engine/index.html`), Silvia abre el cofre descartado por los asaltantes.
+- **Contexto**: En la pantalla de victoria de la patrulla 3D (`web/constellation/zodiac-engine/index.html`), Silvia abre el cofre descartado por los asaltantes.
 - **Relé de Voz del Cartógrafo**:
 ```text
 «Silvia! The signal came through... loud and clear! I've been shadowing the raiders from the ridges along the desert outskirts since dawn. They realized their convoy was too heavy dragged down by iron chests in the sand, so they dumped this cache inside these outpost ruins while plunging into the deep dunes. The dispatch you recovered confirms the worst: they aren't just curious about the stars—they know the Astrolabe triangulates the Fourth Forbidden Chamber when aligned with the Three Ancient Towers! But look south... the sky is turning pitch black. A violent sandstorm is brewing over the deep dunes. Inscribe the recovered glyph into your codex... we must stay on their trail before the storm wipes it clean!»
@@ -600,7 +606,7 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
    - Maestro de la simetría, la luz, el reflejo y la danza. *(Queda terminantemente prohibido llamarlo "Stage Mistress")*.
 5. **The Sanctuary Servant (El Sirviente del Santuario)**:
    - Guardián ceremonial y heraldo del atrio en **Tower II (The Sandstone Sanctuary)**.
-   - Exige la presentación de los 4 mojones sagrados de la peregrinación (Cairns II, III, IV y V) y supervisa la prueba de la Estela de Polibio previa a la apertura del sanctasanctórum.
+   - Exige los 5 Cairns sagrados de la peregrinación (Hermes ya porta el sello de Cairn I; le faltan 4: Cairns II, III, IV y V) y supervisa la prueba de la Estela de Polibio previa a la apertura del sanctasanctórum.
 6. **The BC Ashes (Los Asaltantes de la Ceniza)**:
    - Facción de saqueadores y forajidos del desierto que asaltó el Observatorio Alpino en la noche del solsticio y robó el cofre con el Astrolabio de Latón.
    - Su identidad y enseña son descubiertas por Hermes en *The Desert Lexicon* (Hoja 11A) tras eludir una emboscada en los laberintos de piedra.
@@ -696,6 +702,10 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
 
 ---
 
+Las **Estaciones 10 a 19** (juego ↔ hoja ↔ lugar) se fijan en `docs/DESERT_ODYSSEY_BIBLE.md` §5.B.
+
+---
+
 ## 10. TOPOGRAFÍA OFICIAL DEL GRAN MAPA DEL DESIERTO (LAS 22 LOCALIZACIONES CANÓNICAS EN LOS 4 CUADRANTES)
 
 El Gran Mapa del Desierto de 4 cuadrantes (Spreads 1 y 2 del diario, dispuestos en 2 columnas × 2 filas) contiene exactamente **22 accidentes geográficos y cotas topográficas rotuladas en el lienzo**. Los nombres de los juegos y misiones del desierto proceden directamente de estas localizaciones reales:
@@ -712,19 +722,19 @@ El Gran Mapa del Desierto de 4 cuadrantes (Spreads 1 y 2 del diario, dispuestos 
 7. **The Sun Monolith**: Gran obelisco monolítico de arenisca que proyecta la sombra gnomónica del mediodía solar.
 8. **Arches of the West Wind**: Laberinto de arcos naturales de piedra esculpidos por los vientos dominantes de poniente.
 9. **The Sandstone Labyrinth**: Dédalo de pilares y estrechas fisuras de arenisca donde huyeron las carretas de los asaltantes.
-10. **Cairn II**: Segundo mojón de piedra; asiento de las estelas con inscripciones del desierto (*The Desert Lexicon & Al-Qibla*).
+10. **Cairn II**: Segundo mojón de piedra (pedestal escalonado con tablillas), junto al *Sun Monolith* (Estación 14).
 11. **Cairn III (Copper Benchmark Plate)**: Tercer mojón de piedra con la placa de latón/cobre fijada a la roca viva.
     - *Visual astronómica grabada en el mapa*: Línea discontinua con la inscripción `"Bearing 348* True North-Northwest"` apuntando a *The Sun Monolith*.
 12. **The Sinking Peaks**: Cordillera lejana en el horizonte brumoso oriental (*The Sinking Peaks · Distant Horizon*).
 
-### C. Cuadrante Suroeste · Q3 (Hoja 10B · Spread 2 Izquierda)
-13. **The Whispering Chasm**: Desfiladero acústico y laberinto subterráneo de 25×25 (Misión 1 de Silvia).
+### C. Cuadrante Suroeste · Q3 (Hoja 11B · Spread 2 Izquierda)
+13. **The Whispering Chasm**: Desfiladero acústico y laberinto subterráneo de 25×25 (Estación 10).
 14. **The Lower Wash (Wadi al-Hajar South)**: Garganta meridional inferior del lecho de grava aluvial.
 15. **The Terraces of the Jackal**: Terrazas escalonadas de arenisca en la pared occidental del cañón.
 16. **The Sentinel Mesa**: Meseta centinela a una cota de 980 varas castellanas (*Elev. 980 varas*).
 17. **Cairn IV (Sentry of the Canyon)**: Cuarto mojón de piedra que vigila la boca de salida del cañón hacia las dunas abiertas.
 
-### D. Cuadrante Sureste · Q4 (Hoja 11A · Spread 2 Derecha)
+### D. Cuadrante Sureste · Q4 (Hoja 12A · Spread 2 Derecha)
 18. **The Sandstone Sanctuary of the Oracle**: Templo milenario de la Torre II custodiado por El Oráculo del Desierto.
 19. **The Solar Altar**: Altar solar en el sanctasanctórum del templo donde converge la luz del cenit.
 20. **Arch of the Solstice**: Gran arco pétreo ceremonial que enmarca la entrada monumental.
@@ -740,9 +750,9 @@ Queda establecido como invariante de lore la distinción entre nombres físicos 
 
 | Nombre Analizado | ¿Existe rotulado dentro del Gran Mapa de 4 cuadrantes? | Naturaleza Canónica Real |
 | :--- | :---: | :--- |
-| **Oasis Clepsydra** | **NO** | Es exclusivamente el título del **Juego D3** (Hoja 11B). En el mapa (Hoja 11A) la zona física está rotulada como *The Salt Playa*, *The Solar Altar* y *The Sandstone Sanctuary*. |
-| **Polybius Stele** | **NO** | Es exclusivamente el título del **Juego D4** (Hoja 12A). En el mapa (Hoja 9A) el punto físico es **Cairn III (Copper Benchmark Plate)** con el rumbo $348^\circ\text{ NNW}$. |
-| **Desert Lexicon** | **NO** | Es exclusivamente el título del **Juego D2** (Hoja 10A). En el mapa (Hoja 9A) el punto físico es **Cairn II** y *The Sandstone Labyrinth*. |
+| **Oasis Clepsydra** | **NO** | Es exclusivamente el título del **Juego D4** (Hoja 12B · Estación 13). En el mapa (Hoja 12A) la zona física está rotulada como *The Salt Playa*, *The Solar Altar* y *The Sandstone Sanctuary*. |
+| **Polybius Stele** | **NO** | Es exclusivamente el título del **Juego D9** (Hoja 17A · Estación 18) y la estela está en el atrio de la Torre II. Su solución da el rumbo $348^\circ\text{ NNW}$, el mismo que está grabado en **Cairn III (Copper Benchmark Plate)** (Hoja 9A): la estela confirma el rumbo, pero no está en Cairn III. |
+| **Desert Lexicon** | **NO** | Es exclusivamente el título del **Juego D3** (Hoja 11A · Estación 12) y ocurre en unas ruinas nómadas junto a la Salt Playa, sin rótulo propio en el mapa. |
 | **The Whispering Chasm** | **SÍ** | Es tanto la localización física rotulada en el Cuadrante SO (Hoja 10B) como el título del **Juego D1** (Hoja 09B). |
 
 

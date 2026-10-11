@@ -111,11 +111,10 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 7. **Hojas 8B y 9A (`page08_back` y `page09_front`)**: *The Grand Desert Map* (Spread continuo de 2 páginas A4: Cuadrantes NO y NE).
 8. **Juego D1 (Hoja 9 · Cara B · `page09_back` · Station 10)**: *The Whispering Chasm Maze*.
    - Primer juego interactivo web del Desert Path. Navegación táctica por el laberinto de cañones susurrantes hacia el primer punto de agua.
-9. **Juegos D2, D3, D4 y Clímax del Desierto (Hojas 10, 11 y 12)**:
-   - Juego D2 (*The Desert Lexicon & Al-Qibla*).
-   - Juego D3 (*The Oasis Clepsydra & 4 Wells*).
-   - Juego D4 (*The Polybius Stele*).
-   - Epílogo y Santuario del Oráculo del Desierto (Torre II · El Santuario de Arenisca).
+9. **Juegos D2 a D10 y Clímax del Desierto (Hojas 10 a 18)**: ver la tabla de Estaciones 10–19 (Estación ↔ Juego ↔ Hoja) en [`DESERT_ODYSSEY_BIBLE.md`](DESERT_ODYSSEY_BIBLE.md) §5.B.
+   - D2 *The Salt Playa* (Hoja 10A), D3 *The Desert Lexicon & Al-Qibla* (11A), D4 *The Oasis Clepsydra* (12B).
+   - D5–D8: los sellos de Cairn II a V (Hojas 13B, 14B, 15A, 16B).
+   - D9 *The Polybius Stele* (17A), D10 *The Oracle's Horizon* (18A) y audiencia con el Oráculo en la Torre II (17B).
 
 ---
 
@@ -161,7 +160,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
      * **Longitud Minutos (14')**: `[E] + [V]` ($2 + 12 = 14$)
      * **Longitud Segundos (22")**: `[F] + [T]` ($6 + 16 = 22$)
    
-   - **Tabla Maestra Canónica Aleatoria (Alfabeto 1..26)**:
+   - **Tabla Maestra Canónica Aleatoria (Alfabeto 1..26)** · ⚠️ *Referencia interna del Operador: estos valores NO deben mostrarse nunca en la web, el diario ni los emails (Regla 9).*
      ```
      A = 7      H = 11     O = 23     V = 12
      B = 17     I = 10     P = 21     W = 5
@@ -198,7 +197,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 
 ---
 
-## 8. ESPECIFICACIÓN DEL JUEGO 2: "THE ZODIACAL ENGINE & 3D OUTPOST PATROL" (`web/desert/zodiac-engine/`)
+## 8. ESPECIFICACIÓN DEL JUEGO 2: "THE ZODIACAL ENGINE & 3D OUTPOST PATROL" (`web/constellation/zodiac-engine/`)
 
 ### Ubicación y Estado de la Narrativa (Canónico)
 - **Camino Actual**: **Constellation Path** (El Cartógrafo de la Luz Distante). **NO hemos llegado todavía al Desert Path ni a la Torre II**.
@@ -264,7 +263,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 - **Camino Actual**: **Constellation Path** en transición incipiente hacia el **Desert Path** (Estética Híbrida: 80% Constelación · 20% Desierto).
 - **Escenario**: Riscos montañosos que dominan la llanura de entrada a las dunas. El Cartógrafo mantiene vigilancia visual sobre el convoy enemigo que huye hacia el sur mientras monta su campamento de campaña.
 - **Origen en papel**:
-  - **Hoja 6 · Cara A (`page06_front`)**: *The Midnight Calibration* (Planisferio cenital ovalado, cuadrante de azimuts $000^\circ$ a $315^\circ$, anillos elípticos de altitud $0^\circ$ a $60^\circ$, fórmula $\text{Delta} = (\text{Bearing} + \text{Altitude}) - 38^\circ$ y protocolo de alineación).
+  - **Hoja 6 · Cara A (`page06_front`)**: *The Midnight Calibration* (Planisferio cenital ovalado, cuadrante de rumbos $000^\circ$ a $315^\circ$, anillos elípticos de altitud $0^\circ$ a $60^\circ$, fórmula $\text{Delta} = (\text{Bearing} + \text{Altitude}) - 38^\circ$ y protocolo de alineación).
   - **Hoja 6 · Cara B (`page06_back`)**: *The Midnight Transit* (Mapa de 12 estrellas con distancias en años luz, 6 cuerdas de luz estelar, suma total de distancias, polígono oculto y anclajes polares).
 
 ---
@@ -276,14 +275,14 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 2. **El Instrumento Óptico (El Astrolabio de Respaldo)**:
    - Como el Astrolabio Maestro de la Torre I fue robado en el asalto, el Cartógrafo utiliza una **réplica de campo / astrolabio de reserva de latón** (*The Field Astrolabe Rig*).
    - La interfaz web presenta una mesa de trabajo renacentista interactiva de latón finamente grabado, con:
-     - **Limbo graduado de $360^\circ$** con divisiones azimutales.
+     - **Limbo graduado de $360^\circ$** con divisiones de rumbo.
      - **Rete calada móvil** con los punteros de las estrellas maestras.
      - **Alidada giratoria** con doble mira óptica y nonio de altitud.
      - **Notas de campo del Cartógrafo**: Un pergamino desplegable con reflexiones observacionales (sin spoilers ni soluciones directas) que guía a Silvia sobre cómo contrastar la elevación y el acimut con la fisura del Mountain Vault.
 3. **Mecánica de Deducción y Calibración**:
    - Silvia introduce y prueba las lecturas de su tabla del diario:
      - *Polaris*: Rumbo $360^\circ$, Altitud $30^\circ \implies \text{Delta} = 352^\circ$. El haz impacta en roca ciega.
-     - *Arcturus*: Rumbo $270^\circ$, Altitud $45^\circ \implies \text{Delta} = 277^\circ$. Desajuste de azimut.
+     - *Arcturus*: Rumbo $270^\circ$, Altitud $45^\circ \implies \text{Delta} = 277^\circ$. Desajuste de rumbo.
      - *Aldebaran*: Rumbo $225^\circ$, Altitud $15^\circ \implies \text{Delta} = 202^\circ$. Haz difuso.
      - *Deneb*: Rumbo $045^\circ$, Altitud $15^\circ \implies \text{Delta} = 22^\circ$. Dispersión óptica.
      - *Altair*: Rumbo $180^\circ$, Altitud $15^\circ \implies \text{Delta} = 157^\circ$. Bloqueo de sombra.
@@ -400,8 +399,8 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 - **Datos Matemáticos, Geodésicos y Topográficos Canónicos (100% de uso en puzzles)**:
   * **Los Tres Mojones (`The Three Cairns`)**: Construidos en el lecho del cauce seco (*dry wash bed*), apuntando en dirección **sur-sureste (SSE)** hacia el acceso a las mesas de arenisca.
   * **El Tercer Mojón (`Cairn III`) & La Placa de Cobre**: Bajo las piedras de cimentación de Cairn III, oculta bajo una losa plana de arenisca roja (*flat red sandstone slab*), Hermes enterró la **Placa de Referencia de Cobre (`The Copper Benchmark Plate`)**.
-  * **Azimut Grabado en Cobre**: **112 grados hacia el Este (`Azimuth: 112° East`)**.
-  * **Atalaya Exterior VI (`Outer Watchtower VI`)**: Atalaya de observación encaramada en la cornisa del cañón, azimut visual $112^\circ\text{ E}$.
+  * **Rumbo Grabado en Cobre**: **112 grados hacia el Este (`Bearing: 112° East`)**.
+  * **Atalaya Exterior VI (`Outer Watchtower VI`)**: Atalaya de observación encaramada en la cornisa del cañón, rumbo visual $112^\circ\text{ E}$.
   * **Línea Base del Agrimensor (`Base Baseline`)**: **5.420 pasos** (*5,420 paces to Red Ridge*).
   * **Corrección de Norte Magnético a Verdadero (`Magnetic Offset`)**: **$+04^\circ\ 15'$** (*True N. Corr.*).
   * **Elevación del Vértice (`Apex Elevation - Peak VII`)**: **1.240 varas**.
@@ -417,7 +416,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 - **Las Tres Leyes del Páramo (`The Three Laws of the Waste`) (Mecánicas activas de juego)**:
   1. **La Sombra Meridiana (`The Meridian Shadow`)**: Al mediodía solar verdadero, el gnomon proyecta su sombra más corta exactamente sobre la línea meridiana. Solo entonces se revela el norte verdadero, apuntando directamente de vuelta hacia el antiguo observatorio.
   2. **El Cauce Seco (`The Dry Wash`)**: Donde las antiguas riadas de invierno labraron la arenisca, el lecho de grava compacta es el único paso firme y seguro a través del laberinto de cañones y precipicios.
-  3. **La Placa de Referencia (`The Benchmark Plate`)**: Tres mojones de piedra seca marcan el giro hacia el sur para internarse en el cauce. Bajo la losa de fundación del tercero reposa la placa de cobre, orientada al azimut de **ciento doce grados ($112^\circ$)**.
+  3. **La Placa de Referencia (`The Benchmark Plate`)**: Tres mojones de piedra seca marcan el giro hacia el sur para internarse en el cauce. Bajo la losa de fundación del tercero reposa la placa de cobre, orientada al rumbo de **ciento doce grados ($112^\circ$)**.
 - **Lema Rector de la Fase**: *«What the wind covers, the sun shall reveal»* (Lo que el viento cubre, el sol lo revelará).
 
 ---

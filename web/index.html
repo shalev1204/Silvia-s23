@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Eclipse Order</title>
+  <script>
+    /* Path theme (constellation | desert) is set before first paint to avoid a flash of the wrong backdrop. */
+    try {
+      document.documentElement.setAttribute('data-map-path', localStorage.getItem('order_active_map_path') === 'desert' ? 'desert' : 'constellation');
+    } catch (e) {
+      document.documentElement.setAttribute('data-map-path', 'constellation');
+    }
+  </script>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -214,6 +222,136 @@
         linear-gradient(180deg, #0a1120 0%, #050912 50%, #020408 100%);
     }
 
+
+    /* =========================================================================
+       PATH THEMES · the map view (view-trail) takes the look of the active path
+       html[data-map-path="constellation" | "desert"] is set by switchMapPath()
+       ========================================================================= */
+    .hub-theme-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.9s ease;
+    }
+    body[data-active-view="view-trail"] .hub-theme-backdrop { opacity: 0; }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .hub-theme-backdrop.is-constellation,
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .hub-theme-backdrop.is-desert { opacity: 1; }
+
+    /* Constellation: deep night sky, violet and teal nebulae, a faint Milky Way band */
+    .hub-theme-backdrop.is-constellation {
+      background:
+        radial-gradient(ellipse 60% 42% at 78% 16%, rgba(112, 82, 205, 0.32) 0%, transparent 70%),
+        radial-gradient(ellipse 55% 46% at 14% 72%, rgba(18, 112, 146, 0.28) 0%, transparent 70%),
+        radial-gradient(ellipse 42% 30% at 56% 94%, rgba(150, 60, 124, 0.18) 0%, transparent 70%),
+        linear-gradient(118deg, transparent 26%, rgba(150, 172, 255, 0.07) 41%, rgba(255, 228, 184, 0.11) 50%, rgba(150, 172, 255, 0.06) 59%, transparent 74%),
+        linear-gradient(180deg, #03051a 0%, #060a27 52%, #02030c 100%);
+    }
+
+    /* Desert: golden-hour sky over layered dunes */
+    .hub-theme-backdrop.is-desert {
+      background:
+        radial-gradient(ellipse 46% 34% at 74% 76%, rgba(255, 190, 96, 0.55) 0%, rgba(255, 150, 60, 0.18) 45%, transparent 75%),
+        linear-gradient(180deg, #160a1f 0%, #2d1228 20%, #5d2a2b 46%, #a4532b 68%, #e48b3e 83%, #f3b966 91%, #3a1a0c 100%);
+    }
+    .desert-scenery {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .desert-scenery .dune-mid { animation: duneDriftA 90s ease-in-out infinite alternate; }
+    .desert-scenery .dune-near { animation: duneDriftB 70s ease-in-out infinite alternate; }
+    @keyframes duneDriftA { from { transform: translateX(-22px); } to { transform: translateX(22px); } }
+    @keyframes duneDriftB { from { transform: translateX(18px); } to { transform: translateX(-18px); } }
+    .desert-scenery .sun-disc { animation: sunBreath 9s ease-in-out infinite alternate; }
+    @keyframes sunBreath { from { opacity: 0.88; } to { opacity: 1; } }
+
+    /* The old shared nebula and vignette give way to the path's own atmosphere */
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .cosmic-nebula-layer,
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .cosmic-nebula-layer { opacity: 0; animation: none; }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] #ambient-stars { opacity: 1; }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .cosmic-vignette {
+      background: radial-gradient(circle at 50% 40%, transparent 52%, rgba(1, 2, 10, 0.78) 100%);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] #ambient-stars { opacity: 1; }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .cosmic-vignette {
+      background: radial-gradient(circle at 50% 62%, transparent 42%, rgba(24, 8, 3, 0.72) 100%);
+    }
+
+    /* ---- Desert chrome: sandstone and copper instead of navy and gold ---- */
+    html[data-map-path="desert"] body[data-active-view="view-trail"] {
+      --bg-darkest: #130a05;
+      --bg-panel: rgba(38, 22, 12, 0.93);
+      --bg-panel-hover: rgba(54, 32, 16, 0.97);
+      --brass-bright: #ffd592;
+      --brass-base: #d98a45;
+      --brass-dim: rgba(217, 138, 69, 0.35);
+      --brass-glow: rgba(255, 213, 146, 0.45);
+      --cyan-beam: #f2a65a;
+      --cyan-glow: rgba(242, 166, 90, 0.5);
+      --parchment: #f8ead3;
+      --parchment-dim: #d3b995;
+      --parchment-muted: #9a8060;
+      --border-brass: 1.5px solid rgba(217, 138, 69, 0.42);
+      --border-brass-bright: 1.5px solid rgba(255, 213, 146, 0.65);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .hub-sidebar {
+      background: linear-gradient(180deg, rgba(44, 25, 12, 0.97) 0%, rgba(22, 12, 6, 0.99) 100%);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .nav-menu-btn:not(.active) {
+      background: rgba(60, 34, 16, 0.5);
+      border-color: rgba(217, 138, 69, 0.22);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .nav-menu-btn:not(.active):hover {
+      background: rgba(217, 138, 69, 0.16);
+      border-color: rgba(217, 138, 69, 0.5);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .nav-menu-btn.active {
+      color: #1c0e05;
+      box-shadow: 0 4px 18px rgba(255, 190, 110, 0.4);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .brand-sigil-ring-inner { border-color: rgba(242, 166, 90, 0.45); }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .brand-sigil { filter: drop-shadow(0 0 10px rgba(255, 190, 110, 0.7)); }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .star-inspector-panel {
+      background: linear-gradient(180deg, rgba(52, 30, 15, 0.94) 0%, rgba(28, 15, 7, 0.97) 100%);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .inspector-relics-card {
+      background: rgba(66, 38, 18, 0.55);
+      border-color: rgba(232, 163, 90, 0.4);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .relic-chip {
+      background: rgba(32, 18, 9, 0.88);
+      border-color: rgba(232, 163, 90, 0.42);
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .relic-chip:hover { background: rgba(60, 34, 16, 0.92); }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .relic-chip-text { color: #ffd9a3; }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .sidebar-collapse-btn,
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .btn-floating-sidebar-toggle { background: rgba(44, 25, 12, 0.92); }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] #desert-map-canvas-wrap { background: #1d1109; }
+
+    /* ---- Constellation chrome: midnight indigo with silver-gold accents ---- */
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] {
+      --bg-darkest: #02030a;
+      --bg-panel: rgba(8, 12, 34, 0.93);
+      --bg-panel-hover: rgba(14, 20, 50, 0.97);
+      --cyan-beam: #7fd4ff;
+      --cyan-glow: rgba(127, 212, 255, 0.5);
+      --parchment-dim: #a9b8dd;
+    }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .hub-sidebar {
+      background: linear-gradient(180deg, rgba(6, 9, 30, 0.97) 0%, rgba(3, 4, 16, 0.99) 100%);
+    }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .nav-menu-btn:not(.active) { background: rgba(14, 18, 52, 0.5); }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .star-inspector-panel {
+      background: linear-gradient(180deg, rgba(12, 16, 44, 0.95) 0%, rgba(4, 6, 20, 0.98) 100%);
+    }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .inspector-relics-card { background: rgba(16, 22, 56, 0.6); }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .relic-chip { background: rgba(6, 9, 28, 0.88); }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .constellation-map-frame {
+      background: linear-gradient(135deg, rgba(3, 6, 24, 0.99) 0%, rgba(10, 10, 36, 0.98) 55%, rgba(24, 10, 40, 0.99) 100%);
+    }
 
     /* Master Layout */
     .game-hub-container {
@@ -1560,53 +1698,167 @@
     /* ===================================================================
        THE GRAND DESERT MAP & THE WHISPERING CHASM TACTICAL VIEW (STATION 10)
        =================================================================== */
+    /* Path switcher: two wide cards above the station deck */
     .map-path-tabs-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 22px;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 4px 0 22px;
     }
 
     .map-path-tab-btn {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1.5px solid var(--brass-base);
-      color: var(--parchment-base);
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-family: 'Cinzel', serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: inline-flex;
+      position: relative;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: center;
-      gap: 10px;
+      gap: 18px;
+      min-height: 118px;
+      padding: 18px 22px;
+      text-align: left;
+      color: var(--parchment);
+      background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(0, 0, 0, 0.35) 100%);
+      border: 1.5px solid var(--brass-dim);
+      border-radius: 12px;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    .map-path-tab-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--brass-base) 50%, transparent 100%);
+      opacity: 0.35;
+      transition: opacity 0.25s ease;
     }
 
     .map-path-tab-btn:hover {
-      border-color: var(--brass-bright);
-      color: #fff;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      border-color: var(--brass-base);
     }
+
+    .map-path-tab-btn:focus { outline: none; }
+    .map-path-tab-btn:focus-visible { outline: 2px solid var(--brass-bright); outline-offset: 3px; }
 
     .map-path-tab-btn.active {
-      background: linear-gradient(135deg, rgba(212, 168, 83, 0.22) 0%, rgba(245, 158, 11, 0.12) 100%);
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.24) 0%, var(--bg-panel) 62%);
       border-color: var(--brass-bright);
-      color: #fff;
-      box-shadow: 0 0 18px rgba(245, 158, 11, 0.25);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 26px var(--brass-glow);
     }
 
-    .tab-badge-active {
+    .map-path-tab-btn.active::before { opacity: 1; }
+
+    .path-tab-emblem {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem;
+      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.14) 0%, rgba(0, 0, 0, 0.45) 100%);
+      border: 1.5px solid var(--brass-base);
+      box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.6);
+    }
+
+    .map-path-tab-btn.active .path-tab-emblem {
+      border-color: var(--brass-bright);
+      box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.5), 0 0 16px var(--brass-glow);
+    }
+
+    .path-tab-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .path-tab-kicker {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      background: var(--brass-bright);
-      color: #1e1306;
-      padding: 2px 7px;
-      border-radius: 4px;
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cyan-beam);
+    }
+
+    .path-tab-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
       font-weight: 700;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+
+    .path-tab-tagline {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.35;
+      color: var(--parchment-dim);
+    }
+
+    .path-tab-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .path-tab-bar {
+      flex: 0 0 200px;
+      height: 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.09);
+      overflow: hidden;
+    }
+
+    .path-tab-bar-fill {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--brass-base) 0%, var(--cyan-beam) 100%);
+      transition: width 0.6s ease;
+    }
+
+    .path-tab-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--parchment-dim);
+      white-space: nowrap;
+    }
+
+    .path-tab-state {
+      align-self: start;
+      min-width: 112px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--brass-dim);
+      color: var(--parchment-dim);
+      white-space: nowrap;
+    }
+
+    .map-path-tab-btn.active .path-tab-state {
+      background: var(--brass-bright);
+      border-color: var(--brass-bright);
+      color: #1e1306;
+    }
+
+    @media (max-width: 860px) {
+      .map-path-tabs-bar { grid-template-columns: 1fr; }
+      .map-path-tab-btn { grid-template-columns: auto minmax(0, 1fr); min-height: 0; }
+      .path-tab-state { display: none; }
     }
 
     /* Grand Desert Map Container */
@@ -1622,65 +1874,6 @@
     }
 
     /* Desert Act Selector Navigation Bar */
-    .desert-act-selector-bar {
-      display: flex;
-      gap: 10px;
-      padding: 12px 14px;
-      background: linear-gradient(180deg, #181109 0%, #120c06 100%);
-      border-bottom: 1.5px solid rgba(162, 123, 68, 0.4);
-    }
-
-    .desert-act-btn {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 3px;
-      padding: 10px 14px;
-      background: rgba(28, 18, 11, 0.7);
-      border: 1px solid rgba(162, 123, 68, 0.35);
-      border-radius: 6px;
-      color: #e2d9cc;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      text-align: left;
-    }
-
-    .desert-act-btn:hover {
-      background: rgba(45, 29, 16, 0.85);
-      border-color: var(--brass-bright);
-      transform: translateY(-1px);
-    }
-
-    .desert-act-btn.active {
-      background: linear-gradient(135deg, rgba(62, 38, 20, 0.9) 0%, rgba(32, 19, 10, 0.95) 100%);
-      border-color: var(--brass-bright);
-      box-shadow: 0 0 16px rgba(226, 176, 105, 0.25), inset 0 0 12px rgba(226, 176, 105, 0.15);
-    }
-
-    .desert-act-btn .act-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--brass-bright);
-      letter-spacing: 0.08em;
-    }
-
-    .desert-act-btn .act-title {
-      font-family: 'Cinzel', serif;
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 0.04em;
-    }
-
-    .desert-act-btn .act-landmarks {
-      font-family: 'Marck Script', cursive, sans-serif;
-      font-size: 0.78rem;
-      color: #bfa17a;
-      opacity: 0.88;
-    }
-
     .desert-map-layers-frame {
       position: relative;
       width: 100%;
@@ -1740,7 +1933,7 @@
       filter: drop-shadow(0 0 12px #f59e0b);
     }
 
-    /* Desert Map Station Nodes & Incógnitas */
+    /* Desert Map Station Nodes & Mystery Nodes */
     .desert-station-node {
       cursor: pointer;
       outline: none;
@@ -2219,7 +2412,109 @@
     }
 
     /* ===================================================================
-       THE DESERT LEXICON & AL-QIBLA TACTICAL MODAL (STATION 11)
+       THE SALT PLAYA TACTICAL MODAL (STATION 11) · reuses the .chasm-* chrome
+       =================================================================== */
+    .playa-board-wrap { width: 100%; max-width: 620px; }
+    .playa-col-heads, .playa-row {
+      display: grid;
+      grid-template-columns: 34px repeat(7, minmax(0, 1fr));
+      gap: 6px;
+      align-items: center;
+    }
+    .playa-col-heads {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(212, 168, 83, 0.7);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .playa-row { margin-bottom: 6px; padding: 3px 0; border-radius: 6px; transition: background 0.25s ease; }
+    .playa-row.current { background: rgba(212, 168, 83, 0.10); box-shadow: inset 0 0 0 1px rgba(212, 168, 83, 0.35); }
+    .playa-row-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      text-align: center;
+    }
+    .playa-slab {
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      border: 1.5px solid rgba(60, 50, 35, 0.55);
+      background: linear-gradient(145deg, #efe8d6 0%, #d9cfb6 100%);
+      color: #3a2f1c;
+      font-family: 'Cinzel', serif;
+      cursor: pointer;
+      position: relative;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      line-height: 1.05;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.18), 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    .playa-slab::after {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border-radius: 5px;
+      background:
+        linear-gradient(135deg, transparent 46%, rgba(80, 64, 40, 0.18) 47%, transparent 49%),
+        linear-gradient(60deg, transparent 62%, rgba(80, 64, 40, 0.14) 63%, transparent 65%);
+      pointer-events: none;
+    }
+    .playa-num { font-size: 1.3rem; font-weight: 700; }
+    .playa-let { font-size: 0.72rem; font-weight: 700; color: #6b4f1d; letter-spacing: 0.04em; }
+    .playa-slab.reachable { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.9), 0 0 14px rgba(245, 158, 11, 0.5); }
+    .playa-slab:hover:not(.sink):not(.chosen) { transform: translateY(-2px); }
+    .playa-slab.chosen {
+      background: linear-gradient(145deg, #fde68a 0%, #d4a853 100%);
+      border-color: #92661a;
+      box-shadow: 0 0 0 2px #fbbf24, 0 0 16px rgba(251, 191, 36, 0.55);
+    }
+    .playa-slab.sink {
+      background: repeating-linear-gradient(135deg, #2a1d12 0 5px, #120c07 5px 10px);
+      border-color: #5b3a1d;
+      color: #8a5530;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .playa-slab.sink::after { display: none; }
+    .playa-step-badge {
+      position: absolute;
+      top: 2px;
+      right: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      color: #5a3d0f;
+    }
+    .playa-slab.shake { animation: playaShake 0.35s; }
+    @keyframes playaShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    .playa-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .playa-btn-row .chasm-cairn-btn { flex: 1 1 140px; font-size: 0.85rem; }
+    .playa-keyword-row { display: flex; gap: 8px; }
+    .playa-keyword-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      background: #1d1610;
+      border: 1.5px solid rgba(212, 168, 83, 0.35);
+      color: var(--parchment-base);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+    .playa-keyword-input:focus { outline: none; border-color: var(--brass-bright); }
+    .playa-keyword-input.shake { animation: playaShake 0.35s; }
+    .playa-keyword-row .chasm-cairn-btn { flex: 0 0 auto; }
+
+    /* ===================================================================
+       THE DESERT LEXICON & AL-QIBLA TACTICAL MODAL (STATION 12)
        =================================================================== */
     .lexicon-modal-backdrop {
       position: fixed;
@@ -6508,6 +6803,187 @@
       margin-right: 2px;
     }
 
+    /* ===================================================================
+       WORKSHOP CHAT: message experience, journal sheet cards, Ask Hermes archive
+       =================================================================== */
+    .chat-bubble-wrap.incoming { animation-name: bubbleSlideInLeft; }
+    .chat-bubble-wrap.outgoing { animation-name: bubbleSlideInRight; }
+    .chat-bubble-wrap.system-event { animation-name: bubbleFadeScale; }
+    @keyframes bubbleSlideInLeft { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes bubbleSlideInRight { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes bubbleFadeScale { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    .messenger-chat-body.is-restoring .chat-bubble-wrap { animation: none; }
+
+    /* Typing indicator as a bubble inside the conversation */
+    .chat-typing-wrap .chat-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+    }
+    .chat-typing-wrap .typing-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #cdb9a5;
+    }
+    .chat-typing-wrap .typing-key {
+      display: inline-block;
+      animation: telegraphKeyTap 0.5s steps(2, end) infinite;
+    }
+    @keyframes telegraphKeyTap { 0% { transform: translateY(0); } 50% { transform: translateY(2px); } 100% { transform: translateY(0); } }
+
+    /* Floating "latest message" button */
+    .chat-jump-latest {
+      position: fixed;
+      right: 30px;
+      bottom: 26px;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      background: linear-gradient(180deg, rgba(72, 54, 38, 0.97) 0%, rgba(44, 32, 22, 0.98) 100%);
+      border: 1.5px solid #d4a76a;
+      border-radius: 22px;
+      color: #fff5e8;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.65);
+    }
+    .chat-jump-latest.visible { display: inline-flex; }
+    .chat-jump-latest:hover { border-color: #ffd8a8; transform: translateY(-1px); }
+
+    .journal-ref-pill:focus-visible { outline: 2px solid #ffd8a8; outline-offset: 2px; }
+
+    /* Journal sheet card (opens from any "Sheet NN" in the chat) */
+    .journal-sheet-popover {
+      position: fixed;
+      z-index: 9000;
+      width: 320px;
+      max-width: calc(100vw - 24px);
+      padding: 16px 18px 16px;
+      background: linear-gradient(180deg, rgba(46, 34, 24, 0.99) 0%, rgba(26, 19, 13, 0.99) 100%);
+      border: 1.5px solid #d4a76a;
+      border-radius: 12px;
+      color: #f0e2d0;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.8), 0 0 24px rgba(212, 168, 83, 0.18);
+      animation: bubbleFadeScale 0.18s ease-out;
+    }
+    .journal-sheet-popover .jsp-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(196, 168, 138, 0.4);
+      background: rgba(30, 22, 16, 0.9);
+      color: #ebd8c5;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+    .journal-sheet-popover .jsp-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #d4a76a;
+      margin-bottom: 4px;
+    }
+    .journal-sheet-popover .jsp-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff5e8;
+      margin-bottom: 10px;
+      padding-right: 22px;
+    }
+    .journal-sheet-popover .jsp-thumb {
+      display: block;
+      width: 100%;
+      max-height: 170px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 6px;
+      border: 1px solid rgba(196, 168, 138, 0.35);
+      margin-bottom: 10px;
+    }
+    .journal-sheet-popover .jsp-note {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.4;
+      color: #e6d6c2;
+      margin-bottom: 12px;
+    }
+    .journal-sheet-popover .jsp-go {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #d4a76a;
+      background: linear-gradient(180deg, rgba(104, 76, 48, 0.95) 0%, rgba(70, 50, 32, 0.98) 100%);
+      color: #fff5e8;
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+    .journal-sheet-popover .jsp-go:hover { border-color: #ffd8a8; }
+
+    /* Ask Hermes: search, progress and locked questions */
+    .inquiry-search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .inquiry-search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 9px 14px;
+      background: rgba(24, 20, 16, 0.78);
+      border: 1px solid rgba(184, 152, 118, 0.38);
+      border-radius: 8px;
+      color: #f0e2d0;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+    }
+    .inquiry-search-input::placeholder { color: #9d8a76; font-style: italic; }
+    .inquiry-search-input:focus { outline: none; border-color: #d4a76a; box-shadow: 0 0 0 2px rgba(212, 167, 106, 0.2); }
+    .inquiry-progress {
+      flex: 0 0 auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: #c9b49f;
+      white-space: nowrap;
+    }
+    .messenger-faq-chip.is-locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+    .messenger-faq-chip.is-locked:hover { transform: none; }
+    .inquiry-lock-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.08em;
+      color: #d4a76a;
+    }
+    .messenger-faq-empty {
+      grid-column: 1 / -1;
+      padding: 22px;
+      text-align: center;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      color: #b9a690;
+    }
+
     /* Teletype Cursor */
     .telegraph-cursor {
       display: inline-block;
@@ -7632,6 +8108,41 @@
     </div>
   </div>
 
+  <!-- Path-themed backdrops for the map view: night sky (Constellation) and golden-hour dunes (Desert) -->
+  <div class="hub-theme-backdrop is-constellation" aria-hidden="true"></div>
+  <div class="hub-theme-backdrop is-desert" aria-hidden="true">
+    <svg class="desert-scenery" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="sunGlowGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fff2c4" stop-opacity="1" />
+          <stop offset="35%" stop-color="#ffc766" stop-opacity="0.75" />
+          <stop offset="100%" stop-color="#ff8a3c" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="hazeGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffb866" stop-opacity="0" />
+          <stop offset="100%" stop-color="#ffb866" stop-opacity="0.35" />
+        </linearGradient>
+      </defs>
+      <circle class="sun-disc" cx="1190" cy="640" r="190" fill="url(#sunGlowGrad)" />
+      <circle cx="1190" cy="640" r="46" fill="#fff0c0" opacity="0.95" />
+      <!-- distant mesas -->
+      <path d="M0 700 L90 700 L110 650 L210 650 L230 700 L420 700 L440 668 L520 668 L540 700 L700 700 L720 680 L780 680 L800 700 L1600 700 L1600 900 L0 900 Z" fill="#7a3418" opacity="0.8" />
+      <rect x="0" y="640" width="1600" height="120" fill="url(#hazeGrad)" />
+      <!-- far dunes -->
+      <path d="M0 735 C 200 690, 380 740, 560 712 S 900 668, 1100 706 S 1450 750, 1600 700 L1600 900 L0 900 Z" fill="#5c2812" />
+      <path d="M0 735 C 200 690, 380 740, 560 712 S 900 668, 1100 706 S 1450 750, 1600 700" fill="none" stroke="#ffbf80" stroke-opacity="0.35" stroke-width="2" />
+      <!-- mid dunes -->
+      <g class="dune-mid">
+        <path d="M-60 800 C 180 748, 400 828, 640 790 S 1010 730, 1240 792 S 1520 836, 1680 786 L1680 900 L-60 900 Z" fill="#3d1a0c" />
+        <path d="M-60 800 C 180 748, 400 828, 640 790 S 1010 730, 1240 792 S 1520 836, 1680 786" fill="none" stroke="#ffb070" stroke-opacity="0.28" stroke-width="2" />
+      </g>
+      <!-- near dunes -->
+      <g class="dune-near">
+        <path d="M-60 868 C 260 820, 520 890, 820 856 S 1290 812, 1680 866 L1680 900 L-60 900 Z" fill="#220f07" />
+        <path d="M-60 868 C 260 820, 520 890, 820 856 S 1290 812, 1680 866" fill="none" stroke="#ff9a56" stroke-opacity="0.22" stroke-width="2" />
+      </g>
+    </svg>
+  </div>
   <!-- Ambient Dynamic Stars Canvas & Cosmic Nebula -->
   <canvas id="ambient-stars"></canvas>
   <div class="cosmic-nebula-layer"></div>
@@ -7740,8 +8251,37 @@
           </p>
         </header>
 
-        <!-- Current / Inspected Mission Deck (Positioned directly below title and above map) -->
-        <!-- Current / Inspected Mission Deck (Positioned directly below title and above map) -->
+        <!-- Path Selection Cards (above the station deck) -->
+        <nav class="map-path-tabs-bar" id="map-path-tabs-bar" aria-label="Choose a path">
+          <button type="button" class="map-path-tab-btn active" id="btn-tab-path-constellation" data-path="constellation">
+            <span class="path-tab-emblem">🌌</span>
+            <span class="path-tab-body">
+              <span class="path-tab-kicker">Path I · The Alpine Observatory</span>
+              <span class="path-tab-name">The Constellation Trail</span>
+              <span class="path-tab-tagline">Follow the night sky with the Cartographer of Distant Light.</span>
+              <span class="path-tab-progress">
+                <span class="path-tab-bar"><span class="path-tab-bar-fill" id="path-progress-constellation"></span></span>
+                <span class="path-tab-count" id="path-count-constellation">—</span>
+              </span>
+            </span>
+            <span class="path-tab-state" id="path-state-constellation">You are here</span>
+          </button>
+          <button type="button" class="map-path-tab-btn" id="btn-tab-path-desert" data-path="desert">
+            <span class="path-tab-emblem">🏜️</span>
+            <span class="path-tab-body">
+              <span class="path-tab-kicker">Path II · The Sandstone Sanctuary</span>
+              <span class="path-tab-name">The Grand Desert Map</span>
+              <span class="path-tab-tagline">March south through the dunes with Hermes toward the Desert Oracle.</span>
+              <span class="path-tab-progress">
+                <span class="path-tab-bar"><span class="path-tab-bar-fill" id="path-progress-desert"></span></span>
+                <span class="path-tab-count" id="path-count-desert">—</span>
+              </span>
+            </span>
+            <span class="path-tab-state" id="path-state-desert">Open path</span>
+          </button>
+        </nav>
+
+        <!-- Current / Inspected Mission Deck (Positioned directly below the path cards) -->
         <div class="star-inspector-panel" id="star-inspector">
           <div class="inspector-thumb-frame">
             <img src="./assets/thumbnails/chronicle_station8_locked.webp" id="insp-thumb-img" alt="Stage Thumbnail" loading="eager" fetchpriority="high" width="760" height="320">
@@ -7791,7 +8331,7 @@
               <a href="./constellation/midnight-calibration/index.html" class="btn-inspector-launch" id="insp-btn-primary">
                 <span>⏳ Awaiting Astronomical Midnight</span>
               </a>
-              <a href="./desert/zodiac-engine/index.html" class="btn-inspector-replay" id="insp-btn-replay" style="display:none;">
+              <a href="./constellation/zodiac-engine/index.html" class="btn-inspector-replay" id="insp-btn-replay" style="display:none;">
                 <span>↺ Replay Quest</span>
               </a>
               <button type="button" class="btn-inspector-back" id="insp-btn-reset" style="display:none;" onclick="selectMapNode(8, true)">
@@ -7806,19 +8346,6 @@
           <span class="map-divider-line"></span>
           <span class="map-divider-label">✦ Celestial Route Map ✦</span>
           <span class="map-divider-line"></span>
-        </div>
-
-        <!-- Path Selection Tabs Bar -->
-        <div class="map-path-tabs-bar" id="map-path-tabs-bar">
-          <button type="button" class="map-path-tab-btn active" id="btn-tab-path-constellation" data-path="constellation">
-            <span class="tab-icon">🌌</span>
-            <span>The Constellation Trail (Stations 01–09)</span>
-          </button>
-          <button type="button" class="map-path-tab-btn" id="btn-tab-path-desert" data-path="desert">
-            <span class="tab-icon">🏜️</span>
-            <span>The Grand Desert Map (Stations 10–17: Two-Act Odyssey)</span>
-            <span class="tab-badge-active" id="desert-tab-badge">ACT I & II</span>
-          </button>
         </div>
 
         <!-- The Constellation Graphic Frame with Renaissance Brass Accents -->
@@ -8566,140 +9093,60 @@
           <!-- The Grand Desert Map Container (Two-Act Odyssey & 4-Quadrant Survey) -->
           <div id="desert-map-canvas-wrap" style="display: none;">
             
-            <!-- Atmospheric Desert Act Selector Bar -->
-            <div class="desert-act-selector-bar" id="desert-act-selector-bar">
-              <button type="button" class="desert-act-btn" id="btn-desert-q1" onclick="switchDesertMapPhase('q1')">
-                <span class="act-badge">FASE 1 · HOJA 8B (NO)</span>
-                <span class="act-title">The Desert Frontier</span>
-                <span class="act-landmarks">Outer Watchtower VI · Red Ridge</span>
-              </button>
-              <button type="button" class="desert-act-btn" id="btn-desert-q2" onclick="switchDesertMapPhase('q2')">
-                <span class="act-badge">FASE 2 · HOJA 9A (NE)</span>
-                <span class="act-title">The Sandstone Labyrinth</span>
-                <span class="act-landmarks">Cairn II (Lexicon) · Sun Monolith</span>
-              </button>
-              <button type="button" class="desert-act-btn active" id="btn-desert-q3" onclick="switchDesertMapPhase('q3')">
-                <span class="act-badge">FASE 3 · HOJA 10B (SO) ✦ MISIÓN 1</span>
-                <span class="act-title">The Whispering Chasm</span>
-                <span class="act-landmarks">Lower Wash · Sentinel Mesa · Cairn IV</span>
-              </button>
-              <button type="button" class="desert-act-btn" id="btn-desert-q4" onclick="switchDesertMapPhase('q4')">
-                <span class="act-badge">FASE 4 · HOJA 11A (SE)</span>
-                <span class="act-title">The Sandstone Sanctuary</span>
-                <span class="act-landmarks">Solar Altar · Salt Playa · Tower II</span>
-              </button>
-              <button type="button" class="desert-act-btn" id="btn-desert-overview" onclick="switchDesertMapPhase('overview')">
-                <span class="act-badge">MAPA COMPLETO · 2×2</span>
-                <span class="act-title">Topographical Survey</span>
-                <span class="act-landmarks">Mosaico General de los 4 Cuadrantes</span>
-              </button>
-            </div>
-
             <!-- Frame containing the layers -->
             <div class="desert-map-layers-frame" id="desert-map-layers-frame">
 
               <!-- ==============================================================
-                   LAYER 1: FASE 1 — CUADRANTE NOROESTE (HOJA 8B)
+                   THE GRAND DESERT MAP: FOUR-QUADRANT SURVEY (single full-map view)
+                   Station markers use the quadrant coordinates of the journal maps,
+                   scaled by 1920/3496 into this 1920 x 2724 overview.
                    ============================================================== -->
-              <div class="desert-map-layer" id="desert-layer-q1" style="display: none;">
-                <img src="./assets/maps/desert_quadrant_1_nw.webp" alt="The Desert Frontier (Hoja 8B)" class="desert-map-base-img" width="1748" height="2480">
-                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q1">
-                  <!-- Outer Watchtower VI & Red Ridge -->
-                  <g class="desert-station-node" transform="translate(440, 1370)">
-                    <circle cx="0" cy="0" r="22" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
-                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">🔭</text>
-                    <rect x="-130" y="-45" width="260" height="26" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.95" />
-                    <text x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">OUTER WATCHTOWER VI [112° E]</text>
-                  </g>
-                </svg>
-              </div>
-
-              <!-- ==============================================================
-                   LAYER 2: FASE 2 — CUADRANTE NORESTE (HOJA 9A)
-                   ============================================================== -->
-              <div class="desert-map-layer" id="desert-layer-q2" style="display: none;">
-                <img src="./assets/maps/desert_quadrant_2_ne.webp" alt="The Sandstone Labyrinth & Cairn II (Hoja 9A)" class="desert-map-base-img" width="1748" height="2480">
-                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q2">
-                  <!-- Cairn II & Stele Marker -->
-                  <g class="desert-station-node" id="node-11-trigger" transform="translate(322, 2150)" onclick="selectDesertStation(11)" style="cursor: pointer;">
-                    <circle cx="0" cy="0" r="24" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
-                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">📜</text>
-                    <rect x="-140" y="-46" width="280" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
-                    <text x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a">✦ 11 · CAIRN II (DESERT LEXICON) ➔</text>
-                  </g>
-                </svg>
-              </div>
-
-              <!-- ==============================================================
-                   LAYER 3: FASE 3 — CUADRANTE SUROESTE (HOJA 10B) ✦ MISIÓN 1
-                   ============================================================== -->
-              <div class="desert-map-layer" id="desert-layer-q3">
-                <img src="./assets/maps/desert_quadrant_3_sw.webp" alt="The Whispering Chasm (Hoja 10B)" class="desert-map-base-img" width="1748" height="2480">
-                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q3">
+              <div class="desert-map-layer" id="desert-layer-overview">
+                <img src="./assets/maps/grand_desert_map_overview.webp" alt="The Grand Desert Map: four-quadrant survey" class="desert-map-base-img" width="1920" height="2724">
+                <svg class="desert-map-svg-overlay" viewBox="0 0 1920 2724" id="desert-map-svg-overview">
                   <defs>
                     <radialGradient id="chasmVortexGlow" cx="50%" cy="50%" r="50%">
                       <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.9" />
                       <stop offset="40%" stop-color="#ea580c" stop-opacity="0.4" />
                       <stop offset="100%" stop-color="transparent" stop-opacity="0" />
                     </radialGradient>
-                    <radialGradient id="hermesGlow" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#ffe099" stop-opacity="0.95" />
-                      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.45" />
-                      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
-                    </radialGradient>
                   </defs>
 
-                  <!-- Hermes Expedition Camp at Canyon Head -->
-                  <g class="hermes-map-marker" id="hermes-map-token-q3" transform="translate(480, 1150)" onclick="selectDesertStation(10)" style="cursor: pointer;">
-                    <circle class="hermes-beacon-ring" cx="0" cy="0" r="34" stroke="#f59e0b" stroke-width="2.2" fill="none" />
-                    <circle cx="0" cy="0" r="22" fill="url(#hermesGlow)" />
-                    <circle cx="0" cy="0" r="14" fill="#201107" stroke="#d4a853" stroke-width="2" />
-                    <text x="0" y="5" text-anchor="middle" font-size="14" fill="#ffe099">⛺</text>
-                    <rect x="-130" y="24" width="260" height="26" rx="4" fill="#140f0a" stroke="#d4a853" stroke-width="1.2" opacity="0.95" />
-                    <text x="0" y="41" text-anchor="middle" font-family="'Cinzel', serif" font-size="10.5" font-weight="700" fill="#ffe099">HERMES · ENTRADA DEL CAÑÓN</text>
+                  <!-- Outer Watchtower VI (landmark) -->
+                  <g class="desert-station-node" transform="translate(242, 752) scale(1.5)">
+                    <circle cx="0" cy="0" r="22" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
+                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">🔭</text>
+                    <rect x="-130" y="-45" width="260" height="26" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.95" />
+                    <text x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">OUTER WATCHTOWER VI [112° E]</text>
                   </g>
 
-                  <!-- STATION 10: THE WHISPERING CHASM (480, 1280) -->
-                  <g class="desert-station-node" id="node-10-trigger" transform="translate(480, 1280)" onclick="selectDesertStation(10)" style="cursor: pointer;">
+                  <!-- Station 10 · The Whispering Chasm -->
+                  <g class="desert-station-node" id="node-10-trigger" transform="translate(264, 2065) scale(1.5)" onclick="selectDesertStation(10)" style="cursor: pointer;">
                     <circle class="chasm-vortex-ring" id="node-10-ring" cx="0" cy="0" r="48" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6, 5" fill="none" />
                     <circle id="node-10-glow" cx="0" cy="0" r="32" fill="url(#chasmVortexGlow)" />
                     <circle id="node-10-core" cx="0" cy="0" r="18" fill="#2d1507" stroke="#fbbf24" stroke-width="2.5" />
                     <text id="node-10-icon" x="0" y="6" text-anchor="middle" font-size="15" fill="#fbbf24">🧭</text>
-                    <rect id="node-10-banner-rect" x="-180" y="-62" width="360" height="32" rx="5" fill="#180e07" stroke="#fbbf24" stroke-width="1.6" opacity="0.97" />
-                    <text id="node-10-banner-text" x="0" y="-41" text-anchor="middle" font-family="'Cinzel', serif" font-size="13" font-weight="700" fill="#fde68a" letter-spacing="0.05em">✦ 10 · THE WHISPERING CHASM ➔</text>
-                    <text id="node-10-subtext" x="0" y="76" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#fbbf24" filter="drop-shadow(0 2px 4px #000)">[ DESCENDER AL CAÑÓN · CONSULTAR HOJA 9B ]</text>
+                    <rect id="node-10-banner-rect" x="-165" y="-62" width="330" height="30" rx="5" fill="#180e07" stroke="#fbbf24" stroke-width="1.6" opacity="0.97" />
+                    <text id="node-10-banner-text" x="0" y="-42" text-anchor="middle" font-family="'Cinzel', serif" font-size="12.5" font-weight="700" fill="#fde68a" letter-spacing="0.04em">✦ 10 · WHISPERING CHASM ➔</text>
                   </g>
-                </svg>
-              </div>
 
-              <!-- ==============================================================
-                   LAYER 4: FASE 4 — CUADRANTE SURESTE (HOJA 11A)
-                   ============================================================== -->
-              <div class="desert-map-layer" id="desert-layer-q4" style="display: none;">
-                <img src="./assets/maps/desert_quadrant_4_se.webp" alt="The Sandstone Sanctuary & Solar Altar (Hoja 11A)" class="desert-map-base-img" width="1748" height="2480">
-                <svg class="desert-map-svg-overlay" viewBox="0 0 1748 2480" id="desert-map-svg-q4">
-                  <g class="desert-station-node" id="node-14-trigger" transform="translate(732, 880)" onclick="selectDesertStation(14)" style="cursor: pointer;">
-                    <circle cx="0" cy="0" r="22" fill="#1c1404" stroke="#fef08a" stroke-width="2" />
-                    <text x="0" y="5" text-anchor="middle" font-size="13" fill="#fef08a">🏛️</text>
-                    <rect x="-140" y="-42" width="280" height="26" rx="4" fill="#140f03" stroke="#fef08a" stroke-width="1.3" opacity="0.95" />
-                    <text x="0" y="-25" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fde68a">✦ 14 · SANDSTONE SANCTUARY (TOWER II) ➔</text>
+                  <g class="desert-station-node" id="node-21-trigger" transform="translate(1196, 2460) scale(1.5)" onclick="selectDesertStation(21)" style="cursor: pointer;">
+                    <circle cx="0" cy="0" r="24" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
+                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">🧂</text>
+                    <rect x="-117" y="30" width="233" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
+                    <text id="node-21-banner-text" x="0" y="48" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a">✦ 11 · THE SALT PLAYA ➔</text>
                   </g>
-                </svg>
-              </div>
-
-              <!-- ==============================================================
-                   LAYER 5: MAPA COMPLETO — 4-QUADRANT COMPLETE TOPOGRAPHICAL SURVEY
-                   ============================================================== -->
-              <div class="desert-map-layer" id="desert-layer-overview" style="display: none;">
-                <img src="./assets/maps/grand_desert_map_overview.webp" alt="The Grand Desert Map (4-Quadrant Overview)" class="desert-map-base-img" width="1920" height="2724">
-                <svg class="desert-map-svg-overlay" viewBox="0 0 1920 2724" id="desert-map-svg-overview">
-                  <!-- Node for Phase 3 Whispering Chasm (SW) -->
-                  <g class="desert-station-node" onclick="switchDesertMapPhase('q3'); selectDesertStation(10);" transform="translate(360, 2002)" style="cursor:pointer;">
-                    <circle class="chasm-vortex-ring" cx="0" cy="0" r="32" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5, 4" fill="none" />
-                    <circle cx="0" cy="0" r="18" fill="#2d1507" stroke="#fbbf24" stroke-width="2" />
-                    <text x="0" y="4" text-anchor="middle" font-size="11" font-weight="700" fill="#fbbf24">10</text>
-                    <rect x="-120" y="-36" width="240" height="22" rx="3" fill="#180e07" stroke="#fbbf24" stroke-width="1.2" opacity="0.95" />
-                    <text x="0" y="-21" text-anchor="middle" font-family="'Cinzel', serif" font-size="9.5" font-weight="700" fill="#fde68a">10 · WHISPERING CHASM (HOJA 10B) ➔</text>
+                  <g class="desert-station-node" id="node-11-trigger" transform="translate(1180, 2367) scale(1.5)" onclick="selectDesertStation(11)" style="cursor: pointer;">
+                    <circle cx="0" cy="0" r="24" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
+                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">📜</text>
+                    <rect x="-147" y="-46" width="294" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
+                    <text id="node-11-banner-text" x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a">✦ 12 · NOMAD RUINS (LEXICON) ➔</text>
+                  </g>
+                  <g class="desert-station-node" id="node-14-trigger" transform="translate(1362, 1845) scale(1.5)" onclick="selectDesertStation(14)" style="cursor: pointer;">
+                    <circle cx="0" cy="0" r="24" fill="#1c1404" stroke="#fef08a" stroke-width="2.2" />
+                    <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fef08a">🏛️</text>
+                    <rect x="-151" y="-46" width="302" height="28" rx="4" fill="#180e07" stroke="#fef08a" stroke-width="1.3" opacity="0.96" />
+                    <text id="node-14-banner-text" x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a">✦ 18–19 · SANDSTONE SANCTUARY ➔</text>
                   </g>
                 </svg>
               </div>
@@ -9178,7 +9625,7 @@
                   Calibrating the seven dials of the Zodiacal Engine from Sheet 5, Silvia locked the emergency frequency (142.85 MHz) and breached the subterranean outpost beneath the dunes. Attuning the celestial obelisks of Sol, Luna, and Stella, she recovered the iron cipher chest and unmasked Letter K.
                 </p>
               </div>
-              <a href="./desert/zodiac-engine/index.html" class="btn-historical-web" id="chronicle-7-btn">
+              <a href="./constellation/zodiac-engine/index.html" class="btn-historical-web" id="chronicle-7-btn">
                 <span>↺ Revisit Outpost Patrol ➔</span>
               </a>
             </div>
@@ -9352,6 +9799,9 @@
                       <span>Ask Hermes</span>
                     </button>
                   </div>
+                  <button type="button" class="messenger-btn-restart" id="btn-wire-sound" title="Telegraph sounds: on" aria-label="Toggle telegraph sounds" aria-pressed="true">
+                    <span>🔊</span>
+                  </button>
                   <button type="button" class="messenger-btn-restart" id="btn-wire-replay" title="Reset Rig" aria-label="Reset Rig">
                     <span>↺</span>
                   </button>
@@ -9416,12 +9866,11 @@
                     <span>❓</span>
                     <span>Tap any question to ask Hermes across the telegraph:</span>
                   </div>
-                  <div class="inquiry-filter-bar" id="inquiry-filter-bar">
-                    <button type="button" class="inquiry-filter-pill active" data-filter="all">All Questions (12)</button>
-                    <button type="button" class="inquiry-filter-pill" data-filter="desert">The Desert (7)</button>
-                    <button type="button" class="inquiry-filter-pill" data-filter="astrolabe">The Astrolabe (2)</button>
-                    <button type="button" class="inquiry-filter-pill" data-filter="workshop">The Workshop (3)</button>
+                  <div class="inquiry-search-row">
+                    <input type="search" id="inquiry-search" class="inquiry-search-input" placeholder="Search the telegraph archive…" autocomplete="off" aria-label="Search questions for Hermes">
+                    <span class="inquiry-progress" id="inquiry-progress"></span>
                   </div>
+                  <div class="inquiry-filter-bar" id="inquiry-filter-bar"></div>
                   <div class="messenger-faq-grid" id="inquiries-questions-grid">
                     <!-- Category questions injected here -->
                   </div>
@@ -9597,7 +10046,7 @@
             <div class="chasm-desk-rule">
               1. Never retrace your steps once committed.<br>
               2. Avoid side gorges that skip the sacred relics.<br>
-              3. Collect all 6 relic cairns in strict order to uncover the secret word.
+              3. Collect all 6 relic stone markers in strict order to uncover the secret word.
             </div>
           </div>
 
@@ -9605,7 +10054,7 @@
           <div class="chasm-passphrase-slots-box">
             <div class="chasm-slots-label">
               <span>NOMAD'S PASSPHRASE (SHEET 9B)</span>
-              <span id="chasm-progress-count">0 / 6 CAIRNS</span>
+              <span id="chasm-progress-count">0 / 6 MARKERS</span>
             </div>
             <div class="chasm-slots-row">
               <div class="chasm-slot-box" id="chasm-slot-0"><span class="slot-letter"></span><span class="chasm-slot-idx">1</span></div>
@@ -9631,7 +10080,7 @@
               <span>📻 FIELD WIRE DISPATCH // HERMES</span>
             </div>
             <div id="chasm-dispatch-text">
-              "Silvia, I'm standing at the North Portal of the Whispering Chasm. The canyon splits ahead. Which cairn marker do your notes indicate first?"
+              "Silvia, I'm standing at the North Portal of the Whispering Chasm. The canyon splits ahead. Which stone marker do your notes indicate first?"
             </div>
           </div>
 
@@ -9639,13 +10088,13 @@
           <div class="chasm-victory-card" id="chasm-victory-card" style="display: none;">
             <div class="chasm-victory-title">
               <span>🌴</span>
-              <span>The Desert Oasis Discovered!</span>
+              <span>Out of the Gorge!</span>
             </div>
             <div class="chasm-victory-text">
-              "Silvia, we made it! I am standing beneath the palm trees of the Desert Oasis. The spring water is fresh and cool. Look what I found resting against the ancient well curb: sandstone tablets carved with desert riddles... Look at Sheet 10 of your journal: The Desert Lexicon!"
+              "Silvia, we made it out of the gorge! The cliffs fall away and a blinding white salt basin, the Salt Playa, stretches ahead. Far beyond it I can see the ruins of an old nomad camp, but the crust is riddled with brine sinkholes... Open Sheet 10A of your journal: The Salt Playa!"
             </div>
             <button type="button" class="btn-chasm-finish" id="btn-chasm-finish">
-              <span>🗺️ Return to Grand Desert Map & Unlock Oasis ➔</span>
+              <span>🗺️ Return to Grand Desert Map & Unlock the Salt Playa ➔</span>
             </button>
           </div>
 
@@ -9661,7 +10110,108 @@
   </div>
 
   <!-- =====================================================================
-       TACTICAL EXPEDITION MODAL: THE DESERT LEXICON & AL-QIBLA (STATION 11)
+       TACTICAL EXPEDITION MODAL: THE SALT PLAYA (STATION 11 · SHEET 10A)
+       ===================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-salt-playa" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="playa-modal-title">
+    <div class="chasm-workbench-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🧂</span>
+          <div>
+            <div class="chasm-header-title" id="playa-modal-title">The Salt Playa · Station 11</div>
+            <div class="chasm-header-subtitle">Brine Crust Crossing · Reference Sheet 10A in Physical Journal</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-playa" title="Close Tactical View">✕</button>
+      </div>
+
+      <div class="chasm-telemetry-strip">
+        <div class="chasm-telemetry-pill"><span>🚶 Explorer:</span><strong>Hermes</strong></div>
+        <div class="chasm-telemetry-pill"><span>📜 Law of the Basin:</span><strong>±1 facet per step</strong></div>
+        <div class="chasm-telemetry-pill"><span>↧ Row:</span><strong id="playa-telem-row">I / VII</strong></div>
+        <div class="chasm-telemetry-pill"><span>◇ Facets underfoot:</span><strong id="playa-telem-facets">—</strong></div>
+        <div class="chasm-telemetry-pill"><span>📍 Waypoint:</span><strong id="playa-telem-waypoint">North Edge</strong></div>
+      </div>
+
+      <div class="chasm-workbench-body">
+        <div class="chasm-maze-frame">
+          <div class="playa-board-wrap">
+            <div id="playa-board"></div>
+          </div>
+        </div>
+
+        <div class="chasm-desk-panel">
+          <div class="chasm-desk-header">
+            <div class="chasm-desk-title">The Law of the Basin</div>
+            <div class="chasm-desk-rule">
+              1. Start at Row I, Column D (the slab marked 3 and [C]).<br>
+              2. Advance one row per step, from Row I down to Row VII.<br>
+              3. Move to an adjacent slab in the row below: straight down or diagonal.<br>
+              4. Dark hatched slabs (✕) are sinkholes. Never step on them.<br>
+              5. The facet number must change by exactly 1 at each step (+1 or -1).<br>
+              6. The letters along your 7-step path reveal the passage keyword.
+            </div>
+          </div>
+
+          <div class="chasm-passphrase-slots-box">
+            <div class="chasm-slots-label">
+              <span>PASSAGE KEYWORD (SHEET 10A)</span>
+              <span id="playa-progress-count">0 / 7 STEPS</span>
+            </div>
+            <div class="chasm-slots-row">
+              <div class="chasm-slot-box" id="playa-slot-0"><span class="slot-letter"></span><span class="chasm-slot-idx">I</span></div>
+              <div class="chasm-slot-box" id="playa-slot-1"><span class="slot-letter"></span><span class="chasm-slot-idx">II</span></div>
+              <div class="chasm-slot-box" id="playa-slot-2"><span class="slot-letter"></span><span class="chasm-slot-idx">III</span></div>
+              <div class="chasm-slot-box" id="playa-slot-3"><span class="slot-letter"></span><span class="chasm-slot-idx">IV</span></div>
+              <div class="chasm-slot-box" id="playa-slot-4"><span class="slot-letter"></span><span class="chasm-slot-idx">V</span></div>
+              <div class="chasm-slot-box" id="playa-slot-5"><span class="slot-letter"></span><span class="chasm-slot-idx">VI</span></div>
+              <div class="chasm-slot-box" id="playa-slot-6"><span class="slot-letter"></span><span class="chasm-slot-idx">VII</span></div>
+            </div>
+          </div>
+
+          <div class="chasm-cairns-keypad-box">
+            <div class="chasm-keypad-label">Click each slab on the basin map to guide Hermes, or transmit the keyword you found in your journal:</div>
+            <div class="playa-btn-row">
+              <button type="button" class="chasm-cairn-btn" id="btn-playa-undo"><span>↶ Step back one slab</span></button>
+              <button type="button" class="chasm-cairn-btn" id="btn-playa-reset"><span>↺ Retrace to the North Edge</span></button>
+            </div>
+            <div class="playa-keyword-row">
+              <input type="text" class="playa-keyword-input" id="playa-keyword-input" maxlength="7" autocomplete="off" spellcheck="false" placeholder="KEYWORD" aria-label="Passage keyword (7 letters)">
+              <button type="button" class="chasm-cairn-btn" id="btn-playa-transmit"><span>📡 Transmit</span></button>
+            </div>
+          </div>
+
+          <div class="chasm-dispatch-box" id="playa-dispatch-box">
+            <div class="chasm-dispatch-sender">
+              <span>📻 FIELD WIRE DISPATCH // HERMES</span>
+            </div>
+            <div id="playa-dispatch-text"></div>
+          </div>
+
+          <div class="chasm-victory-card" id="playa-victory-card" style="display: none;">
+            <div class="chasm-victory-title">
+              <span>🧂</span>
+              <span>The Basin Is Crossed!</span>
+            </div>
+            <div class="chasm-victory-text">
+              "Silvia, we crossed the Salt Playa! The seven letters under my boots spell CRYSTAL, and the crust held on every step. The south shore is ahead, and I can see the ruins of an old nomad camp. When I reach them, open Sheet 11A of your journal."
+            </div>
+            <button type="button" class="btn-chasm-finish" id="btn-playa-finish">
+              <span>🗺️ Return to Grand Desert Map &amp; Head for the Nomad Ruins ➔</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       TACTICAL EXPEDITION MODAL: THE DESERT LEXICON & AL-QIBLA (STATION 12)
        ===================================================================== -->
   <div class="lexicon-modal-backdrop" id="modal-desert-lexicon" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="lexicon-modal-title">
     <div class="lexicon-workbench-window">
@@ -9676,8 +10226,8 @@
         <div class="lexicon-header-title-wrap">
           <span class="lexicon-header-icon">📜</span>
           <div>
-            <div class="lexicon-header-title" id="lexicon-modal-title">The Desert Lexicon & Al-Qibla · Station 11</div>
-            <div class="lexicon-header-subtitle">Tactical Crossword & Sun Compass · Reference Sheet 10A in Physical Journal</div>
+            <div class="lexicon-header-title" id="lexicon-modal-title">The Desert Lexicon & Al-Qibla · Station 12</div>
+            <div class="lexicon-header-subtitle">Tactical Crossword & Sun Compass · Reference Sheet 11A in Physical Journal</div>
           </div>
         </div>
         <button type="button" class="lexicon-close-btn" id="btn-close-lexicon" title="Close Tactical View">✕</button>
@@ -9691,7 +10241,7 @@
         </div>
         <div class="lexicon-telemetry-pill">
           <span>📍 Camp:</span>
-          <strong>Camp VII [Desert Oasis Wellhead]</strong>
+          <strong>Camp VII [Nomad Ruins]</strong>
         </div>
         <div class="lexicon-telemetry-pill">
           <span>🧭 Target:</span>
@@ -9699,7 +10249,7 @@
         </div>
         <div class="lexicon-telemetry-pill">
           <span>📐 Al-Qibla Bearing:</span>
-          <strong id="lexicon-telem-azimuth">194° SSW [Locked]</strong>
+          <strong id="lexicon-telem-bearing">194° SSW [Locked]</strong>
         </div>
         <div class="lexicon-telemetry-pill">
           <span>🦅 Desert Sigil:</span>
@@ -9716,7 +10266,7 @@
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #bae6fd;" id="lexicon-words-count">0 / 10 WORDS SOLVED</div>
           </div>
 
-          <!-- Crossword Table (15 rows x 12 cols matching Sheet 10A) -->
+          <!-- Crossword Table (15 rows x 12 cols matching Sheet 11A) -->
           <div class="lexicon-grid-container">
             <table class="lexicon-crossword-table" id="lexicon-grid-table">
               <!-- Dynamically populated or rendered -->
@@ -9837,9 +10387,9 @@
             <div style="color: #cbd5e1; font-size: 0.8rem;">Carved under the gnomon shadow-curb:</div>
             <div class="lexicon-math-formula">[R] × 2 = [F]</div>
             <div style="color: #cbd5e1; font-size: 0.8rem;">
-              • From Whispering Chasm cairns: <strong style="color: #86efac;">[R] = 3</strong> ➔ <strong style="color: #86efac;">[F] = 6</strong>.<br>
-              • From Vector I Card: <strong>[F] + [T] = 22</strong> ➔ <strong style="color: #86efac;">[T] = 16</strong>.<br>
-              <span style="color: #fde68a;">Transcribe F=6 and T=16 into your Cipher Ledger!</span>
+              • Your Whispering Chasm markers gave you a clue for <strong style="color: #86efac;">[R]</strong>, so this stele lets you work out <strong style="color: #86efac;">[F]</strong>.<br>
+              • Your Vector I Card says <strong>[F] + [T] = 22</strong>, so you can work out <strong style="color: #86efac;">[T]</strong> too.<br>
+              <span style="color: #fde68a;">Work out F and T in your Cipher Ledger!</span>
             </div>
           </div>
 
@@ -9849,7 +10399,7 @@
               <span>📻 FIELD WIRE DISPATCH // OASIS CAMP VII</span>
             </div>
             <div id="lexicon-dispatch-text">
-              "Silvia, I am at the wellhead of the Desert Oasis. The three sandstone steles are covered in windblown sand. Ten desert terms cross each other like ancient pilgrim paths. Which word does your journal transcribe first?"
+              "Silvia, I am hiding in the ruined nomad camp. The three sandstone steles are covered in windblown sand. Ten desert terms cross each other like ancient pilgrim paths. Which word does your journal transcribe first?"
             </div>
           </div>
 
@@ -9860,7 +10410,7 @@
               <span>Al-Qibla Sanctuary Heading Locked! (194° SSW)</span>
             </div>
             <div class="lexicon-victory-text">
-              "Silvia! PHOENIX! The Sigil of the Sun-Bird! The bronze dial clicked into place, aligning the needle exactly to 194° South-Southwest. The path across the Great Erg to the Sanctuary of the Desert Oracle is unlocked! Look at the second stele: a mathematical inscription carved by ancient stargazers: [R] × 2 = [F]. Update your Cipher Ledger! Our next stop is the Four Wells of the Oasis Clepsydra!"
+              "Silvia! PHOENIX! The Sigil of the Sun-Bird! The bronze dial clicked into place, aligning the needle exactly to 194° South-Southwest. The path across the Great Erg to the Sanctuary of the Desert Oracle is unlocked! Look at the second stele: a mathematical inscription carved by ancient stargazers: [R] × 2 = [F]. Update your Cipher Ledger! The scorched banners on these walls name the raiders: the BC Ashes! Our next stop is the Four Wells of the Oasis Clepsydra!"
             </div>
             <button type="button" class="btn-lexicon-finish" id="btn-lexicon-finish">
               <span>🗺️ Return to Grand Desert Map & Unlock Clepsydra Trail ➔</span>
@@ -9889,7 +10439,7 @@
           <span class="clepsydra-header-icon">⏳</span>
           <div>
             <h2 class="clepsydra-header-title" id="clepsydra-modal-title">THE OASIS CLEPSYDRA (4 WELLS)</h2>
-            <div class="clepsydra-header-subtitle">Station 12 · Subterranean Water Vaults & Logic Deduction Matrix · Sheet 11B</div>
+            <div class="clepsydra-header-subtitle">Station 13 · Subterranean Water Vaults & Logic Deduction Matrix · Sheet 12B</div>
           </div>
         </div>
         <button type="button" class="clepsydra-close-btn" id="btn-close-clepsydra" aria-label="Close Clepsydra Modal">✕</button>
@@ -9925,7 +10475,7 @@
         <div class="clepsydra-matrix-panel">
           <div class="clepsydra-section-title">
             <span>📐</span>
-            <span>The Deduction Matrix of the Four Seekers (Sheet 11B)</span>
+            <span>The Deduction Matrix of the Four Seekers (Sheet 12B)</span>
           </div>
 
           <!-- The Interactive Matrix Table -->
@@ -10198,7 +10748,7 @@
             </div>
             <div style="color: #cbd5e1; font-size: 0.8rem;">Carved into the granite outflow weir of the Falcon Well:</div>
             <div style="font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700; color: #fde68a; letter-spacing: 0.1em; margin: 4px 0;" id="clepsydra-weir-equation">
-              [P] - [A] = 12
+              [P] - [A] = 14
             </div>
             <div style="color: #cbd5e1; font-size: 0.78rem;">
               • Record this algebraic constraint into your <em>Cipher Ledger</em>.<br>
@@ -10212,7 +10762,7 @@
               <span>📻 FIELD WIRE DISPATCH // CAMP VIII THE FOUR WELLS</span>
             </div>
             <div class="clepsydra-dispatch-text" id="clepsydra-dispatch-text">
-              "Silvia, I have reached Camp VIII beside the Four Wells. The subterranean siphons are silent; the brass weir gate is locked by four shadow counterweights. The stone tablet reads: 'Only when the four seekers rest in their true shadow-hours will the living waters surge.' Check Sheet 11B to balance the siphons!"
+              "Silvia, I have reached Camp VIII beside the Four Wells. The subterranean siphons are silent; the brass weir gate is locked by four shadow counterweights. The stone tablet reads: 'Only when the four seekers rest in their true shadow-hours will the living waters surge.' Check Sheet 12B to balance the siphons!"
             </div>
           </div>
 
@@ -10223,7 +10773,7 @@
               <span>Subterranean Siphons Engaged · 4 Water Skins Filled!</span>
             </div>
             <div class="clepsydra-victory-text">
-              "Silvia! The hydraulic lock released! Fresh mineral water is surging from all four wells! Falcon, Jackal, Scarab, Serpent—all four flow in perfect balance under Key XXX (30 Hours)! We have filled our four leather water skins. Look at the water gate of the Falcon Well: [P] - [A] = 12 is carved into the brass weir! With our canteens full and Al-Qibla set to 194° SSW, the treacherous crossing of the Great Erg to Station 13 is secured!"
+              "Silvia! The hydraulic lock released! Fresh mineral water is surging from all four wells! Falcon, Jackal, Scarab, Serpent—all four flow in perfect balance under Key XXX (30 Hours)! We have filled our four leather water skins. Look at the water gate of the Falcon Well: [P] - [A] = 14 is carved into the brass weir! With our canteens full and Al-Qibla set to 194° SSW, the treacherous crossing of the Great Erg to Station 13 is secured!"
             </div>
             <div class="clepsydra-canteens-row">
               <div class="clepsydra-canteen-chip"><span>🍶</span> Canteen I: Cartographer (Scarab · Hr VI) ✓</div>
@@ -10232,7 +10782,7 @@
               <div class="clepsydra-canteen-chip"><span>🍶</span> Canteen IV: Astronomer (Serpent · Hr XII) ✓</div>
             </div>
             <button type="button" class="btn-clepsydra-finish" id="btn-clepsydra-finish">
-              <span>🗺️ Return to Grand Desert Map & Unlock Station 13 Trail ➔</span>
+              <span>🗺️ Return to Grand Desert Map & Unlock Station 14 Trail ➔</span>
             </button>
           </div>
 
@@ -10307,7 +10857,35 @@
           if (this.ctx.state === 'suspended') this.ctx.resume();
         }
 
+        // Sounds can be switched off inside The Cliffside Workshop
+        _muted() {
+          return window.hubChatMuted === true && document.body.getAttribute('data-active-view') === 'view-field-wire';
+        }
+
+        // Short telegraph burst (dit dit dah) when a new dispatch from Hermes starts to arrive
+        playTelegraphArrival() {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const start = this.ctx.currentTime;
+            [[0, 0.06], [0.1, 0.06], [0.2, 0.17]].forEach(([offset, length]) => {
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'square';
+              osc.frequency.setValueAtTime(640, start + offset);
+              gain.gain.setValueAtTime(0.0001, start + offset);
+              gain.gain.exponentialRampToValueAtTime(0.045, start + offset + 0.008);
+              gain.gain.exponentialRampToValueAtTime(0.0001, start + offset + length);
+              osc.connect(gain);
+              gain.connect(this.ctx.destination);
+              osc.start(start + offset);
+              osc.stop(start + offset + length + 0.02);
+            });
+          } catch(e) {}
+        }
+
         playMechanicalClick() {
+          if (this._muted()) return;
           try {
             this.init();
             const now = this.ctx.currentTime;
@@ -10330,6 +10908,7 @@
         }
 
         playChimeHover() {
+          if (this._muted()) return;
           try {
             this.init();
             const now = this.ctx.currentTime;
@@ -10352,6 +10931,7 @@
         }
 
         playCelestialChime() {
+          if (this._muted()) return;
           try {
             this.init();
             const now = this.ctx.currentTime;
@@ -10524,6 +11104,10 @@
         }
       }
 
+      // Last view the player was on before the current one (the chat button uses it to go back)
+      let previousHubView = 'view-trail';
+      window.getPreviousHubView = () => previousHubView;
+
       function activateHubView(targetView) {
         const isCarles = (currentSeeker || 'Silvia').toLowerCase() === 'carles';
         const isCipherCompleted = getSeekerCipherCompleted();
@@ -10541,6 +11125,9 @@
           targetView = 'view-trail';
         }
 
+        const viewBefore = document.body.getAttribute('data-active-view');
+        if (viewBefore && viewBefore !== targetView) previousHubView = viewBefore;
+
         document.body.setAttribute('data-active-view', targetView);
         document.body.classList.toggle('constellation-trail', targetView === 'view-trail');
         navButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === targetView));
@@ -10548,11 +11135,16 @@
 
         const btnHeaderMessenger = document.getElementById('btn-header-messenger');
         if (btnHeaderMessenger) {
-          btnHeaderMessenger.classList.toggle('active', targetView === 'view-field-wire');
+          const inWorkshop = targetView === 'view-field-wire';
+          btnHeaderMessenger.classList.toggle('active', inWorkshop);
+          btnHeaderMessenger.setAttribute('aria-pressed', inWorkshop ? 'true' : 'false');
+          if (!btnHeaderMessenger.dataset.openTitle) btnHeaderMessenger.dataset.openTitle = btnHeaderMessenger.getAttribute('title') || '';
+          btnHeaderMessenger.setAttribute('title', inWorkshop ? 'Close The Cliffside Workshop and go back' : btnHeaderMessenger.dataset.openTitle);
         }
 
         if (targetView === 'view-field-wire') {
           if (typeof renderWireExpedition === 'function') renderWireExpedition();
+          if (typeof renderInquiriesGrid === 'function') renderInquiriesGrid();
           if (typeof markMessengerAsRead === 'function') markMessengerAsRead();
         }
 
@@ -10893,8 +11485,8 @@
             { icon: '📜', label: 'Intercepted Orders', desc: 'Astrolabe triangulates the Fourth Chamber' }
           ],
           btnText: 'Inspect Secured Cache ➔',
-          url: './desert/zodiac-engine/index.html#victory',
-          replayUrl: './desert/zodiac-engine/index.html',
+          url: './constellation/zodiac-engine/index.html#victory',
+          replayUrl: './constellation/zodiac-engine/index.html',
           replayText: '↺ Replay Outpost Patrol'
         },
         8: () => {
@@ -10975,36 +11567,36 @@
           if (isChasmDone) {
             return {
               badge: 'STATION 10 // CANYON CLEARED',
-              status: 'OASIS REACHED · MIRAGE SOLVED ✓',
+              status: 'GORGE CLEARED · MIRAGE SOLVED ✓',
               statusClass: 'status-done-badge',
               title: 'The Whispering Chasm',
               thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-              lore: 'Guiando a Hermes con la Ley de los Caminantes del Cañón y la Hoja 9B de tu diario físico, Silvia atravesó con éxito el laberinto de arenisca 25×25, descubrió los seis mojones sagrados (M-I-R-A-G-E) y desbloqueó el valor R = 3 para el Cipher Ledger.',
+              lore: 'Guiding Hermes with the Law of the Canyon Walkers and Sheet 9B of your physical journal, Silvia led him through the 25×25 sandstone labyrinth, found the six stone markers (M-I-R-A-G-E) and unlocked a clue about the letter R for the Cipher Ledger.',
               rewards: [
-                { icon: '🏜️', label: 'Laberinto del Cañón Superado', desc: '6 mojones sagrados en estricta secuencia' },
-                { icon: '🗝️', label: 'Contraseña Verificada: MIRAGE', desc: 'La clave de los nómadas del desierto' },
-                { icon: '📐', label: 'Constante Ledger: [R] = 3', desc: 'El 3.er mojón revela la letra R en el Ledger' },
-                { icon: '🌴', label: 'Oasis Descubierto', desc: 'Agua fresca asegurada al final del cañón' }
+                { icon: '🏜️', label: 'Canyon Labyrinth Cleared', desc: '6 stone markers in strict order' },
+                { icon: '🗝️', label: 'Passphrase Verified: MIRAGE', desc: 'The password of the desert nomads' },
+                { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'The 3rd marker reveals the letter R' },
+                { icon: '🏜️', label: 'Out of the Gorge', desc: 'The Salt Playa opens at the end of the canyon' }
               ],
-              btnText: 'Inspeccionar Ruta del Cañón ➔',
+              btnText: 'Review the Canyon Route ➔',
               action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
             };
           }
 
           return {
-            badge: 'STATION 10 // MISIÓN 1 · DESERT PATH',
-            status: 'DESCENSO AL CAÑÓN LISTO ✦',
+            badge: 'STATION 10 // DESERT PATH',
+            status: 'CANYON DESCENT READY ✦',
             statusClass: 'status-live-badge',
             title: 'The Whispering Chasm',
             thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-            lore: 'Primera misión en el Gran Desierto: Hermes ha alcanzado la entrada del Whispering Chasm en el Cuadrante Suroeste del mapa (Hoja 10B). Para guiarlo a través del desfiladero acústico de 25×25, abre la Hoja 9B de tu diario manuscrito ("The Whispering Chasm"), sigue las reglas de los caminantes y descifra los seis mojones de piedra.',
+            lore: 'First mission in the Great Desert: Hermes has reached the entrance of the Whispering Chasm. To guide him through the 25×25 acoustic gorge, open Sheet 9B of your journal ("The Whispering Chasm"), follow the walkers\' rules and find the six stone markers in order.',
             rewards: [
-              { icon: '🧭', label: 'Hoja 9B del Diario Manuscrito', desc: 'Puzle del laberinto de arenisca 25×25' },
-              { icon: '🗺️', label: 'Cuadrante Suroeste (Hoja 10B)', desc: 'Localización topográfica en el mapa' },
-              { icon: '🗝️', label: 'Palabra de Paso: M-I-R-A-G-E', desc: '6 mojones de reliquias' },
-              { icon: '📐', label: 'Valor para el Ledger: [R] = 3', desc: 'Clave criptográfica para deducir letras' }
+              { icon: '🧭', label: 'Sheet 9B of the Journal', desc: '25×25 sandstone labyrinth puzzle' },
+              { icon: '🗺️', label: 'South-West Quadrant (Sheet 11B)', desc: 'Location on the Grand Desert Map' },
+              { icon: '🗝️', label: 'Passphrase: M-I-R-A-G-E', desc: '6 relic markers' },
+              { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'The 3rd marker on the path reveals the letter R' }
             ],
-            btnText: '✦ DESCENDER AL CAÑÓN Y GUIAR A HERMES ➔',
+            btnText: '✦ DESCEND INTO THE CANYON & GUIDE HERMES ➔',
             action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
           };
         },
@@ -11013,35 +11605,35 @@
 
           if (isLexiconDone) {
             return {
-              badge: 'STATION 11 // AL-QIBLA BEARING LOCKED',
-              status: 'RUMBO AL SANTUARIO 194° SSW ✓',
+              badge: 'STATION 12 // AL-QIBLA BEARING LOCKED',
+              status: 'HEADING TO THE SANCTUARY 194° SSW ✓',
               statusClass: 'status-done-badge',
               title: 'The Desert Lexicon & Al-Qibla',
               thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-              lore: 'Traduciendo las diez palabras talladas en las estelas de Cairn II (Hoja 10A), Silvia formó el Sigilo PHOENIX y calibró la brújula solar Al-Qibla a 194° SSW hacia la Torre II.',
+              lore: 'Translating the ten words carved on the stelae of the nomad ruins (Sheet 11A), Silvia formed the PHOENIX Sigil and set the Al-Qibla sun compass to 194° SSW, pointing at Tower II.',
               rewards: [
-                { icon: '🦅', label: 'El Sigilo del Desierto: PHOENIX', desc: 'Clave maestra de 7 letras circuladas' },
-                { icon: '🧭', label: 'Rumbo Al-Qibla: 194° SSW', desc: 'Rumbo directo a la Torre II' },
-                { icon: '📐', label: 'Ecuación Stargazer: [R] × 2 = [F]', desc: 'Cipher Ledger: F=6, T=16 deducidos' }
+                { icon: '🦅', label: 'The Desert Sigil: PHOENIX', desc: 'Master key of 7 circled letters' },
+                { icon: '🧭', label: 'Al-Qibla Bearing: 194° SSW', desc: 'Straight heading to Tower II' },
+                { icon: '📐', label: 'Stargazer Equation: [R] × 2 = [F]', desc: 'Cipher Ledger: work out F and T' }
               ],
-              btnText: 'Inspeccionar Léxico y Brújula ➔',
+              btnText: 'Review the Lexicon & Compass ➔',
               action: () => (window.openDesertLexiconModal ? window.openDesertLexiconModal() : null)
             };
           }
 
           return {
-            badge: 'STATION 11 // MISIÓN 2 · DESERT PATH',
-            status: 'ESTELAS DE CAIRN II DESCUBIERTAS ✦',
+            badge: 'STATION 12 // DESERT PATH',
+            status: 'NOMAD RUINS DISCOVERED ✦',
             statusClass: 'status-live-badge',
             title: 'The Desert Lexicon & Al-Qibla',
             thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-            lore: 'Segunda misión del desierto: En el Cairn II (Cuadrante Noreste, Hoja 9A del mapa), Hermes ha encontrado las estelas del desierto. Consulta la Hoja 10A de tu diario manuscrito ("The Desert Lexicon & Al-Qibla"), resuelve el crucigrama y orienta la brújula solar.',
+            lore: 'In nomad ruins beside the Salt Playa (South-East Quadrant, Sheet 12A of the map), Hermes slipped past an ambush of raiders and found the desert stelae. Open Sheet 11A of your journal ("The Desert Lexicon & Al-Qibla"), solve the crossword and set the sun compass.',
             rewards: [
-              { icon: '📜', label: 'Hoja 10A del Diario Manuscrito', desc: '10 palabras de peregrinos nómadas' },
-              { icon: '🦅', label: 'Sigilo PHOENIX', desc: '7 letras circuladas' },
-              { icon: '🧭', label: 'Brújula Solar Al-Qibla', desc: 'Rumbo directo a la Torre II' }
+              { icon: '📜', label: 'Sheet 11A of the Journal', desc: '10 words of the nomad pilgrims' },
+              { icon: '🦅', label: 'PHOENIX Sigil', desc: '7 circled letters' },
+              { icon: '🧭', label: 'Al-Qibla Sun Compass', desc: 'Straight heading to Tower II' }
             ],
-            btnText: '✦ TRANSCRIBIR ESTELAS Y ALINEAR BRÚJULA ➔',
+            btnText: '✦ TRANSCRIBE THE STELAE & SET THE COMPASS ➔',
             action: () => (window.openDesertLexiconModal ? window.openDesertLexiconModal() : null)
           };
         },
@@ -11050,35 +11642,35 @@
 
           if (isClepsydraDone) {
             return {
-              badge: 'STATION 12 // EXPEDITION COMPLETE',
-              status: '4 POZOS HIDRÁULICOS EQUILIBRADOS ✓',
+              badge: 'STATION 13 // EXPEDITION COMPLETE',
+              status: '4 WATER WELLS BALANCED ✓',
               statusClass: 'status-done-badge',
               title: 'The Oasis Clepsydra (4 Wells)',
               thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
-              lore: 'Los cuatro buscadores han sido emparejados con sus horas de llegada y reliquias en la Hoja 11B. Los sifones liberaron agua pura mineral, llenando las cuatro cantimploras con la Llave XXX (30 Horas).',
+              lore: 'The four seekers have been matched with their arrival hours and relics on Sheet 12B. The siphons released pure mineral water, filling the four canteens with Key XXX (30 Hours).',
               rewards: [
-                { icon: '⏳', label: '4 Pozos Equilibrados', desc: 'Falcon, Jackal, Scarab, Serpent' },
-                { icon: '💧', label: '4 Cantimploras Llenas', desc: 'Cruce del Gran Erg asegurado' },
-                { icon: '📐', label: 'Ecuación Ledger: [P] - [A] = 12', desc: 'Inscripción del vertedero Falcon' }
+                { icon: '⏳', label: '4 Wells Balanced', desc: 'Falcon, Jackal, Scarab, Serpent' },
+                { icon: '💧', label: '4 Full Canteens', desc: 'Great Erg crossing secured' },
+                { icon: '📐', label: 'Ledger Equation: [P] - [A] = 14', desc: 'Inscription on the Falcon weir' }
               ],
-              btnText: 'Inspeccionar Clepsydra Equilibrada ➔',
+              btnText: 'Review the Balanced Clepsydra ➔',
               action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
             };
           }
 
           return {
-            badge: 'STATION 12 // MISIÓN 3 · DESERT PATH',
-            status: 'LOS CUATRO POZOS DESCUBIERTOS ✦',
+            badge: 'STATION 13 // DESERT PATH',
+            status: 'THE FOUR WELLS DISCOVERED ✦',
             statusClass: 'status-live-badge',
             title: 'The Oasis Clepsydra (4 Wells)',
             thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
-            lore: 'En la cuenca del Oasis del Desierto (Cuadrante Sureste, Hoja 11A del mapa), Hermes llegó a los Cuatro Pozos. Consulta la Hoja 11B de tu diario manuscrito ("The Oasis Clepsydra"), equilibra los sifones hidráulicos y llena tus cantimploras.',
+            lore: 'In the Desert Oasis basin (South-East Quadrant, Sheet 12A of the map), Hermes has reached the Four Wells. Open Sheet 12B of your journal ("The Oasis Clepsydra"), balance the hydraulic siphons and fill your canteens.',
             rewards: [
-              { icon: '⏳', label: 'Hoja 11B del Diario Manuscrito', desc: 'Deducción lógica de los 4 Buscadores' },
-              { icon: '💧', label: '4 Cantimploras de Agua', desc: 'Suministros vitales para el desierto' },
-              { icon: '📐', label: 'Llave Clepsydra: XXX (30)', desc: 'Combinación hidráulica' }
+              { icon: '⏳', label: 'Sheet 12B of the Journal', desc: 'Logic deduction of the 4 Seekers' },
+              { icon: '💧', label: '4 Water Canteens', desc: 'Vital supplies for the desert' },
+              { icon: '📐', label: 'Clepsydra Key: XXX (30)', desc: 'Hydraulic combination' }
             ],
-            btnText: '✦ ABRIR TALLER DE LA CLEPSYDRA ➔',
+            btnText: '✦ OPEN THE CLEPSYDRA WORKSHOP ➔',
             action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
           };
         },
@@ -11087,51 +11679,87 @@
 
           if (isPolybiusDone) {
             return {
-              badge: 'STATION 13 // EXPEDITION COMPLETE',
-              status: 'CIFRADO DE POLIBIO DECODIFICADO ✓',
+              badge: 'STATION 18 // EXPEDITION COMPLETE',
+              status: 'POLYBIUS CIPHER DECODED ✓',
               statusClass: 'status-done-badge',
-              title: 'The Polybius Stele of Cairn III',
+              title: 'The Polybius Stele',
               thumb: './assets/thumbnails/polybius_stele_preview.webp',
-              lore: 'El cifrado 5×5 Polybius ha sido decodificado con el sigilo PHOENIX de la Hoja 12A, revelando la alineación final hacia el Santuario.',
+              lore: 'The 5×5 Polybius cipher has been decoded with the PHOENIX sigil from Sheet 17A, revealing the final heading to the Sanctuary.',
               rewards: [
-                { icon: '🏛️', label: 'Placa de Referencia Cairn III', desc: 'Alineación 348° NNW' },
-                { icon: '🗝️', label: 'Estela Nómada Decodificada', desc: 'Grados de compensación solar' }
+                { icon: '🏛️', label: 'Engraved Bearing: 348° NNW', desc: 'The same bearing that Cairn III points to the Sun Monolith' },
+                { icon: '🗝️', label: 'Nomad Stele Decoded', desc: 'Solar offset degrees' }
               ],
-              btnText: 'Inspeccionar Estela Decodificada ➔',
-              action: () => (window.showDesertToast ? window.showDesertToast('Station 13: Polybius Stele de Cairn III decodificada.') : null)
+              btnText: 'Review the Decoded Stele ➔',
+              action: () => (window.showDesertToast ? window.showDesertToast('Station 18: The Polybius Stele decoded.') : null)
             };
           }
 
           return {
-            badge: 'STATION 13 // MISIÓN 4 · DESERT PATH',
-            status: 'MONUMENTO DE REFERENCIA ALCANZADO ✦',
+            badge: 'STATION 18 // DESERT PATH',
+            status: 'SANCTUARY ATRIUM REACHED ✦',
             statusClass: 'status-live-badge',
-            title: 'The Polybius Stele of Cairn III',
+            title: 'The Polybius Stele',
             thumb: './assets/thumbnails/polybius_stele_preview.webp',
-            lore: 'En el promontorio oriental, Cairn III custodia una placa de latón de referencia. Su cuadrícula 5×5 keyed en la Hoja 12A del diario manuscrito guarda el cifrado nómada.',
+            lore: 'At the gates of Tower II, the Servant of the Oracle demands one last trial: decode the Polybius stele carved in the atrium. Its keyed 5×5 grid, on Sheet 17A of your journal, hides the cipher.',
             rewards: [
-              { icon: '🏛️', label: 'Hoja 12A del Diario Manuscrito', desc: 'Cifrado de Polibio 5×5' },
-              { icon: '📜', label: 'Placa Cairn III', desc: 'Alineación 348° NNW' }
+              { icon: '🏛️', label: 'Sheet 17A of the Journal', desc: '5×5 Polybius cipher' },
+              { icon: '📜', label: "The Servant's Trial", desc: 'Prove you understand the language of the founders' }
             ],
-            btnText: 'Consultar Hoja 12A en el Diario ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Station 13: Consulta la Hoja 12A (The Polybius Stele) en tu diario físico.') : null)
+            btnText: 'Open Sheet 17A in Your Journal ➔',
+            action: () => (window.showDesertToast ? window.showDesertToast('Station 18: Open Sheet 17A (The Polybius Stele) in your physical journal.') : null)
           };
         },
         14: () => {
           return {
-            badge: 'STATION 14 // TOWER II · SANCTUARY',
-            status: 'UMBRAL DEL SANTUARIO ALCANZADO ✦',
+            badge: 'STATION 19 // TOWER II · THE ORACLE',
+            status: 'SANCTUARY THRESHOLD REACHED ✦',
             statusClass: 'status-live-badge',
             title: 'The Sandstone Sanctuary of the Oracle',
             thumb: './assets/thumbnails/polybius_stele_preview.webp',
-            lore: 'Torre II — The Sandstone Sanctuary of the Desert Oracle (Hoja 12B del diario físico). Destino final del camino del desierto. Hermes se encuentra ante las grandes puertas de bronce, listo para triangular las Tres Antiguas Torres.',
+            lore: 'Tower II: The Sandstone Sanctuary of the Desert Oracle (Sheet 17B of the physical journal). Final destination of the Desert Path. Hermes stands before the great bronze gates, ready to triangulate the Three Ancient Towers.',
             rewards: [
-              { icon: '🏛️', label: 'Puertas de la Torre II', desc: 'El Segundo Santuario desvelado' },
-              { icon: '☀️', label: 'The Desert Oracle', desc: 'Encuentro profético y coordenadas secretas' },
-              { icon: '🗝️', label: 'Segunda Llave Maestra', desc: 'Hacia la Bóveda del Gran Eclipse' }
+              { icon: '🏛️', label: 'The Gates of Tower II', desc: 'The Second Sanctuary revealed' },
+              { icon: '☀️', label: 'The Desert Oracle', desc: 'Prophetic encounter and secret coordinates' },
+              { icon: '🗝️', label: 'Second Master Key', desc: 'Toward the Vault of the Grand Eclipse' }
             ],
-            btnText: 'Entrar al Santuario de la Torre II ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Torre II: The Sandstone Sanctuary of the Desert Oracle aguarda en la Hoja 12B.') : null)
+            btnText: 'Enter the Sanctuary of Tower II ➔',
+            action: () => (window.showDesertToast ? window.showDesertToast('Station 19: The Sandstone Sanctuary of the Desert Oracle awaits on Sheet 17B.') : null)
+          };
+        },
+        21: () => {
+          const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
+          if (isPlayaDone) {
+            return {
+              badge: 'STATION 11 // BASIN CROSSED',
+              status: 'SALT CRUST CROSSED ✓',
+              statusClass: 'status-done-badge',
+              title: 'The Salt Playa (Dry Basin)',
+              thumb: './assets/thumbnails/salt_playa_preview.webp',
+              lore: 'Guiding Hermes with the Law of the Basin and Sheet 10A of your physical journal, Silvia found the one safe crossing of seven slabs, dodging the brine sinkholes. The letters along the path spelled CRYSTAL and opened the south shore.',
+              rewards: [
+                { icon: '🧂', label: 'Basin Crossed', desc: '7 safe slabs, north to south' },
+                { icon: '🗝️', label: 'Passage Keyword Verified: CRYSTAL', desc: 'The key to the south shore' },
+                { icon: '🏜️', label: 'Nomad Ruins in Sight', desc: 'Station 12 unlocked' }
+              ],
+              btnText: 'Review the Crossing ➔',
+              action: () => (window.openSaltPlayaModal ? window.openSaltPlayaModal() : null)
+            };
+          }
+
+          return {
+            badge: 'STATION 11 // DESERT PATH',
+            status: 'SALT BASIN AHEAD OF HERMES ✦',
+            statusClass: 'status-live-badge',
+            title: 'The Salt Playa (Dry Basin)',
+            thumb: './assets/thumbnails/salt_playa_preview.webp',
+            lore: 'Out of the Whispering Chasm, the ground opens into a blinding white salt basin. Pockets of brine hide under the crust. Open Sheet 10A of your journal ("The Salt Playa"), follow the Law of the Basin from Row I to Row VII and read the letters along your path to find the passage keyword that guides Hermes across.',
+            rewards: [
+              { icon: '🧂', label: 'Sheet 10A of the Journal', desc: '7×7 slab grid with brine sinkholes' },
+              { icon: '📜', label: 'Law of the Basin', desc: 'Each step changes the facet count by exactly 1' },
+              { icon: '🗝️', label: 'Passage Keyword', desc: 'Seven letters that open the south shore' }
+            ],
+            btnText: '✦ CROSS THE SALT PLAYA ➔',
+            action: () => (window.openSaltPlayaModal ? window.openSaltPlayaModal() : null)
           };
         },
         15: () => nodesData[10](),
@@ -12932,13 +13560,13 @@
           h = canvas.height = window.innerHeight;
           initStars();
           initSand();
+          initConstellations();
         });
 
         let stars = [];
         let shootingStars = [];
         let sand = [];
-        let lightning = null;
-        let nextLightningAt = performance.now() + 7000;
+        let constellations = [];
 
         function initStars() {
           stars = [];
@@ -12963,6 +13591,25 @@
         }
         initStars();
 
+        // Faint constellation figures (3 to 6 linked stars) for the Constellation Trail backdrop
+        function initConstellations() {
+          constellations = [];
+          const figures = Math.max(5, Math.floor(w / 230));
+          for (let f = 0; f < figures; f++) {
+            const pts = [];
+            let x = 60 + Math.random() * (w - 120);
+            let y = 40 + Math.random() * (h - 80);
+            const n = 3 + Math.floor(Math.random() * 4);
+            for (let k = 0; k < n; k++) {
+              pts.push({ x: x, y: y, r: 1.5 + Math.random() * 1.5, ph: Math.random() * Math.PI * 2 });
+              x = Math.max(20, Math.min(w - 20, x + 24 + (Math.random() * 2 - 1) * 120));
+              y = Math.max(20, Math.min(h - 20, y + (Math.random() * 2 - 1) * 100));
+            }
+            constellations.push(pts);
+          }
+        }
+        initConstellations();
+
         function initSand() {
           sand = [];
           const count = Math.floor((w * h) / 14000);
@@ -12982,20 +13629,6 @@
         function trailIsActive() {
           const trail = document.getElementById('view-trail');
           return !!(trail && trail.classList.contains('active'));
-        }
-
-        function spawnLightning() {
-          const x = w * (0.15 + Math.random() * 0.7);
-          const points = [{ x: x, y: 0 }];
-          let cy = 0;
-          while (cy < h * 0.55) {
-            cy += 28 + Math.random() * 46;
-            points.push({
-              x: points[points.length - 1].x + (Math.random() * 70 - 35),
-              y: Math.min(cy, h * 0.62)
-            });
-          }
-          lightning = { life: 1, points: points };
         }
 
         function maybeSpawnShootingStar() {
@@ -13054,14 +13687,39 @@
             return; // Clean, authentic environmental backdrops
           }
 
-          if (onTrail) {
-            ctx.fillStyle = 'rgba(62, 40, 16, 0.07)';
-            ctx.fillRect(0, 0, w, h);
+          const onDesertTrail = onTrail && document.documentElement.getAttribute('data-map-path') === 'desert';
+
+          if (onDesertTrail) {
+            // Golden-hour desert: a few early stars high in the sky, wind-blown sand streaks and drifting dust
+            const gust = 0.75 + 0.5 * Math.sin(t * 0.18);
+            for (let i = 0; i < stars.length; i += 6) {
+              const s = stars[i];
+              if (s.y > h * 0.4) continue;
+              const a = (s.a + Math.sin(t * s.speed + s.phase) * 0.3) * 0.35 * (1 - s.y / (h * 0.4));
+              ctx.fillStyle = s.color + Math.max(0.03, Math.min(1, a)) + ')';
+              ctx.beginPath();
+              ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.lineWidth = 1;
+            for (let i = 0; i < sand.length; i++) {
+              const g = sand[i];
+              g.x += g.vx * 3.2 * gust;
+              g.y += g.vy * 0.5;
+              if (g.x < -30) g.x = w + 30;
+              if (g.y > h + 4) g.y = -4;
+              ctx.strokeStyle = 'rgba(240, 196, 130, ' + Math.min(0.5, g.a * 2.2) + ')';
+              ctx.beginPath();
+              ctx.moveTo(g.x, g.y);
+              ctx.lineTo(g.x + 12 + g.r * 8, g.y - g.vy * 2);
+              ctx.stroke();
+            }
+            return;
           }
 
           // Render Calm Twinkling Stars (No mouse lag or parallax)
-          const starStep = onTrail ? 3 : 1;
-          const starDim = onTrail ? 0.28 : 0.8;
+          const starStep = 1;
+          const starDim = onTrail ? 1 : 0.8;
           for (let i = 0; i < stars.length; i += starStep) {
             const s = stars[i];
             const a = (s.a + Math.sin(t * s.speed + s.phase) * 0.3) * starDim;
@@ -13073,37 +13731,31 @@
           }
 
           if (onTrail) {
-            for (let i = 0; i < sand.length; i++) {
-              const g = sand[i];
-              g.x += g.vx;
-              g.y += g.vy;
-              if (g.x < -4) g.x = w + 4;
-              if (g.y > h + 4) g.y = -4;
-              ctx.fillStyle = 'rgba(214, 176, 110, ' + g.a + ')';
-              ctx.fillRect(g.x, g.y, g.r, g.r);
-            }
-
-            if (!lightning && timestamp > nextLightningAt) {
-              spawnLightning();
-              nextLightningAt = timestamp + 8000 + Math.random() * 14000;
-            }
-            if (lightning) {
-              ctx.fillStyle = 'rgba(255, 236, 200, ' + (lightning.life * 0.09) + ')';
-              ctx.fillRect(0, 0, w, h);
-              ctx.strokeStyle = 'rgba(255, 244, 214, ' + lightning.life + ')';
-              ctx.lineWidth = 1.4;
+            // Constellation Trail: faint figures drawn between linked stars
+            ctx.lineWidth = 1;
+            for (let f = 0; f < constellations.length; f++) {
+              const pts = constellations[f];
+              ctx.strokeStyle = 'rgba(150, 190, 255, 0.17)';
               ctx.beginPath();
-              lightning.points.forEach((p, idx) => {
+              pts.forEach((p, idx) => {
                 if (idx === 0) ctx.moveTo(p.x, p.y);
                 else ctx.lineTo(p.x, p.y);
               });
               ctx.stroke();
-              lightning.life -= 0.08;
-              if (lightning.life <= 0) lightning = null;
+              pts.forEach((p) => {
+                const tw = 0.6 + 0.4 * Math.sin(t * 1.3 + p.ph);
+                ctx.fillStyle = 'rgba(200, 222, 255, ' + (0.5 * tw) + ')';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(150, 190, 255, ' + (0.12 * tw) + ')';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r * 3.2, 0, Math.PI * 2);
+                ctx.fill();
+              });
             }
           }
 
-          if (onTrail) return;
 
           // Update & Render Shooting Stars
           maybeSpawnShootingStar();
@@ -13188,19 +13840,19 @@
               id: "choice-1-tactical",
               text: "If their wagons are stuck, they can't escape. Prioritize finding safe shelter before hunting them down.",
               silviaMsg: "If their wagons are stuck, they cannot flee with the Astrolabe. We must prioritize securing your shelter before hunting them through the storm.",
-              hermesReply: "Good thinking, Silvia. Heavy wagons do not disappear into thin air, and thieves have to hide from the wind just like us. First, we secure our own footing.\n\nAnd you are right about the terrain: sand shifts with every gale, but the ancient bones of this canyon never change. In the autumn of 1998, I explored this exact frontier with Aurelia and mapped every stone.\n\nPlease open your physical journal to Sheet 7 · Side B. What notes did I leave about crossing this windy canyon when dust blinds the eyes?"
+              hermesReply: "Good thinking, Silvia. Heavy wagons do not disappear into thin air, and thieves have to hide from the wind just like us. First, we secure our own footing.\n\nAnd you are right about the terrain: sand shifts with every gale, but the ancient bones of this canyon never change. In the autumn of 1998, I searched this exact frontier for weeks and mapped every stone.\n\nPlease open your physical journal to Sheet 7B. What notes did I leave about crossing this windy canyon when dust blinds the eyes?"
             },
             {
               id: "choice-1-landmarks",
               text: "The storm wipes out dunes, but not stone. Look for permanent geological landmarks in the gorge.",
               silviaMsg: "The storm wipes out sand dunes, but not stone. Look for permanent stone landmarks in this gorge that the wind cannot erase.",
-              hermesReply: "Exactly so! You think like a true cartographer. Wind shifts the dunes overnight, but the ancient dry riverbeds and granite rocks remain untouched for centuries.\n\nIn the autumn of 1998, when I was young, I spent three weeks surveying this exact gorge. I marked the safest path in my personal field notes and built permanent stone markers along the rock.\n\nPlease check your physical journal, Silvia. Open Sheet 7 · Side B: what did my younger self record about navigating this canyon?"
+              hermesReply: "Exactly so! You think like a true cartographer. Wind shifts the dunes overnight, but the ancient dry riverbeds and granite rocks remain untouched for centuries.\n\nIn the autumn of 1998, when I was young, I spent three weeks surveying this exact gorge. I marked the safest path in my personal field notes and built permanent stone markers along the rock.\n\nPlease check your physical journal, Silvia. Open Sheet 7B: what did my younger self record about navigating this canyon?"
             },
             {
               id: "choice-1-concern",
               text: "Don't push into the dark, Hermes. The Astrolabe can be tracked later; staying alive tonight comes first.",
               silviaMsg: "Don't push into the dark, Hermes. The Astrolabe can be tracked when the wind dies down. Staying alive and warm through tonight comes first.",
-              hermesReply: "Your words mean more to me than you know, Silvia. It has been many years since anyone cared whether this old stargazer made it through the cold.\n\nYou are wise: we need solid shelter immediately. And fortunately, I have been in this tight spot before. Back in 1998, when I first surveyed this canyon, I found the only reliable route out of the storm.\n\nPlease look at your journal, Silvia. Open Sheet 7 · Side B. What did I write about crossing this windy canyon?"
+              hermesReply: "Your words mean more to me than you know, Silvia. It has been many years since anyone cared whether this old stargazer made it through the cold.\n\nYou are wise: we need solid shelter immediately. And fortunately, I have been in this tight spot before. Back in 1998, when I first surveyed this canyon, I found the only reliable route out of the storm.\n\nPlease look at your journal, Silvia. Open Sheet 7B. What did I write about crossing this windy canyon?"
             }
           ]
         },
@@ -13257,13 +13909,13 @@
         },
         {
           step: 5,
-          hermesInitial: "Silvia! Can you hear this across the line? I hooked my copper transmitter to the wire running all the way down to Camp VII at the Desert Oasis!\n\nThe spring here is cool and surrounded by ancient date palms. But look what is standing right beside the well curb: three massive sandstone steles carved with nomadic words and an astronomical sun compass called Al-Qibla.\n\nThe sandstorm shifted the dunes across the Great Erg, completely burying the raiders' wagon tracks. Our only hope of finding where they took the Master Astrolabe is locating Tower II—the Sanctuary of the Desert Oracle. But navigating the Erg without the true bearing would be suicide.\n\nLook at Sheet 10A in your physical journal. How do we unlock the Al-Qibla bearing on these steles?",
+          hermesInitial: "Silvia! Can you hear this across the line? I hooked my copper transmitter to the wire running all the way down to Camp VII, a ruined nomad camp at the edge of the Salt Playa!\n\nRaiders swept through here at dusk and I had to hide behind the broken walls until they passed. But look what stood right beside my hiding place: three massive sandstone steles carved with nomadic words and an astronomical sun compass called Al-Qibla.\n\nThe sandstorm shifted the dunes across the Great Erg, completely burying the raiders' wagon tracks. Our only hope of finding where they took the Master Astrolabe is locating Tower II—the Sanctuary of the Desert Oracle. But navigating the Erg without the true bearing would be suicide.\n\nLook at Sheet 11A in your physical journal. How do we unlock the Al-Qibla bearing on these steles?",
           choices: [
             {
               id: "choice-5-crossword",
-              text: "Check Sheet 10A: Solve the 10 crossword words to assemble the circled letters.",
-              silviaMsg: "I'm looking at Sheet 10A in my journal: The Desert Lexicon. We must carve the 10 desert terms on the sandstone stele to assemble the circled letters.",
-              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nWhen you solve the grid on Sheet 10A, what word do the circled letters 1 to 7 spell?"
+              text: "Check Sheet 11A: Solve the 10 crossword words to assemble the circled letters.",
+              silviaMsg: "I'm looking at Sheet 11A in my journal: The Desert Lexicon. We must carve the 10 desert terms on the sandstone stele to assemble the circled letters.",
+              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nWhen you solve the grid on Sheet 11A, what word do the circled letters 1 to 7 spell?"
             },
             {
               id: "choice-5-sigil",
@@ -13282,16 +13934,16 @@
         {
           step: 6,
           completed: true,
-          hermesFinal: "Silvia! Al-Qibla is locked: 194° South-Southwest! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: since [R] was 3 from the canyon cairns, [F] is 6! And combined with your Vector Card [F] + [T] = 22, [T] is 16!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check Sheet 11B in your journal to balance the water flow!"
+          hermesFinal: "Silvia! Al-Qibla is locked: 194° South-Southwest! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: the raiders left scorched banners hanging in these ruins, and the burned mark matches the one on their wagons. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check Sheet 12B in your journal to balance the water flow!"
         },
         {
           step: 7,
-          hermesInitial: "Silvia, can you hear me? I hooked my copper wire into the rusted relay at Camp VIII beside the Four Wells!\n\nThe desert heat is merciless, and our canteens are running bone dry. Before us lie four sculpted stone basins: Falcon, Jackal, Scarab, and Serpent. But the surface water is dry! The underground siphons are sealed shut by heavy counterweights.\n\nAn engraved bronze plaque above the water gate reads: 'Only when the four seekers rest in their true shadow-hours will the living waters surge.' Four seekers came here before us: the Cartographer, the Alchemist, the Nomad, and the Astronomer. Each brought a sacred relic, arriving at a distinct shadow hour.\n\nLook at Sheet 11B in your physical journal. How do we deduce their arrival hours and balance the siphons?",
+          hermesInitial: "Silvia, can you hear me? I hooked my copper wire into the rusted relay at Camp VIII beside the Four Wells!\n\nThe desert heat is merciless, and our canteens are running bone dry. Before us lie four sculpted stone basins: Falcon, Jackal, Scarab, and Serpent. But the surface water is dry! The underground siphons are sealed shut by heavy counterweights.\n\nAn engraved bronze plaque above the water gate reads: 'Only when the four seekers rest in their true shadow-hours will the living waters surge.' Four seekers came here before us: the Cartographer, the Alchemist, the Nomad, and the Astronomer. Each brought a sacred relic, arriving at a distinct shadow hour.\n\nLook at Sheet 12B in your physical journal. How do we deduce their arrival hours and balance the siphons?",
           choices: [
             {
               id: "choice-7-matrix",
-              text: "Check Sheet 11B: The Cartographer carried the Astrolabe, arriving at the Scarab Well at Hr VI.",
-              silviaMsg: "I'm checking Sheet 11B in my journal: The Cartographer carried the Brass Astrolabe, arriving at the Scarab Well at Hr VI.",
+              text: "Check Sheet 12B: The Cartographer carried the Astrolabe, arriving at the Scarab Well at Hr VI.",
+              silviaMsg: "I'm checking Sheet 12B in my journal: The Cartographer carried the Brass Astrolabe, arriving at the Scarab Well at Hr VI.",
               hermesReply: "The Brass Astrolabe at the Scarab Well at Hour VI! Yes—the first counterweight groaned and water began trickling into the copper pipes! And what of the other three seekers?"
             },
             {
@@ -13311,7 +13963,7 @@
         {
           step: 8,
           completed: true,
-          hermesFinal: "Silvia! All four wells are flowing in glorious harmony under Key XXX! Falcon, Jackal, Scarab, Serpent—pure water is pouring through every siphon! We filled our four leather water skins to capacity.\n\nAnd look what the receding silt revealed on the brass outflow gate of the Falcon Well: an algebraic cipher carved in deep letters: [P] - [A] = 12!\n\nRecord this relation into your Cipher Ledger right away. With our canteens brimming and Al-Qibla locked at 194° SSW, Hermes is ready to cross the treacherous Great Erg toward Station 13!"
+          hermesFinal: "Silvia! All four wells are flowing in glorious harmony under Key XXX! Falcon, Jackal, Scarab, Serpent—pure water is pouring through every siphon! We filled our four leather water skins to capacity.\n\nAnd look what the receding silt revealed on the brass outflow gate of the Falcon Well: an algebraic cipher carved in deep letters: [P] - [A] = 14!\n\nRecord this relation into your Cipher Ledger right away. With our canteens brimming and Al-Qibla locked at 194° SSW, Hermes is ready to cross the treacherous Great Erg toward Station 14!"
         }
       ];
 
@@ -13346,10 +13998,10 @@
         },
         {
           id: "inq-oasis-steles",
-          title: "What are the three sandstone steles at the Desert Oasis?",
-          category: "The Oasis",
+          title: "What are the three sandstone steles at the Nomad Ruins?",
+          category: "The Nomad Ruins",
           group: "desert",
-          answer: "Standing in the shadow of the date palms at Camp VII are three monolithic sandstone steles erected during the Second Age of Stargazers. The central stele bears a 10-word crossword of desert navigation terms. The second stele carries the brass Al-Qibla sun compass, and the third reveals the sacred mathematical proportion [R] × 2 = [F] carved under its shadow curb."
+          answer: "Standing among the ruined walls of the nomad camp at Camp VII are three monolithic sandstone steles erected during the Second Age of Stargazers. The central stele bears a 10-word crossword of desert navigation terms. The second stele carries the brass Al-Qibla sun compass, and the third reveals the sacred mathematical proportion [R] × 2 = [F] carved under its shadow curb."
         },
         {
           id: "inq-al-qibla",
@@ -13374,17 +14026,17 @@
         },
         {
           id: "inq-falcon-weir",
-          title: "What is the Falcon Weir inscription [P] - [A] = 12?",
+          title: "What is the Falcon Weir inscription [P] - [A] = 14?",
           category: "The Cipher Ledger",
           group: "astrolabe",
-          answer: "Engraved upon the green granite outflow lip of the Falcon Well is the algebraic relation [P] - [A] = 12. It provides a direct mathematical constraint between P and A in the Cipher Ledger without spoiling their raw numeric values, honoring the ancient laws of cryptography."
+          answer: "Engraved upon the green granite outflow lip of the Falcon Well is the algebraic relation [P] - [A] = 14. It provides a direct mathematical constraint between P and A in the Cipher Ledger without spoiling their raw numeric values, honoring the ancient laws of cryptography."
         },
         {
           id: "inq-phoenix-sigil",
           title: "What is the Desert Sigil PHOENIX?",
           category: "Sacred Lore",
           group: "desert",
-          answer: "The seven circled letters of the Oasis crossword spell P-H-O-E-N-I-X, the mythical fire-bird that is reborn from its own ashes under the noon sun. Ancient temple records state that the Desert Oracle only opens the stone sanctuary gates to pilgrims who present this sacred sigil."
+          answer: "The seven circled letters of the Nomad Ruins crossword spell P-H-O-E-N-I-X, the mythical fire-bird that is reborn from its own ashes under the noon sun. Ancient temple records state that the Desert Oracle only opens the stone sanctuary gates to pilgrims who present this sacred sigil."
         },
         {
           id: "inq-dust-navigation",
@@ -13420,6 +14072,118 @@
           category: "Languages",
           group: "workshop",
           answer: "Travelers and merchants from all over the world have crossed this desert for centuries, and the raiders come from different places too. That's why you'll find notes in English, Spanish, French, and Catalan throughout the journal."
+        },
+        {
+          id: "inq-eclipse-order",
+          title: "What is The Eclipse Order?",
+          category: "The Order",
+          group: "constellation",
+          answer: "An old fellowship of astronomers, builders and thinkers who guard secrets that travel between worlds. Its sign is the disc that is half white and half dark, and its sacred hour is 22:22, when the constellations reach their highest point. I joined the Order as a young man, and I still serve it."
+        },
+        {
+          id: "inq-three-towers",
+          title: "What are the Three Ancient Towers?",
+          category: "The Order",
+          group: "constellation",
+          answer: "The Order raised three towers to watch over its secrets. Tower I is the Alpine Observatory, high in the snow, where I kept the stars. Tower II is the Sandstone Sanctuary in the desert, home of the Oracle. Tower III is the Stage Tower, where the Mirror Speaker guards light, symmetry and music. The raiders believe that when all three are lined up, a forbidden fourth chamber will open."
+        },
+        {
+          id: "inq-true-name",
+          title: "Why did you call yourself the Cartographer?",
+          category: "Hermes",
+          group: "constellation",
+          answer: "A long time ago I lost someone I loved at the Southern Bridge, and I buried my name with her. For years I answered only to the Cartographer. Then you spoke the words I had carved into a brass dial, and you gave my name back to me. You can call me Hermes."
+        },
+        {
+          id: "inq-eclipse-script",
+          title: "What is the Eclipse Script?",
+          category: "The Alphabet",
+          group: "constellation",
+          answer: "It is the Order's own alphabet: twenty-six glyphs carved in stone and bronze. They look strange, but each one stands for an ordinary letter. The numbers hidden behind the letters are another matter. You must work those out yourself in your Cipher Ledger, and I will never hand them to you."
+        },
+        {
+          id: "inq-distant-light",
+          title: "What does \"Distant Light\" mean?",
+          category: "The Order",
+          group: "constellation",
+          answer: "Starlight leaves its star long before it reaches your eye, so what looks far away is already on its way to you. The Order has a saying for it: what is far is not lost, it is simply on its way."
+        },
+        {
+          id: "inq-six-stars",
+          title: "Which stars can the Astrolabe point to?",
+          category: "The Astrolabe",
+          group: "astrolabe",
+          answer: "Only six: Aldebaran, Polaris, Vega, Altair, Deneb and Arcturus. They are the master stars of its star web. For the rest of the sky we have to work things out together, using the games in your journal."
+        },
+        {
+          id: "inq-replica-flaws",
+          title: "Why is your replica Astrolabe not as good as the real one?",
+          category: "The Astrolabe",
+          group: "astrolabe",
+          answer: "I made it from scrap brass in a hurry. Its parts are loose, its star pointers are not as sharp, and its readings can be off by a few degrees. It is good enough to teach us, but not good enough to open anything."
+        },
+        {
+          id: "inq-fourth-chamber",
+          title: "What do the raiders want with the Astrolabe?",
+          category: "The Stolen Relic",
+          group: "astrolabe",
+          answer: "We intercepted their orders. They believe the Astrolabe can find a forbidden fourth chamber when it is lined up with the Three Towers. They think I only ever used it as a telescope, and I will not be the one to tell them otherwise."
+        },
+        {
+          id: "inq-ledger-how",
+          title: "How do I use the Cipher Ledger?",
+          category: "The Cipher Ledger",
+          group: "astrolabe",
+          answer: "It starts empty on purpose. Every equation we find is a clue: two letters, joined by a sum or a difference. Put two clues about the same letters side by side and the values begin to fall out. Write what you work out in the Ledger, then test it against the next clue. If you get stuck, look for another equation that shares a letter."
+        },
+        {
+          id: "inq-signal-meter",
+          title: "What does the signal meter show?",
+          category: "The Telegraph",
+          group: "workshop",
+          answer: "It shows how clearly the wire carries my voice to you. Solid rock and calm air keep it high; wind and dust push it down. If it drops, wait a little and ask again. The wire always comes back."
+        },
+        {
+          id: "inq-safe-here",
+          title: "Are you safe where you are?",
+          category: "Hermes",
+          group: "workshop",
+          answer: "For now. The shelter has thick walls, a fire and enough water to last. The raiders are stuck in the dunes. What worries me most is the storm, not them. Keep solving, Silvia. Knowing you are out there keeps me steady."
+        },
+        {
+          id: "inq-journal-purpose",
+          title: "Why does the journal hold maps and puzzles?",
+          category: "Old Journal",
+          group: "workshop",
+          answer: "The raiders can listen to the wire and the radio, but they have never seen the journal. What I cannot say through the air, I put on paper, and only you can read it."
+        },
+        {
+          id: "inq-chasm",
+          title: "What is the Whispering Chasm?",
+          category: "The Whispering Chasm",
+          group: "desert",
+          answer: "A narrow, twisting gorge where the wind carries every sound. The old nomads left stone markers inside it, and a few rules for walkers: never retrace your steps, and never take a side passage that skips a marker."
+        },
+        {
+          id: "inq-cairns",
+          title: "What are the Cairns?",
+          category: "The Grand Map",
+          group: "desert",
+          answer: "Five stone markers of the Order stand along the only safe road through the desert. In 1998 I raised three piles of stones to mark my own route, never imagining they would matter again. The first Cairn gave up its seal when I followed a hunch along the dry riverbed, and I still wonder why my hands remembered the place."
+        },
+        {
+          id: "inq-salt-playa",
+          title: "What is the Salt Playa?",
+          category: "The Salt Playa",
+          group: "desert",
+          answer: "A dry lake of blinding white salt. Under the crust there are pockets of brine that swallow boots. The old surveyors marked the safe slabs with facets and letters, and the safe way across follows a pattern. Count carefully before you tell me where to step."
+        },
+        {
+          id: "inq-bc-ashes",
+          title: "Who are the raiders?",
+          category: "The Stolen Relic",
+          group: "desert",
+          answer: "They call themselves the BC Ashes. I saw their scorched banner hanging in the nomad ruins, the same burned mark that is on their wagons. They are bandits, but they do not steal blindly. They wanted the Astrolabe for what it might open."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -13439,13 +14203,16 @@
       const isChasmDoneForWire = localStorage.getItem('order_whispering_chasm_completed') === 'true';
       const isLexiconDoneForWire = localStorage.getItem('order_desert_lexicon_completed') === 'true';
       const isClepsydraDoneForWire = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+      const isPlayaDoneForWire = localStorage.getItem('order_salt_playa_completed') === 'true';
 
       if (isClepsydraDoneForWire) {
         if (wireCurrentStep < 8) wireCurrentStep = 8;
       } else if (isLexiconDoneForWire) {
         if (wireCurrentStep < 6) wireCurrentStep = 6;
-      } else if (isChasmDoneForWire) {
+      } else if (isChasmDoneForWire && isPlayaDoneForWire) {
         if (wireCurrentStep < 5) wireCurrentStep = 5;
+      } else if (isChasmDoneForWire) {
+        if (wireCurrentStep > 4) wireCurrentStep = 4;
       } else {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       }
@@ -13465,14 +14232,140 @@
       } catch (e) {}
 
       let currentInquiryFilter = 'all';
+      let currentInquirySearch = '';
+
+      // Questions whose answers reveal puzzle results unlock when the matching station is complete
+      const INQUIRY_UNLOCKS = {
+        chasm: { key: 'order_whispering_chasm_completed', label: 'Station 10' },
+        playa: { key: 'order_salt_playa_completed', label: 'Station 11' },
+        lexicon: { key: 'order_desert_lexicon_completed', label: 'Station 12' },
+        clepsydra: { key: 'order_oasis_clepsydra_completed', label: 'Station 13' }
+      };
+      const INQUIRY_REQUIREMENTS = {
+        'inq-salt-playa': 'chasm',
+        'inq-bc-ashes': 'lexicon',
+        'inq-oasis-steles': 'lexicon',
+        'inq-al-qibla': 'lexicon',
+        'inq-phoenix-sigil': 'lexicon',
+        'inq-four-wells': 'lexicon',
+        'inq-shadow-hours': 'clepsydra',
+        'inq-falcon-weir': 'clepsydra'
+      };
+      FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
+      const INQUIRY_GROUPS = [
+        { id: 'all', label: 'All Questions' },
+        { id: 'desert', label: 'The Desert' },
+        { id: 'constellation', label: 'The Constellation' },
+        { id: 'astrolabe', label: 'The Astrolabe' },
+        { id: 'workshop', label: 'The Workshop' }
+      ];
+      function isInquiryUnlocked(inq) {
+        if (!inq.requires) return true;
+        if ((currentSeeker || 'Silvia').toLowerCase() === 'carles') return true; // sandbox
+        return localStorage.getItem(INQUIRY_UNLOCKS[inq.requires].key) === 'true';
+      }
 
       // Physical Journal Callout Highlight Helper: Natural Illuminated Citation
       function formatJournalCallouts(text) {
         if (!text) return '';
-        return text.replace(/\b(?:Sheet|Hoja)\s+([0-9]+[A-Za-z]?)\b/gi, (match, sheet) => {
-          return `<span class="journal-ref-pill" title="Check your physical journal (${match})"><span class="pill-icon">📖</span> Sheet ${sheet.toUpperCase()}</span>`;
+        return text.replace(/\bSheet\s+([0-9]+[A-Za-z]?)\b/gi, (match, sheet) => {
+          const key = sheet.toUpperCase();
+          return `<span class="journal-ref-pill" role="button" tabindex="0" data-sheet="${key}" aria-haspopup="dialog" title="Open details for Sheet ${key}"><span class="pill-icon">📖</span> Sheet ${key}</span>`;
         });
       }
+
+      // Journal sheet cards: what each sheet is for, with a preview and a shortcut to its station
+      const JOURNAL_SHEETS = {
+        '4': { title: 'The Planisphere', note: 'The circle of star words. Find the sixteen celestial guides hidden in it.', thumb: './assets/thumbnails/planisphere_preview.webp', path: 'constellation', node: 6, nodeLabel: 'Station 06 · The Celestial Matrix' },
+        '5': { title: 'The Zodiacal Engine', note: 'The crossword whose words open the console of the underground outpost.', thumb: './assets/thumbnails/zodiac_journal_preview.webp', path: 'constellation', node: 7, nodeLabel: 'Station 07 · The Zodiacal Engine' },
+        '6': { title: 'Midnight Calibration & Transit', note: 'Calibrate the star heights, then trace the six chords of distant light.', thumb: './assets/thumbnails/midnight_calibration_preview.webp', path: 'constellation', node: 8, nodeLabel: 'Station 08 · Midnight Calibration' },
+        '7': { title: 'The Celestial Cipher', note: 'The coordinate dial that hides the old vow of the Order.', path: 'constellation', node: 9, nodeLabel: 'Station 09 · The Celestial Cipher' },
+        '7B': { title: 'Field Log: The Desert Frontier', note: "Hermes's survey notes from 1998: the three cairns, the copper plate and the bearing to Watchtower VI." },
+        '8B': { title: 'Grand Desert Map · North-West', note: 'The first quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_1_nw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
+        '9A': { title: 'Grand Desert Map · North-East', note: 'The second quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_2_ne.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
+        '9B': { title: 'The Whispering Chasm', note: 'The 25×25 canyon labyrinth and the Law of the Canyon Walkers.', thumb: './assets/thumbnails/whispering_chasm_preview.webp', path: 'desert', node: 10, nodeLabel: 'Station 10 · The Whispering Chasm' },
+        '10A': { title: 'The Salt Playa', note: 'A 7×7 field of salt slabs. Read the facets and the letters along a safe path.', thumb: './assets/thumbnails/salt_playa_preview.webp', path: 'desert', node: 21, nodeLabel: 'Station 11 · The Salt Playa' },
+        '11A': { title: 'The Desert Lexicon & Al-Qibla', note: 'The nomad crossword and the sun compass.', thumb: './assets/thumbnails/desert_lexicon_preview.webp', path: 'desert', node: 11, nodeLabel: 'Station 12 · The Desert Lexicon' },
+        '11B': { title: 'Grand Desert Map · South-West', note: 'The third quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_3_sw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
+        '12A': { title: 'Grand Desert Map · South-East', note: 'The fourth quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_4_se.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
+        '12B': { title: 'The Oasis Clepsydra', note: 'The logic grid of the four seekers at the Four Wells.', thumb: './assets/thumbnails/oasis_clepsydra_preview.webp', path: 'desert', node: 12, nodeLabel: 'Station 13 · The Oasis Clepsydra' },
+        '17A': { title: 'The Polybius Stele', note: "The Servant's trial: a keyed 5×5 cipher carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' }
+      };
+      let sheetPopover = null;
+      let sheetPopoverAnchor = null;
+
+      function closeSheetPopover() {
+        if (sheetPopover) sheetPopover.remove();
+        sheetPopover = null;
+        sheetPopoverAnchor = null;
+      }
+
+      function openSheetPopover(pill) {
+        closeSheetPopover();
+        const key = pill.getAttribute('data-sheet') || '';
+        const info = JOURNAL_SHEETS[key] || JOURNAL_SHEETS[key.replace(/[A-Z]$/, '')] || null;
+        const el = document.createElement('div');
+        el.className = 'journal-sheet-popover';
+        el.setAttribute('role', 'dialog');
+        el.setAttribute('aria-label', 'Sheet ' + key);
+        el.innerHTML = `
+          <button type="button" class="jsp-close" aria-label="Close">✕</button>
+          <div class="jsp-kicker">📖 Sheet ${key} · Physical journal</div>
+          <div class="jsp-title">${info ? info.title : 'Your physical journal'}</div>
+          ${info && info.thumb ? `<img class="jsp-thumb" src="${info.thumb}" alt="Preview of Sheet ${key}" loading="lazy">` : ''}
+          <div class="jsp-note">${info ? info.note : 'Open your physical journal to Sheet ' + key + '.'}</div>
+          ${info && info.nodeLabel ? `<button type="button" class="jsp-go">🗺️ ${info.nodeLabel} ➔</button>` : ''}
+        `;
+        document.body.appendChild(el);
+
+        const r = pill.getBoundingClientRect();
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        const left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
+        let top = r.bottom + 10;
+        if (top + h > window.innerHeight - 12) top = Math.max(12, r.top - h - 10);
+        el.style.left = left + 'px';
+        el.style.top = top + 'px';
+
+        el.querySelector('.jsp-close').addEventListener('click', closeSheetPopover);
+        const go = el.querySelector('.jsp-go');
+        if (go && info) {
+          go.addEventListener('click', () => {
+            closeSheetPopover();
+            if (typeof window.switchMapPath === 'function') window.switchMapPath(info.path, false);
+            if (!info.mapOnly && typeof window.selectMapNode === 'function') {
+              window.selectMapNode(info.node, true);
+            } else if (typeof window.activateHubView === 'function') {
+              window.activateHubView('view-trail');
+            }
+          });
+        }
+        sheetPopover = el;
+        sheetPopoverAnchor = pill;
+      }
+
+      // Capture phase: a sheet pill inside a reply button must open its card, not send the reply
+      document.addEventListener('click', (e) => {
+        const pill = e.target.closest ? e.target.closest('.journal-ref-pill') : null;
+        if (pill) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (sheetPopoverAnchor === pill) closeSheetPopover();
+          else openSheetPopover(pill);
+          return;
+        }
+        if (sheetPopover && !e.target.closest('.journal-sheet-popover')) closeSheetPopover();
+      }, true);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSheetPopover();
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('journal-ref-pill')) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (sheetPopoverAnchor === e.target) closeSheetPopover();
+          else openSheetPopover(e.target);
+        }
+      }, true);
+      window.addEventListener('scroll', closeSheetPopover, { passive: true });
 
       // Notification Badge System
       function getMessengerUnreadCount() {
@@ -13540,16 +14433,101 @@
         return d.toTimeString().slice(0, 5) + ' CEST';
       }
 
+      // Typing indicator: a bubble inside the conversation, with a little telegraph key
       function showTyping(show = true) {
-        if (!messengerTypingBar) return;
-        messengerTypingBar.style.display = show ? 'flex' : 'none';
+        document.querySelectorAll('.chat-typing-wrap').forEach((el) => el.remove());
+        if (messengerTypingBar) messengerTypingBar.style.display = 'none';
+        if (!show) return;
         const stream = currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream;
-        if (show && stream) {
-          stream.scrollTop = stream.scrollHeight;
+        if (!stream) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-bubble-wrap incoming chat-typing-wrap';
+        wrap.innerHTML = `
+          <div class="chat-sender-name">The Cartographer of Distant Light</div>
+          <div class="chat-bubble">
+            <span class="typing-key" aria-hidden="true">📟</span>
+            <span class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>
+            <span class="typing-label">operating the telegraph coils</span>
+          </div>
+        `;
+        stream.appendChild(wrap);
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      // Floating "latest message" button, shown when the newest message is out of view
+      const jumpLatestBtn = document.createElement('button');
+      jumpLatestBtn.type = 'button';
+      jumpLatestBtn.id = 'chat-jump-latest';
+      jumpLatestBtn.className = 'chat-jump-latest';
+      jumpLatestBtn.textContent = '↓ Latest message';
+      document.body.appendChild(jumpLatestBtn);
+
+      function activeChatStream() {
+        return currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream;
+      }
+      function updateJumpLatest() {
+        const stream = activeChatStream();
+        const inWorkshop = document.body.getAttribute('data-active-view') === 'view-field-wire';
+        const last = stream ? stream.lastElementChild : null;
+        const hidden = !!(inWorkshop && last && last.getBoundingClientRect().bottom > window.innerHeight - 140);
+        jumpLatestBtn.classList.toggle('visible', hidden);
+      }
+      function noteNewMessage() {
+        setTimeout(updateJumpLatest, 500);
+      }
+      jumpLatestBtn.addEventListener('click', () => {
+        const stream = activeChatStream();
+        const last = stream ? stream.lastElementChild : null;
+        if (last) last.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      });
+      window.addEventListener('scroll', updateJumpLatest, { passive: true });
+      window.addEventListener('resize', updateJumpLatest);
+
+      // Telegraph sounds on/off (remembered)
+      const btnWireSound = document.getElementById('btn-wire-sound');
+      function applyChatSoundState() {
+        const on = !window.hubChatMuted;
+        if (btnWireSound) {
+          btnWireSound.setAttribute('aria-pressed', on ? 'true' : 'false');
+          btnWireSound.setAttribute('title', on ? 'Telegraph sounds: on' : 'Telegraph sounds: off');
+          const icon = btnWireSound.querySelector('span');
+          if (icon) icon.textContent = on ? '🔊' : '🔇';
+        }
+      }
+      try { window.hubChatMuted = localStorage.getItem('order_chat_sound') === 'off'; } catch (e) { window.hubChatMuted = false; }
+      applyChatSoundState();
+      if (btnWireSound) {
+        btnWireSound.addEventListener('click', () => {
+          window.hubChatMuted = !window.hubChatMuted;
+          try { localStorage.setItem('order_chat_sound', window.hubChatMuted ? 'off' : 'on'); } catch (e) {}
+          applyChatSoundState();
+          if (!window.hubChatMuted && sfx) sfx.playMechanicalClick();
+        });
+      }
+
+      // Divider between camps in the expedition thread
+      function appendWireDivider(text) {
+        if (!wireMessagesStream) return;
+        const pill = document.createElement('div');
+        pill.className = 'messenger-date-pill';
+        pill.textContent = text;
+        wireMessagesStream.appendChild(pill);
+      }
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells' };
+      function appendStepIntro(stepIdx) {
+        if (WIRE_STEP_DIVIDERS[stepIdx]) appendWireDivider(WIRE_STEP_DIVIDERS[stepIdx]);
+        if (EXPEDITION_THREAD[stepIdx] && EXPEDITION_THREAD[stepIdx].hermesInitial) {
+          appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[stepIdx].hermesInitial);
         }
       }
 
       function appendWireMessage(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null) {
+        const el = appendWireMessageCore(sender, text, isSystem, isLive, onComplete, targetStream);
+        noteNewMessage();
+        return el;
+      }
+
+      function appendWireMessageCore(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null) {
         const stream = targetStream || (currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream);
         if (!stream) return null;
         const msgEl = document.createElement('div');
@@ -13659,12 +14637,14 @@
           }
         }
 
+        if (sfx && typeof sfx.playTelegraphArrival === 'function') sfx.playTelegraphArrival();
         typeTick();
         return msgEl;
       }
 
       function renderWireExpedition() {
         if (!wireMessagesStream) return;
+        wireMessagesStream.classList.add('is-restoring');
         wireMessagesStream.innerHTML = `
           <div class="messenger-date-pill">Today · The Desert Frontier (112° E)</div>
         `;
@@ -13680,14 +14660,14 @@
             appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[4].hermesFinal);
             appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
             if (EXPEDITION_THREAD[5] && EXPEDITION_THREAD[5].hermesInitial && wireCurrentStep >= 5) {
-              appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[5].hermesInitial);
+              appendStepIntro(5);
             }
           }
           if (s === 6) {
             appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[6].hermesFinal);
             appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true);
             if (EXPEDITION_THREAD[7] && EXPEDITION_THREAD[7].hermesInitial && wireCurrentStep >= 7) {
-              appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[7].hermesInitial);
+              appendStepIntro(7);
             }
           }
           if (stepData.choices) {
@@ -13711,9 +14691,10 @@
           appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true);
         } else if (wireCurrentStep >= 8) {
           appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[8].hermesFinal);
-          appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 12 RECORDED ✦', true);
+          appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 14 RECORDED ✦', true);
         }
 
+        wireMessagesStream.classList.remove('is-restoring');
         renderWireChoices();
       }
 
@@ -13723,6 +14704,7 @@
         const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
         const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
         const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+        const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
 
         if (wireCurrentStep >= 8) {
           wirePromptBox.style.display = 'none';
@@ -13730,7 +14712,7 @@
           const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
           const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
           if (titleEl) titleEl.textContent = 'Four Wells Balanced · 4 Water Skins Filled';
-          if (descEl) descEl.textContent = 'Key XXX (30 Hours) verified. Subterranean siphons flowing. Great Erg crossing secured to Station 13.';
+          if (descEl) descEl.textContent = 'Key XXX (30 Hours) verified. Subterranean siphons flowing. Great Erg crossing secured to Station 14.';
           try {
             localStorage.setItem('order_field_wire_completed', 'true');
             localStorage.setItem('order_field_wire_step', '8');
@@ -13745,7 +14727,7 @@
             const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
             const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
             if (titleEl) titleEl.textContent = 'Al-Qibla Bearing Locked · Heading 194° SSW';
-            if (descEl) descEl.textContent = 'Desert Sigil PHOENIX verified. Trail to Station 12 (The Oasis Clepsydra) is unlocked on the Grand Desert Map.';
+            if (descEl) descEl.textContent = 'Desert Sigil PHOENIX verified. Trail to Station 13 (The Oasis Clepsydra) is unlocked on the Grand Desert Map.';
             try {
               localStorage.setItem('order_field_wire_completed', 'true');
               localStorage.setItem('order_field_wire_step', '6');
@@ -13758,7 +14740,7 @@
               localStorage.setItem('order_field_wire_step', '7');
             } catch(e) {}
             if (EXPEDITION_THREAD[7] && EXPEDITION_THREAD[7].hermesInitial) {
-              appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[7].hermesInitial);
+              appendStepIntro(7);
             }
           }
         }
@@ -13776,14 +14758,26 @@
               localStorage.setItem('order_field_wire_step', '4');
             } catch(e) {}
             return;
+          } else if (!isPlayaDone && !isLexiconDone) {
+            wirePromptBox.style.display = 'none';
+            wireCompletedBar.style.display = 'flex';
+            const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
+            const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
+            if (titleEl) titleEl.textContent = 'Gorge Cleared · The Salt Playa Awaits';
+            if (descEl) descEl.textContent = 'Open the Grand Desert Map and guide Hermes across the Salt Playa (Station 11 · Sheet 10A).';
+            try {
+              localStorage.setItem('order_field_wire_completed', 'true');
+              localStorage.setItem('order_field_wire_step', '4');
+            } catch(e) {}
+            return;
           } else {
-            // Chasm is done, unlock Step 5!
+            // Chasm and Salt Playa are done, unlock Step 5!
             wireCurrentStep = 5;
             try {
               localStorage.setItem('order_field_wire_step', '5');
             } catch(e) {}
             if (EXPEDITION_THREAD[5] && EXPEDITION_THREAD[5].hermesInitial) {
-              appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[5].hermesInitial);
+              appendStepIntro(5);
             }
           }
         }
@@ -13891,7 +14885,7 @@
                     showTyping(false);
                     if (sfx) sfx.playCelestialChime();
                     appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[8].hermesFinal, false, true, () => {
-                      appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 12 RECORDED ✦', true);
+                      appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 14 RECORDED ✦', true);
                       renderWireChoices();
                       updateMessengerBadge();
                     });
@@ -13933,61 +14927,97 @@
       if (tabWireExpedition) tabWireExpedition.addEventListener('click', () => switchWireTab('expedition'));
       if (tabWireInquiries) tabWireInquiries.addEventListener('click', () => switchWireTab('inquiries'));
 
+      function renderInquiryFilterBar() {
+        const filterBar = document.getElementById('inquiry-filter-bar');
+        if (!filterBar) return;
+        filterBar.innerHTML = INQUIRY_GROUPS.map((g) => {
+          const count = g.id === 'all' ? FIELD_INQUIRIES.length : FIELD_INQUIRIES.filter(i => i.group === g.id).length;
+          return `<button type="button" class="inquiry-filter-pill${g.id === currentInquiryFilter ? ' active' : ''}" data-filter="${g.id}">${g.label} (${count})</button>`;
+        }).join('');
+      }
+
       function renderInquiriesGrid(filter = currentInquiryFilter) {
         if (!inquiriesQuestionsGrid) return;
         currentInquiryFilter = filter;
         inquiriesQuestionsGrid.innerHTML = '';
+        renderInquiryFilterBar();
 
-        const filtered = filter === 'all'
-          ? FIELD_INQUIRIES
-          : FIELD_INQUIRIES.filter(inq => inq.group === filter);
+        const query = currentInquirySearch.trim().toLowerCase();
+        const filtered = FIELD_INQUIRIES.filter((inq) => {
+          if (filter !== 'all' && inq.group !== filter) return false;
+          if (!query) return true;
+          return (inq.title + ' ' + inq.category).toLowerCase().includes(query);
+        });
 
-        filtered.forEach(inq => {
+        filtered.forEach((inq) => {
           const isRead = readInquiriesSet.has(inq.id);
+          const unlocked = isInquiryUnlocked(inq);
           const card = document.createElement('button');
           card.type = 'button';
-          card.className = 'messenger-faq-chip' + (isRead ? ' is-read' : '');
+          card.className = 'messenger-faq-chip' + (isRead ? ' is-read' : '') + (unlocked ? '' : ' is-locked');
           card.id = `inq-card-${inq.id}`;
+          if (!unlocked) {
+            card.setAttribute('aria-disabled', 'true');
+            card.title = 'Unlocks after ' + INQUIRY_UNLOCKS[inq.requires].label;
+          }
           card.innerHTML = `
             <div class="messenger-faq-chip-title">
-              <span>✦</span>
+              <span>${unlocked ? '✦' : '🔒'}</span>
               <span>${inq.title}</span>
             </div>
             <div class="messenger-faq-chip-cat">
               <span>${inq.category}</span>
-              ${isRead ? '<span class="inquiry-read-badge">✓ Answered</span>' : ''}
+              ${unlocked
+                ? (isRead ? '<span class="inquiry-read-badge">✓ Answered</span>' : '')
+                : `<span class="inquiry-lock-badge">UNLOCKS AFTER ${INQUIRY_UNLOCKS[inq.requires].label.toUpperCase()}</span>`}
             </div>
           `;
           card.addEventListener('click', () => {
+            if (!unlocked) {
+              if (sfx) sfx.playMechanicalClick();
+              return;
+            }
             handleInquiryClick(inq);
           });
           inquiriesQuestionsGrid.appendChild(card);
         });
 
-        // Sync active pill in filter bar
-        const filterBar = document.getElementById('inquiry-filter-bar');
-        if (filterBar) {
-          const pills = filterBar.querySelectorAll('.inquiry-filter-pill');
-          pills.forEach(p => {
-            p.classList.toggle('active', p.getAttribute('data-filter') === filter);
-          });
+        if (filtered.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'messenger-faq-empty';
+          empty.textContent = query ? 'No question matches "' + currentInquirySearch.trim() + '". Try another word.' : 'No questions here yet.';
+          inquiriesQuestionsGrid.appendChild(empty);
+        }
+
+        const progressEl = document.getElementById('inquiry-progress');
+        if (progressEl) {
+          const answered = FIELD_INQUIRIES.filter(i => readInquiriesSet.has(i.id)).length;
+          progressEl.textContent = answered + ' / ' + FIELD_INQUIRIES.length + ' ANSWERED';
         }
       }
 
       function initInquiryFilters() {
         const filterBar = document.getElementById('inquiry-filter-bar');
-        if (!filterBar) return;
-        const pills = filterBar.querySelectorAll('.inquiry-filter-pill');
-        pills.forEach(pill => {
-          pill.addEventListener('click', () => {
+        const searchInput = document.getElementById('inquiry-search');
+        renderInquiryFilterBar();
+        if (filterBar) {
+          filterBar.addEventListener('click', (e) => {
+            const pill = e.target.closest('.inquiry-filter-pill');
+            if (!pill) return;
             if (sfx) sfx.playMechanicalClick();
-            const filter = pill.getAttribute('data-filter') || 'all';
-            renderInquiriesGrid(filter);
+            renderInquiriesGrid(pill.getAttribute('data-filter') || 'all');
           });
-        });
+        }
+        if (searchInput) {
+          searchInput.addEventListener('input', () => {
+            currentInquirySearch = searchInput.value;
+            renderInquiriesGrid(currentInquiryFilter);
+          });
+        }
       }
 
       function handleInquiryClick(inq) {
+        if (!isInquiryUnlocked(inq)) return;
         if (sfx) sfx.playMechanicalClick();
 
         // 1. Persist read state
@@ -13995,6 +15025,12 @@
         try {
           localStorage.setItem('order_field_inquiries_read', JSON.stringify([...readInquiriesSet]));
         } catch(e) {}
+
+        // Keep the "answered" counter in step with the read state
+        const progressEl = document.getElementById('inquiry-progress');
+        if (progressEl) {
+          progressEl.textContent = FIELD_INQUIRIES.filter(i => readInquiriesSet.has(i.id)).length + ' / ' + FIELD_INQUIRIES.length + ' ANSWERED';
+        }
 
         // 2. Mark card visually with gold ribete and Answered badge
         const card = document.getElementById(`inq-card-${inq.id}`);
@@ -14051,9 +15087,15 @@
       }
 
       if (btnHeaderMessenger) {
+        // The chat button is a toggle: inside The Cliffside Workshop it takes the player back to the previous view
         btnHeaderMessenger.addEventListener('click', () => {
           if (sfx) sfx.playMechanicalClick();
-          activateHubView('view-field-wire');
+          if (document.body.getAttribute('data-active-view') === 'view-field-wire') {
+            const back = typeof window.getPreviousHubView === 'function' ? window.getPreviousHubView() : 'view-trail';
+            activateHubView(back && back !== 'view-field-wire' ? back : 'view-trail');
+          } else {
+            activateHubView('view-field-wire');
+          }
         });
       }
 
@@ -14066,7 +15108,7 @@
     })();
 
     // =========================================================================
-    // 🏜️ THE GRAND DESERT MAP CONTROLLER (TWO-ACT ODYSSEY: STATIONS 10–17)
+    // 🏜️ THE GRAND DESERT MAP CONTROLLER
     // =========================================================================
     (function initGrandDesertMapAndChasm() {
       const sfx = window.sfx || null;
@@ -14080,100 +15122,68 @@
       const viewTitle = viewHeader ? viewHeader.querySelector('.view-title') : null;
       const viewDesc = viewHeader ? viewHeader.querySelector('.view-desc') : null;
 
+      // Progress and state shown on the two path cards
+      function updatePathTabsUI() {
+        const done = (key) => localStorage.getItem(key) === 'true';
+        const seeker = (window.currentSeeker || localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+        const midnightVal = localStorage.getItem('seeker_' + seeker + '_midnight_completed');
+        const midnightDone = midnightVal === null ? true : midnightVal === 'true';
+        const cipherDone = typeof window.getSeekerCipherCompleted === 'function' ? window.getSeekerCipherCompleted() : false;
+
+        // Stations 01 to 07 are canonically cleared before Station 08 (Midnight Calibration) and 09 (Celestial Cipher)
+        const constellationDone = 7 + (midnightDone ? 1 : 0) + (cipherDone ? 1 : 0);
+        const desertDone = ['order_whispering_chasm_completed', 'order_salt_playa_completed', 'order_desert_lexicon_completed', 'order_oasis_clepsydra_completed', 'order_polybius_stele_completed']
+          .filter(done).length;
+
+        const paths = [
+          { id: 'constellation', cleared: constellationDone, total: 9 },
+          { id: 'desert', cleared: desertDone, total: 10 }
+        ];
+        paths.forEach((p) => {
+          const fill = document.getElementById('path-progress-' + p.id);
+          const count = document.getElementById('path-count-' + p.id);
+          const state = document.getElementById('path-state-' + p.id);
+          if (fill) fill.style.width = Math.round((p.cleared / p.total) * 100) + '%';
+          if (count) count.textContent = p.cleared + ' of ' + p.total + ' trials cleared' + (p.cleared === p.total ? ' ✓' : '');
+          if (state) state.textContent = (currentMapPath === p.id) ? 'You are here' : (p.cleared === p.total ? 'Revisit' : 'Open path');
+        });
+      }
+
       let currentMapPath = 'constellation';
       try {
         const savedPath = localStorage.getItem('order_active_map_path');
         if (savedPath === 'desert') currentMapPath = 'desert';
       } catch (e) {}
 
-      let currentDesertPhase = 'q3';
-      try {
-        const savedPhase = localStorage.getItem('order_active_desert_phase');
-        if (savedPhase && ['q1', 'q2', 'cw', 'ce', 'q3', 'q4', 'overview'].includes(savedPhase)) {
-          currentDesertPhase = savedPhase;
-        } else {
-          const legacyAct = localStorage.getItem('order_active_desert_act');
-          if (legacyAct === 'act1') currentDesertPhase = 'q1';
-          else if (legacyAct === 'act2') currentDesertPhase = 'q3';
-          else if (legacyAct === 'overview') currentDesertPhase = 'overview';
-        }
-      } catch (e) {}
+      // Next pending Desert Path station (internal node ids: 10 Chasm, 21 Salt Playa, 11 Lexicon, 12 Clepsydra)
+      function getNextDesertNodeId() {
+        if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') return 10;
+        if (localStorage.getItem('order_desert_lexicon_completed') === 'true') return 12;
+        return localStorage.getItem('order_salt_playa_completed') === 'true' ? 11 : 21;
+      }
 
-      function switchDesertMapPhase(phaseId, autoSelect = false) {
-        currentDesertPhase = phaseId;
-        try {
-          localStorage.setItem('order_active_desert_phase', phaseId);
-          if (phaseId === 'q1' || phaseId === 'q2') localStorage.setItem('order_active_desert_act', 'act1');
-          else if (phaseId === 'q3' || phaseId === 'q4') localStorage.setItem('order_active_desert_act', 'act2');
-          else localStorage.setItem('order_active_desert_act', 'overview');
-        } catch (e) {}
-
-        const btnQ1 = document.getElementById('btn-desert-q1');
-        const btnQ2 = document.getElementById('btn-desert-q2');
-        const btnQ3 = document.getElementById('btn-desert-q3');
-        const btnQ4 = document.getElementById('btn-desert-q4');
-        const btnOverview = document.getElementById('btn-desert-overview');
-
-        const layerQ1 = document.getElementById('desert-layer-q1');
-        const layerQ2 = document.getElementById('desert-layer-q2');
-        const layerQ3 = document.getElementById('desert-layer-q3');
-        const layerQ4 = document.getElementById('desert-layer-q4');
+      // The Desert Path has one view: the full four-quadrant map with every station marker.
+      function showDesertMap(autoSelect = false) {
         const layerOverview = document.getElementById('desert-layer-overview');
-
-        if (btnQ1) btnQ1.classList.toggle('active', phaseId === 'q1');
-        if (btnQ2) btnQ2.classList.toggle('active', phaseId === 'q2');
-        if (btnQ3) btnQ3.classList.toggle('active', phaseId === 'q3');
-        if (btnQ4) btnQ4.classList.toggle('active', phaseId === 'q4');
-        if (btnOverview) btnOverview.classList.toggle('active', phaseId === 'overview');
-
-        if (layerQ1) layerQ1.style.display = phaseId === 'q1' ? 'block' : 'none';
-        if (layerQ2) layerQ2.style.display = phaseId === 'q2' ? 'block' : 'none';
-        if (layerQ3) layerQ3.style.display = phaseId === 'q3' ? 'block' : 'none';
-        if (layerQ4) layerQ4.style.display = phaseId === 'q4' ? 'block' : 'none';
-        if (layerOverview) layerOverview.style.display = phaseId === 'overview' ? 'block' : 'none';
+        if (layerOverview) layerOverview.style.display = 'block';
 
         if (viewDesc) {
-          if (phaseId === 'q1') {
-            viewDesc.textContent = 'Fase 1 · Cuadrante Noroeste (Hoja 8B): The Desert Frontier. Outer Watchtower VI, Red Ridge, Mesa del Sol, Cairn I.';
-          } else if (phaseId === 'q2') {
-            viewDesc.textContent = 'Fase 2 · Cuadrante Noreste (Hoja 9A): The Sandstone Labyrinth. Cairn II (The Desert Lexicon & Al-Qibla), Cairn III (Copper Benchmark), Sun Monolith.';
-          } else if (phaseId === 'q3') {
-            viewDesc.textContent = 'Fase 3 · Cuadrante Suroeste (Hoja 10B) ✦ Misión 1 Activa: The Whispering Chasm. Desciende al cañón y consulta la Hoja 9B de tu diario físico para guiar a Hermes hasta el Oasis.';
-          } else if (phaseId === 'q4') {
-            viewDesc.textContent = 'Fase 4 · Cuadrante Sureste (Hoja 11A): The Sandstone Sanctuary. Solar Altar, Salt Playa, Tower II (The Sandstone Sanctuary), Cairn V.';
-          } else {
-            viewDesc.textContent = 'Visión Topográfica General: Mosaico continuo de los 4 Cuadrantes (2×2) del Gran Mapa del Desierto.';
-          }
+          viewDesc.textContent = 'The Grand Desert Map: the full four-quadrant survey of the expedition. Select a station to review it or to continue with Hermes.';
         }
 
         updateDesertMapMarkers();
 
         if (autoSelect && typeof window.selectMapNode === 'function') {
-          if (phaseId === 'q3') {
-            window.selectMapNode(10, false);
-          } else if (phaseId === 'q2') {
-            window.selectMapNode(11, false);
-          } else if (phaseId === 'q4') {
-            window.selectMapNode(14, false);
-          } else if (phaseId === 'q1') {
-            window.selectMapNode(10, false);
-          }
+          window.selectMapNode(getNextDesertNodeId(), false);
         }
       }
-      window.switchDesertMapPhase = switchDesertMapPhase;
-
-      function switchDesertAct(actId, autoSelect = false) {
-        let phase = 'q3';
-        if (actId === 'act1') phase = 'q1';
-        else if (actId === 'act2') phase = 'q3';
-        else if (actId === 'overview') phase = 'overview';
-        switchDesertMapPhase(phase, autoSelect);
-      }
-      window.switchDesertAct = switchDesertAct;
+      window.showDesertMap = showDesertMap;
 
       function switchMapPath(path, autoSelectNode = true) {
         currentMapPath = path;
         try { localStorage.setItem('order_active_map_path', path); } catch (e) {}
+        document.documentElement.setAttribute('data-map-path', path === 'desert' ? 'desert' : 'constellation');
+        updatePathTabsUI();
 
         if (tabConstellation) tabConstellation.classList.toggle('active', path === 'constellation');
         if (tabDesert) tabDesert.classList.toggle('active', path === 'desert');
@@ -14186,23 +15196,19 @@
           if (viewTitle) viewTitle.textContent = 'The Grand Desert Map';
 
           const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+          const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
           const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
 
-          let initialPhase = 'q3';
-          let activeId = 10;
-
+          let activeId = 12;
           if (!isChasmDone) {
-            initialPhase = 'q3';
             activeId = 10;
+          } else if (!isPlayaDone && !isLexiconDone) {
+            activeId = 21;
           } else if (!isLexiconDone) {
-            initialPhase = 'q2';
             activeId = 11;
-          } else {
-            initialPhase = currentDesertPhase || 'q3';
-            activeId = 12;
           }
 
-          switchDesertMapPhase(initialPhase, false);
+          showDesertMap(false);
 
           if (autoSelectNode && typeof window.selectMapNode === 'function') {
             window.selectMapNode(activeId, false);
@@ -14242,47 +15248,45 @@
       function selectDesertStation(id) {
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
 
-        const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-
         let targetId = id;
         if (id === 15) targetId = 10;
         else if (id === 16) targetId = 12;
         else if (id === 17) targetId = 14;
 
         if (targetId === 10) {
-          switchDesertMapPhase('q3', false);
           window.selectMapNode(10, true);
           if (window.openWhisperingChasmModal) {
             window.openWhisperingChasmModal();
           } else {
-            showDesertToast('Misión 1: The Whispering Chasm · Abre la Hoja 9B de tu diario físico.');
+            showDesertToast('Station 10: The Whispering Chasm · Open Sheet 9B of your physical journal.');
+          }
+        } else if (targetId === 21) {
+          window.selectMapNode(21, true);
+          if (window.openSaltPlayaModal) {
+            window.openSaltPlayaModal();
+          } else {
+            showDesertToast('Station 11: The Salt Playa · See Sheet 10A of your physical journal.');
           }
         } else if (targetId === 11) {
-          switchDesertMapPhase('q2', false);
           window.selectMapNode(11, true);
           if (window.openDesertLexiconModal) {
             window.openDesertLexiconModal();
           } else {
-            showDesertToast('Misión 2: The Desert Lexicon & Al-Qibla · Consulta la Hoja 10A de tu diario físico.');
+            showDesertToast('Station 12: The Desert Lexicon & Al-Qibla · See Sheet 11A of your physical journal.');
           }
         } else if (targetId === 12) {
           window.selectMapNode(12, true);
-          if (!isChasmDone) {
-            showDesertToast('✦ TERRA INCOGNITA ✦ Guía a Hermes por el Whispering Chasm (Misión 1) antes de acceder a la Clepsydra.');
+          if (window.openOasisClepsydraModal) {
+            window.openOasisClepsydraModal();
           } else {
-            if (window.openOasisClepsydraModal) {
-              window.openOasisClepsydraModal();
-            } else {
-              showDesertToast('Misión 3: The Oasis Clepsydra · Consulta la Hoja 11B de tu diario físico.');
-            }
+            showDesertToast('Station 13: The Oasis Clepsydra · See Sheet 12B of your physical journal.');
           }
         } else if (targetId === 13) {
           window.selectMapNode(13, true);
-          showDesertToast('Misión 4: The Polybius Stele · Consulta la Hoja 12A de tu diario físico.');
+          showDesertToast('Station 18: The Polybius Stele (Tower II atrium) · See Sheet 17A of your physical journal.');
         } else if (targetId === 14) {
-          switchDesertMapPhase('q4', false);
           window.selectMapNode(14, true);
-          showDesertToast('Torre II: The Sandstone Sanctuary of the Desert Oracle · Hoja 13A del diario.');
+          showDesertToast('Station 19: Tower II · The Sandstone Sanctuary of the Desert Oracle · Sheet 17B of your journal.');
         }
       }
       window.selectDesertStation = selectDesertStation;
@@ -14291,33 +15295,22 @@
         const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
         const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
 
-        // 1. Phase 5 (Cuadrante Suroeste - Sheet 12B)
-        const node10Subtext = document.getElementById('node-10-subtext');
-        const node10Banner = document.getElementById('node-10-banner-text');
-
-        if (node10Subtext) {
-          node10Subtext.textContent = isChasmDone
-            ? '[ CAÑÓN SUPERADO · OASIS ALCANZADO ✓ ]'
-            : '[ DESCENDER AL CAÑÓN · CONSULTAR HOJA 9B ]';
-          node10Subtext.setAttribute('fill', isChasmDone ? '#34d399' : '#fbbf24');
-        }
-        if (node10Banner) {
-          node10Banner.textContent = isChasmDone
-            ? '✓ 10 · THE WHISPERING CHASM (RESUELTO)'
-            : '✦ 10 · THE WHISPERING CHASM ➔';
-          node10Banner.setAttribute('fill', isChasmDone ? '#a7f3d0' : '#fde68a');
-        }
-
-        // 2. Phase 2 (Cuadrante Noreste - Sheet 9A)
-        const node11Subtext = document.getElementById('node-11-subtext');
-        if (node11Subtext) {
-          node11Subtext.textContent = isLexiconDone
-            ? '[ 194° SSW FIJADO · PHOENIX RESUELTO ✓ ]'
-            : '[ TRANSCRIBIR ESTELAS Y BRÚJULA · HOJA 12A ]';
-          node11Subtext.setAttribute('fill', isLexiconDone ? '#34d399' : '#38bdf8');
-        }
+        const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
+        const banners = [
+          ['node-10-banner-text', isChasmDone, '✓ 10 · WHISPERING CHASM (CLEARED)', '✦ 10 · WHISPERING CHASM ➔'],
+          ['node-21-banner-text', isPlayaDone, '✓ 11 · THE SALT PLAYA (CROSSED)', '✦ 11 · THE SALT PLAYA ➔'],
+          ['node-11-banner-text', isLexiconDone, '✓ 12 · NOMAD RUINS (SOLVED)', '✦ 12 · NOMAD RUINS (LEXICON) ➔']
+        ];
+        updatePathTabsUI();
+        banners.forEach(([id, done, doneText, openText]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.textContent = done ? doneText : openText;
+          el.setAttribute('fill', done ? '#a7f3d0' : '#fde68a');
+        });
       }
       window.updateDesertMapMarkers = updateDesertMapMarkers;
+      window.updatePathTabsUI = updatePathTabsUI;
 
       if (tabConstellation) tabConstellation.addEventListener('click', () => {
         if (sfx) sfx.playMechanicalClick();
@@ -14385,11 +15378,11 @@
 
       const CAIRNS = [
         { letter: 'M', r: 7, c: 9, step: 0, dispatch: "Silvia! I found the first stone pile near the dry wash. It bears the mark 'M'! The rock walls are keeping off the heat." },
-        { letter: 'I', r: 9, c: 23, step: 1, dispatch: "Second cairn reached! The letter 'I' is carved into red sandstone. Heading deeper into the gorge." },
-        { letter: 'R', r: 11, c: 13, step: 2, dispatch: "Third cairn! 'R'! The wind makes a soft whistling sound between the high cliffs. Your directions are keeping me safe." },
-        { letter: 'A', r: 7, c: 1, step: 3, dispatch: "Fourth cairn reached: 'A'! We skirted past the treacherous dry salt basin without losing the track." },
-        { letter: 'G', r: 15, c: 13, step: 4, dispatch: "Fifth cairn: 'G'! The gravel underfoot is damp—I can smell subterranean fresh water nearby!" },
-        { letter: 'E', r: 21, c: 15, step: 5, dispatch: "Sixth cairn! 'E'! The cliffs are opening up. I can see green palm trees in the oasis basin ahead!" }
+        { letter: 'I', r: 9, c: 23, step: 1, dispatch: "Second marker reached! The letter 'I' is carved into red sandstone. Heading deeper into the gorge." },
+        { letter: 'R', r: 11, c: 13, step: 2, dispatch: "Third marker! 'R'! The wind makes a soft whistling sound between the high cliffs. Your directions are keeping me safe." },
+        { letter: 'A', r: 7, c: 1, step: 3, dispatch: "Fourth marker reached: 'A'! We skirted past the treacherous dry salt basin without losing the track." },
+        { letter: 'G', r: 15, c: 13, step: 4, dispatch: "Fifth marker: 'G'! The gravel underfoot is damp—I can smell subterranean fresh water nearby!" },
+        { letter: 'E', r: 21, c: 15, step: 5, dispatch: "Sixth marker! 'E'! The cliffs are opening up. I can see a blinding white salt basin ahead, and ruins beyond it!" }
       ];
 
       const DECOYS = [
@@ -14510,7 +15503,7 @@
           const isVisitedTrue = CAIRNS.some(c => c.letter === letter && c.step < chasmStepIndex);
           return `
             <button type="button" class="chasm-cairn-btn ${isVisitedTrue ? 'visited' : ''}" data-letter="${letter}" ${isVisitedTrue || isWalking ? 'disabled' : ''} onclick="window.handleChasmCairnClick('${letter}')">
-              <span>Cairn</span>
+              <span>Marker</span>
               <strong>${letter}</strong>
             </button>
           `;
@@ -14532,7 +15525,7 @@
           }
         }
         if (progressCount) {
-          progressCount.textContent = `${chasmStepIndex} / 6 CAIRNS`;
+          progressCount.textContent = `${chasmStepIndex} / 6 MARKERS`;
         }
       }
 
@@ -14592,7 +15585,7 @@
             // Update telemetry
             const times = ['4h 30m', '3h 45m', '3h 00m', '2h 15m', '1h 30m', '45m', '0m'];
             if (telemTime) telemTime.textContent = times[chasmStepIndex];
-            if (telemWaypoint) telemWaypoint.textContent = `Cairn ${letter}`;
+            if (telemWaypoint) telemWaypoint.textContent = `Marker ${letter}`;
 
             // Update dispatch
             if (dispatchText) dispatchText.textContent = `"${targetCairn.dispatch}"`;
@@ -14607,9 +15600,9 @@
                 animateHermesWalk(exitPoints, () => {
                   if (sfx) sfx.playCelestialChime();
                   if (telemTime) telemTime.textContent = '0h 00m';
-                  if (telemWaypoint) telemWaypoint.textContent = 'Desert Oasis (Arrived)';
+                  if (telemWaypoint) telemWaypoint.textContent = 'Salt Playa Edge (Arrived)';
                   if (dispatchText) {
-                    dispatchText.textContent = '"Silvia, we made it! I am standing beneath the palm trees of the Desert Oasis. The spring water is fresh and cool. Look what I found resting against the ancient well curb: sandstone tablets carved with desert riddles... Look at Sheet 10A of your journal: The Desert Lexicon & Al-Qibla!"';
+                    dispatchText.textContent = '"Silvia, we made it out of the gorge! The cliffs fall away and a blinding white salt basin, the Salt Playa, stretches ahead. Far beyond it I can see the ruins of an old nomad camp, but the crust is riddled with brine sinkholes... Open Sheet 10A of your journal: The Salt Playa!"';
                   }
                   if (victoryCard) victoryCard.style.display = 'block';
 
@@ -14647,7 +15640,7 @@
         if (trueCairn) {
           if (sfx) sfx.playMechanicalClick();
           if (dispatchText) {
-            dispatchText.textContent = `"Hold on, Silvia! That cairn skips ahead. The Law of the Canyon Walkers requires discovering the sacred runes in strict sequence. Which cairn comes next in the word?"`;
+            dispatchText.textContent = `"Hold on, Silvia! That marker skips ahead. The Law of the Canyon Walkers requires discovering the sacred runes in strict sequence. Which marker comes next in the word?"`;
           }
         }
       };
@@ -14664,7 +15657,7 @@
         if (victoryCard) victoryCard.style.display = 'none';
 
         if (dispatchText) {
-          dispatchText.textContent = '"Silvia, I\'m standing at the North Portal of the Whispering Chasm. The canyon splits ahead. Which cairn marker do your notes indicate first?"';
+          dispatchText.textContent = '"Silvia, I\'m standing at the North Portal of the Whispering Chasm. The canyon splits ahead. Which stone marker do your notes indicate first?"';
         }
 
         updatePassphraseSlots();
@@ -14692,10 +15685,10 @@
             ...SEGMENTS['E_exit']
           ];
           if (telemTime) telemTime.textContent = '0h 00m';
-          if (telemWaypoint) telemWaypoint.textContent = 'Desert Oasis (Arrived)';
+          if (telemWaypoint) telemWaypoint.textContent = 'Salt Playa Edge (Arrived)';
           if (victoryCard) victoryCard.style.display = 'block';
           if (dispatchText) {
-            dispatchText.textContent = '"Silvia, we made it! I am standing beneath the palm trees of the Desert Oasis. The spring water is fresh and cool. Look what I found resting against the ancient well curb: sandstone tablets carved with desert riddles... Look at Sheet 10A of your journal: The Desert Lexicon & Al-Qibla!"';
+            dispatchText.textContent = '"Silvia, we made it out of the gorge! The cliffs fall away and a blinding white salt basin, the Salt Playa, stretches ahead. Far beyond it I can see the ruins of an old nomad camp, but the crust is riddled with brine sinkholes... Open Sheet 10A of your journal: The Salt Playa!"';
           }
         } else {
           if (chasmStepIndex === 0) {
@@ -14758,7 +15751,266 @@
     })();
 
     // =========================================================================
-    // 📜 THE DESERT LEXICON & AL-QIBLA CONTROLLER (STATION 11)
+    // 🧂 THE SALT PLAYA CONTROLLER (STATION 11 · SHEET 10A)
+    // =========================================================================
+    (function initSaltPlayaController() {
+      const modal = document.getElementById('modal-salt-playa');
+      if (!modal) return;
+      const sfx = window.sfx || null;
+      const btnClose = document.getElementById('btn-close-playa');
+      const btnUndo = document.getElementById('btn-playa-undo');
+      const btnReset = document.getElementById('btn-playa-reset');
+      const btnTransmit = document.getElementById('btn-playa-transmit');
+      const btnFinish = document.getElementById('btn-playa-finish');
+      const keywordInput = document.getElementById('playa-keyword-input');
+      const board = document.getElementById('playa-board');
+      const dispatchEl = document.getElementById('playa-dispatch-text');
+      const victoryCard = document.getElementById('playa-victory-card');
+      const progressEl = document.getElementById('playa-progress-count');
+      const telemRow = document.getElementById('playa-telem-row');
+      const telemFacets = document.getElementById('playa-telem-facets');
+      const telemWaypoint = document.getElementById('playa-telem-waypoint');
+      const slots = [0, 1, 2, 3, 4, 5, 6].map(i => document.getElementById('playa-slot-' + i));
+
+      // Slab grid exactly as printed on Sheet 10A (build_desert_odyssey_expanded.py · render_game_d2_salt_playa).
+      // Each cell is [facets, letter]; null marks a brine sinkhole. The crossing is unique and spells the keyword.
+      const GRID = [
+        [[1, 'M'], null, [6, 'B'], [3, 'C'], [1, 'Q'], [6, 'Z'], [2, 'V']],
+        [[4, 'G'], [2, 'E'], null, [6, 'K'], [4, 'R'], [1, 'J'], [5, 'U']],
+        [[3, 'F'], null, [2, 'I'], [5, 'Y'], null, [2, 'P'], [6, 'D']],
+        [[5, 'O'], [1, 'A'], [4, 'S'], [2, 'W'], null, [5, 'B'], [3, 'T']],
+        [[2, 'L'], null, [3, 'T'], [6, 'H'], [1, 'N'], null, [6, 'M']],
+        [[6, 'K'], [5, 'N'], null, [2, 'A'], [5, 'R'], [3, 'E'], [1, 'S']],
+        [[3, 'P'], [1, 'Z'], [4, 'O'], [1, 'L'], null, [6, 'C'], [2, 'Y']]
+      ];
+      const ROWS = 7;
+      const COL_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+      const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+      const START_COL = 3;
+      const KEYWORD = 'CRYSTAL';
+      const SOLUTION_PATH = [3, 4, 3, 2, 2, 3, 3];
+      const START_LINE = "Silvia, I'm standing at the North Edge of the Salt Playa. The white crust cracks under my boots, and the dark patches are brine sinkholes. Your notes say where I must start. Which slab first?";
+
+      let path = [];
+
+      const isDone = () => localStorage.getItem('order_salt_playa_completed') === 'true';
+      const cell = (r, c) => GRID[r][c];
+      const say = (text) => { if (dispatchEl) dispatchEl.textContent = '"' + text + '"'; };
+      const toast = (msg) => { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); };
+      const spelled = () => path.map((c, r) => cell(r, c)[1]).join('');
+
+      function render() {
+        const done = isDone();
+        const nextRow = path.length;
+        let html = '<div class="playa-col-heads"><span></span>' + COL_NAMES.map(n => '<span>' + n + '</span>').join('') + '</div>';
+        for (let r = 0; r < ROWS; r++) {
+          html += '<div class="playa-row' + (r === nextRow && !done ? ' current' : '') + '"><span class="playa-row-label">' + ROMAN[r] + '</span>';
+          for (let c = 0; c < ROWS; c++) {
+            const slab = cell(r, c);
+            const chosen = path[r] === c;
+            const adjacent = r === nextRow && (r === 0 ? c === START_COL : Math.abs(c - path[r - 1]) <= 1);
+            const reachable = !done && slab !== null && adjacent;
+            const cls = 'playa-slab' + (slab === null ? ' sink' : '') + (chosen ? ' chosen' : '') + (reachable ? ' reachable' : '');
+            const aria = slab === null ? 'Row ' + ROMAN[r] + ', column ' + COL_NAMES[c] + ': sinkhole' : 'Row ' + ROMAN[r] + ', column ' + COL_NAMES[c] + ': ' + slab[0] + ' facets, letter ' + slab[1];
+            const inner = slab === null ? '✕' : '<span class="playa-num">' + slab[0] + '</span><span class="playa-let">[' + slab[1] + ']</span>';
+            html += '<button type="button" class="' + cls + '" data-r="' + r + '" data-c="' + c + '" aria-label="' + aria + '">' + inner + (chosen ? '<span class="playa-step-badge">' + (r + 1) + '</span>' : '') + '</button>';
+          }
+          html += '</div>';
+        }
+        board.innerHTML = html;
+
+        slots.forEach((el, i) => {
+          if (!el) return;
+          const letter = el.querySelector('.slot-letter');
+          if (path[i] !== undefined) {
+            letter.textContent = cell(i, path[i])[1];
+            el.classList.add('filled');
+          } else {
+            letter.textContent = '';
+            el.classList.remove('filled');
+          }
+        });
+
+        if (progressEl) progressEl.textContent = path.length + ' / ' + ROWS + ' STEPS';
+        if (telemRow) telemRow.textContent = (path.length >= ROWS ? 'VII' : ROMAN[path.length]) + ' / VII';
+        if (telemFacets) telemFacets.textContent = path.length ? String(cell(path.length - 1, path[path.length - 1])[0]) : '—';
+        if (telemWaypoint) {
+          telemWaypoint.textContent = done ? 'South Shore (Crossed)' : (path.length === 0 ? 'North Edge' : 'Row ' + ROMAN[path.length - 1]);
+        }
+        if (btnUndo) btnUndo.disabled = done || path.length === 0;
+        if (btnReset) btnReset.disabled = done || path.length === 0;
+        if (btnTransmit) btnTransmit.disabled = done;
+        if (keywordInput) keywordInput.disabled = done;
+      }
+
+      function resetCrossing() {
+        if (sfx) sfx.playMechanicalClick();
+        path = [];
+        if (victoryCard) victoryCard.style.display = 'none';
+        say(START_LINE);
+        render();
+      }
+
+      function undoStep() {
+        if (isDone() || path.length === 0) return;
+        if (sfx) sfx.playMechanicalClick();
+        path.pop();
+        say('Back one slab, Silvia. Tell me where to step from here.');
+        render();
+      }
+
+      function flash(r, c) {
+        const el = board.querySelector('.playa-slab[data-r="' + r + '"][data-c="' + c + '"]');
+        if (!el) return;
+        el.classList.remove('shake');
+        void el.offsetWidth;
+        el.classList.add('shake');
+      }
+
+      function completeCrossing() {
+        path = SOLUTION_PATH.slice();
+        try {
+          localStorage.setItem('order_salt_playa_completed', 'true');
+          localStorage.setItem('order_salt_playa_path', JSON.stringify(path));
+        } catch (e) {}
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        say('The crust held on every slab! The seven letters under my boots spell ' + KEYWORD + '. We are across, Silvia!');
+        if (victoryCard) victoryCard.style.display = 'block';
+        render();
+        if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+      }
+
+      function stepOn(r, c) {
+        path.push(c);
+        if (sfx) sfx.playMechanicalClick();
+        if (path.length === ROWS) {
+          completeCrossing();
+          return;
+        }
+        const here = cell(r, c);
+        const next = r + 1;
+        const options = [c - 1, c, c + 1].filter(cc => cc >= 0 && cc < ROWS && cell(next, cc) !== null && Math.abs(cell(next, cc)[0] - here[0]) === 1);
+        if (options.length === 0) {
+          say('I am on a slab of ' + here[0] + ' facets, but nothing below me changes by exactly 1. I cannot go on from here. Step me back and try another route.');
+        } else {
+          const lines = [
+            'A slab of ' + here[0] + ' facets, and it holds. Which slab for Row ' + ROMAN[next] + '?',
+            'Row ' + ROMAN[r] + ' done. The salt crunches but it carries me. Where next, Silvia?',
+            'The crust is steady under ' + here[0] + ' facets. Which slab should I try in Row ' + ROMAN[next] + '?'
+          ];
+          say(lines[r % lines.length]);
+        }
+        render();
+      }
+
+      board.addEventListener('click', (e) => {
+        const btn = e.target.closest('.playa-slab');
+        if (!btn || isDone()) return;
+        const r = parseInt(btn.dataset.r, 10);
+        const c = parseInt(btn.dataset.c, 10);
+
+        if (r === path.length - 1 && c === path[r]) { undoStep(); return; }
+
+        if (r !== path.length) {
+          say('We cross the crust one row at a time, from North to South. Which slab should I take in Row ' + ROMAN[path.length] + '?');
+          return;
+        }
+        if (cell(r, c) === null) {
+          say('Careful, Silvia! That slab is a brine sinkhole. The crust would swallow my boots. Choose another one.');
+          flash(r, c);
+          return;
+        }
+        if (r === 0) {
+          if (c !== START_COL) {
+            say('That is not where we begin. Your notes say to start at Row I, Column D, the slab marked 3 and [C].');
+            flash(r, c);
+            return;
+          }
+        } else {
+          if (Math.abs(c - path[r - 1]) > 1) {
+            say('That slab is too far to reach in one stride. From here I can only step straight down or diagonally.');
+            flash(r, c);
+            return;
+          }
+          const from = cell(r - 1, path[r - 1])[0];
+          const to = cell(r, c)[0];
+          if (Math.abs(to - from) !== 1) {
+            say('The crust cracks under a slab of ' + to + ' facets, Silvia. From ' + from + ' facets I can only step to a slab with exactly one facet more or one less.');
+            flash(r, c);
+            return;
+          }
+        }
+        stepOn(r, c);
+      });
+
+      function transmitKeyword() {
+        if (isDone() || !keywordInput) return;
+        const word = keywordInput.value.trim().toUpperCase();
+        if (word.length === 0) return;
+        if (sfx) sfx.playMechanicalClick();
+        if (word === KEYWORD) {
+          completeCrossing();
+        } else {
+          say('The wire hums, but the crust does not answer to "' + word + '". Check the letters on your 7-step path and try again.');
+          keywordInput.classList.remove('shake');
+          void keywordInput.offsetWidth;
+          keywordInput.classList.add('shake');
+        }
+      }
+
+      function openSaltPlayaModal() {
+        const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+        if (!isChasmDone && !isDone()) {
+          toast('✦ TERRA INCOGNITA ✦ Guide Hermes through the Whispering Chasm (Station 10) before crossing the Salt Playa.');
+          return;
+        }
+        if (sfx) sfx.playMechanicalClick();
+        modal.style.display = 'flex';
+        modal.classList.remove('closing');
+
+        if (isDone()) {
+          path = SOLUTION_PATH.slice();
+          if (victoryCard) victoryCard.style.display = 'block';
+          say('We crossed the Salt Playa together, Silvia. The seven letters on the safe path spell ' + KEYWORD + '.');
+          render();
+        } else {
+          if (path.length === ROWS) path = [];
+          if (path.length === 0) say(START_LINE);
+          render();
+        }
+      }
+
+      function closeSaltPlayaModal() {
+        if (sfx) sfx.playMechanicalClick();
+        modal.classList.add('closing');
+        setTimeout(() => {
+          modal.style.display = 'none';
+          modal.classList.remove('closing');
+        }, 220);
+      }
+
+      window.openSaltPlayaModal = openSaltPlayaModal;
+      window.closeSaltPlayaModal = closeSaltPlayaModal;
+
+      if (btnClose) btnClose.addEventListener('click', closeSaltPlayaModal);
+      if (btnUndo) btnUndo.addEventListener('click', undoStep);
+      if (btnReset) btnReset.addEventListener('click', resetCrossing);
+      if (btnTransmit) btnTransmit.addEventListener('click', transmitKeyword);
+      if (keywordInput) keywordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') transmitKeyword(); });
+      if (btnFinish) {
+        btnFinish.addEventListener('click', () => {
+          closeSaltPlayaModal();
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+        });
+      }
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeSaltPlayaModal(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display !== 'none') closeSaltPlayaModal();
+      });
+    })();
+
+    // =========================================================================
+    // 📜 THE DESERT LEXICON & AL-QIBLA CONTROLLER (STATION 12)
     // =========================================================================
     (function initDesertLexiconController() {
       const modal = document.getElementById('modal-desert-lexicon');
@@ -14775,11 +16027,11 @@
       const victoryCard = document.getElementById('lexicon-victory-card');
       const compassNeedle = document.getElementById('lexicon-compass-needle');
       const compassLabel = document.getElementById('lexicon-compass-label');
-      const telemAzimuth = document.getElementById('lexicon-telem-azimuth');
+      const telemBearing = document.getElementById('lexicon-telem-bearing');
       const telemSigil = document.getElementById('lexicon-telem-sigil');
       const sigilStatus = document.getElementById('lexicon-sigil-status');
 
-      // Canonical Crossword Specification (Matching Sheet 10A / build_desert_games.py)
+      // Canonical Crossword Specification (Matching Sheet 11A / build_desert_games.py)
       const LEXICON_WORDS = {
         'ac-2': { id: 'ac-2', label: '2 Across', clue: 'The blistering south-easterly wind that sweeps the dunes (7)', answer: 'SIROCCO', dir: 'across', r: 2, c: 1, len: 7 },
         'ac-3': { id: 'ac-3', label: '3 Across', clue: 'The eternal wanderer whose only roof is the starry vault (5)', answer: 'NOMAD', dir: 'across', r: 6, c: 3, len: 5 },
@@ -14959,9 +16211,9 @@
           compassLabel.textContent = 'HEADING: 194° SSW [LOCKED ON TOWER II]';
           compassLabel.style.color = '#86efac';
         }
-        if (telemAzimuth) {
-          telemAzimuth.textContent = '194° SSW [Locked]';
-          telemAzimuth.style.color = '#86efac';
+        if (telemBearing) {
+          telemBearing.textContent = '194° SSW [Locked]';
+          telemBearing.style.color = '#86efac';
         }
         if (telemSigil) {
           telemSigil.textContent = 'PHOENIX [Verified]';
@@ -15065,7 +16317,7 @@
           wordInput.classList.add('decoy-hit');
           setTimeout(() => wordInput.classList.remove('decoy-hit'), 800);
           if (dispatchEl) {
-            dispatchEl.textContent = `"Wait, Silvia! '${val || '???'}' does not fit the carved pattern of ${word.label}. Check Sheet 10A in your journal!"`;
+            dispatchEl.textContent = `"Wait, Silvia! '${val || '???'}' does not fit the carved pattern of ${word.label}. Check Sheet 11A in your journal!"`;
           }
         }
       }
@@ -15088,6 +16340,14 @@
       }
 
       function openDesertLexiconModal() {
+        const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
+        const isLexiconAlreadyDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
+        if (!isPlayaDone && !isLexiconAlreadyDone) {
+          if (typeof window.showDesertToast === 'function') {
+            window.showDesertToast('✦ TERRA INCOGNITA ✦ Guide Hermes across the Salt Playa (Station 11) before he reaches the Nomad Ruins.');
+          }
+          return;
+        }
         if (sfx) sfx.playMechanicalClick();
         if (!modal) return;
         modal.style.display = 'flex';
@@ -15453,7 +16713,7 @@
         if (victoryCard) victoryCard.style.display = 'flex';
         if (btnEngage) btnEngage.style.display = 'none';
         if (dispatchText) {
-          dispatchText.textContent = '"Silvia! The hydraulic lock released! Fresh mineral water is surging from all four wells! Falcon, Jackal, Scarab, Serpent—all four flow in perfect balance under Key XXX (30 Hours)! We have filled our four leather water skins. Look at the water gate of the Falcon Well: [P] - [A] = 12 is carved into the brass weir! With our canteens full and Al-Qibla set to 194° SSW, the treacherous crossing of the Great Erg to Station 13 is secured!"';
+          dispatchText.textContent = '"Silvia! The hydraulic lock released! Fresh mineral water is surging from all four wells! Falcon, Jackal, Scarab, Serpent—all four flow in perfect balance under Key XXX (30 Hours)! We have filled our four leather water skins. Look at the water gate of the Falcon Well: [P] - [A] = 14 is carved into the brass weir! With our canteens full and Al-Qibla set to 194° SSW, the treacherous crossing of the Great Erg to Station 13 is secured!"';
         }
       }
 
@@ -15495,7 +16755,7 @@
             setTimeout(() => btnEngage.classList.remove('decoy-hit'), 800);
           }
           if (dispatchText) {
-            dispatchText.textContent = `"The subterranean siphons rattle! ${mismatchCount} seeker(s) are not aligned with their true well, relic, or shadow-hour according to Sheet 11B. Verify your deductions in the matrix!"`;
+            dispatchText.textContent = `"The subterranean siphons rattle! ${mismatchCount} seeker(s) are not aligned with their true well, relic, or shadow-hour according to Sheet 12B. Verify your deductions in the matrix!"`;
           }
           return false;
         }
@@ -15563,10 +16823,11 @@
       }
 
       function openOasisClepsydraModal() {
-        const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-        if (!isChasmDone) {
+        const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
+        const isClepsydraAlreadyDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+        if (!isLexiconDone && !isClepsydraAlreadyDone) {
           if (typeof window.showDesertToast === 'function') {
-            window.showDesertToast('✦ TERRA INCOGNITA ✦ Guide Hermes through the Whispering Chasm (Station 15) before entering the Oasis Clepsydra.');
+            window.showDesertToast('✦ TERRA INCOGNITA ✦ Solve the Desert Lexicon at the Nomad Ruins (Station 12) before entering the Oasis Clepsydra.');
           }
           return;
         }

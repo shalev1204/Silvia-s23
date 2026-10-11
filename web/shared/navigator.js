@@ -82,7 +82,7 @@
       path: 'Constellation Path · Game 07',
       title: 'The Zodiac Engine',
       icon: '🏜️',
-      url: root + 'desert/zodiac-engine/index.html',
+      url: root + 'constellation/zodiac-engine/index.html',
       status: isZodiacCompleted ? 'Explored ✓' : 'Active Pursuit ★',
       statusClass: isZodiacCompleted ? 'status-completed' : 'status-active',
       unlocked: true
@@ -129,7 +129,7 @@
         id: 'celestial-cipher',
         folder: 'celestial-cipher',
         path: 'Station 09 · Unknown Horizon',
-        title: 'Station 09 · [ Incógnita ]',
+        title: 'Station 09 · [ Unknown ]',
         icon: '⏳',
         url: 'javascript:void(0)',
         status: 'Sealed Horizon ⏳',

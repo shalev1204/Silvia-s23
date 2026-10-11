@@ -1,39 +1,28 @@
-# The Eclipse Order · Ecosistema Web
+# The Eclipse Order · Web Ecosystem
 
-Estructura modular de experiencias web organizadas por **Caminos (Paths)** y **Fases / Juegos**.
+Web experiences organised by **Paths** and **Stations**. Full catalogue, status and deployment notes: [`docs/WEB_ECOSYSTEM.md`](../docs/WEB_ECOSYSTEM.md).
 
-## Jerarquía de directorios
+## Directory layout
 
 ```text
 web/
-├── index.html                                   ← Pasarela / Redirección automática al juego activo (Fase 2)
-├── README.md                                    ← Esta guía
-│
-├── constellation/                               ← CAMINO: THE CONSTELLATION PATH
-│   ├── celestial-flower/                        ← FASE 1: The Celestial Flower (Puzzle 22 estrellas original, preservado)
-│   │   ├── index.html
-│   │   ├── cartographer-illustration.jpg
-│   │   └── logo-path-constellation.png
-│   │
-│   ├── celestial-flower-2/                      ← FASE 2: The Severed Sky (Bóveda tras el robo del Astrolabio)
-│   │   ├── index.html
-│   │   ├── cartographer-illustration.jpg
-│   │   └── logo-path-constellation.png
-│   │
-│   └── radio-transmission/                      ← FASE 2: The Stolen Astrolabe (Radio interactiva 22.22 MHz)
-│       ├── index.html
-│       └── cartographer_raid.mp3
-│
-├── desert/                                      ← CAMINO: THE DESERT PATH
-│   └── README.md                                ← Reservado para futuros juegos (The Oracle)
-│
-└── stage/                                       ← CAMINO: THE STAGE PATH
-    └── README.md                                ← Reservado para futuros juegos (The Mirror Speaker)
+├── index.html                 ← CENTRAL HUB: map, transmissions, Cipher Ledger, telegraph and the Desert Path games
+├── assets/                    ← Desert maps (maps/), thumbnails, backgrounds and branding
+├── constellation/             ← THE CONSTELLATION PATH
+│   ├── celestial-flower/      ← Station 03
+│   ├── celestial-flower-2/    ← Station 04 (The Severed Sky)
+│   ├── radio-transmission/    ← Stations 04–05 (radio)
+│   ├── celestial-matrix/      ← Station 06
+│   ├── zodiac-engine/         ← Station 07
+│   ├── midnight-calibration/  ← Station 08
+│   └── celestial-cipher/      ← Station 09
+├── desert/                    ← Reserved: THE DESERT PATH (currently inside the Hub)
+├── shared/                    ← navigator.js / navigator.css (the "Order Codex" drawer)
+└── stage/                     ← Reserved: The Mirror Speaker
 ```
 
-## URLs públicas en Cloudflare Pages
+## Notes
 
-- **Enlace raíz:** `https://TU-DOMINIO.pages.dev/` (Redirige a la Fase 2: `celestial-flower-2`).
-- **Fase 1 (Recuerdo original):** `https://TU-DOMINIO.pages.dev/constellation/celestial-flower/`
-- **Fase 2 (Bóveda sin estrellas):** `https://TU-DOMINIO.pages.dev/constellation/celestial-flower-2/`
-- **Fase 2 (Radio de socorro):** `https://TU-DOMINIO.pages.dev/constellation/radio-transmission/`
+- The **Desert Path** games (Stations 10 to 13) are modals inside `index.html`.
+- Intermediate audio stems (`*.wav`, `*.pcm`) are neither versioned nor deployed.
+- Public routes: `https://YOUR-DOMAIN.pages.dev/` (Hub) and `https://YOUR-DOMAIN.pages.dev/constellation/<game>/`.

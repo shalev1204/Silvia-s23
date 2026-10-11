@@ -4,3 +4,7 @@ node_modules/
 .env
 .env.*
 *.log
+
+# Audio intermedio (stems/foley): se regenera con scripts/audio/ y no se despliega en Cloudflare
+web/**/*.wav
+web/**/*.pcm

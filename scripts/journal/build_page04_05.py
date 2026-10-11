@@ -579,7 +579,7 @@ def render_face_4a(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     if lbl_throne_sub2 is not None:
         blit_rgba(canvas, lbl_throne_sub2, throne_cx - lbl_throne_sub2.shape[1] // 2, throne_cy + 412)
 
-    # 16-point azimuth compass rose accent below throne
+    # 16-point bearing compass rose accent below throne
     rcx, rcy, rr = throne_cx, 1935, 68
     cv2.circle(canvas, (rcx, rcy), rr, (*gc, 130), 1, cv2.LINE_AA)
     cv2.circle(canvas, (rcx, rcy), int(rr * 0.4), (*gc, 100), 1, cv2.LINE_AA)
@@ -781,7 +781,7 @@ def draw_exploded_astrolabe(canvas: np.ndarray, cx: int, gc: tuple = GRAPHITE_CO
         cy_al = zy + int(rad_circ * 0.32)
         cv2.circle(canvas, (zx, cy_al), rad_circ, (*gc, 110 if idx_al % 2 == 0 else 75), 1, cv2.LINE_AA)
 
-    # G. Azimuth arcs radiating from Zenith to Horizon
+    # G. Bearing arcs radiating from Zenith to Horizon
     for az_ang in [-60, -40, -20, 20, 40, 60]:
         az_r = np.deg2rad(az_ang)
         cv2.ellipse(canvas, (zx + int(np.sin(az_r) * 70), zy + 45),
@@ -847,7 +847,7 @@ def draw_exploded_astrolabe(canvas: np.ndarray, cx: int, gc: tuple = GRAPHITE_CO
     cv2.fillPoly(canvas, [muri_pts], (*gc, 200))
     cv2.circle(canvas, (cx + r3 + 8, cy3), 2, (*gc, 240), -1)
 
-    # D. 6 Slender Renaissance Star Pointers (Mucrones) with Acanthus Leaf Bases
+    # D. 6 Slender Renaissance Star Pointers with Acanthus Leaf Bases
     # Symmetrically balanced around the zodiac circle (angles avoid all axis collisions)
     star_data = [
         (35, "Veg", 135),   # Vega (Lyra)
@@ -1402,7 +1402,7 @@ def render_face_4b(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     # 5. Rete Star Pointers Legend in Lower-Right Margin
     cs_x, cs_y = 1040, 1420
 
-    t_stars_head, _ = render_pencil_text("The 6 Star Pointers (Mucrones)", FONT_PATH, font_size=30, gc=gc, seed=582)
+    t_stars_head, _ = render_pencil_text("The 6 Star Pointers", FONT_PATH, font_size=30, gc=gc, seed=582)
     if t_stars_head is not None:
         blit_rgba(canvas, t_stars_head, cs_x + 10, cs_y)
 
@@ -2057,7 +2057,7 @@ def draw_geodetic_survey_triangulation(
     if t_north is not None:
         blit_rgba(canvas, t_north, pt_a[0] - 28, pt_a[1] - 98)
 
-    # Angle arc at station A (azimuth to Watchtower VI)
+    # Angle arc at station A (bearing to Watchtower VI)
     cv2.ellipse(canvas, pt_a, (32, 32), 0, -90, 15, (*gc, 150), 1, cv2.LINE_AA)
     t_az_lbl, _ = render_pencil_text("112*", FONT_PATH, font_size=18, gc=gc, seed=seed + 12)
     if t_az_lbl is not None:
@@ -2076,7 +2076,7 @@ def draw_geodetic_survey_triangulation(
     # Triangulation notes
     notes = [
         ("Base Baseline: 5,420 paces to Red Ridge", y0 + 265),
-        ("Watchtower VI Azimuth: 112* East", y0 + 301),
+        ("Watchtower VI Bearing: 112* East", y0 + 301),
         ("Magnetic Offset: +04* 15' (True N. Corr.)", y0 + 337),
         ("Apex Elevation (Peak VII): 1,240 varas", y0 + 373),
     ]
@@ -2243,7 +2243,7 @@ def render_face_5b(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
             "Before ascending to Outer Watchtower VI, I surveyed the dry wash bed below. To mark the route for "
             "the seeker who would one day follow my footsteps, I raised three stone cairns along the canyon "
             "wash, pointing south-southeast. Beneath the foundation stones of Cairn III, beneath a flat red "
-            "sandstone slab, I buried the first copper benchmark plate engraved with the azimuth of 112 degrees."
+            "sandstone slab, I buried the first copper benchmark plate engraved with the bearing of 112 degrees."
         ))
     ]
 
