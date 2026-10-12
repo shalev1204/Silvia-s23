@@ -20,4 +20,4 @@ Al iniciar una nueva sesión en este repositorio, **TODO AGENTE DE CLAUDE CODE D
 ## Directrices de Desarrollo
 - **Regla 9**: Cero valores numéricos iniciales precargados para Silvia en *The Cipher Ledger*.
 - **Regla 10**: Uso exclusivo del alfabeto latino estándar ($A–Z$) en fórmulas y coordenadas celestes.
-- **Git**: Regla R4 — No realizar `git commit` ni `git push` salvo orden textual explícita del Operador.
+- **Git**: Regla R4 — No realizar `git commit` ni `git push` salvo orden textual explícita del Operador. **Excepción vigente (orden del Operador):** al terminar cada tarea, el agente hace commit y push automáticamente a la rama de trabajo de la sesión, sin pedir permiso. Solo se commitean los archivos tocados en esa tarea. Nunca PR, nunca force-push, nunca borrar ramas sin orden explícita.
