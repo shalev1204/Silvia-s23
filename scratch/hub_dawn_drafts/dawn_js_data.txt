@@ -1,0 +1,135 @@
+      // =======================================================================
+      // THE DAWN SEGMENT: from the storm shelter to the mouth of the Whispering Chasm
+      // (the river hunch, Cairn I and its seal, the North Portal). It lives beside EXPEDITION_THREAD and
+      // is shown while the thread is parked at step 4. Hermes remembers the tone of Silvia's answers.
+      // =======================================================================
+      const HERMES_TONE_MAP = [
+        ['warm', 'protective', 'analytic'],
+        ['tactical', 'analytic', 'protective'],
+        ['tactical', 'warm', 'analytic'],
+        ['tactical', 'warm', 'protective']
+      ];
+
+      const DAWN_THREAD = [
+        {
+          // 0 · the Great Silence
+          divider: 'Dawn · The Great Silence',
+          hermesInitial: (t) => ({
+            warm: "You stayed with me all night, Silvia. I felt it through the wire. I slept with my cheek on the map and woke up warm.",
+            protective: "You made me promise to stay put and keep warm, so I did. The shelter held, and so did I.",
+            tactical: "Your order was to hold position until the wind dropped. It has dropped. Position held.",
+            analytic: "You were right about the walls: the gale broke over the ridge and never reached the fire. Now the air is perfectly still."
+          }[t]) + "\n\nSilvia... do you hear that? Nothing at all. The wind has stopped.\n\nThe red dust still hangs in the air like smoke, and the first sun is climbing the canyon wall. After a night of howling, the quiet is almost louder than the storm. This is the hour Sheet 8A calls the Great Silence: the desert has erased everything and has not yet written anything new.",
+          choices: [
+            {
+              tone: 'warm',
+              text: "Take a breath, Hermes. Drink some water and watch the sun come up. Then we decide.",
+              silviaMsg: "Take a breath, Hermes. Drink some water and watch the sun come up. Then we decide what to do.",
+              hermesReply: "I did just that. The light turned the cliff the color of copper, then the color of honey. It is a fine thing to be alive in a quiet place, Silvia.\n\nBut the quiet has a trap in it. Every dune I knew yesterday has moved, and I cannot trust a single one. The only thing the storm cannot move is stone and gravel. Below the watchtower there is a dry riverbed, and every time I look at it I feel a pull in my chest, a hunch, like a name on the tip of my tongue."
+            },
+            {
+              tone: 'tactical',
+              text: "First light is the best light. Check your shadow, find north and plan today's route.",
+              silviaMsg: "First light is the best light. Check your shadow, find north and plan today's route.",
+              hermesReply: "Done. I planted my staff in the gravel and watched the shadow. It is long and points almost due west, so north is behind my right shoulder. The compass agrees with the shadow, which is a small joy.\n\nThe storm has moved every dune I knew, so the route cannot cross sand. That leaves the dry riverbed below the watchtower, the hard gravel of your Sheet 8A. And, to be honest, a hunch that I cannot put on any map."
+            },
+            {
+              tone: 'analytic',
+              text: "Sheet 8A says the wind covers and the sun reveals. Let the sun show you what the storm moved.",
+              silviaMsg: "Sheet 8A says what the wind covers, the sun shall reveal. Let the sun show you what the storm moved.",
+              hermesReply: "The sun reveals, yes! Look: the dunes walked a hundred paces overnight, but a dark line runs below the watchtower where the sand could not settle. It is the dry riverbed, hard gravel, exactly as the Second Law says.\n\nI cannot explain it, Silvia, but when I look at that line my chest tightens, as if the river were calling me by name. A hunch. I do not trust hunches. I do not ignore them either."
+            }
+          ]
+        },
+        {
+          // 1 · the river hunch
+          choices: [
+            {
+              tone: 'protective',
+              text: "A hunch is not a map, Hermes. Are you sure you want to leave the shelter for a feeling?",
+              silviaMsg: "A hunch is not a map, Hermes. Are you sure you want to leave the shelter for a feeling?",
+              hermesReply: "No, I am not sure. I am never sure. But I am sure of this: the Three Laws say the dry wash is the only firm ground, so if I must move, that is the way. I will go slowly and keep the cliff in sight.\n\nI drew what I can see from the doorway. Keep it beside your journal.",
+              image: { src: './assets/chat/sketch_dry_wash.webp', alt: "Hermes's pencil sketch of the dry wash below Outer Watchtower VI", caption: "Hermes's sketch · the dry wash below Watchtower VI" }
+            },
+            {
+              tone: 'warm',
+              text: "Then follow it. Your hunches have a way of being right. I'll stay on the wire the whole time.",
+              silviaMsg: "Then follow it, Hermes. Your hunches have a way of being right. I'll stay on the wire the whole time.",
+              hermesReply: "That is all I needed to hear. An old man walks better when someone is listening.\n\nI will go down to the riverbed now. This is what I can see from the doorway; I drew it while the tea was boiling.",
+              image: { src: './assets/chat/sketch_dry_wash.webp', alt: "Hermes's pencil sketch of the dry wash below Outer Watchtower VI", caption: "Hermes's sketch · the dry wash below Watchtower VI" }
+            },
+            {
+              tone: 'analytic',
+              text: "Check the Three Laws on Sheet 8A: the dry wash is the only firm road. If your hunch points down the riverbed, it agrees with the Law.",
+              silviaMsg: "Check the Three Laws on Sheet 8A: the dry wash is the only firm road. If your hunch points down the riverbed, it agrees with the Law.",
+              hermesReply: "Then my chest and the Law agree, which is rare enough to celebrate. The dry wash it is.\n\nI sketched what I can see from the doorway, so you can follow my steps on the Grand Desert Map.",
+              image: { src: './assets/chat/sketch_dry_wash.webp', alt: "Hermes's pencil sketch of the dry wash below Outer Watchtower VI", caption: "Hermes's sketch · the dry wash below Watchtower VI" }
+            }
+          ]
+        },
+        {
+          // 2 · the half-buried cairn
+          divider: 'Later · The Second Bend',
+          hermesInitial: "Silvia! Silvia, are you there? I have followed the gravel for an hour and the river has bent twice. I am standing at the second bend, and I have found something half buried in the silt: a heap of river boulders, stacked by hand.\n\nIt is a cone, four stones high, and beside it lie two flat foundation stones, as if two other heaps once stood here. I know this place without knowing why. It looks like the piles I raised in the autumn of 1998, only older, much older. And under the biggest stone I can see the edge of something flat and carved.",
+          initialImage: { src: './assets/chat/sketch_cairn_one.webp', alt: "Hermes's pencil sketch of a cone of river boulders half buried in silt", caption: "Hermes's sketch · Cairn I?" },
+          choices: [
+            {
+              tone: 'analytic',
+              text: "Describe it. How many stones are there, and how are they stacked?",
+              silviaMsg: "Describe it, Hermes. How many stones are there, and how are they stacked?",
+              hermesReply: "Four stones, each smaller than the one below, like loaves of river bread. The biggest rests on the carved slab. The two foundation stones beside it are flat and clean, swept by the storm.\n\nThere is no cement and no tool mark, only a patient hand. The old rule of the stone-setters should hold: one stone at a time, and never a big stone on a small one, or the heap falls apart. I will try to carry the cone to the third foundation, so the slab can see the sky. Hold the wire; this will take a while."
+            },
+            {
+              tone: 'protective',
+              text: "Careful, it could be a trap. Touch nothing until you've told me every detail.",
+              silviaMsg: "Careful, Hermes, it could be a trap. Touch nothing until you have told me every detail.",
+              hermesReply: "Always careful, Silvia. Good. I walked around it twice: no wires, no hollow ring, no scorch marks, only silt and old stone. If it is a trap, it is the patient kind.\n\nFour stones, each smaller than the one below. The old rule of the stone-setters should hold: one stone at a time, and never a big stone on a small one. I will try to carry the cone to the third foundation, so the slab can see the sky. Hold the wire; this will take a while."
+            },
+            {
+              tone: 'tactical',
+              text: "Cairns mark the road. Dig it out, Hermes! Whatever is under there may be our way through.",
+              silviaMsg: "Cairns mark the road. Dig it out, Hermes! Whatever is under there may be our way through.",
+              hermesReply: "Now there is my navigator! Digging is no use, though: the stones are heavy and the silt is deep. The only way to the slab is to move the cone itself, and the old rule of the stone-setters holds: one stone at a time, never a big stone on a small one.\n\nI will carry the cone to the third foundation. Hold the wire; this will take a while."
+            }
+          ]
+        },
+        {
+          // 3 · the stone-stacking game (opens the Cairn I modal)
+          action: 'cairn1'
+        },
+        {
+          // 4 · the seal, and the road to the North Portal
+          divider: 'Midday · The Seal',
+          hermesInitial: (t) => "It is done, Silvia. The last stone rolled away and the flat slab lay open to the sky like a window.\n\nIt is a disc of red sandstone, no bigger than my palm, with the sign of the Order cut into it: the circle half light and half dark, and under it a small cone of stones. In 1998 I raised this heap with my own hands, and I never knew anything lay beneath it.\n\n" + ({
+            warm: "I felt your hands on mine at every stone. Thank you.",
+            protective: "You kept telling me to go slowly, and the stones were kind to us because of it.",
+            tactical: "Clean work. The cone is across, the seal is ours, and the road is open.",
+            analytic: "Your rule held to the last stone: small before large, always. Order in the heap, order in the world."
+          }[t]) + "\n\nI will keep it close to my heart.",
+          telemetry: '✦ SEAL OF CAIRN I SECURED · RED SANDSTONE · THE ORDER’S DISC AND THE CONE ✦',
+          choices: [
+            {
+              tone: 'tactical',
+              text: "Good. Pack the seal and follow the wash south. What does the canyon ahead look like?",
+              silviaMsg: "Good. Pack the seal and follow the wash south, Hermes. What does the canyon ahead look like?",
+              hermesReply: "I will tell you what I see. After the third bend the walls close in and the gravel climbs toward a gap in the red cliff. I stopped at the edge of it, and the oddest thing: it is not silent. It whispers, Silvia. Low, like many voices a long way off.\n\nThis must be the Whispering Chasm of your Sheet 9B. I drew the North Portal for you. The canyon splits ahead, and I need your notes to choose the first stone marker.",
+              image: { src: './assets/chat/sketch_chasm_mouth.webp', alt: "Hermes's pencil sketch of the North Portal of the Whispering Chasm", caption: "Hermes's sketch · the North Portal" }
+            },
+            {
+              tone: 'warm',
+              text: "Rest a moment first, then go on. I'll be here when you reach the next bend.",
+              silviaMsg: "Rest a moment first, Hermes, then go on. I'll be here when you reach the next bend.",
+              hermesReply: "A moment is all I need, with you on the wire. There, rested.\n\nAfter the third bend the walls close in and the gravel climbs toward a gap in the red cliff. I stopped at the edge of it, and the oddest thing: it is not silent. It whispers, Silvia. Low, like many voices a long way off.\n\nThis must be the Whispering Chasm of your Sheet 9B. I drew the North Portal for you. The canyon splits ahead, and I need your notes to choose the first stone marker.",
+              image: { src: './assets/chat/sketch_chasm_mouth.webp', alt: "Hermes's pencil sketch of the North Portal of the Whispering Chasm", caption: "Hermes's sketch · the North Portal" }
+            },
+            {
+              tone: 'analytic',
+              text: "Check Sheet 9B: the dry wash should end at the mouth of the Whispering Chasm.",
+              silviaMsg: "Check Sheet 9B: the dry wash should end at the mouth of the Whispering Chasm.",
+              hermesReply: "It does, exactly. After the third bend the walls close in and the gravel climbs toward a gap in the red cliff. I stopped at the edge of it, and the oddest thing: it is not silent. It whispers, Silvia. Low, like many voices a long way off.\n\nThis is the Whispering Chasm of your Sheet 9B. I drew the North Portal for you. The canyon splits ahead, and I need your notes to choose the first stone marker.",
+              image: { src: './assets/chat/sketch_chasm_mouth.webp', alt: "Hermes's pencil sketch of the North Portal of the Whispering Chasm", caption: "Hermes's sketch · the North Portal" }
+            }
+          ]
+        }
+      ];
+

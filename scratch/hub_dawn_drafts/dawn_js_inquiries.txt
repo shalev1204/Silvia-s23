@@ -1,0 +1,52 @@
+        ,
+        {
+          id: "inq-great-silence",
+          title: "Why is the desert so silent after the storm?",
+          category: "The Great Silence",
+          group: "desert",
+          answer: "The storm swallowed every sound and then fell asleep. Sheet 8A calls it the Great Silence: the hour when the desert has erased everything and has not yet written anything new. The nomads say the desert holds its breath while the sun decides what to reveal. Do not trust that calm too much. Silence means the sand has settled, and the ground has changed."
+        },
+        {
+          id: "inq-river-hunch",
+          title: "Why do you keep following the river?",
+          category: "The Hunch",
+          group: "desert",
+          answer: "Because the Second Law says the dry riverbed is the only firm road, and because of something older than any law. In the autumn of 1998 I walked this wash alone, and some part of me still remembers every bend. A hunch is only a memory that has not found its words yet. I follow it the way you follow a tune you cannot name."
+        },
+        {
+          id: "inq-what-cairn",
+          title: "What exactly is a cairn?",
+          category: "The Cairns",
+          group: "desert",
+          answer: "A cairn is a heap of dry stones that marks a trail, a border or a place that must not be forgotten. It needs no cement and no tools, only a patient hand. The Order has always marked its roads that way. I raised three small ones along this wash in 1998, for whoever might follow my steps one day. I never guessed they might mean more than that."
+        },
+        {
+          id: "inq-wadi-hajar",
+          title: "What is Wadi al-Hajar?",
+          category: "The Dry Wash",
+          group: "desert",
+          answer: "Wadi al-Hajar means the Valley of Stones. It is the dry riverbed that runs below Watchtower VI. Rain falls in the mountains once in many years, and the water roars through here for a few hours, leaving hard, packed gravel behind. That gravel is why the wash is the only safe road: the dunes move, but the stones stay where the river left them."
+        },
+        {
+          id: "inq-hermes-rest",
+          title: "Have you slept, Hermes?",
+          category: "The Workshop",
+          group: "workshop",
+          answer: "A little, with my cheek on the map. The shelter was warm and the wire hummed like a cat. An old man sleeps lightly in a storm, so do not worry about me. Worry about the stones, and about the next bend in the river."
+        },
+        {
+          id: "inq-seal-cairn-one",
+          title: "What is the seal from Cairn I?",
+          category: "The Seals",
+          group: "desert",
+          answer: "A flat disc of red sandstone, no bigger than my palm. It carries the sign of the Order, the circle half light and half dark, and under it a little cone of stones. It lay under my own heap, and I never put it there. I do not yet know what it opens. I only know that it feels as if it has been waiting for a hand to lift it.",
+          requires: "cairn1"
+        },
+        {
+          id: "inq-chasm-whisper",
+          title: "Why is it called the Whispering Chasm?",
+          category: "The Gorge",
+          group: "desert",
+          answer: "Because the wind finds every crack in the red cliffs and plays them like the holes of a flute. The sound runs along the walls, bounces from side to side and comes back as a murmur, so one voice becomes many. Do not shout in there. Whisper, and listen to what comes back.",
+          requires: "cairn1"
+        }

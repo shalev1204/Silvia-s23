@@ -1,0 +1,191 @@
+      // ---- Dawn segment: state, tone memory and rendering -------------------------------------------------
+      let dawnStep = 0;
+      let dawnHistory = [];
+      try {
+        const savedDawn = localStorage.getItem('order_dawn_step');
+        if (savedDawn !== null) dawnStep = parseInt(savedDawn, 10) || 0;
+        const savedDawnChoices = JSON.parse(localStorage.getItem('order_dawn_choices') || '[]');
+        if (Array.isArray(savedDawnChoices)) dawnHistory = savedDawnChoices;
+      } catch (e) {}
+      if (isChasmDoneForWire) {
+        // The gorge is already behind Silvia: the dawn segment counts as lived and Hermes holds the first seal
+        dawnStep = 5;
+        try {
+          localStorage.setItem('order_cairn1_completed', 'true');
+          localStorage.setItem('order_seal_cairn_1', 'true');
+        } catch (e) {}
+      }
+      if (dawnStep > 5) dawnStep = 5;
+      function persistDawn() {
+        try {
+          localStorage.setItem('order_dawn_step', String(dawnStep));
+          localStorage.setItem('order_dawn_choices', JSON.stringify(dawnHistory));
+          if (dawnStep >= 5) localStorage.setItem('order_dawn_completed', 'true');
+        } catch (e) {}
+      }
+
+      // Hermes answers in the voice that Silvia has used with him: warm, protective, tactical or analytic
+      function hermesTone() {
+        const score = { warm: 0, protective: 0, tactical: 0, analytic: 0 };
+        for (let s = 0; s < HERMES_TONE_MAP.length; s++) {
+          const t = HERMES_TONE_MAP[s][wireHistory[s]];
+          if (t) score[t]++;
+        }
+        dawnHistory.forEach((idx, s) => {
+          const st = DAWN_THREAD[s];
+          const ch = st && st.choices && st.choices[idx];
+          if (ch && ch.tone) score[ch.tone]++;
+        });
+        const best = ['warm', 'protective', 'tactical', 'analytic'].reduce((b, t) => (score[t] > score[b] ? t : b), 'warm');
+        try { localStorage.setItem('order_hermes_tone', best); } catch (e) {}
+        return best;
+      }
+      function dawnText(v) {
+        return typeof v === 'function' ? v(hermesTone()) : v;
+      }
+
+      function appendDawnSketch(sk) {
+        const stream = wireMessagesStream;
+        if (!stream || !sk) return;
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-bubble-wrap incoming chat-sketch-wrap';
+        wrap.innerHTML = `
+          <div class="chat-bubble chat-sketch-bubble">
+            <figure class="chat-sketch" tabindex="0" role="button" aria-label="Enlarge sketch">
+              <img src="${sk.src}" alt="${sk.alt}" loading="lazy">
+              <figcaption>${sk.caption}</figcaption>
+            </figure>
+            <span class="chat-bubble-time">${getWireTimestamp()}</span>
+          </div>
+        `;
+        const fig = wrap.querySelector('.chat-sketch');
+        const open = () => {
+          const box = document.createElement('div');
+          box.className = 'chat-sketch-lightbox';
+          box.innerHTML = `<img src="${sk.src}" alt="${sk.alt}">`;
+          box.addEventListener('click', () => box.remove());
+          document.body.appendChild(box);
+        };
+        fig.addEventListener('click', open);
+        fig.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+        stream.appendChild(wrap);
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        noteNewMessage();
+      }
+
+      // Restores the dawn conversation without animation
+      function appendDawnHistory() {
+        for (let i = 0; i <= Math.min(dawnStep, 4); i++) {
+          const st = DAWN_THREAD[i];
+          if (!st) continue;
+          if (st.divider) appendWireDivider(st.divider);
+          if (st.hermesInitial) {
+            appendWireMessage('HERMES · CARTOGRAPHER', dawnText(st.hermesInitial));
+            if (st.initialImage) appendDawnSketch(st.initialImage);
+            if (st.telemetry) appendWireMessage('SYSTEM TELEMETRY', st.telemetry, true);
+          }
+          if (i < dawnStep && st.choices) {
+            const choice = st.choices[dawnHistory[i]] || st.choices[0];
+            appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+            appendWireMessage('HERMES · CARTOGRAPHER', dawnText(choice.hermesReply));
+            if (choice.image) appendDawnSketch(choice.image);
+          }
+        }
+        if (dawnStep >= 5) {
+          appendWireMessage('SYSTEM TELEMETRY', '✦ NORTH PORTAL REACHED · THE WHISPERING CHASM · STATION 10 OPEN ✦', true);
+        }
+      }
+
+      // Plays the opening of a dawn step live (divider, Hermes typing, sketch), then shows the next prompt
+      function beginDawnStep(i) {
+        const st = DAWN_THREAD[i];
+        if (!st) { renderWireChoices(); return; }
+        setTimeout(() => {
+          if (st.divider) appendWireDivider(st.divider);
+          if (!st.hermesInitial) { renderWireChoices(); return; }
+          showTyping(true);
+          setTimeout(() => {
+            showTyping(false);
+            if (sfx) sfx.playChimeHover();
+            appendWireMessage('HERMES · CARTOGRAPHER', dawnText(st.hermesInitial), false, true, () => {
+              if (st.initialImage) appendDawnSketch(st.initialImage);
+              if (st.telemetry) {
+                if (sfx) sfx.playCelestialChime();
+                appendWireMessage('SYSTEM TELEMETRY', st.telemetry, true);
+              }
+              renderWireChoices();
+              updateMessengerBadge();
+            });
+          }, 750);
+        }, st.divider ? 900 : 250);
+      }
+
+      function handleDawnChoice(choice, choiceIdx) {
+        if (sfx) sfx.playMechanicalClick();
+        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+        wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        dawnHistory[dawnStep] = choiceIdx;
+        const answered = dawnStep;
+        dawnStep++;
+        persistDawn();
+        showTyping(true);
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playChimeHover();
+          appendWireMessage('HERMES · CARTOGRAPHER', dawnText(choice.hermesReply), false, true, () => {
+            if (choice.image) appendDawnSketch(choice.image);
+            if (answered === 4) {
+              if (sfx) sfx.playCelestialChime();
+              appendWireMessage('SYSTEM TELEMETRY', '✦ NORTH PORTAL REACHED · THE WHISPERING CHASM · STATION 10 OPEN ✦', true);
+              renderWireChoices();
+            } else if (DAWN_THREAD[dawnStep] && DAWN_THREAD[dawnStep].hermesInitial) {
+              beginDawnStep(dawnStep);
+            } else {
+              renderWireChoices();
+            }
+            updateMessengerBadge();
+          });
+        }, 650);
+      }
+
+      function renderDawnPrompt() {
+        const st = DAWN_THREAD[dawnStep];
+        wirePromptBox.style.display = 'block';
+        wireCompletedBar.style.display = 'none';
+        wireChoicesGrid.innerHTML = '';
+        if (st && st.action === 'cairn1') {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'messenger-choice-pill';
+          btn.innerHTML = '<span class="messenger-choice-tag">🪨</span><span class="messenger-choice-text">Help Hermes carry the cone: open the three heaps of Cairn I</span>';
+          btn.addEventListener('click', () => {
+            if (sfx) sfx.playMechanicalClick();
+            if (typeof window.openCairnOneModal === 'function') window.openCairnOneModal();
+          });
+          wireChoicesGrid.appendChild(btn);
+          return;
+        }
+        (st && st.choices ? st.choices : []).forEach((choice, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'messenger-choice-pill';
+          btn.innerHTML = `
+            <span class="messenger-choice-tag">0${idx + 1}</span>
+            <span class="messenger-choice-text">${formatJournalCallouts(choice.text)}</span>
+          `;
+          btn.addEventListener('click', () => handleDawnChoice(choice, idx));
+          wireChoicesGrid.appendChild(btn);
+        });
+      }
+
+      // Called by the Cairn I game when Silvia takes the seal
+      window.onCairnOneSolved = function () {
+        if (dawnStep === 3) {
+          dawnStep = 4;
+          persistDawn();
+          beginDawnStep(4);
+        } else {
+          renderWireChoices();
+        }
+      };
+

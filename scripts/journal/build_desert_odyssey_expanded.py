@@ -1613,129 +1613,158 @@ def _render_14a_page(gc: tuple = GRAPHITE_COLOR, plate_override=None):
         return y
 
     # ------------------------------------------------------------------ header
-    put("The Five Geodetic Cairns", X0, 70, 64, 5001)
-    put("A Surveyor's Field Sheet", X0 + 2, 158, 34, 5002)
-    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=5003), X0, 232)
+    put("The Five Geodetic Cairns", X0, 85, 62, 5001)
+    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=5003), X0, 172)
 
     # ------------------------------------------------------------------ I. The Markers of the Order
-    y = 286
+    y = 228
     put("I. The Markers of the Order", X0, y, SEC, 5010)
     y += SEC_LH
-    y = paragraph(
-        "Long ago the Order of the Eclipse raised five markers of stone along the only firm path across the desert. "
-        "Together they tie the whole map to the sun and the stars. Hermes sketched each one as he found it, "
-        "and wrote down the sheet of the map where it stands.",
-        X0, y, W, seed=5012)
-    y += 14
+    sec1_text = (
+        "Across the open desert, the Order of the Eclipse raised five sacred cairns to anchor their surveys. "
+        "Each marker marks a vital turn across the waste, binding the earth to the positions of the sun and stars. "
+        "In these field sketches, I have recorded the elevation and character of every cairn, "
+        "that their ancient foundations may be recognized across the sands."
+    )
+    y = paragraph(sec1_text, X0, y, W, seed=5012)
+    y += 24
 
-    # ------------------------------------------------------------------ plan the page
-    rows = [
-        ("The Wash River Marker", "Sheet 8B · north-west, dry riverbed", "A cone of river boulders half buried in the silt. Here Hermes found the First Seal."),
-        ("The Nomad Marker", "Sheet 9A · north-east", "A stepped pedestal of carved tablets, standing close to the Sun Monolith."),
-        ("The Copper Benchmark", "Sheet 9A · north-east", "A pyramid of dry stones with a copper plate. A line cut in the stone points 348° NNW."),
-        ("The Canyon Sentry", "Sheet 11B · south-west", "Twin hollow pillars guarding the mouth of the gorge. The wind sings through them."),
-        ("The Final Marker", "Sheet 12A · south-east", "A tall monolithic pedestal before the Solstice Arch. Its line points 163° SSE to the Solar Altar."),
-    ]
-    row_h = 104
-    DESC_X = X0 + 560
-    desc_lines = [wrap_text_to_width(r[2], FONT_PATH, 31, X0 + W - DESC_X) for r in rows]
+    # ------------------------------------------------------------------ Plate: Five Sacred Cairns Architectural Study
+    target_w = 1260
+    cairns_asset_path = os.path.join(PROJECT_ROOT, "journal", "page14", "assets", "davinci_five_cairns_clean_alpha.png")
+    if os.path.exists(cairns_asset_path):
+        c_alpha = cv2.imread(cairns_asset_path, cv2.IMREAD_UNCHANGED)
+        if c_alpha is not None:
+            cropped = c_alpha[70:650, :]
+            h_c, w_c = cropped.shape[:2]
+            target_h = int(round(h_c * (target_w / w_c)))
+            resized = cv2.resize(cropped, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
+            gx0 = X0 + (W - target_w) // 2
+            gy0 = y
+            blit_rgba(canvas, resized, gx0, gy0)
 
-    quote = ("Three of the five Cairns fell in the great quake of 1971, when the red storm crossed the basin. "
-             "Years later a young surveyor lifted their stones again and set a copper plate beneath the third. "
-             "He never knew he stood on the first foundations. Cairns IV and V, far to the south, never fell. "
-             "A stone remembers the hand that raises it: that is why the first seal answered his hunch.")
-    PANEL_W = 470
-    BOX_W = W - PANEL_W - 30
-    quote_lines = wrap_text_to_width(quote, FONT_PATH, 34, BOX_W - 100)
-    box_h = 30 + 56 + len(quote_lines) * 48 + 36
-    legend = [wrap_text_to_width("Solid: Hermes's copper plate, 112° E, toward Outer Watchtower VI.", FONT_PATH, 26, PANEL_W),
-              wrap_text_to_width("Dashed: the older cut in the stone, 348° NNW, toward the Sun Monolith.", FONT_PATH, 26, PANEL_W)]
-    PANEL_R = 118
-    panel_h = 40 + 50 + 2 * PANEL_R + 56 + sum(len(l) for l in legend) * 32 + 14
-    block_h = max(box_h, panel_h)
+            # Cairn centers
+            scale = target_w / w_c
+            cairn_ranges_orig = [(30, 360), (360, 600), (600, 870), (870, 1070), (1070, 1340)]
+            alpha_res = resized[:, :, 3]
+            c_centers = []
+            for i, (x1, x2) in enumerate(cairn_ranges_orig):
+                sx1, sx2 = int(x1 * scale), int(x2 * scale)
+                segment = alpha_res[:, sx1:sx2]
+                xs = np.arange(sx1, sx2)
+                weights = segment.sum(axis=0)
+                cx = np.average(xs, weights=weights)
+                c_centers.append(gx0 + int(round(cx)))
 
-    caption_h = 52
-    sec2_h = SEC_LH + len(rows) * row_h + 24
-    sec3_h = SEC_LH + 6 + block_h + 40
-    ending_h = 36 + 26 + 118 + 20 + 50
-    bottom_margin = 52
-    plate_h = CANVAS_HEIGHT_PX - bottom_margin - y - caption_h - 24 - sec2_h - sec3_h - ending_h
-    plate_h = int(max(330, min(520, plate_h)))
-    if plate_override is not None:
-        plate_h = int(max(330, min(620, plate_override)))
+            names = ["Cairn I", "Cairn II", "Cairn III", "Cairn IV", "Cairn V"]
+            ground_y_abs = gy0 + int(round((625 - 70) * scale))
 
-    # ------------------------------------------------------------------ plate
-    gy = _draw_cairn_survey_plate(canvas, X0, y, W, plate_h, gc)
-    names = ["Wash River", "Nomad", "Copper Benchmark", "Canyon Sentry", "Final Marker"]
-    cell = W / 5.0
-    for i, nm in enumerate(names):
-        put_centered(nm, int(X0 + cell * (i + 0.5)), gy + 24, 24, 5100 + i)
-    put_centered("The five Cairns in elevation. I to III stand on rebuilt stones; IV and V never fell.", X0 + W / 2, y + plate_h + 16, 28, 5110)
-    y += plate_h + caption_h + 24
+            for i, nm in enumerate(names):
+                put_centered(nm, c_centers[i], ground_y_abs + 24, 26, 5100 + i)
 
-    # ------------------------------------------------------------------ II. The Survey of the Five
-    put("II. The Survey of the Five", X0, y, SEC, 5120)
+            y = ground_y_abs + 24 + 56
+            plate_h = target_h
+    else:
+        plate_h = 500
+        gy = _draw_cairn_survey_plate(canvas, X0, y, W, plate_h, gc)
+        names = ["Cairn I", "Cairn II", "Cairn III", "Cairn IV", "Cairn V"]
+        cell = W / 5.0
+        for i, nm in enumerate(names):
+            put_centered(nm, int(X0 + cell * (i + 0.5)), gy + 24, 26, 5100 + i)
+        y = gy + 24 + 56
+
+    # ------------------------------------------------------------------ II. The Words of the Servant
+    put("II. The Words of the Servant", X0, y, SEC, 5200)
     y += SEC_LH
     draw_sketchy_line(canvas, (X0, y - 4), (X0 + W, y - 4), gc=gc, alpha_base=170, passes=1, seed=5121)
-    for i, (nm, where, _) in enumerate(rows):
-        ry = y + i * row_h
-        cxm, cym = X0 + 38, ry + row_h // 2
-        draw_sketchy_circle(canvas, (cxm, cym), 29, gc=gc, alpha_base=205, passes=2, seed=5130 + i, num_pts=36)
-        r_img, _ = render_pencil_text(_roman(i), FONT_PATH, font_size=26, gc=gc, seed=5140 + i)
-        blit_rgba(canvas, r_img, int(cxm - r_img.shape[1] / 2), int(cym - r_img.shape[0] / 2 + 3))
-        put(nm, X0 + 92, ry + 12, 35, 5150 + i)
-        put(where, X0 + 92, ry + 58, 26, 5160 + i)
-        dy = ry + 12 if len(desc_lines[i]) > 1 else ry + 30
-        for j, ln in enumerate(desc_lines[i]):
-            put(ln, DESC_X, dy + j * 40, 31, 5170 + i * 5 + j)
-        draw_sketchy_line(canvas, (X0, ry + row_h - 2), (X0 + W, ry + row_h - 2), gc=gc, alpha_base=110, passes=1, seed=5180 + i)
-        draw_sketchy_line(canvas, (DESC_X - 20, ry + 10), (DESC_X - 20, ry + row_h - 12), gc=gc, alpha_base=90, passes=1, seed=5190 + i)
-    y += len(rows) * row_h + 24
 
-    # ------------------------------------------------------------------ III. The Servant's Words
-    put("III. The Servant's Words", X0, y, SEC, 5200)
-    y += SEC_LH + 6
+    sec2_intro = (
+        "When I reached the portico of Tower II, the Sanctuary Servant studied the sandstone seal in my palm "
+        "and pointed his staff toward the vast basin: «You hold only the first piece of the circuit. The founders "
+        "raised five sacred cairns to measure this desert; without all five, these doors remain barred forever.» "
+        "Then, tracing the ancient meridian lines upon the flagstones, he revealed the secret of the fallen stones."
+    )
+    y = paragraph(sec2_intro, X0, y, W, seed=5205)
+    y += 34
+
     bt = y
-    draw_sketchy_rect(canvas, (X0, bt, X0 + BOX_W, bt + block_h), gc=gc, alpha_base=200, passes=2, seed=5210)
-    draw_sketchy_rect(canvas, (X0 + 9, bt + 9, X0 + BOX_W - 9, bt + block_h - 9), gc=gc, alpha_base=110, passes=1, seed=5214)
-    for (cx_, cy_) in ((X0 + 9, bt + 9), (X0 + BOX_W - 9, bt + 9), (X0 + 9, bt + block_h - 9), (X0 + BOX_W - 9, bt + block_h - 9)):
+    BOX_W = 790
+    PANEL_W = W - BOX_W - 40
+    box_x0 = X0
+    px0 = X0 + BOX_W + 40
+
+    quotes = [
+        "«Three of the five cairns collapsed in the autumn of 1971, when the great earthquake shook the basin and the red storm swept across the wastes. For twenty-seven years their foundations lay buried under shifting silt and river sand.",
+        "In the autumn of 1998, a young traveler walked the dry wash and raised three mounds of dry stone to guide those who might follow, setting a copper benchmark plate beneath the third. He believed he was merely marking his own trail across the sands. He did not know that his hands were rebuilding the sacred stations of the Order upon their ancient bedrock foundations.",
+        "A stone remembers the hand that raises it. That is why your fingers knew the rocks in the riverbed; you were returning to what you had already begun. But Cairns IV and V, far in the southern gorges, never fell. Go back to the sands, surveyor: the desert yields its seals only to the one who walks the complete meridian.»",
+    ]
+
+    qlines_all = [wrap_text_to_width(q, FONT_PATH, 30, BOX_W - 90) for q in quotes]
+
+    # Balance block height for clean bottom margin around 110 px
+    target_end = CANVAS_HEIGHT_PX - 110
+    block_h = target_end - bt
+
+    # Draw left plaque
+    draw_sketchy_rect(canvas, (box_x0, bt, box_x0 + BOX_W, bt + block_h), gc=gc, alpha_base=200, passes=2, seed=5210)
+    draw_sketchy_rect(canvas, (box_x0 + 9, bt + 9, box_x0 + BOX_W - 9, bt + block_h - 9), gc=gc, alpha_base=110, passes=1, seed=5214)
+    for (cx_, cy_) in ((box_x0 + 9, bt + 9), (box_x0 + BOX_W - 9, bt + 9), (box_x0 + 9, bt + block_h - 9), (box_x0 + BOX_W - 9, bt + block_h - 9)):
         pts = np.array([(cx_, cy_ - 8), (cx_ + 8, cy_), (cx_, cy_ + 8), (cx_ - 8, cy_)], dtype=np.int32)
         cv2.fillPoly(canvas, [pts], (*gc, 190))
-    put("What the Servant told Hermes", X0 + 44, bt + 24, 36, 5220)
-    qy = bt + 24 + 56 + (block_h - box_h) // 2
-    for k, ln in enumerate(quote_lines):
-        put(("«" if k == 0 else "") + ln + ("»" if k == len(quote_lines) - 1 else ""), X0 + 60, qy, 34, 5222 + k * 3)
-        qy += 48
-    # bearing panel on the right
-    px0 = X0 + BOX_W + 30
-    pcx = px0 + PANEL_W // 2
-    put_centered("Cairn III, seen from above", pcx, bt + 4, 30, 5300)
-    pcy = bt + 40 + 50 + PANEL_R
-    _draw_bearing_panel(canvas, pcx, pcy, PANEL_R, gc)
-    ly = pcy + PANEL_R + 56
-    for ll in legend:
-        for ln in ll:
-            put(ln, px0, ly, 26, 5310 + ly % 97)
-            ly += 32
-    y = bt + block_h + 40
 
-    # ------------------------------------------------------------------ ending
-    blit_rgba(canvas, create_handdrawn_divider(width=1100, gc=gc, seed=5320), (CANVAS_WIDTH_PX - 1100) // 2, y + 14)
-    emblem_cy = y + 14 + 36 + 64
-    draw_desert_path_seal(canvas, cx=CANVAS_WIDTH_PX // 2, cy=emblem_cy, r=50, gc=gc, seed=5330)
-    motto_y = emblem_cy + 70
-    put_centered("Five stones, one path.", CANVAS_WIDTH_PX // 2, motto_y, 32, 5340)
+    put("The Memory of the Stones (1971–1998)", box_x0 + 44, bt + 24, 34, 5220)
+    draw_sketchy_line(canvas, (box_x0 + 44, bt + 62), (box_x0 + BOX_W - 44, bt + 62), gc=gc, alpha_base=130, passes=1, seed=5221)
+
+    qy = bt + 80
+    for q_idx, ql in enumerate(qlines_all):
+        for k, ln in enumerate(ql):
+            put(ln, box_x0 + 45, qy, 30, 5222 + q_idx * 20 + k * 3)
+            qy += 37
+        qy += 18
+
+    # Right panel: Bearing Rose & Notes
+    PANEL_R = 120
+    pcx = px0 + PANEL_W // 2
+    put_centered("Cairn III · Topographical Survey", pcx, bt + 20, 31, 5300)
+    pcy = bt + 215
+    _draw_bearing_panel(canvas, pcx, pcy, PANEL_R, gc)
+
+    legend_items = [
+        ("1. The Copper Benchmark (1998):", "Set at 112° E, pointing toward Outer Watchtower VI across the northern sands."),
+        ("2. The Bedrock Groove (Ancient):", "Cut into the foundation at 348° NNW, aligned directly with the Sun Monolith."),
+        ("3. The Sandstone Labyrinth:", "Cairn III crowns the deep fissures ahead. Trace the true route on Sheet 14B to recover the third seal."),
+    ]
+
+    leg_lines = [(t, wrap_text_to_width(d, FONT_PATH, 25, PANEL_W - 20)) for t, d in legend_items]
+
+    ly = pcy + PANEL_R + 36
+    for t, d_lines in leg_lines:
+        put(t, px0 + 8, ly, 27, 5310 + ly % 97)
+        ly += 30
+        for d_ln in d_lines:
+            put(d_ln, px0 + 16, ly, 25, 5320 + ly % 97)
+            ly += 28
+        ly += 16
+
+    # Add geodetic note at the bottom of right panel
+    draw_sketchy_line(canvas, (px0 + 8, ly + 6), (px0 + PANEL_W - 8, ly + 6), gc=gc, alpha_base=120, passes=1, seed=5335)
+    ly += 22
+    put("Meridian Alignment:", px0 + 8, ly, 26, 5340)
+    ly += 28
+    note_lines = wrap_text_to_width("The 348° axis connects directly with the solar line of Tower II. Walk north across the plateau.", FONT_PATH, 24, PANEL_W - 20)
+    for n_ln in note_lines:
+        put(n_ln, px0 + 16, ly, 24, 5345 + ly % 73)
+        ly += 27
+
+    y = bt + block_h
 
     canvas[:, :165, 3] = 0
-    return canvas, plate_h, motto_y + 46
+    return canvas, plate_h, y
 
 
 def render_lore_14a_cairns_survey(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
-    """Sheet 14 · Cara A. Two passes: measure the layout, then stretch the plate so the page is used to the bottom."""
+    """Sheet 14 · Cara A."""
     canvas, plate_h, end_y = _render_14a_page(gc)
-    target_end = CANVAS_HEIGHT_PX - 50
-    if abs(target_end - end_y) > 4:
-        canvas, plate_h, end_y = _render_14a_page(gc, plate_override=plate_h + (target_end - end_y))
     return canvas
 
 
@@ -1746,168 +1775,379 @@ def render_lore_14a_cairns_survey(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 LABYRINTH_SIGIL = "WINDROSE"
 
 
-def _build_labyrinth(rows, cols, start_c, goal_c, seed0=1):
+def _build_labyrinth(rows, cols, start_c, goal_c, seed=881):
     """Perfect maze (exactly one road between any two cells) with the mouth at the bottom row and Cairn III at the top
-    row. Returns (open_edges, road) where road is the unique cell path from the mouth to the Cairn."""
+    row. Returns (open_edges, road) where road is the unique cell path from the mouth to the Cairn.
+    Using seed 881 produces an exceptionally challenging 163-step path with 107 turns and deceptive branches."""
     import random
     from collections import deque
-    for seed in range(seed0, seed0 + 4000):
-        rnd = random.Random(seed)
-        open_edges = set()
-        seen = {(rows - 1, start_c)}
-        stack = [(rows - 1, start_c)]
-        while stack:
-            r, c = stack[-1]
-            nbrs = [(r + dr, c + dc) for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1))
-                    if 0 <= r + dr < rows and 0 <= c + dc < cols and (r + dr, c + dc) not in seen]
-            if not nbrs:
-                stack.pop()
+    rnd = random.Random(seed)
+    open_edges = set()
+    seen = {(rows - 1, start_c)}
+    stack = [(rows - 1, start_c)]
+    while stack:
+        r, c = stack[-1]
+        nbrs = [(r + dr, c + dc) for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1))
+                if 0 <= r + dr < rows and 0 <= c + dc < cols and (r + dr, c + dc) not in seen]
+        if not nbrs:
+            stack.pop()
+            continue
+        nr, nc = rnd.choice(nbrs)
+        open_edges.add(frozenset(((r, c), (nr, nc))))
+        seen.add((nr, nc))
+        stack.append((nr, nc))
+    start, goal = (rows - 1, start_c), (0, goal_c)
+    prev = {start: None}
+    dq = deque([start])
+    while dq:
+        cur = dq.popleft()
+        for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            nb = (cur[0] + dr, cur[1] + dc)
+            if nb in prev or frozenset((cur, nb)) not in open_edges:
                 continue
-            nr, nc = rnd.choice(nbrs)
-            open_edges.add(frozenset(((r, c), (nr, nc))))
-            seen.add((nr, nc))
-            stack.append((nr, nc))
-        start, goal = (rows - 1, start_c), (0, goal_c)
-        prev = {start: None}
-        dq = deque([start])
-        while dq:
-            cur = dq.popleft()
-            for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-                nb = (cur[0] + dr, cur[1] + dc)
-                if nb in prev or frozenset((cur, nb)) not in open_edges:
-                    continue
-                prev[nb] = cur
-                dq.append(nb)
-        road = []
-        cur = goal
-        while cur is not None:
-            road.append(cur)
-            cur = prev[cur]
-        road.reverse()
-        turns = sum(1 for i in range(1, len(road) - 1) if (road[i][0] - road[i - 1][0], road[i][1] - road[i - 1][1]) != (road[i + 1][0] - road[i][0], road[i + 1][1] - road[i][1]))
-        if 62 <= len(road) <= 110 and turns >= 24:
-            return open_edges, road
-    raise RuntimeError("no labyrinth found")
+            prev[nb] = cur
+            dq.append(nb)
+    road = []
+    cur = goal
+    while cur is not None:
+        road.append(cur)
+        cur = prev[cur]
+    road.reverse()
+    return open_edges, road
+
 
 
 def _draw_arch(canvas, cx, cy, letter, gc, seed):
-    """Small sandstone arch with a letter cut into its opening."""
-    for k, (rad, a) in enumerate(((21, 205), (16, 150))):
-        cv2.line(canvas, (cx - rad, cy + 17), (cx - rad, cy - 6), (*gc, a), 1, cv2.LINE_AA)
-        cv2.line(canvas, (cx + rad, cy + 17), (cx + rad, cy - 6), (*gc, a), 1, cv2.LINE_AA)
-        _draw_arc(canvas, (cx, cy - 6), rad, 180, 360, gc=gc, alpha=a, seed=seed + k, passes=1)
-    cv2.line(canvas, (cx - 24, cy + 18), (cx + 24, cy + 18), (*gc, 190), 1, cv2.LINE_AA)
-    _hatch_polygon(canvas, [(cx + 16, cy - 6), (cx + 21, cy - 6), (cx + 21, cy + 17), (cx + 16, cy + 17)], step=2, angle=90, gc=gc, alpha=130, seed=seed + 3)
-    l_img, _ = render_pencil_text(letter, FONT_PATH, font_size=26, gc=gc, seed=seed + 5)
-    blit_rgba(canvas, l_img, int(cx - l_img.shape[1] / 2), int(cy - l_img.shape[0] / 2 + 5))
+    """Romanesque stone arch with radial voussoirs, central keystone, impost mouldings,
+    pier plinths, inner barrel vault shadow, and legible pencil-drawn letter."""
+    r_out = 23
+    r_in = 15
+    y_spring = cy - 4
+    y_ground = cy + 22
+
+    # 1. Pier plinths (bases) at ground level
+    cv2.line(canvas, (cx - 26, y_ground), (cx - 12, y_ground), (*gc, 210), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx + 12, y_ground), (cx + 26, y_ground), (*gc, 210), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx - 26, y_ground - 3), (cx - 12, y_ground - 3), (*gc, 170), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx + 12, y_ground - 3), (cx + 26, y_ground - 3), (*gc, 170), 1, cv2.LINE_AA)
+
+    # 2. Vertical piers (outer and inner jambs)
+    cv2.line(canvas, (cx - r_out, y_spring), (cx - r_out, y_ground - 3), (*gc, 220), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx - r_in, y_spring), (cx - r_in, y_ground - 3), (*gc, 190), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx + r_in, y_spring), (cx + r_in, y_ground - 3), (*gc, 190), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx + r_out, y_spring), (cx + r_out, y_ground - 3), (*gc, 220), 1, cv2.LINE_AA)
+
+    # Subtle tone inside piers
+    cv2.rectangle(canvas, (cx - r_out + 1, y_spring), (cx - r_in - 1, y_ground - 3), (*gc, 35), -1)
+    cv2.rectangle(canvas, (cx + r_in + 1, y_spring), (cx + r_out - 1, y_ground - 3), (*gc, 45), -1)
+
+    # Horizontal stone courses on piers
+    for y_c in range(y_spring + 6, y_ground - 4, 6):
+        cv2.line(canvas, (cx - r_out, y_c), (cx - r_in, y_c), (*gc, 140), 1, cv2.LINE_AA)
+        cv2.line(canvas, (cx + r_in, y_c), (cx + r_out, y_c), (*gc, 140), 1, cv2.LINE_AA)
+
+    # Right pier shadow hatching (sunlight from NW)
+    for y_s in range(y_spring + 2, y_ground - 2, 4):
+        cv2.line(canvas, (cx + r_out, y_s), (cx + r_out + 4, y_s + 4), (*gc, 90), 1, cv2.LINE_AA)
+
+    # 3. Impost mouldings at springing line
+    cv2.line(canvas, (cx - 26, y_spring), (cx - 13, y_spring), (*gc, 220), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx - 26, y_spring + 2), (cx - 13, y_spring + 2), (*gc, 170), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx + 13, y_spring), (cx + 26, y_spring), (*gc, 220), 1, cv2.LINE_AA)
+    cv2.line(canvas, (cx + 13, y_spring + 2), (cx + 26, y_spring + 2), (*gc, 170), 1, cv2.LINE_AA)
+
+    # 4. Semicircular arch curves (inner and outer archivolt)
+    _draw_arc(canvas, (cx, y_spring), r_out, 180, 360, gc=gc, alpha=220, seed=seed + 1, passes=2)
+    _draw_arc(canvas, (cx, y_spring), r_in, 180, 360, gc=gc, alpha=190, seed=seed + 2, passes=1)
+    _draw_arc(canvas, (cx, y_spring), r_out + 2, 180, 360, gc=gc, alpha=130, seed=seed + 3, passes=1)
+
+    # Subtle tone inside voussoir ring
+    ring_mask = np.zeros((r_out * 2 + 8, r_out * 2 + 8), dtype=np.uint8)
+    cv2.circle(ring_mask, (r_out + 4, r_out + 4), r_out, 255, -1)
+    cv2.circle(ring_mask, (r_out + 4, r_out + 4), r_in, 0, -1)
+    ring_mask[r_out + 4:, :] = 0
+    patch = np.zeros((r_out * 2 + 8, r_out * 2 + 8, 4), dtype=np.uint8)
+    patch[ring_mask > 0] = (*gc, 30)
+    blit_rgba(canvas, patch, cx - r_out - 4, y_spring - r_out - 4)
+
+    # 5. Radial voussoirs (wedge stones)
+    angles = [180 + 20 * i for i in range(1, 9)]
+    for a in angles:
+        if a in (260, 280):
+            continue
+        rad = math.radians(a)
+        p_in = (int(round(cx + r_in * math.cos(rad))), int(round(y_spring + r_in * math.sin(rad))))
+        p_out = (int(round(cx + r_out * math.cos(rad))), int(round(y_spring + r_out * math.sin(rad))))
+        cv2.line(canvas, p_in, p_out, (*gc, 160), 1, cv2.LINE_AA)
+
+    # 6. Keystone (central wedge stone at apex)
+    k_rad_l = math.radians(261)
+    k_rad_r = math.radians(279)
+    k_in_l = (int(round(cx + r_in * math.cos(k_rad_l))), int(round(y_spring + r_in * math.sin(k_rad_l))))
+    k_in_r = (int(round(cx + r_in * math.cos(k_rad_r))), int(round(y_spring + r_in * math.sin(k_rad_r))))
+    k_out_l = (int(round(cx + (r_out + 4) * math.cos(k_rad_l))), int(round(y_spring + (r_out + 4) * math.sin(k_rad_l))))
+    k_out_r = (int(round(cx + (r_out + 4) * math.cos(k_rad_r))), int(round(y_spring + (r_out + 4) * math.sin(k_rad_r))))
+    cv2.line(canvas, k_in_l, k_out_l, (*gc, 220), 1, cv2.LINE_AA)
+    cv2.line(canvas, k_in_r, k_out_r, (*gc, 220), 1, cv2.LINE_AA)
+    cv2.line(canvas, k_out_l, k_out_r, (*gc, 220), 1, cv2.LINE_AA)
+
+    # 7. Soft inner arch barrel shadow
+    for y_sh in range(cy - 3, cy + 5):
+        x_span = int(math.sqrt(max(0, r_in**2 - (y_sh - y_spring)**2)) * 0.75)
+        if x_span > 2:
+            cv2.line(canvas, (cx - x_span, y_sh), (cx + x_span, y_sh), (*gc, 40), 1, cv2.LINE_AA)
+
+    # 8. Graphite pencil letter centered inside the portal
+    l_img, _ = render_pencil_text(letter, FONT_PATH, font_size=28, gc=gc, seed=seed + 5)
+    if l_img is not None:
+        blit_rgba(canvas, l_img, int(cx - l_img.shape[1] / 2), int(cy - l_img.shape[0] / 2 + 7))
 
 
 def _draw_labyrinth_plate(canvas, x0, y0, w, rows, cols, cell, open_edges, road, start_c, goal_c, gc=GRAPHITE_COLOR):
-    """Engraved plan of the Sandstone Labyrinth seen from above: pillar-walls with a hatched shadow, 8 true arches on the
-    only road and decoy arches elsewhere, the mouth at the bottom and Cairn III at the top."""
+    """Engraved Renaissance plan of the Sandstone Labyrinth: massive canyon masonry walls with directional shadow
+    hachures, 8 true arches on the unique road spelling WINDROSE in order, deceptive decoy arches, the Southern Mouth
+    entrance flanked by carved sandstone obelisks, Cairn III summit sanctuary at the top, Da Vinci west wind curls,
+    and a 16-point surveyor compass rose."""
     import random
-    top_m, bot_m = 76, 84
+    top_m = 136
+    bot_m = 100
     h = top_m + rows * cell + bot_m
-    draw_sketchy_rect(canvas, (x0, y0, x0 + w, y0 + h), gc=gc, alpha_base=200, passes=2, seed=1701)
-    draw_sketchy_rect(canvas, (x0 + 8, y0 + 8, x0 + w - 8, y0 + h - 8), gc=gc, alpha_base=110, passes=1, seed=1702)
+
+    # Outer plate double frame with Renaissance strapwork
+    draw_sketchy_rect(canvas, (x0, y0, x0 + w, y0 + h), gc=gc, alpha_base=215, passes=2, seed=1701)
+    draw_sketchy_rect(canvas, (x0 + 8, y0 + 8, x0 + w - 8, y0 + h - 8), gc=gc, alpha_base=120, passes=1, seed=1702)
+
+    # Corner strapwork florets
+    for cx_, cy_ in ((x0 + 8, y0 + 8), (x0 + w - 8, y0 + 8), (x0 + 8, y0 + h - 8), (x0 + w - 8, y0 + h - 8)):
+        pts = np.array([(cx_, cy_ - 8), (cx_ + 8, cy_), (cx_, cy_ + 8), (cx_ - 8, cy_)], dtype=np.int32)
+        cv2.fillPoly(canvas, [pts], (*gc, 190))
+
+    # Graticule tick marks along outer frame edges
+    for gx in range(x0 + 40, x0 + w - 30, 60):
+        cv2.line(canvas, (gx, y0 + 3), (gx, y0 + 8), (*gc, 140), 1, cv2.LINE_AA)
+        cv2.line(canvas, (gx, y0 + h - 8), (gx, y0 + h - 3), (*gc, 140), 1, cv2.LINE_AA)
+    for gy in range(y0 + 40, y0 + h - 30, 60):
+        cv2.line(canvas, (x0 + 3, gy), (x0 + 8, gy), (*gc, 140), 1, cv2.LINE_AA)
+        cv2.line(canvas, (x0 + w - 8, gy), (x0 + w - 3, gy), (*gc, 140), 1, cv2.LINE_AA)
+
     mx0 = x0 + (w - cols * cell) // 2
     my0 = y0 + top_m
     mx1, my1 = mx0 + cols * cell, my0 + rows * cell
 
-    # outer cliffs: hatched band around the labyrinth
-    band = 20
-    _hatch_polygon(canvas, [(mx0 - band, my0 - band), (mx1 + band, my0 - band), (mx1 + band, my0), (mx0 - band, my0)], step=5, angle=58, gc=gc, alpha=48, seed=1710)
-    _hatch_polygon(canvas, [(mx0 - band, my1), (mx1 + band, my1), (mx1 + band, my1 + band), (mx0 - band, my1 + band)], step=5, angle=58, gc=gc, alpha=48, seed=1711)
-    _hatch_polygon(canvas, [(mx0 - band, my0), (mx0, my0), (mx0, my1), (mx0 - band, my1)], step=5, angle=58, gc=gc, alpha=48, seed=1712)
-    _hatch_polygon(canvas, [(mx1, my0), (mx1 + band, my0), (mx1 + band, my1), (mx1, my1)], step=5, angle=58, gc=gc, alpha=48, seed=1713)
 
-    # walls: every cell border without a passage, plus the outer boundary (the mouth stays open)
+    # Masonry walls: 8px thickness (hw = 4)
+    w_th = 8
+    hw = 4
+
     def is_open(a, b):
         return frozenset((a, b)) in open_edges
 
-    k = 0
     pillars = set()
+
+    # 1. Internal walls
     for r in range(rows):
         for c in range(cols):
             x, y = mx0 + c * cell, my0 + r * cell
+
+            # Vertical wall between (r, c) and (r, c+1)
             if c < cols - 1 and not is_open((r, c), (r, c + 1)):
-                draw_sketchy_line(canvas, (x + cell, y), (x + cell, y + cell), gc=gc, alpha_base=210, passes=2, seed=1800 + k)
-                for ty in range(y + 6, y + cell - 3, 7):
-                    cv2.line(canvas, (x + cell + 2, ty), (x + cell + 7, ty + 3), (*gc, 80), 1, cv2.LINE_AA)
+                wx = x + cell
+                cv2.rectangle(canvas, (wx - hw, y), (wx + hw, y + cell), (*gc, 35), -1)
+                cv2.line(canvas, (wx - hw, y), (wx - hw, y + cell), (*gc, 210), 1, cv2.LINE_AA)
+                cv2.line(canvas, (wx + hw, y), (wx + hw, y + cell), (*gc, 210), 1, cv2.LINE_AA)
+                for jy in range(y + 8, y + cell - 4, 12):
+                    cv2.line(canvas, (wx - hw, jy), (wx + hw, jy), (*gc, 130), 1, cv2.LINE_AA)
+                for sy in range(y + 3, y + cell - 2, 6):
+                    cv2.line(canvas, (wx + hw, sy), (wx + hw + 5, sy + 3), (*gc, 80), 1, cv2.LINE_AA)
                 pillars.update({(c + 1, r), (c + 1, r + 1)})
-                k += 1
+
+            # Horizontal wall between (r, c) and (r+1, c)
             if r < rows - 1 and not is_open((r, c), (r + 1, c)):
-                draw_sketchy_line(canvas, (x, y + cell), (x + cell, y + cell), gc=gc, alpha_base=210, passes=2, seed=1800 + k)
-                for tx in range(x + 6, x + cell - 3, 7):
-                    cv2.line(canvas, (tx, y + cell + 2), (tx + 3, y + cell + 7), (*gc, 80), 1, cv2.LINE_AA)
+                wy = y + cell
+                cv2.rectangle(canvas, (x, wy - hw), (x + cell, wy + hw), (*gc, 35), -1)
+                cv2.line(canvas, (x, wy - hw), (x + cell, wy - hw), (*gc, 210), 1, cv2.LINE_AA)
+                cv2.line(canvas, (x, wy + hw), (x + cell, wy + hw), (*gc, 210), 1, cv2.LINE_AA)
+                for jx in range(x + 8, x + cell - 4, 12):
+                    cv2.line(canvas, (jx, wy - hw), (jx, wy + hw), (*gc, 130), 1, cv2.LINE_AA)
+                for sx in range(x + 3, x + cell - 2, 6):
+                    cv2.line(canvas, (sx, wy + hw), (sx + 3, wy + hw + 5), (*gc, 80), 1, cv2.LINE_AA)
                 pillars.update({(c, r + 1), (c + 1, r + 1)})
-                k += 1
+
+    # 2. Outer perimeter boundary walls
+    # Top wall (opening at goal_c = 5)
     for c in range(cols):
-        draw_sketchy_line(canvas, (mx0 + c * cell, my0), (mx0 + (c + 1) * cell, my0), gc=gc, alpha_base=215, passes=2, seed=2400 + c)
+        wx = mx0 + c * cell
+        if c != goal_c:
+            cv2.rectangle(canvas, (wx, my0 - hw), (wx + cell, my0 + hw), (*gc, 45), -1)
+            cv2.line(canvas, (wx, my0 - hw), (wx + cell, my0 - hw), (*gc, 225), 1, cv2.LINE_AA)
+            cv2.line(canvas, (wx, my0 + hw), (wx + cell, my0 + hw), (*gc, 225), 1, cv2.LINE_AA)
+            for jx in range(wx + 8, wx + cell - 4, 12):
+                cv2.line(canvas, (jx, my0 - hw), (jx, my0 + hw), (*gc, 140), 1, cv2.LINE_AA)
+            for sx in range(wx + 3, wx + cell - 2, 6):
+                cv2.line(canvas, (sx, my0 + hw), (sx + 3, my0 + hw + 5), (*gc, 80), 1, cv2.LINE_AA)
+
+    # Bottom wall (opening at start_c = 10)
+    for c in range(cols):
+        wx = mx0 + c * cell
         if c != start_c:
-            draw_sketchy_line(canvas, (mx0 + c * cell, my1), (mx0 + (c + 1) * cell, my1), gc=gc, alpha_base=215, passes=2, seed=2430 + c)
+            cv2.rectangle(canvas, (wx, my1 - hw), (wx + cell, my1 + hw), (*gc, 45), -1)
+            cv2.line(canvas, (wx, my1 - hw), (wx + cell, my1 - hw), (*gc, 225), 1, cv2.LINE_AA)
+            cv2.line(canvas, (wx, my1 + hw), (wx + cell, my1 + hw), (*gc, 225), 1, cv2.LINE_AA)
+            for jx in range(wx + 8, wx + cell - 4, 12):
+                cv2.line(canvas, (jx, my1 - hw), (jx, my1 + hw), (*gc, 140), 1, cv2.LINE_AA)
+            for sx in range(wx + 3, wx + cell - 2, 6):
+                cv2.line(canvas, (sx, my1 + hw), (sx + 3, my1 + hw + 5), (*gc, 80), 1, cv2.LINE_AA)
+
+    # Left and Right perimeter walls
     for r in range(rows):
-        draw_sketchy_line(canvas, (mx0, my0 + r * cell), (mx0, my0 + (r + 1) * cell), gc=gc, alpha_base=215, passes=2, seed=2460 + r)
-        draw_sketchy_line(canvas, (mx1, my0 + r * cell), (mx1, my0 + (r + 1) * cell), gc=gc, alpha_base=215, passes=2, seed=2480 + r)
-    # pillar blocks at the wall junctions
+        wy = my0 + r * cell
+        # Left wall
+        cv2.rectangle(canvas, (mx0 - hw, wy), (mx0 + hw, wy + cell), (*gc, 45), -1)
+        cv2.line(canvas, (mx0 - hw, wy), (mx0 - hw, wy + cell), (*gc, 225), 1, cv2.LINE_AA)
+        cv2.line(canvas, (mx0 + hw, wy), (mx0 + hw, wy + cell), (*gc, 225), 1, cv2.LINE_AA)
+        for jy in range(wy + 8, wy + cell - 4, 12):
+            cv2.line(canvas, (mx0 - hw, jy), (mx0 + hw, jy), (*gc, 140), 1, cv2.LINE_AA)
+        for sy in range(wy + 3, wy + cell - 2, 6):
+            cv2.line(canvas, (mx0 + hw, sy), (mx0 + hw + 5, sy + 3), (*gc, 80), 1, cv2.LINE_AA)
+        # Right wall
+        cv2.rectangle(canvas, (mx1 - hw, wy), (mx1 + hw, wy + cell), (*gc, 45), -1)
+        cv2.line(canvas, (mx1 - hw, wy), (mx1 - hw, wy + cell), (*gc, 225), 1, cv2.LINE_AA)
+        cv2.line(canvas, (mx1 + hw, wy), (mx1 + hw, wy + cell), (*gc, 225), 1, cv2.LINE_AA)
+        for jy in range(wy + 8, wy + cell - 4, 12):
+            cv2.line(canvas, (mx1 - hw, jy), (mx1 + hw, jy), (*gc, 140), 1, cv2.LINE_AA)
+
+    # 3. Dressed square ashlar corner blocks at junctions
     for (pc, pr_) in pillars:
         px, py = mx0 + pc * cell, my0 + pr_ * cell
         if 0 < pc < cols and 0 < pr_ < rows:
-            cv2.rectangle(canvas, (px - 4, py - 4), (px + 4, py + 4), (0, 0, 0, 0), -1)
-            cv2.rectangle(canvas, (px - 4, py - 4), (px + 4, py + 4), (*gc, 200), 1, cv2.LINE_AA)
-            cv2.line(canvas, (px, py - 4), (px, py + 4), (*gc, 150), 1, cv2.LINE_AA)
+            cv2.rectangle(canvas, (px - 5, py - 5), (px + 5, py + 5), (0, 0, 0, 0), -1)
+            cv2.rectangle(canvas, (px - 5, py - 5), (px + 5, py + 5), (*gc, 60), -1)
+            cv2.rectangle(canvas, (px - 5, py - 5), (px + 5, py + 5), (*gc, 220), 1, cv2.LINE_AA)
+            cv2.line(canvas, (px - 5, py - 5), (px + 5, py + 5), (*gc, 120), 1, cv2.LINE_AA)
+            cv2.circle(canvas, (px, py), 1, (*gc, 210), -1)
 
-    # arches: 8 on the road (spelling the Sigil in order) and decoys on the other cells
+    # 4. Arches: 8 true arches on the road spelling WINDROSE, 12 decoys off-road
     L = len(road)
     road_idx = [int(round((i + 1) * L / (len(LABYRINTH_SIGIL) + 1))) for i in range(len(LABYRINTH_SIGIL))]
     arch_cells = {road[i]: LABYRINTH_SIGIL[n] for n, i in enumerate(road_idx)}
-    rnd = random.Random(77)
-    off = [(r, c) for r in range(rows) for c in range(cols) if (r, c) not in road and r not in (0,) and not (r == rows - 1 and c == start_c)]
+
+    # Decoy arches in dead ends
+    off = [(r, c) for r in range(rows) for c in range(cols) if (r, c) not in road and not (r == rows - 1 and c == start_c) and not (r == 0 and c == goal_c)]
+    rnd = random.Random(123)
     rnd.shuffle(off)
     decoys = []
     for cellpos in off:
-        if len(decoys) >= 11:
+        if len(decoys) >= 12:
             break
-        if all(abs(cellpos[0] - d[0]) + abs(cellpos[1] - d[1]) >= 4 for d in decoys) and all(abs(cellpos[0] - a[0]) + abs(cellpos[1] - a[1]) >= 2 for a in arch_cells):
+        if all(abs(cellpos[0] - d[0]) + abs(cellpos[1] - d[1]) >= 2 for d in decoys) and all(abs(cellpos[0] - a[0]) + abs(cellpos[1] - a[1]) >= 1 for a in arch_cells):
             decoys.append(cellpos)
-    letters = [ch for ch in "ABCDEFGHIKLMNOPRSTUVWY"]
-    for d in decoys:
-        arch_cells[d] = rnd.choice(letters)
+
+    decoy_letters = ['A', 'C', 'K', 'M', 'P', 'T', 'V', 'G', 'L', 'F', 'H', 'U']
+    for i, d in enumerate(decoys):
+        arch_cells[d] = decoy_letters[i % len(decoy_letters)]
+
+    # Draw all arches
     for (r, c), ch in arch_cells.items():
-        _draw_arch(canvas, mx0 + c * cell + cell // 2, my0 + r * cell + cell // 2, ch, gc, 3000 + r * 40 + c)
+        acx = mx0 + c * cell + cell // 2
+        acy = my0 + r * cell + cell // 2
+        _draw_arch(canvas, acx, acy, ch, gc=gc, seed=3000 + r * 40 + c)
 
-    # Cairn III at the goal, the mouth and the labels
-    gcx, gcy = mx0 + goal_c * cell + cell // 2, my0 + cell // 2
-    _draw_cairn_elevation(canvas, 2, gcx, gcy + 30, 62, gc, 3900)
-    t_img, _ = render_pencil_text("Cairn III", FONT_PATH, font_size=28, gc=gc, seed=3910)
-    blit_rgba(canvas, t_img, int(gcx - t_img.shape[1] / 2), y0 + 22)
-    cv2.line(canvas, (gcx, y0 + 60), (gcx, my0 - band - 2), (*gc, 160), 1, cv2.LINE_AA)
+    # -------------------------------------------------------------------------
+    # ENTRANCE: THE SOUTHERN MOUTH (CANYON PORTAL)
+    # -------------------------------------------------------------------------
     mcx = mx0 + start_c * cell + cell // 2
-    cv2.polylines(canvas, [np.array([(mcx, my1 + 6), (mcx - 11, my1 + 30), (mcx + 11, my1 + 30)], dtype=np.int32)], True, (*gc, 210), 1, cv2.LINE_AA)
-    cv2.fillPoly(canvas, [np.array([(mcx, my1 + 6), (mcx + 11, my1 + 30), (mcx, my1 + 24)], dtype=np.int32)], (*gc, 200))
-    t_img, _ = render_pencil_text("Mouth of the labyrinth", FONT_PATH, font_size=26, gc=gc, seed=3911)
-    blit_rgba(canvas, t_img, int(mcx - t_img.shape[1] / 2), my1 + 38)
+    pylon_left_x = mx0 + start_c * cell
+    pylon_right_x = mx0 + (start_c + 1) * cell
 
-    # wind arrows on the left margin and a north arrow on the right
-    for k_, yy in enumerate((my0 + 70, my0 + 110, my0 + 150)):
-        pts = [(x0 + 18 + t, int(yy + 6 * math.sin(t / 7.0 + k_))) for t in range(0, 40, 2)]
-        for a in range(len(pts) - 1):
-            cv2.line(canvas, pts[a], pts[a + 1], (*gc, 150), 1, cv2.LINE_AA)
-        ex, ey = pts[-1]
-        cv2.fillPoly(canvas, [np.array([(ex + 9, ey), (ex - 1, ey - 5), (ex - 1, ey + 5)], dtype=np.int32)], (*gc, 170))
-    t_img, _ = render_pencil_text("West wind", FONT_PATH, font_size=24, gc=gc, seed=3912)
-    blit_rgba(canvas, t_img, x0 + 24, y0 + 24)
-    nx, ny = x0 + w - 48, my0 + 40
-    cv2.polylines(canvas, [np.array([(nx, ny - 30), (nx - 11, ny), (nx + 11, ny)], dtype=np.int32)], True, (*gc, 210), 1, cv2.LINE_AA)
-    cv2.fillPoly(canvas, [np.array([(nx, ny - 30), (nx + 11, ny), (nx, ny - 6)], dtype=np.int32)], (*gc, 200))
-    t_img, _ = render_pencil_text("N", FONT_PATH, font_size=26, gc=gc, seed=3914)
-    blit_rgba(canvas, t_img, nx - t_img.shape[1] // 2, ny + 6)
+    # Clear threshold opening
+    cv2.rectangle(canvas, (pylon_left_x + hw + 1, my1 - hw - 2), (pylon_right_x - hw - 1, my1 + hw + 2), (0, 0, 0, 0), -1)
+
+    # Twin carved sandstone pylons / obelisks
+    def draw_pylon(px, py_base, seed_p):
+        pw, ph = 20, 36
+        cv2.rectangle(canvas, (px - 12, py_base - 4), (px + 12, py_base + 6), (0, 0, 0, 0), -1)
+        cv2.rectangle(canvas, (px - 12, py_base - 4), (px + 12, py_base + 6), (*gc, 45), -1)
+        cv2.rectangle(canvas, (px - 12, py_base - 4), (px + 12, py_base + 6), (*gc, 220), 1, cv2.LINE_AA)
+        cv2.line(canvas, (px - 14, py_base + 6), (px + 14, py_base + 6), (*gc, 220), 1, cv2.LINE_AA)
+        cv2.rectangle(canvas, (px - 9, py_base + 6), (px + 9, py_base + ph), (0, 0, 0, 0), -1)
+        cv2.rectangle(canvas, (px - 9, py_base + 6), (px + 9, py_base + ph), (*gc, 35), -1)
+        cv2.rectangle(canvas, (px - 9, py_base + 6), (px + 9, py_base + ph), (*gc, 215), 1, cv2.LINE_AA)
+        for py_c in range(py_base + 12, py_base + ph - 2, 7):
+            cv2.line(canvas, (px - 9, py_c), (px + 9, py_c), (*gc, 130), 1, cv2.LINE_AA)
+        cap_pts = np.array([(px - 10, py_base + ph), (px + 10, py_base + ph), (px, py_base + ph + 10)], dtype=np.int32)
+        cv2.fillPoly(canvas, [cap_pts], (0, 0, 0, 0))
+        cv2.fillPoly(canvas, [cap_pts], (*gc, 40))
+        cv2.polylines(canvas, [cap_pts], True, (*gc, 215), 1, cv2.LINE_AA)
+        cv2.circle(canvas, (px, py_base + ph + 12), 2, (*gc, 220), -1)
+
+    draw_pylon(pylon_left_x, my1, 3950)
+    draw_pylon(pylon_right_x, my1, 3951)
+
+    # Stepped flagstone approach paving leading into the mouth
+    for step_i, step_w in enumerate((48, 56, 64)):
+        sy = my1 + 6 + step_i * 6
+        cv2.line(canvas, (mcx - step_w // 2, sy), (mcx + step_w // 2, sy), (*gc, 175 - step_i * 20), 1, cv2.LINE_AA)
+        for sx in range(mcx - step_w // 2 + 8, mcx + step_w // 2, 12):
+            cv2.line(canvas, (sx, sy), (sx, sy + 4), (*gc, 120), 1, cv2.LINE_AA)
+
+    # Directional entrance arrow pointing inward
+    cv2.polylines(canvas, [np.array([(mcx, my1 + 2), (mcx - 10, my1 + 20), (mcx + 10, my1 + 20)], dtype=np.int32)], True, (*gc, 220), 1, cv2.LINE_AA)
+    cv2.fillPoly(canvas, [np.array([(mcx, my1 + 2), (mcx + 10, my1 + 20), (mcx, my1 + 16)], dtype=np.int32)], (*gc, 210))
+
+    # Entrance banner framed neatly above bottom plate border
+    t_ent, _ = render_pencil_text("« THE SOUTHERN MOUTH · ENTRANCE »", FONT_PATH, font_size=27, gc=gc, seed=3911)
+    if t_ent is not None:
+        blit_rgba(canvas, t_ent, int(mcx - t_ent.shape[1] / 2), my1 + 28)
+    t_sub, _ = render_pencil_text("Enter here — follow the true canyon road north", FONT_PATH, font_size=20, gc=gc, seed=3912)
+    if t_sub is not None:
+        blit_rgba(canvas, t_sub, int(mcx - t_sub.shape[1] / 2), my1 + 58)
+
+    # -------------------------------------------------------------------------
+    # EXIT / GOAL: CAIRN III & THE THIRD SEAL
+    # -------------------------------------------------------------------------
+    gcx = mx0 + goal_c * cell + cell // 2
+
+    # Clear top opening into terrace
+    cv2.rectangle(canvas, (gcx - cell // 2 + hw + 1, my0 - hw - 2), (gcx + cell // 2 - hw - 1, my0 + hw + 2), (0, 0, 0, 0), -1)
+
+    # Semicircular stone sanctuary terrace rising above row 0
+    t_rad = 56
+    _clear_polygon = lambda can, pts: cv2.fillPoly(can, [np.array(pts, dtype=np.int32)], (0, 0, 0, 0))
+    _clear_polygon(canvas, [(gcx - t_rad - 8, my0 + 2), (gcx + t_rad + 8, my0 + 2), (gcx + t_rad + 8, my0 - t_rad - 10), (gcx - t_rad - 8, my0 - t_rad - 10)])
+
+    # Curved terrace balustrade
+    _draw_arc(canvas, (gcx, my0), t_rad, 180, 360, gc=gc, alpha=220, seed=3890, passes=2)
+    _draw_arc(canvas, (gcx, my0), t_rad + 6, 180, 360, gc=gc, alpha=150, seed=3891, passes=1)
+    for a in range(190, 360, 18):
+        rad = math.radians(a)
+        p1 = (int(gcx + t_rad * math.cos(rad)), int(my0 + t_rad * math.sin(rad)))
+        p2 = (int(gcx + (t_rad + 6) * math.cos(rad)), int(my0 + (t_rad + 6) * math.sin(rad)))
+        cv2.line(canvas, p1, p2, (*gc, 150), 1, cv2.LINE_AA)
+
+    # Terrace floor paving
+    for r_t in range(12, t_rad - 4, 12):
+        _draw_arc(canvas, (gcx, my0), r_t, 185, 355, gc=gc, alpha=85, seed=3895 + r_t, passes=1)
+
+    # Cairn III elevation (pyramid of dry stones with copper plate)
+    cairn_h = 60
+    _draw_cairn_elevation(canvas, 2, gcx, my0 - 2, cairn_h, gc, 3900)
+
+
+    # Goal Banner cleanly positioned in top margin
+    t_goal, _ = render_pencil_text("« CAIRN III · THE THIRD SEAL (GOAL) »", FONT_PATH, font_size=27, gc=gc, seed=3910)
+    if t_goal is not None:
+        blit_rgba(canvas, t_goal, int(gcx - t_goal.shape[1] / 2), y0 + 16)
+    t_gdesc, _ = render_pencil_text("Summit sanctuary & copper benchmark plate", FONT_PATH, font_size=19, gc=gc, seed=3913)
+    if t_gdesc is not None:
+        blit_rgba(canvas, t_gdesc, int(gcx - t_gdesc.shape[1] / 2), y0 + 44)
+
+
     return h
 
 
 def _render_14b_page(gc: tuple = GRAPHITE_COLOR):
     """Sheet 14 · Cara B (Back: X > 1583 has 0 px). Game D6: follow the only road through the Sandstone Labyrinth to Cairn III."""
-    from scripts.journal.build_page06_07 import create_handdrawn_divider, draw_desert_path_seal, wrap_text_to_width
+    from scripts.journal.build_page06_07 import create_handdrawn_divider, wrap_text_to_width
 
     canvas = np.zeros((CANVAS_HEIGHT_PX, CANVAS_WIDTH_PX, 4), dtype=np.uint8)
     X0, W = 180, 1360
@@ -1918,12 +2158,10 @@ def _render_14b_page(gc: tuple = GRAPHITE_COLOR):
 
     def put(text, x, y, size, seed):
         t_img, _ = render_pencil_text(text, FONT_PATH, font_size=size, gc=gc, seed=seed)
-        blit_rgba(canvas, t_img, x, y)
-        return t_img.shape[1]
-
-    def put_centered(text, cx, y, size, seed):
-        t_img, _ = render_pencil_text(text, FONT_PATH, font_size=size, gc=gc, seed=seed)
-        blit_rgba(canvas, t_img, int(cx - t_img.shape[1] / 2), y)
+        if t_img is not None:
+            blit_rgba(canvas, t_img, x, y)
+            return t_img.shape[1]
+        return 0
 
     def paragraph(text, x, y, max_w, size=BODY, lh=BODY_LH, seed=0):
         for k, ln in enumerate(wrap_text_to_width(text, FONT_PATH, size, max_w)):
@@ -1932,81 +2170,74 @@ def _render_14b_page(gc: tuple = GRAPHITE_COLOR):
         return y
 
     # ------------------------------------------------------------------ header
-    put("The Sandstone Labyrinth & Cairn III", X0, 70, 64, 6001)
-    put("The Road of the Wagons", X0 + 2, 158, 34, 6002)
-    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=6003), X0, 232)
+    put("The Sandstone Labyrinth & Cairn III", X0, 85, 62, 6001)
+    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=6003), X0, 170)
 
     # ------------------------------------------------------------------ I. The Arches of the West Wind
-    y = 286
+    y = 222
     put("I. The Arches of the West Wind", X0, y, SEC, 6010)
     y += SEC_LH
-    y = paragraph(
-        "In the north-east highlands the west wind has carved a forest of pillars, narrow fissures and great stone "
-        "arches. The BC Ashes fled this way with their heavy wagons, and the wind has since swept away every track. "
-        "Beyond the maze waits Cairn III, and beneath its copper plate sleeps the third seal.",
-        X0, y, W, seed=6012)
-    y += 14
-
-    # ------------------------------------------------------------------ plan the page: rows of the labyrinth fill what is left
-    tablet = ("One road crosses the stone, and the wagons took it. Eight arches stand upon that road, and each keeps a single "
-              "letter. Walk from the mouth of the labyrinth to the Cairn and read the arches in the order you pass them. "
-              "The arches that stand beside the road are false.")
-    tablet_lines = wrap_text_to_width(tablet, FONT_PATH, 34, W - 130)
-    caption_h = 52
-    box_h = 36 + len(tablet_lines) * 48 + 30
-    sec2_h = SEC_LH + box_h + 30
-    answer_h = 56 + 84 + 52
-    ending_h = 36 + 26 + 118 + 20 + 50
-    bottom_margin = 52
-    avail = CANVAS_HEIGHT_PX - bottom_margin - y - caption_h - 24 - sec2_h - answer_h - ending_h
-    rows = int(max(8, min(14, (avail - 160) // CELL)))
-    open_edges, road = _build_labyrinth(rows, COLS, START_C, GOAL_C)
-    plate_h = 160 + rows * CELL
-    slack = max(0, avail - plate_h)
+    sec1_text = (
+        "North of the Sun Monolith, the open desert rises into a wild plateau of wind-carved sandstone. "
+        "Here, centuries of scouring gales have sculpted a labyrinth of towering pillars, narrow fissures, and natural arches. "
+        "Deep within this maze stands Cairn III, guarding the third seal of the Order beneath its copper benchmark plate. "
+        "The ancient wagon tracks have long vanished beneath shifting sand, but the bedrock itself remembers the way."
+    )
+    y = paragraph(sec1_text, X0, y, W, size=35, lh=46, seed=6012)
+    y += 32
 
     # ------------------------------------------------------------------ plate: the labyrinth
-    _draw_labyrinth_plate(canvas, X0, y, W, rows, COLS, CELL, open_edges, road, START_C, GOAL_C, gc)
-    put_centered("The Sandstone Labyrinth seen from above. Only one road leads from the mouth to the Cairn.", X0 + W / 2, y + plate_h + 16, 28, 6020)
-    y += plate_h + caption_h + 24 + slack // 2
+    rows = 12
+    open_edges, road = _build_labyrinth(rows, COLS, START_C, GOAL_C, seed=881)
+    plate_h = _draw_labyrinth_plate(canvas, X0, y, W, rows, COLS, CELL, open_edges, road, START_C, GOAL_C, gc)
+    y += plate_h + 46
 
     # ------------------------------------------------------------------ II. The Tablet at the Mouth
     put("II. The Tablet at the Mouth", X0, y, SEC, 6030)
     y += SEC_LH
+    sec2_intro = (
+        "At the entrance to the gorge, half-buried in silt, stands a weather-worn sandstone stele "
+        "left by the early surveyors. Before stepping between the towering walls, I copied its inscription into my log:"
+    )
+    y = paragraph(sec2_intro, X0, y, W, size=33, lh=44, seed=6035)
+    y += 20
+
+    tablet = (
+        "Only one continuous road cuts through the labyrinth from this entrance to the summit of Cairn III. "
+        "Eight stone arches stand upon that true path, each bearing a single letter. Follow the way step by step, "
+        "reading the arches in the exact order you pass beneath them. Heed not the shadows of the side fissures: "
+        "the arches that lie off the path are false."
+    )
+    tab_lines = wrap_text_to_width(tablet, FONT_PATH, 33, W - 140)
+    box_h = 32 + len(tab_lines) * 44 + 24
     bt = y
     draw_sketchy_rect(canvas, (X0, bt, X0 + W, bt + box_h), gc=gc, alpha_base=200, passes=2, seed=6040)
     draw_sketchy_rect(canvas, (X0 + 9, bt + 9, X0 + W - 9, bt + box_h - 9), gc=gc, alpha_base=110, passes=1, seed=6044)
     for (cx_, cy_) in ((X0 + 9, bt + 9), (X0 + W - 9, bt + 9), (X0 + 9, bt + box_h - 9), (X0 + W - 9, bt + box_h - 9)):
         pts = np.array([(cx_, cy_ - 8), (cx_ + 8, cy_), (cx_, cy_ + 8), (cx_ - 8, cy_)], dtype=np.int32)
         cv2.fillPoly(canvas, [pts], (*gc, 190))
-    qy = bt + 36
-    for k, ln in enumerate(tablet_lines):
-        put(("«" if k == 0 else "") + ln + ("»" if k == len(tablet_lines) - 1 else ""), X0 + 56, qy, 34, 6050 + k * 3)
-        qy += 48
-    y = bt + box_h + 30 + slack // 2
+    qy = bt + 32
+    for k, ln in enumerate(tab_lines):
+        put(("«" if k == 0 else "") + ln + ("»" if k == len(tab_lines) - 1 else ""), X0 + 56, qy, 33, 6050 + k * 3)
+        qy += 44
+    y = bt + box_h + 46
 
     # ------------------------------------------------------------------ answer bar
     put("The Sigil of Cairn III:", X0, y, 36, 6100)
-    y += 56
+    y += 52
     box_w, gap = 140, 20
     for k in range(len(LABYRINTH_SIGIL)):
         bx = X0 + k * (box_w + gap)
         draw_sketchy_rect(canvas, (bx, y, bx + box_w, y + 84), gc=gc, alpha_base=200, passes=2, seed=6110 + k * 5)
         draw_sketchy_rect(canvas, (bx + 6, y + 6, bx + box_w - 6, y + 78), gc=gc, alpha_base=90, passes=1, seed=6111 + k * 5)
-        n_img, _ = render_pencil_text(str(k + 1), FONT_PATH, font_size=22, gc=gc, seed=6140 + k)
-        blit_rgba(canvas, n_img, bx + 12, y + 7)
+        n_img, _ = render_pencil_text(str(k + 1), FONT_PATH, font_size=23, gc=gc, seed=6140 + k)
+        blit_rgba(canvas, n_img, bx + 12, y + 8)
     y += 84
-    put("Speak the Sigil at Cairn III, beneath its copper plate, to win the third seal.", X0, y + 10, 30, 6150)
-    y += 52
-
-    # ------------------------------------------------------------------ ending
-    blit_rgba(canvas, create_handdrawn_divider(width=1100, gc=gc, seed=6160), (CANVAS_WIDTH_PX - 1100) // 2 - 80, y + 14)
-    emblem_cy = y + 14 + 36 + 64
-    draw_desert_path_seal(canvas, cx=CANVAS_WIDTH_PX // 2 - 80, cy=emblem_cy, r=50, gc=gc, seed=6170)
-    motto_y = emblem_cy + 70
-    put_centered("Follow the road, not the wind.", CANVAS_WIDTH_PX // 2 - 80, motto_y, 32, 6180)
+    put("Speak this eight-letter name at Cairn III to unlock its copper plate and claim the third seal.", X0, y + 14, 30, 6150)
+    y += 48
 
     canvas[:, 1583:, 3] = 0
-    return canvas, road, motto_y + 46
+    return canvas, road, y
 
 
 def render_game_d6_sandstone_labyrinth(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
@@ -2034,6 +2265,18 @@ def _echo_letter(side, beats):
 def _draw_canyon_panorama(canvas, x0, y0, w, h, gc=GRAPHITE_COLOR):
     """Engraved plate: the mouth of the Whispering Chasm seen from the south in perspective. The twin pillars of
     Cairn IV stand in front, the cliffs run away to the far gate and the Sentinel Mesa with its natural bridge rises beyond."""
+    asset_path = os.path.join(PROJECT_ROOT, "journal", "page15", "assets", "davinci_cairn_iv_panorama_clean_alpha.png")
+    if os.path.exists(asset_path):
+        raw_img = cv2.imread(asset_path, cv2.IMREAD_UNCHANGED)
+        if raw_img is not None:
+            # Crop rows 70 to 520 (keeping setting sun, Sentinel Mesa with natural bridge, Cairn IV pillars, acoustic waves, plinths)
+            crop = raw_img[70:520, :]
+            draw_sketchy_rect(canvas, (x0, y0, x0 + w, y0 + h), gc=gc, alpha_base=210, passes=2, seed=1510)
+            draw_sketchy_rect(canvas, (x0 + 8, y0 + 8, x0 + w - 8, y0 + h - 8), gc=gc, alpha_base=120, passes=1, seed=1514)
+            resized = cv2.resize(crop, (w - 24, h - 24), interpolation=cv2.INTER_LANCZOS4)
+            blit_rgba(canvas, resized, x0 + 12, y0 + 12)
+            return y0 + h
+
     rng = np.random.default_rng(1501)
     draw_sketchy_rect(canvas, (x0, y0, x0 + w, y0 + h), gc=gc, alpha_base=200, passes=2, seed=1510)
     draw_sketchy_rect(canvas, (x0 + 8, y0 + 8, x0 + w - 8, y0 + h - 8), gc=gc, alpha_base=110, passes=1, seed=1514)
@@ -2227,56 +2470,49 @@ def _render_15a_page(gc: tuple = GRAPHITE_COLOR):
         return y
 
     # ------------------------------------------------------------------ header
-    put("Cairn IV: Sentry of the Canyon", X0, 70, 64, 7001)
-    put("The Singing Pillars", X0 + 2, 158, 34, 7002)
-    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=7003), X0, 232)
+    put("Cairn IV: Sentry of the Canyon", X0, 85, 62, 7001)
+    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=7003), X0, 170)
 
     # ------------------------------------------------------------------ I. The Mouth of the Chasm
-    y = 286
+    y = 222
     put("I. The Mouth of the Chasm", X0, y, SEC, 7010)
     y += SEC_LH
     y = paragraph(
-        "At the southern mouth of the Whispering Chasm, in the shadow of the Sentinel Mesa, stand two hollow pillars: "
-        "Cairn IV, the Sentry of the Canyon. When the wind blows through their openings the pillars sing, and the "
-        "cliffs throw every note back. Hermes wrote down seven echoes. Only Silvia can find where each one was born.",
+        "Beyond the sandstone labyrinth, the desert narrows into the towering corridor of the Whispering Chasm. "
+        "Here, beneath the Sentinel Mesa, stand two hollow stone pillars: Cairn IV, the Sentry of the Canyon. "
+        "When the wind rushes through their carved chambers, the pillars sing across the gorge, each stone "
+        "throwing its voice toward its own cliff wall. To claim the fourth seal, Silvia must follow the cadence of "
+        "the canyon and discover where each echo was born.",
         X0, y, W, seed=7012)
-    y += 14
-
-    # ------------------------------------------------------------------ plan the page
-    rules = [
-        "1. Each pillar sings toward its own wall, left or right.",
-        "2. In one beat sound travels 10 paces, 5 going out and 5 coming back. So an echo that returns after 2 beats comes from a crack 10 paces away.",
-        "3. Find that ring on the plan: the crack there carries a letter. The seven letters, in order, spell the Sigil of the Sentry.",
-    ]
-    rule_lines = [wrap_text_to_width(r, FONT_PATH, 34, W - 40) for r in rules]
-    rules_h = sum(len(rl) * 46 + 8 for rl in rule_lines)
-    PLAN_W, PLAN_H = 560, 562
-    caption_h = 52
-    sec2_h = SEC_LH + rules_h + 18
-    sec3_h = SEC_LH + 6 + PLAN_H + 40
-    answer_h = 56 + 84 + 52
-    ending_h = 36 + 26 + 118 + 20 + 50
-    bottom_margin = 52
-    plate_h = CANVAS_HEIGHT_PX - bottom_margin - y - caption_h - 24 - sec2_h - sec3_h - answer_h - ending_h
-    slack = max(0, plate_h - 520)
-    plate_h = int(max(330, min(520, plate_h)))
+    y += 28
 
     # ------------------------------------------------------------------ plate: the canyon in perspective
+    plate_h = 440
     _draw_canyon_panorama(canvas, X0, y, W, plate_h, gc)
-    put_centered("The Whispering Chasm seen from the south: the twin pillars of Cairn IV, the Sentinel Mesa beyond.", X0 + W / 2, y + plate_h + 16, 28, 7020)
-    y += plate_h + caption_h + 24 + slack // 3
+    y += plate_h + 30
 
     # ------------------------------------------------------------------ II. The Rules of the Echo
     put("II. The Rules of the Echo", X0, y, SEC, 7030)
     y += SEC_LH
+    y = paragraph(
+        "To decipher the echoes recorded in the survey log, observe three simple laws:",
+        X0, y, W, size=34, lh=44, seed=7031)
+    y += 8
+    rules = [
+        "1. Direction — The Left pillar echoes only against the left cliff; the Right pillar echoes only against the right cliff.",
+        "2. Distance — Sound travels to the rock and back. Each beat of time measured on the chronometer equals 5 paces of distance to the cliff.",
+        "3. The Letters — Find that distance ring on the survey plan to read the carved letter. Transcribe the seven echoes in order to reveal the Sigil of the Sentry.",
+    ]
+    rule_lines = [wrap_text_to_width(r, FONT_PATH, 34, W - 40) for r in rules]
     for k, rl in enumerate(rule_lines):
         for j, ln in enumerate(rl):
             put(ln, X0 + (0 if j == 0 else 36), y, 34, 7032 + k * 11 + j * 3)
-            y += 46
-        y += 8
-    y += 18 + slack // 3
+            y += 44
+        y += 6
+    y += 28
 
     # ------------------------------------------------------------------ III. The Seven Echoes: plan (left) + ledger (right)
+    PLAN_W, PLAN_H = 560, 562
     put("III. The Seven Echoes", X0, y, SEC, 7060)
     y += SEC_LH + 6
     _draw_echo_plan(canvas, X0, y, PLAN_W, PLAN_H, gc)
@@ -2296,18 +2532,18 @@ def _render_15a_page(gc: tuple = GRAPHITE_COLOR):
         draw_sketchy_line(canvas, (tx0, ty0 + head_h + r * row_h), (tx0 + tw, ty0 + head_h + r * row_h), gc=gc, alpha_base=110, passes=1, seed=7080 + r)
     for i, hd in enumerate(("Echo", "Pillar", "Back after", "Letter")):
         t_img, _ = render_pencil_text(hd, FONT_PATH, font_size=28, gc=gc, seed=7090 + i)
-        blit_rgba(canvas, t_img, int((xs[i] + xs[i + 1]) / 2 - t_img.shape[1] / 2), ty0 + 20)
+        blit_rgba(canvas, t_img, int((xs[i] + xs[i + 1]) / 2 - t_img.shape[1] / 2), ty0 + 18)
     for r, (side, beats) in enumerate(ECHO_LEDGER):
         ry = ty0 + head_h + r * row_h
         for i, val in enumerate((str(r + 1), side, f"{beats} beats")):
             t_img, _ = render_pencil_text(val, FONT_PATH, font_size=34, gc=gc, seed=7100 + r * 7 + i)
             blit_rgba(canvas, t_img, int((xs[i] + xs[i + 1]) / 2 - t_img.shape[1] / 2), ry + 12)
-    put_centered("Hermes's seven echoes", tx0 + tw // 2, table_bottom + 18, 28, 7140)
-    y += PLAN_H + 40 + slack // 3
+    put_centered("Survey log of the seven echoes", tx0 + tw // 2, table_bottom + 18, 28, 7140)
+    y += PLAN_H + 34
 
     # ------------------------------------------------------------------ answer bar
     put("The Sigil of the Sentry:", X0, y, 36, 7150)
-    y += 56
+    y += 50
     box_w, gap = 150, 22
     for k in range(len(ECHO_SIGIL)):
         bx = X0 + k * (box_w + gap)
@@ -2316,18 +2552,11 @@ def _render_15a_page(gc: tuple = GRAPHITE_COLOR):
         n_img, _ = render_pencil_text(str(k + 1), FONT_PATH, font_size=22, gc=gc, seed=7190 + k)
         blit_rgba(canvas, n_img, bx + 12, y + 7)
     y += 84
-    put("Speak the Sigil at Cairn IV to win its seal.", X0, y + 10, 30, 7200)
-    y += 52
-
-    # ------------------------------------------------------------------ ending
-    blit_rgba(canvas, create_handdrawn_divider(width=1100, gc=gc, seed=7210), (CANVAS_WIDTH_PX - 1100) // 2, y + 14)
-    emblem_cy = y + 14 + 36 + 64
-    draw_desert_path_seal(canvas, cx=CANVAS_WIDTH_PX // 2, cy=emblem_cy, r=50, gc=gc, seed=7220)
-    motto_y = emblem_cy + 70
-    put_centered("The canyon answers those who listen.", CANVAS_WIDTH_PX // 2, motto_y, 32, 7230)
+    put("Speak this seven-letter name at Cairn IV to claim the fourth seal.", X0, y + 10, 30, 7200)
+    y += 48
 
     canvas[:, :165, 3] = 0
-    return canvas, plate_h, motto_y + 46
+    return canvas, plate_h, y
 
 
 def render_game_d7_cairn_iv_sentry(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
@@ -2857,34 +3086,158 @@ def _bridge_note(canvas, x, y, w, h, title, lines, seed, gc):
             ty += 38
 
 
+def render_spread3(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
+    """Renders the continuous 100% full-bleed double-page masterwork Spread 3 (3496 x 2480 px).
+
+    Left half (0..1748 px): Hoja 15 · Cara B (The Natural Bridge of the Sentinel Mesa).
+    Right half (1748..3496 px): Hoja 16 · Cara A (The Eastern Buttress & Lower Wash).
+    Fills 100% of the surface continuously edge-to-edge across the binder holes, just like Spread 1 and Spread 2.
+    Zero collisions between handwriting and drawing strokes.
+    """
+    import math
+    spread_w = CANVAS_WIDTH_PX * 2  # 3496 px
+    spread_h = CANVAS_HEIGHT_PX      # 2480 px
+
+    def put_label(canvas, text, x, y, font_size=28, seed=8000):
+        """Blits authentic pencil text directly on top of the map drawing without erasing any background."""
+        t_img, _ = render_pencil_text(text, FONT_PATH, font_size=font_size, gc=gc, seed=seed)
+        if t_img is None:
+            return 0, 0
+        th, tw = t_img.shape[:2]
+        blit_rgba(canvas, t_img, x, y)
+        return tw, th
+
+    def put_multiline_note(canvas, lines_with_sizes, start_x, start_y, line_h=40, seed=8200):
+        """Blits multiline survey notes directly on the map in authentic pencil without halos or margins."""
+        cur_y = start_y
+        for i, (line, f_size) in enumerate(lines_with_sizes):
+            t_img, _ = render_pencil_text(line, FONT_PATH, font_size=f_size, gc=gc, seed=seed + i)
+            if t_img is not None:
+                blit_rgba(canvas, t_img, start_x, cur_y)
+            cur_y += line_h
+
+    # 1. Base Map Artwork (Full-Bleed 100% Edge-to-Edge)
+    asset_path = os.path.join(PROJECT_ROOT, "journal", "page15", "assets", "spread03_natural_bridge_alpha.png")
+    if not os.path.exists(asset_path):
+        raise FileNotFoundError(f"Spread 3 asset not found: {asset_path}")
+
+    strokes = cv2.imread(asset_path, cv2.IMREAD_UNCHANGED)
+    sh, sw = strokes.shape[:2]
+    scale = spread_h / float(sh)
+    target_w = int(round(sw * scale))
+    resized_map = cv2.resize(strokes, (target_w, spread_h), interpolation=cv2.INTER_LANCZOS4)
+    x_offset = (target_w - spread_w) // 2
+    spread_canvas = resized_map[:, x_offset:x_offset + spread_w].copy()
+
+    # -------------------------------------------------------------
+    # LEFT PANEL: Hoja 15 · Cara B (The Western Abutment)
+    # -------------------------------------------------------------
+    t_title_l, _ = render_pencil_text("The Natural Bridge of the Sentinel Mesa", FONT_PATH, font_size=58, gc=gc, seed=8001)
+    blit_rgba(spread_canvas, t_title_l, 180, 70)
+
+    put_label(spread_canvas, "The Sentinel Mesa · Elev. 980 varas", 360, 210, font_size=28, seed=8101)
+    cv2.line(spread_canvas, (350, 225), (260, 270), (*gc, 185), 1, cv2.LINE_AA)
+    cv2.circle(spread_canvas, (260, 270), 3, (*gc, 215), -1, cv2.LINE_AA)
+
+    put_label(spread_canvas, "Bridge deck · Elev. 975 varas", 1060, 690, font_size=28, seed=8102)
+    put_label(spread_canvas, "Old cart track across the stone span", 1060, 728, font_size=25, seed=8103)
+    cv2.line(spread_canvas, (1230, 765), (1330, 875), (*gc, 185), 1, cv2.LINE_AA)
+    cv2.circle(spread_canvas, (1330, 875), 3, (*gc, 215), -1, cv2.LINE_AA)
+
+    put_label(spread_canvas, "The Whispering Chasm", 1080, 1120, font_size=30, seed=8104)
+    put_label(spread_canvas, "Depth 380 varas below the arch", 1080, 1160, font_size=26, seed=8105)
+    cv2.line(spread_canvas, (1220, 1195), (1310, 1380), (*gc, 185), 1, cv2.LINE_AA)
+    cv2.circle(spread_canvas, (1310, 1380), 3, (*gc, 215), -1, cv2.LINE_AA)
+
+    # Bottom note: Survey Note IX
+    note_ix = [
+        ("Survey Note IX · The Western Abutment", 34),
+        ("«The bridge rests on a great shelf of red sandstone, older than any road.", 28),
+        ("The old cart track crosses its back and falls by natural terraces to the Lower Wash.»", 28)
+    ]
+    put_multiline_note(spread_canvas, note_ix, 180, 2210, line_h=40, seed=8200)
+
+    # -------------------------------------------------------------
+    # RIGHT PANEL: Hoja 16 · Cara A (The Eastern Buttress & Lower Wash)
+    # -------------------------------------------------------------
+    r_x0 = CANVAS_WIDTH_PX  # 1748 px
+    t_title_r, _ = render_pencil_text("The Eastern Buttress & Lower Wash", FONT_PATH, font_size=58, gc=gc, seed=9001)
+    blit_rgba(spread_canvas, t_title_r, r_x0 + 180, 70)
+
+    # Renaissance Surveyor Compass Rose
+    cx_, cy_ = 3280, 250
+    cv2.circle(spread_canvas, (cx_, cy_), 65, (*gc, 190), 1, cv2.LINE_AA)
+    cv2.circle(spread_canvas, (cx_, cy_), 52, (*gc, 120), 1, cv2.LINE_AA)
+    for k in range(8):
+        th = math.radians(k * 45 - 90)
+        L = 58 if k % 2 == 0 else 36
+        cv2.line(spread_canvas, (cx_, cy_), (int(cx_ + L * math.cos(th)), int(cy_ + L * math.sin(th))), (*gc, 180), 1, cv2.LINE_AA)
+    cv2.fillPoly(spread_canvas, [np.array([(cx_, cy_ - 64), (cx_ - 10, cy_ - 20), (cx_ + 10, cy_ - 20)], dtype=np.int32)], (*gc, 210))
+    t_n, _ = render_pencil_text("N", FONT_PATH, font_size=30, gc=gc, seed=9020)
+    blit_rgba(spread_canvas, t_n, cx_ - t_n.shape[1] // 2, cy_ - 110)
+
+    # Scale Bar (1 : 250 varas)
+    sbx, sby, sbw = 2620, 250, 360
+    put_label(spread_canvas, "Scale 1 : 250 (varas)", sbx, sby - 36, font_size=26, seed=9031)
+    cv2.line(spread_canvas, (sbx, sby), (sbx + sbw, sby), (*gc, 200), 2, cv2.LINE_AA)
+    for idx, (tk_off, tk_lab) in enumerate([(0, "0"), (120, "100"), (240, "200"), (360, "300 varas")]):
+        cv2.line(spread_canvas, (sbx + tk_off, sby - 8), (sbx + tk_off, sby + 8), (*gc, 200), 1, cv2.LINE_AA)
+        t_tk, _ = render_pencil_text(tk_lab, FONT_PATH, font_size=22, gc=gc, seed=9035 + idx)
+        blit_rgba(spread_canvas, t_tk, sbx + tk_off - t_tk.shape[1] // 2, sby + 12)
+
+    # Plateau survey stone
+    sx_, sy_ = 3180, 680
+    cv2.polylines(spread_canvas, [np.array([(sx_, sy_ - 24), (sx_ - 12, sy_ - 2), (sx_ + 12, sy_ - 2)], dtype=np.int32)], True, (*gc, 215), 1, cv2.LINE_AA)
+    cv2.circle(spread_canvas, (sx_, sy_ - 10), 2, (*gc, 215), -1, cv2.LINE_AA)
+    put_label(spread_canvas, "Survey stone 980", sx_ - 75, sy_ - 68, font_size=26, seed=9040)
+    cv2.line(spread_canvas, (sx_, sy_ - 36), (sx_, sy_ - 26), (*gc, 160), 1, cv2.LINE_AA)
+
+    # Annotations along switchbacks
+    put_label(spread_canvas, "Switchback terraces", 2860, 1175, font_size=28, seed=9050)
+    put_label(spread_canvas, "The turns are too tight", 2860, 1215, font_size=25, seed=9051)
+    put_label(spread_canvas, "for a loaded wagon.", 2860, 1253, font_size=25, seed=9052)
+    cv2.line(spread_canvas, (2850, 1225), (2760, 1300), (*gc, 185), 1, cv2.LINE_AA)
+    cv2.circle(spread_canvas, (2760, 1300), 3, (*gc, 215), -1, cv2.LINE_AA)
+
+    # Dimension line: eastern pier drop 380 varas
+    dx_ = 3410
+    dy_top, dy_bot = 880, 2160
+    cv2.line(spread_canvas, (dx_, dy_top), (dx_, dy_bot), (*gc, 195), 1, cv2.LINE_AA)
+    for (yy, d) in ((dy_top, 1), (dy_bot, -1)):
+        cv2.line(spread_canvas, (dx_ - 18, yy), (dx_ + 18, yy), (*gc, 195), 1, cv2.LINE_AA)
+        cv2.fillPoly(spread_canvas, [np.array([(dx_, yy), (dx_ - 7, yy + 20 * d), (dx_ + 7, yy + 20 * d)], dtype=np.int32)], (*gc, 195))
+    put_label(spread_canvas, "380", dx_ - 95, 1495, font_size=30, seed=9060)
+    put_label(spread_canvas, "varas", dx_ - 95, 1535, font_size=26, seed=9061)
+
+    # Annotations in lower wash
+    put_label(spread_canvas, "Lower Wash (Wadi al-Hajar South)", 2020, 2120, font_size=28, seed=9070)
+    put_label(spread_canvas, "Boulders fallen in the quake of 1971", 2520, 2160, font_size=26, seed=9071)
+    cv2.line(spread_canvas, (2500, 2175), (2420, 2220), (*gc, 185), 1, cv2.LINE_AA)
+    cv2.circle(spread_canvas, (2420, 2220), 3, (*gc, 215), -1, cv2.LINE_AA)
+
+    # Bottom note: Survey Note X
+    note_x = [
+        ("Survey Note X · The Eastern Buttress", 34),
+        ("«The eastern pier rises 380 varas above the scree. Under the arch, deep fissures", 28),
+        ("run toward the old cisterns. Cairn IV guards the southern mouth of the gorge.»", 28)
+    ]
+    put_multiline_note(spread_canvas, note_x, r_x0 + 180, 2210, line_h=40, seed=9200)
+
+    return spread_canvas
+
+
 def render_zoom_bridge_left(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
-    """Sheet 15 · Cara B (Spread 3 left panel, full bleed across the gutter to 16A): the western abutment of the natural
-    rock bridge below the Sentinel Mesa."""
-    from scripts.journal.build_page06_07 import create_handdrawn_divider
-    world = _draw_bridge_world(gc)
-    canvas = world[:, :CANVAS_WIDTH_PX].copy()
-    t_img, _ = render_pencil_text("The Natural Bridge of the Sentinel Mesa", FONT_PATH, font_size=60, gc=gc, seed=8001)
-    blit_rgba(canvas, t_img, 200, 70)
-    t_img, _ = render_pencil_text("Zoom survey · the western abutment", FONT_PATH, font_size=34, gc=gc, seed=8002)
-    blit_rgba(canvas, t_img, 202, 160)
-    blit_rgba(canvas, create_handdrawn_divider(width=1280, gc=gc, seed=8003), 200, 226)
-    _bridge_note(canvas, 200, 2262, 1340, 196, "Survey Note IX · The Western Abutment",
-                 ["«The bridge rests on a great shelf of red sandstone, older than any road. The old cart track crosses its back and falls by natural terraces to the Lower Wash.»"],
-                 8010, gc)
-    return canvas
+    """Sheet 15 · Cara B (Spread 3 left panel): the western abutment of the natural rock bridge below the Sentinel Mesa.
+    Fills 100% full bleed edge-to-edge as the left half of the continuous A4 landscape Spread 3."""
+    spread = render_spread3(gc=gc)
+    return spread[:, :CANVAS_WIDTH_PX].copy()
 
 
 def render_zoom_bridge_right(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
-    """Sheet 16 · Cara A (Spread 3 right panel, full bleed across the gutter from 15B): the eastern buttress of the
-    natural rock bridge and the descent to the Lower Wash."""
-    world = _draw_bridge_world(gc)
-    canvas = world[:, CANVAS_WIDTH_PX:].copy()
-    t_img, _ = render_pencil_text("Zoom survey · the eastern buttress", FONT_PATH, font_size=34, gc=gc, seed=9001)
-    blit_rgba(canvas, t_img, 220, 160)
-    _bridge_note(canvas, 200, 2262, 1340, 196, "Survey Note X · The Eastern Buttress",
-                 ["«The eastern pier rises 380 varas above the scree. Under the arch, deep fissures run toward the old cisterns. Cairn IV guards the southern mouth of the gorge.»"],
-                 9010, gc)
-    return canvas
+    """Sheet 16 · Cara A (Spread 3 right panel): the eastern buttress of the natural rock bridge and the descent to the Lower Wash.
+    Fills 100% full bleed edge-to-edge as the right half of the continuous A4 landscape Spread 3."""
+    spread = render_spread3(gc=gc)
+    return spread[:, CANVAS_WIDTH_PX:].copy()
 
 
 # =========================================================================
@@ -2914,9 +3267,9 @@ def _simulate_ray(rows, cols, start_c, mirrors, pillars, letters, altar):
     return read, False
 
 
-def _build_ray_courtyard(rows, cols, sigil, seed0=1):
-    """Courtyard of the Solar Altar: bronze mirrors, fallen pillars and sun-stones. The ray is guaranteed to cross the sun-stones
-    in the order of the Sigil and end on the altar; every other mirror, pillar and stone stands off its path."""
+def _build_ray_courtyard(rows, cols, sigil, seed0=1911):
+    """Courtyard of the Solar Altar: intricate Renaissance optical maze with 11-13 mirror reflections,
+    decoy branches, blocking fallen pillars and 26 lettered sun-stones. The true beam crosses the Sigil letters in order to the Solar Altar."""
     import random
     n = len(sigil)
     for seed in range(seed0, seed0 + 40000):
@@ -2925,8 +3278,10 @@ def _build_ray_courtyard(rows, cols, sigil, seed0=1):
         pos, d = (c0, 0), (0, 1)
         path, mirrors = [pos], {}
         ok = True
-        for t in range(rnd.choice((8, 9, 10))):
-            for _ in range(rnd.randint(2, 5)):
+        num_turns = rnd.randint(11, 13)
+        for t in range(num_turns):
+            step_len = rnd.randint(2, 5)
+            for _ in range(step_len):
                 nx, ny = pos[0] + d[0], pos[1] + d[1]
                 if not (0 <= nx < cols and 0 <= ny < rows) or (nx, ny) in path:
                     ok = False
@@ -2950,18 +3305,18 @@ def _build_ray_courtyard(rows, cols, sigil, seed0=1):
             d = nd
         if not ok:
             continue
-        for _ in range(rnd.randint(2, 5)):
+        for _ in range(rnd.randint(2, 4)):
             nx, ny = pos[0] + d[0], pos[1] + d[1]
             if not (0 <= nx < cols and 0 <= ny < rows) or (nx, ny) in path:
                 ok = False
                 break
             pos = (nx, ny)
             path.append(pos)
-        if not ok or len(path) < 34:
+        if not ok or len(path) < 40:
             continue
         altar = pos
         cand = [c for c in path[1:-1] if c not in mirrors]
-        if len(cand) < n + 2:
+        if len(cand) < n + 4:
             continue
         picks = []
         for k in range(n):
@@ -2973,10 +3328,19 @@ def _build_ray_courtyard(rows, cols, sigil, seed0=1):
         picks = sorted(picks, key=lambda c: path.index(c))
         letters = {c: sigil[k] for k, c in enumerate(picks)}
         free = [(x, y) for y in range(rows) for x in range(cols) if (x, y) not in path]
+        if len(free) < 55:
+            continue
         rnd.shuffle(free)
-        pillars = set(free[:7])
-        decoy_mirrors = {c: rnd.choice(("/", "\\")) for c in free[7:15]}
-        decoy_letters = {c: rnd.choice("BCDFGHIJLMNPQRSTUVWXYZ") for c in free[15:26]}
+        num_pillars = rnd.randint(14, 18)
+        num_decoy_mirrors = rnd.randint(16, 20)
+        num_decoy_letters = rnd.randint(18, 22)
+
+        pillars = set(free[:num_pillars])
+        idx_dm = num_pillars
+        decoy_mirrors = {c: rnd.choice(("/", "\\")) for c in free[idx_dm:idx_dm + num_decoy_mirrors]}
+        idx_dl = idx_dm + num_decoy_mirrors
+        decoy_letters = {c: rnd.choice("BCDFGHIJLMNPQRSTUVWXYZ") for c in free[idx_dl:idx_dl + num_decoy_letters]}
+
         all_mirrors = dict(mirrors)
         all_mirrors.update(decoy_mirrors)
         all_letters = dict(letters)
@@ -2988,8 +3352,28 @@ def _build_ray_courtyard(rows, cols, sigil, seed0=1):
 
 
 def _draw_solstice_arch_plate(canvas, x0, y0, w, h, gc=GRAPHITE_COLOR):
-    """Engraved plate: the Arch of the Solstice before the facade of Tower II, the sun's ray crossing under its crown to the
-    brass ring of the Solar Altar, Cairn V beyond, and a small plan of the 163 degree line from Cairn V to the altar."""
+    """Engraved plate: masterwork Renaissance architectural elevation study of the Arch of the Solstice,
+    the morning sun, the solstice ray, the Solar Altar with brass ring, Cairn V, and the geodetic inset plan."""
+    asset_path = os.path.join(PROJECT_ROOT, "journal", "page16", "assets", "davinci_solstice_plate_clean_alpha.png")
+    if os.path.exists(asset_path):
+        raw_img = cv2.imread(asset_path, cv2.IMREAD_UNCHANGED)
+        if raw_img is not None:
+            resized = cv2.resize(raw_img, (w, h), interpolation=cv2.INTER_LANCZOS4)
+            blit_rgba(canvas, resized, x0, y0)
+
+            def lab(text, x, y, size, seed, center=False):
+                t_img, _ = render_pencil_text(text, FONT_PATH, font_size=size, gc=gc, seed=seed)
+                px = int(x - t_img.shape[1] / 2) if center else int(x)
+                blit_rgba(canvas, t_img, px, y)
+
+            arch_cx = x0 + int(550 * w / 1325)
+            altar_cx = x0 + int(960 * w / 1325)
+            cairn_cx = x0 + int(1227 * w / 1325)
+            lab("Arch of the Solstice", arch_cx, y0 + h + 14, 26, 1720, center=True)
+            lab("The Solar Altar", altar_cx, y0 + h + 14, 26, 1721, center=True)
+            lab("Cairn V", cairn_cx, y0 + h + 14, 26, 1722, center=True)
+            return y0 + h
+
     rng = np.random.default_rng(1601)
     draw_sketchy_rect(canvas, (x0, y0, x0 + w, y0 + h), gc=gc, alpha_base=200, passes=2, seed=1610)
     draw_sketchy_rect(canvas, (x0 + 8, y0 + 8, x0 + w - 8, y0 + h - 8), gc=gc, alpha_base=110, passes=1, seed=1614)
@@ -3135,76 +3519,204 @@ def _draw_solstice_arch_plate(canvas, x0, y0, w, h, gc=GRAPHITE_COLOR):
     return gy
 
 
+def _draw_mirror_item(canvas, cx, cy, kind="\\", gc=GRAPHITE_COLOR, seed=42):
+    """Renaissance bronze mirror: bevelled bronze casing, polished specular hatch, pivot hub and floor braces."""
+    d = 20
+    ux, uy = (1.0 / 1.414, 1.0 / 1.414) if kind == "\\" else (1.0 / 1.414, -1.0 / 1.414)
+    nx, ny = -uy, ux
+    hw = 3.5
+    p1a = (int(cx - d * ux + hw * nx), int(cy - d * uy + hw * ny))
+    p1b = (int(cx - d * ux - hw * nx), int(cy - d * uy - hw * ny))
+    p2a = (int(cx + d * ux + hw * nx), int(cy + d * uy + hw * ny))
+    p2b = (int(cx + d * ux - hw * nx), int(cy + d * uy - hw * ny))
+    _clear_polygon(canvas, [p1a, p2a, p2b, p1b])
+    cv2.line(canvas, p1a, p2a, (*gc, 225), 1, cv2.LINE_AA)
+    cv2.line(canvas, p1b, p2b, (*gc, 225), 1, cv2.LINE_AA)
+    cv2.line(canvas, p1a, p1b, (*gc, 210), 1, cv2.LINE_AA)
+    cv2.line(canvas, p2a, p2b, (*gc, 210), 1, cv2.LINE_AA)
+    for pt in (p1a, p1b, p2a, p2b):
+        cv2.circle(canvas, pt, 1, (*gc, 200), -1, cv2.LINE_AA)
+    for t_frac in (-0.5, -0.2, 0.1, 0.4):
+        sx = int(cx + t_frac * d * ux)
+        sy = int(cy + t_frac * d * uy)
+        l1 = (int(sx - 2 * nx), int(sy - 2 * ny))
+        l2 = (int(sx + 2 * nx), int(sy + 2 * ny))
+        cv2.line(canvas, l1, l2, (*gc, 130), 1, cv2.LINE_AA)
+    cv2.circle(canvas, (cx, cy), 5, (*gc, 220), 1, cv2.LINE_AA)
+    cv2.circle(canvas, (cx, cy), 3, (*gc, 140), 1, cv2.LINE_AA)
+    cv2.circle(canvas, (cx, cy), 1, (*gc, 240), -1, cv2.LINE_AA)
+    for sign in (-1, 1):
+        bx = int(cx + sign * 10 * ux - 5 * nx)
+        by = int(cy + sign * 10 * uy - 5 * ny)
+        cv2.line(canvas, (int(cx + sign * 10 * ux), int(cy + sign * 10 * uy)), (bx, by), (*gc, 150), 1, cv2.LINE_AA)
+        cv2.circle(canvas, (bx, by), 1, (*gc, 180), -1, cv2.LINE_AA)
+
+
+def _draw_pillar_item(canvas, cx, cy, gc=GRAPHITE_COLOR, seed=42):
+    """Classical fluted column drum: 16 perimeter flutes, mortise center hole, stone fractures & graphite volume hatching."""
+    _clear_polygon(canvas, [(cx - 24, cy - 24), (cx + 24, cy - 24), (cx + 24, cy + 24), (cx - 24, cy + 24)])
+    draw_sketchy_circle(canvas, (cx, cy), 22, gc=gc, alpha_base=225, passes=2, seed=seed, num_pts=32)
+    draw_sketchy_circle(canvas, (cx, cy), 16, gc=gc, alpha_base=135, passes=1, seed=seed + 1, num_pts=24)
+    for k in range(16):
+        th = math.radians(k * 22.5)
+        p_in = (int(cx + 16 * math.cos(th)), int(cy + 16 * math.sin(th)))
+        p_out = (int(cx + 22 * math.cos(th)), int(cy + 22 * math.sin(th)))
+        cv2.line(canvas, p_in, p_out, (*gc, 160), 1, cv2.LINE_AA)
+    m_box = (cx - 3, cy - 3, cx + 3, cy + 3)
+    draw_sketchy_rect(canvas, m_box, gc=gc, alpha_base=210, passes=1, seed=seed + 2)
+    cv2.rectangle(canvas, (cx - 2, cy - 2), (cx + 2, cy + 2), (*gc, 180), -1)
+    pts_crack = [
+        (int(cx + 22 * math.cos(math.radians(205))), int(cy + 22 * math.sin(math.radians(205)))),
+        (int(cx + 12 * math.cos(math.radians(195))), int(cy + 12 * math.sin(math.radians(195)))),
+        (cx - 3, cy + 1),
+        (int(cx + 8 * math.cos(math.radians(45))), int(cy + 8 * math.sin(math.radians(45)))),
+        (int(cx + 18 * math.cos(math.radians(40))), int(cy + 18 * math.sin(math.radians(40)))),
+    ]
+    cv2.polylines(canvas, [np.array(pts_crack, dtype=np.int32)], False, (*gc, 190), 1, cv2.LINE_AA)
+    cv2.line(canvas, pts_crack[1], (pts_crack[1][0] + 3, pts_crack[1][1] - 5), (*gc, 140), 1, cv2.LINE_AA)
+    crescent_pts = []
+    for deg in range(300, 420, 15):
+        rad = math.radians(deg)
+        crescent_pts.append((int(cx + 21 * math.cos(rad)), int(cy + 21 * math.sin(rad))))
+    for deg in range(405, 315, -20):
+        rad = math.radians(deg)
+        crescent_pts.append((int(cx + 9 * math.cos(rad)), int(cy + 9 * math.sin(rad))))
+    if len(crescent_pts) > 2:
+        _hatch_polygon(canvas, crescent_pts, step=3, angle=65, gc=gc, alpha=90, seed=seed + 3)
+    cv2.circle(canvas, (cx - 25, cy + 5), 1, (*gc, 150), -1, cv2.LINE_AA)
+    cv2.circle(canvas, (cx - 23, cy + 10), 2, (*gc, 130), -1, cv2.LINE_AA)
+
+
+def _draw_sun_stone_item(canvas, cx, cy, letter="S", gc=GRAPHITE_COLOR, seed=42):
+    """Carved sunburst stone medallion: 12 radial solar rays in bas-relief, carved ring, engraved letter."""
+    _clear_polygon(canvas, [(cx - 25, cy - 25), (cx + 25, cy - 25), (cx + 25, cy + 25), (cx - 25, cy + 25)])
+    draw_sketchy_circle(canvas, (cx, cy), 23, gc=gc, alpha_base=225, passes=2, seed=seed, num_pts=32)
+    draw_sketchy_circle(canvas, (cx, cy), 18, gc=gc, alpha_base=130, passes=1, seed=seed + 1, num_pts=24)
+    for k in range(12):
+        th = math.radians(k * 30)
+        th1 = math.radians(k * 30 - 7)
+        th2 = math.radians(k * 30 + 7)
+        p_tip = (int(cx + 23 * math.cos(th)), int(cy + 23 * math.sin(th)))
+        p_b1 = (int(cx + 18 * math.cos(th1)), int(cy + 18 * math.sin(th1)))
+        p_b2 = (int(cx + 18 * math.cos(th2)), int(cy + 18 * math.sin(th2)))
+        cv2.line(canvas, p_b1, p_tip, (*gc, 160), 1, cv2.LINE_AA)
+        cv2.line(canvas, p_b2, p_tip, (*gc, 160), 1, cv2.LINE_AA)
+    draw_sketchy_circle(canvas, (cx, cy), 14, gc=gc, alpha_base=75, passes=1, seed=seed + 2, num_pts=20)
+    t_img, _ = render_pencil_text(letter, FONT_PATH, font_size=26, gc=gc, seed=seed + 3)
+    lx = int(cx - t_img.shape[1] / 2)
+    ly = int(cy - t_img.shape[0] / 2 + 4)
+    blit_rgba(canvas, t_img, lx, ly)
+
+
+def _draw_altar_item(canvas, cx, cy, gc=GRAPHITE_COLOR, seed=42):
+    """The Solar Altar: tiered dais, astronomical brass ring with 24 degree marks, central radiant sunburst & focus."""
+    _clear_polygon(canvas, [(cx - 31, cy - 31), (cx + 31, cy - 31), (cx + 31, cy + 31), (cx - 31, cy + 31)])
+    draw_sketchy_circle(canvas, (cx, cy), 29, gc=gc, alpha_base=225, passes=2, seed=seed, num_pts=36)
+    draw_sketchy_circle(canvas, (cx, cy), 26, gc=gc, alpha_base=140, passes=1, seed=seed + 1, num_pts=32)
+    draw_sketchy_circle(canvas, (cx, cy), 23, gc=gc, alpha_base=210, passes=1, seed=seed + 2, num_pts=30)
+    draw_sketchy_circle(canvas, (cx, cy), 16, gc=gc, alpha_base=180, passes=1, seed=seed + 3, num_pts=26)
+    for k in range(24):
+        th = math.radians(k * 15)
+        r_in = 18 if k % 6 != 0 else 16
+        cv2.line(canvas, (int(cx + r_in * math.cos(th)), int(cy + r_in * math.sin(th))),
+                         (int(cx + 23 * math.cos(th)), int(cy + 23 * math.sin(th))), (*gc, 160 if k % 6 == 0 else 110), 1, cv2.LINE_AA)
+    for k in range(4):
+        th = math.radians(k * 90)
+        cv2.circle(canvas, (int(cx + 20 * math.cos(th)), int(cy + 20 * math.sin(th))), 1, (*gc, 230), -1, cv2.LINE_AA)
+    draw_sketchy_circle(canvas, (cx, cy), 11, gc=gc, alpha_base=160, passes=1, seed=seed + 4, num_pts=22)
+    for k in range(12):
+        th = math.radians(k * 30)
+        r_tip = 11 if k % 2 == 0 else 9
+        cv2.line(canvas, (int(cx + 4 * math.cos(th)), int(cy + 4 * math.sin(th))),
+                         (int(cx + r_tip * math.cos(th)), int(cy + r_tip * math.sin(th))), (*gc, 180), 1, cv2.LINE_AA)
+    cv2.circle(canvas, (cx, cy), 3, (*gc, 240), -1, cv2.LINE_AA)
+    cv2.circle(canvas, (cx, cy), 4, (*gc, 180), 1, cv2.LINE_AA)
+
+
 def _draw_courtyard_cells(canvas, x0, y0, rows, cols, cell, data, gc=GRAPHITE_COLOR):
-    """The paved courtyard: flagstones, bronze mirrors, fallen pillars, sun-stones, the altar and the gate of the arch."""
-    from scripts.journal.build_page06_07 import draw_desert_path_seal
+    """The paved courtyard: ashlar stone border, textured flagstones, Renaissance bronze mirrors,
+    fluted fallen column drums, carved sun-stone medallions, the Solar Altar and the Solstice Gate."""
     w, h = cols * cell, rows * cell
-    draw_sketchy_rect(canvas, (x0 - 10, y0 - 10, x0 + w + 10, y0 + h + 10), gc=gc, alpha_base=205, passes=2, seed=1801)
-    draw_sketchy_rect(canvas, (x0 - 2, y0 - 2, x0 + w + 2, y0 + h + 2), gc=gc, alpha_base=130, passes=1, seed=1802)
+    # 1. Outer ashlar curb (14 px stone border with division notches and reinforced corners)
+    draw_sketchy_rect(canvas, (x0 - 14, y0 - 14, x0 + w + 14, y0 + h + 14), gc=gc, alpha_base=215, passes=2, seed=1801)
+    draw_sketchy_rect(canvas, (x0 - 2, y0 - 2, x0 + w + 2, y0 + h + 2), gc=gc, alpha_base=160, passes=1, seed=1802)
+    for c in range(cols + 1):
+        cx_ = x0 + c * cell
+        cv2.line(canvas, (cx_, y0 - 14), (cx_, y0 - 2), (*gc, 110), 1, cv2.LINE_AA)
+        cv2.line(canvas, (cx_, y0 + h + 2), (cx_, y0 + h + 14), (*gc, 110), 1, cv2.LINE_AA)
+    for r in range(rows + 1):
+        cy_ = y0 + r * cell
+        cv2.line(canvas, (x0 - 14, cy_), (x0 - 2, cy_), (*gc, 110), 1, cv2.LINE_AA)
+        cv2.line(canvas, (x0 + w + 2, cy_), (x0 + w + 14, cy_), (*gc, 110), 1, cv2.LINE_AA)
+    for corner in ((x0 - 8, y0 - 8), (x0 + w + 8, y0 - 8), (x0 - 8, y0 + h + 8), (x0 + w + 8, y0 + h + 8)):
+        cv2.circle(canvas, corner, 3, (*gc, 180), 1, cv2.LINE_AA)
+        cv2.circle(canvas, corner, 1, (*gc, 220), -1, cv2.LINE_AA)
+
+    # 2. Flagstone paving with subtle sandstone texture
     rng = np.random.default_rng(1803)
     for r in range(rows):
         for c in range(cols):
             x, y = x0 + c * cell, y0 + r * cell
-            draw_sketchy_rect(canvas, (x + 2, y + 2, x + cell - 2, y + cell - 2), gc=gc, alpha_base=62, passes=1, seed=1900 + r * 31 + c)
-            for k in range(2):
-                tx, ty = x + int(rng.integers(8, cell - 8)), y + int(rng.integers(8, cell - 8))
-                cv2.line(canvas, (tx, ty), (tx + int(rng.integers(5, 12)), ty), (*gc, 40), 1, cv2.LINE_AA)
+            draw_sketchy_rect(canvas, (x + 2, y + 2, x + cell - 2, y + cell - 2), gc=gc, alpha_base=65, passes=1, seed=1900 + r * 31 + c)
+            if (c * 7 + r * 13) % 4 == 0:
+                for k in range(3):
+                    ox = 10 + k * 14
+                    cv2.line(canvas, (x + ox, y + 8), (x + ox + 18, y + 26), (*gc, 28), 1, cv2.LINE_AA)
+            if (c * 11 + r * 19) % 9 == 0:
+                kx, ky = x + 16, y + 16
+                cv2.line(canvas, (kx, ky), (kx + 8, ky + 5), (*gc, 65), 1, cv2.LINE_AA)
+                cv2.line(canvas, (kx + 8, ky + 5), (kx + 14, ky + 3), (*gc, 50), 1, cv2.LINE_AA)
+            cv2.circle(canvas, (x, y), 1, (*gc, 75), -1, cv2.LINE_AA)
+
     half = cell // 2
 
     def center(c, r):
         return x0 + c * cell + half, y0 + r * cell + half
 
+    # 3. Bronze mirrors
     for (c, r), kind in data["mirrors"].items():
         mx, my = center(c, r)
-        d = 21
-        p1, p2 = ((mx - d, my - d), (mx + d, my + d)) if kind == "\\" else ((mx - d, my + d), (mx + d, my - d))
-        nx_, ny_ = (1, -1) if kind == "\\" else (1, 1)
-        for off, a in ((-3, 215), (3, 215)):
-            cv2.line(canvas, (p1[0] + nx_ * off, p1[1] + ny_ * off), (p2[0] + nx_ * off, p2[1] + ny_ * off), (*gc, a), 1, cv2.LINE_AA)
-        for p in (p1, p2):
-            cv2.line(canvas, (p[0] + nx_ * -3, p[1] + ny_ * -3), (p[0] + nx_ * 3, p[1] + ny_ * 3), (*gc, 215), 1, cv2.LINE_AA)
-        for k in range(1, 4):
-            t = k / 4.0
-            sx_, sy_ = int(p1[0] + (p2[0] - p1[0]) * t), int(p1[1] + (p2[1] - p1[1]) * t)
-            cv2.line(canvas, (sx_ + nx_ * 4, sy_ + ny_ * 4), (sx_ + nx_ * 9, sy_ + ny_ * 9), (*gc, 120), 1, cv2.LINE_AA)
-        cv2.circle(canvas, (mx, my), 3, (*gc, 220), -1, cv2.LINE_AA)
+        _draw_mirror_item(canvas, mx, my, kind=kind, gc=gc, seed=2000 + c * 17 + r)
+
+    # 4. Fallen pillars
     for (c, r) in data["pillars"]:
         mx, my = center(c, r)
-        _clear_polygon(canvas, [(mx - 23, my - 23), (mx + 23, my - 23), (mx + 23, my + 23), (mx - 23, my + 23)])
-        draw_sketchy_circle(canvas, (mx, my), 22, gc=gc, alpha_base=210, passes=2, seed=2000 + c * 13 + r, num_pts=26)
-        draw_sketchy_circle(canvas, (mx, my), 14, gc=gc, alpha_base=130, passes=1, seed=2001 + c * 13 + r, num_pts=20)
-        for k in range(10):
-            th = math.radians(k * 36)
-            cv2.line(canvas, (int(mx + 14 * math.cos(th)), int(my + 14 * math.sin(th))), (int(mx + 22 * math.cos(th)), int(my + 22 * math.sin(th))), (*gc, 150), 1, cv2.LINE_AA)
-        _hatch_polygon(canvas, [(mx + 2, my - 20), (mx + 20, my - 8), (mx + 20, my + 8), (mx + 2, my + 20)], step=3, angle=70, gc=gc, alpha=80, seed=2002 + c)
+        _draw_pillar_item(canvas, mx, my, gc=gc, seed=2100 + c * 13 + r)
+
+    # 5. Sun-stones
     for (c, r), ch in data["letters"].items():
         mx, my = center(c, r)
-        _clear_polygon(canvas, [(mx - 25, my - 25), (mx + 25, my - 25), (mx + 25, my + 25), (mx - 25, my + 25)])
-        draw_sketchy_circle(canvas, (mx, my), 24, gc=gc, alpha_base=210, passes=2, seed=2100 + c * 13 + r, num_pts=28)
-        draw_sketchy_circle(canvas, (mx, my), 19, gc=gc, alpha_base=110, passes=1, seed=2101 + c * 13 + r, num_pts=24)
-        t_img, _ = render_pencil_text(ch, FONT_PATH, font_size=26, gc=gc, seed=2102 + c * 7 + r)
-        blit_rgba(canvas, t_img, int(mx - t_img.shape[1] / 2), int(my - t_img.shape[0] / 2 + 4))
+        _draw_sun_stone_item(canvas, mx, my, letter=ch, gc=gc, seed=2200 + c * 7 + r)
+
+    # 6. The Solar Altar
     ac, ar = data["altar"]
     mx, my = center(ac, ar)
-    _clear_polygon(canvas, [(mx - 30, my - 30), (mx + 30, my - 30), (mx + 30, my + 30), (mx - 30, my + 30)])
-    draw_sketchy_circle(canvas, (mx, my), 29, gc=gc, alpha_base=225, passes=2, seed=2200, num_pts=36)
-    draw_sketchy_circle(canvas, (mx, my), 21, gc=gc, alpha_base=170, passes=1, seed=2201, num_pts=30)
-    draw_sketchy_circle(canvas, (mx, my), 11, gc=gc, alpha_base=200, passes=1, seed=2202, num_pts=22)
-    for k in range(16):
-        th = math.radians(k * 22.5)
-        cv2.line(canvas, (int(mx + 12 * math.cos(th)), int(my + 12 * math.sin(th))), (int(mx + 20 * math.cos(th)), int(my + 20 * math.sin(th))), (*gc, 150), 1, cv2.LINE_AA)
-    cv2.circle(canvas, (mx, my), 3, (*gc, 230), -1, cv2.LINE_AA)
-    # the gate: a small arch over the entry column with a downward arrow of light
+    _draw_altar_item(canvas, mx, my, gc=gc, seed=2300)
+
+    # 7. Solstice gate crowning the entry column
     gcx = x0 + data["start_c"] * cell + half
     gate_y = y0 - 10
-    for rad in (26, 20):
-        _draw_arc(canvas, (gcx, gate_y - 40), rad, 180, 360, gc=gc, alpha=215 if rad == 26 else 150, seed=2300 + rad, passes=1)
-        cv2.line(canvas, (gcx - rad, gate_y - 40), (gcx - rad, gate_y - 4), (*gc, 215 if rad == 26 else 150), 1, cv2.LINE_AA)
-        cv2.line(canvas, (gcx + rad, gate_y - 40), (gcx + rad, gate_y - 4), (*gc, 215 if rad == 26 else 150), 1, cv2.LINE_AA)
-    _draw_dashed_line(canvas, (gcx, gate_y - 62), (gcx, gate_y + 8), gc, dash=8, gap=6, alpha=190)
-    cv2.fillPoly(canvas, [np.array([(gcx, y0 + 22), (gcx - 8, y0 + 4), (gcx + 8, y0 + 4)], dtype=np.int32)], (*gc, 200))
-    t_img, _ = render_pencil_text("Arch of the Solstice", FONT_PATH, font_size=24, gc=gc, seed=2310)
-    blit_rgba(canvas, t_img, gcx + 38, gate_y - 52)
+    for side in (-1, 1):
+        px0 = gcx + side * 28 - (8 if side > 0 else 0)
+        px1 = px0 + 8
+        draw_sketchy_rect(canvas, (px0, gate_y - 42, px1, gate_y - 2), gc=gc, alpha_base=180, passes=1, seed=2400 + side)
+        for yy in range(gate_y - 34, gate_y - 2, 10):
+            cv2.line(canvas, (px0, yy), (px1, yy), (*gc, 120), 1, cv2.LINE_AA)
+    for rad, a_ in ((28, 220), (20, 160)):
+        _draw_arc(canvas, (gcx, gate_y - 42), rad, 180, 360, gc=gc, alpha=a_, seed=2410 + rad, passes=1)
+    for deg in range(195, 350, 20):
+        th = math.radians(deg)
+        cv2.line(canvas, (int(gcx + 20 * math.cos(th)), int(gate_y - 42 + 20 * math.sin(th))),
+                         (int(gcx + 28 * math.cos(th)), int(gate_y - 42 + 28 * math.sin(th))), (*gc, 140), 1, cv2.LINE_AA)
+    kc = (gcx, gate_y - 42 - 28)
+    draw_sketchy_rect(canvas, (gcx - 6, kc[1] - 5, gcx + 6, kc[1] + 5), gc=gc, alpha_base=210, passes=1, seed=2420)
+    cv2.circle(canvas, kc, 3, (*gc, 220), -1, cv2.LINE_AA)
+    _draw_dashed_line(canvas, (gcx, gate_y - 64), (gcx, gate_y + 6), gc, dash=7, gap=5, alpha=170)
+    arrow_pts = np.array([(gcx, y0 + 20), (gcx - 7, y0 + 4), (gcx + 7, y0 + 4)], dtype=np.int32)
+    cv2.fillPoly(canvas, [arrow_pts], (*gc, 220))
+    cv2.polylines(canvas, [arrow_pts], True, (*gc, 240), 1, cv2.LINE_AA)
+    t_img, _ = render_pencil_text("Arch of the Solstice", FONT_PATH, font_size=23, gc=gc, seed=2430)
+    blit_rgba(canvas, t_img, gcx + 38, gate_y - 50)
 
 
 def _render_16b_page(gc: tuple = GRAPHITE_COLOR):
@@ -3234,117 +3746,104 @@ def _render_16b_page(gc: tuple = GRAPHITE_COLOR):
         return y
 
     # ------------------------------------------------------------------ header
-    put("Arch of the Solstice & The Solar Altar", X0, 70, 64, 10001)
-    put("The Ray of the Longest Day", X0 + 2, 158, 34, 10002)
-    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=10003), X0, 232)
+    put("Arch of the Solstice & The Solar Altar", X0, 80, 64, 10001)
+    blit_rgba(canvas, create_handdrawn_divider(width=W, gc=gc, seed=10003), X0, 172)
 
     # ------------------------------------------------------------------ I. The Arch at the Edge of the Sands
-    y = 286
+    y = 230
     put("I. The Arch at the Edge of the Sands", X0, y, SEC, 10010)
     y += SEC_LH
-    y = paragraph(
-        "Before the great facade of Tower II stands the Arch of the Solstice, and in its shade the Solar Altar: a round "
-        "dais with a brass ring at its heart. Cairn V, the Final Marker, looks toward it along a bearing of 163°. On the "
-        "longest day the sun's ray slips under the crown of the arch and falls on the altar, bent on its way by the old "
-        "bronze mirrors of the courtyard.",
-        X0, y, W, seed=10012)
-    y += 14
+    sec1_text = (
+        "Beyond the chasm, the trail opens before Tower II: the Sandstone Sanctuary. "
+        "Here stands the Arch of the Solstice, and on the terrace rests the Solar Altar. "
+        "From the dunes (163°), Cairn V watches as the fifth and final marker. "
+        "At midsummer dawn, the sun's first ray slips beneath the arch. Guided by bronze mirrors, "
+        "the beam weaves through the courtyard to strike the altar and reveal the last seal."
+    )
+    y = paragraph(sec1_text, X0, y, W, seed=10012)
+    y += 26
 
     # ------------------------------------------------------------------ plan the page
     RX, RW = X0 + COLS * CELL + 52, W - COLS * CELL - 52
-    rules = ["1. The ray enters through the arch and runs straight down the courtyard.",
-             "2. A bronze mirror turns it a quarter turn. A fallen pillar stops it.",
-             "3. Read every sun-stone the ray crosses, in order. The eight letters are the Sigil of Cairn V."]
-    rule_lines = [wrap_text_to_width(r, FONT_PATH, 32, RW) for r in rules]
-    block_h = 70 + ROWS * CELL + 14
-    caption_h = 52
-    answer_h = 56 + 84 + 52
-    ending_h = 36 + 26 + 118 + 20 + 50
-    bottom_margin = 52
-    sec_h = SEC_LH + 6 + block_h + 40
-    plate_h = CANVAS_HEIGHT_PX - bottom_margin - y - caption_h - 24 - sec_h - answer_h - ending_h
-    slack = max(0, plate_h - 500)
-    plate_h = int(max(340, min(500, plate_h)))
+    rules = [
+        [
+            "1. The ray enters at the arch (see arrow) and",
+            "travels straight down the courtyard."
+        ],
+        [
+            "2. Bronze mirrors reflect the ray 90° along",
+            "their slant. Fallen pillars stop the light."
+        ],
+        [
+            "3. Follow the true beam to the Solar Altar.",
+            "Record each lettered sun-stone crossed, in",
+            "order, to reveal the eight-letter Sigil."
+        ]
+    ]
+    plate_h = 540
 
     # ------------------------------------------------------------------ plate
     gy = _draw_solstice_arch_plate(canvas, X0, y, W, plate_h, gc)
-    put_centered("At the solstice the ray crosses under the arch and lights the brass ring of the altar.", X0 + W / 2, y + plate_h + 16, 28, 10020)
-    y += plate_h + caption_h + 24 + slack // 2
+    y += plate_h + 46 + 28
 
     # ------------------------------------------------------------------ II. The Courtyard of Rays
     put("II. The Courtyard of Rays", X0, y, SEC, 10030)
     y += SEC_LH + 6
-    gx0, gy0 = X0 + 4, y + 70
+    gx0, gy0 = X0 + 4, y + 130
     _draw_courtyard_cells(canvas, gx0, gy0, ROWS, COLS, CELL, data, gc)
     # right column: the rules, the key and a note of Hermes
-    ry = y + 4
-    for k, rl in enumerate(rule_lines):
+    ry = y + 16
+    for k, rl in enumerate(rules):
         for j, ln in enumerate(rl):
-            put(ln, RX + (0 if j == 0 else 28), ry, 32, 10040 + k * 11 + j * 3)
-            ry += 42
-        ry += 12
-    ry += 8
+            put(ln, RX + (0 if j == 0 else 24), ry, 28, 10040 + k * 11 + j * 3)
+            ry += 38
+        ry += 14
+    ry += 24
     put("Key", RX, ry, 34, 10080)
-    ry += 66
+    ry += 76
     kx = RX + 34
+    tx = RX + 88
     # mirror
-    for off in (-3, 3):
-        cv2.line(canvas, (kx - 20 + 3 * off // 3, ry + 24 + off), (kx + 20, ry - 16 + off), (*gc, 215), 1, cv2.LINE_AA)
-    put("Bronze mirror", RX + 82, ry - 6, 28, 10081)
-    ry += 58
-    draw_sketchy_circle(canvas, (kx, ry + 4), 20, gc=gc, alpha_base=210, passes=2, seed=10082, num_pts=24)
-    draw_sketchy_circle(canvas, (kx, ry + 4), 12, gc=gc, alpha_base=130, passes=1, seed=10083, num_pts=18)
-    for k in range(10):
-        th = math.radians(k * 36)
-        cv2.line(canvas, (int(kx + 12 * math.cos(th)), int(ry + 4 + 12 * math.sin(th))), (int(kx + 20 * math.cos(th)), int(ry + 4 + 20 * math.sin(th))), (*gc, 150), 1, cv2.LINE_AA)
-    put("Fallen pillar", RX + 82, ry - 6, 28, 10084)
-    ry += 58
-    draw_sketchy_circle(canvas, (kx, ry + 4), 21, gc=gc, alpha_base=210, passes=2, seed=10085, num_pts=26)
-    draw_sketchy_circle(canvas, (kx, ry + 4), 16, gc=gc, alpha_base=110, passes=1, seed=10086, num_pts=22)
-    t_img, _ = render_pencil_text("S", FONT_PATH, font_size=24, gc=gc, seed=10087)
-    blit_rgba(canvas, t_img, int(kx - t_img.shape[1] / 2), int(ry + 4 - t_img.shape[0] / 2 + 4))
-    put("Sun-stone (a letter)", RX + 82, ry - 6, 28, 10088)
-    ry += 58
-    draw_sketchy_circle(canvas, (kx, ry + 4), 22, gc=gc, alpha_base=225, passes=2, seed=10089, num_pts=30)
-    draw_sketchy_circle(canvas, (kx, ry + 4), 14, gc=gc, alpha_base=170, passes=1, seed=10090, num_pts=24)
-    draw_sketchy_circle(canvas, (kx, ry + 4), 6, gc=gc, alpha_base=200, passes=1, seed=10091, num_pts=16)
-    put("The Solar Altar (the end)", RX + 82, ry - 6, 28, 10092)
+    _draw_mirror_item(canvas, kx, ry, kind="/", gc=gc, seed=10081)
+    put("Bronze mirror", tx, ry - 14, 28, 10081)
+    ry += 68
+    _draw_pillar_item(canvas, kx, ry, gc=gc, seed=10084)
+    put("Fallen pillar", tx, ry - 14, 28, 10084)
+    ry += 68
+    _draw_sun_stone_item(canvas, kx, ry, letter="S", gc=gc, seed=10088)
+    put("Sun-stone (a letter)", tx, ry - 14, 28, 10088)
     ry += 70
-    # note of Hermes
-    nb_h = 150
-    nb_top = max(ry, gy0 + ROWS * CELL - nb_h)
+    _draw_altar_item(canvas, kx, ry, gc=gc, seed=10092)
+    put("The Solar Altar (the goal)", tx, ry - 14, 28, 10092)
+    ry += 60
+    # note of Hermes / Cartographer
+    nb_h = 145
+    nb_top = max(ry + 20, gy0 + ROWS * CELL - nb_h)
     draw_sketchy_rect(canvas, (RX, nb_top, RX + RW, nb_top + nb_h), gc=gc, alpha_base=200, passes=2, seed=10100)
     draw_sketchy_rect(canvas, (RX + 8, nb_top + 8, RX + RW - 8, nb_top + nb_h - 8), gc=gc, alpha_base=110, passes=1, seed=10104)
-    put("Hermes's note", RX + 24, nb_top + 18, 28, 10108)
+    put("Cartographer's note", RX + 24, nb_top + 18, 28, 10108)
     ny_ = nb_top + 58
-    for ln in wrap_text_to_width("«A mirror does not choose. It only gives back what it receives.»", FONT_PATH, 28, RW - 50):
+    for ln in wrap_text_to_width("«A true mirror does not choose its path. It only reflects the light it receives.»", FONT_PATH, 28, RW - 50):
         put(ln, RX + 26, ny_, 28, 10110 + ny_ % 17)
         ny_ += 36
-    y = gy0 + ROWS * CELL + 14 + 40 + slack // 2
+    y = gy0 + ROWS * CELL + 45
 
     # ------------------------------------------------------------------ answer bar
     put("The Sigil of Cairn V:", X0, y, 36, 10130)
-    y += 56
-    box_w, gap = 140, 20
+    y += 52
+    box_w, box_h, gap = 140, 88, 20
     for k in range(len(RAY_SIGIL)):
         bx = X0 + k * (box_w + gap)
-        draw_sketchy_rect(canvas, (bx, y, bx + box_w, y + 84), gc=gc, alpha_base=200, passes=2, seed=10140 + k * 5)
-        draw_sketchy_rect(canvas, (bx + 6, y + 6, bx + box_w - 6, y + 78), gc=gc, alpha_base=90, passes=1, seed=10141 + k * 5)
+        draw_sketchy_rect(canvas, (bx, y, bx + box_w, y + box_h), gc=gc, alpha_base=200, passes=2, seed=10140 + k * 5)
+        draw_sketchy_rect(canvas, (bx + 6, y + 6, bx + box_w - 6, y + box_h - 6), gc=gc, alpha_base=90, passes=1, seed=10141 + k * 5)
         n_img, _ = render_pencil_text(str(k + 1), FONT_PATH, font_size=22, gc=gc, seed=10170 + k)
         blit_rgba(canvas, n_img, bx + 12, y + 7)
-    y += 84
-    put("Speak the Sigil at Cairn V to win the fifth and last seal.", X0, y + 10, 30, 10180)
+    y += box_h + 24
+    put("Speak this eight-letter Sigil at Cairn V to claim the fifth and final seal.", X0, y, 30, 10180)
     y += 52
 
-    # ------------------------------------------------------------------ ending
-    blit_rgba(canvas, create_handdrawn_divider(width=1100, gc=gc, seed=10190), (CANVAS_WIDTH_PX - 1100) // 2 - 80, y + 14)
-    emblem_cy = y + 14 + 36 + 64
-    draw_desert_path_seal(canvas, cx=CANVAS_WIDTH_PX // 2 - 80, cy=emblem_cy, r=50, gc=gc, seed=10200)
-    motto_y = emblem_cy + 70
-    put_centered("Where the light rests, the stone opens.", CANVAS_WIDTH_PX // 2 - 80, motto_y, 32, 10210)
-
     canvas[:, 1583:, 3] = 0
-    return canvas, data, motto_y + 46
+    return canvas, data, y
 
 
 def render_game_d8_arch_solstice_altar(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:

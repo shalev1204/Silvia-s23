@@ -1,0 +1,98 @@
+  <!-- =====================================================================
+       CAIRN I · THE THREE HEAPS OF 1998 (the preliminary seal, before the Whispering Chasm)
+       ===================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-cairn-one" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cairn1-modal-title">
+    <div class="chasm-workbench-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🪨</span>
+          <div>
+            <div class="chasm-header-title" id="cairn1-modal-title">Cairn I · The Three Heaps of 1998</div>
+            <div class="chasm-header-subtitle">The Wash River Marker · The seal beneath the stones</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-cairn1" title="Close">✕</button>
+      </div>
+
+      <div class="chasm-telemetry-strip">
+        <div class="chasm-telemetry-pill"><span>🚶 Stone-setter:</span><strong>Hermes</strong></div>
+        <div class="chasm-telemetry-pill"><span>📜 Rule:</span><strong>one stone at a time, big never on small</strong></div>
+        <div class="chasm-telemetry-pill"><span>↔ Moves:</span><strong id="cairn1-telem-moves">0</strong></div>
+        <div class="chasm-telemetry-pill"><span>🪨 On the third foundation:</span><strong id="cairn1-telem-done">0 / 4</strong></div>
+      </div>
+
+      <div class="chasm-workbench-body">
+        <div class="chasm-maze-frame">
+          <div class="cairn1-board" id="cairn1-board">
+            <button type="button" class="cairn1-heap" data-heap="0" aria-label="First foundation: the old cone">
+              <span class="cairn1-heap-label">First foundation</span>
+              <div class="cairn1-slab" id="cairn1-slab"></div>
+              <div class="cairn1-stack"></div>
+              <div class="cairn1-base"></div>
+            </button>
+            <button type="button" class="cairn1-heap" data-heap="1" aria-label="Second foundation">
+              <span class="cairn1-heap-label">Second foundation</span>
+              <div class="cairn1-stack"></div>
+              <div class="cairn1-base"></div>
+            </button>
+            <button type="button" class="cairn1-heap" data-heap="2" aria-label="Third foundation">
+              <span class="cairn1-heap-label">Third foundation</span>
+              <div class="cairn1-stack"></div>
+              <div class="cairn1-base"></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="chasm-desk-panel">
+          <div class="chasm-desk-header">
+            <div class="chasm-desk-title">The Law of the Stone-Setters</div>
+            <div class="chasm-desk-rule">
+              1. The cone of four stones stands on the first foundation.<br>
+              2. Carry the whole cone to the third foundation.<br>
+              3. Move one stone at a time: always the top stone of a heap.<br>
+              4. A big stone must never rest on a smaller one, or the heap collapses.<br>
+              5. Click a heap to lift its top stone, then click the heap where it should go.
+            </div>
+          </div>
+
+          <div class="chasm-cairns-keypad-box">
+            <div class="chasm-keypad-label">Guide Hermes, or ask him for a hint at any moment:</div>
+            <div class="cairn1-hint-btn-row">
+              <button type="button" class="chasm-cairn-btn" id="btn-cairn1-hint"><span>💡 Ask Hermes for a hint</span></button>
+              <button type="button" class="chasm-cairn-btn" id="btn-cairn1-undo"><span>↶ Undo last move</span></button>
+              <button type="button" class="chasm-cairn-btn" id="btn-cairn1-reset"><span>↺ Start again</span></button>
+            </div>
+          </div>
+
+          <div class="chasm-dispatch-box" id="cairn1-dispatch-box">
+            <div class="chasm-dispatch-sender">
+              <span>📻 FIELD WIRE DISPATCH // HERMES</span>
+            </div>
+            <div id="cairn1-dispatch-text"></div>
+          </div>
+
+          <div class="chasm-victory-card" id="cairn1-victory-card" style="display: none;">
+            <div class="chasm-victory-title">
+              <span>🪨</span>
+              <span>The Slab Is Open!</span>
+            </div>
+            <div class="cairn1-seal-showcase">
+              <span id="cairn1-victory-seal"></span>
+              <div class="chasm-victory-text">
+                "Silvia, the cone stands on the third foundation and the slab lies bare in the sun. It is a disc of red sandstone with the sign of the Order cut into it: the circle half light and half dark, and under it a small cone of stones. I never put it there."
+              </div>
+            </div>
+            <button type="button" class="btn-chasm-finish" id="btn-cairn1-finish">
+              <span>🧭 Take the Seal of Cairn I ➔</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

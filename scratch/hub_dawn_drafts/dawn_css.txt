@@ -1,0 +1,99 @@
+    /* =========================================================================
+       SATCHEL OF SEALS (HEADER) · CHAT SKETCHES · CAIRN I (THE THREE HEAPS OF 1998)
+       ========================================================================= */
+    .satchel-wrap { position: relative; display: inline-flex; }
+    .btn-seal-satchel {
+      display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 10px;
+      background: rgba(18, 24, 38, 0.85); border: 1px solid rgba(212, 168, 83, 0.42); border-radius: 999px;
+      color: #ffd885; cursor: pointer; font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      user-select: none; -webkit-user-select: none;
+    }
+    .btn-seal-satchel:hover { background: rgba(138, 150, 107, 0.22); border-color: #a3ad82; transform: translateY(-1px); }
+    .btn-seal-satchel[aria-expanded="true"] { background: rgba(68, 77, 54, 0.55); border-color: #a3ad82; }
+    .btn-seal-satchel.is-pulsing { animation: satchelPulse 1.4s ease-out 2; }
+    @keyframes satchelPulse { 0% { box-shadow: 0 0 0 0 rgba(243, 213, 138, 0.7); } 100% { box-shadow: 0 0 0 16px rgba(243, 213, 138, 0); } }
+    .satchel-icon { font-size: 1.05rem; line-height: 1; }
+    .satchel-dots { display: inline-flex; gap: 4px; }
+    .satchel-dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(212, 168, 83, 0.7); background: transparent; }
+    .satchel-dot.is-filled { background: radial-gradient(circle at 35% 30%, #f3d58a, #b9803a); box-shadow: 0 0 8px rgba(243, 213, 138, 0.55); }
+    .satchel-popover {
+      position: absolute; top: 50px; left: 0; z-index: 9500; width: 460px; max-width: 92vw; padding: 16px 16px 14px;
+      background: linear-gradient(160deg, rgba(34, 26, 18, 0.98), rgba(14, 12, 10, 0.98)); border: 1px solid rgba(212, 168, 83, 0.55);
+      border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65); color: #e9dcc2;
+    }
+    .satchel-popover[hidden] { display: none; }
+    .satchel-pop-kicker { font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: #d4a853; }
+    .satchel-pop-title { font-family: 'Cinzel', serif; font-size: 1.15rem; color: #ffd885; margin: 4px 0 2px; }
+    .satchel-pop-desc { font-size: 0.82rem; color: #bfae8c; margin-bottom: 12px; line-height: 1.45; }
+    .satchel-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .satchel-socket { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 8px 4px 6px; border-radius: 10px; border: 1px dashed rgba(212, 168, 83, 0.3); background: rgba(255, 255, 255, 0.02); }
+    .satchel-socket.is-found { border: 1px solid rgba(243, 213, 138, 0.65); background: rgba(212, 168, 83, 0.1); box-shadow: inset 0 0 14px rgba(243, 213, 138, 0.12); }
+    .satchel-socket svg { width: 54px; height: 54px; }
+    .satchel-socket-name { font-family: 'Space Mono', monospace; font-size: 0.64rem; letter-spacing: 0.08em; color: #ffd885; }
+    .satchel-socket-role { font-size: 0.62rem; color: #a99a7a; line-height: 1.25; min-height: 2.4em; }
+    .satchel-socket-state { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: #8a8068; }
+    .satchel-socket.is-found .satchel-socket-state { color: #b7d28a; }
+    .seal-svg .seal-ring { fill: none; stroke: #d4a853; stroke-width: 2; }
+    .seal-svg .seal-ring-thin { fill: none; stroke: #d4a853; stroke-width: 1; opacity: 0.7; }
+    .seal-svg .seal-ticks { stroke: #d4a853; stroke-width: 1; opacity: 0.55; }
+    .seal-svg .seal-emblem { fill: none; stroke: #f0d9a8; stroke-width: 1.6; stroke-linejoin: round; }
+    .seal-svg .seal-emblem-fill { fill: rgba(240, 217, 168, 0.35); stroke: #f0d9a8; stroke-width: 1.4; }
+    .seal-svg.is-empty .seal-ring { stroke-dasharray: 3 3; opacity: 0.55; }
+    .seal-svg.is-empty .seal-emblem, .seal-svg.is-empty .seal-emblem-fill { opacity: 0.28; }
+    .seal-svg .seal-disc-found { fill: url(#sealDisc); }
+
+    /* Hermes attaches graphite sketches to his dispatches */
+    .chat-sketch-bubble { padding: 8px 8px 6px; max-width: min(520px, 88%); }
+    .chat-sketch { margin: 0; position: relative; cursor: zoom-in; }
+    .chat-sketch img { display: block; width: 100%; height: auto; border-radius: 4px; border: 1px solid rgba(212, 168, 83, 0.35); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5); transform: rotate(-0.6deg); }
+    .chat-sketch figcaption { margin-top: 6px; font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.04em; color: #c9b88f; }
+    .chat-sketch-lightbox { position: fixed; inset: 0; z-index: 200000; background: rgba(5, 5, 8, 0.9); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+    .chat-sketch-lightbox img { max-width: min(1100px, 96vw); max-height: 90vh; border-radius: 6px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); }
+
+    /* Cairn I: the three heaps of 1998 */
+    .cairn1-board {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 18px 14px 14px; position: relative;
+      background: linear-gradient(180deg, rgba(120, 78, 44, 0.18) 0%, rgba(30, 20, 12, 0.6) 100%);
+      border: 1px solid rgba(212, 168, 83, 0.3); border-radius: 14px;
+    }
+    .cairn1-heap {
+      position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 372px;
+      padding: 0 6px 12px; background: transparent; border: 1px dashed rgba(212, 168, 83, 0.28); border-radius: 12px; cursor: pointer;
+      color: inherit; font: inherit; transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .cairn1-heap:hover, .cairn1-heap:focus-visible { border-color: rgba(243, 213, 138, 0.75); background: rgba(212, 168, 83, 0.07); outline: none; }
+    .cairn1-heap.is-source { border-color: #f3d58a; background: rgba(243, 213, 138, 0.1); }
+    .cairn1-heap.is-hint-from, .cairn1-heap.is-hint-to { animation: cairn1Hint 1.1s ease-in-out infinite; }
+    @keyframes cairn1Hint { 0%, 100% { box-shadow: 0 0 0 0 rgba(163, 173, 130, 0); } 50% { box-shadow: 0 0 0 5px rgba(163, 173, 130, 0.45); } }
+    .cairn1-heap.is-shake { animation: cairn1Shake 0.35s ease; }
+    @keyframes cairn1Shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+    .cairn1-heap-label { position: absolute; top: 8px; left: 0; right: 0; text-align: center; font-family: 'Space Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a99a7a; pointer-events: none; }
+    .cairn1-stack { display: flex; flex-direction: column-reverse; align-items: center; gap: 2px; width: 100%; margin-bottom: 4px; position: relative; z-index: 2; }
+    .cairn1-stone {
+      height: 44px; border-radius: 46% 54% 50% 50% / 58% 56% 44% 42%;
+      background: radial-gradient(ellipse at 32% 28%, #e0b283 0%, #bb7b4e 46%, #8c5636 100%);
+      box-shadow: inset -8px -6px 12px rgba(60, 25, 10, 0.55), inset 5px 4px 8px rgba(255, 224, 186, 0.25), 0 4px 8px rgba(0, 0, 0, 0.5);
+      position: relative; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    }
+    .cairn1-stone::after { content: ''; position: absolute; left: 22%; top: 30%; width: 32%; height: 1px; background: rgba(60, 25, 10, 0.55); transform: rotate(14deg); box-shadow: 16px 8px 0 rgba(60, 25, 10, 0.35); }
+    .cairn1-stone.s1 { width: 74px; } .cairn1-stone.s2 { width: 110px; } .cairn1-stone.s3 { width: 148px; } .cairn1-stone.s4 { width: 186px; }
+    .cairn1-stone.is-lifted { transform: translateY(-36px); box-shadow: inset -8px -6px 12px rgba(60, 25, 10, 0.55), inset 5px 4px 8px rgba(255, 224, 186, 0.25), 0 0 20px rgba(243, 213, 138, 0.7); }
+    .cairn1-base { width: 88%; height: 16px; border-radius: 50%; background: radial-gradient(ellipse at 40% 30%, #a98866, #6d5340); box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.5); position: relative; z-index: 1; }
+    .cairn1-slab {
+      position: absolute; left: 50%; bottom: 16px; width: 150px; height: 64px; transform: translateX(-50%); z-index: 1; opacity: 0; transition: opacity 0.8s ease;
+      display: flex; align-items: center; justify-content: center; pointer-events: none;
+    }
+    .cairn1-slab svg { width: 76px; height: 76px; filter: drop-shadow(0 0 10px rgba(243, 213, 138, 0.8)); }
+    .cairn1-slab.is-revealed { opacity: 1; }
+    .cairn1-hint-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cairn1-seal-showcase { display: flex; align-items: center; gap: 16px; margin: 8px 0 12px; }
+    .cairn1-seal-showcase svg { width: 92px; height: 92px; filter: drop-shadow(0 0 14px rgba(243, 213, 138, 0.7)); flex: 0 0 auto; }
+    @media (max-width: 720px) {
+      .cairn1-heap { height: 330px; }
+      .cairn1-stone.s1 { width: 54px; } .cairn1-stone.s2 { width: 80px; } .cairn1-stone.s3 { width: 108px; } .cairn1-stone.s4 { width: 134px; }
+      .satchel-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+      .satchel-socket svg { width: 42px; height: 42px; }
+    }
+

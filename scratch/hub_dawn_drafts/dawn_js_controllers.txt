@@ -1,0 +1,328 @@
+    // =========================================================================
+    // ◈ THE SATCHEL OF SEALS (HEADER) · one seal for each Cairn of the Order
+    // =========================================================================
+    (function initSatchelOfSeals() {
+      const SEALS = [
+        { n: 1, key: 'order_seal_cairn_1', name: 'Cairn I', role: 'The Wash River Marker' },
+        { n: 2, key: 'order_seal_cairn_2', name: 'Cairn II', role: 'The Nomad Marker' },
+        { n: 3, key: 'order_seal_cairn_3', name: 'Cairn III', role: 'The Copper Benchmark' },
+        { n: 4, key: 'order_seal_cairn_4', name: 'Cairn IV', role: 'The Canyon Sentry' },
+        { n: 5, key: 'order_seal_cairn_5', name: 'Cairn V', role: 'The Final Marker' }
+      ];
+      const btn = document.getElementById('btn-seal-satchel');
+      const pop = document.getElementById('satchel-popover');
+      const dots = document.getElementById('satchel-dots');
+      const grid = document.getElementById('satchel-grid');
+      const has = (n) => localStorage.getItem(SEALS[n - 1].key) === 'true';
+
+      // Seal emblem, drawn like the sockets of the journal: ring, ticks and the shape of the Cairn
+      function sealSVG(n, found, uid) {
+        const emblems = {
+          1: '<ellipse cx="50" cy="66" rx="20" ry="8"/><ellipse cx="50" cy="56" rx="16" ry="7"/><ellipse cx="50" cy="47" rx="12" ry="6"/><ellipse cx="50" cy="39" rx="8" ry="5"/>',
+          2: '<rect x="30" y="60" width="40" height="10"/><rect x="36" y="50" width="28" height="10"/><rect x="42" y="40" width="16" height="10"/><ellipse cx="50" cy="38" rx="10" ry="3"/>',
+          3: '<polygon points="50,30 72,68 28,68"/><circle cx="50" cy="56" r="5"/>',
+          4: '<rect x="33" y="40" width="10" height="28"/><rect x="57" y="40" width="10" height="28"/><rect x="30" y="35" width="16" height="5"/><rect x="54" y="35" width="16" height="5"/>',
+          5: '<rect x="43" y="34" width="14" height="34"/><rect x="36" y="68" width="28" height="5"/><circle cx="50" cy="46" r="3"/><line x1="50" y1="40" x2="50" y2="36"/><line x1="46" y1="42" x2="43" y2="39"/><line x1="54" y1="42" x2="57" y2="39"/>'
+        };
+        let ticks = '';
+        for (let i = 0; i < 40; i++) {
+          const a = (i * 9) * Math.PI / 180;
+          ticks += `<line x1="${(50 + 40 * Math.cos(a)).toFixed(1)}" y1="${(50 + 40 * Math.sin(a)).toFixed(1)}" x2="${(50 + 45 * Math.cos(a)).toFixed(1)}" y2="${(50 + 45 * Math.sin(a)).toFixed(1)}"/>`;
+        }
+        return `
+          <svg class="seal-svg${found ? '' : ' is-empty'}" viewBox="0 0 100 100" role="img" aria-label="Seal of Cairn ${['I', 'II', 'III', 'IV', 'V'][n - 1]}">
+            ${found ? `<defs><radialGradient id="sealDisc${uid}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#d9a06f"/><stop offset="0.6" stop-color="#a8623a"/><stop offset="1" stop-color="#6e3a20"/></radialGradient></defs><circle cx="50" cy="50" r="46" fill="url(#sealDisc${uid})"/>` : ''}
+            <circle class="seal-ring" cx="50" cy="50" r="46"/>
+            <circle class="seal-ring-thin" cx="50" cy="50" r="34"/>
+            <g class="seal-ticks">${ticks}</g>
+            <g class="${n === 1 || n === 3 ? 'seal-emblem-fill' : 'seal-emblem'}">${emblems[n]}</g>
+          </svg>`;
+      }
+      window.sealSVG = sealSVG;
+
+      function render() {
+        if (!grid) return;
+        let count = 0;
+        grid.innerHTML = SEALS.map((s) => {
+          const found = has(s.n);
+          if (found) count++;
+          return `
+            <div class="satchel-socket${found ? ' is-found' : ''}">
+              ${sealSVG(s.n, found, 'sat' + s.n)}
+              <div class="satchel-socket-name">${s.name}</div>
+              <div class="satchel-socket-role">${s.role}</div>
+              <div class="satchel-socket-state">${found ? 'In the satchel' : 'Not found yet'}</div>
+            </div>`;
+        }).join('');
+        if (dots) dots.innerHTML = SEALS.map((s) => `<span class="satchel-dot${has(s.n) ? ' is-filled' : ''}"></span>`).join('');
+        if (btn) btn.title = 'Satchel of Seals: ' + count + ' of 5';
+      }
+
+      function setOpen(open) {
+        if (!pop || !btn) return;
+        pop.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) render();
+      }
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (window.sfx) window.sfx.playMechanicalClick();
+          setOpen(pop.hidden);
+        });
+      }
+      document.addEventListener('click', (e) => {
+        if (pop && !pop.hidden && !e.target.closest('#satchel-wrap')) setOpen(false);
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+
+      window.grantCairnSeal = function (n) {
+        try { localStorage.setItem(SEALS[n - 1].key, 'true'); } catch (e) {}
+        render();
+        if (btn) {
+          btn.classList.remove('is-pulsing');
+          void btn.offsetWidth;
+          btn.classList.add('is-pulsing');
+        }
+        if (typeof window.showDesertToast === 'function') {
+          window.showDesertToast('✦ SEAL OF ' + SEALS[n - 1].name.toUpperCase() + ' · ' + SEALS[n - 1].role + ' ✦ added to the satchel');
+        }
+      };
+      window.refreshSatchel = render;
+      render();
+    })();
+
+    // =========================================================================
+    // 🪨 CAIRN I CONTROLLER · THE THREE HEAPS OF 1998 (before Station 10)
+    // =========================================================================
+    (function initCairnOneController() {
+      const modal = document.getElementById('modal-cairn-one');
+      if (!modal) return;
+      const sfx = window.sfx || null;
+      const board = document.getElementById('cairn1-board');
+      const heapEls = Array.from(modal.querySelectorAll('.cairn1-heap'));
+      const slab = document.getElementById('cairn1-slab');
+      const dispatchEl = document.getElementById('cairn1-dispatch-text');
+      const movesEl = document.getElementById('cairn1-telem-moves');
+      const doneEl = document.getElementById('cairn1-telem-done');
+      const victoryCard = document.getElementById('cairn1-victory-card');
+      const victorySeal = document.getElementById('cairn1-victory-seal');
+      const btnClose = document.getElementById('btn-close-cairn1');
+      const btnHint = document.getElementById('btn-cairn1-hint');
+      const btnUndo = document.getElementById('btn-cairn1-undo');
+      const btnReset = document.getElementById('btn-cairn1-reset');
+      const btnFinish = document.getElementById('btn-cairn1-finish');
+
+      const N = 4;
+      const START_LINE = "Silvia, four stones stand on the first foundation, and the second and third foundations are bare. The rule of the stone-setters is simple: one stone at a time, always the top one, and a big stone never on a small one. Click a heap to lift its top stone, then click the heap where it should go.";
+      const INVALID = [
+        "A big stone on a small one? It would roll off and bring the whole heap down. Small stones go on big ones, never the other way round.",
+        "No, no. That stone is too heavy for the one beneath it. Let's find another place for it.",
+        "The heap would collapse, Silvia. I can feel it in my wrists. Think of the smaller stones as the ones that must always be on top."
+      ];
+      let heaps, lifted, moves, history, invalidCount, completed;
+
+      const isDone = () => localStorage.getItem('order_cairn1_completed') === 'true';
+      const say = (text) => { if (dispatchEl) dispatchEl.textContent = '"' + text + '"'; };
+      const ordinal = ['first', 'second', 'third'];
+
+      function reset() {
+        heaps = [[4, 3, 2, 1], [], []];
+        lifted = null;
+        moves = 0;
+        history = [];
+        invalidCount = 0;
+        completed = false;
+        clearHint();
+        render();
+      }
+
+      function render() {
+        heapEls.forEach((el, i) => {
+          const stack = el.querySelector('.cairn1-stack');
+          stack.innerHTML = '';
+          heaps[i].forEach((size, k) => {
+            const st = document.createElement('div');
+            st.className = 'cairn1-stone s' + size + ((lifted === i && k === heaps[i].length - 1) ? ' is-lifted' : '');
+            stack.appendChild(st);
+          });
+          el.classList.toggle('is-source', lifted === i);
+        });
+        if (slab) {
+          slab.innerHTML = typeof window.sealSVG === 'function' ? window.sealSVG(1, true, 'slab') : '';
+          slab.classList.toggle('is-revealed', heaps[0].length === 0);
+        }
+        if (movesEl) movesEl.textContent = String(moves);
+        if (doneEl) doneEl.textContent = heaps[2].length + ' / ' + N;
+        if (victoryCard) victoryCard.style.display = completed ? 'block' : 'none';
+        if (completed && victorySeal && typeof window.sealSVG === 'function') victorySeal.innerHTML = window.sealSVG(1, true, 'win');
+      }
+
+      function clearHint() {
+        heapEls.forEach((el) => el.classList.remove('is-hint-from', 'is-hint-to'));
+      }
+
+      function topOf(i) { return heaps[i].length ? heaps[i][heaps[i].length - 1] : Infinity; }
+
+      function shake(i) {
+        const el = heapEls[i];
+        el.classList.remove('is-shake');
+        void el.offsetWidth;
+        el.classList.add('is-shake');
+      }
+
+      function move(from, to) {
+        const stone = heaps[from].pop();
+        heaps[to].push(stone);
+        history.push([from, to]);
+        moves++;
+        lifted = null;
+        clearHint();
+        if (sfx) sfx.playMechanicalClick();
+        if (heaps[2].length === N) {
+          completed = true;
+          if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+          say('The last stone is across, Silvia. Look at the first foundation: the slab is bare, and it is not a plain stone. It is carved.');
+        } else {
+          const lines = ["Lighter than it looks. Next.", "That one sat there for thirty years. It does not mind moving.", "Good. The heap is holding.", "Slowly. The silt is loose around the foundations."];
+          say(lines[moves % lines.length]);
+        }
+        render();
+      }
+
+      function onHeap(i) {
+        if (completed) return;
+        if (lifted === null) {
+          if (!heaps[i].length) {
+            say('That foundation is bare, Silvia. Lift a stone from a heap first.');
+            shake(i);
+            return;
+          }
+          lifted = i;
+          if (sfx) sfx.playMechanicalClick();
+          say('Lifted. Where shall I set it down: on the ' + ordinal.filter((_, k) => k !== i).join(' or the ') + ' foundation?');
+          render();
+          return;
+        }
+        if (lifted === i) {
+          lifted = null;
+          render();
+          return;
+        }
+        const stone = topOf(lifted);
+        if (topOf(i) < stone) {
+          invalidCount++;
+          shake(i);
+          say(INVALID[(invalidCount - 1) % INVALID.length] + (invalidCount >= 3 ? ' (If you are stuck, ask me for a hint.)' : ''));
+          return;
+        }
+        move(lifted, i);
+      }
+
+      // Shortest way to the goal from the current heaps (breadth-first over the 81 possible states)
+      function nextOptimalMove() {
+        const where = [0, 0, 0, 0, 0];
+        heaps.forEach((h, p) => h.forEach((s) => { where[s] = p; }));
+        const key = (w) => w.slice(1).join('');
+        const goal = '2222';
+        const start = key(where);
+        if (start === goal) return null;
+        const q = [[where.slice(), null]];
+        const seen = new Set([start]);
+        while (q.length) {
+          const [w, first] = q.shift();
+          for (let from = 0; from < 3; from++) {
+            let disc = 0;
+            for (let d = 1; d <= N; d++) if (w[d] === from) { disc = d; break; }
+            if (!disc) continue;
+            for (let to = 0; to < 3; to++) {
+              if (to === from) continue;
+              let blocked = false;
+              for (let d = 1; d < disc; d++) if (w[d] === to) blocked = true;
+              if (blocked) continue;
+              const nw = w.slice();
+              nw[disc] = to;
+              const k = key(nw);
+              if (seen.has(k)) continue;
+              seen.add(k);
+              const f = first || [from, to];
+              if (k === goal) return f;
+              q.push([nw, f]);
+            }
+          }
+        }
+        return null;
+      }
+
+      function hint() {
+        if (completed) return;
+        lifted = null;
+        const mv = nextOptimalMove();
+        render();
+        clearHint();
+        if (!mv) return;
+        heapEls[mv[0]].classList.add('is-hint-from');
+        heapEls[mv[1]].classList.add('is-hint-to');
+        say('Try this, Silvia: take the top stone of the ' + ordinal[mv[0]] + ' foundation and set it on the ' + ordinal[mv[1]] + ' one. I have marked both heaps.');
+        if (sfx) sfx.playChimeHover();
+      }
+
+      function undo() {
+        if (completed || !history.length) return;
+        const [from, to] = history.pop();
+        heaps[from].push(heaps[to].pop());
+        moves = Math.max(0, moves - 1);
+        lifted = null;
+        clearHint();
+        say('Back it goes. No harm done.');
+        render();
+      }
+
+      function openModal() {
+        if (sfx) sfx.playMechanicalClick();
+        modal.style.display = 'flex';
+        modal.classList.remove('closing');
+        if (isDone()) {
+          heaps = [[], [], [4, 3, 2, 1]];
+          lifted = null; moves = moves || 15; history = []; completed = true;
+          say('The cone stands on the third foundation and the slab is bare. The seal of Cairn I is safe in the satchel.');
+          render();
+          if (btnFinish) btnFinish.querySelector('span').textContent = '🧭 Back to the telegraph ➔';
+          return;
+        }
+        if (!heaps || completed) reset();
+        say(START_LINE);
+        render();
+      }
+
+      function closeModal() {
+        if (sfx) sfx.playMechanicalClick();
+        modal.classList.add('closing');
+        setTimeout(() => {
+          modal.style.display = 'none';
+          modal.classList.remove('closing');
+        }, 220);
+      }
+
+      function finish() {
+        const alreadyDone = isDone();
+        try { localStorage.setItem('order_cairn1_completed', 'true'); } catch (e) {}
+        closeModal();
+        if (alreadyDone) return;
+        setTimeout(() => {
+          if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(1);
+          if (typeof window.onCairnOneSolved === 'function') window.onCairnOneSolved();
+        }, 300);
+      }
+
+      heapEls.forEach((el, i) => el.addEventListener('click', () => onHeap(i)));
+      if (btnClose) btnClose.addEventListener('click', closeModal);
+      if (btnHint) btnHint.addEventListener('click', hint);
+      if (btnUndo) btnUndo.addEventListener('click', undo);
+      if (btnReset) btnReset.addEventListener('click', () => { if (sfx) sfx.playMechanicalClick(); reset(); say(START_LINE); });
+      if (btnFinish) btnFinish.addEventListener('click', finish);
+      window.openCairnOneModal = openModal;
+      window.closeCairnOneModal = closeModal;
+      reset();
+    })();
+
