@@ -1027,19 +1027,11 @@ def build_pages02_03(
         canvas_rgba = renderer(gc=GRAPHITE_COLOR)
 
         pdf_dir = os.path.join(out_dir, "pdf")
-        canvas_dir = os.path.join(out_dir, "canvases")
         mockup_dir = os.path.join(out_dir, "mockups")
         os.makedirs(pdf_dir, exist_ok=True)
-        os.makedirs(canvas_dir, exist_ok=True)
         os.makedirs(mockup_dir, exist_ok=True)
 
-        # 1. Save Transparent 300 DPI Canvas PNG
-        png_path = os.path.join(canvas_dir, f"{prefix}_canvas_A5_300dpi.png")
-        pil_canvas = Image.fromarray(canvas_rgba)
-        pil_canvas.save(png_path)
-        print(f"  -> Transparent Canvas: {png_path}")
-
-        # 2. Save Print-Ready 1:1 Vector A5 PDF
+        # 1. Save Print-Ready 1:1 Vector A5 PDF
         pdf_path = os.path.join(pdf_dir, f"{prefix}_A5.pdf")
         PDFBuilder.save_a5_pdf_from_rgba(canvas_rgba, pdf_path, dpi=300)
         print(f"  -> Vector PDF: {pdf_path}")

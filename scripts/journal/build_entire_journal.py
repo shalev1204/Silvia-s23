@@ -410,13 +410,9 @@ def render_sheet07_front_c4(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 
 
 def render_sheet01_front() -> np.ndarray:
-    """Loads existing master canvas for Sheet 01 Front (Cover)."""
-    p = os.path.join(JOURNAL_DIR, "page01", "canvases", "page01_front_canvas_A5_300dpi.png")
-    if os.path.exists(p):
-        return cv2.imread(p, cv2.IMREAD_UNCHANGED)
+    """Renders Sheet 01 Front (Cover)."""
     raw_sketch = os.path.join(JOURNAL_DIR, "page01", "raw_davinci_sketch.jpg")
-    build_page01(raw_sketch, REAL_PAPER_PATH, os.path.join(JOURNAL_DIR, "page01"))
-    return cv2.imread(p, cv2.IMREAD_UNCHANGED)
+    return build_page01(raw_sketch, REAL_PAPER_PATH, os.path.join(JOURNAL_DIR, "page01"))
 
 
 def render_sheet01_back() -> np.ndarray:
@@ -530,8 +526,8 @@ def build_entire_journal() -> None:
 
         # Sheet 18: Game D10 (Oracle Climax) & Transition Art to Stage Path
         (18,
-         ("Hoja 18 · Cara A (Game D10: The Oracle's Horizon & Triple Triangulation)", render_game_d10_oracle_horizon, "page18_front", False, False),
-         ("Hoja 18 · Cara B (Art: Transition to the Stage Path)", render_art_18b_stage_path_transition, "page18_back", True, False)),
+         ("Hoja 18 · Cara A (Game D10: The Oracle's Horizon & Triple Triangulation)", render_game_d10_oracle_horizon, "page18_front", False, True),
+         ("Hoja 18 · Cara B (Art: Transition to the Stage Path)", render_art_18b_stage_path_transition, "page18_back", True, True)),
     ]
 
     all_canvases = {}
@@ -540,11 +536,9 @@ def build_entire_journal() -> None:
         p_name = f"page{sheet_num:02d}"
         p_dir = os.path.join(JOURNAL_DIR, p_name)
         pdf_dir = os.path.join(p_dir, "pdf")
-        canvases_dir = os.path.join(p_dir, "canvases")
         mockups_dir = os.path.join(p_dir, "mockups")
 
         os.makedirs(pdf_dir, exist_ok=True)
-        os.makedirs(canvases_dir, exist_ok=True)
         os.makedirs(mockups_dir, exist_ok=True)
 
         for label, renderer, stem, is_back, is_fullbleed in [face_a, face_b]:
@@ -571,17 +565,12 @@ def build_entire_journal() -> None:
                     else:
                         print(f"  [OK] Left hole punch zone (X < 165): 0 pixels.")
 
-            # 1. Master Transparent Canvas (300 DPI)
-            canvas_path = os.path.join(canvases_dir, f"{stem}_canvas_A5_300dpi.png")
-            cv2.imwrite(canvas_path, canvas)
-            print(f"  -> Transparent Canvas: {canvas_path}")
-
-            # 2. Print-Ready Vector PDF (300 DPI, exact A5 MediaBox)
+            # 1. Print-Ready Vector PDF (300 DPI, exact A5 MediaBox)
             pdf_path = os.path.join(pdf_dir, f"{stem}_A5.pdf")
             PDFBuilder.save_a5_pdf_from_rgba(canvas, pdf_path, dpi=300)
             print(f"  -> Vector PDF: {pdf_path}")
 
-            # 3. Photorealistic Mockup over Real Paper
+            # 2. Photorealistic Mockup over Real Paper
             if bg_raw is not None:
                 bg_for_face = cv2.flip(bg_raw, 1) if is_back else bg_raw.copy()
                 fg_rgb = canvas[:, :, :3].astype(np.float32)

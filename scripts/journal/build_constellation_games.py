@@ -638,10 +638,8 @@ def render_game_c4(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 def build_constellation_games(real_paper_path: str, output_dir: str) -> None:
     """Renders and builds all production assets for Constellation Games (Hojas C1 & C2)."""
     pdf_dir = os.path.join(output_dir, "pdf")
-    canvas_dir = os.path.join(output_dir, "canvases")
     mockup_dir = os.path.join(output_dir, "mockups")
     os.makedirs(pdf_dir, exist_ok=True)
-    os.makedirs(canvas_dir, exist_ok=True)
     os.makedirs(mockup_dir, exist_ok=True)
 
     print("=== Building Constellation Games (Hojas C1 & C2 — 4 Pages) ===")
@@ -680,12 +678,7 @@ def build_constellation_games(real_paper_path: str, output_dir: str) -> None:
                 print(f"  [ERROR] {violation} pixels in LEFT hole zone (X < 165)!")
                 canvas[:, :165, 3] = 0
 
-        # 1. Master Transparent Canvas (300 DPI)
-        png_path = os.path.join(canvas_dir, f"{prefix}_canvas_A5_300dpi.png")
-        cv2.imwrite(png_path, canvas)
-        print(f"  -> Transparent Canvas: {png_path}")
-
-        # 2. Vector PDF (300 DPI)
+        # 1. Vector PDF (300 DPI)
         pdf_path = os.path.join(pdf_dir, f"{prefix}_A5.pdf")
         PDFBuilder.save_a5_pdf_from_rgba(canvas, pdf_path, dpi=300)
         print(f"  -> Vector PDF: {pdf_path}")

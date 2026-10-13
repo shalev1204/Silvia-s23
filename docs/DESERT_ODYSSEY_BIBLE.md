@@ -190,14 +190,14 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Mecánica**: Cuadrícula de Polibio $5 \times 5$ modulada con la palabra clave `PHOENIX` y seis estrofas de coordenadas numéricas.
   - **Solución Canónica**: Aforismo: **`"STARS GUIDE THOSE WHO SEEK TRUTH"`**, rumbo **`348° NNW`**.
 - **Cara B (Reverso · Lore)**: **Audiencia con El Oráculo del Desierto**.
-  - **Narrativa**: Las pesadas puertas de bronce y arenisca se abren solemnemente. Hermes es conducido ante **El Oráculo del Desierto (The Oracle)**. El Oráculo reconoce a Silvia como la buscadora predestinada, le entrega la revelación **WHERE** (la ciudad europea y el teatro histórico de la gala de ballet) y revela la posición de la segunda estrella maestra: **Vega** (anclada con **Deneb**).
+  - **Narrativa**: Las pesadas puertas de bronce y arenisca se abren solemnemente. Hermes es conducido ante **El Oráculo del Desierto (The Oracle)**. Silvia emprende su camino sin conocer ni el **WHAT**, ni el **WHERE**, ni el **HOW**. El Oráculo reconoce a Silvia como la buscadora predestinada y le entrega su **primera gran revelación: el WHEN** (la fecha, hora y estación exacta de la velada de ballet). La pista del **WHERE** (ciudad y teatro) se reservará para el Stage Path (Torre III), y la revelación del **WHAT** (el regalo supremo de las dos entradas físicas) quedará para el retorno final al Constellation Path y la Bóveda del Gran Eclipse. Asimismo, revela la posición de la segunda estrella maestra: **Vega** (anclada con **Deneb**).
 
 ---
 
 ### HOJA 18 · JUEGO 10 (CLÍMAX DEL ORÁCULO) Y TRANSICIÓN AL STAGE PATH
 - **Cara A (Anverso · Juego D10)**: **Juego 10: The Oracle's Horizon & The Triangulation Climax**.
-  - **Mecánica**: Enigma final de convergencia. El Oráculo presenta un diagrama interactivo con los tres espejos del horizonte que alinean la Torre I (Observatorio Alpino) y la Torre II (Santuario de Arenisca) proyectando un vector de rumbo hacia el oriente.
-  - **Mecánica (diseño impreso, sin imprimir la solución)**: «The Three Mirrors of the Horizon». Lámina con las tres torres y sus haces que convergen en la Cámara del Gran Eclipse, y una carta de 16 columnas × 9 filas (A–I) con letras. Ocho balizas numeradas (en las columnas 1–3) se reflejan en el Espejo I (vertical, columna 4), el Espejo II (plano, fila 5) y el Espejo III (vertical, columna 10): cada espejo manda la baliza al otro lado, a la misma distancia (el vertical conserva la fila; el plano, la columna). Las ocho letras donde aterrizan, en orden 1–8, forman la clave. Sin valores numéricos de letras (Regla 9), solo A–Z (Regla 10). El traslado neto es hacia el este (vector hacia el oriente).
+  - **Mecánica**: Enigma final de convergencia. El Oráculo presenta un diagrama interactivo con los tres espejos del horizonte que alinean la Torre II (Santuario de Arenisca) proyectando un vector de rumbo hacia el oriente (el Stage Path).
+  - **Mecánica (diseño impreso, sin imprimir la solución)**: «The Three Mirrors of the Horizon». Lámina con el estudio arquitectónico renacentista detallado de **The Sandstone Sanctuary (Tower II)** por dentro (bóveda artesonada, óculo cenital, haz de luz, altar de piedra con astrolabio) y por fuera (escalinata monumental, pilares de arenisca, planos con cotas), eliminando las tres torres para dar foco absoluto al santuario. Carta de 16 columnas × 9 filas (A–I) con letras. Ocho balizas numeradas (en las columnas 1–3) se reflejan en el Espejo I (vertical, columna 4), el Espejo II (plano escalonado del santuario: Altar en Fila D y Terraza en Fila F) y el Espejo III (vertical, columna 10): cada espejo manda la baliza al otro lado, a la misma distancia. Las ocho letras donde aterrizan, en orden 1–8, forman el Sigil del Oráculo (`OVERTURE`) que sella la revelación del **WHEN**. Sin valores numéricos de letras (Regla 9), solo alfabeto normal A–Z (Regla 10).
   - **Solución (solo para el Operador)**: OVERTURE. Balizas: (col,fila) 1(2,1)→(14,9) O · 2(1,3)→(13,7) V · 3(3,3)→(15,7) E · 4(2,4)→(14,6) R · 5(1,6)→(13,4) T · 6(3,6)→(15,4) U · 7(2,7)→(14,3) R · 8(3,8)→(15,2) E. Datos en `HORIZON_BEACONS`, `HORIZON_MIRRORS` y `_horizon_letter_grid()` de `build_desert_odyssey_expanded.py`.
   - **Lore Web**: En la plataforma web se despliega el clímax sonoro y telemétrico que desbloquea la transición al siguiente acto.
 - **Cara B (Reverso · Arte de Transición)**: **Dibujo de Transición: Del Desierto al Escenario**.
@@ -225,7 +225,7 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 | **14** | Lore: Los 5 Cairns Sagrados (14A) | **Juego D6: Sandstone Labyrinth (14B)** | Lore + Cairn III |
 | **15** | **Juego D7: Cairn IV Chasm Sentry (15A)** | **Zoom Mapa: Puente Natural - Panel Izq (15B)**| Enigma + Spread 3 Izq |
 | **16** | **Zoom Mapa: Puente Natural - Panel Der (16A)**| **Juego D8: Solstice Arch / Altar (16B)** | Spread 3 Der + Cairn V |
-| **17** | **Juego D9: The Polybius Stele (17A)** | Lore: Audiencia con El Oráculo (17B) | Prueba Sirviente + WHERE |
+| **17** | **Juego D9: The Polybius Stele (17A)** | Lore: Audiencia con El Oráculo (17B) | Prueba Sirviente + WHEN (1ª Pista) |
 | **18** | **Juego D10: Clímax con El Oráculo (18A)** | **Arte: Transición al Stage Path (18B)** | Clímax Final + Dibujo Danza |
 
 ---

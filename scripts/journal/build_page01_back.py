@@ -402,18 +402,9 @@ def build_page01_back(
     canvas_rgba = render_cara_b_canvas()
 
     pdf_dir = os.path.join(output_dir, "pdf")
-    canvas_dir = os.path.join(output_dir, "canvases")
     mockup_dir = os.path.join(output_dir, "mockups")
     os.makedirs(pdf_dir, exist_ok=True)
-    os.makedirs(canvas_dir, exist_ok=True)
     os.makedirs(mockup_dir, exist_ok=True)
-
-    # Save Transparent 300 DPI Canvas PNG
-    png_path = os.path.join(canvas_dir, "page01_back_canvas_A5_300dpi.png")
-    # Convert RGBA to PIL and save
-    pil_canvas = Image.fromarray(canvas_rgba)
-    pil_canvas.save(png_path)
-    print(f"  -> Saved transparent canvas: {png_path}")
 
     # 2. Save Print-Ready 1:1 Vector A5 PDF
     print("\n[Step 2/3] Generating print-ready 1:1 A5 PDF...")

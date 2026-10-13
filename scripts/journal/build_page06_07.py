@@ -774,16 +774,9 @@ def build_pages06_07(
                     canvas[:, :165, 3] = 0
 
         pdf_dir = os.path.join(out_dir, "pdf")
-        canvas_dir = os.path.join(out_dir, "canvases")
         mockup_dir = os.path.join(out_dir, "mockups")
         os.makedirs(pdf_dir, exist_ok=True)
-        os.makedirs(canvas_dir, exist_ok=True)
         os.makedirs(mockup_dir, exist_ok=True)
-
-        # Save transparent PNG
-        png_path = os.path.join(canvas_dir, f"{prefix}_canvas_A5_300dpi.png")
-        cv2.imwrite(png_path, canvas)
-        print(f"  -> Transparent Canvas: {png_path}")
 
         # Save Vector PDF
         pdf_path = os.path.join(pdf_dir, f"{prefix}_A5.pdf")

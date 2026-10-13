@@ -8,3 +8,8 @@ node_modules/
 # Audio intermedio (stems/foley): se regenera con scripts/audio/ y no se despliega en Cloudflare
 web/**/*.wav
 web/**/*.pcm
+
+# Python y artefactos intermedios del diario
+__pycache__/
+*.pyc
+**/canvases/

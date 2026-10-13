@@ -27,7 +27,6 @@ from scripts.journal.geometry import (
 from scripts.journal.alpha_engine import AlphaEngine
 from scripts.journal.composer import PageComposer
 from scripts.journal.pdf_builder import PDFBuilder
-from scripts.journal.calibration import CalibrationGenerator
 
 
 def build_page01(
@@ -363,20 +362,12 @@ def build_page01(
     cv2.line(clean, (tx + tw + 8, uy), (tx + tw + 20, uy), (*gc, 80), 1, cv2.LINE_AA)
 
     pdf_dir = os.path.join(output_dir, "pdf")
-    canvas_dir = os.path.join(output_dir, "canvases")
     mockup_dir = os.path.join(output_dir, "mockups")
-    calib_dir = os.path.join(output_dir, "calibration")
     os.makedirs(pdf_dir, exist_ok=True)
-    os.makedirs(canvas_dir, exist_ok=True)
     os.makedirs(mockup_dir, exist_ok=True)
-    os.makedirs(calib_dir, exist_ok=True)
-
-    art_png_path = os.path.join(canvas_dir, "page01_front_art_transparent_300dpi.png")
-    AlphaEngine.save_rgba_png(clean, art_png_path)
-    print(f"  -> Saved transparent artwork: {art_png_path} ({clean.shape[1]}x{clean.shape[0]} px)")
 
     # 2. Compose onto full A5 Cara A canvas (148 x 210 mm)
-    print("\n[Step 2/5] Composing onto A5 Cara A canvas (1748 x 2480 px @ 300 DPI - Full Page)...")
+    print("\n[Step 2/4] Composing onto A5 Cara A canvas (1748 x 2480 px @ 300 DPI - Full Page)...")
     composer = PageComposer(geometry=GEOMETRY_CARA_A)
     # Full Page Format: Fills 100% of the A5 sheet height and width
     canvas_rgba = composer.place_full_page(
@@ -385,23 +376,15 @@ def build_page01(
         margin_mm=0.0,
         auto_trim_alpha=True
     )
-    canvas_png_path = os.path.join(canvas_dir, "page01_front_canvas_A5_300dpi.png")
-    AlphaEngine.save_rgba_png(canvas_rgba, canvas_png_path)
-    print(f"  -> Saved full A5 transparent canvas: {canvas_png_path} ({CANVAS_WIDTH_PX}x{CANVAS_HEIGHT_PX} px)")
 
     # 3. Generate Print-Ready 1:1 Vector A5 PDF
-    print("\n[Step 3/5] Generating print-ready 1:1 A5 PDF...")
+    print("\n[Step 3/4] Generating print-ready 1:1 A5 PDF...")
     pdf_path = os.path.join(pdf_dir, "page01_front_print_A5.pdf")
     PDFBuilder.save_a5_pdf_from_rgba(canvas_rgba, pdf_path, dpi=300)
     print(f"  -> Saved print-ready PDF: {pdf_path}")
 
-    # 4. Generate Calibration sheets for safe test-printing
-    print("\n[Step 4/5] Generating alignment calibration sheets...")
-    CalibrationGenerator.save_calibration_assets(calib_dir)
-    print(f"  -> Saved calibration PDFs and PNGs in {calib_dir}")
-
-    # 5. Photorealistic mockup over real journal page
-    print("\n[Step 5/5] Generating photorealistic mockup on real photographed paper...")
+    # 4. Photorealistic mockup over real journal page
+    print("\n[Step 4/4] Generating photorealistic mockup on real photographed paper...")
     if os.path.exists(real_paper_photo_path):
         real_bg = cv2.imread(real_paper_photo_path)
         if real_bg is not None:
@@ -413,6 +396,7 @@ def build_page01(
         print(f"  -> Notice: Background paper photo not found at {real_paper_photo_path}, skipping mockup.")
 
     print("\n=== Page 1 Production Pipeline Completed Successfully! ===")
+    return canvas_rgba
 
 
 if __name__ == "__main__":

@@ -6098,6 +6098,247 @@
       pointer-events: none;
     }
 
+    /* ---- Tester controls (admin profile only) ---- */
+    .tester-panel {
+      max-width: 1100px;
+      margin: 0 auto 14px;
+      background: rgba(10, 16, 28, 0.82);
+      border: 1px dashed rgba(212, 168, 83, 0.45);
+      border-radius: 10px;
+      font-family: 'EB Garamond', serif;
+      color: var(--parchment);
+    }
+    .tester-panel > summary {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 14px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .tester-panel > summary::-webkit-details-marker { display: none; }
+    .tester-panel-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brass-bright);
+    }
+    .tester-panel-hint { font-size: 0.85rem; font-style: italic; color: var(--parchment-muted); }
+    .tester-panel[open] > summary { border-bottom: 1px solid rgba(212, 168, 83, 0.25); }
+    .tester-panel-body { padding: 10px 14px 14px; }
+    .tester-row {
+      display: grid;
+      grid-template-columns: 92px 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.12);
+    }
+    .tester-row:last-child { border-bottom: 0; }
+    .tester-row-tag { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--parchment-dim); text-transform: uppercase; }
+    .tester-row-label { font-size: 1rem; }
+    .tester-row-label .tester-state { margin-left: 8px; font-size: 0.78rem; color: var(--parchment-muted); }
+    .tester-row.is-done .tester-state { color: #86efac; }
+    .tester-row.is-unbuilt { opacity: 0.55; }
+    .tester-btn {
+      padding: 5px 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: var(--brass-bright);
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.18s ease, border-color 0.18s ease;
+    }
+    .tester-btn:hover:not(:disabled) { background: rgba(60, 40, 14, 0.7); border-color: var(--brass-bright); }
+    .tester-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .tester-btn-warn { color: #fca5a5; border-color: rgba(252, 165, 165, 0.45); }
+    .tester-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+    @media (max-width: 640px) {
+      .tester-panel-hint { display: none; }
+      .tester-row { grid-template-columns: 1fr auto auto; }
+      .tester-row-tag { grid-column: 1 / -1; }
+    }
+
+    /* ---- Dawn route on the Grand Desert Map ---- */
+    #dawn-map-layer .dawn-route-halo { fill: none; stroke: rgba(255, 244, 214, 0.85); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
+    #dawn-map-layer .dawn-route-line { fill: none; stroke: #9a3412; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 14; }
+    #dawn-map-layer .dawn-route-line.is-latest { animation: dawnRouteFlow 1.6s linear infinite; }
+    @keyframes dawnRouteFlow { to { stroke-dashoffset: -15; } }
+    #dawn-map-layer .dawn-fade { animation: unlockFadeIn 0.8s ease both; }
+    #dawn-map-layer .dawn-mark { cursor: pointer; }
+    #dawn-map-layer .dawn-mark:hover circle.dawn-mark-core { stroke: #fff3c4; }
+
+    /* ---- Dawn segment: satchel, chat sketches and the Cairn I stone-stacking game ---- */
+    .satchel-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+      padding: 4px 10px 4px 12px;
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      border-radius: 22px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      vertical-align: middle;
+    }
+    .satchel-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--parchment-dim);
+      margin-right: 2px;
+    }
+    .satchel-slot {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(212, 168, 83, 0.35);
+      background: rgba(5, 8, 17, 0.7);
+      color: rgba(212, 168, 83, 0.4);
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .satchel-slot:hover { transform: translateY(-1px); }
+    .satchel-slot.filled {
+      border: 1.5px solid var(--brass-bright);
+      background: radial-gradient(circle at 35% 30%, #e9c98a 0%, #b88a46 55%, #7a541c 100%);
+      color: #2a1a06;
+      box-shadow: 0 0 10px var(--brass-glow);
+    }
+    .satchel-slot.just-added { animation: satchelPop 0.9s ease-out 1; }
+    @keyframes satchelPop {
+      0% { transform: scale(0.4); box-shadow: 0 0 0 rgba(255, 224, 153, 0); }
+      55% { transform: scale(1.35); box-shadow: 0 0 22px var(--brass-glow); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 640px) {
+      .satchel-label { display: none; }
+      .satchel-wrap { margin-left: 6px; padding: 3px 6px; gap: 4px; }
+      .satchel-slot { width: 24px; height: 24px; }
+    }
+
+    .chat-sketch-bubble { padding: 8px 8px 6px; max-width: min(460px, 86%); }
+    .chat-sketch-bubble img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+    }
+    .chat-sketch-cap {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--parchment-dim);
+      margin: 6px 4px 2px;
+    }
+
+    .c1-board-wrap {
+      width: 100%;
+      padding: 18px 14px 22px;
+      background: linear-gradient(180deg, rgba(60, 40, 22, 0.35) 0%, rgba(24, 16, 9, 0.6) 100%);
+      border-radius: 8px;
+    }
+    .c1-pegs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      min-height: 330px;
+    }
+    .c1-peg {
+      position: relative;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 3px;
+      padding: 0 6px 34px;
+      background: transparent;
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      color: inherit;
+    }
+    .c1-peg::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 34px;
+      width: 10px;
+      height: 78%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, rgba(120, 90, 50, 0.25), rgba(212, 168, 83, 0.18), rgba(120, 90, 50, 0.25));
+      border-radius: 5px;
+    }
+    .c1-peg::after {
+      content: attr(data-label);
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      bottom: 4px;
+      padding-top: 8px;
+      border-top: 5px solid #7a541c;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--parchment-dim);
+    }
+    .c1-peg:hover { border-color: rgba(212, 168, 83, 0.35); }
+    .c1-peg.is-source { border-color: var(--brass-bright); background: rgba(255, 224, 153, 0.06); }
+    .c1-peg.is-target-ok:hover { border-color: #86efac; }
+    .c1-peg.shake { animation: c1Shake 0.32s ease; }
+    @keyframes c1Shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .c1-stone {
+      position: relative;
+      z-index: 1;
+      height: 38px;
+      border-radius: 14px / 18px;
+      background:
+        radial-gradient(ellipse at 30% 25%, rgba(255, 240, 205, 0.5) 0%, rgba(255, 240, 205, 0) 45%),
+        linear-gradient(180deg, #d8b27a 0%, #b78a52 60%, #8c6434 100%);
+      border: 1.5px solid #5b3d17;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.55), inset 0 -4px 6px rgba(60, 35, 10, 0.35);
+      transition: transform 0.18s ease;
+    }
+    .c1-stone[data-size="1"] { width: 34%; }
+    .c1-stone[data-size="2"] { width: 52%; }
+    .c1-stone[data-size="3"] { width: 70%; }
+    .c1-stone[data-size="4"] { width: 88%; }
+    .c1-stone.is-lifted { transform: translateY(-16px); box-shadow: 0 10px 14px rgba(0, 0, 0, 0.5), 0 0 14px var(--brass-glow); }
+    .c1-stone.is-seal-glow { box-shadow: 0 0 18px rgba(134, 239, 172, 0.55), inset 0 -4px 6px rgba(60, 35, 10, 0.35); }
+    .c1-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .c1-btn-row .chasm-cairn-btn { flex: 1 1 140px; font-size: 0.85rem; }
+    .c1-seal-disc {
+      display: inline-block;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      margin: 4px 0 10px;
+      background: radial-gradient(circle at 35% 30%, #efd9a8 0%, #c79a55 55%, #7a541c 100%);
+      border: 2px solid var(--brass-bright);
+      box-shadow: 0 0 18px var(--brass-glow);
+      text-align: center;
+      line-height: 50px;
+      font-size: 1.6rem;
+      color: #3a2508;
+    }
+
     @keyframes messengerBadgePulse {
       0%, 100% {
         transform: scale(1);
@@ -8223,6 +8464,7 @@
             <span class="messenger-btn-icon">💬</span>
             <span class="messenger-btn-badge" id="messenger-counter-badge" style="display: none;">1</span>
           </button>
+          <div class="satchel-wrap" id="satchel-wrap" style="display: none;" role="group" aria-label="Hermes's satchel: the Cairn seals"></div>
         </div>
         <div class="viewport-header-user" id="viewport-header-user">
           <div class="seeker-pill" id="seeker-active-pill">
@@ -9092,6 +9334,21 @@
 
           <!-- The Grand Desert Map Container (Two-Act Odyssey & 4-Quadrant Survey) -->
           <div id="desert-map-canvas-wrap" style="display: none;">
+            <!-- Tester controls: only shown for the admin tester profile (Carles) -->
+            <details class="tester-panel" id="tester-panel" style="display: none;">
+              <summary>
+                <span class="tester-panel-title">🛠 Tester controls</span>
+                <span class="tester-panel-hint">Desert Path · only visible to Carles</span>
+              </summary>
+              <div class="tester-panel-body">
+                <div class="tester-rows" id="tester-rows"></div>
+                <div class="tester-actions">
+                  <button type="button" class="tester-btn" id="tester-complete-all">⏩ Complete every built game</button>
+                  <button type="button" class="tester-btn tester-btn-warn" id="tester-replay-all">↺ Replay the whole desert</button>
+                </div>
+              </div>
+            </details>
+
             
             <!-- Frame containing the layers -->
             <div class="desert-map-layers-frame" id="desert-map-layers-frame">
@@ -10102,6 +10359,86 @@
           <div class="chasm-actions-row">
             <button type="button" class="btn-chasm-reset" id="btn-chasm-reset">
               <span>↺ Retrace to North Portal</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       CAIRN I · THE WASH RIVER MARKER (DAWN SEGMENT · STONE STACKING)
+       ===================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-cairn-one" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="cairn1-modal-title">
+    <div class="chasm-workbench-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🪨</span>
+          <div>
+            <div class="chasm-header-title" id="cairn1-modal-title">Cairn I · The Wash River Marker</div>
+            <div class="chasm-header-subtitle">Stack the River Stones · The Dry Wash (Wadi al-Hajar)</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-cairn1" title="Close">✕</button>
+      </div>
+
+      <div class="chasm-telemetry-strip">
+        <div class="chasm-telemetry-pill"><span>🚶 Explorer:</span><strong>Hermes</strong></div>
+        <div class="chasm-telemetry-pill"><span>📜 Rule:</span><strong>One stone at a time</strong></div>
+        <div class="chasm-telemetry-pill"><span>✋ Moves:</span><strong id="cairn1-telem-moves">0</strong></div>
+        <div class="chasm-telemetry-pill"><span>📍 On the third foundation:</span><strong id="cairn1-telem-placed">0 / 4</strong></div>
+      </div>
+
+      <div class="chasm-workbench-body">
+        <div class="chasm-maze-frame">
+          <div class="c1-board-wrap">
+            <div class="c1-pegs" id="cairn1-pegs"></div>
+          </div>
+        </div>
+
+        <div class="chasm-desk-panel">
+          <div class="chasm-desk-header">
+            <div class="chasm-desk-title">The Law of the Stones</div>
+            <div class="chasm-desk-rule">
+              1. Four river stones rest on the first foundation, the largest at the bottom.<br>
+              2. Carry the whole pile to the third foundation, on the right.<br>
+              3. Lift one stone at a time: only the top stone of a pile can move.<br>
+              4. Never set a larger stone on top of a smaller one.<br>
+              5. Tap a foundation to lift its top stone, then tap the foundation where it should rest.
+            </div>
+          </div>
+
+          <div class="chasm-cairns-keypad-box">
+            <div class="c1-btn-row">
+              <button type="button" class="chasm-cairn-btn" id="btn-cairn1-undo"><span>↶ Undo last move</span></button>
+              <button type="button" class="chasm-cairn-btn" id="btn-cairn1-reset"><span>↺ Start again</span></button>
+              <button type="button" class="chasm-cairn-btn" id="btn-cairn1-hint"><span>💬 Ask Hermes</span></button>
+            </div>
+          </div>
+
+          <div class="chasm-dispatch-box" id="cairn1-dispatch-box">
+            <div class="chasm-dispatch-sender">
+              <span>📻 FIELD WIRE DISPATCH // HERMES</span>
+            </div>
+            <div id="cairn1-dispatch-text"></div>
+          </div>
+
+          <div class="chasm-victory-card" id="cairn1-victory-card" style="display: none;">
+            <div class="chasm-victory-title">
+              <span>🪨</span>
+              <span>The Hollow Opens!</span>
+            </div>
+            <div class="c1-seal-disc" aria-hidden="true">☉</div>
+            <div class="chasm-victory-text">
+              "Silvia, the last stone settled and something clicked deep inside the base. A hollow opened under the third foundation, and in it lay a flat disc of sandstone: a sun over a wavy line. The Seal of Cairn I. It is in my satchel now."
+            </div>
+            <button type="button" class="btn-chasm-finish" id="btn-cairn1-finish">
+              <span>💬 Back to the Cliffside Workshop ➔</span>
             </button>
           </div>
         </div>
@@ -11142,6 +11479,8 @@
           btnHeaderMessenger.setAttribute('title', inWorkshop ? 'Close The Cliffside Workshop and go back' : btnHeaderMessenger.dataset.openTitle);
         }
 
+        if (targetView === 'view-trail' && typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
+
         if (targetView === 'view-field-wire') {
           if (typeof renderWireExpedition === 'function') renderWireExpedition();
           if (typeof renderInquiriesGrid === 'function') renderInquiriesGrid();
@@ -11338,6 +11677,102 @@
         return false;
       }
       window.getSeekerCipherCompleted = getSeekerCipherCompleted;
+
+      // Carles is the admin tester: every game opens at any time, in any order
+      window.isAdminTester = function () {
+        return String(currentSeeker || 'Silvia').toLowerCase() === 'carles';
+      };
+
+      // =====================================================================
+      // TESTER CONTROLS (Carles only): the Desert Path as one ordered story line.
+      // "Complete up to here" finishes a game and every game before it; "Replay from here" resets it and every game after it.
+      // =====================================================================
+      window.TesterDesert = (function () {
+        const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+        const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+        const del = (k) => { try { localStorage.removeItem(k); } catch (e) {} };
+        const dels = (list) => list.forEach(del);
+
+        const GAMES = [
+          {
+            id: 'cairn1', tag: 'Dawn', label: 'Cairn I · The Wash River Marker', flag: 'order_cairn1_completed', built: true,
+            complete() { set('order_cairn1_completed', 'true'); set('order_cairn1_found', 'true'); set('order_seal_cairn_1', 'true'); set('order_dawn_step', '3'); },
+            reset() { dels(['order_cairn1_completed', 'order_cairn1_found', 'order_seal_cairn_1', 'order_dawn_choices']); set('order_dawn_step', '0'); }
+          },
+          {
+            id: 'chasm', tag: 'Station 10', label: 'The Whispering Chasm', flag: 'order_whispering_chasm_completed', built: true,
+            complete() { set('order_whispering_chasm_completed', 'true'); set('order_desert_station_active', '11'); },
+            reset() { del('order_whispering_chasm_completed'); }
+          },
+          {
+            id: 'playa', tag: 'Station 11', label: 'The Salt Playa', flag: 'order_salt_playa_completed', built: true,
+            complete() { set('order_salt_playa_completed', 'true'); set('order_salt_playa_path', JSON.stringify([3, 4, 3, 2, 2, 3, 3])); },
+            reset() { dels(['order_salt_playa_completed', 'order_salt_playa_path']); }
+          },
+          {
+            id: 'lexicon', tag: 'Station 12', label: 'The Desert Lexicon', flag: 'order_desert_lexicon_completed', built: true,
+            complete() { set('order_desert_lexicon_completed', 'true'); set('order_desert_station_active', '12'); },
+            reset() { dels(['order_desert_lexicon_completed', 'order_lexicon_solved_words']); }
+          },
+          {
+            id: 'clepsydra', tag: 'Station 13', label: 'The Oasis Clepsydra', flag: 'order_oasis_clepsydra_completed', built: true,
+            complete() { set('order_oasis_clepsydra_completed', 'true'); },
+            reset() { dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections']); }
+          },
+          { id: 's14', tag: 'Station 14', label: 'The Sun Monolith · Cairn II', built: false, reset() { del('order_seal_cairn_2'); } },
+          { id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', built: false, reset() { del('order_seal_cairn_3'); } },
+          { id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', built: false, reset() { del('order_seal_cairn_4'); } },
+          { id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', built: false, reset() { del('order_seal_cairn_5'); } },
+          { id: 's18', tag: 'Station 18', label: 'The Polybius Stele', flag: 'order_polybius_stele_completed', built: false, reset() { del('order_polybius_stele_completed'); } },
+          { id: 's19', tag: 'Station 19', label: "The Oracle's Horizon", built: false }
+        ];
+
+        const isDone = (id) => { const g = GAMES.find((x) => x.id === id); return !!(g && g.flag && get(g.flag) === 'true'); };
+
+        // Where the Hermes chat should stand for the games that are done
+        function syncWire(direction) {
+          const c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
+          const cap = c ? 8 : l ? 6 : (ch && p) ? 5 : 4;
+          let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
+          step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
+          set('order_field_wire_step', String(step));
+          dels(['order_messenger_unread_count', 'order_messenger_last_read_step']);
+        }
+
+        function indexOf(id) { return GAMES.findIndex((g) => g.id === id); }
+
+        return {
+          games: GAMES,
+          isDone,
+          completeUpTo(id) {
+            const idx = indexOf(id);
+            for (let i = 0; i <= idx; i++) if (GAMES[i].built && !isDone(GAMES[i].id)) GAMES[i].complete();
+            syncWire('complete');
+          },
+          replayFrom(id) {
+            for (let i = indexOf(id); i < GAMES.length; i++) if (GAMES[i].reset) GAMES[i].reset();
+            syncWire('replay');
+          },
+          completeAll() {
+            GAMES.forEach((g) => { if (g.built && !isDone(g.id)) g.complete(); });
+            syncWire('complete');
+          },
+          replayAll() {
+            GAMES.forEach((g) => { if (g.reset) g.reset(); });
+            dels(['order_field_wire_step', 'order_field_wire_choices', 'order_field_wire_completed', 'order_dawn_step', 'order_dawn_choices',
+              'order_desert_station_active', 'order_messenger_unread_count', 'order_messenger_last_read_step']);
+          }
+        };
+      })();
+
+      // One-time clean slate for the tester profile: only Stations 01 to 09 count as done
+      try {
+        if (window.isAdminTester() && localStorage.getItem('order_tester_desert_reset_v1') !== 'done') {
+          window.TesterDesert.replayAll();
+          localStorage.setItem('order_tester_desert_reset_v1', 'done');
+        }
+      } catch (e) {}
 
       // Station 08 countdown is at 0 (unlocked / ready to enter without timer waiting)
       function isStation8Unlocked() {
@@ -11760,6 +12195,54 @@
             ],
             btnText: '✦ CROSS THE SALT PLAYA ➔',
             action: () => (window.openSaltPlayaModal ? window.openSaltPlayaModal() : null)
+          };
+        },
+        22: () => {
+          const openChat = () => { if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire'); };
+          const cairnDone = localStorage.getItem('order_cairn1_completed') === 'true';
+          const found = cairnDone || (parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 2);
+          if (cairnDone) {
+            return {
+              badge: 'CAIRN I // THE WASH RIVER MARKER',
+              status: 'SEAL SECURED ✓',
+              statusClass: 'status-done-badge',
+              title: 'Cairn I · The Wash River Marker',
+              thumb: './assets/chat/sketch_cairn_one.webp',
+              lore: 'Guided by Silvia, Hermes lifted four river stones from the first foundation to the third, one at a time and never a big stone on a small one. A hollow opened in the base and gave up the Seal of Cairn I: a flat disc of sandstone with a sun above a wavy line. It now rests in his satchel.',
+              rewards: [
+                { icon: '🎒', label: 'Seal of Cairn I', desc: 'Safe in Hermes\'s satchel' },
+                { icon: '🚪', label: 'North Portal of the Whispering Chasm', desc: 'Station 10 is within reach' }
+              ],
+              btnText: 'Review the River Stones ➔',
+              action: () => (window.openCairnOneModal ? window.openCairnOneModal() : null)
+            };
+          }
+          if (found) {
+            return {
+              badge: 'CAIRN I // THE WASH RIVER MARKER',
+              status: 'RIVER STONES FOUND ✦',
+              statusClass: 'status-live-badge',
+              title: 'Cairn I · The Wash River Marker',
+              thumb: './assets/chat/sketch_cairn_one.webp',
+              lore: 'Half buried in the silt of the dry river, Hermes found a heap of round stones, stacked by an old hand. At its foot lies a slab with three foundations and four stones. Guide him: one stone at a time, and never a big stone on a small one.',
+              rewards: [
+                { icon: '🪨', label: 'Four river stones', desc: 'Three foundations, one stone at a time' },
+                { icon: '🎒', label: 'Seal of Cairn I', desc: 'Waiting in a hollow of the base' }
+              ],
+              btnText: '✦ GUIDE HERMES AT CAIRN I ➔',
+              action: () => (window.openCairnOneModal ? window.openCairnOneModal() : null)
+            };
+          }
+          return {
+            badge: 'CAIRN I // THE DRY RIVER',
+            status: 'HERMES FOLLOWS A HUNCH ✦',
+            statusClass: 'status-live-badge',
+            title: 'The Dry River · Wadi al-Hajar',
+            thumb: './assets/chat/sketch_dry_wash.webp',
+            lore: 'Hermes has left the watchtower and walks south along Wadi al-Hajar, the dry river, on nothing more than a hunch. Keep the wire open and see what he finds.',
+            rewards: [],
+            btnText: '💬 Back to the Cliffside Workshop ➔',
+            action: openChat
           };
         },
         15: () => nodesData[10](),
@@ -12544,6 +13027,7 @@
         if (btnHeaderMessenger) {
           btnHeaderMessenger.style.display = (isCarles || isCipherCompleted) ? '' : 'none';
         }
+        if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
       }
 
       // Initial progression UI synchronization
@@ -13967,6 +14451,104 @@
         }
       ];
 
+      // =======================================================================
+      // THE DAWN SEGMENT: from the end of the storm to the North Portal of the Whispering Chasm
+      // Hermes remembers the tone Silvia used so far (warm / protective / tactical / analytic).
+      // =======================================================================
+      const HERMES_TONE_MAP = {
+        'choice-0-grounded': 'warm', 'choice-0-protective': 'protective', 'choice-0-cipher': 'analytic',
+        'choice-1-tactical': 'tactical', 'choice-1-landmarks': 'analytic', 'choice-1-concern': 'warm',
+        'choice-2-riverbed': 'tactical', 'choice-2-cairns': 'analytic', 'choice-2-windbreak': 'analytic',
+        'choice-3-bearing-direct': 'tactical', 'choice-3-bearing-encouraging': 'warm', 'choice-3-bearing-cautious': 'protective'
+      };
+      const HERMES_TONE_LINES = {
+        warm: "Silvia, your voice is the first sound I wanted to hear this morning. Thank you for staying on the wire all night.",
+        protective: "Silvia, I slept sitting up, which you would have scolded me for, but I am in one piece. You can stop worrying for a moment.",
+        tactical: "Silvia, shelter first and then the road: that was your plan, and it worked. Now for the road.",
+        analytic: "Silvia, you said the stone keeps what the wind erases. I tested that this morning, and you were right."
+      };
+      const HERMES_TONE_FINALE = {
+        warm: "I could not have lifted those stones with a heavy heart, and you kept mine light. Thank you.",
+        protective: "You watched every step I took, even from so far away. I felt it.",
+        tactical: "Clean work: no wasted moves, no loose ends. That is how a good survey is done.",
+        analytic: "You found the order in the stones before I did. I think the Order would have liked you."
+      };
+
+      // Dawn steps: 0 and 1 are conversations, 2 is Cairn I (the stone-stacking game), 3 is the finale (done).
+      const DAWN_DONE = 3;
+      const DAWN_THREAD = [
+        {
+          step: 0,
+          divider: "Dawn · The Great Silence",
+          hermesInitial: "The wind has stopped. I woke up because of the quiet, not because of any noise.\n\nOut here they call it the Great Silence. After a big storm the desert holds its breath, and every sound carries for miles. I can hear my own heartbeat. I can hear sand sliding off the ledge, one grain at a time.\n\nI opened the door a crack. The sky is the color of a peach and the red dust still hangs low over the ground. Nothing moves: no raiders, no wagons, not even a bird.\n\nSheet 8A in your journal lists the Three Laws of the Waste. Which one should I trust first this morning?",
+          choices: [
+            {
+              id: "dawn-0-wash",
+              tone: "tactical",
+              text: "Law 2 on Sheet 8A, the Dry Wash: the packed gravel of the riverbed is the only firm road.",
+              silviaMsg: "Law 2 on Sheet 8A, Hermes: the Dry Wash. The packed gravel of the dry riverbed is the only firm road through the canyons.",
+              hermesReply: "The Dry Wash. Yes. The sand will take a week to settle, but gravel packed by a thousand floods does not care about one storm.\n\nThere is a riverbed just below the watchtower. My map calls it Wadi al-Hajar, the river of stones. I will go down to it and keep my eyes open."
+            },
+            {
+              id: "dawn-0-shadow",
+              tone: "analytic",
+              text: "Law 1 on Sheet 8A, the Meridian Shadow: wait for noon and read true north from the shortest shadow.",
+              silviaMsg: "Law 1 on Sheet 8A, Hermes: the Meridian Shadow. At true noon the shortest shadow shows true north, and north points home to the observatory.",
+              hermesReply: "A fine law, and I will keep it close. Something tells me shadows will matter again before this journey is over.\n\nBut noon is hours away, and the silence will not last. While I wait, I will go down to the riverbed under the watchtower. Wadi al-Hajar, the river of stones: dry now, but it is the other law on that sheet, and it is right under my feet."
+            },
+            {
+              id: "dawn-0-rest",
+              tone: "protective",
+              text: "Don't rush out, Hermes. Eat something, drink some water, and test the ground before you trust it.",
+              silviaMsg: "Don't rush out, Hermes. Eat something, drink some water, and test the ground before you trust it. Sheet 8A can wait five minutes.",
+              hermesReply: "Dry figs and a mouthful of water, as ordered. I feel almost human again.\n\nAnd I tested the ground, I promise: three taps with my stick on every step. The only firm road out of here is the one Sheet 8A calls the Dry Wash, the old riverbed under the watchtower. Wadi al-Hajar, the river of stones. I am going down."
+            }
+          ]
+        },
+        {
+          step: 1,
+          divider: "The Dry River · Wadi al-Hajar",
+          hermesInitial: "I am standing in Wadi al-Hajar now. It is wider than a street, with red walls on both sides and a floor of smooth gray stones, polished by water that left long ago. The silence is even deeper down here.\n\nBut something strange is happening, Silvia. The map says the safe road runs west, toward the canyon. And my feet want to turn south, along the river.\n\nI have no reason for it. It is only a hunch, a pull like a hand on my sleeve. Do I trust it?",
+          sketch: { src: "./assets/chat/sketch_dry_wash.webp", caption: "The dry riverbed, from the ledge below the watchtower." },
+          choices: [
+            {
+              id: "dawn-1-trust",
+              tone: "warm",
+              text: "Trust it. A hunch is just an old memory that you can't read yet.",
+              silviaMsg: "Trust it, Hermes. A hunch is just an old memory that you cannot read yet. Follow the river, and tell me what you find.",
+              hermesReply: "An old memory I cannot read yet. I like that. It is a kinder name than a foolish old man's whim.\n\nI am following the river south, one stone at a time."
+            },
+            {
+              id: "dawn-1-marker",
+              tone: "tactical",
+              text: "Follow it, but leave a marker every hundred steps so we can find the way back.",
+              silviaMsg: "Follow it, but leave a marker every hundred steps so we can always find the way back. Mark the gravel with a stripe of chalk.",
+              hermesReply: "Chalk stripes on the stones, every hundred steps. Done. Nobody will lose me in this riverbed, not even me.\n\nI am walking south along the river."
+            },
+            {
+              id: "dawn-1-slow",
+              tone: "protective",
+              text: "Go slowly, and tell me everything you see. Stop the moment anything looks wrong.",
+              silviaMsg: "Go slowly, Hermes, and tell me everything you see. Stop the moment anything looks wrong.",
+              hermesReply: "Slowly, and I will describe everything. Gray stones, red walls, my own shadow... nothing wrong yet. Nothing at all.\n\nI am walking south along the river."
+            }
+          ]
+        },
+        {
+          step: 2,
+          divider: "The Heart of the River",
+          hermesInitial: "Silvia! Stop everything. Look at what the river was hiding.\n\nA heap of stones, half buried in silt. They are round river stones, not cut sandstone, and somebody stacked them into a cone by hand. A long time ago, judging by the dust on them. I know this shape, and I cannot tell you how.\n\nAt the foot of the heap there is a flat slab with three round hollows cut into it, three foundations in a row. Four stones of different sizes lie on the first one, the largest at the bottom. A line of old letters on the slab says that the pile must be carried to the third hollow, one stone at a time, never a big stone on a small one.\n\nMy hands are shaking from thirst and my head is foggy. You see this better from where you are. Will you guide me?",
+          sketch: { src: "./assets/chat/sketch_cairn_one.webp", caption: "Half buried in silt: river stones, stacked by an old hand." },
+          game: true
+        },
+        {
+          step: 3,
+          divider: "The North Portal",
+          hermesFinal: "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Seal of Cairn I.\n\nI have no idea what it opens. But the Order does not hide things without a reason, so it goes into the front pocket of my satchel, and I will carry it carefully.\n\n{TONE}\n\nI followed the river to its end, and the red walls closed in around me. At the end of the wash the rock splits open into a narrow gate: the North Portal of the Whispering Chasm. The wind is already murmuring inside, so softly that I can almost make out words.\n\nOpen the Grand Desert Map, Silvia, and check Sheet 9B. This is where the canyon begins.",
+          sketch: { src: "./assets/chat/sketch_chasm_mouth.webp", caption: "The North Portal of the Whispering Chasm." }
+        }
+      ];
+
       const FIELD_INQUIRIES = [
         {
           id: "inq-shelter",
@@ -14184,6 +14766,48 @@
           category: "The Stolen Relic",
           group: "desert",
           answer: "They call themselves the BC Ashes. I saw their scorched banner hanging in the nomad ruins, the same burned mark that is on their wagons. They are bandits, but they do not steal blindly. They wanted the Astrolabe for what it might open."
+        },
+        {
+          id: "inq-great-silence",
+          title: "Why is the desert so quiet after a storm?",
+          category: "The Great Silence",
+          group: "desert",
+          answer: "The old nomads call it the Great Silence. When the wind drops, the air is clean and still, and a voice or a footstep can carry for miles. Sheet 8A says the desert is the purest archive of the Order: it strips away everything and leaves only the stone. Listen well after a storm. You hear what stays."
+        },
+        {
+          id: "inq-wadi",
+          title: "What is Wadi al-Hajar?",
+          category: "The Dry River",
+          group: "desert",
+          answer: "The Dry Canyon Wash on your map, on Sheet 8B. A wadi is a riverbed that only runs after rain, and al-Hajar means of the stones. The winter floods pack its gravel hard, so it is the one safe road through the red canyons."
+        },
+        {
+          id: "inq-satchel",
+          title: "What do you carry in your satchel?",
+          category: "The Workshop",
+          group: "workshop",
+          answer: "Not much: dry figs, a water skin, a compass, a stub of pencil and my brass replica of the Astrolabe that never quite works. And a small pocket at the front, kept for whatever the road decides to give me."
+        },
+        {
+          id: "inq-stacking-rule",
+          title: "How do the stones of Cairn I work?",
+          category: "Cairn I",
+          group: "desert",
+          answer: "Four stones, three foundations. Move one stone at a time, only the top one of a pile, and never set a big stone on a small one. Think about the smallest stone: it is always free to move, and every move you make should clear room for the next. Don't hurry. A stone put down in the wrong place can always be lifted again."
+        },
+        {
+          id: "inq-seal-one",
+          title: "What is the Seal of Cairn I?",
+          category: "Cairn I",
+          group: "desert",
+          answer: "A flat disc of sandstone as big as my palm, with a sun above a wavy line: the sun and the river. It was waiting in a hollow under the stones. I do not know yet what it opens, but the Order never hides anything without a reason."
+        },
+        {
+          id: "inq-river-hunch",
+          title: "Why did you follow the river on a hunch?",
+          category: "Cairn I",
+          group: "desert",
+          answer: "I wish I knew. My feet turned south before my mind agreed. When I found the first Cairn, I knew the shape of its stones. Some places are remembered by the hands and not by the head. I will think about that when I have time, and when the answer decides to come."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -14221,6 +14845,29 @@
         wireHistory.push(0);
       }
 
+      // Dawn segment progress (see DAWN_THREAD). A save that already cleared the Chasm counts as dawn done, with the Cairn I seal.
+      let dawnStep = 0;
+      let dawnHistory = [];
+      try {
+        const savedDawn = localStorage.getItem('order_dawn_step');
+        if (savedDawn !== null) dawnStep = Math.max(0, Math.min(DAWN_DONE, parseInt(savedDawn, 10) || 0));
+        const savedDawnChoices = localStorage.getItem('order_dawn_choices');
+        if (savedDawnChoices) {
+          const parsedDawn = JSON.parse(savedDawnChoices);
+          if (Array.isArray(parsedDawn)) dawnHistory = parsedDawn;
+        }
+        if (localStorage.getItem('order_cairn1_completed') === 'true') dawnStep = DAWN_DONE;
+        if (savedDawn === null && (isChasmDoneForWire || wireCurrentStep >= 5)) {
+          dawnStep = DAWN_DONE;
+          if (localStorage.getItem('order_cairn1_completed') !== 'true') {
+            localStorage.setItem('order_cairn1_completed', 'true');
+            localStorage.setItem('order_seal_cairn_1', 'true');
+          }
+        }
+        localStorage.setItem('order_dawn_step', String(dawnStep));
+        if (dawnStep >= 2) localStorage.setItem('order_cairn1_found', 'true');
+      } catch (e) {}
+
       // Persistent Read Inquiries Tracking
       let readInquiriesSet = new Set();
       try {
@@ -14239,7 +14886,9 @@
         chasm: { key: 'order_whispering_chasm_completed', label: 'Station 10' },
         playa: { key: 'order_salt_playa_completed', label: 'Station 11' },
         lexicon: { key: 'order_desert_lexicon_completed', label: 'Station 12' },
-        clepsydra: { key: 'order_oasis_clepsydra_completed', label: 'Station 13' }
+        clepsydra: { key: 'order_oasis_clepsydra_completed', label: 'Station 13' },
+        cairn1found: { key: 'order_cairn1_found', label: 'finding Cairn I' },
+        cairn1: { key: 'order_cairn1_completed', label: 'the Cairn I seal' }
       };
       const INQUIRY_REQUIREMENTS = {
         'inq-salt-playa': 'chasm',
@@ -14249,7 +14898,11 @@
         'inq-phoenix-sigil': 'lexicon',
         'inq-four-wells': 'lexicon',
         'inq-shadow-hours': 'clepsydra',
-        'inq-falcon-weir': 'clepsydra'
+        'inq-falcon-weir': 'clepsydra',
+        'inq-cairns': 'cairn1',
+        'inq-stacking-rule': 'cairn1found',
+        'inq-seal-one': 'cairn1',
+        'inq-river-hunch': 'cairn1'
       };
       FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
       const INQUIRY_GROUPS = [
@@ -14281,6 +14934,7 @@
         '6': { title: 'Midnight Calibration & Transit', note: 'Calibrate the star heights, then trace the six chords of distant light.', thumb: './assets/thumbnails/midnight_calibration_preview.webp', path: 'constellation', node: 8, nodeLabel: 'Station 08 · Midnight Calibration' },
         '7': { title: 'The Celestial Cipher', note: 'The coordinate dial that hides the old vow of the Order.', path: 'constellation', node: 9, nodeLabel: 'Station 09 · The Celestial Cipher' },
         '7B': { title: 'Field Log: The Desert Frontier', note: "Hermes's survey notes from 1998: the three cairns, the copper plate and the bearing to Watchtower VI." },
+        '8A': { title: 'The Desert', note: 'Sun, silence and buried stone. The Three Laws of the Waste: the Meridian Shadow, the Dry Wash and the Benchmark Plate.' },
         '8B': { title: 'Grand Desert Map · North-West', note: 'The first quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_1_nw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '9A': { title: 'Grand Desert Map · North-East', note: 'The second quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_2_ne.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '9B': { title: 'The Whispering Chasm', note: 'The 25×25 canyon labyrinth and the Law of the Canyon Walkers.', thumb: './assets/thumbnails/whispering_chasm_preview.webp', path: 'desert', node: 10, nodeLabel: 'Station 10 · The Whispering Chasm' },
@@ -14642,9 +15296,199 @@
         return msgEl;
       }
 
+      // =======================================================================
+      // THE DAWN SEGMENT · conversation logic, restoration and the hand-off to Cairn I
+      // =======================================================================
+      const DAWN_TELEMETRY = '✦ SEAL OF CAIRN I SECURED · NORTH PORTAL OF THE WHISPERING CHASM REACHED ✦';
+
+      function persistDawn() {
+        try {
+          localStorage.setItem('order_dawn_step', String(dawnStep));
+          localStorage.setItem('order_dawn_choices', JSON.stringify(dawnHistory));
+          if (dawnStep >= 2) localStorage.setItem('order_cairn1_found', 'true');
+        } catch (e) {}
+        if (typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
+      }
+
+      function isDawnDone() { return dawnStep >= DAWN_DONE; }
+
+      // The tone Silvia used most often so far; a tie goes to the tone she used first.
+      function dominantTone(includeDawn) {
+        const counts = {};
+        const order = [];
+        const note = (t) => {
+          if (!t) return;
+          if (!(t in counts)) { counts[t] = 0; order.push(t); }
+          counts[t]++;
+        };
+        for (let s = 0; s < 4; s++) {
+          const data = EXPEDITION_THREAD[s];
+          if (data && data.choices && data.choices[wireHistory[s]]) note(HERMES_TONE_MAP[data.choices[wireHistory[s]].id]);
+        }
+        if (includeDawn) {
+          for (let s = 0; s < 2; s++) {
+            const data = DAWN_THREAD[s];
+            if (s < dawnStep && data.choices && data.choices[dawnHistory[s]]) note(data.choices[dawnHistory[s]].tone);
+          }
+        }
+        let best = 'warm';
+        let bestCount = 0;
+        order.forEach((t) => { if (counts[t] > bestCount) { best = t; bestCount = counts[t]; } });
+        return best;
+      }
+
+      function dawnMessageText(i) {
+        const d = DAWN_THREAD[i];
+        if (i === 0) return HERMES_TONE_LINES[dominantTone(false)] + '\n\n' + d.hermesInitial;
+        if (i === DAWN_DONE) return d.hermesFinal.replace('{TONE}', HERMES_TONE_FINALE[dominantTone(true)]);
+        return d.hermesInitial;
+      }
+
+      // A graphite sketch that Hermes attaches to the conversation
+      function appendWireSketch(src, caption) {
+        if (!wireMessagesStream) return;
+        const el = document.createElement('div');
+        el.className = 'chat-bubble-wrap incoming';
+        el.innerHTML = `
+          <div class="chat-sender-name">The Cartographer of Distant Light</div>
+          <div class="chat-bubble chat-sketch-bubble">
+            <img src="${src}" alt="${caption}" loading="lazy">
+            <div class="chat-sketch-cap">${caption}</div>
+            <span class="chat-bubble-time">${getWireTimestamp()}</span>
+          </div>
+        `;
+        wireMessagesStream.appendChild(el);
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        noteNewMessage();
+      }
+
+      function appendDawnIntro(i, live, done) {
+        const d = DAWN_THREAD[i];
+        if (d.divider) appendWireDivider(d.divider);
+        appendWireMessage('HERMES · CARTOGRAPHER', dawnMessageText(i), false, !!live, () => {
+          if (d.sketch) appendWireSketch(d.sketch.src, d.sketch.caption);
+          if (typeof done === 'function') done();
+        });
+      }
+
+      // Re-draws the dawn conversation when the chat opens. Returns true when the finale is playing live.
+      function appendDawnHistory() {
+        const last = Math.min(dawnStep, DAWN_DONE);
+        for (let s = 0; s <= last; s++) {
+          const d = DAWN_THREAD[s];
+          if (s === DAWN_DONE) {
+            if (window.__dawnFinaleLive) {
+              window.__dawnFinaleLive = false;
+              wireMessagesStream.classList.remove('is-restoring');
+              showTyping(true);
+              setTimeout(() => {
+                showTyping(false);
+                if (sfx) sfx.playCelestialChime();
+                appendDawnIntro(s, true, () => {
+                  appendWireMessage('SYSTEM TELEMETRY', DAWN_TELEMETRY, true);
+                  renderWireChoices();
+                  updateMessengerBadge();
+                });
+              }, 700);
+              return true;
+            }
+            appendDawnIntro(s, false);
+            appendWireMessage('SYSTEM TELEMETRY', DAWN_TELEMETRY, true);
+          } else {
+            appendDawnIntro(s, false);
+            if (s < dawnStep && d.choices) {
+              const idx = (dawnHistory[s] !== undefined && d.choices[dawnHistory[s]]) ? dawnHistory[s] : 0;
+              appendWireMessage('SILVIA · NAVIGATOR', d.choices[idx].silviaMsg);
+              appendWireMessage('HERMES · CARTOGRAPHER', d.choices[idx].hermesReply);
+            }
+          }
+        }
+        return false;
+      }
+
+      function makeChoicePill(tag, html, onClick) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'messenger-choice-pill';
+        btn.innerHTML = `
+          <span class="messenger-choice-tag">${tag}</span>
+          <span class="messenger-choice-text">${html}</span>
+        `;
+        btn.addEventListener('click', onClick);
+        return btn;
+      }
+
+      function renderDawnPrompt() {
+        if (!wireChoicesGrid || !wirePromptBox || !wireCompletedBar) return;
+        const d = DAWN_THREAD[dawnStep];
+        const header = document.getElementById('wire-prompt-header-text');
+        if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
+        wirePromptBox.style.display = 'block';
+        wireCompletedBar.style.display = 'none';
+        wireChoicesGrid.innerHTML = '';
+        try {
+          localStorage.setItem('order_field_wire_completed', 'true');
+          localStorage.setItem('order_field_wire_step', '4');
+        } catch (e) {}
+        if (d.game) {
+          if (header) header.textContent = 'Hermes is waiting at Cairn I:';
+          wireChoicesGrid.appendChild(makeChoicePill('🪨', 'Open Cairn I and guide Hermes, stone by stone.', () => {
+            if (typeof window.openCairnOneModal === 'function') window.openCairnOneModal();
+          }));
+          return;
+        }
+        if (header) header.textContent = 'Choose your reply to Hermes:';
+        d.choices.forEach((choice, idx) => {
+          wireChoicesGrid.appendChild(makeChoicePill('0' + (idx + 1), formatJournalCallouts(choice.text), () => handleDawnChoice(choice, idx)));
+        });
+      }
+
+      // Hermes types the intro of a dawn step, then the reply choices (or the Cairn I button) appear
+      function beginDawnStep(i) {
+        dawnStep = i;
+        persistDawn();
+        if (wirePromptBox) wirePromptBox.style.display = 'none';
+        showTyping(true);
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playCelestialChime();
+          appendDawnIntro(i, true, () => {
+            renderDawnPrompt();
+            updateMessengerBadge();
+          });
+        }, 700);
+      }
+
+      function handleDawnChoice(choice, idx) {
+        if (sfx) sfx.playMechanicalClick();
+        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+        wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        dawnHistory[dawnStep] = idx;
+        dawnStep = dawnStep + 1;
+        persistDawn();
+        showTyping(true);
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playChimeHover();
+          appendWireMessage('HERMES · CARTOGRAPHER', choice.hermesReply, false, true, () => {
+            setTimeout(() => beginDawnStep(dawnStep), 500);
+          });
+        }, 650);
+      }
+
+      // Cairn I solved in the game modal: the finale plays live when the chat opens next
+      document.addEventListener('dawn:cairn1-solved', () => {
+        if (dawnStep >= DAWN_DONE) return;
+        const live = (wireCurrentStep === 4 && dawnStep === 2);
+        dawnStep = DAWN_DONE;
+        persistDawn();
+        if (live) window.__dawnFinaleLive = true;
+      });
+
       function renderWireExpedition() {
         if (!wireMessagesStream) return;
         wireMessagesStream.classList.add('is-restoring');
+        let dawnFinalePlaying = false;
         wireMessagesStream.innerHTML = `
           <div class="messenger-date-pill">Today · The Desert Frontier (112° E)</div>
         `;
@@ -14659,6 +15503,7 @@
           if (s === 4) {
             appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[4].hermesFinal);
             appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
+            appendDawnHistory();
             if (EXPEDITION_THREAD[5] && EXPEDITION_THREAD[5].hermesInitial && wireCurrentStep >= 5) {
               appendStepIntro(5);
             }
@@ -14686,6 +15531,7 @@
         if (wireCurrentStep === 4) {
           appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[4].hermesFinal);
           appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
+          dawnFinalePlaying = appendDawnHistory();
         } else if (wireCurrentStep === 6) {
           appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[6].hermesFinal);
           appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true);
@@ -14695,11 +15541,15 @@
         }
 
         wireMessagesStream.classList.remove('is-restoring');
-        renderWireChoices();
+        if (!dawnFinalePlaying) renderWireChoices();
       }
 
       function renderWireChoices() {
         if (!wireChoicesGrid || !wirePromptBox || !wireCompletedBar) return;
+
+        const promptHeader = document.getElementById('wire-prompt-header-text');
+        if (promptHeader) promptHeader.textContent = 'Choose your reply to Hermes:';
+        if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
 
         const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
         const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
@@ -14745,14 +15595,20 @@
           }
         }
 
+        if (wireCurrentStep === 4 && !isChasmDone && !isDawnDone()) {
+          // The dawn after the storm: the Great Silence, the dry river and Cairn I
+          renderDawnPrompt();
+          return;
+        }
+
         if (wireCurrentStep === 4) {
           if (!isChasmDone) {
             wirePromptBox.style.display = 'none';
             wireCompletedBar.style.display = 'flex';
             const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
             const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
-            if (titleEl) titleEl.textContent = 'Waypoint Reached · Safe Shelter at Watchtower VI';
-            if (descEl) descEl.textContent = 'Watchtower VI secured at 112° East. Open the Grand Desert Map to guide Hermes through the Whispering Chasm.';
+            if (titleEl) titleEl.textContent = 'North Portal Reached · The Whispering Chasm Awaits';
+            if (descEl) descEl.textContent = 'The Seal of Cairn I is in the satchel. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).';
             try {
               localStorage.setItem('order_field_wire_completed', 'true');
               localStorage.setItem('order_field_wire_step', '4');
@@ -14842,7 +15698,11 @@
                   if (sfx) sfx.playCelestialChime();
                   appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[4].hermesFinal, false, true, () => {
                     appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
-                    renderWireChoices();
+                    if (isDawnDone() || localStorage.getItem('order_whispering_chasm_completed') === 'true') {
+                      renderWireChoices();
+                    } else {
+                      setTimeout(() => beginDawnStep(dawnStep), 900);
+                    }
                     updateMessengerBadge();
                   });
                 }, 600);
@@ -15062,6 +15922,20 @@
           if (sfx) sfx.playMechanicalClick();
           wireCurrentStep = 0;
           wireHistory = [];
+          dawnHistory = [];
+          try {
+            localStorage.removeItem('order_dawn_choices');
+            localStorage.removeItem('order_dawn_step');
+            // With the Chasm already cleared the Cairn I seal stays earned; otherwise the dawn can be played again
+            if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') {
+              localStorage.removeItem('order_cairn1_found');
+              localStorage.removeItem('order_cairn1_completed');
+              localStorage.removeItem('order_seal_cairn_1');
+            }
+          } catch(e) {}
+          dawnStep = localStorage.getItem('order_whispering_chasm_completed') === 'true' ? DAWN_DONE : 0;
+          persistDawn();
+          if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
           try {
             localStorage.removeItem('order_field_wire_step');
             localStorage.removeItem('order_field_wire_choices');
@@ -15157,7 +16031,7 @@
 
       // Next pending Desert Path station (internal node ids: 10 Chasm, 21 Salt Playa, 11 Lexicon, 12 Clepsydra)
       function getNextDesertNodeId() {
-        if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') return 10;
+        if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') return typeof window.getDawnNodeId === 'function' ? window.getDawnNodeId() : 10;
         if (localStorage.getItem('order_desert_lexicon_completed') === 'true') return 12;
         return localStorage.getItem('order_salt_playa_completed') === 'true' ? 11 : 21;
       }
@@ -15201,7 +16075,7 @@
 
           let activeId = 12;
           if (!isChasmDone) {
-            activeId = 10;
+            activeId = typeof window.getDawnNodeId === 'function' ? window.getDawnNodeId() : 10;
           } else if (!isPlayaDone && !isLexiconDone) {
             activeId = 21;
           } else if (!isLexiconDone) {
@@ -15260,6 +16134,11 @@
           } else {
             showDesertToast('Station 10: The Whispering Chasm · Open Sheet 9B of your physical journal.');
           }
+        } else if (targetId === 22) {
+          window.selectMapNode(22, true);
+          const cairnFound = parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 2 || localStorage.getItem('order_cairn1_completed') === 'true';
+          if (cairnFound && window.openCairnOneModal) window.openCairnOneModal();
+          else showDesertToast('Hermes is still walking the dry river. Keep the wire open.');
         } else if (targetId === 21) {
           window.selectMapNode(21, true);
           if (window.openSaltPlayaModal) {
@@ -15302,6 +16181,7 @@
           ['node-11-banner-text', isLexiconDone, '✓ 12 · NOMAD RUINS (SOLVED)', '✦ 12 · NOMAD RUINS (LEXICON) ➔']
         ];
         updatePathTabsUI();
+        if (typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
         banners.forEach(([id, done, doneText, openText]) => {
           const el = document.getElementById(id);
           if (!el) return;
@@ -15751,6 +16631,471 @@
     })();
 
     // =========================================================================
+    // 🎒 HERMES'S SATCHEL (CAIRN SEALS) & 🪨 CAIRN I · THE WASH RIVER MARKER (DAWN SEGMENT)
+    // =========================================================================
+    (function initSatchelAndCairnOne() {
+      const sfx = window.sfx || null;
+      const SEAL_ROMAN = ['I', 'II', 'III', 'IV', 'V'];
+      const toast = (msg) => { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); };
+      const isAdmin = () => typeof window.isAdminTester === 'function' && window.isAdminTester();
+      const hasSeal = (n) => localStorage.getItem('order_seal_cairn_' + n) === 'true';
+      const cairnOneDone = () => localStorage.getItem('order_cairn1_completed') === 'true';
+
+      // ---------- The satchel in the header ----------
+      function renderSatchel(justAdded) {
+        const wrap = document.getElementById('satchel-wrap');
+        if (!wrap) return;
+        wrap.innerHTML = '<span class="satchel-label">Satchel</span>';
+        SEAL_ROMAN.forEach((roman, i) => {
+          const n = i + 1;
+          const slot = document.createElement('button');
+          slot.type = 'button';
+          const filled = hasSeal(n);
+          slot.className = 'satchel-slot' + (filled ? ' filled' : '') + (justAdded === n ? ' just-added' : '');
+          slot.textContent = filled ? roman : '·';
+          slot.title = filled ? 'Seal of Cairn ' + roman : 'An empty place in the satchel';
+          slot.setAttribute('aria-label', slot.title);
+          slot.addEventListener('click', () => {
+            if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+            if (n === 1 && (isAdmin() || cairnOneDone() || localStorage.getItem('order_cairn1_found') === 'true')) {
+              openCairnOneModal();
+            } else if (filled) {
+              toast('Seal of Cairn ' + roman + ' · safe in Hermes\'s satchel.');
+            } else {
+              toast('✦ An empty place in the satchel. Hermes has not found this seal yet. ✦');
+            }
+          });
+          wrap.appendChild(slot);
+        });
+      }
+
+      // Visible with the chat button, once Hermes has reached the dawn segment (always for the admin tester)
+      function updateSatchelVisibility() {
+        const wrap = document.getElementById('satchel-wrap');
+        const chatBtn = document.getElementById('btn-header-messenger');
+        if (!wrap) return;
+        const chatVisible = !!chatBtn && chatBtn.style.display !== 'none';
+        const step = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
+        const reached = isAdmin() || step >= 4 || SEAL_ROMAN.some((_, i) => hasSeal(i + 1));
+        wrap.style.display = (chatVisible && reached) ? 'inline-flex' : 'none';
+      }
+
+      window.grantCairnSeal = function (n) {
+        n = parseInt(n, 10);
+        if (!(n >= 1 && n <= 5)) return;
+        const had = hasSeal(n);
+        try { localStorage.setItem('order_seal_cairn_' + n, 'true'); } catch (e) {}
+        renderSatchel(had ? 0 : n);
+        updateSatchelVisibility();
+        if (!had) toast('✦ Seal of Cairn ' + SEAL_ROMAN[n - 1] + ' added to Hermes\'s satchel ✦');
+      };
+      window.renderSatchel = renderSatchel;
+      window.updateSatchelVisibility = updateSatchelVisibility;
+
+      // ---------- Cairn I: four stones, three foundations ----------
+      const modal = document.getElementById('modal-cairn-one');
+      if (!modal) { renderSatchel(0); updateSatchelVisibility(); return; }
+      const pegsEl = document.getElementById('cairn1-pegs');
+      const movesEl = document.getElementById('cairn1-telem-moves');
+      const placedEl = document.getElementById('cairn1-telem-placed');
+      const dispatchEl = document.getElementById('cairn1-dispatch-text');
+      const victoryCard = document.getElementById('cairn1-victory-card');
+      const btnClose = document.getElementById('btn-close-cairn1');
+      const btnUndo = document.getElementById('btn-cairn1-undo');
+      const btnReset = document.getElementById('btn-cairn1-reset');
+      const btnHint = document.getElementById('btn-cairn1-hint');
+      const btnFinish = document.getElementById('btn-cairn1-finish');
+
+      const STONES = 4;
+      const TARGET = 2;
+      const STONE_NAMES = ['smallest', 'second', 'third', 'largest'];
+      const PEG_NAMES = ['first', 'second', 'third'];
+      const PEG_ROMAN = ['I', 'II', 'III'];
+      const START_LINE = 'Silvia, the stones are heavy and my arms are tired. Tell me which foundation to lift from, and where to set the stone down.';
+
+      let pegs = [[4, 3, 2, 1], [], []];
+      let selected = -1;
+      let moves = 0;
+      let history = [];
+      let solved = false;
+
+      const say = (text) => { if (dispatchEl) dispatchEl.textContent = '"' + text + '"'; };
+      const topOf = (p) => pegs[p][pegs[p].length - 1];
+
+      function fresh() {
+        pegs = [[4, 3, 2, 1], [], []];
+        selected = -1;
+        moves = 0;
+        history = [];
+        solved = false;
+        if (victoryCard) victoryCard.style.display = 'none';
+      }
+
+      function render() {
+        if (!pegsEl) return;
+        pegsEl.innerHTML = '';
+        for (let p = 0; p < 3; p++) {
+          const peg = document.createElement('button');
+          peg.type = 'button';
+          peg.className = 'c1-peg' + (selected === p ? ' is-source' : '');
+          peg.setAttribute('data-label', 'Foundation ' + PEG_ROMAN[p]);
+          peg.setAttribute('aria-label', 'Foundation ' + PEG_ROMAN[p] + ', ' + pegs[p].length + ' stones');
+          peg.disabled = solved;
+          pegs[p].forEach((size, i) => {
+            const stone = document.createElement('span');
+            stone.className = 'c1-stone' + (selected === p && i === pegs[p].length - 1 ? ' is-lifted' : '') + (solved ? ' is-seal-glow' : '');
+            stone.setAttribute('data-size', String(size));
+            peg.appendChild(stone);
+          });
+          peg.addEventListener('click', () => onPeg(p, peg));
+          pegsEl.appendChild(peg);
+        }
+        if (movesEl) movesEl.textContent = solved && !history.length ? '—' : String(moves);
+        if (placedEl) placedEl.textContent = pegs[TARGET].length + ' / ' + STONES;
+        if (btnUndo) btnUndo.disabled = solved || history.length === 0;
+        if (btnHint) btnHint.disabled = solved;
+      }
+
+      function refuse(peg, line) {
+        say(line);
+        peg.classList.remove('shake');
+        void peg.offsetWidth;
+        peg.classList.add('shake');
+      }
+
+      function onPeg(p, pegEl) {
+        if (solved) return;
+        if (selected === -1) {
+          if (!pegs[p].length) { refuse(pegEl, 'There is no stone on that foundation, Silvia. Pick a pile that has one.'); return; }
+          selected = p;
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          render();
+          say('I am holding the ' + STONE_NAMES[topOf(p) - 1] + ' stone from the ' + PEG_NAMES[p] + ' foundation. Where should it rest?');
+          return;
+        }
+        if (p === selected) {
+          selected = -1;
+          render();
+          say('Back it goes. Which stone shall I lift instead?');
+          return;
+        }
+        const size = topOf(selected);
+        if (pegs[p].length && topOf(p) < size) {
+          refuse(pegEl, 'A big stone on a small one would crush it, and the law of the stones forbids it. Try another foundation.');
+          return;
+        }
+        pegs[p].push(pegs[selected].pop());
+        history.push({ from: selected, to: p });
+        moves++;
+        selected = -1;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (pegs[TARGET].length === STONES) {
+          solve();
+          return;
+        }
+        render();
+        say(moves < 4 ? 'Set down. What next?' : 'Set down. ' + moves + ' lifts so far. What next?');
+      }
+
+      function undo() {
+        if (solved || !history.length) return;
+        const last = history.pop();
+        pegs[last.from].push(pegs[last.to].pop());
+        moves = Math.max(0, moves - 1);
+        selected = -1;
+        render();
+        say('Taken back. Everything is as it was a moment ago.');
+      }
+
+      function reset() {
+        if (solved) return;
+        fresh();
+        render();
+        say('All four stones back on the first foundation. We start again, slowly this time.');
+      }
+
+      // A one-step nudge: breadth-first search from the current position to the finished pile
+      function nextMove() {
+        const start = [0, 1, 2, 3].map((d) => {
+          for (let p = 0; p < 3; p++) if (pegs[p].indexOf(d + 1) !== -1) return p;
+          return 0;
+        });
+        const goal = [TARGET, TARGET, TARGET, TARGET].join('');
+        const seen = { [start.join('')]: null };
+        const queue = [start];
+        while (queue.length) {
+          const s = queue.shift();
+          if (s.join('') === goal) {
+            let key = s.join('');
+            let step = null;
+            while (seen[key]) { step = seen[key]; key = step.prev; }
+            return step;
+          }
+          for (let from = 0; from < 3; from++) {
+            const d = s.indexOf(from);
+            if (d === -1) continue;
+            for (let to = 0; to < 3; to++) {
+              if (to === from) continue;
+              const t = s.indexOf(to);
+              if (t !== -1 && t < d) continue;
+              const n = s.slice();
+              n[d] = to;
+              const k = n.join('');
+              if (k in seen) continue;
+              seen[k] = { stone: d, to: to, prev: s.join('') };
+              queue.push(n);
+            }
+          }
+        }
+        return null;
+      }
+
+      function hint() {
+        if (solved) return;
+        selected = -1;
+        render();
+        const step = nextMove();
+        if (!step) { say('Hmm. I am as lost as you are. Let us start again.'); return; }
+        say('Let me think out loud, Silvia... what if the ' + STONE_NAMES[step.stone] + ' stone went to the ' + PEG_NAMES[step.to] + ' foundation?');
+      }
+
+      function solve() {
+        solved = true;
+        try { localStorage.setItem('order_cairn1_completed', 'true'); } catch (e) {}
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        render();
+        if (victoryCard) victoryCard.style.display = 'block';
+        say('The whole pile stands on the third foundation, and the base is humming under my hands.');
+        window.grantCairnSeal(1);
+        document.dispatchEvent(new CustomEvent('dawn:cairn1-solved'));
+      }
+
+      function openCairnOneModal() {
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        modal.style.display = 'flex';
+        modal.classList.remove('closing');
+        if (cairnOneDone()) {
+          fresh();
+          pegs = [[], [], [4, 3, 2, 1]];
+          solved = true;
+          if (victoryCard) victoryCard.style.display = 'block';
+          say('We lifted every stone together, Silvia. The Seal of Cairn I is safe in my satchel.');
+        } else {
+          if (solved) fresh();
+          if (!history.length && moves === 0) say(START_LINE);
+        }
+        render();
+      }
+
+      function closeCairnOneModal() {
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        modal.classList.add('closing');
+        setTimeout(() => {
+          modal.style.display = 'none';
+          modal.classList.remove('closing');
+          // Just solved: take the player back to the chat, where Hermes tells what he found
+          if (window.__dawnFinaleLive && typeof window.activateHubView === 'function') window.activateHubView('view-field-wire');
+        }, 220);
+      }
+
+      window.openCairnOneModal = openCairnOneModal;
+      window.closeCairnOneModal = closeCairnOneModal;
+
+      if (btnClose) btnClose.addEventListener('click', closeCairnOneModal);
+      if (btnFinish) btnFinish.addEventListener('click', closeCairnOneModal);
+      if (btnUndo) btnUndo.addEventListener('click', undo);
+      if (btnReset) btnReset.addEventListener('click', reset);
+      if (btnHint) btnHint.addEventListener('click', hint);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeCairnOneModal(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display !== 'none') closeCairnOneModal();
+      });
+
+      fresh();
+      renderSatchel(0);
+      updateSatchelVisibility();
+    })();
+
+    // =========================================================================
+    // 🛠 TESTER PANEL (Carles only): complete or replay the Desert Path games
+    // =========================================================================
+    (function initTesterPanel() {
+      const panel = document.getElementById('tester-panel');
+      const rowsEl = document.getElementById('tester-rows');
+      if (!panel || !rowsEl || !window.TesterDesert || !(window.isAdminTester && window.isAdminTester())) return;
+      const T = window.TesterDesert;
+      panel.style.display = '';
+
+      try { panel.open = localStorage.getItem('order_tester_panel_open') === 'true'; } catch (e) {}
+      panel.addEventListener('toggle', () => {
+        try { localStorage.setItem('order_tester_panel_open', panel.open ? 'true' : 'false'); } catch (e) {}
+      });
+
+      // Every action rewrites the saved progress, then reloads so each game restarts from its saved state
+      function apply(action, message) {
+        if (typeof window.showDesertToast === 'function') window.showDesertToast(message);
+        action();
+        setTimeout(() => window.location.reload(), 450);
+      }
+
+      T.games.forEach((g) => {
+        const done = T.isDone(g.id);
+        const row = document.createElement('div');
+        row.className = 'tester-row' + (done ? ' is-done' : '') + (g.built ? '' : ' is-unbuilt');
+        row.innerHTML = '<span class="tester-row-tag"></span><span class="tester-row-label"><span class="tester-name"></span><span class="tester-state"></span></span>';
+        row.querySelector('.tester-row-tag').textContent = g.tag;
+        row.querySelector('.tester-name').textContent = g.label;
+        row.querySelector('.tester-state').textContent = g.built ? (done ? '✓ done' : '· open') : '· web game not built yet';
+
+        const btnComplete = document.createElement('button');
+        btnComplete.type = 'button';
+        btnComplete.className = 'tester-btn';
+        btnComplete.textContent = '⏩ Complete up to here';
+        btnComplete.title = 'Finishes this game and every game before it';
+        btnComplete.disabled = !g.built;
+        btnComplete.addEventListener('click', () => apply(() => T.completeUpTo(g.id), '✦ Completed up to ' + g.tag + ' ✦'));
+
+        const btnReplay = document.createElement('button');
+        btnReplay.type = 'button';
+        btnReplay.className = 'tester-btn';
+        btnReplay.textContent = '↺ Replay from here';
+        btnReplay.title = 'Resets this game and every game after it';
+        btnReplay.disabled = !g.built;
+        btnReplay.addEventListener('click', () => apply(() => T.replayFrom(g.id), '✦ Replaying from ' + g.tag + ' ✦'));
+
+        row.appendChild(btnComplete);
+        row.appendChild(btnReplay);
+        rowsEl.appendChild(row);
+      });
+
+      const btnAll = document.getElementById('tester-complete-all');
+      const btnReplayAll = document.getElementById('tester-replay-all');
+      if (btnAll) btnAll.addEventListener('click', () => apply(() => T.completeAll(), '✦ Every built game completed ✦'));
+      if (btnReplayAll) {
+        btnReplayAll.addEventListener('click', () => {
+          if (!window.confirm('Reset every Desert Path game and the Hermes chat? Only Stations 01 to 09 stay done.')) return;
+          apply(() => T.replayAll(), '✦ Desert Path reset: only Stations 01–09 are done ✦');
+        });
+      }
+    })();
+
+    // =========================================================================
+    // 🌅 DAWN ROUTE ON THE GRAND DESERT MAP: Outer Watchtower VI → the dry river → Cairn I → the North Portal
+    // Revealed as the story advances: marks and routes follow the Hermes chat (order_field_wire_step / order_dawn_step).
+    // =========================================================================
+    (function initDawnMapLayer() {
+      const svg = document.getElementById('desert-map-svg-overview');
+      if (!svg) return;
+      const NS = 'http://www.w3.org/2000/svg';
+      const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+
+      function state() {
+        const wire = parseInt(get('order_field_wire_step') || '0', 10) || 0;
+        const cairnDone = get('order_cairn1_completed') === 'true';
+        const chasmDone = get('order_whispering_chasm_completed') === 'true';
+        const dawn = cairnDone ? 3 : (parseInt(get('order_dawn_step') || '0', 10) || 0);
+        return { reached: wire >= 4 || chasmDone || cairnDone, dawn: dawn };
+      }
+
+      // The station the map should highlight before the Whispering Chasm
+      window.getDawnNodeId = function () {
+        const s = state();
+        return (s.reached && s.dawn >= 1 && s.dawn < 3) ? 22 : 10;
+      };
+
+      const ROUTES = [
+        { id: 'dawn-route-1', d: 'M 170 948 C 215 968 300 990 340 1000 S 395 1012 413 1019' },
+        { id: 'dawn-route-2', d: 'M 413 1019 C 430 1045 425 1070 450 1105 S 505 1160 538 1203' },
+        { id: 'dawn-route-3', d: 'M 538 1203 C 560 1235 548 1290 520 1330 S 505 1400 490 1440 S 440 1540 395 1610 S 340 1700 340 1760 S 385 1860 405 1925 S 418 1995 400 2052' }
+      ];
+      const MARKS = [
+        { id: 'dawn-mark-silence', x: 170, y: 948, icon: '🌅', label: 'THE GREAT SILENCE', w: 190,
+          say: '“The wind has stopped. After a big storm the desert holds its breath, and every sound carries for miles.” · Hermes, at dawn' },
+        { id: 'dawn-mark-river', x: 413, y: 1019, icon: '👣', label: 'THE DRY RIVER', w: 160,
+          say: '“A riverbed wider than a street, with a floor of smooth gray stones. Something pulls me south along it.” · Hermes, Wadi al-Hajar' },
+        { id: 'dawn-mark-portal', x: 400, y: 2052, icon: '🚪', label: 'NORTH PORTAL', w: 150, below: true,
+          say: '“The rock splits open into a narrow gate, and the wind is already murmuring inside.” · Hermes, at the Whispering Chasm' }
+      ];
+
+      const layer = document.createElementNS(NS, 'g');
+      layer.setAttribute('id', 'dawn-map-layer');
+      svg.appendChild(layer);
+
+      function el(name, attrs, parent) {
+        const e = document.createElementNS(NS, name);
+        Object.keys(attrs).forEach((k) => e.setAttribute(k, attrs[k]));
+        if (parent) parent.appendChild(e);
+        return e;
+      }
+
+      ROUTES.forEach((r) => {
+        const g = el('g', { id: r.id, style: 'display:none;' }, layer);
+        el('path', { class: 'dawn-route-halo', d: r.d }, g);
+        el('path', { class: 'dawn-route-line', d: r.d }, g);
+      });
+
+      function buildMark(m, onClick) {
+        const g = el('g', { id: m.id, class: 'dawn-mark', transform: 'translate(' + m.x + ', ' + m.y + ') scale(1.4)', style: 'display:none;' }, layer);
+        el('circle', { class: 'dawn-mark-core', cx: 0, cy: 0, r: 15, fill: '#2d1507', stroke: '#fbbf24', 'stroke-width': 2.2 }, g);
+        const icon = el('text', { class: 'dawn-mark-icon', x: 0, y: 5, 'text-anchor': 'middle', 'font-size': 13, fill: '#fbbf24' }, g);
+        icon.textContent = m.icon;
+        el('rect', { class: 'dawn-mark-rect', x: -m.w / 2, y: m.below ? 24 : -48, width: m.w, height: 24, rx: 4, fill: '#180e07', stroke: '#fbbf24', 'stroke-width': 1.3, opacity: 0.96 }, g);
+        const text = el('text', { class: 'dawn-mark-text', x: 0, y: m.below ? 40 : -32, 'text-anchor': 'middle', 'font-family': "'Cinzel', serif", 'font-size': 10.5, 'font-weight': 700, fill: '#fde68a' }, g);
+        text.textContent = m.label;
+        g.addEventListener('click', onClick);
+        return g;
+      }
+
+      MARKS.forEach((m) => {
+        buildMark(m, () => { if (typeof window.showDesertToast === 'function') window.showDesertToast(m.say); });
+      });
+      const cairnMark = buildMark({ id: 'dawn-mark-cairn', x: 538, y: 1203, icon: '?', label: '', w: 270 }, () => {
+        if (typeof window.selectDesertStation === 'function') window.selectDesertStation(22);
+      });
+
+      let lastSig = '';
+      function update() {
+        const s = state();
+        const show = (id, on) => { const n = document.getElementById(id); if (n) n.style.display = on ? '' : 'none'; };
+        const r1 = s.reached, r2 = s.reached && s.dawn >= 1, r3 = s.dawn >= 3;
+        show('dawn-route-1', r1); show('dawn-route-2', r2); show('dawn-route-3', r3);
+        show('dawn-mark-silence', r1); show('dawn-mark-river', r2); show('dawn-mark-cairn', r2); show('dawn-mark-portal', r3);
+
+        // Only the newest route keeps flowing
+        const latest = r3 ? 'dawn-route-3' : (r2 ? 'dawn-route-2' : 'dawn-route-1');
+        ROUTES.forEach((r) => {
+          const line = document.querySelector('#' + r.id + ' .dawn-route-line');
+          if (line) line.classList.toggle('is-latest', r.id === latest && r1);
+        });
+
+        // Cairn I marker: a question mark until Hermes finds it, then the stones, then a check
+        const icon = cairnMark.querySelector('.dawn-mark-icon');
+        const text = cairnMark.querySelector('.dawn-mark-text');
+        if (s.dawn >= 3) { icon.textContent = '🪨'; text.textContent = '✓ CAIRN I · SEAL SECURED'; }
+        else if (s.dawn >= 2) { icon.textContent = '🪨'; text.textContent = '✦ CAIRN I ➔'; }
+        else { icon.textContent = '?'; text.textContent = '✦ SOMETHING IN THE DRY RIVER'; }
+
+        const sig = [r1, r2, r3, s.dawn].join(',');
+        if (sig !== lastSig && lastSig !== '') {
+          layer.querySelectorAll('g').forEach((g) => { if (g.style.display !== 'none') { g.classList.remove('dawn-fade'); void g.getBoundingClientRect(); g.classList.add('dawn-fade'); } });
+        }
+        lastSig = sig;
+      }
+      window.updateDawnMapLayer = update;
+      document.addEventListener('dawn:cairn1-solved', update);
+      update();
+    })();
+
+    // The one-click "Transcribe Complete Journal Notes" shortcuts are for the admin tester only
+    (function hideSolveShortcuts() {
+      if (window.isAdminTester && window.isAdminTester()) return;
+      ['btn-lexicon-solve-all', 'btn-clepsydra-solve-all'].forEach((id) => {
+        const b = document.getElementById(id);
+        if (b) b.style.display = 'none';
+      });
+    })();
+
+    // =========================================================================
     // 🧂 THE SALT PLAYA CONTROLLER (STATION 11 · SHEET 10A)
     // =========================================================================
     (function initSaltPlayaController() {
@@ -15960,7 +17305,7 @@
 
       function openSaltPlayaModal() {
         const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-        if (!isChasmDone && !isDone()) {
+        if (!isChasmDone && !isDone() && !(window.isAdminTester && window.isAdminTester())) {
           toast('✦ TERRA INCOGNITA ✦ Guide Hermes through the Whispering Chasm (Station 10) before crossing the Salt Playa.');
           return;
         }
@@ -16342,7 +17687,7 @@
       function openDesertLexiconModal() {
         const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
         const isLexiconAlreadyDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
-        if (!isPlayaDone && !isLexiconAlreadyDone) {
+        if (!isPlayaDone && !isLexiconAlreadyDone && !(window.isAdminTester && window.isAdminTester())) {
           if (typeof window.showDesertToast === 'function') {
             window.showDesertToast('✦ TERRA INCOGNITA ✦ Guide Hermes across the Salt Playa (Station 11) before he reaches the Nomad Ruins.');
           }
@@ -16825,7 +18170,7 @@
       function openOasisClepsydraModal() {
         const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
         const isClepsydraAlreadyDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
-        if (!isLexiconDone && !isClepsydraAlreadyDone) {
+        if (!isLexiconDone && !isClepsydraAlreadyDone && !(window.isAdminTester && window.isAdminTester())) {
           if (typeof window.showDesertToast === 'function') {
             window.showDesertToast('✦ TERRA INCOGNITA ✦ Solve the Desert Lexicon at the Nomad Ruins (Station 12) before entering the Oasis Clepsydra.');
           }

@@ -3,8 +3,13 @@ Unit tests for Pages 4 and 5 of the Journal (The Astrolabe Codex).
 Validates canvas dimensions, channel count, alpha ranges, and hole punch margins.
 """
 
+import os
+import sys
 import unittest
 import numpy as np
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+sys.path.insert(0, PROJECT_ROOT)
 
 from scripts.journal.build_page04_05 import (
     render_face_4a,

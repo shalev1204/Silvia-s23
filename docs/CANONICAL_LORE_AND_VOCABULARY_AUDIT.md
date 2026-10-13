@@ -619,7 +619,7 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 ```
                         ▲ TOWER I: THE ALPINE OBSERVATORY
                        / \  (Snowy Peaks · Hermes · Constellation Path)
-                      /   \  [ PISTA REVELADA: WHAT = 2 Entradas de Ballet ]
+                      /   \  [ 3ª PISTA Y REVELACIÓN FINAL: WHAT = 2 Entradas de Ballet ]
                      /     \
                     /   ✦   \   <--- [ EL 4º LUGAR SECRETO DE CONVERGENCIA ]
                    /    |    \       (The Vault of the Grand Eclipse)
@@ -628,17 +628,19 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   THE SANDSTONE TOWER             THE STAGE TOWER
   (The Sandstone Sanctuary ·       (The Mirror Sanctuary / The Theater ·
    Desert Path · The Oracle)        Stage Path · The Mirror Speaker)
-  [ PISTA: WHERE = Ciudad y Teatro ] [ PISTA: WHEN = Fecha y Hora ]
+  [ 1ª PISTA: WHEN = Fecha y Hora ] [ 2ª PISTA: WHERE = Ciudad y Teatro ]
 ```
 
-1. **Tower I — The Alpine Observatory** (Cumbres Alpinas · Constellation Path):
-   - Revela: **WHAT** (El contenido del regalo: dos entradas de ballet).
-2. **Tower II — The Sandstone Tower / The Sandstone Sanctuary** (Dunas · Desert Path):
+*Invariante Canónico Absoluto de las Pistas*: Silvia comienza su viaje sin conocer ni el **WHAT**, ni el **WHERE**, ni el **HOW**. Las revelaciones siguen un orden estricto de anclaje:
+1. **Tower II — The Sandstone Tower / The Sandstone Sanctuary** (Dunas · Desert Path · El Oráculo):
    - Monolito de arenisca milenario en el desierto profundo. *(Nunca "Sunken")*.
-   - Revela: **WHERE** (La ciudad europea y el teatro histórico de la representación).
-3. **Tower III — The Stage Tower / The Mirror Sanctuary / The Theater** (Escenario · Stage Path):
+   - Revela: **1ª Gran Pista — WHEN** (La fecha, momento exacto y estación del año de la cita).
+2. **Tower III — The Stage Tower / The Mirror Sanctuary / The Theater** (Escenario · Stage Path · The Mirror Speaker):
    - Santuario de la simetría y la acústica. *(Nunca "Coastal" ni "Coast")*.
-   - Revela: **WHEN** (La fecha exacta y hora de la función de ballet).
+   - Revela: **2ª Gran Pista — WHERE** (La ciudad europea y el teatro histórico de la representación).
+3. **Tower I — The Alpine Observatory** (Cumbres Alpinas · Retorno al Constellation Path & Convergencia):
+   - Observatorio en las cumbres nevadas.
+   - Revela: **3ª Gran Pista y Revelación Final — WHAT** (El contenido supremo del regalo: la velada de ballet / las 2 entradas físicas).
 4. **The Vault of the Grand Eclipse (La Cuarta Cámara Prohibida)**:
    - Cámara secreta desprecintada al alinear las Tres Torres con el Astrolabio.
    - Contiene el cofre físico con las entradas reales del 23º cumpleaños de Silvia.
@@ -695,9 +697,9 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
 - **Hoja 17**:
   - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$.
-  - **Cara B (17B · Lore)**: **Audiencia con El Oráculo del Desierto**. Apertura de la Torre II; revelación de la pista **WHERE**; estrella maestra **Vega**.
+  - **Cara B (17B · Lore)**: **Audiencia con El Oráculo del Desierto**. Apertura de la Torre II; revelación de la primera gran pista: **WHEN** (fecha y estación de la función); estrella maestra **Vega**.
 - **Hoja 18**:
-  - **Cara A (18A · Juego D10)**: **Clímax con El Oráculo**. Triangulación de horizontes y desbloqueo del camino a la Torre III.
+  - **Cara A (18A · Juego D10)**: **Clímax con El Oráculo**. Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path).
   - **Cara B (18B · Arte de Transición)**: **Dibujo de Transición al Stage Path**. Obra estética inspirada en el boceto artístico (pliegues teatrales violetas, columnas chevron en perspectiva, espirales, estrellas y malla geométrica escénica).
 
 ---

@@ -25,10 +25,10 @@ Silvia's23/
 │   └── stage/                 ← Reservado
 │
 ├── journal/                   ← DIARIO MANUSCRITO A5 (18 hojas, 36 caras)
-│   ├── page01 … page18/       ← Por hoja: canvases/ (PNG 300 dpi), mockups/ (JPG) y pdf/ (A5)
-│   ├── constellation_games/   ← Lienzos y mockups de los juegos C1–C4
-│   ├── desert_games/          ← Lienzos y mockups de los juegos de la primera tanda del desierto
-│   └── impresion/             ← PDFs de impresión (⚠️ versión antigua de 12 hojas; ver nota)
+│   ├── page01 … page18/       ← Por hoja: mockups/ (JPG fotorrealistas) y pdf/ (A5 listos para imprimir)
+│   ├── constellation_games/   ← Mockups de los juegos C1–C4
+│   ├── desert_games/          ← Mockups de los juegos de la primera tanda del desierto
+│   └── impresion/             ← PDFs de impresión completos (18 hojas doble cara y diario maestro de 36 págs)
 │
 ├── assets/                    ← RECURSOS MULTIMEDIA DE PRODUCCIÓN
 │   ├── fonts/                 ← Tipografías manuscritas (Fondamento, etc.)
@@ -49,13 +49,13 @@ Silvia's23/
 │   └── desert/ · stage/
 │
 ├── scripts/                   ← HERRAMIENTAS
-│   ├── journal/               ← Generadores del diario (build_entire_journal.py, build_page*.py, tests/)
+│   ├── journal/               ← Generadores del diario (build_entire_journal.py, build_impresion_master.py, tests/)
 │   ├── audio/                 ← Voz, foley y mezclas (stems intermedios no versionados en web/)
 │   ├── glyphs/                ← Generadores del Eclipse Script
 │   ├── render/                ← Renderizado de emails
 │   └── audit/lint_lore_and_vocabulary.py   ← Linter de lore y vocabulario
 │
-├── scratch/                   ← Capturas y verificaciones de trabajo (no es fuente de verdad)
+├── scratch/                   ← Scripts auxiliares y verificaciones de trabajo
 │
 └── docs/                      ← DOCUMENTACIÓN
     ├── CANONICAL_LORE_AND_VOCABULARY_AUDIT.md   ← Biblia Maestra 6.0 (fuente de verdad)
@@ -72,5 +72,5 @@ Silvia's23/
 
 - **Desert Path en el Hub:** las Estaciones 10 a 13 son modales de `web/index.html`; el diseño de cada juego está en `docs/DESERT_ODYSSEY_BIBLE.md`.
 - **Regeneración del diario:** `python3 -m scripts.journal.build_entire_journal` desde la raíz reescribe las 36 caras y sincroniza los mapas en `web/assets/maps/`. Es determinista: una cara solo cambia si cambia su script.
-- **`journal/impresion/`:** contiene los PDFs de impresión doble cara de la versión anterior (12 hojas, numeración antigua) y **no se genera con ningún script**. Para imprimir, use los `page*/pdf/*_A5.pdf` actuales.
+- **`journal/impresion/`:** contiene los PDFs de impresión doble cara actualizados para las 18 hojas (`hojas_doble_cara/`) y el diario unificado de 36 páginas (`00_DIARIO_COMPLETO_36_PAGINAS_A5.pdf`), generados con `python3 scripts/journal/build_impresion_master.py`.
 - **Audio:** los `*.wav` / `*.pcm` de `web/` están en `.gitignore`; solo se versionan los `.mp3` / `.mp4` finales.

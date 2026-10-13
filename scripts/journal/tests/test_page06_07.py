@@ -3,8 +3,13 @@ Unit tests for Sheets 6 and 7 of the Journal (The Desert Frontier & The Grand Ma
 Validates canvas dimensions, channel count, alpha ranges, and hole punch margins.
 """
 
+import os
+import sys
 import unittest
 import numpy as np
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+sys.path.insert(0, PROJECT_ROOT)
 
 from scripts.journal.build_page06_07 import (
     render_face_6a,

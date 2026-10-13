@@ -872,12 +872,10 @@ def main():
     p8_dir = os.path.join(PROJECT_ROOT, "journal", "page08")
     dg_dir = os.path.join(PROJECT_ROOT, "journal", "desert_games")
     dg_pdf_dir = os.path.join(dg_dir, "pdf")
-    dg_canvas_dir = os.path.join(dg_dir, "canvases")
     dg_mockup_dir = os.path.join(dg_dir, "mockups")
 
     os.makedirs(p8_dir, exist_ok=True)
     os.makedirs(dg_pdf_dir, exist_ok=True)
-    os.makedirs(dg_canvas_dir, exist_ok=True)
     os.makedirs(dg_mockup_dir, exist_ok=True)
 
     tasks = [
@@ -891,17 +889,12 @@ def main():
         print(f"\nRendering {title}...")
         canvas = renderer(gc=GRAPHITE_COLOR)
 
-        # 1. Master Transparent Canvas (300 DPI) in desert_games/canvases/
-        canvas_path = os.path.join(dg_canvas_dir, f"{stem}_canvas_A5_300dpi.png")
-        cv2.imwrite(canvas_path, canvas)
-        print(f"  -> Transparent Canvas: {canvas_path}")
-
-        # 2. Vector PDF in desert_games/pdf/
+        # 1. Vector PDF in desert_games/pdf/
         pdf_path = os.path.join(dg_pdf_dir, f"{stem}_A5.pdf")
         PDFBuilder.save_a5_pdf_from_rgba(canvas, pdf_path, dpi=300)
         print(f"  -> Vector PDF: {pdf_path}")
 
-        # 3. Photorealistic Mockup in desert_games/mockups/
+        # 2. Photorealistic Mockup in desert_games/mockups/
         if bg_raw is not None:
             bg_for_face = cv2.flip(bg_raw, 1) if is_back else bg_raw.copy()
             fg_rgb = canvas[:, :, :3].astype(np.float32)
@@ -914,16 +907,12 @@ def main():
             # Also maintain page08 synchronization if applicable
             if is_page08:
                 p8_pdf_dir = os.path.join(p8_dir, "pdf")
-                p8_canvas_dir = os.path.join(p8_dir, "canvases")
                 p8_mockup_dir = os.path.join(p8_dir, "mockups")
                 os.makedirs(p8_pdf_dir, exist_ok=True)
-                os.makedirs(p8_canvas_dir, exist_ok=True)
                 os.makedirs(p8_mockup_dir, exist_ok=True)
 
-                p8_canvas = os.path.join(p8_canvas_dir, "page08_back_canvas_A5_300dpi.png")
                 p8_pdf = os.path.join(p8_pdf_dir, "page08_back_A5.pdf")
                 p8_mockup = os.path.join(p8_mockup_dir, "page08_back_real_paper_mockup.jpg")
-                cv2.imwrite(p8_canvas, canvas)
                 PDFBuilder.save_a5_pdf_from_rgba(canvas, p8_pdf, dpi=300)
                 cv2.imwrite(p8_mockup, blended, [cv2.IMWRITE_JPEG_QUALITY, 96])
                 print(f"  -> Also synced to Page 08 Back: {p8_pdf}")
@@ -931,16 +920,12 @@ def main():
             if stem == "game04_polybius_stele":
                 p12_dir = os.path.join(PROJECT_ROOT, "journal", "page12")
                 p12_pdf_dir = os.path.join(p12_dir, "pdf")
-                p12_canvas_dir = os.path.join(p12_dir, "canvases")
                 p12_mockup_dir = os.path.join(p12_dir, "mockups")
                 os.makedirs(p12_pdf_dir, exist_ok=True)
-                os.makedirs(p12_canvas_dir, exist_ok=True)
                 os.makedirs(p12_mockup_dir, exist_ok=True)
 
-                p12_canvas = os.path.join(p12_canvas_dir, "page12_front_canvas_A5_300dpi.png")
                 p12_pdf = os.path.join(p12_pdf_dir, "page12_front_A5.pdf")
                 p12_mockup = os.path.join(p12_mockup_dir, "page12_front_real_paper_mockup.jpg")
-                cv2.imwrite(p12_canvas, canvas)
                 PDFBuilder.save_a5_pdf_from_rgba(canvas, p12_pdf, dpi=300)
                 cv2.imwrite(p12_mockup, blended, [cv2.IMWRITE_JPEG_QUALITY, 96])
                 print(f"  -> Also synced to Page 12 Front: {p12_pdf}")
