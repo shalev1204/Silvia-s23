@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>The Station Title · The Eclipse Order</title>
+  
+  <!-- Typography & Fonts: Premium Editorial Serifs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Shared Navigator Styles -->
+  <link rel="stylesheet" href="../../shared/navigator.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="order-game-body">
+
+  <!-- =====================================================================
+       1. PRÓLOGO ATMOSFÉRICO / MODAL DE INSTRUCCIONES
+       ===================================================================== -->
+  <div class="game-modal-overlay" id="intro-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop"></div>
+    <div class="brass-card-frame modal-card">
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+
+      <header class="modal-header">
+        <div class="modal-badge">
+          <span class="badge-icon">✦</span>
+          <span class="badge-station" id="station-label">STATION XX</span>
+          <span class="badge-icon">✦</span>
+        </div>
+        <h1 class="modal-title" id="modal-title">The Mirror Sanctuary</h1>
+        <p class="modal-subtitle">The Stage Path · The Third Tower</p>
+      </header>
+
+      <div class="modal-content">
+        <p class="lore-paragraph">
+          "Silvia, the red curtains of stone have yielded to the silent desert wind. Behind the seven bronze mirrors lies the true orientation of our convergence. Align the sighting rule and observe where the light turns."
+        </p>
+        <div class="rules-box">
+          <h2 class="rules-heading">Objective:</h2>
+          <ul class="rules-list">
+            <li>Rotate the bronze sighting rings to balance the celestial angles.</li>
+            <li>Deduce the missing Latin letter using your <em>Cipher Ledger</em>.</li>
+            <li>Enter the alignment code to seal the meridian coordinates.</li>
+          </ul>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="order-btn-primary" id="btn-start-game">
+          <span>EXAMINE MECHANISM</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       2. CONTENEDOR PRINCIPAL DEL JUEGO / MECANISMO INTERACTIVO
+       ===================================================================== -->
+  <main class="game-container" id="main-content">
+    
+    <!-- Barra superior de estado -->
+    <header class="station-topbar">
+      <div class="station-meta">
+        <span class="meta-order">THE ECLIPSE ORDER</span>
+        <span class="meta-sep">/</span>
+        <span class="meta-name">THE STAGE PATH</span>
+      </div>
+      <div class="station-controls">
+        <button class="control-btn" id="btn-sound-toggle" title="Toggle Sound" aria-label="Toggle Sound">🔊</button>
+        <button class="control-btn" id="btn-help-toggle" title="View Instructions" aria-label="View Instructions">📜</button>
+      </div>
+    </header>
+
+    <!-- Escenario del Puzzle Central -->
+    <section class="puzzle-stage">
+      
+      <!-- Fondo de Anillos Astrolábicos -->
+      <div class="astrolabe-rings-bg" aria-hidden="true">
+        <svg class="rings-svg" viewBox="0 0 500 500">
+          <circle cx="250" cy="250" r="230" class="ring-outer" />
+          <circle cx="250" cy="250" r="170" class="ring-mid" />
+          <circle cx="250" cy="250" r="110" class="ring-inner" />
+          <line x1="250" y1="20" x2="250" y2="480" class="axis-line" />
+          <line x1="20" y1="250" x2="480" y2="250" class="axis-line" />
+        </svg>
+      </div>
+
+      <!-- Mecanismo Central Interactivo (Ruedas / Cuadrícula / Diales) -->
+      <div class="interactive-mechanism-frame brass-card-frame">
+        <div class="card-corner corner-tl"></div>
+        <div class="card-corner corner-tr"></div>
+        <div class="card-corner corner-bl"></div>
+        <div class="card-corner corner-br"></div>
+
+        <div class="mechanism-display">
+          <div class="display-label">CURRENT SIGHTING ANGLE</div>
+          <div class="display-value" id="current-angle-display">000° 00'</div>
+        </div>
+
+        <div class="interactive-dial-area" id="dial-area">
+          <!-- Dial interactivo SVG o Canvas -->
+          <div class="dial-wheel" id="rotatable-wheel" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="360" aria-valuenow="0" aria-label="Sighting dial">
+            <div class="dial-center-gem"></div>
+            <div class="dial-pointer"></div>
+          </div>
+        </div>
+
+        <!-- Entrada de Código / Solución en Alfabeto Latino Normal -->
+        <div class="solution-input-bar">
+          <label for="input-letter" class="input-bar-label">ENTER TARGET MERIDIAN KEY:</label>
+          <div class="input-group">
+            <input type="text" id="input-letter" maxlength="4" placeholder="K" autocomplete="off" spellcheck="false" class="order-input-letter">
+            <button class="order-btn-submit" id="btn-verify-solution">ALIGN</button>
+          </div>
+          <div class="feedback-msg" id="feedback-message" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       3. MODAL DE VICTORIA Y REVELACIÓN DE COORDENADAS
+       ===================================================================== -->
+  <div class="game-modal-overlay hidden" id="victory-modal" role="dialog" aria-modal="true">
+    <div class="modal-backdrop"></div>
+    <div class="brass-card-frame modal-card victory-card">
+      <div class="card-corner corner-tl"></div>
+      <div class="card-corner corner-tr"></div>
+      <div class="card-corner corner-bl"></div>
+      <div class="card-corner corner-br"></div>
+
+      <header class="modal-header">
+        <div class="modal-badge victory-badge">
+          <span>✦ CELESTIAL ALIGNMENT CONFIRMED ✦</span>
+        </div>
+        <h2 class="modal-title">Station Unlocked</h2>
+      </header>
+
+      <div class="modal-content">
+        <p class="lore-paragraph">
+          The sighting arm locked into the true vector. The third seal has been inscribed into your journey.
+        </p>
+
+        <!-- Pizarra de Coordenadas Descifradas (Notación de Alfabeto Normal) -->
+        <div class="coordinates-slate">
+          <div class="slate-title">SECRETS RECORDED IN CIPHER LEDGER</div>
+          <div class="coordinates-grid">
+            <div class="coord-item">
+              <span class="coord-label">LATITUDE:</span>
+              <span class="coord-value" id="coord-lat">K · G · A ° N</span>
+            </div>
+            <div class="coord-item">
+              <span class="coord-label">LONGITUDE:</span>
+              <span class="coord-value" id="coord-long">O · B · P ° W</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="order-btn-primary" id="btn-return-hub">
+          <span>RECORD PROGRESS & CONTINUE</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Shared Navigator Script -->
+  <script src="../../shared/navigator.js"></script>
+  <script src="./game.js"></script>
+</body>
+</html>

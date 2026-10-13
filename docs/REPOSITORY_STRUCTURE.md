@@ -22,7 +22,8 @@ Silvia's23/
 │   │                            celestial-matrix, zodiac-engine, midnight-calibration, celestial-cipher
 │   ├── desert/                ← Reservado (los juegos del Desert Path viven en el Hub)
 │   ├── shared/                ← navigator.js / navigator.css
-│   └── stage/                 ← Reservado
+│   ├── stage/                 ← Reservado
+│   └── templates/             ← game_boilerplate/ (HTML, CSS, JS procedural para nuevos puzzles)
 │
 ├── journal/                   ← DIARIO MANUSCRITO A5 (18 hojas, 36 caras)
 │   ├── page01 … page18/       ← Por hoja: mockups/ (JPG fotorrealistas) y pdf/ (A5 listos para imprimir)
@@ -49,7 +50,7 @@ Silvia's23/
 │   └── desert/ · stage/
 │
 ├── scripts/                   ← HERRAMIENTAS
-│   ├── journal/               ← Generadores del diario (build_entire_journal.py, build_impresion_master.py, tests/)
+│   ├── journal/               ← Generadores del diario (build_entire_journal.py, build_impresion_master.py, tests/, templates/template_new_sheet.py)
 │   ├── audio/                 ← Voz, foley y mezclas (stems intermedios no versionados en web/)
 │   ├── glyphs/                ← Generadores del Eclipse Script
 │   ├── render/                ← Renderizado de emails
@@ -58,6 +59,11 @@ Silvia's23/
 ├── scratch/                   ← Scripts auxiliares y verificaciones de trabajo
 │
 └── docs/                      ← DOCUMENTACIÓN
+    ├── design_system/         ← SISTEMA DE DISEÑO Y MANUALES DE CREACIÓN
+    │   ├── README.md                          ← Índice y guía de inicio rápido
+    │   ├── 01_JOURNAL_STYLE_AND_ART_GUIDE.md  ← Diario A5: dibujo renacentista, Stage Path, troquelado, tipografía
+    │   ├── 02_WEB_GAMES_AND_HUB_GUIDE.md      ← Web: UI dark mode, tokens, micro-animaciones, Web Audio API
+    │   └── 03_VOICE_TONE_AND_LORE_GUIDE.md    ← Narrativa: personajes, agencia Silvia, WHEN/WHERE/WHAT, vocabulario
     ├── CANONICAL_LORE_AND_VOCABULARY_AUDIT.md   ← Biblia Maestra 6.0 (fuente de verdad)
     ├── DESERT_ODYSSEY_BIBLE.md                  ← Desert Path: hojas, juegos y estaciones 10–19
     ├── lore_and_puzzle_bible.md                 ← Diseño de puzzles, astronomía y mecánicas
