@@ -12901,7 +12901,7 @@
 
       // One-time Silvia live seed: Station 09 done · storm until Sat 17 20:00 · Hermes wire live · desert clean for checkpoint 1
       try {
-        if (localStorage.getItem('order_silvia_live_v3') !== 'done') {
+        if (localStorage.getItem('order_silvia_live_v4') !== 'done') {
           localStorage.setItem('seeker_silvia_midnight_completed', 'true');
           localStorage.setItem('seeker_silvia_cipher_completed', 'true');
           localStorage.setItem('seeker_silvia_sandstorm_active', 'true');
@@ -12919,6 +12919,10 @@
             window.TesterDesert.replayAll();
           }
           localStorage.removeItem('order_field_inquiries_read');
+          // Pending Hermes distress (badge "1") until she opens The Cliffside Workshop
+          localStorage.removeItem('order_messenger_last_read_step');
+          localStorage.setItem('order_messenger_unread_count', '1');
+          localStorage.setItem('order_silvia_live_v4', 'done');
           localStorage.setItem('order_silvia_live_v3', 'done');
         }
         // Ask Hermes: wipe leftover "Answered" badges from tester runs (shared localStorage key)
@@ -14576,9 +14580,17 @@
             } else if (window.SandstormLockdown && wireAnswered) {
               window.SandstormLockdown.deactivate(false);
             }
-            // After the storm gate: land on Desert Path → Transceiver Offline inspector
-            if (wireAnswered && typeof window.switchMapPath === 'function') {
-              window.switchMapPath('desert', true);
+            // After the storm gate: Desert Path ready under the hood; Workshop holds the live wire
+            if (wireAnswered) {
+              if (typeof window.switchMapPath === 'function') {
+                window.switchMapPath('desert', false);
+              }
+              if (typeof window.updateSatchelVisibility === 'function') {
+                window.updateSatchelVisibility();
+              }
+              if (typeof window.updateMessengerBadge === 'function') {
+                window.updateMessengerBadge();
+              }
             }
           }
         }
@@ -18660,7 +18672,8 @@
         });
       }
 
-      // Visible with the chat button, once Hermes has reached the dawn segment or found a tool (always for the admin tester)
+      // Visible with the chat button once the Desert / storm era is live (Silvia after Station 09),
+      // or once Hermes has a wire step, a tool, or any Cairn seal (always for the admin tester).
       function updateSatchelVisibility() {
         const wrap = document.getElementById('satchel-wrap');
         const invBtn = document.getElementById('btn-open-inventory');
@@ -18669,7 +18682,11 @@
         const chatVisible = !!chatBtn && chatBtn.style.display !== 'none';
         const step = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
         const hasTool = !!localStorage.getItem('order_satchel_expedition_item');
-        const reached = isAdmin() || step >= 1 || hasTool || SEAL_ROMAN.some((_, i) => hasSeal(i + 1));
+        const desertEra =
+          localStorage.getItem('order_desert_path_unlocked') === 'true' ||
+          localStorage.getItem('order_sandstorm_active') === 'true' ||
+          localStorage.getItem('seeker_silvia_sandstorm_active') === 'true';
+        const reached = isAdmin() || desertEra || step >= 1 || hasTool || SEAL_ROMAN.some((_, i) => hasSeal(i + 1));
         wrap.style.display = (chatVisible && reached) ? 'inline-flex' : 'none';
         if (invBtn) invBtn.style.display = (chatVisible && reached) ? 'inline-flex' : 'none';
         if (typeof window.updateInventoryBadge === 'function') window.updateInventoryBadge();
@@ -20780,14 +20797,20 @@
             localStorage.setItem('order_sandstorm_wire_unlocked', 'true');
             localStorage.setItem('seeker_silvia_sandstorm_active', 'true');
             localStorage.setItem('order_sandstorm_active', 'true');
+            localStorage.setItem('order_desert_path_unlocked', 'true');
+            // Pending Hermes distress on the wire (badge + stream)
+            localStorage.removeItem('order_messenger_last_read_step');
+            localStorage.setItem('order_messenger_unread_count', '1');
           } catch (e) {}
           // Leave the fullscreen storm overlay and open The Cliffside Workshop directly
           deactivateStormLockout();
           const btnHeaderMessenger = document.getElementById('btn-header-messenger');
           if (btnHeaderMessenger) btnHeaderMessenger.style.display = '';
           if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
-          if (typeof activateHubView === 'function') {
-            activateHubView('view-field-wire');
+          if (typeof window.updateMessengerBadge === 'function') window.updateMessengerBadge();
+          // Sandstorm IIFE is outside the Hub controller — must use window.activateHubView
+          if (typeof window.activateHubView === 'function') {
+            window.activateHubView('view-field-wire');
           } else {
             const workshop = document.getElementById('view-field-wire');
             if (workshop) {
@@ -20804,6 +20827,10 @@
           if (typeof window.switchWireTab === 'function') {
             window.switchWireTab('expedition');
           }
+          if (typeof window.switchMapPath === 'function') {
+            window.switchMapPath('desert', false);
+          }
+          if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
         });
       }
 
