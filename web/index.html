@@ -15657,20 +15657,6 @@
               text: "Hermes — We are companions in this desert, not strangers. Call me Silvia, and I will call you Hermes.",
               silviaMsg: "Call you Hermes. We are companions in this desert, not strangers. Call me Silvia, and I will call you Hermes.",
               hermesReply: "Hermes... It has been twenty-four years since anyone spoke that name with warmth. It feels good to put down the heavy mantle of the Order, if only between friends on a copper wire. Hermes it is, Silvia.\n\nNow, about our situation: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to Sheet 7B. What does it say about crossing this windy canyon?"
-            },
-            {
-              id: "choice-1-name-cartographer",
-              nameTitle: "The Cartographer",
-              text: "The Cartographer — You charted these stars and sands; that is the title of honor you earned with your compass.",
-              silviaMsg: "I will call you The Cartographer. You mapped these stars and sands; that is the title of honor you earned with your compass.",
-              hermesReply: "The Cartographer. Direct, professional, and true to the craft. A surveyor's duty is never finished until every stone and meridian is accounted for. I will wear that title proudly on this wire, Navigator Silvia.\n\nNow, to business: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to Sheet 7B. What does it say about crossing this windy canyon?"
-            },
-            {
-              id: "choice-1-name-order",
-              nameTitle: "The Cartographer of Distant Light",
-              text: "The Cartographer of Distant Light — The sacred title of the Order. We must honor the ancient rites.",
-              silviaMsg: "The Cartographer of Distant Light. The sacred title of the Order must not be forgotten in the storm.",
-              hermesReply: "The full title... 'The Cartographer of Distant Light'. Hearing those words across the wire makes the old vows echo in these cliffs once more. The Order may be scattered, but its flame still burns in you. I accept the solemn mantle, Seeker Silvia.\n\nNow, heed this report: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to Sheet 7B. What does it say about crossing this windy canyon?"
             }
           ]
         },
@@ -16431,7 +16417,7 @@
       function updateHeaderContactName(title) {
         const wrap = document.getElementById('messenger-contact-name-wrap');
         const textEl = document.getElementById('messenger-contact-name');
-        const chosen = title !== undefined ? title : localStorage.getItem('order_cartographer_title');
+        const chosen = WIRE_CONTACT_NAME;
         if (!wrap || !textEl) return;
         if (chosen) {
           textEl.textContent = chosen;
@@ -16450,11 +16436,14 @@
         }
       }
 
+      // Canon (Desert Path): Silvia named him Hermes. Fixed forever in the wire chat.
+      const WIRE_CONTACT_NAME = 'Hermes';
       function getCartographerTitle() {
-        return localStorage.getItem('order_cartographer_title') || 'The Cartographer of Distant Light';
+        return WIRE_CONTACT_NAME;
       }
       function setCartographerTitle(title) {
         if (!title) return;
+        title = WIRE_CONTACT_NAME;
         try { localStorage.setItem('order_cartographer_title', title); } catch(e) {}
         document.querySelectorAll('.chat-bubble-wrap.incoming:not(.chat-typing-wrap) .chat-sender-name').forEach(el => {
           el.textContent = title;
