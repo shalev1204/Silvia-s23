@@ -13007,7 +13007,7 @@
               let hist = [];
               try { hist = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]') || []; } catch (e) { hist = []; }
               if (!Array.isArray(hist)) hist = [];
-              hist[0] = hist[0] !== undefined ? hist[0] : 0;
+              hist[0] = 1; // Silvia's real first reply: "I solved your celestial cipher…"
               hist[1] = 0; // Hermes
               localStorage.setItem('order_field_wire_choices', JSON.stringify(hist));
               localStorage.setItem('order_field_wire_step', '2');
@@ -13016,6 +13016,22 @@
               localStorage.setItem('order_messenger_unread_count', '0');
             }
             localStorage.setItem('order_silvia_wire_resume_v1', 'done');
+          }
+        }
+        // Correction: her first reply was the cipher one (index 1). Only while she is still exactly at step 2.
+        if (localStorage.getItem('order_silvia_wire_resume_v2') !== 'done') {
+          const seekerNow2 = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+          if (seekerNow2 === 'silvia') {
+            const step2 = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
+            if (step2 === 2) {
+              let h2 = [];
+              try { h2 = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]') || []; } catch (e) { h2 = []; }
+              if (!Array.isArray(h2)) h2 = [];
+              h2[0] = 1;
+              if (h2[1] === undefined) h2[1] = 0;
+              localStorage.setItem('order_field_wire_choices', JSON.stringify(h2));
+            }
+            localStorage.setItem('order_silvia_wire_resume_v2', 'done');
           }
         }
         // Ask Hermes: wipe leftover "Answered" badges from tester runs (shared localStorage key)
