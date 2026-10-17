@@ -12997,6 +12997,27 @@
           localStorage.setItem('order_silvia_live_v4', 'done');
           localStorage.setItem('order_silvia_live_v3', 'done');
         }
+        // Resume point (17 Oct 2026, 11:38): Silvia named him Hermes and is now on the Sheet 7B reply choices (wire step 2).
+        // One-time, and never rolls progress back: only lifts a lower step up to 2.
+        if (localStorage.getItem('order_silvia_wire_resume_v1') !== 'done') {
+          const seekerNow = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
+          if (seekerNow === 'silvia') {
+            const curStep = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
+            if (curStep < 2) {
+              let hist = [];
+              try { hist = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]') || []; } catch (e) { hist = []; }
+              if (!Array.isArray(hist)) hist = [];
+              hist[0] = hist[0] !== undefined ? hist[0] : 0;
+              hist[1] = 0; // Hermes
+              localStorage.setItem('order_field_wire_choices', JSON.stringify(hist));
+              localStorage.setItem('order_field_wire_step', '2');
+              localStorage.setItem('order_cartographer_title', 'Hermes');
+              localStorage.removeItem('order_messenger_last_read_step');
+              localStorage.setItem('order_messenger_unread_count', '0');
+            }
+            localStorage.setItem('order_silvia_wire_resume_v1', 'done');
+          }
+        }
         // Ask Hermes: wipe leftover "Answered" badges from tester runs (shared localStorage key)
         if (localStorage.getItem('order_silvia_inquiries_reset_v1') !== 'done') {
           localStorage.removeItem('order_field_inquiries_read');
