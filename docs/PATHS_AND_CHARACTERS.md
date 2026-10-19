@@ -8,9 +8,9 @@
 
 | Camino | Personaje | Puzzles | Pista final |
 |--------|-----------|---------|-------------|
-| 🏜️ **Desert** | **The Oracle** *(sin rostro)* | Omens, parábolas, mapas, decisiones binarias | WHERE (Ciudad / Teatro) |
-| 🎭 **Stage** | **The Mirror Speaker** *(elegante)* | Reflejo, simetría, objetos, luz | WHEN (Fecha / Hora de la función) |
-| ✨ **Constellation** | **The Cartographer of Distant Light** | Fragmentos, cielo, mitología, recuperación del Astrolabio | WHAT (2 entradas de ballet) |
+| 🏜️ **Desert** | **The Oracle** *(sin rostro)* | Omens, parábolas, mapas, decisiones binarias | WHEN (Fecha / Hora de la función) · Tower II |
+| 🎭 **Stage** | **The Mirror Speaker** *(elegante)* | Reflejo, simetría, objetos, luz | WHERE (Ciudad / Teatro) · Tower III |
+| ✨ **Constellation** | **The Cartographer of Distant Light** | Fragmentos, cielo, mitología, recuperación del Astrolabio | WHAT (2 entradas de ballet) · Tower I |
 
 ---
 

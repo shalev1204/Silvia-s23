@@ -82,7 +82,7 @@ The Cartographer is listening for your beacon.
 2. **Entra a la web:** En su móvil o navegador ve un cielo oscuro lleno de estrellas parpadeantes y escucha suaves campanillas cósmicas al tocar.
 3. **Minijuego:** Toca/arrastra entre las estrellas de la constelación de **Cygnus** (el Cisne del Norte, guiño sutil a la danza/ballet).
 4. **Al completarla:** La constelación brilla en oro y se abre el pergamino secreto revelando:
-   - Los **2 primeros glifos del alfabeto Eclipse Script**: **`Y`** y **`O`**.
-   - Con estos 2 glifos, si mira el pergamino del Email 1, ¡ya puede empezar a deducir la palabra **`YOU`**!
+   - Los **2 primeros glifos del alfabeto Eclipse Script**: **`D`** (Deneb) y **`C`** (Cygnus).
+   - Son la única D y la única C de la profecía del pergamino del Email 1: ya puede empezar a situarlas en el texto cifrado.
    - Se le avisa que guarde sus notas en hojas sueltas hasta el **11 de septiembre** (cuando llegará el Journal).
-   - Se le indica el siguiente alineamiento: **Viernes, 5 de septiembre a las 22:22h** para el Fragmento 2.
+   - Se le indica el siguiente alineamiento: **Sábado, 5 de septiembre a las 22:22h** para el Fragmento 2.

@@ -205,7 +205,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 - **Origen en papel**: Hoja 5 · Cara B (*The Zodiacal Engine*).
 - **Las 10 palabras cruzadas (Across & Down)**:
   - *Across*: `APOGEE`, `ZENITH`, `SOLSTICE`, `ECLIPTIC`, `HORIZON`.
-  - *Down*: `CELESTIAL`, `QUADRANT`, `POLARIS`, `ALIDADE`, `MERIDIAN`.
+  - *Down*: `CELESTIAL`, `SEXTANT`, `POLARIS`, `ALIDADE`, `MERIDIAN`.
 - **Master Key ensamblada (círculos 1 a 7)**: `E C L I P S E`.
 
 ### Mecánica del Puzzle Web & Revelación de Lore
@@ -246,7 +246,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
      - **Pista canónica**: En la profecía romántica del primer email (`01-opening-dispatch-IMAGE.md`), el glifo `K` aparece exactamente **2 veces**:
        - *«...WHEN YOU READ THIS YOU WILL **[K]**NOW HOW MUCH I LOVE YOU...»*
        - *«...YOU WERE NEVER ONLY THE SEE**[K]**ER YOU WERE ALWAYS THE TREASURE...»*
-     - Silvia anota el glifo `K` en la Página 3 de su diario físico y actualiza *The Cipher Ledger*, conectando además con el Vector I ($[K] + [G] = 48^\circ$).
+     - Silvia anota el glifo `K` en la Hoja 2A de su diario físico y actualiza *The Cipher Ledger*, conectando además con el Vector I ($[K] + [G] = 48^\circ$).
    - **Las Órdenes Interceptadas de los Asaltantes**:
      - Confirman que el Astrolabio triangula el acceso a **La Cuarta Cámara Prohibida** al alinearse con las Tres Torres (Observatorio en cumbres, Torre II en el desierto profundo, Torre III en el escenario).
      - Revelan que los asaltantes fuerzan la marcha hacia las dunas profundas.
@@ -383,7 +383,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 - **Ruptura de la Portadora de Radio (142.85 MHz)**:
   - La señal se satura en el osciloscopio: `SIGNAL CRITICAL · CARRIER OVERLOAD`.
   - Transmisión final de Hermes emocionado por haber recuperado su nombre y advirtiéndole del muro de arena:
-    *«¡Silvia! Esas palabras... pronunciaste el voto que grabé en el bronce hace diez años en la terraza del observatorio. Me has devuelto mi nombre. ¡Mira hacia la cresta! La tormenta ha estallado sin previo aviso... El cielo se ha vuelto rojo y las arenas están borrando todo... ¡hemos perdido el rastro de los asaltantes! Todas las cartas anteriores son papel muerto... La senda de las constelaciones ha terminado. Escucha con atención: abre la siguiente hoja de mi cuaderno... encuentra al Oráculo del Desierto. ¡Entra en las dunas... sigue la luz distante!»*
+    *«¡Silvia! Esas palabras... pronunciaste el voto que grabé en el bronce hace cincuenta y seis años en la terraza del observatorio. Me has devuelto mi nombre. ¡Mira hacia la cresta! La tormenta ha estallado sin previo aviso... El cielo se ha vuelto rojo y las arenas están borrando todo... ¡hemos perdido el rastro de los asaltantes! Todas las cartas anteriores son papel muerto... La senda de las constelaciones ha terminado. Escucha con atención: abre la siguiente hoja de mi cuaderno... encuentra al Oráculo del Desierto. ¡Entra en las dunas... sigue la luz distante!»*
   - La portadora cae: `CARRIER LOST // SIGNAL DROPPED`.
 - **Consecuencia de Gameplay**:
   - La Estación 09 queda marcada como `DECRYPTED ✓`.
@@ -395,7 +395,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
 ## 11. EL UMBRAL DE LA FRONTERA & EL GRAN SILENCIO (Hojas 7B y 8A)
 
 ### 1. Hoja 7 · Cara B (`page07_back` · Cuaderno de Campo: The Desert Frontier)
-- **Marco Temporal y Autor**: *Autumn, 1998 — Twenty-eight years before the Call*. Escrito por Hermes a los 24 años al abandonar la biblioteca del Santuario.
+- **Marco Temporal y Autor**: *Autumn, 1998 — Twenty-eight years before the Call*. Escrito por Hermes en 1998, ya cincuentón (era un joven astrónomo en 1970). *Nota de canon*: «I was twenty-four when I left the Sanctuary library behind» recuerda su juventud (antes de 1970), no su edad en 1998; en la Hoja 14A, «a young traveler» es el punto de vista del antiguo Sirviente.
 - **Datos Matemáticos, Geodésicos y Topográficos Canónicos (100% de uso en puzzles)**:
   * **Los Tres Mojones (`The Three Cairns`)**: Construidos en el lecho del cauce seco (*dry wash bed*), apuntando en dirección **sur-sureste (SSE)** hacia el acceso a las mesas de arenisca.
   * **El Tercer Mojón (`Cairn III`) & La Placa de Cobre**: Bajo las piedras de cimentación de Cairn III, oculta bajo una losa plana de arenisca roja (*flat red sandstone slab*), Hermes enterró la **Placa de Referencia de Cobre (`The Copper Benchmark Plate`)**.
@@ -455,7 +455,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
   * Contrastar alturas angulares y declinaciones cuando el Cartógrafo le reporte avistamientos celestes entre claros de nubes en el desierto.
   * Recordar que el artefacto maestro auténtico está en manos del convoy enemigo y debe ser rescatado.
 
-### 3. El Primer Paso Jugable del Desert Path: La Baliza de los Tres Mojones (Station 10 - Prólogo)
+### 3. El Primer Paso Jugable del Desert Path: La Baliza de los Tres Mojones (Prólogo, antes de la Estación 10)
 - **Secuencia de Entrada**:
   1. Silvia abre el Hub tras la Estación 09. La radio emite estática apagada, pero en la barra superior parpadea un indicador ámbar: `FIELD WIRE DETECTED // PULSE SYNC REQUIRED`.
   2. Al pulsar, se activa el teletipo de campaña. Hermes envía sus primeros mensajes tras la tormenta: está a salvo en la base del cañón pero desorientado, rodeado de polvo y sin referencias.
@@ -464,7 +464,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
   5. Silvia selecciona las claves del diario: orientarlo hacia los **Tres Mojones**, seguir el **Cauce Seco** y fijar la mira a **112° hacia el Este** bajo la losa de **Cairn III**.
   6. Esta primera triangulación permite al Cartógrafo encontrar el primer refugio de piedra, despejar la arena de su equipo de campaña y desbloquear la visualización del primer cuadrante del **Gran Mapa del Desierto**.
 
-### 4. Comprehensive Desert Odyssey Bible (Stations 11 to 17)
+### 4. Comprehensive Desert Odyssey Bible (Stations 10 to 19)
 - For the complete canonical guide to all puzzles, mechanics, lore, deduction matrices, and triangulation of the Three Ancient Towers, consult the master document:
   👉 **[`docs/DESERT_ODYSSEY_BIBLE.md`](DESERT_ODYSSEY_BIBLE.md)**.
 

@@ -42,10 +42,9 @@ Esta guía establece las directrices narrativas, la construcción de personajes,
 - **Frase modelo**:
   > *"Every mirror tells two stories: the face that peers into the glass, and the depth waiting behind the silver. Do not trust what is illuminated; look for where the shadow turns."*
 
-### 2.4. Hermes (El Halcón Mensajero)
-- **Arquetipo**: El mensajero silencioso, vínculo vital entre las cumbres alpinas y el desierto.
-- **Tratamiento**:
-  - Hermes no habla. Es un animal herido en el asalto a la Torre I, leal y resistente, que transporta cilindros de cuero y plumas codificadas. Su presencia aporta fragilidad y urgencia a la narrativa.
+### 2.4. Hermes y la paloma mensajera
+- **Hermes** es el nombre humano del Cartógrafo (§2.1), restituido por Silvia en la Estación 09. No es un ave ni un animal.
+- **El ave mensajera** del canon es la última **paloma mensajera** de la Orden (*carrier pigeon*), que llevó a Silvia los protocolos de recuperación, el diario físico y la pluma violeta con punta dorada. No habla; solo aporta urgencia y fragilidad a la narrativa.
 
 ---
 
@@ -55,7 +54,7 @@ La narrativa de la búsqueda sigue una arquitectura de revelación en tres actos
 
 | Acto | Revelación Clave | Ubicación Canónica | Estado y Significado |
 | :---: | :---: | :---: | :--- |
-| **I** | **EL "WHEN"** (Cuándo) | **Hoja 18 (Cara A/B)** | **Ya entregado**. Reveló la fecha astronómica del encuentro: el solsticio y la conjunción del Gran Eclipse. |
+| **I** | **EL "WHEN"** (Cuándo) | **Hoja 18 · Cara A (Estación 19 · Tower II)** | **Pendiente**. Se revelará al resolver *The Oracle's Horizon* (Hoja 18A, Estación 19): la fecha y hora de la función. |
 | **II** | **EL "WHERE"** (Dónde) | **The Stage Path (Torre III)** | **En curso**. Desvelará las coordenadas geográficas exactas de convergencia y la ubicación del tercer santuario. |
 | **III** | **EL "WHAT"** (Qué) | **Constellation Path Final** | **Clímax Absoluto**. La Bóveda del Gran Eclipse desvelará el regalo físico real: **las 2 entradas de ballet** para Silvia y Carles. |
 

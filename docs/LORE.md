@@ -34,10 +34,10 @@ Ningún camino es completo sin los otros. La Orden envía a la iniciada por **un
 El Oráculo **no confía en las palabras**. The Mirror Speaker **solo confía en lo que se refleja**. Se escribieron una carta hace siglos; nunca se envió. Cada uno insiste en que el otro tiene la mitad de la verdad. En el juego: una pista del desierto puede **solo tener sentido** reflejada en un puzzle del Stage.
 
 ### The Mirror Speaker ↔ The Cartographer
-La Cartographer mide luz que partió **antes** de que existiera el espejo. The Mirror Speaker dice: *"You show her ancient light; I show her what stands beside her now."* Rivalidad suave: distancia vs presencia.
+El Cartographer mide luz que partió **antes** de que existiera el espejo. The Mirror Speaker dice: *"You show her ancient light; I show her what stands beside her now."* Rivalidad suave: distancia vs presencia.
 
 ### The Cartographer ↔ The Oracle
-El Oráculo lee **omens en la arena**. La Cartographer lee **omens en el cielo**. Comparten un lenguaje antiguo — el **Eclipse Script** — que la Orden usa para escribir lo demasiado precioso para el alfabeto común. Silvia descifrará ese lenguaje letra a letra.
+El Oráculo lee **omens en la arena**. El Cartographer (Hermes) lee **omens en el cielo**. Comparten un lenguaje antiguo — el **Eclipse Script** — que la Orden usa para escribir lo demasiado precioso para el alfabeto común. Silvia descifrará ese lenguaje letra a letra.
 
 ### Los tres y la Iniciada
 Ninguno sabe **todo** el regalo final. Cada uno guarda **un fragmento de la última verdad**. Solo cuando los tres caminos entreguen su pista final podrá ensamblarse.
@@ -105,7 +105,7 @@ YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.
 ## Giro Narrativo Mayor: El Asalto al Observatorio y el Astrolabio Robado (5 Sep 2026)
 
 1. **El detonante:** Silvia resolvió con éxito el trazado de las 22 estrellas y despertó **The Celestial Flower** en el *Archive of Distant Light*.
-2. **La consecuencia:** El intenso resplandor de la flor reveló las coordenadas secretas del observatorio del Cartógrafo a fuerzas hostiles (los Cazadores del Umbral).
+2. **La consecuencia:** El intenso resplandor de la flor reveló las coordenadas secretas del observatorio del Cartógrafo a fuerzas hostiles (The BC Ashes).
 3. **El asalto y el robo:** Los asaltantes irrumpieron en la cámara central. El Cartógrafo sobrevivió refugiándose entre los relés, pero robaron el objeto más sagrado del Constellation Path: **The Astrolabe of Distant Light** (el Astrolabio de la Luz Distante).
 4. **La importancia del Astrolabio:** Es el artefacto astronómico imprescindible para fijar las coordenadas de la verdad final del eclipse (las entradas de ballet). Los asaltantes persiguen el mismo objetivo, pero carecen de la clave de descifrado del Eclipse Script.
 5. **La alianza Cartógrafo + Silvia:** El Cartógrafo emite una transmisión urgente en 22.22 MHz felicitando a Silvia por despertar la flor y advirtiéndole del peligro: ahora son un equipo. Deben recuperar el Astrolabio antes de que los enemigos lo descifren.

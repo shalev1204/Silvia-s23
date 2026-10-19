@@ -20,7 +20,7 @@ El diario manuscrito físico comprende un total de **18 hojas dobles (36 caras)*
 |  - Hojas 04 a 07: Códice del Astrolabio & Juegos Celestes C1-C4 (Planisferio, Zodíaco, etc.)    |
 +--------------------------------------------------------------------------------------------------+
 |  ACTO II: EL CAMINO DEL DESIERTO (HOJAS 08 A 18 · 22 CARAS)                                      |
-|  - Hoja 08: Lore del Umbral (08A) & Gran Mapa Cuadrante NO (08B · Spread 1 Izq)                   |
+|  - Hoja 08: Lore: The Desert (08A) & Gran Mapa Cuadrante NO (08B · Spread 1 Izq)                  |
 |  - Hoja 09: Gran Mapa Cuadrante NE (09A · Spread 1 Der) & Juego D1: The Whispering Chasm (09B)   |
 |  - Hoja 10: Juego D2: The Salt Playa (10A) & Lore/Estudio: The Salt Playa Basin (10B)            |
 |  - Hoja 11: Juego D3: The Desert Lexicon (11A · Raiders BC Ashes) & Gran Mapa Cuadrante SO (11B) |
@@ -61,7 +61,7 @@ Existen exactamente **5 mojones (Cairns)** rotulados en la cartografía original
 
 1. **Cairn I (The Wash River Marker · Misión Previa del Presentimiento)**:
    - **Ubicación en el mapa**: Hoja 08B (Cuadrante NO), coordenadas $(980, 2190)$ en el lecho de *Wadi al-Hajar*.
-   - **Misión Previa de Hermes y Silvia**: Antes de descender al Whispering Chasm, Hermes le dice a Silvia por la radio: *«Voy a seguir el río, tengo un presentimiento...»*. Siguiendo el cauce pedregoso del uadi, encuentran por accidente Cairn I semioculto en los sedimentos. Juegan y resuelven juntos un enigma preliminar para desbloquear y extraer el primer talismán/sello de piedra: **El Sello de Cairn I**. Con este artefacto en las alforjas, sin saber aún para qué servirá, se dirigen de inmediato a *The Whispering Chasm* como antesala a la primera misión oficial.
+   - **Misión Previa de Hermes y Silvia (web · Field Wire del amanecer; no está en la Hoja 08A impresa)**: Antes de descender al Whispering Chasm, Hermes le dice a Silvia por la radio: *«Voy a seguir el río, tengo un presentimiento...»*. Siguiendo el cauce pedregoso del uadi, encuentran por accidente Cairn I semioculto en los sedimentos. Juegan y resuelven juntos un enigma preliminar para desbloquear y extraer el primer talismán/sello de piedra: **El Sello de Cairn I**. Con este artefacto en las alforjas, sin saber aún para qué servirá, se dirigen de inmediato a *The Whispering Chasm* como antesala a la primera misión oficial.
 2. **Cairn II (The Nomad Marker)**:
    - **Ubicación en el mapa**: Hoja 09A (Cuadrante NE), coordenadas $(2070, 2150)$.
    - **Desafío asociado**: Juego D5 (*The Sun Monolith Alignment*).
@@ -83,8 +83,9 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 
 - **Los 5 son mojones antiguos de la Orden del Eclipse**, erigidos por los maestros cartógrafos a lo largo del único paso firme del desierto (Ley 2 de la Hoja 8A: el cauce seco).
 - **Otoño de 1971**: el mismo terremoto y la misma tormenta roja que se llevaron a Aurelia derribaron los tres primeros mojones del cauce (**I, II y III**). Los dos del sur (**IV y V**) resistieron en pie.
-- **Otoño de 1998 (invariante, Hoja 7B)**: Hermes, con 24 años, levantó «tres montones de piedra seca» a lo largo del cauce, rumbo SSE, «para el buscador que algún día siga mis pasos», y enterró bajo el tercero la *primera* placa de referencia de cobre (rumbo 112° E hacia Outer Watchtower VI). Sin saberlo, alzó con las piedras caídas **sobre los cimientos originales** de los Cairns I, II y III. Nunca vio IV ni V: quedan al sur de su línea base (5.420 pasos).
-- **Lo que descubre Silvia (Hoja 14A, «The Servant's Words»)**: el Sirviente se lo cuenta a Hermes. Por eso el «presentimiento» del río era su mano reconociendo sus propias piedras (Cairn I) y por eso los sellos de II y III se activan con juegos: debajo de sus montones están los mecanismos de la Orden. La placa de 112° E es la capa moderna de Hermes; el rumbo 348° NNW grabado en la propia piedra de Cairn III es la capa antigua.
+- **Otoño de 1998 (invariante, Hoja 7B)**: Hermes, ya cincuentón (era un joven astrónomo en 1970), levantó «tres montones de piedra seca» a lo largo del cauce, rumbo SSE, «para el buscador que algún día siga mis pasos», y enterró bajo el tercero la *primera* placa de referencia de cobre (rumbo 112° E hacia Outer Watchtower VI). Sin saberlo, alzó con las piedras caídas **sobre los cimientos originales** de los Cairns I, II y III. Nunca vio IV ni V: quedan al sur de su línea base (5.420 pasos).
+  - *Nota de canon (edad)*: en la Hoja 7B impresa, «I was twenty-four when I left the Sanctuary library behind» recuerda su juventud (antes de 1970), no su edad en 1998. En la Hoja 14A impresa, «a young traveler» es el punto de vista del antiguo Sirviente.
+- **Lo que descubre Silvia (Hoja 14A, «The Words of the Servant»)**: el Sirviente se lo cuenta a Hermes. Por eso el «presentimiento» del río era su mano reconociendo sus propias piedras (Cairn I) y por eso los sellos de II y III se activan con juegos: debajo de sus montones están los mecanismos de la Orden. La placa de 112° E es la capa moderna de Hermes; el rumbo 348° NNW grabado en la propia piedra de Cairn III es la capa antigua.
 - **Cuenta final**: Hermes ya porta el Sello de Cairn I; le faltan cuatro (II, III, IV y V). Con el de Cairn I suman cinco.
 - **Descripciones físicas** (Hoja 14A): I cono de cantos rodados; II pedestal escalonado con tablillas; III cairn piramidal con placa de **cobre** (nunca «bronce»); IV pilares gemelos; V pedestal monolítico.
 
@@ -93,8 +94,9 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 ---
 
 ### HOJA 08 · EL UMBRAL DEL DESIERTO Y CUADRANTE NOROESTE
-- **Cara A (Anverso · Lore)**: *The Desert Frontier, The River Hunch & The Great Silence*.
-  - **Narrativa**: Hermes narra la huida desde la Atalaya VI (*Outer Watchtower VI*, cota 1.240 varas). Antes de entrar al cañón, sigue el cauce del río seco por una corazonada (*«Voy a seguir el río, tengo un presentimiento...»*). Junto a Silvia descifran el enigma oculto en **Cairn I**, obteniendo su misterioso sello de arenisca antes de poner rumbo a la entrada de *The Whispering Chasm*.
+- **Cara A (Anverso · Lore)**: *The Desert · Of Sun, Silence, and Buried Stone* (título impreso).
+  - **Contenido impreso**: I. *The Mirror of the Earth* (el desierto como archivo puro de la Orden) · II. *The Voice of Shadows* (la Oráculo, «She wears no face») · III. *The Three Laws of the Waste* (sombra del meridiano, cauce seco, placa de referencia) y sello del Desert Path.
+  - **(web)**: La corazonada del río seco (*«Voy a seguir el río, tengo un presentimiento...»*) y el enigma de **Cairn I**, con su sello, ocurren en el Field Wire del amanecer, no en esta hoja.
 - **Cara B (Reverso · Mapa)**: **Gran Mapa del Desierto · Cuadrante NO** (*Spread 1 Izquierda*).
   - Accidentes: *The Desert Frontier*, *The Red Ridge*, *Outer Watchtower VI*, *Dry Canyon Wash (Wadi al-Hajar)*, *The Great Mesa (Mesa del Sol)*, *Cairn I*.
 
@@ -106,7 +108,7 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 - **Cara B (Reverso · Juego D1)**: **Juego 1: The Whispering Chasm**.
   - **Ubicación**: Con el Sello de Cairn I a buen recaudo en la faltriquera, Hermes desciende a la sombría garganta acústica.
   - **Mecánica**: Laberinto topográfico de $25 \times 25$ celdas con 6 mojones de reliquias en estricto orden.
-  - **Solución Canónica**: Santo y seña nómada **`M I R A G E`** (Mirage). Deducción: $[R] = 3$.
+  - **Solución Canónica**: Santo y seña nómada **`M I R A G E`** (Mirage). Pista web: el 3.er mojón es la R (R = 3); la hoja impresa no trae ecuación.
 
 ---
 
@@ -124,7 +126,7 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 - **Cara A (Anverso · Juego D3)**: **Juego 3: The Desert Lexicon & Al-Qibla (Los Asaltantes BC Ashes)**.
   - **Narrativa**: Hermes cae en una emboscada de forajidos en las ruinas nómadas. Al descifrar las inscripciones en los sillares de piedra, logra despistar a los perseguidores y descubre en los estandartes y marcas de fuego el nombre de la banda que saqueó el Observatorio: **Los BC Ashes**.
   - **Mecánica**: Crucigrama nómada de 10 palabras y brújula solar *Al-Qibla*.
-  - **Solución Canónica**: Sigil solar **`P H O E N I X`**, rumbo **$194^\circ\text{ SSW}$**. Deducción cripto-aritmética: $[R] \times 2 = [F] \implies F = 6, T = 16$.
+  - **Solución Canónica**: Sigil solar **`P H O E N I X`**, rumbo **$194^\circ\text{ SSW}$**. Deducción cripto-aritmética: $[R] \times 2 = [F] \implies F = 6$ (confirma F de St06+St09); la ecuación solo está en la web.
 - **Cara B (Reverso · Mapa)**: **Gran Mapa del Desierto · Cuadrante SO** (*Spread 2 Izquierda*).
   - Accidentes: *The Whispering Chasm*, *The Lower Wash*, *The Terraces of the Jackal*, *The Sentinel Mesa (Elev. 980 varas)*, *Cairn IV (Sentry of the Canyon)*.
 
@@ -136,7 +138,9 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 - **Cara B (Reverso · Juego D4)**: **Juego 4: The Oasis Clepsydra (El Espejismo de la Supervivencia)**.
   - **Narrativa**: Abrasado por el calor implacable y al borde del delirio por la sed, Hermes sufre una vívida alucinación de cuatro pozos monumentales y clepsidras que gotean agua cristalina. Resolver este intrincado sistema lógico en su cuaderno es lo que le mantiene cuerdo y concentrado; gracias a esa lucidez deductiva, identifica una verdadera grieta en la roca donde halla agua y provisiones de emergencia abandonadas.
   - **Mecánica**: Matriz lógica $4 \times 4 \times 4$ (4 buscadores, 4 pozos, 4 horas, 4 reliquias).
-  - **Solución Canónica**: Constante hidráulica **`X X X`** ($30\text{ horas}$). Ecuación: $[P] - [A] = 14$.
+  - **Solución Canónica**: Constante hidráulica **`X X X`** ($30\text{ horas}$): es la respuesta real, no un marcador provisional. Ecuación: $[P] - [A] = 14$.
+  - **Cuadrícula solución (solo para el Operador)**: Cartographer – Astrolabe – Scarab – VI · Alchemist – Sandglass – Jackal – III · Nomad – Dagger – Falcon – IX · Astronomer – Gold Scarab – Serpent – XII (VI + III + IX + XII = XXX).
+  - **Canon (subtítulo impreso «Feverish Mirage of the Siphons — Maintaining Lucidity» y web)**: los cuatro pozos son un espejismo febril; resolver la lógica mantiene lúcido a Hermes. Los pozos se desvanecen y encuentra un manantial real en una grieta de la roca bajo un halcón tallado, con un viejo alijo de provisiones; junto al halcón está rayada la relación $[P] - [A] = 14$.
 
 ---
 
@@ -147,18 +151,18 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Ubicación**: Hermes viaja al norte, hasta *The Sun Monolith* en las cercanías de Cairn II.
   - **Mecánica (rediseñada; la hoja ya no imprime la solución)**: «Noon Shadow Puzzle». A primera luz el bastón de Hermes (2 pasos) da una sombra de 4 pasos y el Monolito (24 pasos) una de 48: la sombra del Monolito es siempre 12 veces la del bastón. La hoja da siete sombras de bastón al mediodía (1.5, 0.5, 2.5, 1, 3, 2, 3.5 pasos). Silvia calcula la sombra del Monolito de cada una y busca esa longitud en el dial semicircular de Cairn II (siete anillos de 6 a 42 pasos, una losa con letra por anillo en la línea norte). Las siete letras, en orden de mediodía, forman la clave. Sin valores numéricos de letras (Regla 9) y solo alfabeto A–Z (Regla 10).
   - **Solución (solo para el Operador)**: SUNDIAL. Cálculo: sombra del Monolito = 12 × sombra del bastón → 18, 6, 30, 12, 36, 24, 42 pasos → S, U, N, D, I, A, L.
-  - **Recompensa**: Obtención del primer sello de peregrinación: **Sello de Cairn II**.
+  - **Recompensa**: Obtención del segundo sello de peregrinación: **Sello de Cairn II**.
 
 ---
 
 ### HOJA 14 · LORE DE LOS CAIRNS Y JUEGO 6 (SANDSTONE LABYRINTH)
 - **Cara A (Anverso · Lore)**: **Los Cinco Mojones de la Peregrinación Solar**.
-  - **Narrativa y bocetos**: Estudio manuscrito de los 5 mojones sagrados de la Orden (I a V) y la nota del Sirviente sobre el terremoto de 1971 («The Servant's Words»), sus coordenadas angulares, marcas heráldicas talladas en cobre y piedra, y su relación con las líneas de horizonte.
+  - **Narrativa y bocetos**: Estudio manuscrito de los 5 mojones sagrados de la Orden (I a V) y la nota del Sirviente sobre el terremoto de 1971 («The Words of the Servant»), sus coordenadas angulares, marcas heráldicas talladas en cobre y piedra, y su relación con las líneas de horizonte.
 - **Cara B (Reverso · Juego D6)**: **Juego 6: The Sandstone Labyrinth & Cairn III**.
   - **Ubicación**: *The Sandstone Labyrinth* en dirección a Cairn III.
-  - **Mecánica (rediseñada, sin imprimir la solución)**: laberinto de 17 × 11 celdas visto desde arriba (pilares y fisuras de arenisca) con una única ruta desde la «boca» (abajo) hasta Cairn III (arriba). Sobre la ruta hay **8 arcos** con una letra cada uno y, fuera de ella, 11 arcos falsos. Silvia traza el camino único y lee los arcos de la ruta en el orden en que los cruza. La tablilla de la entrada («The Tablet at the Mouth») da la regla; la placa de **cobre** de Cairn III guarda el sello. Sin valores numéricos de letras (Regla 9) y solo alfabeto A–Z (Regla 10).
+  - **Mecánica (rediseñada, sin imprimir la solución)**: laberinto de 17 × 12 celdas (17 columnas × 12 filas) visto desde arriba (pilares y fisuras de arenisca) con una única ruta desde la «boca» (abajo) hasta Cairn III (arriba). Sobre la ruta hay **8 arcos** con una letra cada uno y, fuera de ella, 12 arcos falsos. Silvia traza el camino único y lee los arcos de la ruta en el orden en que los cruza. La tablilla de la entrada («The Tablet at the Mouth») da la regla; la placa de **cobre** de Cairn III guarda el sello. Sin valores numéricos de letras (Regla 9) y solo alfabeto A–Z (Regla 10).
   - **Solución (solo para el Operador)**: WINDROSE (laberinto generado de forma determinista en `_build_labyrinth`, semilla fija; la ruta es única por construcción).
-  - **Recompensa**: Obtención del segundo sello de peregrinación: **Sello de Cairn III**.
+  - **Recompensa**: Obtención del tercer sello de peregrinación: **Sello de Cairn III**.
 
 ---
 
@@ -167,7 +171,7 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Ubicación**: La boca meridional del desfiladero, donde se erige Cairn IV custodiando el paso hacia la Mesa Centinela.
   - **Mecánica (rediseñada, sin imprimir la solución)**: «The Singing Pillars». Lámina en perspectiva de la boca del cañón (pilares gemelos de Cairn IV, acantilados con grietas, Sentinel Mesa al fondo) y plano cenital con anillos de 25 a 60 pasos alrededor de cada pilar. Cada pilar canta hacia su propio muro; en un compás el sonido recorre 10 pasos (5 de ida y 5 de vuelta), así que un eco de n compases viene de una grieta a 5 × n pasos. El libro de Hermes lista 7 ecos (pilar y compases); cada anillo cruza una grieta con una letra tallada (16 grietas, 8 por muro, 9 son falsas). Las siete letras, en orden, forman la clave. Sin valores numéricos de letras (Regla 9), solo A–Z (Regla 10).
   - **Solución (solo para el Operador)**: RESOUND. Ecos: Derecho 8 → 40 pasos (R); Izquierdo 11 → 55 (E); Izquierdo 6 → 30 (S); Derecho 12 → 60 (O); Izquierdo 9 → 45 (U); Derecho 5 → 25 (N); Derecho 10 → 50 (D). Datos en `ECHO_LEFT`, `ECHO_RIGHT` y `ECHO_LEDGER` de `build_desert_odyssey_expanded.py`.
-  - **Recompensa**: Obtención del tercer sello de peregrinación: **Sello de Cairn IV**.
+  - **Recompensa**: Obtención del cuarto sello de peregrinación: **Sello de Cairn IV**.
 - **Cara B (Reverso · Zoom Mapa)**: **Zoom Topográfico: El Puente Natural y la Garganta (Panel Izquierdo · Spread 3)**.
   - **Contenido Cartográfico**: Vista en primer plano a escala grande del puente de roca natural que conecta la meseta con la mole de *The Sentinel Mesa (Elev. 980 varas)*. Detalle de estratos de arenisca, fisuras de falla y cotas de nivel. Conexión continua con la Hoja 16A.
 
@@ -180,7 +184,7 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Ubicación**: En las inmediaciones del santuario, donde se alza el gran Arco del Solsticio y el Altar Solar frente a Cairn V.
   - **Mecánica (rediseñada, sin imprimir la solución)**: «The Courtyard of Rays». Lámina del Arco del Solsticio con el rayo cruzando bajo su clave hasta el anillo de latón del Altar Solar, Cairn V al fondo y un esquema con el rumbo 163° SSE de Cairn V al altar. El patio es una cuadrícula de 12 × 11 losas con espejos de bronce (giran el rayo un cuarto de vuelta), columnas caídas (lo detienen) y «piedras solares» con una letra. El rayo entra por el arco (arriba) y recorre el patio; Silvia lo sigue y lee, en orden, las ocho piedras solares que cruza hasta el altar. Los espejos, columnas y letras fuera de su recorrido son señuelos. Sin valores numéricos de letras (Regla 9), solo A–Z (Regla 10).
   - **Solución (solo para el Operador)**: DAYBREAK (patio generado de forma determinista en `_build_ray_courtyard` y verificado con `_simulate_ray`).
-  - **Recompensa**: Obtención del cuarto sello de peregrinación: **Sello de Cairn V**. ¡Los 4 sellos que faltaban (II a V) están completos y, con el de Cairn I, suman los 5!
+  - **Recompensa**: Obtención del quinto y último sello de peregrinación: **Sello de Cairn V**. ¡Los 4 sellos que faltaban (II a V) están completos y, con el de Cairn I, suman los 5!
 
 ---
 
@@ -190,15 +194,17 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Mecánica**: Cuadrícula de Polibio $5 \times 5$ modulada con la palabra clave `PHOENIX` y seis estrofas de coordenadas numéricas.
   - **Solución Canónica**: Aforismo: **`"STARS GUIDE THOSE WHO SEEK TRUTH"`**, rumbo **`348° NNW`**.
 - **Cara B (Reverso · Lore)**: **Audiencia con El Oráculo del Desierto**.
-  - **Narrativa**: Las pesadas puertas de bronce y arenisca se abren solemnemente. Hermes es conducido ante **El Oráculo del Desierto (The Oracle)**. Silvia emprende su camino sin conocer ni el **WHAT**, ni el **WHERE**, ni el **HOW**. El Oráculo reconoce a Silvia como la buscadora predestinada y le entrega su **primera gran revelación: el WHEN** (la fecha, hora y estación exacta de la velada de ballet). La pista del **WHERE** (ciudad y teatro) se reservará para el Stage Path (Torre III), y la revelación del **WHAT** (el regalo supremo de las dos entradas físicas) quedará para el retorno final al Constellation Path y la Bóveda del Gran Eclipse. Asimismo, revela la posición de la segunda estrella maestra: **Vega** (anclada con **Deneb**).
+  - **Título impreso**: *The Desert Oracle*.
+  - **Narrativa (impresa)**: Hermes confiesa su arrogancia (creía que el Astrolabio recuperado bastaba). Siguiendo un cauce salino seco halla el refugio de la Oráculo bajo un gran saliente de arenisca y la observa durante horas desde una cresta: no mira las estrellas, sino arena y piedras de río. La juzga inquietante pero indispensable (guarda las coordenadas terrestres que necesita el Astrolabio). No puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen. The Desert Path is yours.» La hoja **no** revela el WHEN ni menciona Vega; el pronombre «he» es una errata de impresión (la Oráculo es femenina, Hoja 8A).
 
 ---
 
 ### HOJA 18 · JUEGO 10 (CLÍMAX DEL ORÁCULO) Y TRANSICIÓN AL STAGE PATH
 - **Cara A (Anverso · Juego D10)**: **Juego 10: The Oracle's Horizon & The Triangulation Climax**.
+  - **Lore impreso (I. The Oracle's Parchment)**: Silvia, ante la Oráculo en la Torre II, sin conocer ni el **WHAT**, ni el **WHERE**, ni el **HOW**, recibe la **primera gran revelación: el WHEN** («the hour and season ordained under the stars»). El **WHERE** la espera en el Stage Path y el **WHAT** solo se desvelará en su regreso final a las cumbres.
   - **Mecánica**: Enigma final de convergencia. El Oráculo presenta un diagrama interactivo con los tres espejos del horizonte que alinean la Torre II (Santuario de Arenisca) proyectando un vector de rumbo hacia el oriente (el Stage Path).
   - **Mecánica (diseño impreso, sin imprimir la solución)**: «The Three Mirrors of the Horizon». Lámina con el estudio arquitectónico renacentista detallado de **The Sandstone Sanctuary (Tower II)** por dentro (bóveda artesonada, óculo cenital, haz de luz, altar de piedra con astrolabio) y por fuera (escalinata monumental, pilares de arenisca, planos con cotas), eliminando las tres torres para dar foco absoluto al santuario. Carta de 16 columnas × 9 filas (A–I) con letras. Ocho balizas numeradas (en las columnas 1–3) se reflejan en el Espejo I (vertical, columna 4), el Espejo II (plano escalonado del santuario: Altar en Fila D y Terraza en Fila F) y el Espejo III (vertical, columna 10): cada espejo manda la baliza al otro lado, a la misma distancia. Las ocho letras donde aterrizan, en orden 1–8, forman el Sigil del Oráculo (`OVERTURE`) que sella la revelación del **WHEN**. Sin valores numéricos de letras (Regla 9), solo alfabeto normal A–Z (Regla 10).
-  - **Solución (solo para el Operador)**: OVERTURE. Balizas: (col,fila) 1(2,1)→(14,9) O · 2(1,3)→(13,7) V · 3(3,3)→(15,7) E · 4(2,4)→(14,6) R · 5(1,6)→(13,4) T · 6(3,6)→(15,4) U · 7(2,7)→(14,3) R · 8(3,8)→(15,2) E. Datos en `HORIZON_BEACONS`, `HORIZON_MIRRORS` y `_horizon_letter_grid()` de `build_desert_odyssey_expanded.py`.
+  - **Solución (solo para el Operador)**: OVERTURE. Balizas: (col,fila) 1(2,1)→(14,7) O · 2(1,3)→(13,9) V · 3(3,3)→(15,9) E · 4(2,4)→(14,4) R · 5(1,6)→(13,6) T · 6(3,6)→(15,6) U · 7(2,7)→(14,1) R · 8(3,8)→(15,4) E. Datos en `HORIZON_BEACONS`, `_horizon_final()` y `_horizon_letter_grid()` de `build_desert_odyssey_expanded.py`.
   - **Lore Web**: En la plataforma web se despliega el clímax sonoro y telemétrico que desbloquea la transición al siguiente acto.
 - **Cara B (Reverso · Arte de Transición)**: **Dibujo de Transición: Del Desierto al Escenario**.
   - **Inspiración Artística**: Basado fielmente en la composición de boceto del cuaderno de arte:
@@ -216,7 +222,7 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 
 | Hoja | Cara A (Anverso · Margen Izq Libre) | Cara B (Reverso · Margen Der Libre) | Tipo de Contenido |
 | :---: | :--- | :--- | :--- |
-| **08** | Lore: The Desert Frontier (08A) | **Gran Mapa: Cuadrante NO (08B)** | Lore + Spread 1 Izq |
+| **08** | Lore: The Desert (08A) | **Gran Mapa: Cuadrante NO (08B)** | Lore + Spread 1 Izq |
 | **09** | **Gran Mapa: Cuadrante NE (09A)** | **Juego D1: The Whispering Chasm (09B)** | Spread 1 Der + Laberinto |
 | **10** | **Juego D2: The Salt Playa (10A)** | Lore/Estudio: The Salt Playa Basin (10B) | Enigma Salar + Da Vinci |
 | **11** | **Juego D3: Desert Lexicon - BC Ashes (11A)**| **Gran Mapa: Cuadrante SO (11B)** | Crucigrama + Spread 2 Izq |
@@ -225,8 +231,8 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 | **14** | Lore: Los 5 Cairns Sagrados (14A) | **Juego D6: Sandstone Labyrinth (14B)** | Lore + Cairn III |
 | **15** | **Juego D7: Cairn IV Chasm Sentry (15A)** | **Zoom Mapa: Puente Natural - Panel Izq (15B)**| Enigma + Spread 3 Izq |
 | **16** | **Zoom Mapa: Puente Natural - Panel Der (16A)**| **Juego D8: Solstice Arch / Altar (16B)** | Spread 3 Der + Cairn V |
-| **17** | **Juego D9: The Polybius Stele (17A)** | Lore: Audiencia con El Oráculo (17B) | Prueba Sirviente + WHEN (1ª Pista) |
-| **18** | **Juego D10: Clímax con El Oráculo (18A)** | **Arte: Transición al Stage Path (18B)** | Clímax Final + Dibujo Danza |
+| **17** | **Juego D9: The Polybius Stele (17A)** | Lore: Audiencia con El Oráculo (17B) | Prueba Sirviente + Lore del Oráculo |
+| **18** | **Juego D10: Clímax con El Oráculo (18A)** | **Arte: Transición al Stage Path (18B)** | Clímax Final + WHEN (1ª Pista) + Dibujo Danza |
 
 ---
 
@@ -247,7 +253,7 @@ Desde la Estación 10, cada juego del desierto lleva número de estación (Estac
 | **18** | D9 | The Polybius Stele (prueba del Sirviente) | 17A | Atrio de la Torre II | ⏳ Pendiente |
 | **19** | D10 | The Oracle's Horizon & Triple Triangulation | 18A | Torre II | ⏳ Pendiente |
 
-Páginas de lore sin estación: 08A (The Desert Frontier y Cairn I), 10B (estudio de la Salt Playa), 13A (el Sirviente y la demanda de los 5 Cairns), 14A (los 5 Cairns y «The Servant's Words»), 17B (audiencia con el Oráculo), 18B (arte de transición al Stage Path). Mapas: 08B, 09A, 11B, 12A y zoom 15B+16A.
+Páginas de lore sin estación: 08A (The Desert · Of Sun, Silence, and Buried Stone; Cairn I solo en la web), 10B (estudio de la Salt Playa), 13A (el Sirviente y la demanda de los 5 Cairns), 14A (los 5 Cairns y «The Words of the Servant»), 17B (audiencia con el Oráculo), 18B (arte de transición al Stage Path). Mapas: 08B, 09A, 11B, 12A y zoom 15B+16A.
 
 ---
 

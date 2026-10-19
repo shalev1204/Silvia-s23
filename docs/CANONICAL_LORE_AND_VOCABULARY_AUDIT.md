@@ -15,6 +15,8 @@ El propósito de esta versión 6.0 es blindar el proyecto al 100%:
 4. **Documentar el 100% de la criptografía y matemáticas**: inventario de glifos geométricos del *Eclipse Script*, dónde se ubica cada uno en el diario físico y en la web, qué operaciones ha recibido Silvia y la deducción algebraica rigurosa de cada valor numérico en *The Cipher Ledger*.
 5. **Fijar de forma inamovible los nombres propios, personajes y lugares canónicos**: extirpando cualquier desliz, invención o deriva terminológica (*"Sunken"*, *"Coastal"*, *"Coast"*, *"Hermit"*, *"Stage Mistress"*).
 
+> *Nota de impresión*: las Hojas 4A y 5A del diario ya impreso conservan aún «stereographic», «Mater» y «Tympan» (no se pueden reimprimir). La purga de §8.C se aplica a todo lo nuevo (web, emails, documentos y hojas futuras).
+
 ---
 
 ## 2. LA HISTORIA COMPLETA (CHRONOLOGICAL LORE BIBLE)
@@ -83,7 +85,7 @@ El propósito de esta versión 6.0 es blindar el proyecto al 100%:
 - **El Asalto al Observatorio (Estación 04)**: El despertar de la flor activa sensores que alertan a una banda de asaltantes armados. Irrumpen violentamente en el Alpine Observatory, dinamitan las bóvedas y arrancan **The Astrolabe of Distant Light** de su soporte, huyendo hacia el sur. El Cartógrafo sobrevive en las catacumbas y emite la Transmisión 1 (22.22 MHz).
 - **La Persecución en los Riscos (Estaciones 05–08)**: El Cartógrafo desciende por acueductos y riscos siguiendo las huellas de las carretas de los asaltantes hacia el desierto. Silvia le asiste descifrando las hojas 4, 5 y 6 del diario físico.
 - **El Clímax de la Estación 09 (*The Celestial Cipher*)**: Silvia descifra la Hoja 7A del diario y transmite por 142.85 MHz el voto sagrado: *"YOU WERE ALWAYS THE TREASURE"*. Estas palabras rompen el anonimato de 55 años del Cartógrafo y le devuelven su verdadero nombre: **Hermes**.
-- **El Estallido de la Gran Tormenta Roja**: En ese instante exacto estalla una colosal tormenta de arena roja en Deserti Limen. Los vientos superan los 130 km/h, derriban la antena de radio de Hermes y sellan por completo el desfiladero de montaña. Hermes queda atrapado bajo un saliente de roca y pide a Silvia que utilice el hilo de cobre del telégrafo artesanal (*Ask Hermes*) para orientarlo hacia el refugio de piedra usando la Hoja 7B (*Field Log: The Desert Frontier*). El Hub Central queda bloqueado bajo la tormenta durante 48 horas.
+- **El Estallido de la Gran Tormenta Roja**: En ese instante exacto estalla una colosal tormenta de arena roja en Deserti Limen. Los vientos superan los 130 km/h, derriban la antena de radio de Hermes y sellan por completo el desfiladero de montaña. Hermes queda atrapado bajo un saliente de roca y pide a Silvia que utilice el hilo de cobre del telégrafo artesanal (*Ask Hermes*) para orientarlo hacia el refugio de piedra usando la Hoja 7B (*Field Log: The Desert Frontier*). El Hub Central queda bloqueado bajo la tormenta durante 48 horas (ventana que terminó el **domingo 18 de octubre de 2026 a las 14:00**, constante `SUNDAY_OCT_18_2026_2PM` del Hub).
 
 ---
 
@@ -180,12 +182,12 @@ The crossroads ahead: Three celestial anchors will test your perception. When th
 The Eclipse Order · XXII:XXII
 "What is far is not lost. It is simply on its way."
 ```
-- **Recompensa**: Acceso a *The Celestial Flower*; alineación de Cygnus; revelación de los primeros glifos: **`Y`** y **`O`**.
+- **Recompensa**: Acceso a *The Celestial Flower*; alineación de Cygnus; revelación de las primeras letras del Eclipse Script: **`D`** (Deneb) y **`C`** (Cygnus).
 
 ---
 
 ### Email 3: [Dispatch] · Intercepted Transmission (The Celestial Matrix)
-- **Fecha y Hora**: 5 de Septiembre de 2026 · **22:22 exactas**
+- **Fecha y Hora**: 5 de Septiembre de 2026 · **22:22 exactas** *(confirmar con Gmail · Enviados)*
 - **De**: The Cartographer of Distant Light `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
 - **Asunto**: `[Dispatch] · Intercepted Transmission: The Celestial Matrix`
@@ -215,7 +217,7 @@ The Eclipse Order · XXII:XXII
 ---
 
 ### Email 4: [Dispatch III] · The Zodiacal Outpost & The Dust of the Mainframe
-- **Fecha y Hora**: 8 de Septiembre de 2026 · **22:22 exactas**
+- **Fecha y Hora**: 8 de Septiembre de 2026 · **22:22 exactas** *(confirmar con Gmail · Enviados)*
 - **De**: The Cartographer of Distant Light `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
 - **Asunto**: `[Dispatch III] · The Zodiacal Outpost & The Dust of the Mainframe`
@@ -245,12 +247,13 @@ The meridian waits for no one. Clear the dust and bring the stars back to light.
 — The Cartographer of Distant Light
 The Eclipse Order · Constellation Path
 ```
+- *Nota de canon*: el email dice «second letter of each discovered word», pero la Hoja 5B impresa y la web usan los **siete círculos numerados** del crucigrama, que dan `ECLIPSE` (`web/constellation/zodiac-engine/zodiac.js`). Manda la hoja impresa.
 - **Recompensa**: Desbloqueo del Hub mediante `ECLIPSE`; patrulla 3D en las ruinas; recuperación del cofre con la letra **`K`** y la ecuación $[O] - [A] = 16$.
 
 ---
 
 ### Email 5: [Emergency Carrier · 142.85 MHz] A Signal in the Sandstorm
-- **Fecha y Hora**: 12 de Septiembre de 2026 · **20:00h** (Momento del colapso)
+- **Fecha y Hora**: 12 de Septiembre de 2026 · **20:00h** (Momento del colapso) *(confirmar con Gmail · Enviados; la tormenta del Hub es la ventana de 48 h que terminó el domingo 18 de octubre de 2026 a las 14:00)*
 - **De**: Hermes · The Cartographer `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
 - **Asunto**: `[Emergency Carrier · 142.85 MHz] A signal cuts through the sandstorm`
@@ -431,7 +434,7 @@ Este es el estado exacto en el que se encuentra Silvia en este preciso momento:
   🌪️ THE SHIFTING TEMPEST — CATACLYSMIC SANDSTORM LOCKDOWN
   Ubicación: Hub Central (web/index.html)
   Estado de Silvia: BLOQUEADA (Acceso ordinario al Hub cerrado)
-  Duración del Bloqueo: 48 Horas desde las 20:00:00 del colapso
+  Duración del Bloqueo: 48 Horas (terminó el domingo 18 de octubre de 2026 a las 14:00)
 ```
 
 ### Arquitectura Técnica del Bloqueo (`web/index.html`)
@@ -475,9 +478,9 @@ Este es el estado exacto en el que se encuentra Silvia en este preciso momento:
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
 | **01** | **The Threshold** | Umbral del Cosmos | The Eclipse Order | Hoja 1 · Cara A/B | Lectura del pergamino; elección entre 3 caminos. | Elección de *The Constellation Path*; Ledger virgen. |
 | **02** | **Cartographer Arrival** | Umbral de la Montaña | The Cartographer of Distant Light | Hoja 1 · Cara B | Carta de bienvenida; anuncio del diario de cuero. | Tarjeta del Fragmento 1; apertura de la flor estelar. |
-| **03** | **The Celestial Flower** | Patio del Observatorio | The Cartographer of Distant Light | Hoja 2 · Cara A/B | Trazo interactivo de 22 estrellas de Cygnus. | Glifos **`Y`** y **`O`**; letras **`D`** (Deneb) y **`C`** (Cygnus). |
-| **04** | **The Observatory Raid** | Torreta Alta (Torre I) | The Cartographer of Distant Light | Hoja 4 · Cara A | Asalto violento; robo del Astrolabio; Transmisión 1. | Transición obligatoria al diario físico de cuero. |
-| **05** | **Emergency Radio Relay** | Acueductos del Sur | The Cartographer of Distant Light | Hoja 4 · Cara A | Sintonización de Transmisión 2 (19.84 MHz). | Confirmación de supervivencia; apertura de Hoja 4B. |
+| **03** | **The Celestial Flower** | Patio del Observatorio | The Cartographer of Distant Light | — (web, antes de la llegada del diario) | Trazo interactivo de 22 estrellas de Cygnus. | Letras **`D`** (Deneb) y **`C`** (Cygnus). |
+| **04** | **The Observatory Raid** | Torreta Alta (Torre I) | The Cartographer of Distant Light | — (web, antes de la llegada del diario) | Asalto violento; robo del Astrolabio; Transmisión 1. | Transición obligatoria al diario físico de cuero. |
+| **05** | **Emergency Radio Relay** | Acueductos del Sur | The Cartographer of Distant Light | — (web, antes de la llegada del diario) | Sintonización de Transmisión 2 (19.84 MHz). | Confirmación de supervivencia; apertura de Hoja 4B. |
 | **06** | **The Celestial Matrix** | Arena de Resonancia | The Cartographer of Distant Light | Hoja 4 · Cara B | Sopa de estrellas 12×12; 16 guías celestes. | Letra **`P`**; tarjeta de **Vector I** (5 ecuaciones). |
 | **07** | **The Zodiacal Engine** | Puesto Subterráneo | The Cartographer of Distant Light | Hoja 5 · Cara B | Crucigrama de 7 diales (`ECLIPSE`); patrulla 3D. | Letra **`K`**; cofre con $[O] - [A] = 16$; órdenes. |
 | **08** | **Midnight Calibration** | Riscos del Campamento | The Cartographer of Distant Light | Hoja 6 · Cara A/B | Calibración de Vega a $97^\circ$; 6 acordes hexagonales. | Tránsito: **2090 ly**; geometría: `HEXAGON`. |
@@ -491,34 +494,36 @@ Este es el estado exacto en el que se encuentra Silvia en este preciso momento:
 Todos los glifos geométricos oficiales residen en:
 `assets/general/glyphs/ecl-[a-z].svg` y en `assets/general/glyphs/rendered_png/glyph_[a-z].png`.
 
+Orden impreso del alfabeto (`scripts/journal/build_page02_03.py`, `SHUFFLED_GLYPHS`): **Hoja 2A**: K R D Y M B T · **Hoja 2B**: O F W A S P C · **Hoja 3A**: X H L U J E N · **Hoja 3B**: Z Q G V I.
+
 | Letra | Archivo SVG Canónico | Dónde se Encuentra Físicamente en el Diario / Web |
 | :---: | :--- | :--- |
-| **A** | `assets/general/glyphs/ecl-a.svg` | Pergamino Email 1 / Hoja 2A (Alfabeto I) |
+| **A** | `assets/general/glyphs/ecl-a.svg` | Solo Hoja 2B (alfabeto) |
 | **B** | `assets/general/glyphs/ecl-b.svg` | Estación 09 (Modal de Recompensas) / Hoja 2A |
-| **C** | `assets/general/glyphs/ecl-c.svg` | Estación 03 (Cygnus) / Hoja 2A |
+| **C** | `assets/general/glyphs/ecl-c.svg` | Estación 03 (Cygnus) / Hoja 2B |
 | **D** | `assets/general/glyphs/ecl-d.svg` | Estación 03 (Deneb) / Hoja 2A |
-| **E** | `assets/general/glyphs/ecl-e.svg` | Hoja 5B (Crucigrama `ECLIPSE`) / Hoja 2A |
-| **F** | `assets/general/glyphs/ecl-f.svg` | Estación 09 (Modal de Recompensas) / Hoja 2A |
-| **G** | `assets/general/glyphs/ecl-g.svg` | Estación 09 (Modal de Recompensas) / Hoja 2A |
-| **H** | `assets/general/glyphs/ecl-h.svg` | Hoja 2B (Alfabeto II) |
-| **I** | `assets/general/glyphs/ecl-i.svg` | Hoja 2B |
-| **J** | `assets/general/glyphs/ecl-j.svg` | Hoja 2B |
-| **K** | `assets/general/glyphs/ecl-k.svg` | Estación 07 (Cofre Subterráneo 3D) / Hoja 2B |
-| **L** | `assets/general/glyphs/ecl-l.svg` | Hoja 2B |
-| **M** | `assets/general/glyphs/ecl-m.svg` | Hoja 2B |
-| **N** | `assets/general/glyphs/ecl-n.svg` | Hoja 2B |
-| **O** | `assets/general/glyphs/ecl-o.svg` | Estación 03 (Rollo de Victoria) / Hoja 3A (Alfabeto III) |
-| **P** | `assets/general/glyphs/ecl-p.svg` | Estación 06 (Sopa de Letras / Planisferio) / Hoja 3A |
-| **Q** | `assets/general/glyphs/ecl-q.svg` | Hoja 3A |
-| **R** | `assets/general/glyphs/ecl-r.svg` | Hoja 3A |
-| **S** | `assets/general/glyphs/ecl-s.svg` | Hoja 3A |
-| **T** | `assets/general/glyphs/ecl-t.svg` | Hoja 3A |
-| **U** | `assets/general/glyphs/ecl-u.svg` | Hoja 3A |
-| **V** | `assets/general/glyphs/ecl-v.svg` | Estación 09 (Modal de Recompensas) / Hoja 3B (Alfabeto IV) |
-| **W** | `assets/general/glyphs/ecl-w.svg` | Hoja 3B |
-| **X** | `assets/general/glyphs/ecl-x.svg` | Hoja 3B |
-| **Y** | `assets/general/glyphs/ecl-y.svg` | Estación 03 (Rollo de Victoria) / Hoja 3B |
-| **Z** | `assets/general/glyphs/ecl-z.svg` | Hoja 3B |
+| **E** | `assets/general/glyphs/ecl-e.svg` | Solo Hoja 3A (alfabeto) |
+| **F** | `assets/general/glyphs/ecl-f.svg` | Estación 09 (Modal de Recompensas) / Hoja 2B |
+| **G** | `assets/general/glyphs/ecl-g.svg` | Estación 09 (Modal de Recompensas) / Hoja 3B |
+| **H** | `assets/general/glyphs/ecl-h.svg` | Solo Hoja 3A (alfabeto) |
+| **I** | `assets/general/glyphs/ecl-i.svg` | Solo Hoja 3B (alfabeto) |
+| **J** | `assets/general/glyphs/ecl-j.svg` | Solo Hoja 3A (alfabeto) |
+| **K** | `assets/general/glyphs/ecl-k.svg` | Estación 07 (Cofre Subterráneo 3D) / Hoja 2A |
+| **L** | `assets/general/glyphs/ecl-l.svg` | Solo Hoja 3A (alfabeto) |
+| **M** | `assets/general/glyphs/ecl-m.svg` | Solo Hoja 2A (alfabeto) |
+| **N** | `assets/general/glyphs/ecl-n.svg` | Solo Hoja 3A (alfabeto) |
+| **O** | `assets/general/glyphs/ecl-o.svg` | Solo Hoja 2B (alfabeto) |
+| **P** | `assets/general/glyphs/ecl-p.svg` | Estación 06 (The Celestial Matrix) / Hoja 2B |
+| **Q** | `assets/general/glyphs/ecl-q.svg` | Solo Hoja 3B (alfabeto) |
+| **R** | `assets/general/glyphs/ecl-r.svg` | Estación 10 (3.er mojón del Whispering Chasm) / Hoja 2A |
+| **S** | `assets/general/glyphs/ecl-s.svg` | Solo Hoja 2B (alfabeto) |
+| **T** | `assets/general/glyphs/ecl-t.svg` | Solo Hoja 2A (alfabeto) |
+| **U** | `assets/general/glyphs/ecl-u.svg` | Solo Hoja 3A (alfabeto) |
+| **V** | `assets/general/glyphs/ecl-v.svg` | Estación 09 (Modal de Recompensas) / Hoja 3B |
+| **W** | `assets/general/glyphs/ecl-w.svg` | Solo Hoja 2B (alfabeto) |
+| **X** | `assets/general/glyphs/ecl-x.svg` | Solo Hoja 3A (alfabeto) |
+| **Y** | `assets/general/glyphs/ecl-y.svg` | Solo Hoja 2A (alfabeto) |
+| **Z** | `assets/general/glyphs/ecl-z.svg` | Solo Hoja 3B (alfabeto) |
 
 ---
 
@@ -578,12 +583,14 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$F = 22 - 16 \implies \mathbf{F = 6}$$
 - **Asignación en el Ledger**: $\mathbf{T = 16, \quad F = 6}$.
 
-#### 6. DEDUCCIÓN DE $R$ (Estación 12 en el Desierto)
-- **Ecuación de la Estela Solar**:
+#### 6. DEDUCCIÓN DE $R$ (Estaciones 10 y 12 en el Desierto)
+- **Pista de la Estación 10 (The Whispering Chasm)**: el 3.er mojón del cañón es la letra **R** → pista web: $\mathbf{R = 3}$ (la Hoja 9B impresa no trae ecuación).
+- **Ecuación de la Estela Solar (Estación 12 · The Desert Lexicon, solo en la web)**:
   $$[R] \times 2 = [F]$$
-- **Como $F = 6$**:
-  $$2R = 6 \implies \mathbf{R = 3}$$
-- **Asignación en el Ledger**: $\mathbf{R = 3}$.
+- **Como $R = 3$**:
+  $$[F] = 2 \times 3 \implies \mathbf{F = 6}$$
+- **Comprobación cruzada**: coincide con el $F$ ya obtenido en §7.B.5 (Estaciones 06 + 09: $F + T = 22$, $T - F = 10$). La estela confirma $F$; no lo introduce.
+- **Asignación en el Ledger**: $\mathbf{R = 3}$ ($F = 6$ confirmado).
 
 ---
 
@@ -599,8 +606,9 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
    - Amada y compañera de Hermes. Astrónoma y artista de cartas celestes en azul cobalto y pan de oro.
    - Fallecida en el colapso del puente en 1971 al salvar el disco de latón y los mapas. Inspiración del voto eterno *"You were always the treasure"*.
 3. **The Oracle (El Oráculo / The Desert Oracle)**:
-   - Guardián de **Tower II (The Sandstone Sanctuary)** en las dunas del desierto.
-   - Viste túnica desgastada, interpreta las sombras solares en el gnomon y habla en parábolas concisas. *(Queda terminantemente prohibido llamarlo "Hermit" o "Ermitaño")*.
+   - La guardiana de **Tower II (The Sandstone Sanctuary)** en las dunas del desierto.
+   - Viste túnica desgastada, interpreta las sombras solares en el gnomon y habla en parábolas concisas. *(Queda terminantemente prohibido llamarla "Hermit" o "Ermitaño")*.
+   - *Nota de canon*: la Hoja 8A impresa («She wears no face») y el Email 2 («the Oracle in her sands») la fijan en femenino. La Hoja 17B impresa usa «he» (errata de impresión conocida, `build_entire_journal.py`; no se puede reimprimir).
 4. **The Mirror Speaker (El Portavoz del Espejo)**:
    - Guardián solemne y ceremonial de **Tower III (The Stage Tower / The Mirror Sanctuary)**.
    - Maestro de la simetría, la luz, el reflejo y la danza. *(Queda terminantemente prohibido llamarlo "Stage Mistress")*.
@@ -608,7 +616,7 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
    - Guardián ceremonial y heraldo del atrio en **Tower II (The Sandstone Sanctuary)**.
    - Exige los 5 Cairns sagrados de la peregrinación (Hermes ya porta el sello de Cairn I; le faltan 4: Cairns II, III, IV y V) y supervisa la prueba de la Estela de Polibio previa a la apertura del sanctasanctórum.
 6. **The BC Ashes (Los Asaltantes de la Ceniza)**:
-   - Facción de saqueadores y forajidos del desierto que asaltó el Observatorio Alpino en la noche del solsticio y robó el cofre con el Astrolabio de Latón.
+   - Facción de saqueadores y forajidos del desierto que asaltó el Observatorio Alpino a principios de septiembre de 2026 (Estación 04) y robó **The Astrolabe of Distant Light**.
    - Su identidad y enseña son descubiertas por Hermes en *The Desert Lexicon* (Hoja 11A) tras eludir una emboscada en los laberintos de piedra.
 7. **Carles (The Petitioner / Seeker Companion)**:
    - Quien solicitó la aventura a la Orden del Eclipse para el 23º cumpleaños de Silvia.
@@ -649,6 +657,8 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 
 ### C. Directorio de Términos Prohibidos y Purga Permanente
 
+> *Excepción de impresión*: las Hojas 4A y 5A del diario ya impreso contienen todavía «stereographic», «Mater» y «Tympan»; no se pueden reimprimir. La purga se aplica a todo lo nuevo.
+
 | Término Descartado / Inventado | Término Canónico Exclusivo | Razón Arquitectónica Obligatoria |
 | :--- | :--- | :--- |
 | ❌ *The Sunken Sanctuary* | **The Sandstone Sanctuary** / **Tower II** | La Torre II es de piedra arenisca en el desierto; no hay ruinas sumergidas ni marinas. |
@@ -669,16 +679,16 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Acto II (The Desert Path) abarca las Hojas 08 a 18 (22 caras) con 10 juegos y el spread de zoom al puente natural:
 
 - **Hoja 08**:
-  - **Cara A (08A · Lore)**: *The Desert Frontier, The River Hunch & The Great Silence*. Hermes sigue el río seco (*Wadi al-Hajar*) por una corazonada; junto a Silvia descifran y obtienen el **Sello de Cairn I** como misión previa antes de entrar al desfiladero.
+  - **Cara A (08A · Lore)**: *The Desert · Of Sun, Silence, and Buried Stone* (impresa): I. The Mirror of the Earth · II. The Voice of Shadows (la Oráculo) · III. The Three Laws of the Waste. *(web)* La corazonada del río seco (*Wadi al-Hajar*) y el **Sello de Cairn I** ocurren en el Field Wire del amanecer, no en la hoja.
   - **Cara B (08B · Mapa)**: **Gran Mapa · Cuadrante NO** (*Spread 1 Izq*).
 - **Hoja 09**:
   - **Cara A (09A · Mapa)**: **Gran Mapa · Cuadrante NE** (*Spread 1 Der*).
-  - **Cara B (09B · Juego D1)**: **The Whispering Chasm**. Con el Sello de Cairn I a buen recaudo, descenso a la garganta laberíntica de $25 \times 25$; santo y seña **`MIRAGE`**; deducción $[R] = 3$.
+  - **Cara B (09B · Juego D1)**: **The Whispering Chasm**. Con el Sello de Cairn I a buen recaudo, descenso a la garganta laberíntica de $25 \times 25$; santo y seña **`MIRAGE`**; pista web: el 3.er mojón es la R (R = 3); la hoja impresa no trae ecuación.
 - **Hoja 10**:
   - **Cara A (10A · Juego D2)**: **The Salt Playa (Dry Basin)**. Navegación sobre la corteza salina quebradiza y simas de salmuera.
   - **Cara B (10B · Lore/Estudio)**: **Estudio Da Vinci: The Salt Playa Basin**. Morfología de la cristalización salina y estratos sedimentarios.
 - **Hoja 11**:
-  - **Cara A (11A · Juego D3)**: **The Desert Lexicon & Al-Qibla**. Emboscada de forajidos eludida; descubrimiento del nombre de los raiders: **Los BC Ashes**; Sigil solar **`PHOENIX`**; rumbo **$194^\circ\text{ SSW}$**; deducción $[R] \times 2 = [F] \implies F = 6, T = 16$.
+  - **Cara A (11A · Juego D3)**: **The Desert Lexicon & Al-Qibla**. Emboscada de forajidos eludida; descubrimiento del nombre de los raiders: **Los BC Ashes**; Sigil solar **`PHOENIX`**; rumbo **$194^\circ\text{ SSW}$**; $[R] \times 2 = [F] \implies F = 6$ (confirma F de St06+St09); la ecuación solo está en la web.
   - **Cara B (11B · Mapa)**: **Gran Mapa · Cuadrante SO** (*Spread 2 Izq*).
 - **Hoja 12**:
   - **Cara A (12A · Mapa)**: **Gran Mapa · Cuadrante SE** (*Spread 2 Der*).
@@ -697,9 +707,9 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
 - **Hoja 17**:
   - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$.
-  - **Cara B (17B · Lore)**: **Audiencia con El Oráculo del Desierto**. Apertura de la Torre II; revelación de la primera gran pista: **WHEN** (fecha y estación de la función); estrella maestra **Vega**.
+  - **Cara B (17B · Lore)**: **The Desert Oracle** (impresa). Hermes observa a la Oráculo durante horas desde una cresta, junto a su refugio bajo un saliente de arenisca; no puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen». Menciona el Astrolabio recuperado. No revela el WHEN ni menciona Vega.
 - **Hoja 18**:
-  - **Cara A (18A · Juego D10)**: **Clímax con El Oráculo**. Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path).
+  - **Cara A (18A · Juego D10)**: **The Oracle's Horizon**. Ante la Oráculo, Silvia recibe la primera gran pista impresa: el **WHEN** («the hour and season ordained under the stars»). Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path).
   - **Cara B (18B · Arte de Transición)**: **Dibujo de Transición al Stage Path**. Obra estética inspirada en el boceto artístico (pliegues teatrales violetas, columnas chevron en perspectiva, espirales, estrellas y malla geométrica escénica).
 
 ---
@@ -753,8 +763,8 @@ Queda establecido como invariante de lore la distinción entre nombres físicos 
 | Nombre Analizado | ¿Existe rotulado dentro del Gran Mapa de 4 cuadrantes? | Naturaleza Canónica Real |
 | :--- | :---: | :--- |
 | **Oasis Clepsydra** | **NO** | Es exclusivamente el título del **Juego D4** (Hoja 12B · Estación 13). En el mapa (Hoja 12A) la zona física está rotulada como *The Salt Playa*, *The Solar Altar* y *The Sandstone Sanctuary*. |
-| **Polybius Stele** | **NO** | Es exclusivamente el título del **Juego D9** (Hoja 17A · Estación 18) y la estela está en el atrio de la Torre II. Su solución da el rumbo $348^\circ\text{ NNW}$, el mismo que está grabado en **Cairn III (Copper Benchmark Plate)** (Hoja 9A): la estela confirma el rumbo, pero no está en Cairn III. |
+| **Polybius Stele** | **NO** | Es exclusivamente el título del **Juego D9** (Hoja 17A · Estación 18) y la estela está en el atrio de la Torre II. Su solución da el rumbo $348^\circ\text{ NNW}$, el mismo que está grabado en **Cairn III (Copper Benchmark Plate)** (Hoja 9A): la estela confirma el rumbo, pero no está en Cairn III. Por repetir ese rumbo, el subtítulo impreso de la Hoja 17A la llama *«The Cipher of Cairn III (348* NNW)»*. |
 | **Desert Lexicon** | **NO** | Es exclusivamente el título del **Juego D3** (Hoja 11A · Estación 12) y ocurre en unas ruinas nómadas junto a la Salt Playa, sin rótulo propio en el mapa. |
-| **The Whispering Chasm** | **SÍ** | Es tanto la localización física rotulada en el Cuadrante SO (Hoja 10B) como el título del **Juego D1** (Hoja 09B). |
+| **The Whispering Chasm** | **SÍ** | Es tanto la localización física rotulada en el Cuadrante SO (Hoja 11B) como el título del **Juego D1** (Hoja 09B). |
 
 

@@ -63,9 +63,9 @@ Caza del tesoro no lineal de ~56 días para el 23.º cumpleaños de Silvia. Rega
 ### Tres caminos (TODOS se recorren)
 | Camino | Guardián | Puzzles | Pista final |
 |--------|----------|---------|-------------|
-| 🏜️ Desert | **The Oracle** (sin rostro, Indiana Jones / Alquimista) | Omens, parábolas, mapas, decisiones binarias | WHERE (Ciudad / Teatro) |
-| 🎭 Stage | **The Mirror Speaker** (elegante, reflejo — NO teatro/ballet en diálogo) | Simetría, espejo, objetos, luz | WHEN (Fecha / Hora) |
-| ✨ Constellation | **The Cartographer of Distant Light** | Fragmentos, cielo, mitología, Astrolabio | WHAT (2 entradas ballet) |
+| 🏜️ Desert | **The Oracle** (sin rostro, Indiana Jones / Alquimista) | Omens, parábolas, mapas, decisiones binarias | WHEN (Fecha / Hora) · Tower II |
+| 🎭 Stage | **The Mirror Speaker** (elegante, reflejo — NO teatro/ballet en diálogo) | Simetría, espejo, objetos, luz | WHERE (Ciudad / Teatro) · Tower III |
+| ✨ Constellation | **The Cartographer of Distant Light** | Fragmentos, cielo, mitología, Astrolabio | WHAT (2 entradas ballet) · Tower I |
 
 - Email 1: elige **orden de inicio** (irreversible). Reply con nombre del camino.
 - **2 sep 22:22:** email/HTML bienvenida del camino elegido + personaje
@@ -177,4 +177,4 @@ YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.
 
 ## Notas de sesión
 
-Ver **[docs/SESSION_LOG.md](SESSION_LOG.md)** — transcripción cronológica de todo lo hablado en sesión 1.
+Ver **[docs/SESSION_LOG.md](docs/SESSION_LOG.md)** — transcripción cronológica de todo lo hablado en sesión 1.
