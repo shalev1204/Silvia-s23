@@ -3692,6 +3692,8 @@
 
     /* ===================================================================
        STATION 14 · THE SUN MONOLITH & CAIRN II (THE WALKING SUN)
+       The .monolith-* shell (backdrop, window, header, telemetry, cards, buttons, sigil input,
+       feedback, lock note, victory, equations, dispatch) is shared by Station 15.
        =================================================================== */
     .monolith-modal-backdrop {
       position: fixed;
@@ -3931,6 +3933,47 @@
       .monolith-modal-backdrop, .monolith-modal-backdrop.closing { animation: none; }
       .monolith-btn { transition: none; }
     }
+
+    /* ===================================================================
+       STATION 15 · THE SANDSTONE LABYRINTH & CAIRN III (ESCAPE FROM THE BC ASHES)
+       Uses the .monolith-* shell of Station 14; only the board and its controls live here.
+       =================================================================== */
+    .laby-board {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 470px;
+      border-radius: 8px;
+      background: #0b0805;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .laby-board .laby-cell-hit { fill: transparent; cursor: pointer; }
+    .laby-status-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .laby-lives { font-size: 1.05rem; letter-spacing: 0.15em; }
+    .laby-lives .is-spent { filter: grayscale(1); opacity: 0.3; }
+    .laby-turn { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.06em; color: #b8a07a; }
+    .laby-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 52px);
+      grid-template-rows: repeat(3, 44px);
+      gap: 6px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .laby-pad .monolith-btn { padding: 0; font-size: 1.05rem; font-family: inherit; }
+    .laby-pad .laby-up { grid-column: 2; grid-row: 1; }
+    .laby-pad .laby-left { grid-column: 1; grid-row: 2; }
+    .laby-pad .laby-wait { grid-column: 2; grid-row: 2; font-size: 0.66rem; font-family: 'Cinzel', serif; letter-spacing: 0.04em; }
+    .laby-pad .laby-right { grid-column: 3; grid-row: 2; }
+    .laby-pad .laby-down { grid-column: 2; grid-row: 3; }
+    .laby-rules { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: 0.82rem; line-height: 1.45; color: #e7d9bf; }
+    .laby-rules li::marker { color: #f59e0b; }
+    .laby-hint { margin-top: 8px; font-size: 0.8rem; color: #fde68a; }
+    .laby-flash { animation: labyFlash 0.6s ease-out; }
+    @keyframes labyFlash { 0% { box-shadow: inset 0 0 0 999px rgba(239, 68, 68, 0.35); } 100% { box-shadow: inset 0 0 0 999px rgba(239, 68, 68, 0); } }
+    @media (prefers-reduced-motion: reduce) { .laby-flash { animation: none; } }
 
     /* Station 08 Unlock Cinematic Celebration Overlay */
     .station8-unlock-overlay {
@@ -12960,6 +13003,99 @@
   </div>
 
   <!-- ===================================================================
+       STATION 15: THE SANDSTONE LABYRINTH & CAIRN III · ESCAPE FROM THE BC ASHES
+       Part I is the journal (Sheet 14B: the eight arches of the true road). Part II only exists here:
+       a turn-based escape through a dark labyrinth patrolled by the raiders' torches.
+       =================================================================== -->
+  <div class="monolith-modal-backdrop" id="modal-sandstone-labyrinth" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="laby-modal-title">
+    <div class="monolith-window">
+      <div class="monolith-header">
+        <div class="monolith-title-wrap">
+          <span class="monolith-title-icon" aria-hidden="true">🌀</span>
+          <div>
+            <h2 class="monolith-title" id="laby-modal-title">THE SANDSTONE LABYRINTH &amp; CAIRN III</h2>
+            <div class="monolith-subtitle">Station 15 · Escape from the BC Ashes · Sheet 14B</div>
+          </div>
+        </div>
+        <button type="button" class="monolith-close-btn" id="btn-close-labyrinth" aria-label="Close The Sandstone Labyrinth">✕</button>
+      </div>
+
+      <div class="monolith-telemetry">
+        <div>EXPEDITION:<strong>CAIRN III // THE ARCHES OF THE WEST WIND</strong></div>
+        <div>SIGIL:<strong id="laby-telem-sigil">[ 8 LETTERS ]</strong></div>
+        <div>TURN:<strong id="laby-telem-turn">0</strong></div>
+        <div>CLOSE CALLS LEFT:<strong id="laby-telem-lives">3</strong></div>
+        <div>SEAL:<strong id="laby-telem-seal">[ SEALED ]</strong></div>
+      </div>
+
+      <div class="monolith-body">
+        <div class="monolith-panel">
+          <div class="monolith-card" id="laby-sigil-card">
+            <div class="monolith-card-title">I · The Sigil of Cairn III</div>
+            <p>Solve <strong>Sheet 14B</strong> of your journal: trace the one true road from the Southern Mouth to Cairn III and read its eight arches in the order Hermes passes beneath them. Speak the eight-letter sigil to unlock the copper plate.</p>
+            <div class="monolith-key-row">
+              <label class="monolith-sr-only" for="laby-key-input">The eight-letter sigil of Cairn III</label>
+              <input type="text" class="monolith-key-input" id="laby-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-laby-speak">✦ Speak the Sigil</button>
+            </div>
+            <div class="monolith-feedback" id="laby-key-feedback" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="monolith-card monolith-game is-locked" id="laby-game">
+            <div class="monolith-card-title">II · Escape from the BC Ashes</div>
+            <div class="monolith-game-inner">
+              <svg class="laby-board" id="laby-board" viewBox="-4 -12 138 136" role="img" aria-label="The labyrinth seen from above, lit only around Hermes's lamp. Raiders' torches patrol the corridors. The Western Cleft is the exit at the bottom left."></svg>
+              <div class="laby-status-row">
+                <span class="laby-lives" id="laby-lives" aria-hidden="true"></span>
+                <span class="laby-turn" id="laby-turn-label">Turn 0</span>
+              </div>
+              <div class="laby-pad" role="group" aria-label="Move Hermes">
+                <button type="button" class="monolith-btn laby-up" id="btn-laby-up" aria-label="Move north">▲</button>
+                <button type="button" class="monolith-btn laby-left" id="btn-laby-left" aria-label="Move west">◀</button>
+                <button type="button" class="monolith-btn laby-wait" id="btn-laby-wait" aria-label="Hold still for one turn">HOLD</button>
+                <button type="button" class="monolith-btn laby-right" id="btn-laby-right" aria-label="Move east">▶</button>
+                <button type="button" class="monolith-btn laby-down" id="btn-laby-down" aria-label="Move south">▼</button>
+              </div>
+              <div class="monolith-feedback" id="laby-move-feedback" role="status" aria-live="polite"></div>
+            </div>
+            <div class="monolith-lock-note">Speak the sigil of Cairn III to open the copper plate.</div>
+          </div>
+        </div>
+
+        <div class="monolith-panel">
+          <div class="monolith-card">
+            <div class="monolith-card-title">The Rules of the Dark</div>
+            <ul class="laby-rules">
+              <li>Every time Hermes takes a step or holds still, every torch takes one step too.</li>
+              <li>A torch lights its own square and the two squares ahead of it, in the direction it walks. Walls stop the light.</li>
+              <li>Hermes's lamp shows only the rock right around him. The squares he has seen stay on his map.</li>
+              <li>Caught in the light, Hermes uses up a close call. With none left, he runs back to the shadow of Cairn III.</li>
+              <li>Reach the Western Cleft, at the bottom left. Arrows, WASD or tapping a square next to Hermes also move him; the space bar holds still.</li>
+            </ul>
+            <div class="laby-hint" id="laby-hint" style="display: none;">✦ Hermes has been watching the torches: their rounds are now drawn on the board.</div>
+          </div>
+
+          <div class="monolith-card monolith-victory" id="laby-victory" style="display: none;">
+            <div class="monolith-card-title">✦ Out through the Western Cleft</div>
+            <p id="laby-victory-text"></p>
+            <div>
+              <span class="monolith-equation">[W] + [A] = 26</span>
+              <span class="monolith-equation">[N] − [E] = 9</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #b8a07a;">Carved on the founders' stone under the copper plate. Record both in your Cipher Ledger.</p>
+            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-laby-finish">🗺️ Return to the Grand Desert Map ➔</button>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE SANDSTONE LABYRINTH</div>
+            <div class="monolith-dispatch" id="laby-dispatch-text" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
        STATION 14: THE SUN MONOLITH & CAIRN II · THE WALKING SUN
        Part I is the journal (Sheet 13B: the seven-letter sigil). Part II only exists here:
        move the sun until the Monolith's shadow touches the carved marks named by the inscription.
@@ -13759,7 +13895,11 @@
             complete() { set('order_monolith_march_start', '1'); set('order_sun_monolith_awake', 'true'); set('order_sun_monolith_marks', '4'); set('order_sun_monolith_completed', 'true'); set('order_seal_cairn_2', 'true'); },
             reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_monolith_gate_seal1']); }
           },
-          { id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', built: false, reset() { del('order_seal_cairn_3'); } },
+          {
+            id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', flag: 'order_sandstone_labyrinth_completed', built: true,
+            complete() { set('order_labyrinth_march_start', '1'); set('order_labyrinth_awake', 'true'); set('order_labyrinth_star_seen', 'true'); set('order_labyrinth_camp_seen', 'true'); set('order_sandstone_labyrinth_completed', 'true'); set('order_seal_cairn_3', 'true'); },
+            reset() { dels(['order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed']); }
+          },
           { id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', built: false, reset() { del('order_seal_cairn_4'); } },
           { id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', built: false, reset() { del('order_seal_cairn_5'); } },
           { id: 's18', tag: 'Station 18', label: 'The Polybius Stele', flag: 'order_polybius_stele_completed', built: false, reset() { del('order_polybius_stele_completed'); } },
@@ -13770,9 +13910,9 @@
 
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
-          const m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
-          const cap = m ? 12 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
+          const lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
+          const cap = lab ? 16 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -14389,6 +14529,50 @@
               { icon: '🪨', label: 'The Seal of Cairn II', desc: 'Second seal of the five' }
             ],
             btnText: arrived ? '✦ WAKE THE SUN MONOLITH ➔' : 'Hermes is on his way',
+            btnDisabled: !arrived,
+            action: open
+          };
+        },
+        // Station 15 · The Sandstone Labyrinth & Cairn III (node id 24)
+        24: () => {
+          const thumb = './assets/thumbnails/sandstone_labyrinth_preview.webp';
+          const open = () => (window.openLabyrinthModal ? window.openLabyrinthModal() : null);
+          if (localStorage.getItem('order_sandstone_labyrinth_completed') === 'true') {
+            return {
+              badge: 'STATION 15 // CAIRN III OPEN',
+              status: 'SEAL OF CAIRN III SECURED ✓',
+              statusClass: 'status-done-badge',
+              title: 'The Sandstone Labyrinth & Cairn III',
+              thumb,
+              lore: 'Silvia read the eight arches of the true road on Sheet 14B and the copper plate of Cairn III turned. Then she guided Hermes through the dark, between the torches of the BC Ashes, and out through the Western Cleft.',
+              rewards: [
+                { icon: '🪨', label: 'The Seal of Cairn III', desc: 'Third seal of the five' },
+                { icon: '📐', label: 'Ledger: [W] + [A] = 26 · [N] − [E] = 9', desc: 'Carved under the copper plate' },
+                { icon: '✶', label: 'A Star of Gold Leaf', desc: 'Painted on a wall of the labyrinth' }
+              ],
+              btnText: 'Review the Sandstone Labyrinth ➔',
+              action: open
+            };
+          }
+          const eta = typeof window.getLabyrinthMarchEta === 'function' ? window.getLabyrinthMarchEta() : '';
+          const arrived = typeof window.isLabyrinthMarchOver === 'function' && window.isLabyrinthMarchOver();
+          return {
+            badge: 'STATION 15 // DESERT PATH',
+            status: arrived ? 'CAIRN III REACHED ✦' : (eta ? 'HERMES WALKING DOWN FROM THE MONOLITH ✦' : 'SOUTH-SOUTH-EAST OF THE SUN MONOLITH ✦'),
+            statusClass: 'status-live-badge',
+            title: 'The Sandstone Labyrinth & Cairn III',
+            thumb,
+            lore: arrived
+              ? 'Below the Arches of the West Wind, a maze of pillars and fissures hides Cairn III and its copper plate. Solve Sheet 14B of your journal, speak the sigil, and get Hermes out alive: the BC Ashes are inside.'
+              : (eta
+                ? 'Hermes is walking down from the Sun Monolith to the Sandstone Labyrinth, on the bearing of 168°. Arrival in ' + eta + '. Keep Sheet 14B close.'
+                : 'The Sandstone Labyrinth lies south-south-east of the Sun Monolith, under the Arches of the West Wind. Hermes will set out once you answer him on the wire.'),
+            rewards: [
+              { icon: '📖', label: 'Sheet 14B of the Journal', desc: 'The eight arches of the true road' },
+              { icon: '🔥', label: 'Escape from the BC Ashes', desc: 'A second trial, only in the labyrinth' },
+              { icon: '🪨', label: 'The Seal of Cairn III', desc: 'Third seal of the five' }
+            ],
+            btnText: arrived ? '✦ ENTER THE LABYRINTH ➔' : 'Hermes is on his way',
             btnDisabled: !arrived,
             action: open
           };
@@ -15569,7 +15753,9 @@
         { id: 'stele-rf', station: 'Station 12 · Nomad Ruins Stele', name: 'Stargazer Proportion', expr: 'R × 2', l1: 'R', op: 'x2', l2: 'F', target: null, unit: '', requires: 'order_desert_lexicon_completed' },
         { id: 'falcon-pa', station: 'Station 13 · Falcon Stone', name: 'Falcon Inscription', expr: 'P − A', l1: 'P', op: '-', l2: 'A', target: 14, unit: '', requires: 'order_oasis_clepsydra_completed' },
         { id: 'cairn2-df', station: 'Station 14 · Lid of Cairn II', name: 'The Deneb Line', expr: 'D + F', l1: 'D', op: '+', l2: 'F', target: 24, unit: '', requires: 'order_sun_monolith_completed' },
-        { id: 'cairn2-ct', station: 'Station 14 · Lid of Cairn II', name: 'The Cygnus Line', expr: 'C − T', l1: 'C', op: '-', l2: 'T', target: 8, unit: '', requires: 'order_sun_monolith_completed' }
+        { id: 'cairn2-ct', station: 'Station 14 · Lid of Cairn II', name: 'The Cygnus Line', expr: 'C − T', l1: 'C', op: '-', l2: 'T', target: 8, unit: '', requires: 'order_sun_monolith_completed' },
+        { id: 'cairn3-wa', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The West Wind Line', expr: 'W + A', l1: 'W', op: '+', l2: 'A', target: 26, unit: '', requires: 'order_sandstone_labyrinth_completed' },
+        { id: 'cairn3-ne', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The Wind Rose Line', expr: 'N − E', l1: 'N', op: '-', l2: 'E', target: 9, unit: '', requires: 'order_sandstone_labyrinth_completed' }
       ];
 
       // Desert equations only appear once their station is solved, so the Ledger never spoils them
@@ -16950,7 +17136,72 @@
           step: 12,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtGates() + 1) + " of five, Silvia. The Seal of Cairn II sits in my satchel, and the two lines from the lid of the niche belong in your Cipher Ledger: [D] + [F] = 24 and [C] − [T] = 8.\n\nThe next cairn waits beyond the Arches of the West Wind, inside the Sandstone Labyrinth (Station 15). I will rest under the Monolith tonight and set out at first light. I will wire you when I reach the mouth of the labyrinth.";
+            return sealsPhrase(sealsAtGates() + 1) + " of five, Silvia. The Seal of Cairn II sits in my satchel, and the two lines from the lid of the niche belong in your Cipher Ledger: [D] + [F] = 24 and [C] − [T] = 8.\n\nThe next cairn waits beyond the Arches of the West Wind, inside the Sandstone Labyrinth (Station 15). I will rest under the Monolith tonight and wire you at first light, before I set out.";
+          }
+        },
+        {
+          // First light at the Monolith (Sheet 14A/14B). Covers the printed "North of the Sun Monolith" of Sheet 14B:
+          // the line comes from the founders' survey, and the Order drew its charts with the south at the top.
+          step: 13,
+          hermesInitial: "First light, Silvia. From the foot of the Monolith I can see the plateau of the Arches of the West Wind, and under it the Sandstone Labyrinth. It lies south-south-east of here, on the old line of 348° that the founders cut into Cairn III to point back at this very stone (Sheet 14A).\n\nYes, Sheet 14B says 'North of the Sun Monolith'. I copied that line from the founders' survey, and it puzzled me for years. Then, in the shadow of the Sanctuary, I remembered how they drew their charts: with the south at the top, as the great cartographers of the caravans did. Their north is our south. The ground does not lie; only the paper turns.\n\nOne more thing. There are fresh wheel ruts in the sand, going the same way. The BC Ashes fled into that labyrinth with their wagons once before.",
+          choices: [
+            {
+              id: "choice-13-bearing",
+              text: "Walk the reverse of the 348° groove.",
+              silviaMsg: "Take the bearing from Sheet 14A, Hermes. If Cairn III points to the Monolith at 348°, walk the reverse: 168°, south-south-east, and the cairn will be waiting at the end of it.",
+              hermesReply: "One hundred and sixty-eight degrees. You turn the founders' compass faster than I do, Silvia. I will keep the Monolith exactly behind my back all the way down."
+            },
+            {
+              id: "choice-13-ruts",
+              text: "Keep off the ruts. Don't let them see you.",
+              silviaMsg: "Keep away from those ruts, Hermes. Walk on rock where you can, and don't let them see you coming.",
+              hermesReply: "I will walk the stone shelves, where wheels leave no mark and the sand cannot remember me. If they are inside, I want to see their fires before they see my lamp."
+            },
+            {
+              id: "choice-13-tablet",
+              text: "Copy the Tablet at the Mouth before you go in.",
+              silviaMsg: "When you reach the Southern Mouth, copy the tablet before you go in. I'll trace the true road on Sheet 14B while you walk.",
+              hermesReply: "It is already in my log: eight stone arches stand upon the one true road, each bearing a single letter. Find me those eight letters, Silvia, and I will speak them at the cairn."
+            }
+          ]
+        },
+        {
+          step: 14,
+          completed: true,
+          get hermesFinal() {
+            return "I am going down now. Six hours to the Southern Mouth of the labyrinth, along the line of 168°, keeping to the rock. Trace Sheet 14B while I walk: only one road reaches Cairn III, and eight arches stand upon it.\n\n" + sealsPhrase(sealsAtGates() + 1) + " in my satchel, Silvia. " + sealsPhrase(4 - sealsAtGates()) + " still sleeping in the stone.";
+          }
+        },
+        {
+          // Station 15 debrief: the raiders' camp and the gold star (the next thread towards the Oracle, see the Master Bible §12)
+          step: 15,
+          hermesInitial: "I am out, Silvia. Through the Western Cleft and onto the open hardpan, with the Seal of Cairn III wrapped in my scarf. They never saw my face.\n\nTwo things I cannot stop thinking about. Their camp: cold ashes, a broken wagon wheel, the charred circle of the BC Ashes scratched on the rock. They have been sleeping in that labyrinth for days, waiting for someone to open the cairn for them. Now they know someone did.\n\nAnd the star. A star painted in gold leaf on the wall of a fissure, eight points over a ground of blue, and the gold still bright. Aurelia gilded her stars exactly like that, the blue first so the gold would seem to burn in the night. First the blue at Cairn II, now this. Either the sun is cooking my mind, or someone walks these cairns ahead of me and knows the old way of painting the sky.",
+          choices: [
+            {
+              id: "choice-15-star",
+              text: "Someone is marking the way for you.",
+              silviaMsg: "Hermes, that's no accident. Someone is marking the way for you. The blue at Cairn II, the gold in the labyrinth...",
+              hermesReply: "Or marking it for someone else, and I happen to be walking it. I copied the star into my log, point by point. Eight points, like the wind rose of the Order. I will look for the next one."
+            },
+            {
+              id: "choice-15-raiders",
+              text: "Lose the raiders before Cairn IV.",
+              silviaMsg: "The raiders will follow you now. Lose them before Cairn IV, whatever it takes.",
+              hermesReply: "The canyon of Cairn IV is far to the south-west, across the open hardpan. I will cross it by night and sleep in the rocks by day. Let them search the labyrinth for a man who is no longer in it."
+            },
+            {
+              id: "choice-15-aurelia",
+              text: "Tell me about Aurelia's stars.",
+              silviaMsg: "Tell me about Aurelia's stars, Hermes. How did she paint them?",
+              hermesReply: "With a brush of squirrel hair, holding her breath so the gold leaf would not fly away. A ground of lapis first, then the gold, then one stroke of white at the tip of each point. I never saw anyone else do it. I never saw anyone else need to."
+            }
+          ]
+        },
+        {
+          step: 16,
+          completed: true,
+          get hermesFinal() {
+            return sealsPhrase(sealsAtGates() + 2) + " of five, Silvia. The Seal of Cairn III sits next to the second one, and the two lines carved under the copper plate belong in your Cipher Ledger: [W] + [A] = 26 and [N] − [E] = 9.\n\nThe fourth cairn stands far to the south-west, where the canyon narrows: Cairn IV, the Sentry of the Canyon (Station 16). I will wire you when I see its twin pillars.";
           }
         }
       ];
@@ -17335,6 +17586,27 @@
           category: "Cairn II",
           group: "desert",
           answer: "The iron marks are the raiders'. The BC Ashes carry pry bars on their wagons, and the ash in the cracks is the same grey ash as on their banners. They know the Astrolabe needs the seals, and they tried to take one by force. But the founders built every cairn so that only the patient can open it. Force finds nothing but stone."
+        },
+        {
+          id: "inq-labyrinth-arches",
+          title: "How do I find the true road of Sheet 14B?",
+          category: "Cairn III",
+          group: "desert",
+          answer: "Start at the Southern Mouth, never at the cairn: the tablet was written for someone walking in. Trace with a pencil and keep one hand on the wall, the way a blind man walks a corridor; every dead end you leave behind, shade it in, and the true road will stand out on its own. Only the arches that stand on that one road count, and only in the order you pass beneath them. The arches in the side fissures are there to fool the hurried. Eight letters, Silvia, read from the mouth to the cairn."
+        },
+        {
+          id: "inq-torch-rounds",
+          title: "How do the raiders' torches move?",
+          category: "Cairn III",
+          group: "desert",
+          answer: "They walk rounds, Silvia, the same squares again and again, like sentries on a wall. Some go back and forth along one corridor; one walks a loop around their camp. A torch only lights what is in front of it, so the safest place in the labyrinth is right behind one. Hold still in a side passage, let the light go past, then follow it. I have drawn their rounds on your board so you can count the beats between them."
+        },
+        {
+          id: "inq-cairn3-plate",
+          title: "What was under the copper plate of Cairn III?",
+          category: "Cairn III",
+          group: "desert",
+          answer: "Two plates, one on top of the other. On top, the copper benchmark I set myself in 1998, pointing 112° to Outer Watchtower VI, without knowing whose stones I was stacking (Sheet 14A). Beneath it, the founders' own copper plate, with eight letter slots and the old groove of 348° cut into the stone. When the eight letters of the true road were spoken it turned on its pin, and the founders' stone was waiting underneath with the Seal of Cairn III and two lines: [W] + [A] = 26 and [N] − [E] = 9."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -17368,7 +17640,8 @@
       } else {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       }
-      if (wireCurrentStep > 12) wireCurrentStep = 12;
+      const WIRE_LAST_STEP = 16;   // the last step of the expedition thread written so far (end of Station 15)
+      if (wireCurrentStep > WIRE_LAST_STEP) wireCurrentStep = WIRE_LAST_STEP;
       while (wireHistory.length < wireCurrentStep) {
         wireHistory.push(0);
       }
@@ -17420,7 +17693,10 @@
         cairn1: { key: 'order_cairn1_completed', label: 'the Cairn I seal' },
         monolithHint: { key: 'order_monolith_hint', label: 'three tries at the sigil of Cairn II' },
         monolithAwake: { key: 'order_sun_monolith_awake', label: 'waking the Sun Monolith' },
-        monolith: { key: 'order_sun_monolith_completed', label: 'Station 14' }
+        monolith: { key: 'order_sun_monolith_completed', label: 'Station 14' },
+        labyrinthHint: { key: 'order_labyrinth_hint', label: 'three tries at the sigil of Cairn III' },
+        labyrinthTorches: { key: 'order_labyrinth_torch_hint', label: 'three close calls in the labyrinth' },
+        labyrinth: { key: 'order_sandstone_labyrinth_completed', label: 'Station 15' }
       };
       const INQUIRY_REQUIREMENTS = {
         'inq-salt-playa': 'chasm',
@@ -17437,7 +17713,10 @@
         'inq-river-hunch': 'cairn1',
         'inq-monolith-shadows': 'monolithHint',
         'inq-walking-sun': 'monolithAwake',
-        'inq-cairn2-niche': 'monolith'
+        'inq-cairn2-niche': 'monolith',
+        'inq-labyrinth-arches': 'labyrinthHint',
+        'inq-torch-rounds': 'labyrinthTorches',
+        'inq-cairn3-plate': 'labyrinth'
       };
       FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
       const INQUIRY_GROUPS = [
@@ -17480,6 +17759,8 @@
         '12B': { title: 'The Oasis Clepsydra', note: 'The logic grid of the four seekers at the Four Wells.', thumb: './assets/thumbnails/oasis_clepsydra_preview.webp', path: 'desert', node: 12, nodeLabel: 'Station 13 · The Oasis Clepsydra' },
         '13A': { title: 'At the Gates of Tower II', note: 'The Sandstone Sanctuary, its Servant, and the demand of the five seals. The great circuit begins north-north-east.' },
         '13B': { title: 'The Sun Monolith & Cairn II', note: 'Seven noons, seven shadows, seven rings of the dial: the sigil of Cairn II.', thumb: './assets/thumbnails/sun_monolith_preview.webp', path: 'desert', node: 23, nodeLabel: 'Station 14 · The Sun Monolith' },
+        '14A': { title: 'The Five Geodetic Cairns', note: 'The markers of the Order, the words of the Servant, and the survey of Cairn III: 112° to Watchtower VI, 348° to the Sun Monolith.' },
+        '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
         '17A': { title: 'The Polybius Stele', note: "The Servant's trial: a keyed 5×5 cipher carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' }
       };
       let sheetPopover = null;
@@ -18102,7 +18383,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -18131,7 +18412,9 @@
       const WIRE_FINAL_TELEMETRY = {
         8: () => '✦ MIRAGE DISPELLED · REAL SPRING FOUND · 4 WATER SKINS FILLED · KEY XXX · [P] - [A] = 14 RECORDED ✦',
         10: () => '✦ TOWER II SEALED · SEALS ' + sealsAtGates() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (12 H) ✦',
-        12: () => '✦ SEAL OF CAIRN II SECURED · SEALS ' + (sealsAtGates() + 1) + ' / 5 · [D] + [F] = 24 · [C] − [T] = 8 RECORDED ✦'
+        12: () => '✦ SEAL OF CAIRN II SECURED · SEALS ' + (sealsAtGates() + 1) + ' / 5 · [D] + [F] = 24 · [C] − [T] = 8 RECORDED ✦',
+        14: () => '✦ SEALS ' + (sealsAtGates() + 1) + ' / 5 · DOWN TO THE SANDSTONE LABYRINTH (6 H) · BEARING 168° SSE ✦',
+        16: () => '✦ SEAL OF CAIRN III SECURED · SEALS ' + (sealsAtGates() + 2) + ' / 5 · [W] + [A] = 26 · [N] − [E] = 9 RECORDED ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -18160,7 +18443,7 @@
         showTyping(false);
 
         const isSilvia = (localStorage.getItem('the_eclipse_active_seeker') || (window.currentSeeker || 'Silvia')).toLowerCase() === 'silvia';
-        targetStep = Math.max(isSilvia ? 4 : 0, Math.min(12, Number(targetStep) || 0));
+        targetStep = Math.max(isSilvia ? 4 : 0, Math.min(WIRE_LAST_STEP, Number(targetStep) || 0));
         wireCurrentStep = targetStep;
         wireHistory = wireHistory.slice(0, targetStep);
 
@@ -18525,40 +18808,74 @@
         renderWireExpedition();
       };
 
-      // The 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (Station 14).
-      // It starts when Silvia answers Hermes at the gates (wire step 9).
-      const MONOLITH_MARCH_HOURS = 12;
-      const MONOLITH_MARCH_MS = MONOLITH_MARCH_HOURS * 3600 * 1000;
-      function getMonolithMarchProgress() {
-        if (localStorage.getItem('order_monolith_march_bypassed') === 'true') return 1.0;
-        if (localStorage.getItem('order_sun_monolith_completed') === 'true') return 1.0;
-        const start = parseInt(localStorage.getItem('order_monolith_march_start') || '0', 10);
-        if (!start) return 0.0;
-        return Math.max(0, Math.min(1.0, (Date.now() - start) / MONOLITH_MARCH_MS));
+      // Timed walks between stations: they start when Silvia answers Hermes on the wire, and end when
+      // the hours have passed, the station is solved, or a tester skips them.
+      function makeMarch(hours, keys) {
+        const ms = hours * 3600 * 1000;
+        const progress = () => {
+          if (localStorage.getItem(keys.bypassed) === 'true') return 1.0;
+          if (localStorage.getItem(keys.done) === 'true') return 1.0;
+          const start = parseInt(localStorage.getItem(keys.start) || '0', 10);
+          if (!start) return 0.0;
+          return Math.max(0, Math.min(1.0, (Date.now() - start) / ms));
+        };
+        const started = () => !!localStorage.getItem(keys.start) || progress() >= 1.0;
+        const over = () => progress() >= 1.0;
+        // "5 h 12 min" while Hermes walks; '' before he sets out or once he has arrived
+        const eta = () => {
+          if (!started() || over()) return '';
+          const remMs = Math.max(0, ms * (1 - progress()));
+          return Math.floor(remMs / 3600000) + ' h ' + String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0') + ' min';
+        };
+        const start = () => { if (!localStorage.getItem(keys.start)) { try { localStorage.setItem(keys.start, String(Date.now())); } catch (e) {} } };
+        const skip = () => {
+          localStorage.setItem(keys.bypassed, 'true');
+          if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
+          renderWireExpedition();
+        };
+        return { progress, started, over, eta, start, skip };
       }
-      function isMonolithMarchStarted() {
-        return !!localStorage.getItem('order_monolith_march_start') || getMonolithMarchProgress() >= 1.0;
-      }
-      function isMonolithMarchOver() {
-        return getMonolithMarchProgress() >= 1.0;
-      }
-      // "5 h 12 min" while Hermes walks; '' before he sets out or once he has arrived
-      function getMonolithMarchEta() {
-        if (!isMonolithMarchStarted() || isMonolithMarchOver()) return '';
-        const remMs = Math.max(0, MONOLITH_MARCH_MS * (1 - getMonolithMarchProgress()));
-        const hrs = Math.floor(remMs / 3600000);
-        const mins = Math.floor((remMs % 3600000) / 60000);
-        return hrs + ' h ' + String(mins).padStart(2, '0') + ' min';
-      }
+
+      // Station 14: the 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (wire step 9 starts it)
+      const monolithMarch = makeMarch(12, { start: 'order_monolith_march_start', bypassed: 'order_monolith_march_bypassed', done: 'order_sun_monolith_completed' });
+      const getMonolithMarchProgress = monolithMarch.progress;
+      const isMonolithMarchStarted = monolithMarch.started;
+      const isMonolithMarchOver = monolithMarch.over;
+      const getMonolithMarchEta = monolithMarch.eta;
       window.getMonolithMarchProgress = getMonolithMarchProgress;
       window.isMonolithMarchStarted = isMonolithMarchStarted;
       window.isMonolithMarchOver = isMonolithMarchOver;
       window.getMonolithMarchEta = getMonolithMarchEta;
-      window.skipMonolithMarch = function () {
-        localStorage.setItem('order_monolith_march_bypassed', 'true');
-        if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
-        renderWireExpedition();
+      window.skipMonolithMarch = monolithMarch.skip;
+
+      // Station 15: the 6-hour walk down from the Sun Monolith to the Sandstone Labyrinth (wire step 13 starts it)
+      const labyrinthMarch = makeMarch(6, { start: 'order_labyrinth_march_start', bypassed: 'order_labyrinth_march_bypassed', done: 'order_sandstone_labyrinth_completed' });
+      window.getLabyrinthMarchProgress = labyrinthMarch.progress;
+      window.isLabyrinthMarchStarted = labyrinthMarch.started;
+      window.isLabyrinthMarchOver = labyrinthMarch.over;
+      window.getLabyrinthMarchEta = labyrinthMarch.eta;
+      window.skipLabyrinthMarch = labyrinthMarch.skip;
+
+      // What the Field Wire shows while each march is under way (wire step → leg), and which answer starts it
+      const MARCH_LEGS = {
+        10: {
+          step: 10, march: monolithMarch, doneKey: 'order_sun_monolith_completed',
+          walkingTitle: '✦ Crossing the Great Erg · Heading NNE to the Sun Monolith ✦',
+          walkingDesc: 'Hermes is walking by night across the Great Erg, with the stars for a compass. Keep Sheet 13B close.',
+          etaLabel: 'ARRIVAL AT THE SUN MONOLITH',
+          arrivedTitle: 'Sun Monolith Reached · Station 14 Awaits',
+          arrivedDesc: 'Hermes is standing on the Ridge of the Sun. Open the Grand Desert Map and wake Cairn II (Station 14 · Sheet 13B).'
+        },
+        14: {
+          step: 14, march: labyrinthMarch, doneKey: 'order_sandstone_labyrinth_completed',
+          walkingTitle: '✦ Down to the Sandstone Labyrinth · Bearing 168° SSE ✦',
+          walkingDesc: 'Hermes is walking down from the Sun Monolith on the stone shelves, away from the raiders\' ruts. Trace Sheet 14B while he walks.',
+          etaLabel: 'ARRIVAL AT THE SANDSTONE LABYRINTH',
+          arrivedTitle: 'Sandstone Labyrinth Reached · Station 15 Awaits',
+          arrivedDesc: 'Hermes is at the foot of Cairn III, inside the labyrinth. Open the Grand Desert Map and speak the sigil of its copper plate (Station 15 · Sheet 14B).'
+        }
       };
+      const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch };
 
       function dawnMessageText(i) {
         const d = DAWN_THREAD[i];
@@ -18892,7 +19209,7 @@
               appendStepIntro(7);
             }
           }
-          if (s === 8 || s === 10) {
+          if (WIRE_FINAL_TELEMETRY[s]) {
             appendStepFinal(s);
             if (wireCurrentStep >= s + 1) appendStepIntro(s + 1);
           }
@@ -18926,8 +19243,8 @@
         } else if (wireCurrentStep === 6) {
           appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[6].hermesFinal, false, false, null, null, { type: 'expedition', step: 6 });
           appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA LOCKED [RAIDERS 194° SSW · TOWER II 14° NNE] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
-        } else if (wireCurrentStep === 8 || wireCurrentStep === 10 || wireCurrentStep >= 12) {
-          appendStepFinal(Math.min(wireCurrentStep, 12));
+        } else if (WIRE_FINAL_TELEMETRY[Math.min(wireCurrentStep, WIRE_LAST_STEP)]) {
+          appendStepFinal(Math.min(wireCurrentStep, WIRE_LAST_STEP));
         }
 
         wireMessagesStream.classList.remove('is-restoring');
@@ -18949,8 +19266,8 @@
         const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
         const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
 
-        // Steps 8–12: the gates of Tower II (9), the crossing to the Sun Monolith (10),
-        // the Station 14 debrief (11) and the end of this leg (12)
+        // Steps 8–16: the gates of Tower II (9), the crossing to the Sun Monolith (10), the Station 14 debrief (11),
+        // first light at the Monolith (13), the walk down to the labyrinth (14), the Station 15 debrief (15) and the end of this leg (16)
         const showWaypointBar = (title, desc, persistStep) => {
           wirePromptBox.style.display = 'none';
           wireCompletedBar.style.display = 'flex';
@@ -18964,51 +19281,61 @@
           } catch (e) {}
           return descEl;
         };
-        if (wireCurrentStep >= 12) {
-          showWaypointBar('Seal of Cairn II Secured · Seals ' + countCairnSeals() + ' / 5', 'Next: The Sandstone Labyrinth (Station 15 · Sheet 14B). Hermes will wire you when he reaches its mouth.', 12);
+        // Steps 10 and 14: Hermes walks to the next station. The trek bar shows the countdown (refreshed every 30 s),
+        // then the arrival bar stays until the station is solved. Returns true while that leg is not finished.
+        const showMarchLeg = (leg) => {
+          leg.march.start();   // a save that stands here without a start time (e.g. after a tester replay) sets out now
+          if (!leg.march.over()) {
+            const descEl = showWaypointBar(leg.walkingTitle, '', leg.step);
+            const updateTrek = () => {
+              if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || leg.march.over()) {
+                if (window.__wireMarchTimer) { clearInterval(window.__wireMarchTimer); window.__wireMarchTimer = null; }
+                if (leg.march.over()) renderWireChoices();
+                return;
+              }
+              if (!descEl) return;
+              descEl.innerHTML = leg.walkingDesc
+                + '<div style="margin-top:6px; color:#fde68a; font-family:\'Cinzel\',serif; font-size:0.84rem; letter-spacing:0.05em;">⏱️ ' + leg.etaLabel + ' IN ' + leg.march.eta().toUpperCase() + '</div>'
+                + (isCarlesTester() ? '<div style="margin-top:8px;"><button type="button" class="btn-admin-skip-march" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:\'Cinzel\',serif; cursor:pointer;">⏩ Tester: skip the walk</button></div>' : '');
+              const skipBtn = descEl.querySelector('.btn-admin-skip-march');
+              if (skipBtn) skipBtn.onclick = (e) => { e.stopPropagation(); leg.march.skip(); };
+            };
+            updateTrek();
+            if (window.__wireMarchTimer) clearInterval(window.__wireMarchTimer);
+            window.__wireMarchTimer = setInterval(updateTrek, 30000);
+            return true;
+          }
+          if (localStorage.getItem(leg.doneKey) !== 'true') {
+            showWaypointBar(leg.arrivedTitle, leg.arrivedDesc, leg.step);
+            return true;
+          }
+          return false;
+        };
+        const advanceTo = (step) => {
+          wireCurrentStep = step;
+          try { localStorage.setItem('order_field_wire_step', String(step)); } catch (e) {}
+          appendStepIntro(step);
+        };
+
+        if (wireCurrentStep >= WIRE_LAST_STEP) {
+          showWaypointBar('Seal of Cairn III Secured · Seals ' + countCairnSeals() + ' / 5', 'Next: Cairn IV, Sentry of the Canyon (Station 16 · Sheet 15A). Hermes will wire you when he sees its twin pillars.', WIRE_LAST_STEP);
           return;
         }
         if (wireCurrentStep === 8) {
           // The Four Wells are behind him: Hermes reaches the gates of Tower II (Sheet 13A)
-          wireCurrentStep = 9;
-          try { localStorage.setItem('order_field_wire_step', '9'); } catch (e) {}
           rememberGateSeal();
-          appendStepIntro(9);
+          advanceTo(9);
         }
         if (wireCurrentStep === 10) {
-          // A save that stands at step 10 without a start time (e.g. after a tester replay) sets out now
-          if (!isMonolithMarchStarted()) {
-            try { localStorage.setItem('order_monolith_march_start', String(Date.now())); } catch (e) {}
-          }
-          if (!isMonolithMarchOver()) {
-            const descEl = showWaypointBar('✦ Crossing the Great Erg · Heading NNE to the Sun Monolith ✦', '', 10);
-            const updateMonolithTrek = () => {
-              if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || isMonolithMarchOver()) {
-                if (window.__monolithMarchTimer) { clearInterval(window.__monolithMarchTimer); window.__monolithMarchTimer = null; }
-                if (isMonolithMarchOver()) renderWireChoices();
-                return;
-              }
-              if (!descEl) return;
-              const isTester = isCarlesTester();
-              descEl.innerHTML = 'Hermes is walking by night across the Great Erg, with the stars for a compass. Keep Sheet 13B close.'
-                + '<div style="margin-top:6px; color:#fde68a; font-family:\'Cinzel\',serif; font-size:0.84rem; letter-spacing:0.05em;">⏱️ ARRIVAL AT THE SUN MONOLITH IN ' + getMonolithMarchEta().toUpperCase() + '</div>'
-                + (isTester ? '<div style="margin-top:8px;"><button type="button" id="btn-admin-skip-monolith-march" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:\'Cinzel\',serif; cursor:pointer;">⏩ Tester: skip the crossing</button></div>' : '');
-              const skipBtn = descEl.querySelector('#btn-admin-skip-monolith-march');
-              if (skipBtn) skipBtn.onclick = (e) => { e.stopPropagation(); window.skipMonolithMarch(); };
-            };
-            updateMonolithTrek();
-            if (window.__monolithMarchTimer) clearInterval(window.__monolithMarchTimer);
-            window.__monolithMarchTimer = setInterval(updateMonolithTrek, 30000);
-            return;
-          }
-          if (localStorage.getItem('order_sun_monolith_completed') !== 'true') {
-            showWaypointBar('Sun Monolith Reached · Station 14 Awaits', 'Hermes is standing on the Ridge of the Sun. Open the Grand Desert Map and wake Cairn II (Station 14 · Sheet 13B).', 10);
-            return;
-          }
-          // Station 14 solved: the debrief (and the blue on the rim of the niche)
-          wireCurrentStep = 11;
-          try { localStorage.setItem('order_field_wire_step', '11'); } catch (e) {}
-          appendStepIntro(11);
+          if (showMarchLeg(MARCH_LEGS[10])) return;
+          advanceTo(11);   // Station 14 solved: the debrief (and the blue on the rim of the niche)
+        }
+        if (wireCurrentStep === 12) {
+          advanceTo(13);   // first light at the Sun Monolith, before the walk down to the labyrinth
+        }
+        if (wireCurrentStep === 14) {
+          if (showMarchLeg(MARCH_LEGS[14])) return;
+          advanceTo(15);   // Station 15 solved: the raiders' camp and the gold star
         }
 
         if (wireCurrentStep === 6) {
@@ -19433,13 +19760,13 @@
                 renderWireChoices();
                 updateMessengerBadge();
               }
-            } else if (justAnsweredStep === 9 || justAnsweredStep === 11) {
+            } else if (justAnsweredStep === 9 || justAnsweredStep === 11 || justAnsweredStep === 13 || justAnsweredStep === 15) {
               // 9: Silvia answered at the gates of Tower II, and the 12-hour crossing to the Sun Monolith begins.
               // 11: Silvia answered the Station 14 debrief.
+              // 13: Silvia answered at first light, and the 6-hour walk down to the Sandstone Labyrinth begins.
+              // 15: Silvia answered the Station 15 debrief.
               if (justAnsweredStep === 9) rememberGateSeal();
-              if (justAnsweredStep === 9 && !localStorage.getItem('order_monolith_march_start')) {
-                try { localStorage.setItem('order_monolith_march_start', String(Date.now())); } catch (e) {}
-              }
+              if (MARCH_STARTED_BY_ANSWER[justAnsweredStep]) MARCH_STARTED_BY_ANSWER[justAnsweredStep].start();
               const finalStep = justAnsweredStep + 1;
               setTimeout(() => {
                 showTyping(true);
@@ -19864,6 +20191,7 @@
       // Next pending Desert Path station (internal node ids: 10 Chasm, 21 Salt Playa, 11 Lexicon, 12 Clepsydra)
       function getNextDesertNodeId() {
         if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') return typeof window.getDawnNodeId === 'function' ? window.getDawnNodeId() : 10;
+        if (localStorage.getItem('order_sun_monolith_completed') === 'true') return 24;
         if (localStorage.getItem('order_oasis_clepsydra_completed') === 'true') return 23;
         if (localStorage.getItem('order_desert_lexicon_completed') === 'true') return 12;
         return localStorage.getItem('order_salt_playa_completed') === 'true' ? 11 : 21;
@@ -19914,20 +20242,7 @@
           const divLabel = document.querySelector('.map-divider-label');
           if (divLabel) divLabel.textContent = '✦ The Grand Desert Map ✦';
 
-          const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
-          const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
-          const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
-
-          let activeId = 12;
-          if (!isChasmDone) {
-            activeId = typeof window.getDawnNodeId === 'function' ? window.getDawnNodeId() : 10;
-          } else if (!isPlayaDone && !isLexiconDone) {
-            activeId = 21;
-          } else if (!isLexiconDone) {
-            activeId = 11;
-          } else if (localStorage.getItem('order_oasis_clepsydra_completed') === 'true') {
-            activeId = 23;
-          }
+          const activeId = getNextDesertNodeId();
 
           showDesertMap(false);
 
@@ -20036,6 +20351,10 @@
           window.selectMapNode(23, true);
           if (window.openSunMonolithModal) window.openSunMonolithModal();
           else showDesertToast('Station 14: The Sun Monolith · See Sheet 13B of your physical journal.');
+        } else if (targetId === 24) {
+          window.selectMapNode(24, true);
+          if (window.openLabyrinthModal) window.openLabyrinthModal();
+          else showDesertToast('Station 15: The Sandstone Labyrinth · See Sheet 14B of your physical journal.');
         } else if (targetId === 13) {
           window.selectMapNode(13, true);
           if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
@@ -22894,6 +23213,465 @@
 
       drawSky();
       drawPavement();
+      if (isDone()) applyVictory();
+      else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
+      render();
+    })();
+
+    // =========================================================================
+    // 🌀 STATION 15 · THE SANDSTONE LABYRINTH & CAIRN III (ESCAPE FROM THE BC ASHES · SHEET 14B)
+    // Part I (journal): the eight-letter sigil opens the copper plate of Cairn III.
+    // Part II (web only): a turn-based escape through a dark labyrinth. Every step of Hermes
+    // (or holding still) moves every torch one square along its round.
+    // The level was generated and checked offline (search over square × turn): it can be solved from
+    // any phase of the rounds, the shortest road that ignores the torches gets caught, and the gold
+    // star and the raiders' camp sit on squares that every road must cross.
+    // Reward: the Seal of Cairn III and two Ledger equations.
+    // =========================================================================
+    (function initSandstoneLabyrinth() {
+      const modal = document.getElementById('modal-sandstone-labyrinth');
+      if (!modal) return;
+      const sfx = window.sfx || null;
+      const $ = (id) => document.getElementById(id);
+      const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+      const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const KEYS = {
+        awake: 'order_labyrinth_awake',
+        done: 'order_sandstone_labyrinth_completed',
+        fails: 'order_labyrinth_key_fails',
+        hint: 'order_labyrinth_hint',
+        captures: 'order_labyrinth_captures',
+        torchHint: 'order_labyrinth_torch_hint',
+        star: 'order_labyrinth_star_seen',
+        camp: 'order_labyrinth_camp_seen'
+      };
+      const SIGIL = 'WINDROSE';
+      const HINT_AFTER_FAILS = 3;
+      const TORCH_HINT_AFTER = 3;   // captures before Hermes has learnt the rounds
+      const LIVES = 3;              // close calls per run
+      const LAMP = 2;               // Hermes's lamp: squares around him (in both axes)
+      const REACH = 2;              // a torch lights its square and this many squares ahead
+
+      // Walls: one hex digit per square, bits N=1 E=2 S=4 W=8. Torches: their rounds, square by square.
+      const LEVEL = {
+        cols: 13,
+        rows: 11,
+        walls: [
+          '955539391553b',
+          'ad53ac2c4396a',
+          'a93c43c396c56',
+          'aac1569683953',
+          '869693c3c2a92',
+          'a9456c3c3c6aa',
+          'c2939503c556a',
+          '96ac2d6813956',
+          'a943c556aaa93',
+          'c2929153c46aa',
+          'd46c46d455546'
+        ],
+        start: [6, 0],
+        exit: [0, 10],
+        star: [10, 6],
+        camp: [8, 7],
+        guards: [
+          [[12, 5], [12, 4], [12, 3], [11, 3], [10, 3], [10, 4], [10, 3], [11, 3], [12, 3], [12, 4]],
+          [[8, 7], [9, 7], [9, 8], [9, 9], [10, 9], [10, 8], [10, 9], [9, 9], [9, 8], [9, 7]],
+          [[2, 7], [2, 8], [3, 8], [2, 8]],
+          [[4, 7], [4, 6], [5, 6], [6, 6], [7, 6], [7, 7], [7, 8], [6, 8], [5, 8], [4, 8]]
+        ]
+      };
+      const DIRS = [
+        { bit: 1, dx: 0, dy: -1, name: 'north' },
+        { bit: 2, dx: 1, dy: 0, name: 'east' },
+        { bit: 4, dx: 0, dy: 1, name: 'south' },
+        { bit: 8, dx: -1, dy: 0, name: 'west' }
+      ];
+      const CELL = 10;
+      const cellKey = (x, y) => y * LEVEL.cols + x;
+      const wallBits = (x, y) => parseInt(LEVEL.walls[y][x], 16);
+      const dirOf = (dx, dy) => DIRS.find((d) => d.dx === dx && d.dy === dy) || null;
+      const canStep = (x, y, dir) => !(wallBits(x, y) & dir.bit);
+      const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+      const PERIOD = LEVEL.guards.reduce((acc, r) => acc * r.length / gcd(acc, r.length), 1);
+
+      function guardAt(route, t) { return route[t % route.length]; }
+      // Squares lit by the torches at turn t
+      function litAt(t) {
+        const lit = new Set();
+        LEVEL.guards.forEach((route) => {
+          const [x, y] = guardAt(route, t);
+          const [nx, ny] = guardAt(route, t + 1);
+          lit.add(cellKey(x, y));
+          const dir = dirOf(nx - x, ny - y);
+          if (!dir) return;
+          let cx = x, cy = y;
+          for (let i = 0; i < REACH && canStep(cx, cy, dir); i++) {
+            cx += dir.dx; cy += dir.dy;
+            lit.add(cellKey(cx, cy));
+          }
+        });
+        return lit;
+      }
+
+      const el = {
+        close: $('btn-close-labyrinth'), sigilCard: $('laby-sigil-card'), keyInput: $('laby-key-input'), speak: $('btn-laby-speak'),
+        keyFeedback: $('laby-key-feedback'), game: $('laby-game'), gameInner: document.querySelector('#laby-game .monolith-game-inner'),
+        board: $('laby-board'), lives: $('laby-lives'), turnLabel: $('laby-turn-label'), moveFeedback: $('laby-move-feedback'),
+        hint: $('laby-hint'), victory: $('laby-victory'), victoryText: $('laby-victory-text'), finish: $('btn-laby-finish'),
+        dispatch: $('laby-dispatch-text'), pad: { up: $('btn-laby-up'), down: $('btn-laby-down'), left: $('btn-laby-left'), right: $('btn-laby-right'), wait: $('btn-laby-wait') },
+        tSigil: $('laby-telem-sigil'), tTurn: $('laby-telem-turn'), tLives: $('laby-telem-lives'), tSeal: $('laby-telem-seal')
+      };
+
+      const isAwake = () => get(KEYS.awake) === 'true';
+      const isDone = () => get(KEYS.done) === 'true';
+      const torchHintOn = () => get(KEYS.torchHint) === 'true';
+
+      // One run of the escape. It lives only while the page is open; a reload starts again at Cairn III.
+      let run = null;
+      const seen = new Set();
+      function newRun() {
+        run = { x: LEVEL.start[0], y: LEVEL.start[1], t: 0, moves: 0, lives: LIVES, trail: [] };
+        reveal();
+      }
+      function reveal() {
+        for (let y = run.y - LAMP; y <= run.y + LAMP; y++) {
+          for (let x = run.x - LAMP; x <= run.x + LAMP; x++) {
+            if (x >= 0 && y >= 0 && x < LEVEL.cols && y < LEVEL.rows) seen.add(cellKey(x, y));
+          }
+        }
+      }
+      const inLamp = (x, y) => Math.abs(x - run.x) <= LAMP && Math.abs(y - run.y) <= LAMP;
+
+      const svgEl = (tag, attrs) => {
+        const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.keys(attrs).forEach((k) => n.setAttribute(k, attrs[k]));
+        return n;
+      };
+      const svgText = (x, y, text, attrs) => {
+        const t = svgEl('text', Object.assign({ x, y, 'text-anchor': 'middle' }, attrs || {}));
+        t.textContent = text;
+        return t;
+      };
+      function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
+      function feedback(node, text, kind) {
+        if (!node) return;
+        node.textContent = text;
+        node.classList.toggle('is-error', kind === 'error');
+        node.classList.toggle('is-ok', kind === 'ok');
+      }
+
+      // ---- Drawing ----
+      const cx = (x) => x * CELL + CELL / 2;
+      const cy = (y) => y * CELL + CELL / 2;
+      function drawBoard() {
+        const b = el.board;
+        if (!b || !run) return;
+        b.textContent = '';
+        const done = isDone();
+        const lit = litAt(run.t);
+        b.appendChild(svgEl('rect', { x: 0, y: 0, width: LEVEL.cols * CELL, height: LEVEL.rows * CELL, fill: '#050302', stroke: '#5c4524', 'stroke-width': 0.6 }));
+
+        // Floor: bright inside the lamp, dim where Hermes has already been, black elsewhere
+        const walls = { near: '', far: '' };
+        for (let y = 0; y < LEVEL.rows; y++) {
+          for (let x = 0; x < LEVEL.cols; x++) {
+            if (!done && !seen.has(cellKey(x, y))) continue;
+            const near = done || inLamp(x, y);
+            b.appendChild(svgEl('rect', { x: x * CELL, y: y * CELL, width: CELL, height: CELL, fill: near ? '#5a3f1e' : '#1a1109' }));
+            const bits = wallBits(x, y), x0 = x * CELL, y0 = y * CELL;
+            let d = '';
+            if (bits & 1) d += `M${x0} ${y0}h${CELL}`;
+            if (bits & 2) d += `M${x0 + CELL} ${y0}v${CELL}`;
+            if (bits & 4) d += `M${x0} ${y0 + CELL}h${CELL}`;
+            if (bits & 8) d += `M${x0} ${y0}v${CELL}`;
+            walls[near ? 'near' : 'far'] += d;
+          }
+        }
+        if (walls.far) b.appendChild(svgEl('path', { d: walls.far, stroke: '#8a6d3b', 'stroke-width': 1.1, 'stroke-linecap': 'square', fill: 'none' }));
+        if (walls.near) b.appendChild(svgEl('path', { d: walls.near, stroke: '#fcd34d', 'stroke-width': 1.4, 'stroke-linecap': 'square', fill: 'none' }));
+
+        // The torches' rounds, once Hermes has learnt them (hint)
+        if (torchHintOn() && !done) {
+          LEVEL.guards.forEach((route) => {
+            const pts = route.map(([x, y]) => cx(x) + ',' + cy(y)).join(' ');
+            b.appendChild(svgEl('polyline', { points: pts + ' ' + cx(route[0][0]) + ',' + cy(route[0][1]), fill: 'none', stroke: '#fb923c', 'stroke-opacity': 0.45, 'stroke-width': 0.8, 'stroke-dasharray': '1.5 1.5' }));
+          });
+        }
+
+        // Torchlight is visible from anywhere in the dark
+        if (!done) {
+          lit.forEach((k) => {
+            const x = k % LEVEL.cols, y = Math.floor(k / LEVEL.cols);
+            b.appendChild(svgEl('rect', { x: x * CELL + 0.6, y: y * CELL + 0.6, width: CELL - 1.2, height: CELL - 1.2, fill: 'rgba(251, 146, 60, 0.32)' }));
+          });
+        }
+
+        // Landmarks
+        const [sx, sy] = LEVEL.start, [ex, ey] = LEVEL.exit;
+        b.appendChild(svgText(cx(sx), cy(sy) + 2.6, '△', { fill: '#fde68a', 'font-size': 7 }));
+        b.appendChild(svgText(cx(ex), cy(ey) + 2.4, '⇦', { fill: '#86efac', 'font-size': 7 }));
+        const [stx, sty] = LEVEL.star, [cpx, cpy] = LEVEL.camp;
+        if (done || seen.has(cellKey(stx, sty))) b.appendChild(svgText(cx(stx), cy(sty) + 2.6, '✶', { fill: '#fbbf24', 'font-size': 7.5 }));
+        if (done || seen.has(cellKey(cpx, cpy))) b.appendChild(svgText(cx(cpx), cy(cpy) + 2.2, '⨁', { fill: '#a8a29e', 'font-size': 6.5 }));
+
+        // Torches, with an arrowhead showing where they walk next
+        if (!done) {
+          LEVEL.guards.forEach((route) => {
+            const [x, y] = guardAt(route, run.t), [nx, ny] = guardAt(route, run.t + 1);
+            const dx = nx - x, dy = ny - y, ox = cx(x) + dx * 4.4, oy = cy(y) + dy * 4.4;
+            b.appendChild(svgEl('circle', { cx: cx(x), cy: cy(y), r: 3.3, fill: '#7c2d12', stroke: '#fb923c', 'stroke-width': 0.7 }));
+            b.appendChild(svgText(cx(x), cy(y) + 1.7, '🔥', { 'font-size': 4.4 }));
+            b.appendChild(svgEl('polygon', { points: `${ox + dx * 1.6},${oy + dy * 1.6} ${ox - dy * 1.4},${oy + dx * 1.4} ${ox + dy * 1.4},${oy - dx * 1.4}`, fill: '#fdba74' }));
+          });
+        }
+
+        // Hermes and his lamp
+        b.appendChild(svgEl('circle', { cx: cx(run.x), cy: cy(run.y), r: 6, fill: 'rgba(253, 230, 138, 0.12)' }));
+        b.appendChild(svgEl('circle', { cx: cx(run.x), cy: cy(run.y), r: 2.9, fill: '#fde68a', stroke: '#fff7d6', 'stroke-width': 0.6 }));
+
+        // Labels around the board
+        b.appendChild(svgText(cx(sx), -4, 'CAIRN III', { fill: '#fde68a', 'font-size': 4.2, 'letter-spacing': 0.4 }));
+        b.appendChild(svgText(65, LEVEL.rows * CELL + 7, 'THE SOUTHERN MOUTH · RAIDERS', { fill: '#fb923c', 'font-size': 3.6, 'letter-spacing': 0.3 }));
+        b.appendChild(svgText(0, LEVEL.rows * CELL + 13, 'THE WESTERN CLEFT ⇧', { fill: '#86efac', 'font-size': 3.6, 'text-anchor': 'start', 'letter-spacing': 0.3 }));
+      }
+
+      function render() {
+        const awake = isAwake(), done = isDone();
+        if (run) drawBoard();
+        if (el.lives) {
+          el.lives.textContent = '';
+          for (let i = 0; i < LIVES; i++) {
+            const span = document.createElement('span');
+            span.textContent = '🏮';
+            if (run && i >= run.lives) span.className = 'is-spent';
+            el.lives.appendChild(span);
+          }
+        }
+        if (el.turnLabel) el.turnLabel.textContent = done ? 'Escaped' : 'Turn ' + (run ? run.moves : 0);
+        if (el.tTurn) el.tTurn.textContent = String(run ? run.moves : 0);
+        if (el.tLives) el.tLives.textContent = done ? '—' : String(run ? run.lives : LIVES);
+        if (el.tSigil) el.tSigil.textContent = awake ? SIGIL + ' ✓' : '[ 8 LETTERS ]';
+        if (el.tSeal) el.tSeal.textContent = done ? 'CAIRN III ✓' : (awake ? 'IN HERMES\'S HAND' : '[ SEALED ]');
+        if (el.game) el.game.classList.toggle('is-locked', !awake);
+        if (el.gameInner) el.gameInner.inert = !awake;
+        if (el.sigilCard) el.sigilCard.classList.toggle('is-collapsed', awake);
+        const spoken = 'Sigil spoken: ' + SIGIL + ' ✓';
+        if (awake && el.keyFeedback && el.keyFeedback.textContent !== spoken) feedback(el.keyFeedback, spoken, 'ok');
+        Object.values(el.pad).forEach((btn) => { if (btn) btn.disabled = !awake || done; });
+        if (el.hint) el.hint.style.display = torchHintOn() && !done ? '' : 'none';
+        if (el.victory) el.victory.style.display = done ? '' : 'none';
+      }
+
+      // ---- Part I: the sigil from Sheet 14B ----
+      function speakSigil() {
+        if (isAwake()) return;
+        const typed = (el.keyInput ? el.keyInput.value : '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
+        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from Sheet 14B.', 'error'); return; }
+        if (typed !== SIGIL) {
+          const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
+          set(KEYS.fails, String(fails));
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
+            set(KEYS.hint, 'true');
+            feedback(el.keyFeedback, 'The copper plate does not move. Hermes left you a note in Ask Hermes about reading the arches.', 'error');
+          } else {
+            feedback(el.keyFeedback, 'The copper plate does not move. Walk the one true road of Sheet 14B again.', 'error');
+          }
+          return;
+        }
+        set(KEYS.awake, 'true');
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+        feedback(el.keyFeedback, 'WINDROSE. The copper plate turns, and the seal is in Hermes\'s hand.', 'ok');
+        say("The plate turned under my hand, Silvia, and the Seal of Cairn III is in my palm. But there are torches at the Southern Mouth. The BC Ashes followed my tracks into the labyrinth, and I cannot go back the way I came. The founders cut another way out, the Western Cleft. Guide me there through the dark. Let the torches pass, then follow behind them.");
+        render();
+        if (el.pad.wait) setTimeout(() => el.pad.wait.focus(), 60);
+      }
+
+      // ---- Part II: the escape ----
+      function takeTurn(dx, dy) {
+        if (!isAwake() || isDone() || !run) return;
+        if (dx || dy) {
+          const dir = dirOf(dx, dy);
+          if (!dir || !canStep(run.x, run.y, dir)) {
+            feedback(el.moveFeedback, 'Solid rock to the ' + (dir ? dir.name : 'side') + '.', 'error');
+            return;
+          }
+        }
+        run.trail.push([run.x, run.y]);
+        run.x += dx; run.y += dy;
+        run.moves++;
+        const here = cellKey(run.x, run.y);
+        if (litAt(run.t).has(here)) { caught('Hermes walked straight into the torchlight.'); return; }
+        run.t++;
+        if (litAt(run.t).has(here)) { caught('A torch came round the corner and found him.'); return; }
+        reveal();
+        feedback(el.moveFeedback, dx || dy ? '' : 'Hermes holds his breath in the dark.', '');
+        landmarks();
+        if (run.x === LEVEL.exit[0] && run.y === LEVEL.exit[1]) { completeStation(); return; }
+        render();
+      }
+
+      function landmarks() {
+        if (run.x === LEVEL.star[0] && run.y === LEVEL.star[1] && get(KEYS.star) !== 'true') {
+          set(KEYS.star, 'true');
+          say("Silvia... on the wall of this fissure there is a star, painted in gold leaf. Eight points, laid over a ground of blue. The gold is bright: it has not been here long. I know only one hand that gilded stars like this. I cannot stop now.");
+        } else if (run.x === LEVEL.camp[0] && run.y === LEVEL.camp[1] && get(KEYS.camp) !== 'true') {
+          set(KEYS.camp, 'true');
+          say("Their camp. Cold ashes, a broken wagon wheel, and the charred circle of the BC Ashes scratched on the rock. They have been sleeping in this labyrinth for days, waiting for someone to open the cairn for them.");
+        }
+      }
+
+      function caught(how) {
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        const captures = (parseInt(get(KEYS.captures) || '0', 10) || 0) + 1;
+        set(KEYS.captures, String(captures));
+        if (captures >= TORCH_HINT_AFTER && !torchHintOn()) set(KEYS.torchHint, 'true');
+        if (el.board) { el.board.classList.remove('laby-flash'); void el.board.getBoundingClientRect(); el.board.classList.add('laby-flash'); }
+        run.lives--;
+        if (run.lives <= 0) {
+          newRun();
+          feedback(el.moveFeedback, how + ' No close calls left: Hermes ran back to the shadow of Cairn III.', 'error');
+          say("They saw me, Silvia. I ran back up to the cairn and they lost me among the pillars. The torches keep their rounds; watch them, and we try again." + (torchHintOn() ? " I have drawn their rounds on your board." : ''));
+          render();
+          return;
+        }
+        // A close call: Hermes flattens himself into a crack and the raiders walk on.
+        // The rounds move on until his square is dark again; if it never is, he steps back the way he came.
+        let k = 1;
+        while (k <= PERIOD && litAt(run.t + k).has(cellKey(run.x, run.y))) k++;
+        while (k > PERIOD && run.trail.length) {
+          [run.x, run.y] = run.trail.pop();
+          k = 1;
+          while (k <= PERIOD && litAt(run.t + k).has(cellKey(run.x, run.y))) k++;
+        }
+        run.t += k;
+        reveal();
+        feedback(el.moveFeedback, how + ' A close call: he pressed into a crack in the rock and the torch walked on.', 'error');
+        render();
+      }
+
+      function completeStation() {
+        set(KEYS.done, 'true');
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(3);
+        else set('order_seal_cairn_3', 'true');
+        feedback(el.moveFeedback, 'The Western Cleft. Hermes is out.', 'ok');
+        say("I am out, Silvia! Through the Western Cleft and onto the open hardpan. The torches are still searching the fissures behind me.");
+        applyVictory();
+        render();
+        if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+        if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
+        if (el.finish) setTimeout(() => el.finish.focus(), 60);
+      }
+
+      function applyVictory() {
+        if (el.victoryText) {
+          el.victoryText.textContent = "Hermes squeezed through the Western Cleft with the Seal of Cairn III wrapped in his scarf. The raiders never saw his face. Under the copper plate, on the founders' stone, two lines were waiting. And there was more in that labyrinth... He will tell you on the wire.";
+        }
+        if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+        if (run) { run.x = LEVEL.exit[0]; run.y = LEVEL.exit[1]; }
+      }
+
+      // ---- Controls: pad, keyboard, tapping a square next to Hermes ----
+      const STEPS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0], wait: [0, 0] };
+      Object.keys(STEPS).forEach((k) => { if (el.pad[k]) el.pad[k].addEventListener('click', () => takeTurn(STEPS[k][0], STEPS[k][1])); });
+      const KEYMAP = { ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down', ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right', ' ': 'wait' };
+      document.addEventListener('keydown', (e) => {
+        if (modal.style.display === 'none' || !isAwake() || isDone()) return;
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+        const k = KEYMAP[e.key];
+        if (!k) return;
+        if (k === 'wait' && e.target && e.target.tagName === 'BUTTON') return;   // the space bar already presses the focused button
+        e.preventDefault();
+        takeTurn(STEPS[k][0], STEPS[k][1]);
+      });
+      if (el.board) {
+        el.board.addEventListener('click', (e) => {
+          if (!run || !isAwake() || isDone()) return;
+          const ctm = el.board.getScreenCTM();
+          if (!ctm) return;
+          const pt = el.board.createSVGPoint();
+          pt.x = e.clientX; pt.y = e.clientY;
+          const p = pt.matrixTransform(ctm.inverse());
+          const x = Math.floor(p.x / CELL), y = Math.floor(p.y / CELL);
+          const dx = x - run.x, dy = y - run.y;
+          if (Math.abs(dx) + Math.abs(dy) <= 1) takeTurn(dx, dy);
+        });
+      }
+      if (el.speak) el.speak.addEventListener('click', speakSigil);
+      if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });
+
+      // ---- Open / close ----
+      function canOpen() {
+        if (isDone()) return true;
+        if (typeof window.isAdminTester === 'function' && window.isAdminTester()) return true;
+        if (get('order_sun_monolith_completed') !== 'true') return false;
+        return typeof window.isLabyrinthMarchOver === 'function' ? window.isLabyrinthMarchOver() : false;
+      }
+      let returnFocusTo = null;
+      function openLabyrinthModal() {
+        if (!canOpen()) {
+          const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
+          if (!toast) return;
+          if (get('order_sun_monolith_completed') !== 'true') {
+            toast('✦ TERRA INCOGNITA ✦ Wake Cairn II at the Sun Monolith (Station 14) before the road to the labyrinth opens.');
+          } else if (typeof window.getLabyrinthMarchEta === 'function' && window.getLabyrinthMarchEta()) {
+            toast('Hermes is walking down to the Sandstone Labyrinth. Arrival in ' + window.getLabyrinthMarchEta() + '.');
+          } else {
+            toast('Hermes is resting under the Sun Monolith. Open the Cliffside Workshop: he will wire you at first light.');
+          }
+          return;
+        }
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        modal.style.display = 'flex';
+        modal.classList.remove('closing');
+        returnFocusTo = document.activeElement;
+        if (!run) newRun();
+        if (isDone()) applyVictory();
+        else if (!isAwake()) say("Silvia, I am inside the labyrinth, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road: Sheet 14B.");
+        else say("The torches are still out there. Watch their rounds, Silvia, and take me to the Western Cleft.");
+        render();
+        const focusTarget = isDone() ? el.finish : isAwake() ? el.pad.wait : el.keyInput;
+        if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
+      }
+      function closeLabyrinthModal() {
+        if (modal.style.display === 'none') return;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        modal.classList.add('closing');
+        setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
+        if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
+        returnFocusTo = null;
+      }
+      window.openLabyrinthModal = openLabyrinthModal;
+      window.closeLabyrinthModal = closeLabyrinthModal;
+      if (el.close) el.close.addEventListener('click', closeLabyrinthModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeLabyrinthModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display !== 'none') closeLabyrinthModal(); });
+      if (el.finish) {
+        el.finish.addEventListener('click', () => {
+          closeLabyrinthModal();
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+          if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+          if (typeof window.showDesertToast === 'function') {
+            let seals = 0;
+            for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
+            window.showDesertToast('✦ Seal of Cairn III secured (' + seals + ' of 5) ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
+          }
+        });
+      }
+
+      // Test hook for scripts/audit/web_smoke.py: the level (it is in this source anyway) and the controls
+      window.__labyrinth = {
+        level: JSON.parse(JSON.stringify(LEVEL)),
+        reach: REACH,
+        state: () => (run ? { x: run.x, y: run.y, t: run.t, moves: run.moves, lives: run.lives } : null),
+        step: (dx, dy) => takeTurn(dx, dy)
+      };
+
+      newRun();
       if (isDone()) applyVictory();
       else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
       render();

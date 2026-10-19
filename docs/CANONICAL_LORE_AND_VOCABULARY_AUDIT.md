@@ -646,6 +646,17 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$[C] = 8 + 16 \implies \mathbf{C = 24}$$
 - **Asignación en el Ledger**: $\mathbf{D = 18, \quad C = 24}$. La web nunca muestra estos valores (Regla 9): Silvia los deduce.
 
+#### 8. DEDUCCIÓN DE $W$ Y $N$ (Estación 15 · Bajo la placa de cobre de Cairn III, solo en la web)
+- **Origen**: al salir del laberinto por la Western Cleft (Estación 15), las dos líneas grabadas en la piedra de los fundadores bajo la placa de cobre aparecen en el Ledger (`requires: 'order_sandstone_labyrinth_completed'`).
+- **Ecuación 1 (The West Wind Line)**:
+  $$[W] + [A] = 26$$
+- **Ecuación 2 (The Wind Rose Line)**:
+  $$[N] - [E] = 9$$
+- **Resolución** (con $A = 7$ de §7.B.1 y $E = 2$ de §7.B.4):
+  $$[W] = 26 - 7 \implies \mathbf{W = 19}$$
+  $$[N] = 9 + 2 \implies \mathbf{N = 11}$$
+- **Asignación en el Ledger**: $\mathbf{W = 19, \quad N = 11}$. Valores aún libres en la tabla (todas las letras asignadas tienen valores distintos).
+
 ---
 
 ## 8. DIRECTORIO GEOGRÁFICO Y ONOMÁSTICO CANÓNICO
@@ -757,7 +768,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara B (13B · Juego D5)**: **The Sun Monolith**. Alineación y obtención del **Sello de Cairn II**. *(web, Estación 14)* Segunda parte: «el sol que camina»; en la tapa del nicho, $[D] + [F] = 24$ y $[C] - [T] = 8$; marcas de palanca de los BC Ashes y un rastro de azul cobalto (ver §12).
 - **Hoja 14**:
   - **Cara A (14A · Lore)**: **Los 5 Cairns de Peregrinación**. Estudio cartográfico y marcas geodésicas.
-  - **Cara B (14B · Juego D6)**: **The Sandstone Labyrinth**. Senda entre arcos y fisuras para conseguir el **Sello de Cairn III**.
+  - **Cara B (14B · Juego D6)**: **The Sandstone Labyrinth**. Senda entre arcos y fisuras para conseguir el **Sello de Cairn III**. *(web, Estación 15)* Segunda parte: huida por turnos de las antorchas de los BC Ashes hasta la Western Cleft; bajo la placa de cobre, $[W] + [A] = 26$ y $[N] - [E] = 9$; campamento de los asaltantes y una estrella de pan de oro (ver §12).
 - **Hoja 15**:
   - **Cara A (15A · Juego D7)**: **Cairn IV (Sentry of the Canyon)**. Custodia de la garganta acústica; obtención del **Sello de Cairn IV**.
   - **Cara B (15B · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Izq · Spread 3)**. Elev. 980 varas, arco de roca y desfiladero en alta definición.
@@ -841,6 +852,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **1B / 17B** | *«the Astrolabe we recovered»* | Ver §2.E: el Astrolabio maestro se recuperó de los escombros de 1971 y Hermes lo restauró y mejoró (2016–2026). |
 | **10A / 10B** | *«Elev. 980 paces»* (el mapa dice *varas*) | En la agrimensura de la Orden el «paso» de Hermes es la vara de medir: usa ambas palabras para la misma cota. |
 | **11A** | *«Al-Qibla Vector 194* SSW»* | Rumbo de huida de los BC Ashes; la Torre II queda en el rumbo inverso, 14° NNE (ver §9, Hoja 11A). |
+| **14B** | *«North of the Sun Monolith, the open desert rises…»* (el mapa y la Hoja 14A ponen el laberinto al SSE del Monolito: la ranura de Cairn III apunta a 348° NNW hacia él) | Hermes copió esa línea del levantamiento de los fundadores. **La Orden dibujaba sus cartas con el sur arriba**, como los grandes cartógrafos de las caravanas: su «norte» es nuestro sur. Hermes lo explica en el Field Wire (paso 13, Estación 15). |
 | **4A / 5A** | *«stereographic»*, *«The Mater»*, *«The Tympan»* | Se imprimieron el 28-09-2026, antes de que la lista de términos prohibidos entrara en esta Biblia (10-10-2026). Son las notas técnicas del Hermes astrónomo; los textos nuevos usan el vocabulario sencillo (Regla 6 de `AGENTS.md`). |
 
 ---
@@ -870,7 +882,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | :---: | :--- | :--- | :--- |
 | **13A / 14** | El Sirviente sonríe al oír el nombre de Hermes (respuesta *choice-9-remember*). | Un anciano que se alegra de una visita. | ✅ Web |
 | **14** | En el nicho de Cairn II, un rastro de **azul cobalto** de lapislázuli molido muy fino. Hermes: *«Aurelia ground her lapis exactly like this»*; se convence de que ve fantasmas. Último fragmento de la tapa: *«And the Oracle, who keeps the sand, will remember.»* | Otro pintor de la Orden; una profecía. | ✅ Web |
-| **15** | Una estrella dorada con pan de oro en un cruce del laberinto, con el trazo de las cartas de Aurelia. | Marca de los fundadores. | ⏳ Plan |
+| **15** | Una estrella de pan de oro de ocho puntas sobre fondo de lapislázuli, reciente, en la pared de una fisura del laberinto (casilla por la que pasa toda ruta de huida). Hermes: *«Aurelia gilded her stars exactly like that»*; duda entre un guía y el sol. Su respuesta *choice-15-aurelia* describe la técnica (pincel de ardilla, fondo azul, toque blanco). | Marca de los fundadores; alguien guía a otro. | ✅ Web |
 | **16** | Los nómadas hablan de «la velada que canta a las estrellas en otoño». | Leyenda del desierto. | ⏳ Plan |
 | **17** | Desde el Arco del Solsticio, Hermes vuelve a ver de noche el pulso de 2016: tres cortos, pausa, dos largos. | El faro del Santuario. | ⏳ Plan |
 | **18** | El Sirviente, tras la Estela de Polibio: *«She came from the edge of the sky with a disc in her arms and no name.»* | — (la duda ya es seria). | ⏳ Plan |
