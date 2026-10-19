@@ -126,7 +126,7 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
 - **Cara A (Anverso · Juego D3)**: **Juego 3: The Desert Lexicon & Al-Qibla (Los Asaltantes BC Ashes)**.
   - **Narrativa**: Hermes cae en una emboscada de forajidos en las ruinas nómadas. Al descifrar las inscripciones en los sillares de piedra, logra despistar a los perseguidores y descubre en los estandartes y marcas de fuego el nombre de la banda que saqueó el Observatorio: **Los BC Ashes**.
   - **Mecánica**: Crucigrama nómada de 10 palabras y brújula solar *Al-Qibla*.
-  - **Solución Canónica**: Sigil solar **`P H O E N I X`**, rumbo **$194^\circ\text{ SSW}$**. Deducción cripto-aritmética: $[R] \times 2 = [F] \implies F = 6$ (confirma F de St06+St09); la ecuación solo está en la web.
+  - **Solución Canónica**: Sigil solar **`P H O E N I X`**, rumbo **$194^\circ\text{ SSW}$**: es el rumbo de huida de los BC Ashes (subtítulo impreso: *«Inscriptions from the Bivouac of The BC Ashes · Al-Qibla Vector 194° SSW»*). La cola de la aguja marca el rumbo inverso, **$14^\circ\text{ NNE}$**, que lleva a la Torre II (el santuario queda al NNE de la Salt Playa en el mapa 12A). Deducción cripto-aritmética: $[R] \times 2 = [F] \implies F = 6$ (confirma F de St06+St09); la ecuación solo está en la web.
 - **Cara B (Reverso · Mapa)**: **Gran Mapa del Desierto · Cuadrante SO** (*Spread 2 Izquierda*).
   - Accidentes: *The Whispering Chasm*, *The Lower Wash*, *The Terraces of the Jackal*, *The Sentinel Mesa (Elev. 980 varas)*, *Cairn IV (Sentry of the Canyon)*.
 

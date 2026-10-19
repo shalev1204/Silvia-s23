@@ -12327,10 +12327,10 @@
           <div class="lexicon-victory-card" id="lexicon-victory-card" style="display: none;">
             <div class="lexicon-victory-title">
               <span>🦅</span>
-              <span>Al-Qibla Sanctuary Heading Locked! (194° SSW)</span>
+              <span>Al-Qibla Locked! Raiders 194° SSW · Tower II 14° NNE</span>
             </div>
             <div class="lexicon-victory-text">
-              "Silvia! PHOENIX! The Sigil of the Sun-Bird! The bronze dial clicked into place, aligning the needle exactly to 194° South-Southwest. The path across the Great Erg to the Sanctuary of the Desert Oracle is unlocked! Look at the second stele: a mathematical inscription carved by ancient stargazers: [R] × 2 = [F]. Update your Cipher Ledger! The scorched banners on these walls name the raiders: the BC Ashes! Our next stop is the Four Wells of the Oasis Clepsydra!"
+              "Silvia! PHOENIX! The Sigil of the Sun-Bird! The bronze dial clicked into place and the needle swung to 194° South-Southwest: the heading the raiders carved in their bivouac, the way they fled with the Astrolabe. But a needle has two ends, and the sun-bird's tail points 14° North-Northeast, straight to the Sanctuary of the Desert Oracle. The path across the Great Erg is unlocked! Look at the second stele: a mathematical inscription carved by ancient stargazers: [R] × 2 = [F]. Update your Cipher Ledger! The scorched banners on these walls name the raiders: the BC Ashes! Our next stop is the Four Wells of the Oasis Clepsydra!"
             </div>
             <button type="button" class="btn-lexicon-finish" id="btn-lexicon-finish">
               <span>🗺️ Return to Grand Desert Map & Unlock Clepsydra Trail ➔</span>
@@ -12693,7 +12693,7 @@
               <span>Subterranean Siphons Engaged · 4 Water Skins Filled!</span>
             </div>
             <div class="clepsydra-victory-text">
-              "Silvia! The moment Key XXX fell into place, the four wells shimmered and vanished. There were never any siphons: it was the fever, a mirage of the heat. But your logic kept my head clear, and with a clear head I saw what was really there: a narrow cleft in the rock beneath a carved falcon, cold water seeping from it, and an old cache of supplies. Our four leather water skins are full. Scratched into the stone beside the falcon: [P] - [A] = 14! With water in our skins and Al-Qibla set to 194° SSW, the crossing of the Great Erg is secured. Next: Station 14!"
+              "Silvia! The moment Key XXX fell into place, the four wells shimmered and vanished. There were never any siphons: it was the fever, a mirage of the heat. But your logic kept my head clear, and with a clear head I saw what was really there: a narrow cleft in the rock beneath a carved falcon, cold water seeping from it, and an old cache of supplies. Our four leather water skins are full. Scratched into the stone beside the falcon: [P] - [A] = 14! With water in our skins and Al-Qibla set on Tower II (14° NNE), the crossing of the Great Erg is secured. Next: Station 14!"
             </div>
             <div class="clepsydra-canteens-row">
               <div class="clepsydra-canteen-chip"><span>🍶</span> Canteen I: Cartographer (Scarab · Hr VI) ✓</div>
@@ -13944,14 +13944,14 @@
           if (isLexiconDone) {
             return {
               badge: 'STATION 12 // AL-QIBLA BEARING LOCKED',
-              status: 'HEADING TO THE SANCTUARY 194° SSW ✓',
+              status: 'TOWER II LIES 14° NNE ✓',
               statusClass: 'status-done-badge',
               title: 'The Desert Lexicon & Al-Qibla',
               thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-              lore: 'Translating the ten words carved on the stelae of the nomad ruins (Sheet 11A), Silvia formed the PHOENIX Sigil and set the Al-Qibla sun compass to 194° SSW, pointing at Tower II.',
+              lore: 'Translating the ten words carved on the stelae of the nomad ruins (Sheet 11A), Silvia formed the PHOENIX Sigil and set the Al-Qibla sun compass: its needle points 194° SSW, the way the raiders fled, and its tail 14° NNE, toward Tower II.',
               rewards: [
                 { icon: '🦅', label: 'The Desert Sigil: PHOENIX', desc: 'Master key of 7 circled letters' },
-                { icon: '🧭', label: 'Al-Qibla Bearing: 194° SSW', desc: 'Straight heading to Tower II' },
+                { icon: '🧭', label: 'Al-Qibla: 194° SSW · 14° NNE', desc: 'The raiders\' heading, and its reverse to Tower II' },
                 { icon: '📐', label: 'Stargazer Equation: [R] × 2 = [F]', desc: 'Cipher Ledger: work out F and T' }
               ],
               btnText: 'Review the Lexicon & Compass ➔',
@@ -16417,20 +16417,20 @@
               id: "choice-5-sigil",
               text: "The circled letters spell PHOENIX. That Desert Sigil unlocks the Al-Qibla sun compass!",
               silviaMsg: "The circled letters spell PHOENIX! That Desert Sigil unlocks the Al-Qibla sun compass dial.",
-              hermesReply: "PHOENIX! The sacred Sun-Bird of the desert that rises from its own embers! When I tapped those seven letters into the brass dial, the needle broke free of the sand with a crisp click!\n\nIt settled steadily on 194° South-Southwest! That is our true line across the Great Erg directly to Tower II!"
+              hermesReply: "PHOENIX! The sacred Sun-Bird of the desert that rises from its own embers! When I tapped those seven letters into the brass dial, the needle broke free of the sand with a crisp click!\n\nIt settled steadily on 194° South-Southwest: the heading the raiders carved here, the way they fled with the Astrolabe! And the sun-bird's tail points the other way, 14° North-Northeast. That is our true line across the Great Erg to Tower II!"
             },
             {
               id: "choice-5-oracle",
               text: "The compass must point to Tower II. The Desert Oracle is the only one who can guide us now.",
               silviaMsg: "The compass must point directly to Tower II. The Desert Oracle is the only guardian who can see through this storm.",
-              hermesReply: "Exactly so, Silvia! The raiders' tracks are gone, but the Oracle's eye never sleeps. With this 194° SSW bearing locked into our charts, we can cross the Great Erg without fear of losing the trail.\n\nAnd look under the shadow curb of the second stele: an ancient mathematical inscription: [R] × 2 = [F]! Update your Cipher Ledger!"
+              hermesReply: "Exactly so, Silvia! The raiders' tracks are gone, but the Oracle's eye never sleeps. With Al-Qibla locked into our charts, 14° NNE to the Sanctuary and 194° SSW for the raiders, we can cross the Great Erg without losing our way.\n\nAnd look under the shadow curb of the second stele: an ancient mathematical inscription: [R] × 2 = [F]! Update your Cipher Ledger!"
             }
           ]
         },
         {
           step: 6,
           completed: true,
-          hermesFinal: "Silvia! Al-Qibla is locked: 194° South-Southwest! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: the raiders left scorched banners hanging in these ruins, and the burned mark matches the one on their wagons. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check Sheet 12B in your journal to balance the water flow!"
+          hermesFinal: "Silvia! Al-Qibla is locked: the raiders fled 194° South-Southwest, and Tower II lies the other way, 14° North-Northeast! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: the raiders left scorched banners hanging in these ruins, and the burned mark matches the one on their wagons. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check Sheet 12B in your journal to balance the water flow!"
         },
         {
           step: 7,
@@ -16459,7 +16459,7 @@
         {
           step: 8,
           completed: true,
-          hermesFinal: "Silvia! The four wells were a fever mirage, but your logic kept me lucid long enough to find the real spring: a cleft in the rock beneath a carved falcon, with an old cache of supplies tucked inside. We filled our four leather water skins to capacity.\n\nAnd scratched into the stone beside the falcon, in deep letters: [P] - [A] = 14!\n\nRecord this relation in your Cipher Ledger right away. With our water skins full and Al-Qibla locked at 194° SSW, I am ready to cross the treacherous Great Erg toward Station 14!"
+          hermesFinal: "Silvia! The four wells were a fever mirage, but your logic kept me lucid long enough to find the real spring: a cleft in the rock beneath a carved falcon, with an old cache of supplies tucked inside. We filled our four leather water skins to capacity.\n\nAnd scratched into the stone beside the falcon, in deep letters: [P] - [A] = 14!\n\nRecord this relation in your Cipher Ledger right away. With our water skins full and Al-Qibla set on Tower II (14° NNE), I am ready to cross the treacherous Great Erg toward Station 14!"
         }
       ];
 
@@ -16604,7 +16604,7 @@
           title: "What is the Al-Qibla heading and why 194° SSW?",
           category: "Navigation",
           group: "desert",
-          answer: "Al-Qibla is the sacred direction dial used by nomads to cross trackless dune seas. In our sector, a bearing of exactly 194° South-Southwest leads through the blinding shifting sands of the Great Erg directly to Tower II (The Sandstone Sanctuary). Without this calibrated heading, an expedition would wander in circles and perish in the Erg."
+          answer: "Al-Qibla is the sacred direction dial used by nomads to cross trackless dune seas. In the raiders' bivouac, its needle locks on 194° South-Southwest: the heading the BC Ashes carved before they fled with the Astrolabe. A needle has two ends, though: the sun-bird's tail points the reverse way, 14° North-Northeast, through the shifting sands of the Great Erg to Tower II (The Sandstone Sanctuary). Without this calibrated line, an expedition would wander in circles and perish in the Erg."
         },
         {
           id: "inq-four-wells",
@@ -18296,7 +18296,7 @@
           }
           if (s === 6) {
             appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[6].hermesFinal, false, false, null, null, { type: 'expedition', step: 6 });
-            appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
+            appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA LOCKED [RAIDERS 194° SSW · TOWER II 14° NNE] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
             if (EXPEDITION_THREAD[7] && EXPEDITION_THREAD[7].hermesInitial && wireCurrentStep >= 7) {
               appendStepIntro(7);
             }
@@ -18330,7 +18330,7 @@
           dawnFinalePlaying = appendDawnHistory();
         } else if (wireCurrentStep === 6) {
           appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[6].hermesFinal, false, false, null, null, { type: 'expedition', step: 6 });
-          appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
+          appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA LOCKED [RAIDERS 194° SSW · TOWER II 14° NNE] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
         } else if (wireCurrentStep >= 8) {
           appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[8].hermesFinal, false, false, null, null, { type: 'expedition', step: 8 });
           appendWireMessage('SYSTEM TELEMETRY', '✦ MIRAGE DISPELLED · REAL SPRING FOUND · 4 WATER SKINS FILLED · KEY XXX · [P] - [A] = 14 RECORDED ✦', true, false, null, null, { type: 'expedition', step: 8 });
@@ -18757,7 +18757,7 @@
                     showTyping(false);
                     if (sfx) sfx.playCelestialChime();
                     appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[6].hermesFinal, false, true, () => {
-                      appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
+                      appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA LOCKED [RAIDERS 194° SSW · TOWER II 14° NNE] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
                       renderWireChoices();
                       updateMessengerBadge();
                     }, null, { type: 'expedition', step: 6 });
@@ -19469,12 +19469,12 @@
       };
 
       const CAIRNS = [
-        { letter: 'M', r: 7, c: 9, step: 0, dispatch: "Silvia! I found the first marker near the dry wash. It bears the mark 'M'! The rock walls are keeping off the heat." },
+        { letter: 'M', r: 7, c: 9, step: 0, dispatch: "Silvia! I found the first marker near the dry wash. It bears the mark 'M'! The canyon walkers call these the Six Relic Cairns: small shrine-stones, each keeping a relic of a pilgrim the gorge never gave back. They are not the Order's great Cairns, but the walkers still leave water at their feet. The rock walls are keeping off the heat." },
         { letter: 'I', r: 9, c: 23, step: 1, dispatch: "Second marker reached! The letter 'I' is carved into red sandstone. Heading deeper into the gorge." },
         { letter: 'R', r: 11, c: 13, step: 2, dispatch: "Third marker! 'R'! The wind makes a soft whistling sound between the high cliffs. Your directions are keeping me safe." },
         { letter: 'A', r: 7, c: 1, step: 3, dispatch: "Fourth marker reached: 'A'! We skirted past the treacherous dry salt basin without losing the track." },
         { letter: 'G', r: 15, c: 13, step: 4, dispatch: "Fifth marker: 'G'! The gravel underfoot is damp—I can smell subterranean fresh water nearby!" },
-        { letter: 'E', r: 21, c: 15, step: 5, dispatch: "Sixth marker! 'E'! The cliffs are opening up. I can see a blinding white salt basin ahead, and ruins beyond it!" }
+        { letter: 'E', r: 21, c: 15, step: 5, dispatch: "Sixth marker! 'E'! The cliffs are opening up. The walkers call this mouth the Oasis Gate, because their old track runs on across the salt to the wells. I can see a blinding white salt basin ahead, and ruins beyond it!" }
       ];
 
       const DECOYS = [
@@ -21091,11 +21091,11 @@
           compassNeedle.style.transition = 'transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
         }
         if (compassLabel) {
-          compassLabel.textContent = 'HEADING: 194° SSW [LOCKED ON TOWER II]';
+          compassLabel.textContent = 'RAIDERS 194° SSW · TOWER II 14° NNE [LOCKED]';
           compassLabel.style.color = '#86efac';
         }
         if (telemBearing) {
-          telemBearing.textContent = '194° SSW [Locked]';
+          telemBearing.textContent = '194° SSW ⇄ 14° NNE [Locked]';
           telemBearing.style.color = '#86efac';
         }
         if (telemSigil) {
@@ -21106,7 +21106,7 @@
           victoryCard.style.display = 'block';
         }
         if (dispatchEl) {
-          dispatchEl.textContent = '"Silvia, the Al-Qibla brass dial locked into place with a chime! 194° South-Southwest! The path across the Great Erg to Tower II and the Desert Oracle is unlocked! Look at the second stele: [R] × 2 = [F]. Update your Cipher Ledger!"';
+          dispatchEl.textContent = '"Silvia, the Al-Qibla brass dial locked into place with a chime! The needle points 194° South-Southwest, the way the raiders fled; its tail points 14° North-Northeast, to Tower II and the Desert Oracle! The path across the Great Erg is unlocked! Look at the second stele: [R] × 2 = [F]. Update your Cipher Ledger!"';
         }
 
         try {
@@ -21596,7 +21596,7 @@
         if (victoryCard) victoryCard.style.display = 'flex';
         if (btnEngage) btnEngage.style.display = 'none';
         if (dispatchText) {
-          dispatchText.textContent = '"Silvia! The moment Key XXX fell into place, the four wells shimmered and vanished. There were never any siphons: it was the fever, a mirage of the heat. But your logic kept my head clear, and with a clear head I saw what was really there: a narrow cleft in the rock beneath a carved falcon, cold water seeping from it, and an old cache of supplies. Our four leather water skins are full. Scratched into the stone beside the falcon: [P] - [A] = 14! With water in our skins and Al-Qibla set to 194° SSW, the crossing of the Great Erg is secured. Next: Station 14!"';
+          dispatchText.textContent = '"Silvia! The moment Key XXX fell into place, the four wells shimmered and vanished. There were never any siphons: it was the fever, a mirage of the heat. But your logic kept my head clear, and with a clear head I saw what was really there: a narrow cleft in the rock beneath a carved falcon, cold water seeping from it, and an old cache of supplies. Our four leather water skins are full. Scratched into the stone beside the falcon: [P] - [A] = 14! With water in our skins and Al-Qibla set on Tower II (14° NNE), the crossing of the Great Erg is secured. Next: Station 14!"';
         }
       }
 

@@ -74,7 +74,7 @@ El propósito de esta versión 6.0 es blindar el proyecto al 100%:
 - **El Código del Disco**: Aquel destello no era una fogata ni una estrella: parpadeaba con una cadencia artificial inconfundible: **tres pulsos cortos, pausa, dos pulsos largos** —la clave matemática grabada en el disco de Aurelia.
 - **Adopción del Título Definitivo**: El hielo de 45 años se derritió en su corazón. Aurelia, o la reliquia de su amor, seguía viva en el desierto. Tomó un pliego de vitela virgen y firmó por primera vez su título de esperanza:
   $$\mathbf{«\ THE\ CARTOGRAPHER\ OF\ DISTANT\ LIGHT\ »\ (EL\ CARTÓGRAFO\ DE\ LA\ LUZ\ DISTANTE)}$$
-- **La Creación del Astrolabio (2016–2026)**: Durante la década siguiente forjó su obra maestra en los talleres del observatorio: **The Astrolabe of Distant Light**, un instrumento de precisión con 22 estrellas guía concebido para medir las seis estrellas maestras y alinear las Tres Torres Antiguas cuando llegara la buscadora elegida.
+- **La Recuperación y Restauración del Astrolabio (1971–2026)**: El Astrolabio maestro de los fundadores, custodiado en la Torre I, se perdió en el incendio de 1971. Durante la reconstrucción del observatorio (1971–1998) Hermes lo rescató de los escombros: mudo, roto e incompleto. Tras el pulso dorado de 2016 dedicó la década siguiente a restaurarlo y mejorarlo en los talleres del observatorio hasta convertirlo en **The Astrolabe of Distant Light**, un instrumento de precisión con 22 estrellas guía concebido para medir las seis estrellas maestras y alinear las Tres Torres Antiguas cuando llegara la buscadora elegida. *(Por eso las hojas impresas 1B y 17B hablan de «the Astrolabe we recovered» / «the recovered Astrolabe».)*
 
 ---
 
@@ -606,9 +606,9 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
    - Amada y compañera de Hermes. Astrónoma y artista de cartas celestes en azul cobalto y pan de oro.
    - Fallecida en el colapso del puente en 1971 al salvar el disco de latón y los mapas. Inspiración del voto eterno *"You were always the treasure"*.
 3. **The Oracle (El Oráculo / The Desert Oracle)**:
-   - La guardiana de **Tower II (The Sandstone Sanctuary)** en las dunas del desierto.
-   - Viste túnica desgastada, interpreta las sombras solares en el gnomon y habla en parábolas concisas. *(Queda terminantemente prohibido llamarla "Hermit" o "Ermitaño")*.
-   - *Nota de canon*: la Hoja 8A impresa («She wears no face») y el Email 2 («the Oracle in her sands») la fijan en femenino. La Hoja 17B impresa usa «he» (errata de impresión conocida, `build_entire_journal.py`; no se puede reimprimir).
+   - Guardián de **Tower II (The Sandstone Sanctuary)** en las dunas del desierto, de identidad desconocida.
+   - Viste túnica desgastada con capucha, interpreta las sombras solares en el gnomon y habla en parábolas concisas. *(Queda terminantemente prohibido llamarlo "Hermit" o "Ermitaño")*.
+   - *Nota de canon (identidad secreta)*: nadie, ni siquiera Hermes, sabe quién es. La doctrina de la Orden habla de «ella» (Hoja 8A «She wears no face»; Email 2 «the Oracle in her sands»); Hermes, que solo vio una figura encapuchada desde la cresta, escribe «he» (Hoja 17B). Los relatos se contradicen a propósito; ver §11.
 4. **The Mirror Speaker (El Portavoz del Espejo)**:
    - Guardián solemne y ceremonial de **Tower III (The Stage Tower / The Mirror Sanctuary)**.
    - Maestro de la simetría, la luz, el reflejo y la danza. *(Queda terminantemente prohibido llamarlo "Stage Mistress")*.
@@ -688,7 +688,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara A (10A · Juego D2)**: **The Salt Playa (Dry Basin)**. Navegación sobre la corteza salina quebradiza y simas de salmuera.
   - **Cara B (10B · Lore/Estudio)**: **Estudio Da Vinci: The Salt Playa Basin**. Morfología de la cristalización salina y estratos sedimentarios.
 - **Hoja 11**:
-  - **Cara A (11A · Juego D3)**: **The Desert Lexicon & Al-Qibla**. Emboscada de forajidos eludida; descubrimiento del nombre de los raiders: **Los BC Ashes**; Sigil solar **`PHOENIX`**; rumbo **$194^\circ\text{ SSW}$**; $[R] \times 2 = [F] \implies F = 6$ (confirma F de St06+St09); la ecuación solo está en la web.
+  - **Cara A (11A · Juego D3)**: **The Desert Lexicon & Al-Qibla**. Emboscada de forajidos eludida; descubrimiento del nombre de los raiders: **Los BC Ashes**; Sigil solar **`PHOENIX`**; rumbo **$194^\circ\text{ SSW}$** (el rumbo de huida de los BC Ashes, grabado en su vivac; la cola de la aguja marca el rumbo inverso, **$14^\circ\text{ NNE}$**, hacia la Torre II, como muestra el mapa 12A); $[R] \times 2 = [F] \implies F = 6$ (confirma F de St06+St09); la ecuación solo está en la web.
   - **Cara B (11B · Mapa)**: **Gran Mapa · Cuadrante SO** (*Spread 2 Izq*).
 - **Hoja 12**:
   - **Cara A (12A · Mapa)**: **Gran Mapa · Cuadrante SE** (*Spread 2 Der*).
@@ -767,4 +767,20 @@ Queda establecido como invariante de lore la distinción entre nombres físicos 
 | **Desert Lexicon** | **NO** | Es exclusivamente el título del **Juego D3** (Hoja 11A · Estación 12) y ocurre en unas ruinas nómadas junto a la Salt Playa, sin rótulo propio en el mapa. |
 | **The Whispering Chasm** | **SÍ** | Es tanto la localización física rotulada en el Cuadrante SO (Hoja 11B) como el título del **Juego D1** (Hoja 09B). |
 
+---
+
+## 11. ERRATAS DEL DIARIO IMPRESO Y SU COBERTURA DE LORE
+
+El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene una explicación dentro de la historia, que es canon:
+
+| Hoja impresa | Lo que dice | Cobertura canónica |
+| :--- | :--- | :--- |
+| **9B** | *«The Six Relic Cairns»* | No son los Cinco Cairns de la Orden. Son seis pequeños mojones-santuario de los caminantes del cañón: cada uno guarda la reliquia de un peregrino que la garganta no devolvió, y los nómadas aún dejan agua a sus pies. Cada uno lleva una letra (M-I-R-A-G-E). Hermes lo cuenta en la web al encontrar el primero. |
+| **9B** | Salida *«-> Desert Oasis»* | Es el nombre nómada de la boca sur del cañón, **la Oasis Gate**: la vieja senda de los caminantes cruza desde ahí la Salt Playa hasta los pozos (Camp VIII). |
+| **8A / 17B** | El Oráculo es *«she»* (8A) y *«he»* (17B) | **Nadie conoce la identidad del Oráculo, ni siquiera Hermes.** La 8A recoge la doctrina de la Orden («She wears no face»); la 17B es lo que Hermes vio desde la cresta: una figura con el rostro perdido en la capucha, y escribió «he». Los relatos de los viajeros también se contradicen. Posible revelación en la Torre II (Estación 19): el título de Oráculo pasa de un guardián a otro, y la Oráculo de la leyenda y quien ocupa hoy el santuario no son la misma persona. Los textos nuevos evitan el pronombre o lo presentan como duda. |
+| **7B** | *«Autumn, 1998 … I was twenty-four when I left the Sanctuary library behind»* | El apartado se titula *«I. The First Crossing into the Red Sands»*: en 1998 Hermes **recuerda su primera travesía**, que hizo a los 24 años (hacia 1968) al dejar la biblioteca del Santuario, antes de llegar al Observatorio Alpino. Cronología: nace hacia 1944 · 26 años en 1970 (joven astrónomo) · 54 en 1998 · 82 en 2026. Por eso el Sirviente (Hoja 14A, *«a young traveler»*) le recuerda joven: le conoció en aquella primera travesía. |
+| **1B / 17B** | *«the Astrolabe we recovered»* | Ver §2.E: el Astrolabio maestro se recuperó de los escombros de 1971 y Hermes lo restauró y mejoró (2016–2026). |
+| **10A / 10B** | *«Elev. 980 paces»* (el mapa dice *varas*) | En la agrimensura de la Orden el «paso» de Hermes es la vara de medir: usa ambas palabras para la misma cota. |
+| **11A** | *«Al-Qibla Vector 194* SSW»* | Rumbo de huida de los BC Ashes; la Torre II queda en el rumbo inverso, 14° NNE (ver §9, Hoja 11A). |
+| **4A / 5A** | *«stereographic»*, *«The Mater»*, *«The Tympan»* | Se imprimieron el 28-09-2026, antes de que la lista de términos prohibidos entrara en esta Biblia (10-10-2026). Son las notas técnicas del Hermes astrónomo; los textos nuevos usan el vocabulario sencillo (Regla 6 de `AGENTS.md`). |
 
