@@ -201,6 +201,7 @@ def test_sun_monolith(browser):
     js("window.openSunMonolithModal()"); page.wait_for_timeout(500)
     check(modal_open() and "Sealed in stone" in js("document.getElementById('monolith-inscription').innerText"),
           "after 12 h it opens, inscription still sealed")
+    check(js("document.querySelector('#monolith-game .monolith-game-inner').inert") is True, "sun controls inert while the stone sleeps")
     for word in ["SUNDAY", "DIALSUN", "SUN DIAL X"]:
         page.fill("#monolith-key-input", word); page.click("#btn-monolith-speak"); page.wait_for_timeout(120)
     check(get("order_monolith_hint") == "true" and get("order_sun_monolith_awake") is None, "3 wrong sigils unlock the hint, stone stays asleep")
@@ -208,10 +209,13 @@ def test_sun_monolith(browser):
     check(get("order_sun_monolith_awake") == "true", "forgiving sigil 'sun-dial' wakes the stone")
 
     feedback = lambda: js("document.getElementById('monolith-mark-feedback').innerText")
+    js("window.__sunMonolith.setMinute(660)"); page.click("#btn-monolith-mark")
+    check("sand" in feedback(), "11:00 shadow touches only sand")
+    js("window.__sunMonolith.setMinute(480)"); page.click("#btn-monolith-mark")
     js("window.__sunMonolith.setMinute(600)"); page.click("#btn-monolith-mark")
-    check("sand" in feedback(), "10:00 shadow touches only sand")
+    check(get("order_sun_monolith_marks") == "0" and "never names" in feedback(), "an unnamed mark (10:00) puts the marks back to sleep")
     js("window.__sunMonolith.setMinute(720)"); page.click("#btn-monolith-mark")
-    check(get("order_sun_monolith_marks") is None, "noon before the morning mark is rejected")
+    check(get("order_sun_monolith_marks") in (None, "0"), "noon before the morning mark is rejected")
     for minute in [480, 720, 900, 990]:
         js(f"window.__sunMonolith.setMinute({minute})"); page.click("#btn-monolith-mark"); page.wait_for_timeout(120)
     check(get("order_sun_monolith_completed") == "true" and get("order_seal_cairn_2") == "true", "four marks in order: Seal of Cairn II granted")
@@ -227,6 +231,7 @@ def test_sun_monolith(browser):
     text = wire_text()
     check(get("order_field_wire_step") == "12" and text.count("He is her Servant") == 1 and "Two seals of five" in text,
           "reload replays steps 9-12 once each")
+    check("Four seals to find" in text and "SEALS 1 / 5 · CROSSING" in text, "replayed crossing keeps the seal count Hermes had at the gates")
     js("window.openSunMonolithModal()"); page.wait_for_timeout(400)
     check(js("document.getElementById('monolith-telem-marks').innerText") == "4 / 4", "monolith restores its solved state")
     check(not errors, "no JS errors during Station 14", "; ".join(sorted(set(errors))[:3]))

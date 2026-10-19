@@ -3825,12 +3825,17 @@
     .monolith-game.is-locked .monolith-game-inner { filter: grayscale(0.9) brightness(0.45); pointer-events: none; }
     .monolith-lock-note {
       position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: max-content;
+      max-width: calc(100% - 32px);
       text-align: center;
-      padding: 18px;
+      padding: 12px 18px;
+      background: #1a120b;
+      border: 1px solid rgba(212, 168, 83, 0.55);
+      border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
       font-family: 'Cinzel', serif;
       font-size: 0.86rem;
       letter-spacing: 0.06em;
@@ -13752,7 +13757,7 @@
           {
             id: 's14', tag: 'Station 14', label: 'The Sun Monolith · Cairn II', flag: 'order_sun_monolith_completed', built: true,
             complete() { set('order_monolith_march_start', '1'); set('order_sun_monolith_awake', 'true'); set('order_sun_monolith_marks', '4'); set('order_sun_monolith_completed', 'true'); set('order_seal_cairn_2', 'true'); },
-            reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed']); }
+            reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_monolith_gate_seal1']); }
           },
           { id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', built: false, reset() { del('order_seal_cairn_3'); } },
           { id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', built: false, reset() { del('order_seal_cairn_4'); } },
@@ -16883,8 +16888,7 @@
           // Tower II · the gates (Sheet 13A). Hermes recognises the Servant he watched from a ridge in 1998 (Sheet 17B).
           step: 9,
           get hermesInitial() {
-            const hasFirstSeal = localStorage.getItem('order_seal_cairn_1') === 'true';
-            const demand = hasFirstSeal
+            const demand = hadFirstSealAtGates()
               ? "When I showed him the stone seal from the dry river, he studied it in silence and pointed his staff at five empty sockets in the arch: 'You found the first seal by following the dry wash, but four still sleep in stone. Return to the sands and complete the survey, or these gates stay closed.'"
               : "When I told him I carried no seal, he pointed his staff at five empty sockets in the arch: 'Five cairns were raised by our founders to measure this desert. The first sleeps by the dry wash, where you turned away. Return to the sands and complete the survey, or these gates stay closed.'";
             return "Silvia, I reached the gates of Tower II at last light. The Sandstone Sanctuary is carved into the red cliff itself: fluted columns of living rock and bronze gates as tall as a ship's mast. And on the top step, leaning on an iron staff crowned with a star-sight, an old man was waiting for me.\n\n" + demand + "\n\nSilvia... I know this man. Twenty-eight years ago I watched him from a ridge for hours, his face lost in his cowl, and I wrote in my journal that he was the Oracle. He is not. He is her Servant. And he looked at me as if he knew me, too.";
@@ -16914,7 +16918,7 @@
           step: 10,
           completed: true,
           get hermesFinal() {
-            return "I am setting out now, Silvia: north-north-east across the Great Erg, by night, with the stars for a compass. Twelve hours on foot to the Ridge of the Sun. Keep Sheet 13B close; when I reach the Monolith, its seven noons will be your work.\n\nThe Servant watched me go from the top step until the dark took him. " + sealsPhrase(5 - countCairnSeals()) + " to find. One is waiting under the Sun.";
+            return "I am setting out now, Silvia: north-north-east across the Great Erg, by night, with the stars for a compass. Twelve hours on foot to the Ridge of the Sun. Keep Sheet 13B close; when I reach the Monolith, its seven noons will be your work.\n\nThe Servant watched me go from the top step until the dark took him. " + sealsPhrase(5 - sealsAtGates()) + " to find. One is waiting under the Sun.";
           }
         },
         {
@@ -16946,7 +16950,7 @@
           step: 12,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(countCairnSeals()) + " of five, Silvia. The Seal of Cairn II sits in my satchel, and the two lines from the lid of the niche belong in your Cipher Ledger: [D] + [F] = 24 and [C] − [T] = 8.\n\nThe next cairn waits beyond the Arches of the West Wind, inside the Sandstone Labyrinth (Station 15). I will rest under the Monolith tonight and set out at first light. I will wire you when I reach the mouth of the labyrinth.";
+            return sealsPhrase(sealsAtGates() + 1) + " of five, Silvia. The Seal of Cairn II sits in my satchel, and the two lines from the lid of the niche belong in your Cipher Ledger: [D] + [F] = 24 and [C] − [T] = 8.\n\nThe next cairn waits beyond the Arches of the West Wind, inside the Sandstone Labyrinth (Station 15). I will rest under the Monolith tonight and set out at first light. I will wire you when I reach the mouth of the labyrinth.";
           }
         }
       ];
@@ -18106,6 +18110,19 @@
         for (let i = 1; i <= 5; i++) if (localStorage.getItem('order_seal_cairn_' + i) === 'true') n++;
         return n;
       }
+      // Did Hermes carry the Seal of Cairn I to the gates of Tower II? Saved when the gates scene first plays,
+      // so the replayed chat never rewrites what he said there (Seals II–V are only won after the gates).
+      const GATE_SEAL_KEY = 'order_monolith_gate_seal1';
+      function rememberGateSeal() {
+        if (localStorage.getItem(GATE_SEAL_KEY) === null) {
+          try { localStorage.setItem(GATE_SEAL_KEY, String(localStorage.getItem('order_seal_cairn_1') === 'true')); } catch (e) {}
+        }
+      }
+      function hadFirstSealAtGates() {
+        const saved = localStorage.getItem(GATE_SEAL_KEY);
+        return saved !== null ? saved === 'true' : localStorage.getItem('order_seal_cairn_1') === 'true';
+      }
+      const sealsAtGates = () => (hadFirstSealAtGates() ? 1 : 0);
       function sealsPhrase(n) {
         const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five'];
         return (words[n] || String(n)) + (n === 1 ? ' seal' : ' seals');
@@ -18113,8 +18130,8 @@
       // Closing message + telemetry of the "completed" steps that end each conversation
       const WIRE_FINAL_TELEMETRY = {
         8: () => '✦ MIRAGE DISPELLED · REAL SPRING FOUND · 4 WATER SKINS FILLED · KEY XXX · [P] - [A] = 14 RECORDED ✦',
-        10: () => '✦ TOWER II SEALED · SEALS ' + countCairnSeals() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (12 H) ✦',
-        12: () => '✦ SEAL OF CAIRN II SECURED · SEALS ' + countCairnSeals() + ' / 5 · [D] + [F] = 24 · [C] − [T] = 8 RECORDED ✦'
+        10: () => '✦ TOWER II SEALED · SEALS ' + sealsAtGates() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (12 H) ✦',
+        12: () => '✦ SEAL OF CAIRN II SECURED · SEALS ' + (sealsAtGates() + 1) + ' / 5 · [D] + [F] = 24 · [C] − [T] = 8 RECORDED ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -18955,6 +18972,7 @@
           // The Four Wells are behind him: Hermes reaches the gates of Tower II (Sheet 13A)
           wireCurrentStep = 9;
           try { localStorage.setItem('order_field_wire_step', '9'); } catch (e) {}
+          rememberGateSeal();
           appendStepIntro(9);
         }
         if (wireCurrentStep === 10) {
@@ -19418,6 +19436,7 @@
             } else if (justAnsweredStep === 9 || justAnsweredStep === 11) {
               // 9: Silvia answered at the gates of Tower II, and the 12-hour crossing to the Sun Monolith begins.
               // 11: Silvia answered the Station 14 debrief.
+              if (justAnsweredStep === 9) rememberGateSeal();
               if (justAnsweredStep === 9 && !localStorage.getItem('order_monolith_march_start')) {
                 try { localStorage.setItem('order_monolith_march_start', String(Date.now())); } catch (e) {}
               }
@@ -22515,18 +22534,24 @@
         return { x: length * Math.sin(bearing), y: length * Math.cos(bearing), length };
       }
 
-      // The four carved marks sit where the shadow tip falls at the inscription's four moments;
-      // the moon (south) and the star (shorter than the noon shadow) can never be touched.
+      // The four carved marks sit where the shadow tip falls at the inscription's four moments.
+      // The Lion (10:00) and the Ibis (14:00) also lie on the shadow's path but are never named: touching one
+      // puts the marks back to sleep, so sweeping the sun without reading the inscription fails.
+      // The moon (south) and the star (shorter than the noon shadow) can never be touched.
       const MARKS = [
         { id: 'jackal', icon: '🐺', name: 'the Jackal', minute: 8 * 60 },
         { id: 'falcon', icon: '🦅', name: 'the Falcon', minute: 12 * 60 },
         { id: 'scarab', icon: '🪲', name: 'the Scarab', minute: 15 * 60 },
         { id: 'serpent', icon: '🐍', name: 'the Serpent', minute: 16 * 60 + 30 }
       ].map((m) => Object.assign(m, shadowTip(m.minute)));
-      const DECOYS = [
+      const TRAPS = [
+        { id: 'lion', icon: '🦁', name: 'the Lion', minute: 10 * 60 },
+        { id: 'ibis', icon: '🪶', name: 'the Ibis', minute: 14 * 60 }
+      ].map((m) => Object.assign(m, shadowTip(m.minute)));
+      const DECOYS = TRAPS.concat([
         { id: 'moon', icon: '🌙', name: 'the Moon', x: 0, y: -20 },
         { id: 'star', icon: '⭐', name: 'the Star', x: -7, y: 5 }
-      ];
+      ]);
       const ALL_MARKS = MARKS.concat(DECOYS).map((m) => Object.assign(m, { radius: Math.max(3, 0.11 * Math.hypot(m.x, m.y)) }));
 
       const INSCRIPTION = [
@@ -22550,7 +22575,7 @@
 
       const el = {
         close: $('btn-close-monolith'), sigilCard: $('monolith-sigil-card'), keyInput: $('monolith-key-input'), speak: $('btn-monolith-speak'),
-        keyFeedback: $('monolith-key-feedback'), game: $('monolith-game'), sky: $('monolith-sky'),
+        keyFeedback: $('monolith-key-feedback'), game: $('monolith-game'), gameInner: document.querySelector('#monolith-game .monolith-game-inner'), sky: $('monolith-sky'),
         pavement: $('monolith-pavement'), slider: $('monolith-time-slider'), earlier: $('btn-monolith-earlier'),
         later: $('btn-monolith-later'), timeLabel: $('monolith-time-label'), mark: $('btn-monolith-mark'),
         markFeedback: $('monolith-mark-feedback'), inscription: $('monolith-inscription'),
@@ -22654,15 +22679,16 @@
           g.classList.toggle('is-awake', idx >= 0 && idx < found);
           g.classList.toggle('is-near', !!near && near.id === m.id && !(idx >= 0 && idx < found));
         });
-        if (el.slider) el.slider.value = String(minute);
+        if (el.slider) { el.slider.value = String(minute); el.slider.setAttribute('aria-valuetext', fmt(minute)); }
         if (el.timeLabel) el.timeLabel.textContent = fmt(minute);
         if (el.tSun) el.tSun.textContent = fmt(minute);
         if (el.tMarks) el.tMarks.textContent = found + ' / ' + MARKS.length;
         if (el.tSigil) el.tSigil.textContent = isAwake() ? SIGIL + ' ✓' : '[ 7 LETTERS ]';
         if (el.tSeal) el.tSeal.textContent = isDone() ? 'CAIRN II ✓' : '[ SEALED ]';
         if (el.game) el.game.classList.toggle('is-locked', !isAwake());
+        if (el.gameInner) el.gameInner.inert = !isAwake();
         if (el.sigilCard) el.sigilCard.classList.toggle('is-collapsed', isAwake());
-        if (isAwake()) feedback(el.keyFeedback, 'Sigil spoken: ' + SIGIL + ' ✓', 'ok');
+        if (isAwake() && el.keyFeedback && el.keyFeedback.textContent !== 'Sigil spoken: ' + SIGIL + ' ✓') feedback(el.keyFeedback, 'Sigil spoken: ' + SIGIL + ' ✓', 'ok');
         if (el.mark) el.mark.disabled = !isAwake() || isDone();
         if (el.inscription) {
           el.inscription.innerHTML = '';
@@ -22725,6 +22751,18 @@
         const touched = markUnderShadow(minute);
         if (!touched) {
           feedback(el.markFeedback, 'Only sand lies under the tip of the shadow.', 'error');
+          return;
+        }
+        if (TRAPS.indexOf(touched) >= 0) {
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (found > 0) {
+            set(KEYS.marks, '0');
+            feedback(el.markFeedback, 'The inscription never names ' + touched.name + '. The awakened marks sink back to sleep: begin again with the morning shadow.', 'error');
+            say("The glow went out, Silvia, all of it. The stone wants the inscription's moments and nothing else. Start again from the morning.");
+            render();
+          } else {
+            feedback(el.markFeedback, 'The inscription never names ' + touched.name + '. The stone stays asleep.', 'error');
+          }
           return;
         }
         const idx = MARKS.indexOf(touched);
@@ -22800,6 +22838,7 @@
         if (get('order_oasis_clepsydra_completed') !== 'true') return false;
         return typeof window.isMonolithMarchOver === 'function' ? window.isMonolithMarchOver() : false;
       }
+      let returnFocusTo = null;
       function openSunMonolithModal() {
         if (!canOpen()) {
           const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
@@ -22816,17 +22855,21 @@
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');
+        returnFocusTo = document.activeElement;
         if (isDone()) applyVictory();
         else if (!isAwake()) say("Silvia, I made it to the Ridge of the Sun. The Monolith is taller than I imagined, and Cairn II sits at its feet like a sundial waiting for its hour. The stone tablet asks for the sigil of Sheet 13B.");
         else say("The rings are still glowing. Move the sun, Silvia, and let the shadow touch the marks the inscription names, in order.");
         render();
-        if (!isAwake() && el.keyInput) setTimeout(() => el.keyInput.focus(), 60);
+        const focusTarget = isDone() ? el.finish : isAwake() ? el.slider : el.keyInput;
+        if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
       }
       function closeSunMonolithModal() {
         if (modal.style.display === 'none') return;
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.classList.add('closing');
         setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
+        if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
+        returnFocusTo = null;
       }
       window.openSunMonolithModal = openSunMonolithModal;
       window.closeSunMonolithModal = closeSunMonolithModal;
@@ -22839,7 +22882,9 @@
           if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
           if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
           if (typeof window.showDesertToast === 'function') {
-            window.showDesertToast('✦ Seal of Cairn II secured (2 of 5) ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
+            let seals = 0;
+            for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
+            window.showDesertToast('✦ Seal of Cairn II secured (' + seals + ' of 5) ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
           }
         });
       }
