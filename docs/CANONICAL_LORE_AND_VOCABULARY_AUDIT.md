@@ -99,13 +99,13 @@ A continuación se documenta el texto exacto, metadatos y función de cada despa
 | :--- | :--- | :--- |
 | 1 sep 2026 · 22:22 | `Tonight, something shifted.` | Email 1 |
 | 2 sep 2026 · 22:22 (y respuesta el 3 sep) | `The Cartographer of Distant Light` | Email 2 (enlace enviado: `constellation-watch.pages.dev`) |
-| 12 sep 2026 | `[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur` (adjunto `email_cover_ba…`) | Email 3 · The Celestial Matrix *(asunto en español; sin transcribir)* |
-| 14 sep 2026 | `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]` — «Silvia, the mountain console has flickered to life. Have your journ…» | Despacho 3-bis · recordatorio de la Matrix *(sin transcribir)* |
+| sáb 12 sep 2026 · madrugada (00:xx) | `[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur` (adjunto `email_cover_ba…`) | Despacho de la radio · Transmisión 2, Estación 05 |
+| lun 14 sep 2026 · 22:22 | `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]` | Email 3 · The Celestial Matrix (Estación 06) |
 | 25 sep 2026 | `The Zodiacal Outpost & The Dust of the Mainframe` | Email 4 |
-| 8 oct 2026 | `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]` — «Silvia, the beacon at the southern cliff (Station 09) has just respo…» | Despacho 4-bis · apertura de la Estación 09 *(sin transcribir)* |
+| jue 8 oct 2026 · 22:22 | `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]` | Despacho de la Estación 09 (The Celestial Cipher) |
 | 10 oct 2026 | `[Emergency Carrier · 142.85 MHz] A signal cuts through the sandstorm` | Email 5 |
 
-Las horas de los envíos del 12 sep en adelante no aparecen en el listado de Enviados: se dan como «por confirmar».
+Horas confirmadas con las capturas de Gmail; las del 25 sep y el 10 oct siguen «por confirmar». Los enlaces enviados apuntaban a proyectos de Cloudflare Pages separados (`constellation-watch`, `radio-transmission`, `celestial-matrix`) antes de unificarse en `the-eclipse-order.pages.dev`.
 
 ### Email 1: The Initiation Dispatch
 - **Fecha y Hora**: 1 de Septiembre de 2026 · **22:22 exactas**
@@ -200,34 +200,42 @@ The Eclipse Order · XXII:XXII
 
 ---
 
-### Email 3: [Dispatch] · Intercepted Transmission (The Celestial Matrix)
-- **Fecha y Hora**: 12 de Septiembre de 2026 · hora por confirmar *(Gmail · Enviados; el diario llegó el 11 de septiembre)*
-- **Asunto real**: `[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur` (el asunto y el texto de abajo son la versión de trabajo; el texto literal enviado está pendiente de transcribir). El 14 de septiembre siguió un recordatorio, *«Silvia, the mountain console has flickered to life…»*.
-- **De**: The Cartographer of Distant Light `<theeclipseorder.quest@gmail.com>`
+### Despacho de la radio · Transmisión 2 (Estación 05)
+- **Fecha y Hora**: sábado 12 de Septiembre de 2026 · madrugada (00:xx), al día siguiente de la llegada del diario.
+- **De**: The Eclipse Order `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
-- **Asunto**: `[Dispatch] · Intercepted Transmission: The Celestial Matrix`
+- **Asunto**: `[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur`
+- **Adjunto / Visual**: imagen de portada (`email_cover_ba…`): radio de válvulas con osciloscopio, ventana arqueada sobre las dunas, luna creciente, Vía Láctea, mapas estelares, brújula y diario abierto.
+- **Texto Literal del Mensaje** (en español):
+```text
+SISTEMA DE ESCUCHA DE LA ORDEN DEL ECLIPSE
+REGISTRO DE MODULACIÓN // CANAL 142.850 MHz
+PRIORIDAD: MÁXIMA · DESTINATARIA: SILVIA
+
+______________________________________
+
+👉 [ ENLACE A LA TRANSMISIÓN: https://radio-transmission.pages.dev/#transmission-2 ] 👈
+```
+- **Función**: abre la Transmisión 2 (*Voices in the Dunes*, Estación 05): el Cartógrafo sigue vivo y el diario «llega a Italia». *(El asunto dice 142.85 MHz; la Transmisión 2 sintoniza 19.84 MHz, §4.)*
+
+---
+
+### Email 3: [Intercepted Signal] · The Celestial Matrix (Estación 06)
+- **Fecha y Hora**: lunes 14 de Septiembre de 2026 · **22:22 exactas**
+- **De**: The Eclipse Order `<theeclipseorder.quest@gmail.com>`
+- **Para**: Silvia
+- **Asunto**: `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]`
 - **Texto Literal del Mensaje**:
 ```text
-To the one who carries the codex.
+Silvia, the mountain console has flickered to life.
+Have your journal open to Sheet 4 · Side B ("The Planisphere"). Solve the paper grid first, then access the emergency console:
 
-An emergency resonance signal has broken through from the mountains. The Alpine station has answered.
+👉 https://celestial-matrix.pages.dev/
 
-Before you touch the console, keep your journal in your hands:
-Open your notebook to Sheet 4 · Side B — "The Planisphere".
-Solve the circular starfield on paper first. Once the sixteen celestial guides are recorded in your notes, access the console below to stabilize the beacon.
-
-The Cartographer is waiting.
-
-✦ INTERACTIVE CONSOLE ✦
-Access the Celestial Matrix:
-👉 https://the-eclipse-order.pages.dev
-
-"What appears distant is already in motion."
-
-— The Cartographer of Distant Light
-The Eclipse Order · XXII:XXII
+The Cartographer is listening for your beacon.
 ```
 - **Recompensa**: Descifrado de la letra **`P`**; entrega de la placa oficial de **Vector I** con las 5 ecuaciones maestras de coordenadas celestes.
+- *Nota*: la versión larga que figuraba antes aquí (*«To the one who carries the codex…»*, asunto `[Dispatch] · Intercepted Transmission: The Celestial Matrix`) fue un borrador que **no se envió**.
 
 ---
 
@@ -268,8 +276,27 @@ The Eclipse Order · Constellation Path
 
 ---
 
+### Despacho de la Estación 09 · The Celestial Cipher
+- **Fecha y Hora**: jueves 8 de Octubre de 2026 · **22:22 exactas**
+- **De**: The Eclipse Order `<theeclipseorder.quest@gmail.com>`
+- **Para**: Silvia
+- **Asunto**: `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]`
+- **Texto Literal del Mensaje**:
+```text
+Silvia, the beacon at the southern cliff (Station 09) has just responded.
+
+Keep your journal close and open Sheet 7 · Side A ("The Celestial Cipher"). Cross the twenty-four coordinates from the dial on paper, then access the console to transmit the key:
+
+👉 https://the-eclipse-order.pages.dev
+
+The Cartographer of Distant Light awaits your signal before the dunes.
+```
+- **Función**: abre la Estación 09; tras el voto se desata la tormenta y llega el Email 5 (10 oct).
+
+---
+
 ### Email 5: [Emergency Carrier · 142.85 MHz] A Signal in the Sandstorm
-- **Fecha y Hora**: 10 de Octubre de 2026 · hora por confirmar *(Gmail · Enviados)*. El 8 de octubre lo precedió el despacho que abrió la Estación 09: *«Silvia, the beacon at the southern cliff (Station 09) has just responded…»*.
+- **Fecha y Hora**: 10 de Octubre de 2026 · hora por confirmar *(Gmail · Enviados)*. Lo precedió el despacho de la Estación 09 (8 oct, arriba).
 - **De**: Hermes · The Cartographer `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
 - **Asunto**: `[Emergency Carrier · 142.85 MHz] A signal cuts through the sandstorm`

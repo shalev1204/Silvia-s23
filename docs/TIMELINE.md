@@ -12,11 +12,11 @@
 | 1 sep 22:22 | Email 1 · *Tonight, something shifted.* Silvia elige `THE CONSTELLATION PATH`. |
 | 2 sep 22:22 | Email 2 · *The Cartographer of Distant Light* (The Celestial Flower). Respuesta el 3 sep. |
 | 11 sep | Entrega del diario físico en Italia. |
-| 12 sep | Email 3 · *[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur* (The Celestial Matrix, Hoja 4B). |
-| 14 sep | Recordatorio · *[INTERCEPTED SIGNAL] Silvia, the mountain console has flickered to life…* |
+| sáb 12 sep 00:xx | Despacho de radio · *[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur* (Transmisión 2, Estación 05). |
+| lun 14 sep 22:22 | Email 3 · *[INTERCEPTED SIGNAL]* «Silvia, the mountain console has flickered to life…» (The Celestial Matrix, Hoja 4B). |
 | 25 sep | Email 4 · *The Zodiacal Outpost & The Dust of the Mainframe* (Estación 07). |
 | 28 sep 00:00 (CEST) | Ventana de medianoche de la Estación 08 (Midnight Calibration). |
-| 8 oct | Despacho · *[INTERCEPTED SIGNAL] Silvia, the beacon at the southern cliff (Station 09) has just responded…* (apertura de la Estación 09). |
+| jue 8 oct 22:22 | Despacho · *[INTERCEPTED SIGNAL]* «Silvia, the beacon at the southern cliff (Station 09) has just responded.» (apertura de la Estación 09). |
 | 10 oct | Email 5 · *[Emergency Carrier · 142.85 MHz] A signal cuts through the sandstorm*. |
 | 8–9 oct → dom 18 oct 14:00 | Tormenta de arena tras la Estación 09 (el Email 5 del 10 oct llega en plena tormenta). El Hub fija su final el dom 18 oct 14:00 (constante `SUNDAY_OCT_18_2026_2PM`). Para Silvia ya ha terminado. |
 | En curso | Desert Path (Estaciones 10–19, Hojas 08–18). Estaciones 10 a 13 ya jugables en el Hub. |
