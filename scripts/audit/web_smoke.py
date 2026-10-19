@@ -10,6 +10,8 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
   5. Station 14 (The Sun Monolith): gates scene, 12-hour crossing, sigil, walking sun, Seal II, debrief, reload.
   6. Station 15 (The Sandstone Labyrinth): first light, 6-hour walk, sigil, the escape (solved by search), Seal III, debrief.
   7. Station 16 (Cairn IV): dusk scene, 18-hour crossing, sigil, the three verses decoded from the calls, Seal IV, relic, debrief.
+  8. Station 17 (Arch of the Solstice): the October dawn solved by its own route search, the night signal, Seal V,
+     the five-seal ceremony, relic and debrief.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -458,13 +460,143 @@ def test_cairn_four(browser):
     open_wire()
     check(get("order_field_wire_step") == "19" and choices() == 3 and "Toward Tower II" in wire_text(), "debrief: step 19 (the code, the pebble, the raiders) with 3 replies")
     answer_first()
-    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
-    check(get("order_field_wire_step") == "20" and "Seals 4 / 5" in bar, "step 20 shows Seals 4 / 5", bar)
+    check(get("order_field_wire_step") == "21" and "SEALS 4 / 5 · [S] + [U] = 17" in wire_text() and choices() == 3,
+          "step 20 records Seals 4 / 5, then dusk at Cairn IV (step 21) opens")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(text.count("Dusk, Silvia") == 1 and text.count("I have not slept") == 1 and "Four seals of five" in text,
-          "reload replays steps 17-20 once each")
+    check(text.count("Dusk, Silvia") == 1 and text.count("I have not slept") == 1 and "Four seals of five" in text
+          and text.count("Dusk again, Silvia") == 1, "reload replays steps 17-21 once each")
     check(not errors, "no JS errors during Station 16", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+def dawn_routes(court, col):
+    """Every way the ray entering the arch at `col` can reach the altar: {mirror index: 'f' or 'b'}.
+    Built only from the courtyard data the page exposes."""
+    reflect = {"f": {(0, 1): (-1, 0), (0, -1): (1, 0), (1, 0): (0, -1), (-1, 0): (0, 1)},
+               "b": {(0, 1): (1, 0), (0, -1): (-1, 0), (1, 0): (0, 1), (-1, 0): (0, -1)}}
+    mirrors = {tuple(c): i for i, c in enumerate(court["mirrors"])}
+    pillars = {tuple(c) for c in court["pillars"]}
+    altar = tuple(court["altar"])
+    out = []
+
+    def go(x, y, d, assign, steps):
+        while steps < 200:
+            if not (0 <= x < court["cols"] and 0 <= y < court["rows"]):
+                return
+            if (x, y) == altar:
+                out.append(dict(assign))
+                return
+            if (x, y) in pillars:
+                return
+            if (x, y) in mirrors:
+                i = mirrors[(x, y)]
+                if i in assign:
+                    d = reflect[assign[i]][d]
+                else:
+                    for m in "fb":
+                        assign[i] = m
+                        nd = reflect[m][d]
+                        go(x + nd[0], y + nd[1], nd, assign, steps + 1)
+                        del assign[i]
+                    return
+            x, y = x + d[0], y + d[1]
+            steps += 1
+
+    go(col, 0, (0, 1), {}, 0)
+    return out
+
+
+def test_solstice_arch(browser):
+    print("\n8. Station 17 · The Arch of the Solstice, end to end")
+    seed = dict(DESERT_BASE, **DESERT_DONE, order_sun_monolith_completed="true", order_seal_cairn_2="true",
+                order_sandstone_labyrinth_completed="true", order_seal_cairn_3="true", order_monolith_gate_seal1="true",
+                order_cairn_iv_completed="true", order_seal_cairn_4="true", order_cairn4_sound="off", order_field_wire_step="20",
+                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]")
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    modal_open = lambda: js("getComputedStyle(document.getElementById('modal-solstice-arch')).display") != "none"
+    choices = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].length")
+    wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
+
+    def open_wire():
+        js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+        page.wait_for_timeout(2200)
+
+    def answer_first():
+        js("document.querySelector('#wire-choices-grid button').click()")
+        page.wait_for_timeout(9000)
+
+    open_wire()
+    check(get("order_field_wire_step") == "21" and choices() == 3 and "midsummer" in wire_text(), "dusk at Cairn IV: step 21 (the October sun) with 3 replies")
+    js("window.selectDesertStation(26)"); page.wait_for_timeout(500)
+    check(not modal_open(), "the Arch sealed before Hermes sets out")
+    open_wire(); answer_first()
+    check(get("order_field_wire_step") == "22" and get("order_cairn5_march_start") and "EAST TO THE ARCH OF THE SOLSTICE (18 H)" in wire_text(),
+          "reply at dusk starts the 18-hour walk")
+    js("localStorage.setItem('order_cairn5_march_start', String(Date.now() - 19 * 3600 * 1000))")
+    js("window.openSolsticeModal()"); page.wait_for_timeout(500)
+    check(modal_open() and js("document.querySelector('#solstice-dawn-game .monolith-game-inner').inert") is True,
+          "after 18 h it opens, the courtyard locked until the sigil")
+    for word in ["DAYBREAKS", "BREAKDAY", "DAY BRAKE"]:
+        page.fill("#solstice-key-input", word); page.click("#btn-solstice-speak"); page.wait_for_timeout(120)
+    check(get("order_cairn5_hint") == "true" and get("order_cairn5_awake") is None, "3 wrong sigils unlock the hint, the altar stays closed")
+    page.fill("#solstice-key-input", " day-break "); page.click("#btn-solstice-speak"); page.wait_for_timeout(250)
+    check(get("order_cairn5_awake") == "true", "forgiving sigil 'day-break' wakes the altar")
+
+    court = js("window.__cairn5.court")
+    routes = [dawn_routes(court, col) for col in court["entries"]]
+    check(all(len(r) == 1 for r in routes), "every ray of the October dawn has exactly one route", str([len(r) for r in routes]))
+
+    def aim(route):
+        current = js("window.__cairn5.mirrors()")
+        for i, m in route.items():
+            if current[i] != m:
+                js(f"window.__cairn5.turn({i})")
+
+    # a dawn that runs out is spent and keeps the mirrors
+    js("window.__cairn5.startDawn()"); js("window.__cairn5.expireStep()"); page.wait_for_timeout(300)
+    check(not js("window.__cairn5.state().running") and get("order_cairn5_dawn_fails") == "1", "a dawn that runs out is spent")
+    js("window.__cairn5.startDawn()")
+    for k, r in enumerate(routes):
+        aim(r[0])
+        page.wait_for_timeout(150)
+    st = js("window.__cairn5.state()")
+    check(st["dawnDone"] and get("order_cairn5_dawn_done") == "true", "four rays reach the altar: the ring closes its four locks", str(st))
+
+    rounds = js("window.__cairn5.rounds")
+    js("window.__cairn5.flash('L')"); js("window.__cairn5.send()")
+    check(get("order_cairn5_signal_round") is None and get("order_cairn5_signal_fails") == "1", "a wrong answer to the light is refused")
+    for pattern in rounds:
+        for p in pattern:
+            js(f"window.__cairn5.flash('{p}')")
+        js("window.__cairn5.send()"); page.wait_for_timeout(200)
+    check(rounds[-1] == "SSSLL" and js("window.__cairn5.state().finale"), "the last signal is the disc's code: three short, two long")
+    page.wait_for_timeout(16000)
+    check(get("order_arch_solstice_completed") == "true" and get("order_seal_cairn_5") == "true", "the light speaks and goes out: Seal of Cairn V granted")
+    page.wait_for_timeout(1200)
+    check(js("getComputedStyle(document.getElementById('five-seals-overlay')).display") != "none" and get("order_five_seals_celebrated") == "true",
+          "the five seals come home (ceremony)")
+    check("signal_mirror" in js("window.getOwnedRelicIds()"), "the Signal Mirror is in the satchel")
+    page.click("#btn-five-seals-close"); page.click("#btn-close-solstice"); page.wait_for_timeout(300)
+
+    js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
+    ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
+    check("eq-item-cairn5-yo" in ids and "eq-item-cairn5-lg" in ids, "Ledger shows [Y] − [O] = 2 and [L] + [G] = 23")
+
+    open_wire()
+    check(get("order_field_wire_step") == "23" and choices() == 3 and "smoke" in wire_text(), "debrief: step 23 (the light, the smoke) with 3 replies")
+    answer_first()
+    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+    check(get("order_field_wire_step") == "24" and "Seals 5 / 5" in bar, "step 24 shows Seals 5 / 5", bar)
+    page.reload(); page.wait_for_timeout(2500); open_wire()
+    text = wire_text()
+    check(text.count("Dusk again, Silvia") == 1 and text.count("it is dawn again and I have not slept") == 1 and "Five seals of five" in text,
+          "reload replays steps 21-24 once each")
+    check(not errors, "no JS errors during Station 17", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
 
@@ -483,6 +615,7 @@ def main():
         test_sun_monolith(browser)
         test_sandstone_labyrinth(browser)
         test_cairn_four(browser)
+        test_solstice_arch(browser)
         browser.close()
     server.shutdown()
 

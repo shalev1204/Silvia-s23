@@ -668,6 +668,17 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$[U] = 17 - 13 \implies \mathbf{U = 4}$$
 - **Asignación en el Ledger**: $\mathbf{S = 13, \quad U = 4}$. Valores libres hasta ahora; ninguna letra repite valor.
 
+#### 10. DEDUCCIÓN DE $Y$ Y $L$ (Estación 17 · La luz de la Torre II, solo en la web)
+- **Origen**: tras responder a las cuatro señales nocturnas (Estación 17), la luz de la Torre II deletrea dos líneas en el código de luz de la Orden; aparecen en el Ledger con `requires: 'order_arch_solstice_completed'`.
+- **Ecuación 1 (The First Line of Light)**:
+  $$[Y] - [O] = 2$$
+- **Ecuación 2 (The Second Line of Light)**:
+  $$[L] + [G] = 23$$
+- **Resolución** (con $O = 23$ de §7.B.1 y $G = 22$ de §7.B.2):
+  $$[Y] = 2 + 23 \implies \mathbf{Y = 25}$$
+  $$[L] = 23 - 22 \implies \mathbf{L = 1}$$
+- **Asignación en el Ledger**: $\mathbf{Y = 25, \quad L = 1}$. Valores libres; ninguna letra repite valor.
+
 ---
 
 ## 8. DIRECTORIO GEOGRÁFICO Y ONOMÁSTICO CANÓNICO
@@ -785,7 +796,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara B (15B · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Izq · Spread 3)**. Elev. 980 varas, arco de roca y desfiladero en alta definición.
 - **Hoja 16**:
   - **Cara A (16A · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Der · Spread 3)**.
-  - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
+  - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. *(web, Estación 17)* Amanecer de octubre (espejos reorientados en 4 pasos del sol), la señal nocturna con la Torre II (código del disco), $[Y] - [O] = 2$ y $[L] + [G] = 23$, *The Signal Mirror*, ceremonia de los cinco sellos y humo sobre el Santuario (ver §12). Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
 - **Hoja 17**:
   - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$.
   - **Cara B (17B · Lore)**: **The Desert Oracle** (impresa). Nota de la expedición de 1998: Hermes observa durante horas desde una cresta al hombre que cree el Oráculo (en realidad el Sirviente del Santuario, §8.A.5), junto a su refugio bajo un saliente de arenisca; no puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen». Menciona el Astrolabio recuperado. No revela el WHEN ni menciona Vega.
@@ -864,6 +875,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **10A / 10B** | *«Elev. 980 paces»* (el mapa dice *varas*) | En la agrimensura de la Orden el «paso» de Hermes es la vara de medir: usa ambas palabras para la misma cota. |
 | **11A** | *«Al-Qibla Vector 194* SSW»* | Rumbo de huida de los BC Ashes; la Torre II queda en el rumbo inverso, 14° NNE (ver §9, Hoja 11A). |
 | **14B** | *«North of the Sun Monolith, the open desert rises…»* (el mapa y la Hoja 14A ponen el laberinto al SSE del Monolito: la ranura de Cairn III apunta a 348° NNW hacia él) | Hermes copió esa línea del levantamiento de los fundadores. **La Orden dibujaba sus cartas con el sur arriba**, como los grandes cartógrafos de las caravanas: su «norte» es nuestro sur. Hermes lo explica en el Field Wire (paso 13, Estación 15). |
+| **16B** | *«At midsummer dawn, the sun's first ray slips beneath the arch»* (Hermes llega en octubre) | El patio se construyó para el solsticio de verano. En octubre el sol sale más al sur y el rayo entra por otro punto: Silvia reorienta los espejos para un amanecer de otoño (Estación 17, *The Autumn Dawn*). |
 | **4A / 5A** | *«stereographic»*, *«The Mater»*, *«The Tympan»* | Se imprimieron el 28-09-2026, antes de que la lista de términos prohibidos entrara en esta Biblia (10-10-2026). Son las notas técnicas del Hermes astrónomo; los textos nuevos usan el vocabulario sencillo (Regla 6 de `AGENTS.md`). |
 
 ---
@@ -895,7 +907,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **14** | En el nicho de Cairn II, un rastro de **azul cobalto** de lapislázuli molido muy fino. Hermes: *«Aurelia ground her lapis exactly like this»*; se convence de que ve fantasmas. Último fragmento de la tapa: *«And the Oracle, who keeps the sand, will remember.»* | Otro pintor de la Orden; una profecía. | ✅ Web |
 | **15** | Una estrella de pan de oro de ocho puntas sobre fondo de lapislázuli, reciente, en la pared de una fisura del laberinto (casilla por la que pasa toda ruta de huida). Hermes: *«Aurelia gilded her stars exactly like that»*; duda entre un guía y el sol. Su respuesta *choice-15-aurelia* describe la técnica (pincel de ardilla, fondo azul, toque blanco). | Marca de los fundadores; alguien guía a otro. | ✅ Web |
 | **16** | Un pastor al borde del *hardpan*: cada otoño, en noches claras, **una mujer velada baja de la arenisca y canta a las estrellas**; le dejan leche y dátiles (paso 17; en *choice-17-veiled* tararea la melodía y a Hermes le tiembla la mano). En Cairn IV el último verso del viento suena con el **código del disco** (tres cortas, pausa, dos largas) porque alguien encajó en el pilar izquierdo **un guijarro con estrella dorada sobre azul** (reliquia *The Tuning Pebble*). | Leyenda del desierto; el viento; un extraño que conoce el código. | ✅ Web |
-| **17** | Desde el Arco del Solsticio, Hermes vuelve a ver de noche el pulso de 2016: tres cortos, pausa, dos largos. | El faro del Santuario. | ⏳ Plan |
+| **17** | Desde el Arco del Solsticio, una luz en la Torre II dialoga con el espejo de Hermes; él envía **tres cortos, pausa, dos largos** y la luz **responde** deletreando dos líneas en el código de luz de la Orden, con la calma de quien lo ha hecho muchas veces. Hermes: el código era solo suyo y de Aurelia. Luego la luz se apaga de golpe y amanece con humo sobre el Santuario. | Alguien dentro de la Torre II conoce el código; ¿lo aprendió de otro? | ✅ Web |
 | **18** | El Sirviente, tras la Estela de Polibio: *«She came from the edge of the sky with a disc in her arms and no name.»* | — (la duda ya es seria). | ⏳ Plan |
 | **19** | Audiencia en la Torre II: la Oráculo alza el disco de 24 avistamientos. Silvia (o Hermes) pronuncia el voto y la memoria vuelve en parte. Se entrega el **WHEN**. | Revelación. | ⏳ Plan |
 

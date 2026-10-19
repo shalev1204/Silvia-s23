@@ -45,7 +45,8 @@ Abre la web en un Chromium real con las cabeceras de `web/_headers` y comprueba 
 4. el Cipher Ledger solo muestra las ecuaciones del desierto tras su estación;
 5. la Estación 14 (The Sun Monolith) funciona de principio a fin: puertas de la Torre II, travesía de 12 h, sigilo, el sol que camina, Sello de Cairn II, balance en el chat y recarga de la página;
 6. la Estación 15 (The Sandstone Labyrinth) funciona de principio a fin: amanecer bajo el Monolito, bajada de 6 h, sigilo, la huida (el test la resuelve por su cuenta con una búsqueda sobre casilla × turno y comprueba que la ruta que ignora las antorchas acaba atrapada), Sello de Cairn III, balance y recarga;
-7. la Estación 16 (Cairn IV) funciona de principio a fin: anochecer en el *hardpan*, travesía de 18 h, sigilo, los tres versos del canto, Sello de Cairn IV, la reliquia, balance y recarga (unos 5 minutos en total).
+7. la Estación 16 (Cairn IV) funciona de principio a fin: anochecer en el *hardpan*, travesía de 18 h, sigilo, los tres versos del canto, Sello de Cairn IV, la reliquia, balance y recarga;
+8. la Estación 17 (Arch of the Solstice) funciona de principio a fin: el amanecer de octubre (el test resuelve cada paso con su propia búsqueda de rutas), la señal nocturna, el Sello de Cairn V, la ceremonia de los cinco sellos, la reliquia y el balance (unos 6 minutos en total).
 
 Si termina con `✅ ALL GREEN`, se puede desplegar; si sale `❌`, no despliegues y revisa la línea marcada con ✗.
 También conviene pasar `python3 scripts/audit/lint_lore_and_vocabulary.py` (vocabulario y nombres canónicos).

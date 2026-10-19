@@ -203,6 +203,13 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Mecánica (rediseñada, sin imprimir la solución)**: «The Courtyard of Rays». Lámina del Arco del Solsticio con el rayo cruzando bajo su clave hasta el anillo de latón del Altar Solar, Cairn V al fondo y un esquema con el rumbo 163° SSE de Cairn V al altar. El patio es una cuadrícula de 12 × 11 losas con espejos de bronce (giran el rayo un cuarto de vuelta), columnas caídas (lo detienen) y «piedras solares» con una letra. El rayo entra por el arco (arriba) y recorre el patio; Silvia lo sigue y lee, en orden, las ocho piedras solares que cruza hasta el altar. Los espejos, columnas y letras fuera de su recorrido son señuelos. Sin valores numéricos de letras (Regla 9), solo A–Z (Regla 10).
   - **Solución (solo para el Operador)**: DAYBREAK (patio generado de forma determinista en `_build_ray_courtyard` y verificado con `_simulate_ray`).
   - **Recompensa**: Obtención del quinto y último sello de peregrinación: **Sello de Cairn V**. ¡Los 4 sellos que faltaban (II a V) están completos y, con el de Cairn I, suman los 5!
+- **Web (Estación 17, Hub · añadido al diario, no réplica)**:
+  - **Transición (Field Wire)**: paso 20 → paso 21 al anochecer en Cairn IV. Hermes relee la 16B: *«At midsummer dawn, the sun's first ray slips beneath the arch»*. **Cobertura de la errata**: el patio se construyó para el solsticio de verano; en octubre el sol sale más al sur y el rayo entra por otro punto del arco. Las huellas de los asaltantes a pie siguen tras él. Travesía de **18 h** sin dormir (paso 22).
+  - **Parte 1 · El sigilo**: `DAYBREAK` (acepta «day-break»). Tras 3 fallos, pista en *Ask Hermes*.
+  - **Parte 2 · The Autumn Dawn**: patio web distinto del impreso (9 × 9, 12 espejos de bronce girables y 5 columnas caídas). Silvia puede orientar los espejos de noche; al llamar al amanecer, el sol sube en **4 pasos** y el rayo entra en el arco cada vez más al oeste (columnas 7, 6, 4 y 3). En cada paso tiene 30 s (45 s tras 3 amaneceres perdidos) para llevar la luz al anillo de latón del altar; cada acierto cierra uno de sus **4 cierres**. Si el sol sube antes, el amanecer se pierde (los cierres se sueltan; los espejos se quedan donde estaban). Comprobado fuera de línea: cada paso tiene **una única ruta**, ninguna orientación ilumina dos pasos seguidos y entre pasos hay que girar 2–4 espejos.
+  - **Parte 3 · The Night Signal**: esa noche una luz parpadea en la **Torre II**. Silvia responde con el espejo de Hermes (toque corto / pulsación larga) a cuatro señales: `··`, `·—·`, `——··` y **`···  ——`, el código del disco de Aurelia**. Entonces la luz deletrea dos líneas en el antiguo código de luz de la Orden… y se apaga de golpe. Al amanecer, **humo sobre la Torre II**: los carros de los BC Ashes están al pie de la escalinata y no hay rastro del Sirviente.
+  - **Recompensa**: Sello de Cairn V (`order_seal_cairn_5`), dos ecuaciones en el Ledger: $[Y] - [O] = 2$ y $[L] + [G] = 23$ (Biblia Maestra §7.B.10), la reliquia **The Signal Mirror** y la **ceremonia de los cinco sellos** (se muestra una sola vez, cuando el quinto sello llega a la Alforja, sea cual sea; si Silvia esquivó Cairn I, llega al recuperarlo).
+  - Balance en el paso 23 (Hermes: el código era solo suyo y de Aurelia; nadie más lo conocía). Paso 24: «Seals 5 / 5», siguiente destino la Torre II en llamas (Estación 18, la Estela de Polibio).
 
 ---
 
@@ -268,7 +275,7 @@ Desde la Estación 10, cada juego del desierto lleva número de estación (Estac
 | **14** | D5 | The Sun Monolith & Cairn II | 13B | Cuadrante NE (Hoja 9A) | ✅ Implementado |
 | **15** | D6 | The Sandstone Labyrinth & Cairn III | 14B | Cuadrante NE (Hoja 9A) | ✅ Implementado |
 | **16** | D7 | Cairn IV · Sentry of the Canyon | 15A | Cuadrante SO (Hoja 11B) | ✅ Implementado |
-| **17** | D8 | Arch of the Solstice & The Solar Altar (Cairn V) | 16B | Cuadrante SE (Hoja 12A) | ⏳ Pendiente |
+| **17** | D8 | Arch of the Solstice & The Solar Altar (Cairn V) | 16B | Cuadrante SE (Hoja 12A) | ✅ Implementado |
 | **18** | D9 | The Polybius Stele (prueba del Sirviente) | 17A | Atrio de la Torre II | ⏳ Pendiente |
 | **19** | D10 | The Oracle's Horizon & Triple Triangulation | 18A | Torre II | ⏳ Pendiente |
 

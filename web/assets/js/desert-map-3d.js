@@ -123,7 +123,7 @@
     { key: 'monolith', x: 1262, y: 430, lvl: 7, id: 23, icon: '☀️', label: '14 · THE SUN MONOLITH', done: 'monolith', doneLabel: '14 · THE SUN MONOLITH (CAIRN II)', revealWhen: 'clep' },
     { key: 'labyrinth', x: 1640, y: 770, lvl: 8, id: 24, icon: '🌀', label: '15 · THE SANDSTONE LABYRINTH', done: 'labyrinth', doneLabel: '15 · THE SANDSTONE LABYRINTH (CAIRN III)', revealWhen: 'monolith' },
     { key: 'cairn4', x: 130, y: 2150, lvl: 9, id: 25, icon: '🗿', label: '16 · CAIRN IV · SENTRY OF THE CANYON', done: 'cairn4', doneLabel: '16 · CAIRN IV (THE PILLARS SANG)', revealWhen: 'labyrinth' },
-    { key: 'arch', x: 1480, y: 2040, lvl: 10, icon: '🌓', label: '17 · ARCH OF THE SOLSTICE', done: 'arch', soon: 'Station 17: Arch of the Solstice · Sheet 16B of your journal.' },
+    { key: 'arch', x: 1480, y: 2040, lvl: 10, id: 26, icon: '🌓', label: '17 · ARCH OF THE SOLSTICE', done: 'arch', doneLabel: '17 · ARCH OF THE SOLSTICE (CAIRN V)', revealWhen: 'cairn4' },
     { key: 'sanctuary', x: 1560, y: 1660, lvl: 11, id: 14, icon: '🏛️', label: '18–19 · SANDSTONE SANCTUARY', done: 'oracle' }
   ];
 
@@ -174,7 +174,9 @@
     // Station 16: Cairn IV (lvl 9) only when the 18-hour crossing is over
     var cairnFourArrived = d.cairn4 || (typeof window.isCairnFourMarchOver === 'function' && window.isCairnFourMarchOver());
     if (d.labyrinth) lvl = Math.max(lvl, cairnFourArrived ? 9 : 8);
-    if (d.arch) lvl = Math.max(lvl, 11);
+    // Station 17: the Arch of the Solstice (lvl 10) only when the 18-hour walk is over
+    var archArrived = d.arch || (typeof window.isSolsticeMarchOver === 'function' && window.isSolsticeMarchOver());
+    if (d.cairn4) lvl = Math.max(lvl, archArrived ? 10 : 9);
 
     try {   // test hook: ?d3lvl=4 forces a progress level
       var forced = new URLSearchParams(location.search).get('d3lvl');
@@ -203,6 +205,7 @@
     if (st.revealWhen === 'clep') return !!s.done.clep;
     if (st.revealWhen === 'monolith') return !!s.done.monolith;
     if (st.revealWhen === 'labyrinth') return !!s.done.labyrinth;
+    if (st.revealWhen === 'cairn4') return !!s.done.cairn4;
     return s.lvl >= st.lvl;
   }
 
@@ -720,10 +723,12 @@
     function monolithProgress() { return hub('getMonolithMarchProgress', 1); }
     function labyrinthProgress() { return hub('getLabyrinthMarchProgress', 1); }
     function cairnFourProgress() { return hub('getCairnFourMarchProgress', 1); }
+    function solsticeProgress() { return hub('getSolsticeMarchProgress', 1); }
     // The leg Hermes is walking right now, if any:
     // · after Station 13: at the gates of Tower II, then the 12-hour crossing to the Sun Monolith (segment 7, from the gates);
     // · after Station 14: resting under the Monolith, then the 6-hour walk down to the Sandstone Labyrinth (segment 8);
-    // · after Station 15: hiding at the Western Cleft, then the 18-hour crossing to Cairn IV (segment 9).
+    // · after Station 15: hiding at the Western Cleft, then the 18-hour crossing to Cairn IV (segment 9);
+    // · after Station 16: waiting for dusk at Cairn IV, then the 18-hour walk to the Arch of the Solstice (segment 10).
     function currentCrossing() {
       if (state.done.clep && !state.done.monolith && monolithProgress() < 1 && route.gates !== null) {
         var etaM = hub('getMonolithMarchEta', '');
@@ -739,6 +744,11 @@
         var eta4 = hub('getCairnFourMarchEta', '');
         return { progress: cairnFourProgress(), from: route.cum[8], to: route.cum[9],
                  text: eta4 ? '🚶 ACROSS THE HARDPAN TO CAIRN IV · ETA: ' + eta4 : 'Hiding at the Western Cleft until dark' };
+      }
+      if (state.done.cairn4 && !state.done.arch && solsticeProgress() < 1) {
+        var eta5 = hub('getSolsticeMarchEta', '');
+        return { progress: solsticeProgress(), from: route.cum[9], to: route.cum[10],
+                 text: eta5 ? '🚶 EAST TO THE ARCH OF THE SOLSTICE · ETA: ' + eta5 : 'Waiting for dusk at Cairn IV' };
       }
       return null;
     }
@@ -877,7 +887,7 @@
       var marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
       var marchProgress = typeof window.getChasmMarchProgress === 'function' ? window.getChasmMarchProgress() : 1.0;
 
-      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), Math.floor(monolithProgress() * 200), Math.floor(labyrinthProgress() * 200), Math.floor(cairnFourProgress() * 200), JSON.stringify(next.done)].join('|');
+      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), Math.floor(monolithProgress() * 200), Math.floor(labyrinthProgress() * 200), Math.floor(cairnFourProgress() * 200), Math.floor(solsticeProgress() * 200), JSON.stringify(next.done)].join('|');
       if (!force && nextSig === sig) return;
       var advanced = next.lvl > state.lvl;
       state = next;
