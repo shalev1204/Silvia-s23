@@ -195,7 +195,8 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Solución Canónica**: Aforismo: **`"STARS GUIDE THOSE WHO SEEK TRUTH"`**, rumbo **`348° NNW`**.
 - **Cara B (Reverso · Lore)**: **Audiencia con El Oráculo del Desierto**.
   - **Título impreso**: *The Desert Oracle*.
-  - **Narrativa (impresa)**: Hermes confiesa su arrogancia (creía que el Astrolabio recuperado bastaba). Siguiendo un cauce salino seco halla el refugio de la Oráculo bajo un gran saliente de arenisca y la observa durante horas desde una cresta: no mira las estrellas, sino arena y piedras de río. La juzga inquietante pero indispensable (guarda las coordenadas terrestres que necesita el Astrolabio). No puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen. The Desert Path is yours.» La hoja **no** revela el WHEN ni menciona Vega; el pronombre «he» es una errata de impresión (la Oráculo es femenina, Hoja 8A).
+  - **Narrativa (impresa; nota de la expedición de 1998)**: Hermes confiesa su arrogancia (creía que el Astrolabio recuperado bastaba). Siguiendo un cauce salino seco halla, bajo un gran saliente de arenisca, el refugio de quien cree el Oráculo y lo observa durante horas desde una cresta: no mira las estrellas, sino arena y piedras de río. La juzga inquietante pero indispensable (guarda las coordenadas terrestres que necesita el Astrolabio). No puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen. The Desert Path is yours.» La hoja **no** revela el WHEN ni menciona Vega.
+  - **Canon (el error de Hermes)**: el anciano barbudo y encapuchado que observó era el **Sirviente del Santuario**, no el Oráculo; de ahí el «he». La Oráculo es una mujer sin rostro que nunca se deja ver (Hoja 8A). Hermes reconoce al Sirviente al llegar al atrio en 2026 (Hoja 13A) y la Oráculo verdadera se revela en la Torre II (Estación 19, Hoja 18A).
 
 ---
 
