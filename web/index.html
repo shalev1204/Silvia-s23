@@ -3992,8 +3992,8 @@
     }
     .pillars-plan .pillars-fissure { cursor: pointer; }
     .pillars-plan .pillars-fissure:focus { outline: none; }
-    .pillars-plan .pillars-fissure:focus-visible rect.pillars-tag,
     .pillars-plan .pillars-fissure:hover rect.pillars-tag { stroke: #fde68a; stroke-width: 0.9; }
+    .pillars-plan .pillars-fissure:focus-visible rect.pillars-tag { stroke: #fde68a; stroke-width: 1.6; filter: drop-shadow(0 0 1.5px #fbbf24); }
     .pillars-tape-wrap {
       margin-top: 10px;
       overflow-x: auto;
@@ -13107,7 +13107,7 @@
                 <div class="pillars-verse-tabs" id="pillars-verse-tabs" role="group" aria-label="Verses of the song"></div>
                 <button type="button" class="monolith-btn" id="btn-pillars-sound" aria-pressed="true">🔊 Sound</button>
               </div>
-              <svg class="pillars-plan" id="pillars-plan" viewBox="0 0 120 142" role="group" aria-label="Cairn IV seen from above: the two pillars, the rings of paces and the sixteen fissures of the cliffs. Choose a fissure to mark an echo."></svg>
+              <svg class="pillars-plan" id="pillars-plan" viewBox="0 0 120 146" role="group" aria-label="Cairn IV seen from above: the two pillars, the rings of paces and the sixteen fissures of the cliffs. Choose a fissure to mark an echo."></svg>
               <div class="pillars-tape-wrap" id="pillars-tape-wrap">
                 <svg class="pillars-tape" id="pillars-tape" role="img" aria-label="The chronograph tape: one tick per beat, the calls of the pillars and their echoes."></svg>
               </div>
@@ -13137,7 +13137,7 @@
               <li>The wind plays one pillar at a time. The Left pillar sings only to the left cliff, the Right pillar only to the right one, each in its own voice.</li>
               <li>Count the beats of the chronometer from the start of a call to the start of its echo: every beat is 5 paces to the fissure that answered.</li>
               <li>A long call comes back as a long echo. Listen with headphones if you can; the tape records everything you hear.</li>
-              <li>Mark the fissure of each echo, in the order the wind played them, then sing the verse back. <strong>Test call</strong> lets Hermes shout at a fissure to hear how it answers.</li>
+              <li>Take the calls in the order the wind played them (they are numbered on the tape) and mark, for each one, the fissure that answered it. Then sing the verse back. <strong>Test call</strong> lets Hermes shout at a fissure to hear how it answers.</li>
             </ul>
             <div class="laby-hint" id="pillars-hint" style="display: none;">✦ Hermes has numbered the beats on the tape for you.</div>
           </div>
@@ -24155,7 +24155,7 @@
             if (!Ctx) return null;
             ctx = (audio && audio.ctx) || new Ctx();
           }
-          if (ctx.state === 'suspended' && typeof ctx.resume === 'function') Promise.resolve(ctx.resume()).catch(() => {});
+          if (ctx.state !== 'running' && typeof ctx.resume === 'function') Promise.resolve(ctx.resume()).catch(() => {});
           if (!audio || audio.ctx !== ctx) {
             const master = ctx.createGain();
             master.gain.value = 0.9;
@@ -24171,11 +24171,11 @@
       function voice(at, side, seconds, distance) {
         const { ctx, master, noise } = audio;
         const far = distance ? (distance - 25) / 35 : 0;
-        const level = distance ? 0.3 - 0.13 * far : 0.4;
+        const level = distance ? 0.2 - 0.1 * far : 0.42;   // an echo is at least 6 dB softer than its call
         const out = ctx.createGain();
         const lp = ctx.createBiquadFilter();
         lp.type = 'lowpass';
-        lp.frequency.value = distance ? 2600 - 1700 * far : 6000;
+        lp.frequency.value = distance ? 1200 - 800 * far : 6000;   // and duller, the farther the fissure
         let tail = lp;
         if (ctx.createStereoPanner) {
           const pan = ctx.createStereoPanner();
@@ -24218,7 +24218,7 @@
         o.type = 'square';
         o.frequency.value = 1900;
         g.gain.setValueAtTime(0.0001, at);
-        g.gain.exponentialRampToValueAtTime(0.025, at + 0.003);
+        g.gain.exponentialRampToValueAtTime(0.07, at + 0.003);
         g.gain.exponentialRampToValueAtTime(0.0001, at + 0.03);
         o.connect(g); g.connect(master);
         o.start(at); o.stop(at + 0.05);
@@ -24235,8 +24235,8 @@
       let tape = null;   // { events, beats, beatMs, label, start, raf }
       function eventsOf(calls) {
         const evs = [];
-        calls.forEach((c) => {
-          evs.push({ beat: c.t, kind: 'call', side: c.side, len: c.len });
+        calls.forEach((c, i) => {
+          evs.push({ beat: c.t, kind: 'call', side: c.side, len: c.len, n: i + 1 });
           evs.push({ beat: c.t + c.d / PACES_PER_BEAT, kind: 'echo', side: c.side, len: c.len, d: c.d });
         });
         return evs.sort((a, b) => a.beat - b.beat);
@@ -24253,7 +24253,7 @@
         svg.appendChild(svgEl('line', { x1: 0, y1: TAPE_H / 2, x2: width, y2: TAPE_H / 2, stroke: '#8a6d3b', 'stroke-width': 0.6 }));
         for (let b = 0; b <= beats; b++) {
           svg.appendChild(svgEl('line', { x1: xb(b), y1: TAPE_H / 2 - 5, x2: xb(b), y2: TAPE_H / 2 + 5, stroke: '#5c4524', 'stroke-width': 0.8 }));
-          if (countHintOn()) svg.appendChild(svgText(xb(b), TAPE_H / 2 + 4, String(b), { 'font-size': 6, fill: '#7c5a32', dx: 4 }));
+          if (countHintOn()) svg.appendChild(svgText(xb(b), TAPE_H / 2 + 13, String(b), { 'font-size': 7, fill: '#7c5a32' }));
         }
         if (!tape) return;
         tape.events.forEach((ev) => {
@@ -24264,32 +24264,46 @@
           const color = top ? '#b45309' : '#0f766e';
           if (ev.kind === 'call') {
             svg.appendChild(svgEl('rect', { x: xb(ev.beat), y, width: w, height: 20, rx: 2, fill: color }));
+            if (tape.events.length > 2) svg.appendChild(svgText(xb(ev.beat) + w / 2, y + 28, String(ev.n), { 'font-size': 7, fill: color, 'font-weight': 700 }));
           } else {
             svg.appendChild(svgEl('rect', { x: xb(ev.beat), y: y + 2, width: w, height: 16, rx: 2, fill: 'none', stroke: color, 'stroke-width': 1.6 }));
           }
         });
         if (nowBeat !== Infinity) svg.appendChild(svgEl('line', { x1: xb(nowBeat), y1: 2, x2: xb(nowBeat), y2: TAPE_H - 2, stroke: '#dc2626', 'stroke-width': 1 }));
       }
+      let record = null;   // the last verse heard to the end: a test call plays over it, then gives it back
       function stopTape() {
-        if (tape && tape.raf) cancelAnimationFrame(tape.raf);
-        if (tape) tape.raf = null;
+        const unfinished = !!(tape && tape.raf);
+        if (unfinished) cancelAnimationFrame(tape.raf);
         silence();
+        if (unfinished) {
+          tape = record;   // what was never heard is not on the tape
+          if (el.tapeStatus) el.tapeStatus.textContent = record ? record.label + ' · recorded' : 'Stopped';
+          drawTape(Infinity);
+        }
       }
-      function playCalls(calls, beatMs, label) {
+      function playCalls(calls, beatMs, label, isTest) {
         stopTape();
         const events = eventsOf(calls);
         const last = events.reduce((m, ev) => Math.max(m, ev.beat + LEN_BEATS[ev.len]), 0);
-        tape = { events, beats: Math.ceil(last) + 2, beatMs, label, raf: null, start: performance.now() + 120 };
+        tape = { events, beats: Math.ceil(last) + 2, beatMs, label, isTest: !!isTest, raf: null, start: performance.now() + 120, audio: null };
         const a = ensureAudio();
         if (a) {
           const t0 = a.ctx.currentTime + 0.12;
           const beatSec = beatMs / 1000;
           for (let b = 0; b <= tape.beats; b++) tick(t0 + b * beatSec);
           events.forEach((ev) => voice(t0 + ev.beat * beatSec, ev.side, LEN_BEATS[ev.len] * beatSec, ev.kind === 'echo' ? ev.d : 0));
+          tape.audio = { ctx: a.ctx, t0, beatSec };
         }
         if (el.tapeStatus) el.tapeStatus.textContent = label + ' · playing…';
+        // The cursor follows the sound itself (audio clock minus output latency, e.g. Bluetooth), or the page clock when muted
+        const beatNow = () => {
+          const au = tape.audio;
+          if (au && au.ctx.state === 'running') return (au.ctx.currentTime - au.t0 - (au.ctx.outputLatency || 0)) / au.beatSec;
+          return (performance.now() - tape.start) / tape.beatMs;
+        };
         const frame = () => {
-          const beat = (performance.now() - tape.start) / tape.beatMs;
+          const beat = beatNow();
           drawTape(Math.max(0, beat));
           if (el.tapeWrap) {
             const x = TAPE_PAD + beat * BEAT_PX - el.tapeWrap.clientWidth * 0.6;
@@ -24299,6 +24313,15 @@
           tape.raf = null;
           drawTape(Infinity);
           if (el.tapeStatus) el.tapeStatus.textContent = label + ' · recorded';
+          if (!tape.isTest) { record = tape; return; }
+          // a test call stays on the tape for a moment, then the verse's record comes back
+          const heard = tape;
+          setTimeout(() => {
+            if (tape !== heard || !record) return;
+            tape = record;
+            drawTape(Infinity);
+            if (el.tapeStatus) el.tapeStatus.textContent = record.label + ' · recorded';
+          }, 2500);
         };
         if (el.tapeWrap) el.tapeWrap.scrollLeft = 0;
         tape.raf = requestAnimationFrame(frame);
@@ -24309,7 +24332,7 @@
         playCalls(v.calls, v.beatMs, 'Verse ' + ['I', 'II', 'III'][verseIdx]);
       }
       function testCall(side, d) {
-        playCalls([{ t: 1, side, len: 'short', d }], VERSES[verseIdx].beatMs, 'Test call · ' + SIDE_NAME[side] + ' cliff, ' + d + ' paces');
+        playCalls([{ t: 1, side, len: 'short', d }], VERSES[verseIdx].beatMs, 'Test call · ' + SIDE_NAME[side] + ' cliff, ' + d + ' paces', true);
       }
 
       // ---- The canyon plan ----
@@ -24332,12 +24355,12 @@
         RINGS.forEach((d) => {
           const y = ringY(d);
           svg.appendChild(svgEl('path', { d: `M${PLAN.wallL} ${y + 7} Q 60 ${y - 9} ${PLAN.wallR} ${y + 7}`, fill: 'none', stroke: '#b8a07a', 'stroke-opacity': 0.45, 'stroke-width': 0.5 }));
-          svg.appendChild(svgText(60, y - 0.6, String(d), { 'font-size': 4.2, fill: '#d6c3a0' }));
+          svg.appendChild(svgText(60, y - 3.6, String(d), { 'font-size': 4.2, fill: '#d6c3a0' }));
         });
         // the twin pillars
         [['L', 50], ['R', 70]].forEach(([side, x]) => {
           svg.appendChild(svgEl('rect', { x: x - 4, y: PLAN.baseY, width: 8, height: 8, fill: '#3b2a17', stroke: side === 'L' ? '#f59e0b' : '#2dd4bf', 'stroke-width': 0.9 }));
-          svg.appendChild(svgText(x, 141.5, SIDE_NAME[side], { 'font-size': 3.8, fill: '#d6c3a0' }));
+          svg.appendChild(svgText(x, 142, SIDE_NAME[side], { 'font-size': 3.8, fill: '#d6c3a0' }));
         });
         // the sixteen fissures
         ['L', 'R'].forEach((side) => {
@@ -24350,7 +24373,7 @@
             const tx = side === 'L' ? x - 8 : x + 8;
             g.appendChild(svgEl('rect', { class: 'pillars-tag', x: tx - 4.5, y: y - 4.5, width: 9, height: 9, rx: 1, fill: shown.has(id) ? 'rgba(134, 239, 172, 0.18)' : '#1a120a', stroke: side === 'L' ? '#f59e0b' : '#2dd4bf', 'stroke-width': 0.5 }));
             g.appendChild(svgText(tx, y + 1.8, shown.has(id) ? WALLS[side][d] : '?', { 'font-size': 5, fill: shown.has(id) ? '#86efac' : '#b8a07a' }));
-            g.appendChild(svgEl('rect', { x: side === 'L' ? 0 : x - 6, y: y - 5, width: side === 'L' ? x + 6 : 120 - x + 6, height: 10, fill: 'transparent' }));
+            g.appendChild(svgEl('rect', { x: side === 'L' ? 0 : x - 10, y: y - 6.4, width: side === 'L' ? x + 10 : 120 - x + 10, height: 12.8, fill: 'transparent' }));
             svg.appendChild(g);
           });
         });
@@ -24376,7 +24399,7 @@
           const div = document.createElement('div');
           const id = slots[i];
           div.className = 'pillars-slot' + (id ? ' is-filled' : '');
-          div.textContent = id ? SIDE_NAME[id[0]][0] + ' · ' + id.slice(1) : String(i + 1);
+          div.textContent = id ? SIDE_NAME[id[0]][0] + ' · ' + id.slice(1) : 'Call ' + (i + 1);
           el.slots.appendChild(div);
         }
         if (el.sing) el.sing.disabled = slots.length !== need || isDone();
@@ -24402,6 +24425,10 @@
         }
         set(KEYS.verses, String(verseIdx + 1));
         slots = [];
+        stopTape();
+        tape = null; record = null;
+        drawTape(Infinity);
+        if (el.tapeStatus) el.tapeStatus.textContent = '';
         if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         feedback(el.songFeedback, v.word + '. The verse rings true.', 'ok');
         if (verseIdx + 1 >= VERSES.length) { completeStation(); return; }
@@ -24469,7 +24496,14 @@
             b.textContent = 'Verse ' + ['I', 'II', 'III'][i];
             b.setAttribute('aria-pressed', String(i === verseIdx));
             b.disabled = i > sung;
-            b.addEventListener('click', () => { if (i === verseIdx) return; stopTape(); tape = null; drawTape(Infinity); verseIdx = i; slots = []; render(); });
+            b.addEventListener('click', () => {
+              if (i === verseIdx) return;
+              stopTape();
+              tape = null; record = null;
+              drawTape(Infinity);
+              if (el.tapeStatus) el.tapeStatus.textContent = '';
+              verseIdx = i; slots = []; render();
+            });
             el.tabs.appendChild(b);
           });
         }
