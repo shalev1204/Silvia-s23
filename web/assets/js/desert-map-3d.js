@@ -935,7 +935,8 @@
                 var mins = Math.floor((remMs % 3600000) / 60000);
                 hudText.textContent = '🚶 EN ROUTE TO NORTH PORTAL · ETA: ' + hrs + 'h ' + mins + 'm';
               } else {
-                hudText.textContent = (state.waiting ? 'Sheltering at ' : '') + WHERE[state.lvl];
+                var leg = currentCrossing();   // stopped part-way along a walking leg: keep its countdown
+                hudText.textContent = leg ? leg.text : (state.waiting ? 'Sheltering at ' : '') + WHERE[state.lvl];
               }
             }
           }

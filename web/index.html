@@ -14556,9 +14556,11 @@
           }
           const eta = typeof window.getLabyrinthMarchEta === 'function' ? window.getLabyrinthMarchEta() : '';
           const arrived = typeof window.isLabyrinthMarchOver === 'function' && window.isLabyrinthMarchOver();
+          // The bearing is Hermes's to explain at first light (wire step 13): before that, no direction
+          const heardAtDawn = (parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0) >= 13;
           return {
             badge: 'STATION 15 // DESERT PATH',
-            status: arrived ? 'CAIRN III REACHED ✦' : (eta ? 'HERMES WALKING DOWN FROM THE MONOLITH ✦' : 'SOUTH-SOUTH-EAST OF THE SUN MONOLITH ✦'),
+            status: arrived ? 'CAIRN III REACHED ✦' : (eta ? 'HERMES WALKING DOWN FROM THE MONOLITH ✦' : (heardAtDawn ? 'SOUTH-SOUTH-EAST OF THE SUN MONOLITH ✦' : 'BEYOND THE ARCHES OF THE WEST WIND ✦')),
             statusClass: 'status-live-badge',
             title: 'The Sandstone Labyrinth & Cairn III',
             thumb,
@@ -14566,7 +14568,9 @@
               ? 'Below the Arches of the West Wind, a maze of pillars and fissures hides Cairn III and its copper plate. Solve Sheet 14B of your journal, speak the sigil, and get Hermes out alive: the BC Ashes are inside.'
               : (eta
                 ? 'Hermes is walking down from the Sun Monolith to the Sandstone Labyrinth, on the bearing of 168°. Arrival in ' + eta + '. Keep Sheet 14B close.'
-                : 'The Sandstone Labyrinth lies south-south-east of the Sun Monolith, under the Arches of the West Wind. Hermes will set out once you answer him on the wire.'),
+                : (heardAtDawn
+                  ? 'The Sandstone Labyrinth lies south-south-east of the Sun Monolith, under the Arches of the West Wind. Hermes will set out once you answer him on the wire.'
+                  : 'Somewhere beyond the Arches of the West Wind lies the Sandstone Labyrinth. Hermes is resting under the Sun Monolith and will wire you at first light.')),
             rewards: [
               { icon: '📖', label: 'Sheet 14B of the Journal', desc: 'The eight arches of the true road' },
               { icon: '🔥', label: 'Escape from the BC Ashes', desc: 'A second trial, only in the labyrinth' },
@@ -17173,7 +17177,7 @@
           }
         },
         {
-          // Station 15 debrief: the raiders' camp and the gold star (the next thread towards the Oracle, see the Master Bible §12)
+          // Station 15 debrief: the raiders' camp and the gold star
           step: 15,
           hermesInitial: "I am out, Silvia. Through the Western Cleft and onto the open hardpan, with the Seal of Cairn III wrapped in my scarf. They never saw my face.\n\nTwo things I cannot stop thinking about. Their camp: cold ashes, a broken wagon wheel, the charred circle of the BC Ashes scratched on the rock. They have been sleeping in that labyrinth for days, waiting for someone to open the cairn for them. Now they know someone did.\n\nAnd the star. A star painted in gold leaf on the wall of a fissure, eight points over a ground of blue, and the gold still bright. Aurelia gilded her stars exactly like that, the blue first so the gold would seem to burn in the night. First the blue at Cairn II, now this. Either the sun is cooking my mind, or someone walks these cairns ahead of me and knows the old way of painting the sky.",
           choices: [
@@ -17599,7 +17603,7 @@
           title: "How do the raiders' torches move?",
           category: "Cairn III",
           group: "desert",
-          answer: "They walk rounds, Silvia, the same squares again and again, like sentries on a wall. Some go back and forth along one corridor; one walks a loop around their camp. A torch only lights what is in front of it, so the safest place in the labyrinth is right behind one. Hold still in a side passage, let the light go past, then follow it. I have drawn their rounds on your board so you can count the beats between them."
+          answer: "They walk rounds, Silvia, the same squares again and again, like sentries on a wall. Some go back and forth along one corridor; one walks a loop beside their camp. A torch only lights what is in front of it, so the safest place in the labyrinth is right behind one. Hold still in a side passage, let the light go past, then follow it. I have drawn their rounds on your board so you can count the beats between them."
         },
         {
           id: "inq-cairn3-plate",
@@ -23252,7 +23256,7 @@
       const LAMP = 2;               // Hermes's lamp: squares around him (in both axes)
       const REACH = 2;              // a torch lights its square and this many squares ahead
 
-      // Walls: one hex digit per square, bits N=1 E=2 S=4 W=8. Torches: their rounds, square by square.
+      // Walls: one hex digit per square (0x1 north, 0x2 east, 0x4 south, 0x8 west). Torches: their rounds, square by square.
       const LEVEL = {
         cols: 13,
         rows: 11,
@@ -23548,6 +23552,7 @@
         }
         run.t += k;
         reveal();
+        landmarks();
         feedback(el.moveFeedback, how + ' A close call: he pressed into a crack in the rock and the torch walked on.', 'error');
         render();
       }
@@ -23584,9 +23589,13 @@
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
         const k = KEYMAP[e.key];
         if (!k) return;
-        if (k === 'wait' && e.target && e.target.tagName === 'BUTTON') return;   // the space bar already presses the focused button
+        // The space bar holds still even when a pad arrow has focus: the browser would otherwise press that arrow again
+        if (k === 'wait' && e.target && e.target.tagName === 'BUTTON' && !modal.contains(e.target)) return;
         e.preventDefault();
         takeTurn(STEPS[k][0], STEPS[k][1]);
+      });
+      document.addEventListener('keyup', (e) => {
+        if (e.key === ' ' && modal.style.display !== 'none' && e.target && e.target.tagName === 'BUTTON' && modal.contains(e.target)) e.preventDefault();
       });
       if (el.board) {
         el.board.addEventListener('click', (e) => {
