@@ -1,12 +1,17 @@
 import os
+import sys
 import json
 import urllib.request
 import base64
 import subprocess
 
-key_path = os.path.expanduser("~/.gemini_api_key")
-with open(key_path, "r") as f:
-    api_key = f.read().strip()
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    key_path = os.path.expanduser("~/.gemini_api_key")
+    if not os.path.exists(key_path):
+        sys.exit("Error: set GEMINI_API_KEY or create ~/.gemini_api_key (never commit it).")
+    with open(key_path, "r") as f:
+        api_key = f.read().strip()
 
 OUT_DIR = "assets/constellation/radio-transmission/audio/pursuers"
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -19,7 +24,7 @@ pursuer_lines = [
 ]
 
 for tag, voice, text in pursuer_lines:
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:generateContent"
     payload = {
         "contents": [{"role": "user", "parts": [{"text": text}]}],
         "generationConfig": {
@@ -27,7 +32,7 @@ for tag, voice, text in pursuer_lines:
             "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}}
         }
     }
-    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers={"Content-Type": "application/json", "x-goog-api-key": api_key})
     try:
         with urllib.request.urlopen(req) as resp:
             data = json.loads(resp.read().decode("utf-8"))

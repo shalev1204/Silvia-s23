@@ -1,4 +1,6 @@
 import re
+import os
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 new_svg = '''            <svg id="trail-svg-map" viewBox="0 0 1120 800">
               <defs>
@@ -727,7 +729,7 @@ new_svg = '''            <svg id="trail-svg-map" viewBox="0 0 1120 800">
               </g>
             </svg>'''
 
-file_path = "/path/to/Silvia's23/web/index.html"
+file_path = os.path.join(ROOT, "web/index.html")
 with open(file_path, "r", encoding="utf-8") as f:
     content = f.read()
 

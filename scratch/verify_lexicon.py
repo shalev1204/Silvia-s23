@@ -1,10 +1,11 @@
 import os
 import time
 from playwright.sync_api import sync_playwright
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 def run_test():
-    url = "file:///path/to/Silvia's23/web/index.html?bypass=1"
-    os.makedirs("/path/to/Silvia's23/scratch/screenshots", exist_ok=True)
+    url = "file://" + os.path.join(ROOT, "web/index.html") + "?bypass=1"
+    os.makedirs(os.path.join(ROOT, "scratch/screenshots"), exist_ok=True)
 
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="chrome", headless=True)
@@ -33,7 +34,7 @@ def run_test():
         }""")
         page.wait_for_timeout(1000)
 
-        page.screenshot(path="/path/to/Silvia's23/scratch/screenshots/01_desert_map_with_station11.png")
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshots/01_desert_map_with_station11.png"))
         print("Saved screenshot 01")
 
         # Verify Station 11 exists on map
@@ -50,7 +51,7 @@ def run_test():
         assert lexicon_modal.is_visible(), "Desert Lexicon modal should be visible"
         print("Desert Lexicon modal opened successfully!")
 
-        page.screenshot(path="/path/to/Silvia's23/scratch/screenshots/02_desert_lexicon_modal_opened.png")
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshots/02_desert_lexicon_modal_opened.png"))
         print("Saved screenshot 02")
 
         # Select clue ac-2
@@ -73,7 +74,7 @@ def run_test():
         print(f"Slot 3 (index 2) letter in Desert Sigil rack: {slot3_letter}")
         assert slot3_letter == "O", f"Expected 'O' in slot 3, got: {slot3_letter}"
 
-        page.screenshot(path="/path/to/Silvia's23/scratch/screenshots/03_sirocco_carved.png")
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshots/03_sirocco_carved.png"))
         print("Saved screenshot 03")
 
         # Solve all words via Transcribe Complete Journal Notes button
@@ -104,7 +105,7 @@ def run_test():
         print(f"Telemetry azimuth: {azimuth_text}")
         assert "194° SSW" in azimuth_text, "Azimuth should be 194° SSW"
 
-        page.screenshot(path="/path/to/Silvia's23/scratch/screenshots/04_lexicon_victory_state.png")
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshots/04_lexicon_victory_state.png"))
         print("Saved screenshot 04")
 
         # Click return to map button
@@ -122,7 +123,7 @@ def run_test():
         assert "THE OASIS CLEPSYDRA" in clepsydra_text, "Clepsydra title should be revealed"
         print(f"Trail to Clepsydra and Station 12 node are visible on map: {clepsydra_text}")
 
-        page.screenshot(path="/path/to/Silvia's23/scratch/screenshots/05_desert_map_clepsydra_unlocked.png")
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshots/05_desert_map_clepsydra_unlocked.png"))
         print("Saved screenshot 05")
 
         # Now test Cliffside Workshop (view-field-wire)
@@ -132,7 +133,7 @@ def run_test():
         }""")
         page.wait_for_timeout(1500)
 
-        page.screenshot(path="/path/to/Silvia's23/scratch/screenshots/06_field_wire_expedition.png")
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshots/06_field_wire_expedition.png"))
         print("Saved screenshot 06")
 
         # Test Inquiries tab
@@ -159,7 +160,7 @@ def run_test():
         al_qibla_card.click()
         page.wait_for_timeout(2000)
 
-        page.screenshot(path="/path/to/Silvia's23/scratch/screenshots/07_field_wire_inquiry_answered.png")
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshots/07_field_wire_inquiry_answered.png"))
         print("Saved screenshot 07")
 
         print("ALL PLAYWRIGHT TESTS PASSED WITH 100% SUCCESS!")

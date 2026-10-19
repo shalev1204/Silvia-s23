@@ -19,9 +19,13 @@ import urllib.request
 import subprocess
 import numpy as np
 
-KEY_PATH = os.path.expanduser("~/.gemini_api_key")
-with open(KEY_PATH, "r") as f:
-    API_KEY = f.read().strip()
+API_KEY = os.environ.get("GEMINI_API_KEY")
+if not API_KEY:
+    key_path = os.path.expanduser("~/.gemini_api_key")
+    if not os.path.exists(key_path):
+        sys.exit("Error: set GEMINI_API_KEY or create ~/.gemini_api_key (never commit it).")
+    with open(key_path, "r") as f:
+        API_KEY = f.read().strip()
 
 BASE_DIR = "web/constellation/midnight-calibration/audio"
 STEMS_DIR = os.path.join(BASE_DIR, "stems_victory_pro")
@@ -70,6 +74,7 @@ def generate_voice_stems():
             stem_durations[tag] = dur
             print(f"  [CACHE] Stem {tag} ({dur:.2f}s): {text[:55]}...")
             continue
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
         payload = {
             "contents": [{"role": "user", "parts": [{"text": text}]}],
             "generationConfig": {
@@ -87,7 +92,7 @@ def generate_voice_stems():
         req = urllib.request.Request(
             url,
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json", "x-goog-api-key": API_KEY}
         )
         
         for attempt in range(4):

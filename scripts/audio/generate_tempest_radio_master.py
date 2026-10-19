@@ -64,7 +64,7 @@ def generate_voice_stem(tag, text):
         print(f"  [CACHE] Stem {tag} exists.")
         return wav_out
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
     payload = {
         "contents": [{"role": "user", "parts": [{"text": text}]}],
         "generationConfig": {
@@ -81,7 +81,7 @@ def generate_voice_stem(tag, text):
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json", "x-goog-api-key": API_KEY}
     )
     
     for attempt in range(4):

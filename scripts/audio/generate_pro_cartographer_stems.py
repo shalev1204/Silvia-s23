@@ -1,13 +1,18 @@
 import os
+import sys
 import json
 import urllib.request
 import base64
 import subprocess
 import time
 
-key_path = os.path.expanduser("~/.gemini_api_key")
-with open(key_path, "r") as f:
-    api_key = f.read().strip()
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    key_path = os.path.expanduser("~/.gemini_api_key")
+    if not os.path.exists(key_path):
+        sys.exit("Error: set GEMINI_API_KEY or create ~/.gemini_api_key (never commit it).")
+    with open(key_path, "r") as f:
+        api_key = f.read().strip()
 
 STEM_DIR = "assets/constellation/radio-transmission/audio/stems_pro_achernar"
 os.makedirs(STEM_DIR, exist_ok=True)
@@ -30,7 +35,7 @@ model = "gemini-2.5-pro-preview-tts"
 print(f"Generating 8 breathless pro stems with voice '{voice}' on '{model}'...")
 
 for tag, text in lines:
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     payload = {
         "contents": [{"role": "user", "parts": [{"text": text}]}],
         "generationConfig": {
@@ -38,7 +43,7 @@ for tag, text in lines:
             "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": voice}}}
         }
     }
-    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers={"Content-Type": "application/json", "x-goog-api-key": api_key})
     
     success = False
     for attempt in range(3):
