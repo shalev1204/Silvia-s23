@@ -13101,6 +13101,7 @@
       window.getPreviousHubView = () => previousHubView;
 
       function activateHubView(targetView) {
+        if (targetView === 'view-cipher' && typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
         const isCarles = (currentSeeker || 'Silvia').toLowerCase() === 'carles';
         const isCipherCompleted = getSeekerCipherCompleted();
 
@@ -15184,8 +15185,32 @@
         { id: 'diff-kg', station: 'Station 09 · Folio Limen', name: 'Meridian Parallax', expr: 'K − G', l1: 'K', op: '-', l2: 'G', target: 4, unit: ' N' },
         { id: 'diff-pb', station: 'Station 09 · Folio Limen', name: 'Frontier Shift', expr: 'P − B', l1: 'P', op: '-', l2: 'B', target: 4, unit: ' E' },
         { id: 'diff-ve', station: 'Station 09 · Folio Limen', name: 'Solar Amplitude', expr: 'V − E', l1: 'V', op: '-', l2: 'E', target: 10, unit: ' S' },
-        { id: 'diff-tf', station: 'Station 09 · Folio Limen', name: 'Polar Resonance', expr: 'T − F', l1: 'T', op: '-', l2: 'F', target: 10, unit: ' W' }
+        { id: 'diff-tf', station: 'Station 09 · Folio Limen', name: 'Polar Resonance', expr: 'T − F', l1: 'T', op: '-', l2: 'F', target: 10, unit: ' W' },
+        { id: 'stele-rf', station: 'Station 12 · Nomad Ruins Stele', name: 'Stargazer Proportion', expr: 'R × 2', l1: 'R', op: 'x2', l2: 'F', target: null, unit: '', requires: 'order_desert_lexicon_completed' },
+        { id: 'falcon-pa', station: 'Station 13 · Falcon Stone', name: 'Falcon Inscription', expr: 'P − A', l1: 'P', op: '-', l2: 'A', target: 14, unit: '', requires: 'order_oasis_clepsydra_completed' }
       ];
+
+      // Desert equations only appear once their station is solved, so the Ledger never spoils them
+      const isEquationUnlocked = (eq) => !eq.requires || localStorage.getItem(eq.requires) === 'true';
+      const getVisibleEquations = () => CLUE_EQUATIONS.filter(isEquationUnlocked);
+
+      // Most equations read [L1] ± [L2] = N; the stele's proportion reads [R] × 2 = [F]
+      const isProportion = (eq) => eq.op === 'x2';
+      function equationFormula(eq) {
+        if (isProportion(eq)) return `[${eq.l1}] × 2 = [${eq.l2}]`;
+        const opSymbol = (eq.op === '-') ? '−' : '+';
+        return `[${eq.l1}] ${opSymbol} [${eq.l2}] = ${eq.target}${eq.unit}`;
+      }
+      function equationCheck(eq, v1, v2) {
+        if (isProportion(eq)) {
+          const ok = v1 * 2 === v2;
+          return { ok, line: ok ? `${v1} × 2 = ${v2}` : `${v1} × 2 = ${v1 * 2} ≠ ${v2}` };
+        }
+        const opSymbol = (eq.op === '-') ? '−' : '+';
+        const result = (eq.op === '-') ? (v1 - v2) : (v1 + v2);
+        const ok = result === eq.target;
+        return { ok, line: ok ? `${v1} ${opSymbol} ${v2} = ${result}${eq.unit}` : `${v1} ${opSymbol} ${v2} = ${result} (Target: ${eq.target}${eq.unit})` };
+      }
 
       const alphabetGridEl = document.getElementById('alphabet-grid');
       const clueEquationsContainer = document.getElementById('clue-equations-container');
@@ -15249,10 +15274,11 @@
       }
 
       function getSortedEquations() {
+        const visible = getVisibleEquations();
         if (!Array.isArray(equationsOrder) || equationsOrder.length === 0) {
-          return [...CLUE_EQUATIONS];
+          return visible;
         }
-        const eqMap = new Map(CLUE_EQUATIONS.map(eq => [eq.id, eq]));
+        const eqMap = new Map(visible.map(eq => [eq.id, eq]));
         const sorted = [];
         equationsOrder.forEach(id => {
           if (eqMap.has(id)) {
@@ -15615,7 +15641,7 @@
           item.className = 'clue-equation-item';
           item.id = `eq-item-${eq.id}`;
 
-          const opSymbol = (eq.op === '-') ? '−' : '+';
+          const opSymbol = isProportion(eq) ? '× 2 =' : ((eq.op === '-') ? '−' : '+');
           const v1 = cipherLedger[eq.l1];
           const v2 = cipherLedger[eq.l2];
           const val1Str = (v1 !== undefined && v1 !== null && v1 !== '') ? v1 : '';
@@ -15640,9 +15666,9 @@
                     <span class="clue-eq-name">${eq.name}</span>
                   </div>
                   <div class="clue-eq-formula-line">
-                    <span class="clue-eq-formula">[${eq.l1}] ${opSymbol} [${eq.l2}] = ${eq.target}${eq.unit}</span>
+                    <span class="clue-eq-formula">${equationFormula(eq)}</span>
                     <span class="clue-eq-live-values waiting" id="eq-live-${eq.id}">
-                      Values: [${eq.l1}] ${opSymbol} [${eq.l2}] = ?
+                      Values: ?
                     </span>
                   </div>
                 </div>
@@ -15671,7 +15697,7 @@
                   <strong>${eq.l2} =</strong>
                   <input type="number" min="1" max="26" class="eq-number-input eq-input-${eq.l2}" data-letter="${eq.l2}" placeholder="—" value="${val2Str}" autocomplete="off">
                 </div>
-                <span class="eq-editor-equals">=</span>
+                ${isProportion(eq) ? '' : '<span class="eq-editor-equals">=</span>'}
               </div>
               <div class="eq-calc-feedback waiting" id="eq-feedback-${eq.id}">
                 Assign values to calculate
@@ -15773,11 +15799,11 @@
           let stateClass = 'waiting';
 
           if (hasV1 && hasV2) {
-            const result = (eq.op === '-') ? (v1 - v2) : (v1 + v2);
-            if (result === eq.target) {
+            const check = equationCheck(eq, v1, v2);
+            if (check.ok) {
               stateClass = 'is-balanced';
-              liveHtml = `Values: ${v1} ${opSymbol} ${v2} = ${result}${eq.unit} (Balanced ✓)`;
-              feedbackHtml = `✓ Balanced: ${v1} ${opSymbol} ${v2} = ${result}${eq.unit}`;
+              liveHtml = `Values: ${check.line} (Balanced ✓)`;
+              feedbackHtml = `✓ Balanced: ${check.line}`;
               // Auto-mark resolved on mathematical match if not already explicitly toggled off
               if (resolvedEquations[eq.id] === undefined) {
                 resolvedEquations[eq.id] = true;
@@ -15785,9 +15811,13 @@
               }
             } else {
               stateClass = 'is-imbalanced';
-              liveHtml = `Values: ${v1} ${opSymbol} ${v2} = ${result} (Target: ${eq.target}${eq.unit})`;
-              feedbackHtml = `⚠ Result: ${result} ≠ Target: ${eq.target}${eq.unit}`;
+              liveHtml = `Values: ${check.line}`;
+              feedbackHtml = `⚠ Not balanced: ${check.line}`;
             }
+          } else if (isProportion(eq)) {
+            stateClass = 'waiting';
+            liveHtml = `Values: ${hasV1 ? v1 : `[${eq.l1}]`} × 2 = ${hasV2 ? v2 : `[${eq.l2}]`}`;
+            feedbackHtml = `Assign values to ${eq.l1} and ${eq.l2} to test the proportion`;
           } else if (hasV1) {
             stateClass = 'waiting';
             liveHtml = `Values: ${v1} ${opSymbol} [${eq.l2}] = ? (Need ${eq.l2})`;
@@ -15825,10 +15855,11 @@
         });
 
         // Update overall resolved status pill
-        const resolvedTotal = CLUE_EQUATIONS.filter(eq => !!resolvedEquations[eq.id]).length;
+        const visibleEquations = getVisibleEquations();
+        const resolvedTotal = visibleEquations.filter(eq => !!resolvedEquations[eq.id]).length;
         if (sanctuaryStatusPill) {
-          sanctuaryStatusPill.innerText = `${resolvedTotal} / ${CLUE_EQUATIONS.length} Equations Resolved`;
-          sanctuaryStatusPill.classList.toggle('all-balanced', resolvedTotal === CLUE_EQUATIONS.length);
+          sanctuaryStatusPill.innerText = `${resolvedTotal} / ${visibleEquations.length} Equations Resolved`;
+          sanctuaryStatusPill.classList.toggle('all-balanced', resolvedTotal === visibleEquations.length);
         }
       }
 
@@ -15896,15 +15927,13 @@
             const v1 = cipherLedger[eq.l1];
             const v2 = cipherLedger[eq.l2];
             const hasBoth = (v1 !== undefined && v1 !== null && v1 !== '' && v2 !== undefined && v2 !== null && v2 !== '');
-            const opSign = (eq.op === '-') ? '−' : '+';
             const isRes = !!resolvedEquations[eq.id];
             const resStatus = isRes ? '[RESOLVED ✓]' : '[PENDING]';
             if (hasBoth) {
-              const res = (eq.op === '-') ? (v1 - v2) : (v1 + v2);
-              const isBal = (res === eq.target);
-              text += `• ${eq.name}: [${eq.l1}] ${opSign} [${eq.l2}] = ${eq.target}${eq.unit} | Values: ${v1} ${opSign} ${v2} = ${res} [${isBal ? 'BALANCED' : 'IMBALANCED'}] ${resStatus}\n`;
+              const check = equationCheck(eq, v1, v2);
+              text += `• ${eq.name}: ${equationFormula(eq)} | Values: ${check.line} [${check.ok ? 'BALANCED' : 'IMBALANCED'}] ${resStatus}\n`;
             } else {
-              text += `• ${eq.name}: [${eq.l1}] ${opSign} [${eq.l2}] = ${eq.target}${eq.unit} [Awaiting letter values] ${resStatus}\n`;
+              text += `• ${eq.name}: ${equationFormula(eq)} [Awaiting letter values] ${resStatus}\n`;
             }
           });
 
@@ -15918,6 +15947,18 @@
           });
         });
       }
+
+      // A desert equation unlocks when its station is solved: show it next time the Ledger opens, without a reload
+      function refreshLedgerUnlocks() {
+        if (!clueEquationsContainer) return;
+        const rendered = clueEquationsContainer.querySelectorAll('.clue-equation-item').length;
+        if (rendered !== getVisibleEquations().length) {
+          renderClueEquations();
+          updateAllLedgerUI();
+        }
+      }
+      window.refreshLedgerUnlocks = refreshLedgerUnlocks;
+      document.querySelectorAll('[data-view="view-cipher"]').forEach(btn => btn.addEventListener('click', refreshLedgerUnlocks));
 
       // Reset All Letters Action (Scoped strictly to current seeker)
       if (btnResetLedger) {

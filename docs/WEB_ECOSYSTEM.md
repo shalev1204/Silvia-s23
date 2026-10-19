@@ -96,6 +96,8 @@ web/
 
 ## 6. Despliegue (Cloudflare Pages)
 
+> **Antes de desplegar**: `python3 scripts/audit/web_smoke.py` debe terminar en `✅ ALL GREEN` (ver `scripts/README.md`).
+
 Al subir la carpeta **`web`** completa:
 - Cloudflare conserva la estructura de carpetas.
 - Cada juego tiene sus assets independientes (sin riesgo de colisión).
