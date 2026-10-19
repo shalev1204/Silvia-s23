@@ -91,13 +91,27 @@ El propósito de esta versión 6.0 es blindar el proyecto al 100%:
 
 ## 3. REGISTRO EXHAUSTIVO DE EMAILS Y DESPACHOS ENVIADOS
 
-A continuación se documenta el texto exacto, metadatos y función de cada despacho enviado a Silvia:
+A continuación se documenta el texto exacto, metadatos y función de cada despacho enviado a Silvia.
+
+**Registro real de envíos** (Gmail `theeclipseorder.quest@gmail.com` · Enviados, comprobado el 19-10-2026). Se enviaron **7 correos**; los marcados «sin transcribir» aún no tienen su texto literal en esta Biblia:
+
+| Fecha | Asunto real | Despacho |
+| :--- | :--- | :--- |
+| 1 sep 2026 · 22:22 | `Tonight, something shifted.` | Email 1 |
+| 2 sep 2026 · 22:22 (y respuesta el 3 sep) | `The Cartographer of Distant Light` | Email 2 (enlace enviado: `constellation-watch.pages.dev`) |
+| 12 sep 2026 | `[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur` (adjunto `email_cover_ba…`) | Email 3 · The Celestial Matrix *(asunto en español; sin transcribir)* |
+| 14 sep 2026 | `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]` — «Silvia, the mountain console has flickered to life. Have your journ…» | Despacho 3-bis · recordatorio de la Matrix *(sin transcribir)* |
+| 25 sep 2026 | `The Zodiacal Outpost & The Dust of the Mainframe` | Email 4 |
+| 8 oct 2026 | `📻 [INTERCEPTED SIGNAL // THE ECLIPSE ORDER]` — «Silvia, the beacon at the southern cliff (Station 09) has just respo…» | Despacho 4-bis · apertura de la Estación 09 *(sin transcribir)* |
+| 10 oct 2026 | `[Emergency Carrier · 142.85 MHz] A signal cuts through the sandstorm` | Email 5 |
+
+Las horas de los envíos del 12 sep en adelante no aparecen en el listado de Enviados: se dan como «por confirmar».
 
 ### Email 1: The Initiation Dispatch
 - **Fecha y Hora**: 1 de Septiembre de 2026 · **22:22 exactas**
 - **De**: The Eclipse Order `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
-- **Asunto**: `Something shifted`
+- **Asunto**: `Tonight, something shifted.`
 - **Adjunto / Visual**: Pergamino vertical de alta resolución (`assets/email-01-parchment.png`)
 - **Texto Literal del Mensaje**:
 ```text
@@ -187,7 +201,8 @@ The Eclipse Order · XXII:XXII
 ---
 
 ### Email 3: [Dispatch] · Intercepted Transmission (The Celestial Matrix)
-- **Fecha y Hora**: 5 de Septiembre de 2026 · **22:22 exactas** *(confirmar con Gmail · Enviados)*
+- **Fecha y Hora**: 12 de Septiembre de 2026 · hora por confirmar *(Gmail · Enviados; el diario llegó el 11 de septiembre)*
+- **Asunto real**: `[INTERCEPTADO // FRECUENCIA 142.85 MHz] Nueva señal entrante detectada — Origen: Sector Sur` (el asunto y el texto de abajo son la versión de trabajo; el texto literal enviado está pendiente de transcribir). El 14 de septiembre siguió un recordatorio, *«Silvia, the mountain console has flickered to life…»*.
 - **De**: The Cartographer of Distant Light `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
 - **Asunto**: `[Dispatch] · Intercepted Transmission: The Celestial Matrix`
@@ -217,7 +232,8 @@ The Eclipse Order · XXII:XXII
 ---
 
 ### Email 4: [Dispatch III] · The Zodiacal Outpost & The Dust of the Mainframe
-- **Fecha y Hora**: 8 de Septiembre de 2026 · **22:22 exactas** *(confirmar con Gmail · Enviados)*
+- **Fecha y Hora**: 25 de Septiembre de 2026 · hora por confirmar *(Gmail · Enviados)*
+- **Asunto real**: `The Zodiacal Outpost & The Dust of the Mainframe` (con imagen adjunta)
 - **De**: The Cartographer of Distant Light `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
 - **Asunto**: `[Dispatch III] · The Zodiacal Outpost & The Dust of the Mainframe`
@@ -253,7 +269,7 @@ The Eclipse Order · Constellation Path
 ---
 
 ### Email 5: [Emergency Carrier · 142.85 MHz] A Signal in the Sandstorm
-- **Fecha y Hora**: 12 de Septiembre de 2026 · **20:00h** (Momento del colapso) *(confirmar con Gmail · Enviados; la tormenta del Hub es la ventana de 48 h que terminó el domingo 18 de octubre de 2026 a las 14:00)*
+- **Fecha y Hora**: 10 de Octubre de 2026 · hora por confirmar *(Gmail · Enviados)*. El 8 de octubre lo precedió el despacho que abrió la Estación 09: *«Silvia, the beacon at the southern cliff (Station 09) has just responded…»*.
 - **De**: Hermes · The Cartographer `<theeclipseorder.quest@gmail.com>`
 - **Para**: Silvia
 - **Asunto**: `[Emergency Carrier · 142.85 MHz] A signal cuts through the sandstorm`
@@ -434,7 +450,7 @@ Este es el estado exacto en el que se encuentra Silvia en este preciso momento:
   🌪️ THE SHIFTING TEMPEST — CATACLYSMIC SANDSTORM LOCKDOWN
   Ubicación: Hub Central (web/index.html)
   Estado de Silvia: BLOQUEADA (Acceso ordinario al Hub cerrado)
-  Duración del Bloqueo: 48 Horas (terminó el domingo 18 de octubre de 2026 a las 14:00)
+  Duración del Bloqueo: desde la Estación 09 (8–9 oct) hasta el domingo 18 de octubre de 2026 a las 14:00 (constante del Hub)
 ```
 
 ### Arquitectura Técnica del Bloqueo (`web/index.html`)
@@ -658,6 +674,8 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 ### C. Directorio de Términos Prohibidos y Purga Permanente
 
 > *Excepción de impresión*: las Hojas 4A y 5A del diario ya impreso contienen todavía «stereographic», «Mater» y «Tympan»; no se pueden reimprimir. La purga se aplica a todo lo nuevo.
+>
+> *Vigilancia automática*: `scripts/audit/lint_lore_and_vocabulary.py` bloquea estos términos (y la jerga técnica en todo lo que ve Silvia: web, emails y generadores del diario) en cada push, mediante el workflow **Lore lint** de GitHub Actions. La única excepción es `scripts/journal/build_page04_05.py` (Hojas 4A/5A ya impresas).
 
 | Término Descartado / Inventado | Término Canónico Exclusivo | Razón Arquitectónica Obligatoria |
 | :--- | :--- | :--- |

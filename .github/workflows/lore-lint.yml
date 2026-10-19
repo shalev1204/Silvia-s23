@@ -1,0 +1,18 @@
+name: Lore lint
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lore-and-vocabulary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forbidden lore terms and technical jargon
+        run: python3 scripts/audit/lint_lore_and_vocabulary.py

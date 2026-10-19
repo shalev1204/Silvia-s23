@@ -40,13 +40,24 @@ FORBIDDEN_PATTERNS = [
     (r"\bCoastal\b", "Prohibited term 'Coastal' found. Tower III is 'The Stage Tower' or 'The Mirror Sanctuary'."),
     (r"\b(Hermit|Ermitaño|eremita)\b", "Prohibited term 'Hermit'/'Ermitaño' found. The guardian of Tower II is 'The Oracle'."),
     (r"\bStage\s+Mistress\b", "Prohibited term 'Stage Mistress' found. The guardian of Tower III is 'The Mirror Speaker'."),
+    (r"\bCoast\b", "Prohibited term 'Coast' found. Tower III is 'The Stage Tower' or 'The Mirror Sanctuary'."),
 ]
 
 # Player-facing accessible vocabulary checks (for web and journal)
 ACCESSIBILITY_PATTERNS = [
     (r"\bAzimuth\b", "Technical jargon 'Azimuth' found. Use 'Bearing', 'Heading', or 'Direction'."),
     (r"\b(Mucro|Mucrones)\b", "Technical jargon 'Mucro/Mucrones' found. Use 'Star Pointer' or 'Star Marker'."),
+    (r"\bTympan(um)?\b", "Technical jargon 'Tympan' found. Use 'Plate', 'Disc' or 'Dial'."),
+    (r"\bMater\b", "Technical jargon 'Mater' found. Use 'Plate', 'Disc' or 'Dial'."),
+    (r"\bStereographic\b", "Technical jargon 'Stereographic' found. Use 'Star Map' or 'Sky Plan'."),
 ]
+
+# Material Silvia sees: the web, the emails and the journal (and the scripts that render its sheets)
+PLAYER_FACING_PARTS = ["web/", "journal/", "emails/", "scripts/journal/"]
+
+# Sheets already printed before the vocabulary list existed (10 Oct 2026): they cannot be reprinted.
+# Anything NEW must still follow the rules, so keep this list as short as possible.
+LEGACY_PRINTED_FILES = {"scripts/journal/build_page04_05.py"}  # Sheets 4A/5A, printed 28 Sep 2026
 
 # Patterns in rules/audits that mention forbidden terms ONLY to forbid them
 EXEMPT_PATTERNS = [
@@ -125,13 +136,16 @@ def run_audit():
                             if not is_exempt_line(line, file_path):
                                 violations.append((file_path.relative_to(WORKSPACE_ROOT), line_num, line.strip(), reason))
 
-                    # Check accessibility in web and journal files
-                    is_player_facing = any(p in str(file_path) for p in ["web/", "journal/"])
+                    # Accessible vocabulary is mandatory in everything Silvia sees (blocks, like the lore terms)
+                    rel = file_path.relative_to(WORKSPACE_ROOT).as_posix()
+                    is_player_facing = any(p in rel for p in PLAYER_FACING_PARTS)
                     if is_player_facing:
                         for pattern, reason in ACCESSIBILITY_PATTERNS:
                             if re.search(pattern, line, re.IGNORECASE):
-                                if not is_exempt_line(line, file_path):
-                                    warnings.append((file_path.relative_to(WORKSPACE_ROOT), line_num, line.strip(), reason))
+                                if rel in LEGACY_PRINTED_FILES:
+                                    warnings.append((file_path.relative_to(WORKSPACE_ROOT), line_num, line.strip(), reason + " (printed legacy sheet)"))
+                                elif not is_exempt_line(line, file_path):
+                                    violations.append((file_path.relative_to(WORKSPACE_ROOT), line_num, line.strip(), reason))
 
     print(f"📂 Archivos analizados: {files_checked}")
 
@@ -153,7 +167,8 @@ def run_audit():
         return 1
     else:
         print("\n✅ ÉXITO TOTAL: 0 Términos no canónicos encontrados.")
-        print("   - Cero menciones no autorizadas de 'Sunken', 'Coastal', 'Hermit', 'Stage Mistress'.")
+        print("   - Cero menciones no autorizadas de 'Sunken', 'Coastal', 'Coast', 'Hermit', 'Stage Mistress'.")
+        print("   - Cero jerga técnica (Azimuth, Mucro, Tympan, Mater, Stereographic) en material de Silvia.")
         print("   - Todas las referencias a Torres, personajes y criptografía están 100% alineadas.")
         print("   - El ecosistema cumple el canon de 'docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md'.")
         return 0
