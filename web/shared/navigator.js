@@ -80,7 +80,7 @@
       id: 'zodiac-engine',
       folder: 'zodiac-engine',
       path: 'Constellation Path · Game 07',
-      title: 'The Zodiac Engine',
+      title: 'The Zodiacal Engine',
       icon: '🏜️',
       url: root + 'constellation/zodiac-engine/index.html',
       status: isZodiacCompleted ? 'Explored ✓' : 'Active Pursuit ★',

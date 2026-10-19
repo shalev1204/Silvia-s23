@@ -620,11 +620,11 @@
         if (apertureBox) apertureBox.className = 'aperture-feedback-box error';
         if (apertureStatusTag) apertureStatusTag.textContent = 'ALDEBARAN ALIGNMENT // 202° DELTA';
         if (apertureStatusMsg) apertureStatusMsg.textContent = 'Ray lost in southern dune dust haze near the horizon (Alt 15°). No sanctuary gateway present.';
-      } else if (currentLimbo === 37) {
+      } else if (currentLimbo === 22) {
         window.OrderStormEngine.playBrassClank();
         if (collimatorRayEl) collimatorRayEl.classList.remove('resonance-success');
         if (apertureBox) apertureBox.className = 'aperture-feedback-box error';
-        if (apertureStatusTag) apertureStatusTag.textContent = 'DENEB ALIGNMENT // 037° DELTA';
+        if (apertureStatusTag) apertureStatusTag.textContent = 'DENEB ALIGNMENT // 022° DELTA';
         if (apertureStatusMsg) apertureStatusMsg.textContent = 'Ray strikes upper rock fissure. Lens angle misaligned.';
       } else if (currentLimbo === 157) {
         window.OrderStormEngine.playBrassClank();

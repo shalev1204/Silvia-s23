@@ -602,20 +602,20 @@
 
   // --- 4. Packet Verification (Sheet 6 · Side B) ---
   function verifyTransitSubmission() {
-    const rawDist = (inputDistance ? inputDistance.value : '').trim().replace(/,/g, '').toLowerCase();
+    const rawDist = (inputDistance ? inputDistance.value : '').trim().toLowerCase();
     const rawPoly = (inputPolygon ? inputPolygon.value : '').trim().toLowerCase();
     const rawA1 = (inputAnchor1 ? inputAnchor1.value : '').trim().toLowerCase();
     const rawA2 = (inputAnchor2 ? inputAnchor2.value : '').trim().toLowerCase();
 
     // Distance: 2090
-    const isDistValid = rawDist.includes('2090');
+    const isDistValid = rawDist.replace(/\D/g, '') === '2090' || rawDist.includes('2090');
 
     // Polygon: Hexagon / Hexágono / 6-gon
     const isPolyValid = rawPoly.includes('hexag') || rawPoly.includes('hexág') || rawPoly.includes('6-gon');
 
     // Anchors: Achernar and Polaris
     const hasAchernar = rawA1.includes('achernar') || rawA2.includes('achernar');
-    const hasPolaris = rawA1.includes('polaris') || rawA2.includes('polaris');
+    const hasPolaris = rawA1.includes('polar') || rawA2.includes('polar');
     const isAnchorsValid = hasAchernar && hasPolaris;
 
     if (isDistValid && isPolyValid && isAnchorsValid) {
