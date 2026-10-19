@@ -42,7 +42,8 @@ Abre la web en un Chromium real con las cabeceras de `web/_headers` y comprueba 
 1. todas las páginas cargan sin errores de JavaScript, sin archivos que fallen y sin bloqueos de la CSP;
 2. el Hub abre todas las vistas como Silvia, como Silvia en la tormenta y como Carles;
 3. el chat con Hermes no ofrece las respuestas de las Estaciones 12 y 13 antes de resolverlas;
-4. el Cipher Ledger solo muestra las ecuaciones del desierto tras su estación.
+4. el Cipher Ledger solo muestra las ecuaciones del desierto tras su estación;
+5. la Estación 14 (The Sun Monolith) funciona de principio a fin: puertas de la Torre II, travesía de 12 h, sigilo, el sol que camina, Sello de Cairn II, balance en el chat y recarga de la página (tarda unos 3 minutos en total).
 
 Si termina con `✅ ALL GREEN`, se puede desplegar; si sale `❌`, no despliegues y revisa la línea marcada con ✗.
 También conviene pasar `python3 scripts/audit/lint_lore_and_vocabulary.py` (vocabulario y nombres canónicos).

@@ -152,6 +152,12 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Mecánica (rediseñada; la hoja ya no imprime la solución)**: «Noon Shadow Puzzle». A primera luz el bastón de Hermes (2 pasos) da una sombra de 4 pasos y el Monolito (24 pasos) una de 48: la sombra del Monolito es siempre 12 veces la del bastón. La hoja da siete sombras de bastón al mediodía (1.5, 0.5, 2.5, 1, 3, 2, 3.5 pasos). Silvia calcula la sombra del Monolito de cada una y busca esa longitud en el dial semicircular de Cairn II (siete anillos de 6 a 42 pasos, una losa con letra por anillo en la línea norte). Las siete letras, en orden de mediodía, forman la clave. Sin valores numéricos de letras (Regla 9) y solo alfabeto A–Z (Regla 10).
   - **Solución (solo para el Operador)**: SUNDIAL. Cálculo: sombra del Monolito = 12 × sombra del bastón → 18, 6, 30, 12, 36, 24, 42 pasos → S, U, N, D, I, A, L.
   - **Recompensa**: Obtención del segundo sello de peregrinación: **Sello de Cairn II**.
+- **Web (Estación 14, Hub · añadido al diario, no réplica)**:
+  - **Transición (Field Wire)**: paso 9, Hermes llega a las puertas de la Torre II (13A) y reconoce en el Sirviente al hombre que observó en 1998 (17B). Variante sin Sello I si Silvia esquivó Cairn I. Tras la respuesta de Silvia empieza una travesía de **12 h** hacia el NNE (`order_monolith_march_start`); el mapa 3D y el chat muestran la cuenta atrás. Paso 10 = cierre; la estación solo se abre al llegar.
+  - **Parte 1 · El sigilo**: Silvia pronuncia la clave del diario, `SUNDIAL` (acepta «sun-dial», espacios y acentos). Tras 3 fallos se desbloquea una pista general en *Ask Hermes*. La inscripción del Monolito queda sellada hasta entonces.
+  - **Parte 2 · El sol que camina**: un deslizador mueve el sol de 7:00 a 17:00 sobre un modelo fijo (rumbo = 90° + 15°·(h − 6); altura = 60°·sen(π·(h − 6)/12); sombra = 24 / tan(altura)). La inscripción describe cuatro sombras y Silvia debe marcarlas en orden donde la punta de la sombra toca una losa tallada: 8:00 Chacal (anillo exterior, al oeste), 12:00 Halcón (la más corta, al norte), 15:00 Escarabajo (NE, casi el doble), 16:30 Serpiente (cuatro veces la más corta, hacia el este). Dos señuelos (luna al sur, estrella dentro del anillo de mediodía) son inalcanzables. Fuera de orden la piedra calla; sin losa solo hay arena.
+  - **Recompensa**: Sello de Cairn II (`order_seal_cairn_2`, en la Alforja) y dos ecuaciones en el Ledger: $[D] + [F] = 24$ y $[C] - [T] = 8$ (Biblia Maestra §7.B.7). Cada marca despierta un fragmento de la tapa del nicho («…And the Oracle, who keeps the sand, will remember.»).
+  - **Lore nuevo**: el borde del nicho está marcado por barras de hierro y ceniza (los BC Ashes conocen los sellos y fracasaron). En el balance del Field Wire (paso 11), Hermes ve un rastro de **azul cobalto** de lapislázuli y piensa en Aurelia (canon secreto: Biblia Maestra §12). Paso 12: «Seals 2 / 5»; siguiente destino, el Sandstone Labyrinth (Estación 15).
 
 ---
 
@@ -247,7 +253,7 @@ Desde la Estación 10, cada juego del desierto lleva número de estación (Estac
 | **11** | D2 | The Salt Playa (Dry Basin) | 10A | The Salt Playa (Cuadrante SE, Hoja 12A) | ✅ Implementado |
 | **12** | D3 | The Desert Lexicon & Al-Qibla (BC Ashes) | 11A | Ruinas nómadas junto a la Salt Playa (Cuadrante SE) | ✅ Implementado |
 | **13** | D4 | The Oasis Clepsydra | 12B | The Oasis, Camp VIII, Cuatro Pozos (Cuadrante SE) | ✅ Implementado |
-| **14** | D5 | The Sun Monolith & Cairn II | 13B | Cuadrante NE (Hoja 9A) | ⏳ Pendiente |
+| **14** | D5 | The Sun Monolith & Cairn II | 13B | Cuadrante NE (Hoja 9A) | ✅ Implementado |
 | **15** | D6 | The Sandstone Labyrinth & Cairn III | 14B | Cuadrante NE (Hoja 9A) | ⏳ Pendiente |
 | **16** | D7 | Cairn IV · Sentry of the Canyon | 15A | Cuadrante SO (Hoja 11B) | ⏳ Pendiente |
 | **17** | D8 | Arch of the Solstice & The Solar Altar (Cairn V) | 16B | Cuadrante SE (Hoja 12A) | ⏳ Pendiente |

@@ -48,7 +48,7 @@
     'M 400 2052 C 520 2200 780 2230 960 2330 S 1140 2430 1196 2460',
     'M 1196 2460 C 1210 2430 1195 2395 1180 2367',
     'M 1180 2367 C 1300 2330 1450 2330 1580 2420',
-    'M 1580 2420 C 1800 2000 1760 1100 1500 700 S 1300 520 1262 430',
+    'M 1580 2420 C 1590 2180 1580 1900 1560 1660 C 1530 1250 1450 820 1350 600 S 1280 470 1262 430',   // via the gates of Tower II
     'M 1262 430 C 1400 520 1550 640 1640 770',
     'M 1640 770 C 1500 1300 900 1500 700 1800 S 300 2100 130 2150',
     'M 130 2150 C 400 2350 900 2300 1200 2150 S 1420 2060 1480 2040',
@@ -83,7 +83,7 @@
     'M 400 2052 C 520 2200 780 2230 960 2330 S 1140 2430 1196 2460',
     'M 1196 2460 C 1210 2430 1195 2395 1180 2367',
     'M 1180 2367 C 1300 2330 1450 2330 1580 2420',
-    'M 1580 2420 C 1800 2000 1760 1100 1500 700 S 1300 520 1262 430',
+    'M 1580 2420 C 1590 2180 1580 1900 1560 1660 C 1530 1250 1450 820 1350 600 S 1280 470 1262 430',   // via the gates of Tower II
     'M 1262 430 C 1400 520 1550 640 1640 770',
     'M 1640 770 C 1500 1300 900 1500 700 1800 S 300 2100 130 2150',
     'M 130 2150 C 400 2350 900 2300 1200 2150 S 1420 2060 1480 2040',
@@ -94,6 +94,10 @@
     'Nomad Ruins', 'The Oasis', 'The Sun Monolith', 'The Sandstone Labyrinth', 'Cairn IV',
     'Arch of the Solstice', 'The Sandstone Sanctuary'
   ];
+
+  // From the Oasis, Hermes first walks to the gates of Tower II (Sheet 13A), then crosses the Great Erg
+  // to the Sun Monolith. Segment 7 starts with exactly this sub-path, so its length marks the gates.
+  var GATES_SUBPATH = 'M 1580 2420 C 1590 2180 1580 1900 1560 1660';
 
   var WP = WP_NORMAL;
   var SEG = SEG_NORMAL;
@@ -116,7 +120,7 @@
     { key: 'playa', x: 1196, y: 2460, lvl: 4, id: 21, icon: '🧂', label: '11 · THE SALT PLAYA', done: 'playa', doneLabel: '11 · THE SALT PLAYA (CROSSED)' },
     { key: 'lexicon', x: 1180, y: 2367, lvl: 5, id: 11, icon: '📜', label: '12 · NOMAD RUINS (LEXICON)', done: 'lex', doneLabel: '12 · NOMAD RUINS (SOLVED)' },
     { key: 'oasis', x: 1580, y: 2420, lvl: 6, id: 12, icon: '💧', label: '13 · THE OASIS CLEPSYDRA', done: 'clep', doneLabel: '13 · THE OASIS CLEPSYDRA (SOLVED)' },
-    { key: 'monolith', x: 1262, y: 430, lvl: 7, icon: '☀️', label: '14 · THE SUN MONOLITH', done: 'monolith', soon: 'Station 14: The Sun Monolith · Sheet 13B of your journal.' },
+    { key: 'monolith', x: 1262, y: 430, lvl: 7, id: 23, icon: '☀️', label: '14 · THE SUN MONOLITH', done: 'monolith', doneLabel: '14 · THE SUN MONOLITH (CAIRN II)', revealWhen: 'clep' },
     { key: 'labyrinth', x: 1640, y: 770, lvl: 8, icon: '🌀', label: '15 · THE SANDSTONE LABYRINTH', done: 'labyrinth', soon: 'Station 15: The Sandstone Labyrinth · Sheet 14B of your journal.' },
     { key: 'cairn4', x: 130, y: 2150, lvl: 9, icon: '🗿', label: '16 · CAIRN IV · SENTRY OF THE CANYON', done: 'cairn4', soon: 'Station 16: Cairn IV, Sentry of the Canyon · Sheet 15A of your journal.' },
     { key: 'arch', x: 1480, y: 2040, lvl: 10, icon: '🌓', label: '17 · ARCH OF THE SOLSTICE', done: 'arch', soon: 'Station 17: Arch of the Solstice · Sheet 16B of your journal.' },
@@ -161,8 +165,10 @@
     if (d.chasm) lvl = Math.max(lvl, 4);
     if (d.playa) lvl = Math.max(lvl, 5);
     if (d.lex) lvl = Math.max(lvl, 6);
-    if (d.clep) lvl = Math.max(lvl, 7);
-    if (d.monolith) lvl = Math.max(lvl, 8);
+    // Station 14: Hermes reaches the Sun Monolith (lvl 7) only when the 12-hour crossing is over.
+    // He rests there after Cairn II until the road to Station 15 exists.
+    var monolithArrived = d.monolith || (typeof window.isMonolithMarchOver === 'function' && window.isMonolithMarchOver());
+    if (d.clep) lvl = Math.max(lvl, monolithArrived ? 7 : 6);
     if (d.labyrinth) lvl = Math.max(lvl, 9);
     if (d.cairn4) lvl = Math.max(lvl, 10);
     if (d.arch) lvl = Math.max(lvl, 11);
@@ -191,6 +197,7 @@
     }
     if (st.key === 'wt6') return !!(s.done.cairn1 || s.isBypassed);
     if (st.revealWhen === 'cairnFound') return s.dawn >= 2 || s.done.cairn1;
+    if (st.revealWhen === 'clep') return !!s.done.clep;
     return s.lvl >= st.lvl;
   }
 
@@ -201,7 +208,7 @@
     holder.setAttribute('height', '0');
     holder.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;visibility:hidden';
     document.body.appendChild(holder);
-    var pts = [], cum = [0], total = 0;
+    var pts = [], cum = [0], total = 0, gatesD = null;
     SEG.forEach(function (d, i) {
       if (!d) { pts.push({ x: WP[0].x, y: WP[0].y, d: 0 }); return; }
       var p = document.createElementNS(SVGNS, 'path');
@@ -213,11 +220,17 @@
         var pt = p.getPointAtLength(len * k / n);
         pts.push({ x: pt.x, y: pt.y, d: total + len * k / n });
       }
+      if (i === 7) {
+        var gatesPath = document.createElementNS(SVGNS, 'path');
+        gatesPath.setAttribute('d', GATES_SUBPATH);
+        holder.appendChild(gatesPath);
+        gatesD = total + gatesPath.getTotalLength();
+      }
       total += len;
       cum[i] = total;
     });
     holder.remove();
-    return { pts: pts, cum: cum, total: total };
+    return { pts: pts, cum: cum, total: total, gates: gatesD };
   }
 
   function pointAt(route, dist) {
@@ -528,7 +541,9 @@
       }
       if (hudText) {
         var placeName = WHERE[w] || ('Waypoint ' + w);
-        if (w === state.lvl) {
+        if (w === state.lvl && isCrossingToMonolith()) {
+          hudText.textContent = crossingHudText();   // passing the Oasis on the way to the gates, not arriving
+        } else if (w === state.lvl) {
           hudText.textContent = (state.waiting ? 'Sheltering at ' : '✦ Arrived at ') + placeName;
         } else {
           hudText.textContent = '✦ Hermes reaches ' + placeName + '...';
@@ -695,6 +710,13 @@
     }
 
     function toast(msg) { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); }
+    function monolithProgress() { return typeof window.getMonolithMarchProgress === 'function' ? window.getMonolithMarchProgress() : 1; }
+    // Between Station 13 and the arrival at the Sun Monolith: at the gates of Tower II, then on the 12-hour crossing
+    function isCrossingToMonolith() { return !!(state.done.clep && !state.done.monolith && monolithProgress() < 1); }
+    function crossingHudText() {
+      var eta = typeof window.getMonolithMarchEta === 'function' ? window.getMonolithMarchEta() : '';
+      return eta ? '🚶 CROSSING THE GREAT ERG TO THE SUN MONOLITH · ETA: ' + eta : 'At the gates of Tower II';
+    }
 
     function renderMarkers() {
       markersEl.textContent = '';
@@ -787,6 +809,9 @@
         var hrs = Math.floor(remMs / 3600000);
         var mins = Math.floor((remMs % 3600000) / 60000);
         hudText.textContent = '🚶 EN ROUTE TO NORTH PORTAL · ETA: ' + hrs + 'h ' + mins + 'm';
+      } else if (isCrossingToMonolith()) {
+        hud.style.display = '';
+        hudText.textContent = crossingHudText();
       } else {
         hud.style.display = '';
         hudText.textContent = (state.waiting ? 'Sheltering at ' : '') + WHERE[state.lvl];
@@ -827,7 +852,8 @@
       var marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
       var marchProgress = typeof window.getChasmMarchProgress === 'function' ? window.getChasmMarchProgress() : 1.0;
 
-      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), JSON.stringify(next.done)].join('|');
+      var monoProgress = monolithProgress();
+      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), Math.floor(monoProgress * 200), JSON.stringify(next.done)].join('|');
       if (!force && nextSig === sig) return;
       var advanced = next.lvl > state.lvl;
       state = next;
@@ -837,6 +863,9 @@
         var dStart = route.cum[2];
         var dEnd = route.cum[3];
         targetD = dStart + (dEnd - dStart) * marchProgress;
+      } else if (state.done.clep && !state.done.monolith && monoProgress < 1 && route.gates !== null) {
+        // At the gates of Tower II, then along the 12-hour crossing to the Sun Monolith
+        targetD = route.gates + (route.cum[7] - route.gates) * monoProgress;
       } else {
         targetD = route.cum[state.lvl];
       }

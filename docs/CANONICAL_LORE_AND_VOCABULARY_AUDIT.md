@@ -635,6 +635,17 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Comprobación cruzada**: coincide con el $F$ ya obtenido en §7.B.5 (Estaciones 06 + 09: $F + T = 22$, $T - F = 10$). La estela confirma $F$; no lo introduce.
 - **Asignación en el Ledger**: $\mathbf{R = 3}$ ($F = 6$ confirmado).
 
+#### 7. DEDUCCIÓN DE $D$ Y $C$ (Estación 14 · Tapa del nicho de Cairn II, solo en la web)
+- **Origen**: al despertar el Sello de Cairn II (The Sun Monolith), la tapa del nicho trae dos líneas grabadas. Aparecen en el Ledger solo cuando la Estación 14 está resuelta (`requires: 'order_sun_monolith_completed'`).
+- **Ecuación 1 (The Deneb Line)**:
+  $$[D] + [F] = 24$$
+- **Ecuación 2 (The Cygnus Line)**:
+  $$[C] - [T] = 8$$
+- **Resolución** (con $F = 6$ y $T = 16$ de §7.B.5):
+  $$[D] = 24 - 6 \implies \mathbf{D = 18}$$
+  $$[C] = 8 + 16 \implies \mathbf{C = 24}$$
+- **Asignación en el Ledger**: $\mathbf{D = 18, \quad C = 24}$. La web nunca muestra estos valores (Regla 9): Silvia los deduce.
+
 ---
 
 ## 8. DIRECTORIO GEOGRÁFICO Y ONOMÁSTICO CANÓNICO
@@ -647,7 +658,8 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
    - Septiembre 2026: Nombre humano restituido por Silvia al transmitir el voto en la Estación 09.
 2. **Aurelia**:
    - Amada y compañera de Hermes. Astrónoma y artista de cartas celestes en azul cobalto y pan de oro.
-   - Fallecida en el colapso del puente en 1971 al salvar el disco de latón y los mapas. Inspiración del voto eterno *"You were always the treasure"*.
+   - Dada por muerta en el colapso del puente en 1971 al salvar el disco de latón y los mapas. Inspiración del voto eterno *"You were always the treasure"*.
+   - **Canon secreto (solo Operador)**: sobrevivió y es la Oráculo del Desierto. Ver §12; no se revela a Silvia antes de la Estación 19.
 3. **The Oracle (El Oráculo / The Desert Oracle)**:
    - La guardiana de **Tower II (The Sandstone Sanctuary)** en las dunas del desierto. **Es una mujer sin rostro que nunca se deja ver**: nadie, ni siquiera Hermes, la ha visto jamás.
    - Viste túnica desgastada con capucha, interpreta las sombras solares en el gnomon y habla en parábolas concisas. *(Queda terminantemente prohibido llamarla "Hermit" o "Ermitaño")*.
@@ -742,7 +754,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara B (12B · Juego D4)**: **The Oasis Clepsydra (Espejismo)**. Alucinación febril por calor y deshidratación que mantiene cuerdo a Hermes y permite hallar provisiones; clave hidráulica **`XXX`**; ecuación $[P] - [A] = 14$.
 - **Hoja 13**:
   - **Cara A (13A · Lore)**: **Llegada al Santuario & El Sirviente**. Demanda de los 5 Cairns Sagrados; Hermes muestra que ya posee Cairn I (del río), pero debe buscar los 4 restantes (II, III, IV, V).
-  - **Cara B (13B · Juego D5)**: **The Sun Monolith**. Alineación y obtención del **Sello de Cairn II**.
+  - **Cara B (13B · Juego D5)**: **The Sun Monolith**. Alineación y obtención del **Sello de Cairn II**. *(web, Estación 14)* Segunda parte: «el sol que camina»; en la tapa del nicho, $[D] + [F] = 24$ y $[C] - [T] = 8$; marcas de palanca de los BC Ashes y un rastro de azul cobalto (ver §12).
 - **Hoja 14**:
   - **Cara A (14A · Lore)**: **Los 5 Cairns de Peregrinación**. Estudio cartográfico y marcas geodésicas.
   - **Cara B (14B · Juego D6)**: **The Sandstone Labyrinth**. Senda entre arcos y fisuras para conseguir el **Sello de Cairn III**.
@@ -830,4 +842,39 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **10A / 10B** | *«Elev. 980 paces»* (el mapa dice *varas*) | En la agrimensura de la Orden el «paso» de Hermes es la vara de medir: usa ambas palabras para la misma cota. |
 | **11A** | *«Al-Qibla Vector 194* SSW»* | Rumbo de huida de los BC Ashes; la Torre II queda en el rumbo inverso, 14° NNE (ver §9, Hoja 11A). |
 | **4A / 5A** | *«stereographic»*, *«The Mater»*, *«The Tympan»* | Se imprimieron el 28-09-2026, antes de que la lista de términos prohibidos entrara en esta Biblia (10-10-2026). Son las notas técnicas del Hermes astrónomo; los textos nuevos usan el vocabulario sencillo (Regla 6 de `AGENTS.md`). |
+
+---
+
+## 12. CANON SECRETO DEL OPERADOR: LA ORÁCULO ES AURELIA
+
+> ⚠️ **Solo para el Operador.** Ningún texto visible para Silvia (Hub, correos, diario) lo afirma antes de la Estación 19. Hasta entonces solo se siembran pistas que admiten otra lectura.
+
+### A. Lo que ocurrió de verdad (1971)
+- Aurelia cayó del Southern Bridge (§2.C) hacia las arenas del sur. La tormenta roja de aquel mediodía había amontonado al pie del acantilado una duna de arena suelta y profunda: la duna frenó la caída. Sobrevivió con el disco de latón de 24 avistamientos apretado contra el pecho; la cartera de mapas se perdió en el viento.
+- Días después la encontró el **Sirviente del Santuario**, entonces un hombre de mediana edad: vagaba por el cauce seco, sin nombre ni memoria, sin soltar el disco.
+- El mismo terremoto de 1971 que derribó los tres primeros Cairns (DESERT_ODYSSEY_BIBLE, «Historia de los Cairns») mató a la Oráculo anterior bajo el derrumbe de una galería del Santuario.
+- El Sirviente vio en una mujer caída del cielo con un disco de estrellas en los brazos la señal de la sucesión. Ella, sin otro pasado al que volver, creyó que ese era su lugar y su deber. Tomó el velo sin rostro (*«She wears no face»*, Hoja 8A) y ha sido la Oráculo desde entonces, con un empeño y un detalle que nadie había puesto en el cargo antes.
+
+### B. Lo que conserva sin saber por qué
+- **Las manos**: muele lapislázuli hasta un azul cobalto fino como el cielo nocturno y dora estrellas con pan de oro, como hacía junto al fuego del observatorio (§2.B). Así pinta las cartas de la Orden en el Santuario.
+- **El disco**: cada otoño, en noches claras, lo alza hacia las estrellas en un ritual que cree propio del cargo. El destello sigue la cadencia grabada en él: **tres pulsos cortos, pausa, dos pulsos largos**. Ese fue el **Pulso de Oro de 2016** (§2.E). Hermes acertó: la luz venía de Aurelia, no de una reliquia.
+- **Las palabras**: la frase del voto, *«You were always the treasure»*, le resulta conocida y no sabe de dónde.
+
+### C. Por qué Hermes no la encontró
+- **1971–1998**: la buscó en el fondo del cañón; ella ya estaba a días de camino, dentro del Santuario.
+- **1998 (Hoja 17B)**: observó durante horas al hombre barbudo y encapuchado desde una cresta y lo tomó por el Oráculo. Era el Sirviente (§8.A.5). La Oráculo nunca sale a la vista.
+- **2026**: el Sirviente reconoce a Hermes en las puertas (Estación 14, paso 9 del Field Wire) y calla. Protege a la Oráculo: exige los cinco sellos porque es la ley de la Orden, y también para comprobar que quien busca es digno.
+
+### D. Plan de pistas hasta la revelación (Estaciones 14–19)
+| Estación | Pista sembrada | Lectura inocente | Estado |
+| :---: | :--- | :--- | :--- |
+| **13A / 14** | El Sirviente sonríe al oír el nombre de Hermes (respuesta *choice-9-remember*). | Un anciano que se alegra de una visita. | ✅ Web |
+| **14** | En el nicho de Cairn II, un rastro de **azul cobalto** de lapislázuli molido muy fino. Hermes: *«Aurelia ground her lapis exactly like this»*; se convence de que ve fantasmas. Último fragmento de la tapa: *«And the Oracle, who keeps the sand, will remember.»* | Otro pintor de la Orden; una profecía. | ✅ Web |
+| **15** | Una estrella dorada con pan de oro en un cruce del laberinto, con el trazo de las cartas de Aurelia. | Marca de los fundadores. | ⏳ Plan |
+| **16** | Los nómadas hablan de «la velada que canta a las estrellas en otoño». | Leyenda del desierto. | ⏳ Plan |
+| **17** | Desde el Arco del Solsticio, Hermes vuelve a ver de noche el pulso de 2016: tres cortos, pausa, dos largos. | El faro del Santuario. | ⏳ Plan |
+| **18** | El Sirviente, tras la Estela de Polibio: *«She came from the edge of the sky with a disc in her arms and no name.»* | — (la duda ya es seria). | ⏳ Plan |
+| **19** | Audiencia en la Torre II: la Oráculo alza el disco de 24 avistamientos. Silvia (o Hermes) pronuncia el voto y la memoria vuelve en parte. Se entrega el **WHEN**. | Revelación. | ⏳ Plan |
+
+**Invariantes**: el disco y el voto (§2.B) no cambian; la Oráculo sigue siendo «she» (§8.A.3); no se escribe «Aurelia es la Oráculo» en material de Silvia antes de la Estación 19.
 
