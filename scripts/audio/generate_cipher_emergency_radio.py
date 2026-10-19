@@ -14,15 +14,20 @@ import subprocess
 import time
 import numpy as np
 
-PROJECT_ROOT = "/path/to/Silvia's23"
-KEY_PATH = os.path.expanduser("~/.gemini_api_key")
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 AUDIO_OUT_DIR = os.path.join(PROJECT_ROOT, "web", "constellation", "celestial-cipher", "audio")
 TEMP_DIR = os.path.join(PROJECT_ROOT, "web", "constellation", "celestial-cipher", "audio", "stems")
 os.makedirs(AUDIO_OUT_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 
-with open(KEY_PATH, "r") as f:
-    api_key = f.read().strip()
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    key_path = os.path.expanduser("~/.gemini_api_key")
+    if os.path.exists(key_path):
+        with open(key_path, "r") as f:
+            api_key = f.read().strip()
+    else:
+        raise ValueError("GEMINI_API_KEY environment variable or ~/.gemini_api_key required.")
 
 lines = [
     ("s1", "Silvia! Silvia, can you hear me through the static? The storm is right on top of me out here in the dunes!"),

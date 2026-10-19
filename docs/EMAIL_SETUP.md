@@ -39,15 +39,15 @@ Crear cuenta o alias Gmail dedicado al juego:
 
 ## Opción 2 — Un alias en tu propio dominio / Google Workspace *(0 € extra)*
 
-Sin comprar dominio nuevo:
+Sin comprar dominio nuevo si ya tienes un dominio propio:
 
 | Campo | Ejemplo |
 |-------|---------|
 | Email | `dispatch@tudominio.com` *(alias en tu Workspace)* |
 | Nombre visible | **The Eclipse Order** |
 
-**Pros:** Profesional, SMTP fácil, ya lo pagas.  
-**Contras:** Rompe un poco la ficción si conoce tu empresa.
+**Pros:** Profesional, SMTP fácil, sin coste adicional.  
+**Contras:** Rompe un poco la ficción si el destinatario reconoce tu dominio.
 
 ---
 

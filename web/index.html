@@ -5993,6 +5993,14 @@
       font-size: 0.76rem;
       color: var(--brass-bright);
       font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .seeker-pill:hover {
+      border-color: var(--brass-bright);
+      box-shadow: 0 0 12px rgba(212, 168, 83, 0.35);
+      transform: translateY(-1px);
     }
 
     .seeker-dot {
@@ -6780,81 +6788,282 @@
 
     .c1-board-wrap {
       width: 100%;
-      padding: 18px 14px 22px;
-      background: linear-gradient(180deg, rgba(60, 40, 22, 0.35) 0%, rgba(24, 16, 9, 0.6) 100%);
-      border-radius: 8px;
+      padding: 24px 16px 20px;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.12) 0%, transparent 65%),
+        linear-gradient(180deg, rgba(32, 22, 14, 0.88) 0%, rgba(18, 12, 8, 0.95) 75%, rgba(12, 8, 5, 0.98) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.3);
+      border-radius: 10px;
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.85), 0 8px 24px rgba(0, 0, 0, 0.65);
+      position: relative;
+      overflow: hidden;
+    }
+    .c1-board-wrap::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 48px;
+      background: linear-gradient(180deg, transparent 0%, rgba(55, 36, 18, 0.4) 60%, rgba(35, 22, 10, 0.85) 100%);
+      pointer-events: none;
+      border-bottom: 2px solid rgba(212, 168, 83, 0.25);
     }
     .c1-pegs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      min-height: 330px;
+      gap: 16px;
+      min-height: 350px;
+      position: relative;
+      z-index: 2;
     }
     .c1-peg {
       position: relative;
       display: flex;
       flex-direction: column-reverse;
       align-items: center;
-      gap: 3px;
-      padding: 0 6px 34px;
+      gap: 4px;
+      padding: 0 6px 42px;
       background: transparent;
       border: 1.5px solid transparent;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       color: inherit;
+      transition: all 0.2s ease;
     }
+    /* Celestial meridian plumb-line alignment guide */
     .c1-peg::before {
       content: '';
       position: absolute;
       left: 50%;
-      bottom: 34px;
-      width: 10px;
-      height: 78%;
+      bottom: 42px;
+      width: 2px;
+      height: 75%;
       transform: translateX(-50%);
-      background: linear-gradient(90deg, rgba(120, 90, 50, 0.25), rgba(212, 168, 83, 0.18), rgba(120, 90, 50, 0.25));
-      border-radius: 5px;
+      background: repeating-linear-gradient(180deg, rgba(212, 168, 83, 0.32) 0, rgba(212, 168, 83, 0.32) 6px, transparent 6px, transparent 12px);
+      box-shadow: 0 0 6px rgba(212, 168, 83, 0.15);
+      pointer-events: none;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
     }
+    .c1-peg:hover::before {
+      background: repeating-linear-gradient(180deg, rgba(251, 191, 36, 0.6) 0, rgba(251, 191, 36, 0.6) 6px, transparent 6px, transparent 12px);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+    }
+    /* Carved stone plinth / altar pedestal */
     .c1-peg::after {
       content: attr(data-label);
       position: absolute;
-      left: 6px;
-      right: 6px;
+      left: 4px;
+      right: 4px;
       bottom: 4px;
-      padding-top: 8px;
-      border-top: 5px solid #7a541c;
+      height: 32px;
+      line-height: 30px;
       text-align: center;
       font-family: 'Cinzel', serif;
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      color: var(--parchment-dim);
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--brass-bright);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 230, 160, 0.2) 0%, transparent 70%),
+        linear-gradient(180deg, #422d16 0%, #291b0d 60%, #170e06 100%);
+      border: 1.5px solid #7a541c;
+      border-top: 2px solid var(--brass-bright);
+      border-radius: 4px 4px 6px 6px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+      transition: all 0.2s ease;
     }
-    .c1-peg:hover { border-color: rgba(212, 168, 83, 0.35); }
-    .c1-peg.is-source { border-color: var(--brass-bright); background: rgba(255, 224, 153, 0.06); }
-    .c1-peg.is-target-ok:hover { border-color: #86efac; }
+    .c1-peg:hover::after {
+      border-color: var(--brass-bright);
+      box-shadow: 0 0 14px rgba(212, 168, 83, 0.4), 0 4px 8px rgba(0, 0, 0, 0.7);
+    }
+    .c1-peg.is-source::after {
+      border-color: #fbbf24;
+      background: linear-gradient(180deg, #593d1f 0%, #3a2613 60%, #1f1308 100%);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
+      color: #fff;
+    }
+    .c1-peg.is-source {
+      border-color: rgba(251, 191, 36, 0.4);
+      background: radial-gradient(circle at 50% 40%, rgba(251, 191, 36, 0.08) 0%, transparent 70%);
+    }
+    .c1-peg.is-target-ok:hover::after {
+      border-color: #86efac;
+      box-shadow: 0 0 16px rgba(134, 239, 172, 0.45);
+      color: #86efac;
+    }
+    .c1-peg.is-target-blocked:hover {
+      cursor: not-allowed;
+    }
+    .c1-peg.is-target-blocked:hover::after {
+      border-color: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
     .c1-peg.shake { animation: c1Shake 0.32s ease; }
     @keyframes c1Shake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-6px); }
       75% { transform: translateX(6px); }
     }
+    .c1-peg.is-drag-hover::after {
+      border-color: #fbbf24;
+      background: linear-gradient(180deg, #593d1f 0%, #3a2613 60%, #1f1308 100%);
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.65);
+      color: #fff;
+    }
+    .c1-stone[draggable="true"] {
+      cursor: grab;
+    }
+    .c1-stone[draggable="true"]:active {
+      cursor: grabbing;
+    }
+    .c1-stone.is-dragging {
+      opacity: 0.4;
+      filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.5));
+    }
     .c1-stone {
       position: relative;
       z-index: 1;
-      height: 38px;
-      border-radius: 14px / 18px;
-      background:
-        radial-gradient(ellipse at 30% 25%, rgba(255, 240, 205, 0.5) 0%, rgba(255, 240, 205, 0) 45%),
-        linear-gradient(180deg, #d8b27a 0%, #b78a52 60%, #8c6434 100%);
-      border: 1.5px solid #5b3d17;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.55), inset 0 -4px 6px rgba(60, 35, 10, 0.35);
-      transition: transform 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.2s ease, filter 0.2s ease;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.75));
     }
-    .c1-stone[data-size="1"] { width: 34%; }
-    .c1-stone[data-size="2"] { width: 52%; }
-    .c1-stone[data-size="3"] { width: 70%; }
-    .c1-stone[data-size="4"] { width: 88%; }
-    .c1-stone.is-lifted { transform: translateY(-16px); box-shadow: 0 10px 14px rgba(0, 0, 0, 0.5), 0 0 14px var(--brass-glow); }
-    .c1-stone.is-seal-glow { box-shadow: 0 0 18px rgba(134, 239, 172, 0.55), inset 0 -4px 6px rgba(60, 35, 10, 0.35); }
+    .c1-stone::before {
+      content: '';
+      position: absolute;
+      inset: 2px 4px;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0.65;
+      mix-blend-mode: overlay;
+    }
+    .c1-stone::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 10%;
+      right: 10%;
+      height: 35%;
+      border-radius: 50% / 100% 100% 0 0;
+      background: linear-gradient(180deg, rgba(255, 250, 230, 0.5) 0%, rgba(255, 250, 230, 0) 100%);
+      pointer-events: none;
+    }
+    /* SIZE 1 · Smallest River Pebble */
+    .c1-stone[data-size="1"] {
+      width: 32%;
+      height: 34px;
+      border-radius: 46% 54% 50% 50% / 62% 48% 52% 38%;
+      transform: rotate(-1.5deg);
+      background:
+        radial-gradient(ellipse at 35% 25%, rgba(255, 252, 240, 0.6) 0%, transparent 45%),
+        radial-gradient(ellipse at 70% 75%, rgba(40, 25, 12, 0.5) 0%, transparent 55%),
+        linear-gradient(172deg, #e0be8a 0%, #be965e 40%, #876231 85%, #5a3c18 100%);
+      border: 1.5px solid #4a3012;
+      box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.65),
+        inset 0 2px 3px rgba(255, 255, 255, 0.5),
+        inset 0 -3px 5px rgba(30, 18, 8, 0.6);
+    }
+    .c1-stone[data-size="1"]::before {
+      background: linear-gradient(110deg, transparent 35%, rgba(255, 245, 215, 0.45) 42%, rgba(70, 42, 16, 0.5) 45%, transparent 55%);
+    }
+    /* SIZE 2 · Weathered Sandstone River Slab */
+    .c1-stone[data-size="2"] {
+      width: 50%;
+      height: 40px;
+      border-radius: 54% 46% 58% 42% / 46% 56% 44% 54%;
+      transform: rotate(1deg);
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 245, 220, 0.5) 0%, transparent 40%),
+        repeating-linear-gradient(174deg, transparent 0, transparent 7px, rgba(95, 60, 25, 0.22) 8px, transparent 10px),
+        linear-gradient(180deg, #d2a86e 0%, #b3854b 38%, #805724 85%, #523412 100%);
+      border: 1.5px solid #4c3010;
+      box-shadow:
+        0 5px 8px rgba(0, 0, 0, 0.7),
+        inset 0 2px 4px rgba(255, 255, 255, 0.45),
+        inset 0 -4px 6px rgba(32, 19, 8, 0.65);
+    }
+    .c1-stone[data-size="2"]::before {
+      background:
+        linear-gradient(168deg, transparent 48%, rgba(60, 36, 14, 0.45) 50%, rgba(255, 240, 200, 0.35) 52%, transparent 56%),
+        radial-gradient(circle at 75% 30%, rgba(255, 225, 170, 0.3) 0%, transparent 35%);
+    }
+    /* SIZE 3 · Desert Quartzite Boulder */
+    .c1-stone[data-size="3"] {
+      width: 68%;
+      height: 48px;
+      border-radius: 45% 55% 42% 58% / 54% 44% 56% 46%;
+      transform: rotate(-0.6deg);
+      background:
+        radial-gradient(ellipse at 38% 22%, rgba(255, 242, 215, 0.5) 0%, transparent 45%),
+        radial-gradient(ellipse at 80% 65%, rgba(35, 20, 8, 0.45) 0%, transparent 50%),
+        linear-gradient(135deg, transparent 35%, rgba(180, 80, 30, 0.16) 42%, transparent 50%),
+        linear-gradient(182deg, #c6995c 0%, #a2753a 45%, #714a19 88%, #442a0b 100%);
+      border: 1.5px solid #44280b;
+      box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.75),
+        inset 0 3px 5px rgba(255, 255, 255, 0.4),
+        inset 0 -5px 7px rgba(28, 16, 6, 0.7);
+    }
+    .c1-stone[data-size="3"]::before {
+      background:
+        linear-gradient(125deg, transparent 20%, rgba(255, 235, 190, 0.3) 24%, rgba(65, 38, 15, 0.5) 26%, transparent 32%),
+        repeating-linear-gradient(178deg, transparent 0, transparent 9px, rgba(80, 48, 18, 0.18) 10px, transparent 12px);
+    }
+    /* SIZE 4 · Ancient Foundation Megalith (The Base Stone) */
+    .c1-stone[data-size="4"] {
+      width: 88%;
+      height: 56px;
+      border-radius: 50% 50% 56% 44% / 40% 46% 54% 60%;
+      transform: rotate(0.3deg);
+      background:
+        radial-gradient(ellipse at 32% 18%, rgba(255, 238, 200, 0.45) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 70%, rgba(30, 18, 7, 0.55) 0%, transparent 55%),
+        linear-gradient(180deg, #ba8c50 0%, #94662d 42%, #633e13 85%, #382006 100%);
+      border: 1.5px solid #3c2207;
+      box-shadow:
+        0 8px 14px rgba(0, 0, 0, 0.8),
+        inset 0 3px 6px rgba(255, 255, 255, 0.35),
+        inset 0 -6px 8px rgba(24, 13, 4, 0.75);
+    }
+    .c1-stone[data-size="4"]::before {
+      background:
+        linear-gradient(172deg, transparent 40%, rgba(50, 30, 10, 0.55) 42%, rgba(255, 230, 175, 0.28) 44%, transparent 50%),
+        repeating-linear-gradient(105deg, transparent 0, transparent 14px, rgba(70, 40, 15, 0.15) 15px, transparent 18px);
+    }
+    .c1-stone-glyph {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: rgba(255, 230, 160, 0.32);
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Lifted State with volumetric floating shadow */
+    .c1-stone.is-lifted {
+      transform: translateY(-26px) scale(1.03) rotate(-2deg) !important;
+      filter: drop-shadow(0 20px 24px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 16px rgba(251, 191, 36, 0.45));
+      z-index: 10;
+      animation: stoneHoverPulse 2.4s ease-in-out infinite alternate;
+    }
+    @keyframes stoneHoverPulse {
+      0% { transform: translateY(-26px) scale(1.03) rotate(-2deg); }
+      100% { transform: translateY(-30px) scale(1.04) rotate(-1deg); }
+    }
+    /* Solved Seal Glow */
+    .c1-stone.is-seal-glow {
+      box-shadow:
+        0 0 22px rgba(134, 239, 172, 0.65),
+        inset 0 0 14px rgba(134, 239, 172, 0.35),
+        inset 0 -4px 6px rgba(60, 35, 10, 0.45) !important;
+      border-color: #86efac;
+    }
     .c1-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
     .c1-btn-row .chasm-cairn-btn { flex: 1 1 140px; font-size: 0.85rem; }
     .c1-seal-disc {
@@ -6870,6 +7079,86 @@
       line-height: 50px;
       font-size: 1.6rem;
       color: #3a2508;
+    }
+
+    /* Centered Victory Popup for Cairn 1 / The Wash River Marker */
+    #cairn1-victory-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10010;
+      width: min(580px, calc(100vw - 36px));
+      max-height: 88vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      background: linear-gradient(135deg, rgba(28, 20, 12, 0.98) 0%, rgba(14, 11, 7, 0.99) 100%);
+      border: 2px solid #22c55e;
+      border-radius: 14px;
+      padding: 30px 32px 26px;
+      box-shadow:
+        0 0 0 100vmax rgba(0, 0, 0, 0.72),
+        0 0 45px rgba(34, 197, 94, 0.4),
+        0 25px 60px rgba(0, 0, 0, 0.95);
+      text-align: center;
+      animation: cairnVictoryPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    #cairn1-victory-card .chasm-victory-title {
+      justify-content: center;
+      font-size: 1.45rem;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      color: #86efac;
+      text-shadow: 0 0 16px rgba(134, 239, 172, 0.4);
+    }
+
+    #cairn1-victory-card .c1-seal-disc {
+      margin: 10px auto 18px;
+      display: block;
+      width: 62px;
+      height: 62px;
+      line-height: 58px;
+      font-size: 1.85rem;
+      box-shadow: 0 0 24px rgba(212, 168, 83, 0.6);
+    }
+
+    #cairn1-victory-card .chasm-victory-text {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.15rem;
+      line-height: 1.65;
+      margin-bottom: 24px;
+      color: #f3eedd;
+      text-align: center;
+    }
+
+    #cairn1-victory-card .btn-chasm-finish {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      padding: 13px 26px;
+      font-size: 1.05rem;
+      letter-spacing: 0.8px;
+      border-radius: 8px;
+      box-shadow: 0 4px 18px rgba(21, 128, 61, 0.45);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    #cairn1-victory-card .btn-chasm-finish:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(34, 197, 94, 0.6);
+    }
+
+    @keyframes cairnVictoryPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -46%) scale(0.92);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
 
     @keyframes messengerBadgePulse {
@@ -7483,6 +7772,59 @@
       border-color: #e5c5a1;
       color: #ffffff;
       box-shadow: inset 0 0 0 1px rgba(229, 197, 161, 0.4), 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Global replay button removed for everyone */
+    #btn-wire-replay {
+      display: none !important;
+    }
+
+    /* Mini Rewind Button beside messages: Exclusively for Carles (Tester Sandbox) */
+    .carles-rewind-btn {
+      display: none;
+      width: 26px;
+      height: 26px;
+      min-width: 26px;
+      min-height: 26px;
+      border-radius: 6px;
+      background: rgba(38, 28, 20, 0.9);
+      border: 1.5px solid rgba(184, 152, 118, 0.45);
+      color: #ebd8c5;
+      font-size: 0.85rem;
+      line-height: 1;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+      flex-shrink: 0;
+      align-self: center;
+      user-select: none;
+    }
+
+    .carles-rewind-btn:hover {
+      background: rgba(64, 48, 34, 0.98);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(229, 197, 161, 0.4), 0 2px 8px rgba(0, 0, 0, 0.5);
+      transform: scale(1.15);
+    }
+
+    .carles-rewind-btn:active {
+      transform: scale(0.92);
+    }
+
+    body[data-active-seeker="carles"] .carles-rewind-btn {
+      display: inline-flex;
+    }
+
+    body:not([data-active-seeker="carles"]) .carles-rewind-btn {
+      display: none !important;
+    }
+
+    body[data-active-seeker="carles"] .chat-bubble-wrap {
+      max-width: 88%;
     }
 
     /* Chat Messages Canvas: Semi-transparent Textured Slate Gray (Natural Workshop Bedrock Relay) */
@@ -9542,11 +9884,11 @@
           <div class="satchel-wrap" id="satchel-wrap" style="display: none;" role="group" aria-label="Cairns: the Cairn seals"></div>
           <button type="button" class="btn-satchel-inventory" id="btn-open-inventory" title="Open Expedition Inventory" aria-label="Open Inventory" style="display: none;">
             <span class="bsi-text">Inventory</span>
-            <span id="bsi-badge" class="bsi-badge">2</span>
+            <span id="bsi-badge" class="bsi-badge">3</span>
           </button>
         </div>
         <div class="viewport-header-user" id="viewport-header-user">
-          <div class="seeker-pill" id="seeker-active-pill">
+          <div class="seeker-pill" id="seeker-active-pill" role="button" tabindex="0" title="Seeker Profile: Silvia · Click to view Expedition Inventory & Relics" aria-label="Seeker Profile Silvia">
             <span class="seeker-dot"></span>
             <span id="seeker-name-display">Seeker: Silvia</span>
           </div>
@@ -11120,7 +11462,7 @@
                   <button type="button" class="messenger-btn-restart" id="btn-wire-sound" title="Telegraph sounds: on" aria-label="Toggle telegraph sounds" aria-pressed="true">
                     <span>🔊</span>
                   </button>
-                  <button type="button" class="messenger-btn-restart" id="btn-wire-replay" title="Reset Rig" aria-label="Reset Rig">
+                  <button type="button" class="messenger-btn-restart" id="btn-wire-replay" title="Reset Rig" aria-label="Reset Rig" style="display: none !important;">
                     <span>↺</span>
                   </button>
                 </div>
@@ -11531,7 +11873,7 @@
         <div class="chasm-header-title-wrap">
           <span class="chasm-header-icon">🪨</span>
           <div>
-            <div class="chasm-header-title" id="cairn1-modal-title">Cairn I · The Wash River Marker</div>
+            <div class="chasm-header-title" id="cairn1-modal-title">The Wash River Marker</div>
             <div class="chasm-header-subtitle">Stack the River Stones · The Dry Wash (Wadi al-Hajar)</div>
           </div>
         </div>
@@ -11542,6 +11884,7 @@
         <div class="chasm-telemetry-pill"><span>🚶 Explorer:</span><strong>Hermes</strong></div>
         <div class="chasm-telemetry-pill"><span>📜 Rule:</span><strong>One stone at a time</strong></div>
         <div class="chasm-telemetry-pill"><span>✋ Moves:</span><strong id="cairn1-telem-moves">0</strong></div>
+        <div class="chasm-telemetry-pill" title="The mathematical minimum of the ancient surveyors"><span>🎯 Minimal:</span><strong>15 Lifts</strong></div>
         <div class="chasm-telemetry-pill"><span>📍 On the third foundation:</span><strong id="cairn1-telem-placed">0 / 4</strong></div>
       </div>
 
@@ -11566,7 +11909,6 @@
 
           <div class="chasm-cairns-keypad-box">
             <div class="c1-btn-row">
-              <button type="button" class="chasm-cairn-btn" id="btn-cairn1-undo"><span>↶ Undo last move</span></button>
               <button type="button" class="chasm-cairn-btn" id="btn-cairn1-reset"><span>↺ Start again</span></button>
               <button type="button" class="chasm-cairn-btn" id="btn-cairn1-hint"><span>💬 Ask Hermes</span></button>
             </div>
@@ -11586,13 +11928,103 @@
             </div>
             <div class="c1-seal-disc" aria-hidden="true">☉</div>
             <div class="chasm-victory-text">
-              "Silvia, the last stone settled and something clicked deep inside the base. A hollow opened under the third foundation, and in it lay a flat disc of sandstone: a sun over a wavy line. The Seal of Cairn I. It is in my satchel now."
+              "Silvia, the last stone settled and something clicked deep inside the base. A hollow opened under the third foundation, and in it lay a flat disc of sandstone: a sun over a wavy line. The Wash River seal. It is in my satchel now."
             </div>
             <button type="button" class="btn-chasm-finish" id="btn-cairn1-finish">
               <span>💬 Back to the Cliffside Workshop ➔</span>
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       TOWER II · THE SERVANT'S DEMAND (CAIRN I RECOVERY DIALOGUE)
+       ===================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-servant-cairn-check" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="servant-cairn-title">
+    <div class="chasm-workbench-window" style="max-width: 820px;">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🏛️</span>
+          <div>
+            <div class="chasm-header-title" id="servant-cairn-title">Tower II · The Bronze Gates of the Sanctuary</div>
+            <div class="chasm-header-subtitle">The Demand of the Five Cairns · The Servant of the Oracle</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-servant-cairn" title="Close">✕</button>
+      </div>
+
+      <div class="chasm-telemetry-strip">
+        <div class="chasm-telemetry-pill"><span>🏛️ Location:</span><strong>Atrium of Tower II</strong></div>
+        <div class="chasm-telemetry-pill"><span>🧔‍♂️ Presence:</span><strong>The Servant of the Oracle</strong></div>
+        <div class="chasm-telemetry-pill"><span>🎒 Satchel Status:</span><strong id="servant-satchel-status" style="color: #f87171;">Missing Cairn I</strong></div>
+      </div>
+
+      <div class="chasm-workbench-body" style="padding: 24px 28px; display: flex; flex-direction: column; gap: 20px;">
+        <div class="servant-dialogue-card" style="background: rgba(14, 20, 32, 0.85); border: 1px solid rgba(212, 168, 83, 0.35); border-radius: 8px; padding: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+          
+          <div style="display: flex; gap: 16px; margin-bottom: 18px; align-items: flex-start;">
+            <div style="font-size: 28px; background: rgba(30, 42, 68, 0.6); border: 1px solid rgba(212, 168, 83, 0.4); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🧔‍♂️</div>
+            <div>
+              <div style="font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: #f3b966; letter-spacing: 1px; margin-bottom: 4px;">THE SERVANT OF THE ORACLE</div>
+              <p style="font-size: 15px; line-height: 1.6; color: #e2e8f0; margin: 0;">
+                "Halt, travelers. You stand before the bronze portal of Tower II, but the ancient laws of the Order are immutable: <strong>five sacred seals of pilgrimage</strong> must be presented to unseal the sanctuary. Your satchel lacks the very first marker—the Seal of Cairn I of the Wash River."
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 18px; align-items: flex-start; padding-left: 20px; border-left: 2px solid rgba(79, 227, 193, 0.3);">
+            <div style="font-size: 28px; background: rgba(18, 38, 32, 0.6); border: 1px solid rgba(79, 227, 193, 0.4); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">📜</div>
+            <div>
+              <div style="font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: #4fe3c1; letter-spacing: 1px; margin-bottom: 4px;">HERMES · CARTOGRAPHER</div>
+              <p style="font-size: 15px; line-height: 1.6; color: #e2e8f0; margin: 0;">
+                "Elder brother, forgive us. The red tempest was fierce, and we pressed on to outrun the gale. Tell me... what was the shape and mark of Cairn I?"
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; margin-bottom: 18px; align-items: flex-start;">
+            <div style="font-size: 28px; background: rgba(30, 42, 68, 0.6); border: 1px solid rgba(212, 168, 83, 0.4); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🧔‍♂️</div>
+            <div>
+              <div style="font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: #f3b966; letter-spacing: 1px; margin-bottom: 4px;">THE SERVANT OF THE ORACLE</div>
+              <p style="font-size: 15px; line-height: 1.6; color: #cbd5e1; margin: 0;">
+                "It was raised in the dry wash of Wadi al-Hajar, just beneath Outer Watchtower VI. A cone of smooth gray river stones stacked upon three hollow stone foundations, guarding a sandstone disc carved with the sun over moving water."
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 16px; align-items: flex-start; padding-left: 20px; border-left: 2px solid rgba(255, 224, 153, 0.4);">
+            <div style="font-size: 28px; background: rgba(48, 32, 14, 0.6); border: 1px solid rgba(255, 224, 153, 0.4); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">⭐</div>
+            <div>
+              <div style="font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: #ffe099; letter-spacing: 1px; margin-bottom: 4px;">HERMES · TO SILVIA</div>
+              <p style="font-size: 15px; line-height: 1.6; color: #fef08a; margin: 0;">
+                "Silvia... the heap of river stones half buried in silt at Wadi al-Hajar! That was Cairn I. My hunch was true all along. Without its seal, the Servant will not let us through the inner bronze gates. What is your command?"
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="servant-cairn-choice-actions" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+          <button type="button" class="btn-chasm-finish" id="btn-servant-retrace" style="background: linear-gradient(135deg, #2d5a3f 0%, #173824 100%); border-color: #4fe3c1; color: #ecfdf5;">
+            <span>✦ Retrace Our Steps to Wadi al-Hajar & Uncover Cairn I ➔</span>
+          </button>
+          <button type="button" class="btn-chasm-finish" id="btn-servant-refuse" style="background: linear-gradient(135deg, #422018 0%, #25120d 100%); border-color: #f87171; color: #fee2e2;">
+            <span>✕ No, Hermes. We will not turn back. Let us press forward without it. ➔</span>
+          </button>
+        </div>
+
+        <div id="servant-cairn-result-box" style="display: none; padding: 16px; border-radius: 6px; background: rgba(18, 12, 10, 0.9); border: 1px solid rgba(212, 168, 83, 0.4); text-align: center;">
+          <p id="servant-cairn-result-text" style="font-size: 14px; line-height: 1.6; color: #fde68a; margin-bottom: 12px;"></p>
+          <button type="button" class="chasm-cairn-btn" id="btn-servant-confirm-close" style="margin: 0 auto;"><span>Understood ➔</span></button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -12395,6 +12827,78 @@
           } catch(e) {}
         }
 
+        playStoneLift() {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const filter = this.ctx.createBiquadFilter();
+
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(280, now);
+            filter.frequency.exponentialRampToValueAtTime(140, now + 0.08);
+            filter.Q.setValueAtTime(1.5, now);
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(95, now);
+            osc.frequency.linearRampToValueAtTime(160, now + 0.03);
+            osc.frequency.exponentialRampToValueAtTime(70, now + 0.08);
+
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.2, now + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.09);
+          } catch(e) {}
+        }
+
+        playStoneThud(size = 2) {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            const sNum = Number(size) || 2;
+            const baseFreq = sNum === 4 ? 65 : sNum === 3 ? 85 : sNum === 2 ? 115 : 150;
+            
+            // Deep low-frequency rock body thud
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(baseFreq * 1.6, now);
+            osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.6, now + 0.12);
+
+            gain.gain.setValueAtTime(0.28, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.14);
+
+            // Snappy stone-contact click
+            const clickOsc = this.ctx.createOscillator();
+            const clickGain = this.ctx.createGain();
+            clickOsc.type = 'sine';
+            clickOsc.frequency.setValueAtTime(360, now);
+            clickOsc.frequency.exponentialRampToValueAtTime(110, now + 0.03);
+            clickGain.gain.setValueAtTime(0.09, now);
+            clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+            clickOsc.connect(clickGain);
+            clickGain.connect(this.ctx.destination);
+            clickOsc.start(now);
+            clickOsc.stop(now + 0.04);
+          } catch(e) {}
+        }
+
         playChimeHover() {
           if (this._muted()) return;
           try {
@@ -12605,11 +13109,13 @@
           targetView = 'view-trail';
         }
 
-        // Access guard: Silvia accesses Cliffside Workshop after Game 9 or during emergency wire
-        const isEmergencyWire = localStorage.getItem('seeker_silvia_sandstorm_active') === 'true' ||
-                                new URLSearchParams(window.location.search).get('wire') === '1' ||
-                                window.forceWireAlert;
-        if (targetView === 'view-field-wire' && !isCarles && !isCipherCompleted && !isEmergencyWire) {
+        // Access guard: Silvia accesses Cliffside Workshop after Game 9, Desert Path unlocked, or during wire
+        const isWireUnlocked = isCipherCompleted ||
+                               localStorage.getItem('order_desert_path_unlocked') === 'true' ||
+                               localStorage.getItem('order_sandstorm_wire_unlocked') === 'true' ||
+                               new URLSearchParams(window.location.search).get('wire') === '1' ||
+                               window.forceWireAlert;
+        if (targetView === 'view-field-wire' && !isCarles && !isWireUnlocked) {
           targetView = 'view-trail';
         }
 
@@ -12633,9 +13139,12 @@
         if (targetView === 'view-trail' && typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
 
         if (targetView === 'view-field-wire') {
+          if (typeof syncSilviaWaypointBaseline === 'function') syncSilviaWaypointBaseline();
+          if (typeof switchWireTab === 'function') switchWireTab('expedition');
           if (typeof renderWireExpedition === 'function') renderWireExpedition();
           if (typeof renderInquiriesGrid === 'function') renderInquiriesGrid();
           if (typeof markMessengerAsRead === 'function') markMessengerAsRead();
+          if (typeof scrollChatToActivePrompt === 'function') scrollChatToActivePrompt(false);
         }
 
         // On-Demand Fast Loading & Ghost Skeleton: Archives Parchment
@@ -12796,6 +13305,11 @@
         window.currentSeeker = normalized;
         try { localStorage.setItem('the_eclipse_active_seeker', normalized); } catch (e) {}
         try { document.body.setAttribute('data-active-seeker', normalized.toLowerCase()); } catch (e) {}
+        if (typeof syncWaypointBaseline === 'function') {
+          syncWaypointBaseline();
+        } else if (typeof syncSilviaWaypointBaseline === 'function') {
+          syncSilviaWaypointBaseline();
+        }
         return normalized;
       }
       window.persistActiveSeeker = persistActiveSeeker;
@@ -12819,8 +13333,9 @@
       // Both Silvia and Carles have completed Games 8–9 (Midnight Calibration + Celestial Cipher).
       // Silvia is in the live sandstorm era (Hermes wire → Watchtower VI / checkpoint 1).
       // Carles keeps tester controls + storm toggles; Silvia does not.
-      const SATURDAY_OCT_17_2026_8PM = 1792260000000; // Sat 17 Oct 2026 20:00 CEST
-      window.SATURDAY_OCT_17_2026_8PM = SATURDAY_OCT_17_2026_8PM;
+      const SUNDAY_OCT_18_2026_2PM = 1792324800000; // Sun 18 Oct 2026 14:00 CEST
+      window.SUNDAY_OCT_18_2026_2PM = SUNDAY_OCT_18_2026_2PM;
+      window.SATURDAY_OCT_17_2026_8PM = SUNDAY_OCT_18_2026_2PM; // legacy alias
       try {
         if (localStorage.getItem('seeker_carles_midnight_completed') === null) {
           localStorage.setItem('seeker_carles_midnight_completed', 'true');
@@ -12857,6 +13372,10 @@
 
       // Carles is the admin tester: every game opens at any time, in any order
       window.isAdminTester = function () {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('admin') === '1' || urlParams.get('carles') === '1' || urlParams.get('tester') === '1') return true;
+        } catch (e) {}
         const u = String(
           (typeof window.currentSeeker !== 'undefined' && window.currentSeeker) ||
           currentSeeker ||
@@ -12879,8 +13398,8 @@
         const GAMES = [
           {
             id: 'cairn1', tag: 'Dawn', label: 'Cairn I · The Wash River Marker', flag: 'order_cairn1_completed', built: true,
-            complete() { set('order_cairn1_completed', 'true'); set('order_cairn1_found', 'true'); set('order_seal_cairn_1', 'true'); set('order_dawn_step', '3'); },
-            reset() { dels(['order_cairn1_completed', 'order_cairn1_found', 'order_seal_cairn_1', 'order_dawn_choices']); set('order_dawn_step', '0'); }
+            complete() { set('order_cairn1_completed', 'true'); set('order_cairn1_found', 'true'); set('order_seal_cairn_1', 'true'); set('order_dawn_step', '3'); del('order_cairn1_bypassed'); del('order_cairn1_locked_until_3_cairns'); },
+            reset() { dels(['order_cairn1_completed', 'order_cairn1_found', 'order_seal_cairn_1', 'order_dawn_choices', 'order_cairn1_bypassed', 'order_cairn1_locked_until_3_cairns']); set('order_dawn_step', '0'); }
           },
           {
             id: 'chasm', tag: 'Station 10', label: 'The Whispering Chasm', flag: 'order_whispering_chasm_completed', built: true,
@@ -12997,43 +13516,97 @@
           localStorage.setItem('order_silvia_live_v4', 'done');
           localStorage.setItem('order_silvia_live_v3', 'done');
         }
-        // Resume point (17 Oct 2026, 11:38): Silvia named him Hermes and is now on the Sheet 7B reply choices (wire step 2).
-        // One-time, and never rolls progress back: only lifts a lower step up to 2.
-        if (localStorage.getItem('order_silvia_wire_resume_v1') !== 'done') {
-          const seekerNow = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
-          if (seekerNow === 'silvia') {
-            const curStep = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
-            if (curStep < 2) {
-              let hist = [];
-              try { hist = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]') || []; } catch (e) { hist = []; }
-              if (!Array.isArray(hist)) hist = [];
-              hist[0] = 1; // Silvia's real first reply: "I solved your celestial cipher…"
-              hist[1] = 0; // Hermes
-              localStorage.setItem('order_field_wire_choices', JSON.stringify(hist));
-              localStorage.setItem('order_field_wire_step', '2');
-              localStorage.setItem('order_cartographer_title', 'Hermes');
-              localStorage.removeItem('order_messenger_last_read_step');
-              localStorage.setItem('order_messenger_unread_count', '0');
+        // Canonical Story Point (18 Oct 2026):
+        // Both Silvia and Carles have crossed the Desert Frontier, weathered the storm, and reached Outer Watchtower VI.
+        // Authentic choices during the storm:
+        //   - Step 0: [2] "Loud and clear. I solved your celestial cipher at the southern cliff..."
+        //   - Step 1: [0] "Call you Hermes..."
+        //   - Step 2: [1] "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark..."
+        //   - Step 3: [0] "According to your notes on Sheet 7B, the benchmark plate points 112° East toward Outer Watchtower VI."
+        //   - Satchel Item: "1998 Brass Surveyor's Compass" (Cairn III foundation)
+        // Waypoint secured at Outer Watchtower VI (wire step 4).
+        // The storm has ended. Dawn has broken (The Great Silence).
+        // Hermes has sent his morning dispatch (Dawn Step 0).
+        // Awaiting the seeker's first reply to the Three Laws of the Waste.
+        function syncWaypointBaseline() {
+          const seekerNow = (localStorage.getItem('the_eclipse_active_seeker') || (window.currentSeeker || 'Silvia')).toLowerCase();
+
+          // Storm is officially over for both seekers across all devices
+          localStorage.removeItem('order_sandstorm_active');
+          localStorage.removeItem('seeker_silvia_sandstorm_active');
+          localStorage.removeItem('seeker_carles_sandstorm_active');
+          localStorage.setItem('order_storm_tester_bypassed', 'true');
+          localStorage.setItem('order_desert_path_unlocked', 'true');
+          localStorage.setItem('order_sandstorm_wire_unlocked', 'true');
+
+          // Always ensure authentic choices for the 4 storm steps: [2, 0, 1, 0]
+          localStorage.setItem('order_cartographer_title', 'Hermes');
+          const compassItem = {
+            id: "surveyor_compass",
+            name: "1998 Brass Surveyor's Compass",
+            icon: "🧭",
+            desc: "Precision surveyor compass retrieved from the stone foundation of Cairn III."
+          };
+          localStorage.setItem('order_satchel_expedition_item', JSON.stringify(compassItem));
+          localStorage.setItem('seeker_silvia_satchel_expedition_item', JSON.stringify(compassItem));
+          localStorage.setItem('seeker_carles_satchel_expedition_item', JSON.stringify(compassItem));
+
+          // Ensure inventory has the compass in both general and profile-specific storage
+          try {
+            let relics = ['gilded_feather', 'order_wax_seal'];
+            const rawRelics = localStorage.getItem('order_inventory_relics');
+            if (rawRelics) {
+              try { const p = JSON.parse(rawRelics); if (Array.isArray(p)) relics = p; } catch(e) {}
             }
-            localStorage.setItem('order_silvia_wire_resume_v1', 'done');
+            if (!relics.includes('surveyor_compass')) relics.push('surveyor_compass');
+            localStorage.setItem('order_inventory_relics', JSON.stringify(relics));
+            localStorage.setItem('seeker_silvia_inventory_relics', JSON.stringify(relics));
+            localStorage.setItem('seeker_carles_inventory_relics', JSON.stringify(relics));
+          } catch(e) {}
+
+          // Waypoint baseline: both seekers are at step 4 (Outer Watchtower VI reached)
+          // and Dawn Step 0 (awaiting first reply to Hermes's morning dispatch)
+          const chasmCompleted = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+          if (!chasmCompleted) {
+            const waypointDoneKey = `order_${seekerNow}_waypoint_v2`;
+            if (localStorage.getItem(waypointDoneKey) !== 'done') {
+              localStorage.setItem('order_field_wire_step', '4');
+              localStorage.setItem('order_field_wire_completed', 'true');
+              localStorage.setItem('order_field_wire_choices', JSON.stringify([2, 0, 1, 0]));
+              localStorage.setItem('order_dawn_step', '0');
+              localStorage.setItem('order_dawn_choices', '[]');
+              localStorage.removeItem('order_cairn1_completed');
+              localStorage.removeItem('order_cairn1_found');
+              localStorage.removeItem('order_cairn1_bypassed');
+              localStorage.removeItem('order_seal_cairn_1');
+              localStorage.removeItem('order_cairn1_optimal');
+              localStorage.removeItem('order_cairn1_locked_until_3_cairns');
+              localStorage.removeItem('order_chasm_march_start');
+              localStorage.removeItem('order_chasm_march_bypassed');
+              localStorage.setItem(waypointDoneKey, 'done');
+              localStorage.setItem('order_silvia_waypoint_v2', 'done');
+              localStorage.setItem('order_carles_waypoint_v2', 'done');
+            } else {
+              const curStep = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
+              if (curStep < 4) {
+                localStorage.setItem('order_field_wire_step', '4');
+                localStorage.setItem('order_field_wire_completed', 'true');
+                localStorage.setItem('order_field_wire_choices', JSON.stringify([2, 0, 1, 0]));
+              } else {
+                let hist = [];
+                try { hist = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]') || []; } catch(e) { hist = []; }
+                if (!Array.isArray(hist) || hist.length < 4 || hist[0] !== 2 || hist[1] !== 0 || hist[2] !== 1 || hist[3] !== 0) {
+                  hist[0] = 2; hist[1] = 0; hist[2] = 1; hist[3] = 0;
+                  localStorage.setItem('order_field_wire_choices', JSON.stringify(hist));
+                }
+              }
+            }
           }
         }
-        // Correction: her first reply was the cipher one (index 1). Only while she is still exactly at step 2.
-        if (localStorage.getItem('order_silvia_wire_resume_v2') !== 'done') {
-          const seekerNow2 = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
-          if (seekerNow2 === 'silvia') {
-            const step2 = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
-            if (step2 === 2) {
-              let h2 = [];
-              try { h2 = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]') || []; } catch (e) { h2 = []; }
-              if (!Array.isArray(h2)) h2 = [];
-              h2[0] = 1;
-              if (h2[1] === undefined) h2[1] = 0;
-              localStorage.setItem('order_field_wire_choices', JSON.stringify(h2));
-            }
-            localStorage.setItem('order_silvia_wire_resume_v2', 'done');
-          }
-        }
+        window.syncSilviaWaypointBaseline = syncWaypointBaseline;
+        window.syncWaypointBaseline = syncWaypointBaseline;
+        syncWaypointBaseline();
+
         // Ask Hermes: wipe leftover "Answered" badges from tester runs (shared localStorage key)
         if (localStorage.getItem('order_silvia_inquiries_reset_v1') !== 'done') {
           localStorage.removeItem('order_field_inquiries_read');
@@ -13077,8 +13650,8 @@
         handleHubUrlHash();
       });
 
-      // Execute on initial page load (all functions and vars are now ready!)
-      handleHubUrlHash();
+      // Initial execution of handleHubUrlHash() is deferred to the end of this script
+      // so that all views, wire stream elements, and map controllers are fully initialized.
 
       // 3. Star Map Node Definitions & Click Inspection
       const nodesData = {
@@ -13283,20 +13856,29 @@
         },
         10: () => {
           const isCairnDone = localStorage.getItem('order_cairn1_completed') === 'true';
+          const isCairnBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+          const isDawnDone = parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 3;
+          const isChasmUnlocked = isCairnDone || isCairnBypassed || isDawnDone;
           const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
 
-          // During the sandstorm, waiting for the first mission before Cairn I is recovered:
-          if (!isCairnDone) {
+          // The storm is over. Dawn has broken at Outer Watchtower VI; awaiting first canyon descent:
+          if (!isChasmUnlocked) {
             return {
-              badge: 'ATMOSPHERIC TELEMETRY // DESERT PATH',
-              status: 'SIGNAL SEVERED · RED SANDSTORM ⚡',
-              statusClass: 'status-locked-badge',
-              title: 'Transceiver Offline · Telemetry Disconnected',
-              thumb: './assets/thumbnails/transceiver_offline_preview.webp',
-              lore: 'The violent red sandstorm has severed atmospheric communication across the canyon corridor. Telemetry to the Desert Path remains completely disconnected while the gale rages outside Outer Watchtower VI. No expedition mission can be initiated until atmospheric interference subsides and Hermes recovers Cairn I.',
-              rewards: [],
-              btnText: null,
-              hideReturnBtn: true
+              badge: 'STATION 10 // EXPEDITION BASECAMP',
+              status: 'WAYPOINT SECURED · DAWN AT WATCHTOWER VI ✦',
+              statusClass: 'status-live-badge',
+              title: 'Outer Watchtower VI · The Canyon Mouth',
+              thumb: './assets/thumbnails/whispering_chasm_preview.webp',
+              lore: 'The red sandstorm has subsided into the great dawn silence. Hermes is sheltered inside Outer Watchtower VI by the hearth fire with the 1998 brass surveyor\'s compass. To review his morning dispatch and survey the entrance to the Whispering Chasm, open the field wire relay.',
+              rewards: [
+                { icon: '🧭', label: "1998 Surveyor's Compass", desc: 'Retrieved from the stone foundation of Cairn III' },
+                { icon: '📻', label: 'Field Wire Relay Active', desc: 'Direct communications line with Hermes' },
+                { icon: '🏜️', label: 'Wadi al-Hajar Frontier', desc: 'Entrance to the 25×25 sandstone labyrinth' }
+              ],
+              btnText: '✦ OPEN CLIFFSIDE WORKSHOP WIRE ➔',
+              action: () => {
+                if (typeof activateHubView === 'function') activateHubView('view-field-wire');
+              }
             };
           }
 
@@ -13319,9 +13901,33 @@
             };
           }
 
+          const isMarchOver = (typeof window.isChasmMarchOver === 'function') ? window.isChasmMarchOver() : true;
+          if (!isMarchOver) {
+            const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+            return {
+              badge: 'STATION 10 // 26-HOUR TREK IN PROGRESS',
+              status: 'TREK TO NORTH PORTAL · IN PROGRESS ⏳',
+              statusClass: 'status-live-badge',
+              title: isBypassed ? 'Western Shelf Trek · Heading to North Portal' : 'Dry Wash Trek · Heading to North Portal',
+              thumb: './assets/thumbnails/whispering_chasm_preview.webp',
+              lore: isBypassed
+                ? 'Hermes left the river stones undisturbed and is traversing the hard rock shelf directly toward the canyon. Track his beacon across the western ridge on the Grand Desert Map or consult the Field Wire for live ETA.'
+                : 'The Wash River seal is secured in Hermes\'s satchel. He is trekking across the dry wash and scree slopes toward the Whispering Chasm. Follow his progress on the Field Wire.',
+              rewards: [
+                { icon: '🎒', label: isBypassed ? 'River Stones Undisturbed' : 'Wash River Seal in Satchel', desc: 'Heading toward the gorge' },
+                { icon: '⏱️', label: '26-Hour Traversal', desc: 'Hermes will radio when the portal is reached' },
+                { icon: '📻', label: 'Field Wire Standby', desc: 'Low-power telemetry beacon active' }
+              ],
+              btnText: '✦ OPEN FIELD WIRE & CHECK TREK ETA ➔',
+              action: () => {
+                if (typeof activateHubView === 'function') activateHubView('view-field-wire');
+              }
+            };
+          }
+
           return {
             badge: 'STATION 10 // DESERT PATH',
-            status: 'CANYON DESCENT READY ✦',
+            status: 'NORTH PORTAL REACHED · CANYON DESCENT READY ✦',
             statusClass: 'status-live-badge',
             title: 'The Whispering Chasm',
             thumb: './assets/thumbnails/whispering_chasm_preview.webp',
@@ -13442,7 +14048,10 @@
               { icon: '📜', label: "The Servant's Trial", desc: 'Prove you understand the language of the founders' }
             ],
             btnText: 'Open Sheet 17A in Your Journal ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Station 18: Open Sheet 17A (The Polybius Stele) in your physical journal.') : null)
+            action: () => {
+              if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
+              if (window.showDesertToast) window.showDesertToast('Station 18: Open Sheet 17A (The Polybius Stele) in your physical journal.');
+            }
           };
         },
         14: () => {
@@ -13459,7 +14068,10 @@
               { icon: '🗝️', label: 'Second Master Key', desc: 'Toward the Vault of the Grand Eclipse' }
             ],
             btnText: 'Enter the Sanctuary of Tower II ➔',
-            action: () => (window.showDesertToast ? window.showDesertToast('Station 19: The Sandstone Sanctuary of the Desert Oracle awaits on Sheet 17B.') : null)
+            action: () => {
+              if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
+              if (window.showDesertToast) window.showDesertToast('Station 19: The Sandstone Sanctuary of the Desert Oracle awaits on Sheet 17B.');
+            }
           };
         },
         21: () => {
@@ -13501,7 +14113,9 @@
         22: () => {
           const openChat = () => { if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire'); };
           const cairnDone = localStorage.getItem('order_cairn1_completed') === 'true';
-          const found = cairnDone || (parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 2);
+          const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+          const isLockedTemp = localStorage.getItem('order_cairn1_locked_until_3_cairns') === 'true';
+          const found = cairnDone || (!isBypassed && parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 2);
           if (cairnDone) {
             return {
               badge: 'CAIRN I // THE WASH RIVER MARKER',
@@ -13518,24 +14132,40 @@
               action: () => (window.openCairnOneModal ? window.openCairnOneModal() : null)
             };
           }
+          if (isBypassed) {
+            return {
+              badge: 'WADI AL-HAJAR // DRY RIVER',
+              status: isLockedTemp ? 'PATH BARRED · ?' : 'LEFT UNDISTURBED · ?',
+              statusClass: 'status-locked-badge',
+              title: 'Wadi al-Hajar · The Dry River',
+              thumb: './assets/chat/sketch_dry_wash.webp',
+              lore: isLockedTemp
+                ? 'The silent bend of Wadi al-Hajar. The Servant of Tower II has temporarily barred access until you have gathered at least two to three other sacred cairn seals across the desert pilgrimage.'
+                : 'A quiet bend in the dry riverbed of Wadi al-Hajar. When Hermes surveyed the canyon at dawn, you chose to keep strictly to the surveyor\'s route toward the gorge, leaving whatever lay buried in the silt undisturbed.',
+              rewards: [],
+              btnText: isLockedTemp ? 'Locked by the Servant of Tower II' : '💬 Review Notes in Workshop ➔',
+              btnDisabled: isLockedTemp,
+              action: isLockedTemp ? () => { if (typeof window.showDesertToast === 'function') window.showDesertToast('The path to Cairn I is temporarily closed until you hold 2–3 other cairn seals.'); } : openChat
+            };
+          }
           if (found) {
             return {
-              badge: 'CAIRN I // THE WASH RIVER MARKER',
+              badge: 'WADI AL-HAJAR // THE RIVER STONES',
               status: 'RIVER STONES FOUND ✦',
               statusClass: 'status-live-badge',
-              title: 'Cairn I · The Wash River Marker',
+              title: 'The River Stones · Wadi al-Hajar',
               thumb: './assets/chat/sketch_cairn_one.webp',
               lore: 'Half buried in the silt of the dry river, Hermes found a heap of round stones, stacked by an old hand. At its foot lies a slab with three foundations and four stones. Guide him: one stone at a time, and never a big stone on a small one.',
               rewards: [
                 { icon: '🪨', label: 'Four river stones', desc: 'Three foundations, one stone at a time' },
-                { icon: '🎒', label: 'Seal of Cairn I', desc: 'Waiting in a hollow of the base' }
+                { icon: '❓', label: 'Concealed Hollow', desc: 'Waiting under the third foundation' }
               ],
-              btnText: '✦ GUIDE HERMES AT CAIRN I ➔',
+              btnText: '✦ GUIDE HERMES AT THE STONES ➔',
               action: () => (window.openCairnOneModal ? window.openCairnOneModal() : null)
             };
           }
           return {
-            badge: 'CAIRN I // THE DRY RIVER',
+            badge: 'WADI AL-HAJAR // THE DRY RIVER',
             status: 'HERMES FOLLOWS A HUNCH ✦',
             statusClass: 'status-live-badge',
             title: 'The Dry River · Wadi al-Hajar',
@@ -14667,39 +15297,43 @@
             if (window.SandstormLockdown && !urlForce) {
               window.SandstormLockdown.deactivate();
             }
+            if (typeof window.switchMapPath === 'function') {
+              window.switchMapPath('desert', false);
+            }
+            if (typeof window.updateSatchelVisibility === 'function') {
+              window.updateSatchelVisibility();
+            }
+            if (typeof window.updateMessengerBadge === 'function') {
+              window.updateMessengerBadge();
+            }
+            if (typeof window.updateInventoryBadge === 'function') {
+              window.updateInventoryBadge();
+            }
           } else {
             seekerActivePill.classList.remove('is-carles');
             seekerNameDisplay.textContent = 'Seeker: Silvia';
-            // Pin live storm end: Saturday 17 Oct 2026 · 20:00 CEST — entry state is the storm
+            // Silvia baseline: the storm has ended. Dawn has broken at Outer Watchtower VI.
             try {
-              const end = window.SATURDAY_OCT_17_2026_8PM || 1792260000000;
-              localStorage.setItem('order_sandstorm_target_time', String(end));
-              localStorage.setItem('seeker_silvia_cipher_completed', 'true');
-              localStorage.setItem('seeker_silvia_sandstorm_active', 'true');
-              localStorage.setItem('order_sandstorm_active', 'true');
+              localStorage.removeItem('order_sandstorm_active');
+              localStorage.removeItem('seeker_silvia_sandstorm_active');
+              localStorage.setItem('order_storm_tester_bypassed', 'true');
               localStorage.setItem('order_sandstorm_wire_unlocked', 'true');
               localStorage.setItem('order_desert_path_unlocked', 'true');
-              // Legacy localStorage flag blocked the storm forever after one click — session only now
-              localStorage.removeItem('order_sandstorm_wire_answered');
             } catch (e) {}
-            // Fullscreen lockout until she answers the telegraph in this browser session
-            const wireAnswered = sessionStorage.getItem('order_sandstorm_wire_answered') === 'true';
-            if (window.SandstormLockdown && !wireAnswered) {
-              window.SandstormLockdown.activate(false);
-            } else if (window.SandstormLockdown && wireAnswered) {
+            if (window.SandstormLockdown) {
               window.SandstormLockdown.deactivate(false);
             }
-            // After the storm gate: Desert Path ready under the hood; Workshop holds the live wire
-            if (wireAnswered) {
-              if (typeof window.switchMapPath === 'function') {
-                window.switchMapPath('desert', false);
-              }
-              if (typeof window.updateSatchelVisibility === 'function') {
-                window.updateSatchelVisibility();
-              }
-              if (typeof window.updateMessengerBadge === 'function') {
-                window.updateMessengerBadge();
-              }
+            if (typeof window.switchMapPath === 'function') {
+              window.switchMapPath('desert', false);
+            }
+            if (typeof window.updateSatchelVisibility === 'function') {
+              window.updateSatchelVisibility();
+            }
+            if (typeof window.updateMessengerBadge === 'function') {
+              window.updateMessengerBadge();
+            }
+            if (typeof window.updateInventoryBadge === 'function') {
+              window.updateInventoryBadge();
             }
           }
         }
@@ -14712,6 +15346,11 @@
 
       // Load Profile Data from Active Seeker Sandbox
       function loadCurrentProfile() {
+        if (typeof syncWaypointBaseline === 'function') {
+          syncWaypointBaseline();
+        } else if (typeof syncSilviaWaypointBaseline === 'function') {
+          syncSilviaWaypointBaseline();
+        }
         try {
           const savedLedger = localStorage.getItem(getSeekerKey('cipher_ledger'));
           cipherLedger = savedLedger ? JSON.parse(savedLedger) : {};
@@ -15722,21 +16361,21 @@
               beats: [
                 "Down to the gravel wash it is! I'm sliding down the shale embankment now... The slope is steep and loose rocks are tumbling into the dark, but the high canyon walls are finally cutting the gale overhead. The red dust stays low near the ground, and my boots can actually find firm footing on the dry gravel bed.",
                 "Wait, Silvia... look at what's caught against this flood boulder! The winter floods washed down a tangle of ancient, bone-dry juniper root, perfectly sheltered under the rock overhang. And half-buried in the silt right beside it: an old oilskin pouch from 1998 with my spare fire-striker and dark flint stone! We have fuel and fire for the night.",
-                "I packed the juniper wood and flint into my satchel and pushed fifty paces south through the swirling dust. Three stone sentinels emerged through the haze: the Three Cairns! I'm kneeling at Cairn III now. Beneath the flat sandstone slab lies the copper benchmark plate I buried twenty-eight years ago.\n\nOpen your journal to Sheet 7B, Silvia: what compass direction was stamped on that plate to guide me to Watchtower VI?"
+                "I packed the juniper wood and flint into my satchel and pushed fifty paces along the sheltered cliff trail. Ahead through the swirling dust, the entrance benchmark of the watchtower path emerged through the haze! Beneath the flat sandstone slab lies the copper benchmark plate I buried twenty-eight years ago.\n\nOpen your journal to Sheet 7B, Silvia: what compass direction was stamped on that plate to guide me to Watchtower VI?"
               ],
-              hermesReply: "Down to the wash it is! I slid down the shale embankment onto the gravel bed. What a relief—overhead the gale is screaming, but down here the dust stays near the floor.\n\nAlong the dry bank, caught under a boulder, I found a tangle of dry juniper root and an old oilskin pouch half-buried in silt: my own spare flint from 1998! I stowed both in my satchel.\n\nAhead through the haze, I see the landmark: three stone towers. I've reached Cairn III! Underneath the base slab is the copper reference plate pointing to Watchtower VI.\n\nLook at Sheet 7B in your journal: what compass direction was stamped on that plate?"
+              hermesReply: "Down to the wash it is! I slid down the shale embankment onto the gravel bed. What a relief—overhead the gale is screaming, but down here the dust stays near the floor.\n\nAlong the dry bank, caught under a boulder, I found a tangle of dry juniper root and an old oilskin pouch half-buried in silt: my own spare flint from 1998! I stowed both in my satchel.\n\nAhead through the haze, I reached the entrance benchmark of the watchtower trail! Underneath the base slab is the copper reference plate pointing to Watchtower VI.\n\nLook at Sheet 7B in your journal: what compass direction was stamped on that plate?"
             },
             {
               id: "choice-2-cairns-compass",
-              item: { id: "surveyor_compass", name: "1998 Brass Surveyor's Compass", icon: "🧭", desc: "Precision surveyor compass preserved in the stone niche of Cairn II." },
-              text: "Check Sheet 7B · Section III: Navigate strictly by the Three Cairns. The stones hold true against any sandstorm, and Cairn II anchors the line.",
-              silviaMsg: "Check Sheet 7B · Section III: you built the Three Cairns specifically to survive these gales. Follow the line of stone pillars south-southeast; wind shifts the sands, but the cairns hold true.",
+              item: { id: "surveyor_compass", name: "1998 Brass Surveyor's Compass", icon: "🧭", desc: "Precision surveyor compass retrieved from the stone foundation of Cairn III." },
+              text: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. Follow the wash bed to Cairn III, then take the stamped bearing up to the watchtower.",
+              silviaMsg: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. You raised three stone cairns along the canyon wash pointing south-southeast. Beneath the foundation slab of Cairn III is the copper benchmark plate that points the bearing to Watchtower VI!",
               beats: [
-                "The Three Cairns! You are right—thirty years of desert gales have battered this canyon, but dry-stone pillars built on solid bedrock never fall. I'm dropping down through the chimney crag, keeping my back pressed against the rock face to fight the crosswinds.",
-                "I reached the canyon floor and made it to Cairn I, then Cairn II! Silvia, you won't believe this... In a hollow stone niche on the leeward face of Cairn II, the greasecloth package is still sealed tight. Inside is my master surveyor's brass compass from 1998—the blued-steel needle floated straight toward magnetic north the second the lid clicked open! Not a speck of rust.",
-                "I secured the brass compass in my satchel and followed the alignment fifty paces south-southeast. Cairn III stands proud at the canyon mouth. At its base, under the flat sandstone foundation slab, lies the buried surveyor's plate.\n\nLook closely at Sheet 7B in your journal: what compass heading was stamped on that copper plate to guide me to Watchtower VI?"
+                "The Three Cairns in the canyon wash! You found my notes from 1998, Silvia! Thirty years of desert winds haven't moved an inch of those bedrock boulders. I'm sliding down into the sheltered wash bed, keeping my back to the gale, following the line of cairns pointing south-southeast...",
+                "I reached Cairn III! The stone mound held firm against the squall. Tucked into a dry stone niche at its foundation, wrapped tight in oiled canvas, was my precision surveyor's brass compass from 1998! The blued-steel needle floated straight true the moment I lifted the latch. Not a speck of rust.",
+                "I secured the brass compass in my satchel and brushed the silt from the flat sandstone slab at the base of Cairn III. The buried copper benchmark plate is right here.\n\nLook closely at Sheet 7B in your journal: what compass heading was stamped on that plate to guide me up to Watchtower VI?"
               ],
-              hermesReply: "The Three Cairns! Thirty years of gales haven't moved an inch of those stones. It feels like meeting old sentinels in the dark.\n\nI pushed through the swirling sand to Cairn I, then Cairn II. In a hollow niche of Cairn II, wrapped in greased parchment, was my backup brass surveyor's compass from 1998—its needle still balances with astronomical precision! I slipped it safely into my satchel.\n\nFifty paces further, I reached Cairn III, the southernmost marker. At its foundation lies the flat sandstone slab concealing the surveyor's plate.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on the copper plate to reach the watchtower gate?"
+              hermesReply: "The Three Cairns in the wash! Thirty years of desert gales haven't moved those stone mounds. Following your guidance from Sheet 7B, I reached Cairn III and found my 1998 brass surveyor's compass preserved in a dry stone niche! Beneath the foundation slab rests the copper plate.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on the copper plate to guide me to Watchtower VI?"
             },
             {
               id: "choice-2-lookout-spyglass",
@@ -15746,9 +16385,9 @@
               beats: [
                 "A brilliant scout's eye, Silvia. I'm creeping out onto the northern bluff shelf, staying low on my stomach beneath the crag. Through the red squall, I can see the entire southern basin... Silvia, you were right to have me look.",
                 "The raiders' six heavy baggage wagons are completely buried up to the hubs in the great dune drift three leagues south! Their canvas awnings are torn to shreds and their scouts abandoned their outpost in panic. Look what they dropped right by the descent fissure: a heavy optical spyglass lens in a scorched brass ring, finely etched with their burned ash sigil! I'm pocketing it in my satchel.",
-                "I slipped down the protected rock fissure, completely bypassing the storm on the ridge, and came out right at the base of Cairn III! The stone pillar has survived intact. Beneath the foundation slab lies the copper surveyor's benchmark.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on that plate to reach Watchtower VI?"
+                "I slipped down the protected rock fissure, completely bypassing the storm on the ridge, and came out right at the entrance crag of the watchtower path! Beneath the foundation slab lies the copper surveyor's benchmark plate.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on that plate to reach Watchtower VI?"
               ],
-              hermesReply: "A brilliant tactician's eye, Silvia. I crept along the northern shelf, shielded by the crag, and looked through the storm.\n\nThe raiders' six heavy wagons are completely trapped in the sand dunes three leagues south—their canvas is torn to shreds and they are abandoning their carts! Right by the descent crack, where their scout must have surveyed the gorge, I found a brass optical lens dropped in the dust, etched with their scorched ash sigil. I pocketed it in my satchel—it may reveal how they read our skies.\n\nFrom there, I slipped down the hidden fissure straight to Cairn III. Under the flat sandstone foundation rests the copper plate.\n\nLook at Sheet 7B in your journal: what compass direction was stamped on that plate to guide me to Watchtower VI?"
+              hermesReply: "A brilliant tactician's eye, Silvia. I crept along the northern shelf, shielded by the crag, and looked through the storm.\n\nThe raiders' six heavy wagons are completely trapped in the sand dunes three leagues south—their canvas is torn to shreds and they are abandoning their carts! Right by the descent crack, where their scout must have surveyed the gorge, I found a brass optical lens dropped in the dust, etched with their scorched ash sigil. I pocketed it in my satchel—it may reveal how they read our skies.\n\nFrom there, I slipped down the hidden fissure straight to the entrance benchmark of the watchtower path. Under the flat sandstone foundation rests the copper plate.\n\nLook at Sheet 7B in your journal: what compass direction was stamped on that plate to guide me to Watchtower VI?"
             }
           ]
         },
@@ -15758,7 +16397,7 @@
           choices: [
             {
               id: "choice-3-bearing-direct",
-              silviaMsg: "Under the third cairn, your notes indicate a copper plate pointing 112° East toward Outer Watchtower VI.",
+              silviaMsg: "According to your notes on Sheet 7B, the benchmark plate points 112° East toward Outer Watchtower VI.",
               hermesReply: "112 degrees East... I cleared away the drifted sand with my knife, and the green metal showed the letters: '112° E // WATCHTOWER VI'.\n\nI aligned my field compass, fixed my eyes on the heading, and followed the base of the bluff. Through the swirling dust, a heavy wooden door appeared in the rock! The lock was stiff, but the old key turned with a loud click."
             }
           ]
@@ -15886,43 +16525,44 @@
         {
           step: 1,
           divider: "The Dry River · Wadi al-Hajar",
-          hermesInitial: "I am standing in Wadi al-Hajar now. It is wider than a street, with red walls on both sides and a floor of smooth gray stones, polished by water that left long ago. The silence is even deeper down here.\n\nBut something strange is happening, Silvia. The map says the safe road runs west, toward the canyon. And my feet want to turn south, along the river.\n\nI have no reason for it. It is only a hunch, a pull like a hand on my sleeve. Do I trust it?",
+          hermesInitial: "I am standing in Wadi al-Hajar now. It is wider than a street, with red walls on both sides and a floor of smooth gray stones, polished by water that left long ago. The silence is even deeper down here.\n\nThe map on Sheet 8B marks the safe road running west, straight to the canyon mouth. But my feet want to turn south, following this dry river into the unknown.\n\nI have no reason for it, Silvia. It is only a hunch, a pull like a quiet hand on my sleeve. Do I trust it, or do we stick strictly to the surveyor's line?",
           sketch: { src: "./assets/chat/sketch_dry_wash.webp", caption: "The dry riverbed, from the ledge below the watchtower." },
           choices: [
             {
               id: "dawn-1-trust",
               tone: "warm",
-              text: "Trust it. A hunch is just an old memory that you can't read yet.",
-              silviaMsg: "Trust it, Hermes. A hunch is just an old memory that you cannot read yet. Follow the river, and tell me what you find.",
-              hermesReply: "An old memory I cannot read yet. I like that. It is a kinder name than a foolish old man's whim.\n\nI am following the river south, one stone at a time."
+              text: "Trust it, Hermes. A hunch is just an old memory you cannot read yet. Follow the river south, and tell me what you find.",
+              silviaMsg: "Trust it, Hermes. A hunch is just an old memory you cannot read yet. Follow the river south, and tell me what you find.",
+              hermesReply: "An old memory I cannot read yet... I like that. It is a kinder name than a foolish old man's whim.\n\nI am following the river south, one stone at a time."
             },
             {
               id: "dawn-1-marker",
               tone: "tactical",
-              text: "Follow it, but leave a marker every hundred steps so we can find the way back.",
-              silviaMsg: "Follow it, but leave a marker every hundred steps so we can always find the way back. Mark the gravel with a stripe of chalk.",
-              hermesReply: "Chalk stripes on the stones, every hundred steps. Done. Nobody will lose me in this riverbed, not even me.\n\nI am walking south along the river."
+              text: "Go take a look, Hermes, but leave a chalk mark every hundred paces. If it's nothing or looks dangerous, do not touch anything and turn back.",
+              silviaMsg: "Go take a look, Hermes, but leave a chalk mark every hundred paces. If it's nothing or looks dangerous, do not touch anything and turn back.",
+              hermesReply: "Chalk stripes on the stones, every hundred paces. Done. I will inspect the riverbed, but I will keep my hands in my pockets until you give the word.\n\nI am walking south along the dry river."
             },
             {
-              id: "dawn-1-slow",
+              id: "dawn-1-reject",
               tone: "protective",
-              text: "Go slowly, and tell me everything you see. Stop the moment anything looks wrong.",
-              silviaMsg: "Go slowly, Hermes, and tell me everything you see. Stop the moment anything looks wrong.",
-              hermesReply: "Slowly, and I will describe everything. Gray stones, red walls, my own shadow... nothing wrong yet. Nothing at all.\n\nI am walking south along the river."
+              isBypass: true,
+              text: "No, Hermes. Do not chase hunches in an empty desert. The map says west to the canyon. Keep your canteen full and head straight to the portal.",
+              silviaMsg: "No, Hermes. Do not chase hunches in an empty desert. The map says west to the canyon. Keep your canteen full and head straight to the portal.",
+              hermesReply: "You are right, Silvia. A surveyor who follows whims in the waste is a surveyor who does not come back. The sun is climbing, and our water is too precious for ghost hunts.\n\nI am turning west, away from the river, following the hard rock shelf straight toward the gorge."
             }
           ]
         },
         {
           step: 2,
           divider: "The Heart of the River",
-          hermesInitial: "Silvia! Stop everything. Look at what the river was hiding.\n\nA heap of stones, half buried in silt. They are round river stones, not cut sandstone, and somebody stacked them into a cone by hand. A long time ago, judging by the dust on them. I know this shape, and I cannot tell you how.\n\nAt the foot of the heap there is a flat slab with three round hollows cut into it, three foundations in a row. Four stones of different sizes lie on the first one, the largest at the bottom. A line of old letters on the slab says that the pile must be carried to the third hollow, one stone at a time, never a big stone on a small one.\n\nMy hands are shaking from thirst and my head is foggy. You see this better from where you are. Will you guide me?",
+          hermesInitial: "Silvia! Stop everything. Look at what the river was hiding.\n\nA heap of stones, half buried in silt. They are round river stones, not cut sandstone, and somebody stacked them into a cone by hand. A long time ago, judging by the dust on them. I know this shape, and I cannot tell you how.\n\nAt the foot of the heap there is a flat slab with three round hollows cut into it, three foundations in a row. Four stones of different sizes lie on the first one, the largest at the bottom. A line of old letters on the slab says that the pile must be carried to the third hollow, one stone at a time, never a big stone on a small one.\n\nMy hands are shaking from thirst and my head is foggy. You see this better from where you are. What should we do?",
           sketch: { src: "./assets/chat/sketch_cairn_one.webp", caption: "Half buried in silt: river stones, stacked by an old hand." },
           game: true
         },
         {
           step: 3,
           divider: "The North Portal",
-          hermesFinal: "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Seal of Cairn I.\n\nI have no idea what it opens. But the Order does not hide things without a reason, so it goes into the front pocket of my satchel, and I will carry it carefully.\n\n{TONE}\n\nI followed the river to its end, and the red walls closed in around me. At the end of the wash the rock splits open into a narrow gate: the North Portal of the Whispering Chasm. The wind is already murmuring inside, so softly that I can almost make out words.\n\nOpen the Grand Desert Map, Silvia, and check Sheet 9B. This is where the canyon begins.",
+          hermesFinal: "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Wash River seal.\n\nI have no idea what it opens. But the Order does not hide things without a reason, so it goes into the front pocket of my satchel, and I will carry it carefully.\n\n{TONE}\n\nI followed the river to its end, and the red walls closed in around me. At the end of the wash the rock splits open into a narrow gate: the North Portal of the Whispering Chasm. The wind is already murmuring inside, so softly that I can almost make out words.\n\nOpen the Grand Desert Map, Silvia, and check Sheet 9B. This is where the canyon begins.",
           sketch: { src: "./assets/chat/sketch_chasm_mouth.webp", caption: "The North Portal of the Whispering Chasm." }
         }
       ];
@@ -16190,6 +16830,7 @@
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
 
+      if (typeof syncSilviaWaypointBaseline === 'function') syncSilviaWaypointBaseline();
       let wireCurrentStep = 0;
       let wireHistory = [];
       try {
@@ -16234,16 +16875,17 @@
           const parsedDawn = JSON.parse(savedDawnChoices);
           if (Array.isArray(parsedDawn)) dawnHistory = parsedDawn;
         }
-        if (localStorage.getItem('order_cairn1_completed') === 'true') dawnStep = DAWN_DONE;
+        const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+        if (localStorage.getItem('order_cairn1_completed') === 'true' || isBypassed) dawnStep = DAWN_DONE;
         if (savedDawn === null && (isChasmDoneForWire || wireCurrentStep >= 5)) {
           dawnStep = DAWN_DONE;
-          if (localStorage.getItem('order_cairn1_completed') !== 'true') {
+          if (!isBypassed && localStorage.getItem('order_cairn1_completed') !== 'true') {
             localStorage.setItem('order_cairn1_completed', 'true');
             localStorage.setItem('order_seal_cairn_1', 'true');
           }
         }
         localStorage.setItem('order_dawn_step', String(dawnStep));
-        if (dawnStep >= 2) localStorage.setItem('order_cairn1_found', 'true');
+        if (dawnStep >= 2 && !isBypassed) localStorage.setItem('order_cairn1_found', 'true');
       } catch (e) {}
 
       // Persistent Read Inquiries Tracking
@@ -16311,7 +16953,7 @@
         '5': { title: 'The Zodiacal Engine', note: 'The crossword whose words open the console of the underground outpost.', thumb: './assets/thumbnails/zodiac_journal_preview.webp', path: 'constellation', node: 7, nodeLabel: 'Station 07 · The Zodiacal Engine' },
         '6': { title: 'Midnight Calibration & Transit', note: 'Calibrate the star heights, then trace the six chords of distant light.', thumb: './assets/thumbnails/midnight_calibration_preview.webp', path: 'constellation', node: 8, nodeLabel: 'Station 08 · Midnight Calibration' },
         '7': { title: 'The Celestial Cipher', note: 'The coordinate dial that hides the old vow of the Order.', path: 'constellation', node: 9, nodeLabel: 'Station 09 · The Celestial Cipher' },
-        '7B': { title: 'Field Log: The Desert Frontier', note: "Hermes's survey notes from 1998: the three cairns, the copper plate and the bearing to Watchtower VI." },
+        '7B': { title: 'Field Log: The Desert Frontier', note: "Hermes's survey notes from 1998: the Three Cairns along the canyon wash, the copper benchmark plate beneath Cairn III, and the 112° E bearing to Outer Watchtower VI." },
         '8A': { title: 'The Desert', note: 'Sun, silence and buried stone. The Three Laws of the Waste: the Meridian Shadow, the Dry Wash and the Benchmark Plate.' },
         '8B': { title: 'Grand Desert Map · North-West', note: 'The first quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_1_nw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '9A': { title: 'Grand Desert Map · North-East', note: 'The second quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_2_ne.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
@@ -16538,9 +17180,9 @@
           name: "1998 Brass Surveyor's Compass",
           category: "Survey Instrument",
           image: "assets/items/item_brass_compass.png",
-          origin: "Niche of Cairn II · Survey of 1998",
+          origin: "Cairn III · Wash Survey of 1998",
           summary: "A heavy brass pocket compass engraved with celestial degree coordinates.",
-          lore: "Hermes's precision field compass from twenty-eight years ago, stored inside a dry stone niche of Cairn II. Its balanced blued-steel needle still responds with absolute fidelity to the desert's magnetic meridians."
+          lore: "Hermes's precision field compass from twenty-eight years ago, preserved inside a dry stone niche at the foundation of Cairn III. Guided by the 112° E copper benchmark plate buried beneath its slab, it guided Hermes through the blinding sandstorm up the ridge to Outer Watchtower VI. Its balanced blued-steel needle still responds with absolute fidelity to the desert's magnetic meridians."
         },
         spyglass_lens: {
           id: "spyglass_lens",
@@ -16550,6 +17192,15 @@
           origin: "Northern Bluff Shelf · Dropped by Raiders",
           summary: "A convex tempered optical lens set in a charred brass ring, etched with ash sigils.",
           lore: "Dropped on the bluff edge by the scouts of the BC Ashes while surveying the gorge. The optical curvature of the glass is ground specifically to calculate the path of the Grand Eclipse."
+        },
+        seal_cairn_1: {
+          id: "seal_cairn_1",
+          name: "Wash River Seal · Cairn I",
+          category: "Sacred Seal",
+          image: "assets/chat/sketch_cairn_one.webp",
+          origin: "Wadi al-Hajar · Under Foundation of Cairn I",
+          summary: "A flat sandstone disc carved with the radiant sun above a wavy water line.",
+          lore: "Discovered inside the hollow bedrock beneath the third foundation of Cairn I after solving the ancient river stone trial. The first of the five sacred seals of the Order required to unseal Tower II."
         }
       };
 
@@ -16558,7 +17209,12 @@
           const raw = localStorage.getItem('order_satchel_expedition_item');
           if (raw) return JSON.parse(raw);
         } catch(e) {}
-        return null;
+        return {
+          id: "surveyor_compass",
+          name: "1998 Brass Surveyor's Compass",
+          icon: "🧭",
+          desc: "Precision surveyor compass retrieved from the stone foundation of Cairn III."
+        };
       }
 
       function setSatchelExpeditionItem(item) {
@@ -16574,17 +17230,25 @@
       window.setSatchelExpeditionItem = setSatchelExpeditionItem;
 
       function getOwnedRelicIds() {
-        let list = ['gilded_feather', 'order_wax_seal'];
+        let list = ['gilded_feather', 'order_wax_seal', 'surveyor_compass'];
         try {
           const raw = localStorage.getItem('order_inventory_relics');
           if (raw) {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) list = parsed;
+            if (Array.isArray(parsed)) {
+              parsed.forEach(id => { if (!list.includes(id)) list.push(id); });
+            }
           }
         } catch(e) {}
         const expItem = getSatchelExpeditionItem();
         if (expItem && expItem.id && !list.includes(expItem.id)) {
           list.push(expItem.id);
+        }
+        if (!list.includes('surveyor_compass')) {
+          list.push('surveyor_compass');
+        }
+        if (localStorage.getItem('order_seal_cairn_1') === 'true' || localStorage.getItem('order_cairn1_completed') === 'true') {
+          if (!list.includes('seal_cairn_1')) list.push('seal_cairn_1');
         }
         return list;
       }
@@ -16750,7 +17414,7 @@
           if (item.id === 'flint_tinder') {
             fireDetails = "Using that dry juniper root and the 1998 flint we recovered from the canyon bed, I struck a spark in the fireplace. The hearth is roaring warm, filling the room with the fragrant scent of cedar and juniper smoke.";
           } else if (item.id === 'surveyor_compass') {
-            fireDetails = "I found dry cedar wood in the corner and lit a spark in the fireplace. On the wooden table, I set down that brass surveyor's compass from Cairn II—its needle is humming with the ancient magnetic lines of the desert.";
+            fireDetails = "I found dry cedar wood in the corner and lit a spark in the fireplace. On the wooden table, I set down that brass surveyor's compass from 1998—its needle is humming with the ancient magnetic lines of the desert.";
           } else if (item.id === 'spyglass_lens') {
             fireDetails = "I found dry cedar wood in the corner and lit a spark in the fireplace. Under the glow of the flames, I examined the raider's scorched lens from the bluff—its optical curvature is ground specifically to track our stars!";
           }
@@ -16760,10 +17424,14 @@
 
       function isStormOver() {
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('storm_over') === '1' || urlParams.get('dawn') === '1') return true;
-        const target = typeof window.getStormTargetTime === 'function' ? window.getStormTargetTime() : 1792260000000;
-        return Date.now() >= target;
+        if (urlParams.get('test_storm_lock') === '1') return false;
+        return true;
       }
+      window.skipStormWait = function () {
+        localStorage.setItem('order_storm_tester_bypassed', 'true');
+        removeShelterStormWaitBox();
+        beginDawnStep(Math.max(1, dawnStep));
+      };
 
       let shelterTimerInterval = null;
 
@@ -16772,13 +17440,17 @@
         const box = document.createElement('div');
         box.className = 'shelter-storm-wait-box';
         box.id = 'shelter-storm-wait-box';
+        const isTester = (typeof isCarlesTester === 'function' && isCarlesTester()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
+        const adminBtnHtml = isTester
+          ? `<div style="margin-top:14px; text-align:center;"><button type="button" id="btn-admin-skip-storm" style="padding:6px 14px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.08em; cursor:pointer; text-transform:uppercase;">⚡ Carles Tester: Skip Storm Wait ➔</button></div>`
+          : '';
         box.innerHTML = `
           <div class="ssw-header">
             <span class="ssw-icon">⏳</span>
-            <span class="ssw-title">WATCHTOWER VI SECURED · WAITING OUT THE CATACLYSMIC SANDSTORM</span>
+            <span class="ssw-title">WATCHTOWER VI · THE GREAT SILENCE BEFORE THE DESERT</span>
           </div>
           <p class="ssw-desc">
-            ${getCartographerTitle()} is safely sheltered inside Watchtower VI by the hearth fire while the red sandstorm rages across the desert canyons. The open waste is impassable until the gale subsides.
+            ${getCartographerTitle()} is safely sheltered inside Watchtower VI by the hearth fire while the remaining red sandstorm winds subside across the outer canyons. The open waste to Wadi al-Hajar is impassable until the gale clears completely.
           </p>
           <div class="ssw-timer-row">
             <span class="ssw-timer-label">STORM SUBSIDES IN:</span>
@@ -16792,24 +17464,34 @@
               <span class="ssw-cd-segment"><strong id="ssw-cd-secs">00</strong><small>s</small></span>
             </div>
           </div>
-          <div class="ssw-subtext">The Great Silence & Wadi al-Hajar unlock Saturday at 20:00 CEST.</div>
+          <div class="ssw-subtext">Wadi al-Hajar & The Dry Riverbed unlock Sunday, October 18 at 14:00 CEST.</div>
+          ${adminBtnHtml}
         `;
+        const adminBtn = box.querySelector('#btn-admin-skip-storm');
+        if (adminBtn) {
+          adminBtn.addEventListener('click', () => {
+            localStorage.setItem('order_storm_tester_bypassed', 'true');
+            if (shelterTimerInterval) clearInterval(shelterTimerInterval);
+            removeShelterStormWaitBox();
+            beginDawnStep(Math.max(1, dawnStep));
+          });
+        }
         wireMessagesStream.appendChild(box);
         box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
         function updateShelterCountdown() {
-          const target = typeof window.getStormTargetTime === 'function' ? window.getStormTargetTime() : 1792260000000;
+          const target = typeof window.getStormTargetTime === 'function' ? window.getStormTargetTime() : (window.SUNDAY_OCT_18_2026_2PM || 1792324800000);
           const diff = Math.max(0, target - Date.now());
 
           if (diff <= 0) {
             clearInterval(shelterTimerInterval);
             removeShelterStormWaitBox();
             if (sfx && typeof sfx.playCelestialChime === 'function') sfx.playCelestialChime();
-            appendWireMessage('SYSTEM TELEMETRY', '✦ THE CATACLYSMIC SANDSTORM HAS SUBSIDED · THE GREAT SILENCE BEGINS ✦', true);
+            appendWireMessage('SYSTEM TELEMETRY', '✦ THE CATACLYSMIC SANDSTORM HAS SUBSIDED · WADI AL-HAJAR UNLOCKED ✦', true, false, null, null, { type: 'dawn', step: 1 });
             if (typeof window.SandstormLockdown === 'object' && window.SandstormLockdown.deactivate) {
               window.SandstormLockdown.deactivate();
             }
-            beginDawnStep(0);
+            beginDawnStep(Math.max(1, dawnStep));
             return;
           }
 
@@ -16901,29 +17583,184 @@
       function appendStepIntro(stepIdx) {
         if (WIRE_STEP_DIVIDERS[stepIdx]) appendWireDivider(WIRE_STEP_DIVIDERS[stepIdx]);
         if (EXPEDITION_THREAD[stepIdx] && EXPEDITION_THREAD[stepIdx].hermesInitial) {
-          appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[stepIdx].hermesInitial);
+          appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[stepIdx].hermesInitial, false, false, null, null, { type: 'expedition', step: stepIdx });
         }
       }
 
-      function appendWireMessage(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null) {
-        const el = appendWireMessageCore(sender, text, isSystem, isLive, onComplete, targetStream);
+      function isCarlesTester() {
+        if (typeof window.isAdminTester === 'function' && window.isAdminTester()) return true;
+        const u = String((typeof currentSeeker !== 'undefined' && currentSeeker) || (window.currentSeeker || '') || localStorage.getItem('the_eclipse_active_seeker') || '').toLowerCase();
+        if (u === 'carles') return true;
+        if (document.body && document.body.getAttribute('data-active-seeker') === 'carles') return true;
+        return false;
+      }
+      window.isCarlesTester = isCarlesTester;
+
+      function rewindToExpeditionStep(targetStep) {
+        if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();
+        window.__wireTypewriterToken = (window.__wireTypewriterToken || 0) + 1;
+        showTyping(false);
+
+        const isSilvia = (localStorage.getItem('the_eclipse_active_seeker') || (window.currentSeeker || 'Silvia')).toLowerCase() === 'silvia';
+        targetStep = Math.max(isSilvia ? 4 : 0, Math.min(8, Number(targetStep) || 0));
+        wireCurrentStep = targetStep;
+        wireHistory = wireHistory.slice(0, targetStep);
+
+        try {
+          localStorage.setItem('order_field_wire_step', targetStep.toString());
+          localStorage.setItem('order_field_wire_choices', JSON.stringify(wireHistory));
+        } catch(e) {}
+
+        if (targetStep <= 1) {
+          try {
+            localStorage.removeItem('order_cartographer_title');
+          } catch(e) {}
+          setCartographerTitle('HERMES · CARTOGRAPHER');
+        }
+
+        if (targetStep <= 2) {
+          try {
+            localStorage.removeItem('order_satchel_expedition_item');
+            localStorage.setItem('order_inventory_relics', JSON.stringify(['gilded_feather', 'order_wax_seal']));
+          } catch(e) {}
+          if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
+          if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
+          if (typeof window.updateInventoryBadge === 'function') window.updateInventoryBadge();
+        }
+
+        if (targetStep <= 4) {
+          try {
+            if (targetStep < 4) localStorage.removeItem('order_field_wire_completed');
+            localStorage.removeItem('order_dawn_step');
+            localStorage.removeItem('order_dawn_choices');
+            localStorage.removeItem('order_cairn1_bypassed');
+            localStorage.removeItem('order_cairn1_completed');
+            localStorage.removeItem('order_cairn1_optimal');
+            localStorage.removeItem('order_seal_cairn_1');
+            localStorage.removeItem('order_cairn1_found');
+            localStorage.removeItem('order_cairn1_locked_until_3_cairns');
+            localStorage.removeItem('order_chasm_march_start');
+            localStorage.removeItem('order_chasm_march_bypassed');
+            removeShelterStormWaitBox();
+          } catch(e) {}
+          dawnStep = 0;
+          dawnHistory = [];
+          if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
+          if (typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
+        }
+
+        if (typeof window.refreshTelegraphSignal === 'function') {
+          window.refreshTelegraphSignal();
+        }
+
+        renderWireExpedition();
+        markMessengerAsRead();
+      }
+      window.rewindToExpeditionStep = rewindToExpeditionStep;
+
+      function rewindToDawnStep(targetDawnStep) {
+        if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();
+        window.__wireTypewriterToken = (window.__wireTypewriterToken || 0) + 1;
+        showTyping(false);
+
+        targetDawnStep = Math.max(0, Math.min(DAWN_DONE, Number(targetDawnStep) || 0));
+
+        // When in dawn, expedition thread is at step 4
+        wireCurrentStep = 4;
+        try {
+          localStorage.setItem('order_field_wire_step', '4');
+          localStorage.setItem('order_field_wire_completed', 'true');
+          localStorage.removeItem('order_chasm_march_start');
+          localStorage.removeItem('order_chasm_march_bypassed');
+        } catch(e) {}
+
+        dawnStep = targetDawnStep;
+        dawnHistory = dawnHistory.slice(0, targetDawnStep);
+
+        if (targetDawnStep < DAWN_DONE) {
+          try {
+            localStorage.removeItem('order_cairn1_bypassed');
+            localStorage.removeItem('order_cairn1_completed');
+            localStorage.removeItem('order_cairn1_optimal');
+            localStorage.removeItem('order_seal_cairn_1');
+            localStorage.removeItem('order_cairn1_locked_until_3_cairns');
+            if (targetDawnStep < 2) {
+              localStorage.removeItem('order_cairn1_found');
+            }
+          } catch(e) {}
+          if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
+        }
+        removeShelterStormWaitBox();
+
+        persistDawn();
+        if (typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
+
+        renderWireExpedition();
+        markMessengerAsRead();
+      }
+      window.rewindToDawnStep = rewindToDawnStep;
+
+      function attachRewindHandler(btn, meta) {
+        if (!btn) return;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          if (!meta) {
+            rewindToExpeditionStep(0);
+            return;
+          }
+          if (meta.type === 'dawn') {
+            if (meta.step >= DAWN_DONE) {
+              rewindToDawnStep(2);
+            } else {
+              rewindToDawnStep(meta.step);
+            }
+          } else if (meta.type === 'inquiry') {
+            const bubbleWrap = btn.closest('.chat-bubble-wrap');
+            if (bubbleWrap) bubbleWrap.remove();
+          } else {
+            rewindToExpeditionStep(meta.step);
+          }
+        });
+      }
+
+      function appendWireMessage(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null, meta = null) {
+        const el = appendWireMessageCore(sender, text, isSystem, isLive, onComplete, targetStream, meta);
         noteNewMessage();
         return el;
       }
 
-      function appendWireMessageCore(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null) {
+      function appendWireMessageCore(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null, meta = null) {
         const stream = targetStream || (currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream);
         if (!stream) return null;
         const msgEl = document.createElement('div');
         const isSilvia = sender.toLowerCase().includes('silvia');
 
+        const effectiveMeta = meta || (
+          (stream === wireInquiriesStream || currentWireTab === 'inquiries')
+            ? { type: 'inquiry' }
+            : (wireCurrentStep === 4 && (isDawnDone() || dawnStep > 0))
+              ? { type: 'dawn', step: dawnStep }
+              : { type: 'expedition', step: wireCurrentStep }
+        );
+
+        let rewindBtnHtml = '';
+        if (isCarlesTester()) {
+          rewindBtnHtml = `<button type="button" class="carles-rewind-btn" title="Rewind conversation here" aria-label="Rewind conversation here"><span>↺</span></button>`;
+        }
+
         if (isSystem) {
           msgEl.className = 'chat-bubble-wrap system-event';
           msgEl.innerHTML = `
-            <div class="chat-bubble">
-              <span>${text}</span>
+            <div class="chat-bubble-row" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+              <div class="chat-bubble">
+                <span>${text}</span>
+              </div>
+              ${rewindBtnHtml}
             </div>
           `;
+          const btn = msgEl.querySelector('.carles-rewind-btn');
+          if (btn) attachRewindHandler(btn, effectiveMeta);
           stream.appendChild(msgEl);
           msgEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           if (typeof onComplete === 'function') onComplete();
@@ -16939,6 +17776,7 @@
           msgEl.innerHTML = `
             <div class="chat-sender-name">${senderDisplay}</div>
             <div class="chat-bubble-row">
+              ${rewindBtnHtml}
               <div class="chat-bubble">
                 <div class="chat-bubble-text">${formattedText}</div>
                 <span class="chat-bubble-time">${getWireTimestamp()}${checks}</span>
@@ -16948,6 +17786,8 @@
               </div>
             </div>
           `;
+          const btn = msgEl.querySelector('.carles-rewind-btn');
+          if (btn) attachRewindHandler(btn, effectiveMeta);
           stream.appendChild(msgEl);
           msgEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           if (typeof onComplete === 'function') onComplete();
@@ -16961,11 +17801,16 @@
           const formattedText = formatJournalCallouts(text).split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
           msgEl.innerHTML = `
             <div class="chat-sender-name">${senderDisplay}</div>
-            <div class="chat-bubble">
-              <div class="chat-bubble-text">${formattedText}</div>
-              <span class="chat-bubble-time">${getWireTimestamp()}</span>
+            <div class="chat-bubble-row">
+              <div class="chat-bubble">
+                <div class="chat-bubble-text">${formattedText}</div>
+                <span class="chat-bubble-time">${getWireTimestamp()}</span>
+              </div>
+              ${rewindBtnHtml}
             </div>
           `;
+          const btn = msgEl.querySelector('.carles-rewind-btn');
+          if (btn) attachRewindHandler(btn, effectiveMeta);
           stream.appendChild(msgEl);
           if (typeof onComplete === 'function') onComplete();
           return msgEl;
@@ -16974,11 +17819,16 @@
         // Live typewriter effect for new incoming Hermes dispatch
         msgEl.innerHTML = `
           <div class="chat-sender-name">${senderDisplay}</div>
-          <div class="chat-bubble highlight-pulse">
-            <div class="chat-bubble-text"><span class="telegraph-typewriter-target"></span><span class="telegraph-cursor"></span></div>
-            <span class="chat-bubble-time">${getWireTimestamp()}</span>
+          <div class="chat-bubble-row">
+            <div class="chat-bubble highlight-pulse">
+              <div class="chat-bubble-text"><span class="telegraph-typewriter-target"></span><span class="telegraph-cursor"></span></div>
+              <span class="chat-bubble-time">${getWireTimestamp()}</span>
+            </div>
+            ${rewindBtnHtml}
           </div>
         `;
+        const btn = msgEl.querySelector('.carles-rewind-btn');
+        if (btn) attachRewindHandler(btn, effectiveMeta);
         stream.appendChild(msgEl);
 
         // Smooth scroll to focus on newly arriving dispatch
@@ -16991,9 +17841,10 @@
         let charIdx = 0;
         const totalChars = text.length;
         let lastSoundTime = 0;
+        const myToken = (window.__wireTypewriterToken = (window.__wireTypewriterToken || 0));
 
         function typeTick() {
-          if (!targetSpan) return;
+          if (!targetSpan || !targetSpan.isConnected || myToken !== window.__wireTypewriterToken) return;
           const chunk = Math.min(Math.max(5, Math.ceil(totalChars / 70)), totalChars - charIdx);
           charIdx += chunk;
           const currentSub = text.substring(0, charIdx);
@@ -17024,6 +17875,33 @@
         if (sfx && typeof sfx.playTelegraphArrival === 'function') sfx.playTelegraphArrival();
         typeTick();
         return msgEl;
+      }
+
+      // A graphite sketch that Hermes attaches to the conversation
+      function appendWireSketch(src, caption, meta = null) {
+        if (!wireMessagesStream) return;
+        const el = document.createElement('div');
+        el.className = 'chat-bubble-wrap incoming';
+        let rewindBtnHtml = '';
+        if (isCarlesTester()) {
+          rewindBtnHtml = `<button type="button" class="carles-rewind-btn" title="Rewind conversation here" aria-label="Rewind conversation here"><span>↺</span></button>`;
+        }
+        el.innerHTML = `
+          <div class="chat-sender-name">${getCartographerTitle()}</div>
+          <div class="chat-bubble-row">
+            <div class="chat-bubble chat-sketch-bubble">
+              <img src="${src}" alt="${caption}" loading="lazy">
+              <div class="chat-sketch-cap">${caption}</div>
+              <span class="chat-bubble-time">${getWireTimestamp()}</span>
+            </div>
+            ${rewindBtnHtml}
+          </div>
+        `;
+        const btn = el.querySelector('.carles-rewind-btn');
+        if (btn) attachRewindHandler(btn, meta || { type: 'dawn', step: 2 });
+        wireMessagesStream.appendChild(el);
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        noteNewMessage();
       }
 
       // =======================================================================
@@ -17067,46 +17945,66 @@
         return best;
       }
 
+      const CHASM_MARCH_HOURS = 26;
+      const CHASM_MARCH_MS = CHASM_MARCH_HOURS * 3600 * 1000;
+
+      function getChasmMarchProgress() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('skip_march') === '1' || urlParams.get('chasm_ready') === '1') return 1.0;
+        if (localStorage.getItem('order_chasm_march_bypassed') === 'true') return 1.0;
+        const start = parseInt(localStorage.getItem('order_chasm_march_start') || '0', 10);
+        if (!start) return 0.0;
+        return Math.max(0, Math.min(1.0, (Date.now() - start) / CHASM_MARCH_MS));
+      }
+
+      function isChasmMarchOver() {
+        return getChasmMarchProgress() >= 1.0;
+      }
+      window.isChasmMarchOver = isChasmMarchOver;
+      window.skipChasmMarch = function () {
+        localStorage.setItem('order_chasm_march_bypassed', 'true');
+        if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
+        renderWireExpedition();
+      };
+
       function dawnMessageText(i) {
         const d = DAWN_THREAD[i];
         if (i === 0) return HERMES_TONE_LINES[dominantTone(false)] + '\n\n' + d.hermesInitial;
-        if (i === DAWN_DONE) return d.hermesFinal.replace('{TONE}', HERMES_TONE_FINALE[dominantTone(true)]);
+        if (i === DAWN_DONE) {
+          const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+          const isOptimal = localStorage.getItem('order_cairn1_optimal') === 'true';
+          if (isBypassed) {
+            return "You are right, Silvia. A surveyor who follows whims in the waste is a surveyor who does not come back. The sun is climbing, and our water is too precious for ghost hunts.\n\nI am leaving the river stones untouched in the wash and turning west, following the hard rock shelf directly toward the gorge. It will be a grueling 26-hour trek across the scree slopes to reach the North Portal, but the rock is solid underfoot.\n\nTrack my beacon across the western ridge on the Grand Desert Map. I will keep the wire on low-power standby and radio in the moment I reach the canyon mouth.";
+          }
+          const optimalPraise = isOptimal
+            ? "Fifteen lifts—exactly fifteen! You moved the four river stones with the pure mathematical economy of the ancient surveyors, Silvia. Not a single stone was lifted in vain.\n\n"
+            : "";
+          return (optimalPraise + "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Wash River seal.\n\nI have no idea what it opens, but into my satchel it goes.\n\n{TONE}\n\nNow look ahead, Silvia. The riverbed ends against a colossal wall of red basalt, where the Whispering Chasm splits the mountain. It is a long, grueling trek across the broken wash and scree slopes to reach that fissure—at least 26 hours of hard walking through the heat and dust.\n\nI am tightening my boots, filling my canteen from the cool silt reservoir, and setting out right now. Follow my beacon on the Grand Desert Map. I will keep the wire on low-power standby and radio in the moment I sight the canyon mouth.").replace('{TONE}', HERMES_TONE_FINALE[dominantTone(true)]);
+        }
         return d.hermesInitial;
-      }
-
-      // A graphite sketch that Hermes attaches to the conversation
-      function appendWireSketch(src, caption) {
-        if (!wireMessagesStream) return;
-        const el = document.createElement('div');
-        el.className = 'chat-bubble-wrap incoming';
-        el.innerHTML = `
-          <div class="chat-sender-name">${getCartographerTitle()}</div>
-          <div class="chat-bubble chat-sketch-bubble">
-            <img src="${src}" alt="${caption}" loading="lazy">
-            <div class="chat-sketch-cap">${caption}</div>
-            <span class="chat-bubble-time">${getWireTimestamp()}</span>
-          </div>
-        `;
-        wireMessagesStream.appendChild(el);
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        noteNewMessage();
       }
 
       function appendDawnIntro(i, live, done) {
         const d = DAWN_THREAD[i];
         if (d.divider) appendWireDivider(d.divider);
         appendWireMessage('HERMES · CARTOGRAPHER', dawnMessageText(i), false, !!live, () => {
-          if (d.sketch) appendWireSketch(d.sketch.src, d.sketch.caption);
+          if (d.sketch) appendWireSketch(d.sketch.src, d.sketch.caption, { type: 'dawn', step: i });
           if (typeof done === 'function') done();
-        });
+        }, null, { type: 'dawn', step: i });
       }
 
       // Re-draws the dawn conversation when the chat opens. Returns true when the finale is playing live.
       function appendDawnHistory() {
-        const last = Math.min(dawnStep, DAWN_DONE);
+        const stormPending = !isStormOver();
+        const effectiveDawnStep = (stormPending && dawnStep === 1) ? 0 : dawnStep;
+        const last = Math.min(effectiveDawnStep, DAWN_DONE);
         for (let s = 0; s <= last; s++) {
           const d = DAWN_THREAD[s];
           if (s === DAWN_DONE) {
+            const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+            const telemetryText = isBypassed
+              ? '✦ NORTH PORTAL REACHED · DRY RIVER UNEXPLORED ✦'
+              : DAWN_TELEMETRY;
             if (window.__dawnFinaleLive) {
               window.__dawnFinaleLive = false;
               wireMessagesStream.classList.remove('is-restoring');
@@ -17115,7 +18013,7 @@
                 showTyping(false);
                 if (sfx) sfx.playCelestialChime();
                 appendDawnIntro(s, true, () => {
-                  appendWireMessage('SYSTEM TELEMETRY', DAWN_TELEMETRY, true);
+                  appendWireMessage('SYSTEM TELEMETRY', telemetryText, true, false, null, null, { type: 'dawn', step: 2 });
                   renderWireChoices();
                   updateMessengerBadge();
                 });
@@ -17123,13 +18021,18 @@
               return true;
             }
             appendDawnIntro(s, false);
-            appendWireMessage('SYSTEM TELEMETRY', DAWN_TELEMETRY, true);
+            appendWireMessage('SYSTEM TELEMETRY', telemetryText, true, false, null, null, { type: 'dawn', step: 2 });
           } else {
             appendDawnIntro(s, false);
-            if (s < dawnStep && d.choices) {
-              const idx = (dawnHistory[s] !== undefined && d.choices[dawnHistory[s]]) ? dawnHistory[s] : 0;
-              appendWireMessage('SILVIA · NAVIGATOR', d.choices[idx].silviaMsg);
-              appendWireMessage('HERMES · CARTOGRAPHER', d.choices[idx].hermesReply);
+            if (s < dawnStep) {
+              if (s === 2 && dawnHistory[2] === 'bypassed') {
+                appendWireMessage('SILVIA · NAVIGATOR', "Do not disturb the stones, Hermes. We don't know who stacked them, and the sun is rising. Walk away and head to the canyon.", false, false, null, null, { type: 'dawn', step: 2 });
+                appendWireMessage('HERMES · CARTOGRAPHER', "You are right. Old stones in a dry wash might be an ancient marker, a raider trap, or simply a waste of precious daylight. I will leave them as they are and head west to the canyon mouth.", false, false, null, null, { type: 'dawn', step: 2 });
+              } else if (d.choices) {
+                const idx = (dawnHistory[s] !== undefined && d.choices[dawnHistory[s]]) ? dawnHistory[s] : 0;
+                appendWireMessage('SILVIA · NAVIGATOR', d.choices[idx].silviaMsg, false, false, null, null, { type: 'dawn', step: s });
+                appendWireMessage('HERMES · CARTOGRAPHER', d.choices[idx].hermesReply, false, false, null, null, { type: 'dawn', step: s });
+              }
             }
           }
         }
@@ -17148,9 +18051,42 @@
         return btn;
       }
 
+      function handleDawnBypassAtStones() {
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        appendWireMessage('SILVIA · NAVIGATOR', "Do not disturb the stones, Hermes. We don't know who stacked them, and the sun is rising. Walk away and head to the canyon.", false, false, null, null, { type: 'dawn', step: 2 });
+        wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        dawnHistory[2] = 'bypassed';
+        try {
+          localStorage.setItem('order_cairn1_bypassed', 'true');
+          localStorage.removeItem('order_cairn1_completed');
+          localStorage.removeItem('order_seal_cairn_1');
+          if (!localStorage.getItem('order_chasm_march_start')) {
+            localStorage.setItem('order_chasm_march_start', String(Date.now()));
+          }
+        } catch (e) {}
+        dawnStep = DAWN_DONE;
+        persistDawn();
+        showTyping(true);
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playChimeHover();
+          appendWireMessage('HERMES · CARTOGRAPHER', "You are right. Old stones in a dry wash might be an ancient marker, a raider trap, or simply a waste of precious daylight. I will leave them as they are and head west to the canyon mouth.", false, true, () => {
+            setTimeout(() => beginDawnStep(DAWN_DONE), 500);
+          }, null, { type: 'dawn', step: 2 });
+        }, 650);
+      }
+
       function renderDawnPrompt() {
         if (!wireChoicesGrid || !wirePromptBox || !wireCompletedBar) return;
+        if (dawnStep >= DAWN_DONE) {
+          renderWireChoices();
+          return;
+        }
         const d = DAWN_THREAD[dawnStep];
+        if (!d) {
+          renderWireChoices();
+          return;
+        }
         const header = document.getElementById('wire-prompt-header-text');
         if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
         wirePromptBox.style.display = 'block';
@@ -17161,16 +18097,22 @@
           localStorage.setItem('order_field_wire_step', '4');
         } catch (e) {}
         if (d.game) {
-          if (header) header.textContent = 'Hermes is waiting at Cairn I:';
-          wireChoicesGrid.appendChild(makeChoicePill('🪨', 'Open Cairn I and guide Hermes, stone by stone.', () => {
+          if (header) header.textContent = 'Hermes stands before the river stones:';
+          wireChoicesGrid.appendChild(makeChoicePill('🪨', 'Examine the slab and guide Hermes: lift the stones one by one.', () => {
             if (typeof window.openCairnOneModal === 'function') window.openCairnOneModal();
+          }));
+          wireChoicesGrid.appendChild(makeChoicePill('👣', 'Do not disturb the stones, Hermes. Walk away and head to the canyon.', () => {
+            handleDawnBypassAtStones();
           }));
           return;
         }
         if (header) header.textContent = 'Choose your reply';
-        d.choices.forEach((choice, idx) => {
-          wireChoicesGrid.appendChild(makeChoicePill('0' + (idx + 1), formatJournalCallouts(choice.text), () => handleDawnChoice(choice, idx)));
-        });
+        if (Array.isArray(d.choices)) {
+          d.choices.forEach((choice, idx) => {
+            wireChoicesGrid.appendChild(makeChoicePill('0' + (idx + 1), formatJournalCallouts(choice.text), () => handleDawnChoice(choice, idx)));
+          });
+        }
+        if (typeof scrollChatToActivePrompt === 'function') scrollChatToActivePrompt(false);
       }
 
       // Hermes types the intro of a dawn step, then the reply choices (or the Cairn I button) appear
@@ -17183,7 +18125,11 @@
           showTyping(false);
           if (sfx) sfx.playCelestialChime();
           appendDawnIntro(i, true, () => {
-            renderDawnPrompt();
+            if (dawnStep >= DAWN_DONE) {
+              renderWireChoices();
+            } else {
+              renderDawnPrompt();
+            }
             updateMessengerBadge();
           });
         }, 700);
@@ -17191,18 +18137,38 @@
 
       function handleDawnChoice(choice, idx) {
         if (sfx) sfx.playMechanicalClick();
-        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+        const currentDawnStep = dawnStep;
+        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg, false, false, null, null, { type: 'dawn', step: currentDawnStep });
         wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
         dawnHistory[dawnStep] = idx;
-        dawnStep = dawnStep + 1;
+        if (choice.isBypass) {
+          try {
+            localStorage.setItem('order_cairn1_bypassed', 'true');
+            localStorage.removeItem('order_cairn1_completed');
+            localStorage.removeItem('order_seal_cairn_1');
+            if (!localStorage.getItem('order_chasm_march_start')) {
+              localStorage.setItem('order_chasm_march_start', String(Date.now()));
+            }
+          } catch (e) {}
+          dawnStep = DAWN_DONE;
+        } else {
+          dawnStep = dawnStep + 1;
+        }
         persistDawn();
         showTyping(true);
         setTimeout(() => {
           showTyping(false);
           if (sfx) sfx.playChimeHover();
           appendWireMessage('HERMES · CARTOGRAPHER', choice.hermesReply, false, true, () => {
-            setTimeout(() => beginDawnStep(dawnStep), 500);
-          });
+            if (currentDawnStep === 0 && !isStormOver()) {
+              if (wirePromptBox) wirePromptBox.style.display = 'none';
+              if (wireCompletedBar) wireCompletedBar.style.display = 'none';
+              renderShelterStormWaitBox();
+              updateMessengerBadge();
+            } else {
+              setTimeout(() => beginDawnStep(dawnStep), 500);
+            }
+          }, null, { type: 'dawn', step: currentDawnStep });
         }, 650);
       }
 
@@ -17212,10 +18178,61 @@
         const live = (wireCurrentStep === 4 && dawnStep === 2);
         dawnStep = DAWN_DONE;
         persistDawn();
+        try {
+          if (!localStorage.getItem('order_chasm_march_start')) {
+            localStorage.setItem('order_chasm_march_start', String(Date.now()));
+          }
+        } catch (e) {}
         if (live) window.__dawnFinaleLive = true;
       });
 
+      function scrollChatToActivePrompt(smooth = false) {
+        const doScroll = () => {
+          const promptBox = document.getElementById('wire-prompt-box');
+          const completedBar = document.getElementById('wire-completed-bar');
+          const activeDeck = (promptBox && promptBox.style.display !== 'none')
+            ? promptBox
+            : ((completedBar && completedBar.style.display !== 'none') ? completedBar : null);
+
+          const target = activeDeck || (wireMessagesStream ? wireMessagesStream.lastElementChild : null);
+          if (target) {
+            target.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'end' });
+          }
+        };
+        doScroll();
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(() => {
+            doScroll();
+            setTimeout(doScroll, 80);
+            setTimeout(doScroll, 220);
+            setTimeout(doScroll, 450);
+          });
+        } else {
+          setTimeout(doScroll, 80);
+          setTimeout(doScroll, 250);
+        }
+      }
+      window.scrollChatToActivePrompt = scrollChatToActivePrompt;
+
       function renderWireExpedition() {
+        if (typeof syncSilviaWaypointBaseline === 'function') syncSilviaWaypointBaseline();
+        try {
+          const savedStep = localStorage.getItem('order_field_wire_step');
+          if (savedStep !== null) wireCurrentStep = parseInt(savedStep, 10);
+          const savedHistory = localStorage.getItem('order_field_wire_choices');
+          if (savedHistory) {
+            const parsed = JSON.parse(savedHistory);
+            if (Array.isArray(parsed)) wireHistory = parsed;
+          }
+          const savedDawn = localStorage.getItem('order_dawn_step');
+          if (savedDawn !== null) dawnStep = Math.max(0, Math.min(DAWN_DONE, parseInt(savedDawn, 10) || 0));
+          const savedDawnChoices = localStorage.getItem('order_dawn_choices');
+          if (savedDawnChoices) {
+            const parsedDawn = JSON.parse(savedDawnChoices);
+            if (Array.isArray(parsedDawn)) dawnHistory = parsedDawn;
+          }
+        } catch(e) {}
+
         if (!wireMessagesStream) return;
         wireMessagesStream.classList.add('is-restoring');
         let dawnFinalePlaying = false;
@@ -17261,25 +18278,23 @@
         }
 
         // 1. Initial opening transmission
-        appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[0].hermesInitial);
+        appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[0].hermesInitial, false, false, null, null, { type: 'expedition', step: 0 });
 
         // 2. Render previous conversation steps from history
         for (let s = 0; s < wireCurrentStep; s++) {
           const stepData = EXPEDITION_THREAD[s];
           if (!stepData) continue;
           if (s === 4) {
-            appendWireMessage(getCartographerTitle(), getHermesFinalForWatchtower());
-            appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
-            if (isDawnDone() || localStorage.getItem('order_whispering_chasm_completed') === 'true' || isStormOver()) {
-              appendDawnHistory();
-            }
+            appendWireMessage(getCartographerTitle(), getHermesFinalForWatchtower(), false, false, null, null, { type: 'expedition', step: 4 });
+            appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true, false, null, null, { type: 'expedition', step: 4 });
+            appendDawnHistory();
             if (EXPEDITION_THREAD[5] && EXPEDITION_THREAD[5].hermesInitial && wireCurrentStep >= 5) {
               appendStepIntro(5);
             }
           }
           if (s === 6) {
-            appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[6].hermesFinal);
-            appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true);
+            appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[6].hermesFinal, false, false, null, null, { type: 'expedition', step: 6 });
+            appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
             if (EXPEDITION_THREAD[7] && EXPEDITION_THREAD[7].hermesInitial && wireCurrentStep >= 7) {
               appendStepIntro(7);
             }
@@ -17294,13 +18309,13 @@
               if (s === 2 && choice.item) {
                 setSatchelExpeditionItem(choice.item);
               }
-              appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+              appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg, false, false, null, null, { type: 'expedition', step: s });
               if (choice.beats && choice.beats.length === 3) {
-                appendWireMessage(getCartographerTitle(), choice.beats[0]);
-                appendWireMessage(getCartographerTitle(), choice.beats[1]);
-                appendWireMessage(getCartographerTitle(), choice.beats[2]);
+                appendWireMessage(getCartographerTitle(), choice.beats[0], false, false, null, null, { type: 'expedition', step: s });
+                appendWireMessage(getCartographerTitle(), choice.beats[1], false, false, null, null, { type: 'expedition', step: s });
+                appendWireMessage(getCartographerTitle(), choice.beats[2], false, false, null, null, { type: 'expedition', step: s });
               } else if (choice.hermesReply) {
-                appendWireMessage(getCartographerTitle(), choice.hermesReply);
+                appendWireMessage(getCartographerTitle(), choice.hermesReply, false, false, null, null, { type: 'expedition', step: s });
               }
             }
           }
@@ -17308,21 +18323,22 @@
 
         // 3. If reached completion step
         if (wireCurrentStep === 4) {
-          appendWireMessage(getCartographerTitle(), getHermesFinalForWatchtower());
-          appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
-          if (isDawnDone() || localStorage.getItem('order_whispering_chasm_completed') === 'true' || isStormOver()) {
-            dawnFinalePlaying = appendDawnHistory();
-          }
+          appendWireMessage(getCartographerTitle(), getHermesFinalForWatchtower(), false, false, null, null, { type: 'expedition', step: 4 });
+          appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true, false, null, null, { type: 'expedition', step: 4 });
+          dawnFinalePlaying = appendDawnHistory();
         } else if (wireCurrentStep === 6) {
-          appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[6].hermesFinal);
-          appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true);
+          appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[6].hermesFinal, false, false, null, null, { type: 'expedition', step: 6 });
+          appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
         } else if (wireCurrentStep >= 8) {
-          appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[8].hermesFinal);
-          appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 14 RECORDED ✦', true);
+          appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[8].hermesFinal, false, false, null, null, { type: 'expedition', step: 8 });
+          appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 14 RECORDED ✦', true, false, null, null, { type: 'expedition', step: 8 });
         }
 
         wireMessagesStream.classList.remove('is-restoring');
-        if (!dawnFinalePlaying) renderWireChoices();
+        if (!dawnFinalePlaying) {
+          renderWireChoices();
+          scrollChatToActivePrompt(false);
+        }
       }
 
       function renderWireChoices() {
@@ -17377,7 +18393,7 @@
         }
 
         if (wireCurrentStep === 4 && !isChasmDone && !isDawnDone()) {
-          if (!isStormOver()) {
+          if (dawnStep >= 1 && !isStormOver()) {
             wirePromptBox.style.display = 'none';
             wireCompletedBar.style.display = 'none';
             renderShelterStormWaitBox();
@@ -17395,8 +18411,70 @@
             wireCompletedBar.style.display = 'flex';
             const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
             const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
-            if (titleEl) titleEl.textContent = 'North Portal Reached · The Whispering Chasm Awaits';
-            if (descEl) descEl.textContent = 'The Seal of Cairn I is in the satchel. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).';
+            const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+            const marchOver = isChasmMarchOver();
+
+            if (!marchOver) {
+              if (titleEl) {
+                titleEl.textContent = isBypassed
+                  ? '✦ Western Shelf Trek in Progress · Heading to North Portal ✦'
+                  : '✦ 26-Hour Trek in Progress · Heading to North Portal ✦';
+              }
+              const updateTrekTimer = () => {
+                if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || isChasmMarchOver()) {
+                  if (window.__chasmMarchTimer) {
+                    clearInterval(window.__chasmMarchTimer);
+                    window.__chasmMarchTimer = null;
+                  }
+                  if (isChasmMarchOver()) renderWireChoices();
+                  return;
+                }
+                const start = parseInt(localStorage.getItem('order_chasm_march_start') || '0', 10);
+                const elapsed = start ? Date.now() - start : 0;
+                const remMs = Math.max(0, CHASM_MARCH_MS - elapsed);
+                const hrs = Math.floor(remMs / 3600000);
+                const mins = Math.floor((remMs % 3600000) / 60000);
+                const secs = Math.floor((remMs % 60000) / 1000);
+                const timeStr = `${String(hrs).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;
+                const routeText = isBypassed
+                  ? 'Hermes left the river stones untouched in the wash and is traversing the western rock shelf directly toward the canyon.'
+                  : 'The Seal of Cairn I is secured in Hermes\' satchel. He is trekking across the dry wash and scree slopes toward the Whispering Chasm.';
+                const isTester = (typeof isCarlesTester === 'function' && isCarlesTester()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
+                const testerBtn = isTester
+                  ? `<div style="margin-top:8px;"><button type="button" id="btn-admin-skip-march" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.06em; cursor:pointer; text-transform:uppercase;">⚡ Carles Tester: Skip 26h Trek ➔</button></div>`
+                  : '';
+                if (descEl) {
+                  descEl.innerHTML = `
+                    ${routeText}
+                    <div style="margin-top:6px; color:#fde68a; font-family:'Cinzel',serif; font-size:0.84rem; letter-spacing:0.05em;">
+                      ⏱️ TREK ETA: ${timeStr} remaining until arrival at North Portal
+                    </div>
+                    ${testerBtn}
+                  `;
+                  const skipBtn = descEl.querySelector('#btn-admin-skip-march');
+                  if (skipBtn) {
+                    skipBtn.onclick = (e) => {
+                      e.stopPropagation();
+                      skipChasmMarch();
+                    };
+                  }
+                }
+              };
+              updateTrekTimer();
+              if (window.__chasmMarchTimer) clearInterval(window.__chasmMarchTimer);
+              window.__chasmMarchTimer = setInterval(updateTrekTimer, 1000);
+            } else {
+              if (window.__chasmMarchTimer) {
+                clearInterval(window.__chasmMarchTimer);
+                window.__chasmMarchTimer = null;
+              }
+              if (titleEl) titleEl.textContent = 'North Portal Reached · The Whispering Chasm Awaits';
+              if (descEl) {
+                descEl.textContent = isBypassed
+                  ? 'Hermes arrived at the canyon mouth via the western shelf. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).'
+                  : 'The Seal of Cairn I is in the satchel. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).';
+              }
+            }
             try {
               localStorage.setItem('order_field_wire_completed', 'true');
               localStorage.setItem('order_field_wire_step', '4');
@@ -17444,7 +18522,7 @@
           consoleEl.id = 'wire-compass-console';
           consoleEl.innerHTML = `
             <div class="tcc-header">
-              <span class="tcc-badge">✦ COPPER REFERENCE PLATE // CAIRN III ✦</span>
+              <span class="tcc-badge">✦ COPPER BENCHMARK PLATE // WATCHTOWER VI ✦</span>
               <span class="tcc-ref">1998 SURVEY NOTES</span>
             </div>
             <p class="tcc-desc">
@@ -17510,7 +18588,7 @@
               handleWireChoiceSelection(currentData.choices[0], 0);
             } else {
               if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();
-              showFeedback('That heading does not align with the canyon wash. Check the stamped copper plate beneath Cairn III on Sheet 7B.');
+              showFeedback('That heading does not align with the trail. Check the stamped copper plate for Watchtower VI on Sheet 7B.');
             }
           }
 
@@ -17546,18 +18624,18 @@
 
       function handleWireChoiceSelection(choice, choiceIdx) {
         if (sfx) sfx.playMechanicalClick();
+        const justAnsweredStep = wireCurrentStep;
         if (choice.nameTitle) {
           setCartographerTitle(choice.nameTitle);
         }
-        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg);
+        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg, false, false, null, null, { type: 'expedition', step: justAnsweredStep });
 
         // Temporarily disable buttons and inputs in grid
         const allInteractive = wireChoicesGrid.querySelectorAll('button, input');
         allInteractive.forEach(b => b.disabled = true);
 
         // Record history and advance step
-        wireHistory[wireCurrentStep] = choiceIdx;
-        const justAnsweredStep = wireCurrentStep;
+        wireHistory[justAnsweredStep] = choiceIdx;
         wireCurrentStep++;
 
         try {
@@ -17600,7 +18678,7 @@
                             appendWireMessage(getCartographerTitle(), choice.beats[2], false, true, () => {
                               renderWireChoices();
                               updateMessengerBadge();
-                            });
+                            }, null, { type: 'expedition', step: justAnsweredStep });
                           }, 900);
                         }, 350);
                       });
@@ -17612,14 +18690,14 @@
                           appendWireMessage(getCartographerTitle(), choice.beats[2], false, true, () => {
                             renderWireChoices();
                             updateMessengerBadge();
-                          });
+                          }, null, { type: 'expedition', step: justAnsweredStep });
                         }, 800);
                       }, 350);
                     }
-                  });
+                  }, null, { type: 'expedition', step: justAnsweredStep });
                 }, 1800);
               }, 700);
-            });
+            }, null, { type: 'expedition', step: justAnsweredStep });
           }, 1400);
           return;
         }
@@ -17639,16 +18717,16 @@
                   showTyping(false);
                   if (sfx) sfx.playCelestialChime();
                   appendWireMessage(getCartographerTitle(), getHermesFinalForWatchtower(), false, true, () => {
-                    appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true);
-                    if (!isStormOver()) {
+                    appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true, false, null, null, { type: 'expedition', step: 4 });
+                    if (isDawnDone() || localStorage.getItem('order_whispering_chasm_completed') === 'true') {
                       renderWireChoices();
-                    } else if (isDawnDone() || localStorage.getItem('order_whispering_chasm_completed') === 'true') {
+                    } else if (dawnStep >= 1 && !isStormOver()) {
                       renderWireChoices();
                     } else {
                       setTimeout(() => beginDawnStep(dawnStep), 900);
                     }
                     updateMessengerBadge();
-                  });
+                  }, null, { type: 'expedition', step: 4 });
                 }, 600);
               }, 400);
             } else if (justAnsweredStep === 5) {
@@ -17665,10 +18743,10 @@
                     showTyping(false);
                     if (sfx) sfx.playCelestialChime();
                     appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[6].hermesFinal, false, true, () => {
-                      appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true);
+                      appendWireMessage('SYSTEM TELEMETRY', '✦ AL-QIBLA BEARING LOCKED [194° SSW] · DESERT SIGIL VERIFIED [PHOENIX] · CLEPSYDRA TRAIL UNLOCKED ✦', true, false, null, null, { type: 'expedition', step: 6 });
                       renderWireChoices();
                       updateMessengerBadge();
-                    });
+                    }, null, { type: 'expedition', step: 6 });
                   }, 600);
                 }, 400);
               } else {
@@ -17689,10 +18767,10 @@
                     showTyping(false);
                     if (sfx) sfx.playCelestialChime();
                     appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[8].hermesFinal, false, true, () => {
-                      appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 14 RECORDED ✦', true);
+                      appendWireMessage('SYSTEM TELEMETRY', '✦ FOUR WELLS BALANCED · 4 WATER SKINS FILLED · KEY XXX ENGAGED · WEIR [P] - [A] = 14 RECORDED ✦', true, false, null, null, { type: 'expedition', step: 8 });
                       renderWireChoices();
                       updateMessengerBadge();
-                    });
+                    }, null, { type: 'expedition', step: 8 });
                   }, 600);
                 }, 400);
               } else {
@@ -17703,7 +18781,7 @@
               renderWireChoices();
               updateMessengerBadge();
             }
-          });
+          }, null, { type: 'expedition', step: justAnsweredStep });
         }, 650);
       }
 
@@ -17878,6 +18956,7 @@
             if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') {
               localStorage.removeItem('order_cairn1_found');
               localStorage.removeItem('order_cairn1_completed');
+              localStorage.removeItem('order_cairn1_optimal');
               localStorage.removeItem('order_seal_cairn_1');
             }
           } catch(e) {}
@@ -18218,16 +19297,40 @@
 
         if (targetId === 10) {
           window.selectMapNode(10, true);
-          if (window.openWhisperingChasmModal) {
-            window.openWhisperingChasmModal();
-          } else {
-            showDesertToast('Station 10: The Whispering Chasm · Open Sheet 9B of your physical journal.');
+          const isCairnDone = localStorage.getItem('order_cairn1_completed') === 'true';
+          const isCairnBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+          const isDawnDone = parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 3;
+          const isChasmUnlocked = isCairnDone || isCairnBypassed || isDawnDone;
+          const isChasmAlreadyDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+          const isTester = (typeof window.isAdminTester === 'function' && window.isAdminTester()) || (typeof isCarlesTester === 'function' && isCarlesTester());
+          const marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
+
+          if ((isChasmUnlocked && marchOver) || isChasmAlreadyDone || isTester) {
+            if (window.openWhisperingChasmModal) {
+              window.openWhisperingChasmModal();
+            } else {
+              showDesertToast('Station 10: The Whispering Chasm · Open Sheet 9B of your physical journal.');
+            }
+          } else if (!isChasmUnlocked) {
+            showDesertToast('✦ BASECAMP · WATCHTOWER VI ✦ Hermes is at Watchtower VI. Open the Field Wire to review his dawn dispatch.');
+          } else if (!marchOver) {
+            showDesertToast('✦ 26-HOUR TREK IN PROGRESS ✦ Hermes is trekking toward the North Portal. Follow his beacon on the map.');
           }
         } else if (targetId === 22) {
           window.selectMapNode(22, true);
-          const cairnFound = parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 2 || localStorage.getItem('order_cairn1_completed') === 'true';
-          if (cairnFound && window.openCairnOneModal) window.openCairnOneModal();
-          else showDesertToast('Hermes is still walking the dry river. Keep the wire open.');
+          const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+          const isLockedTemp = localStorage.getItem('order_cairn1_locked_until_3_cairns') === 'true';
+          if (isBypassed) {
+            if (isLockedTemp) {
+              showDesertToast('Wadi al-Hajar: The river is quiet. You must first secure other cairn seals.');
+            } else {
+              showDesertToast('Wadi al-Hajar: You chose not to explore this bend of the dry river at dawn.');
+            }
+          } else {
+            const cairnFound = parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 2 || localStorage.getItem('order_cairn1_completed') === 'true';
+            if (cairnFound && window.openCairnOneModal) window.openCairnOneModal();
+            else showDesertToast('Hermes is still walking the dry river. Keep the wire open.');
+          }
         } else if (targetId === 21) {
           window.selectMapNode(21, true);
           if (window.openSaltPlayaModal) {
@@ -18251,9 +19354,11 @@
           }
         } else if (targetId === 13) {
           window.selectMapNode(13, true);
+          if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
           showDesertToast('Station 18: The Polybius Stele (Tower II atrium) · See Sheet 17A of your physical journal.');
         } else if (targetId === 14) {
           window.selectMapNode(14, true);
+          if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
           showDesertToast('Station 19: Tower II · The Sandstone Sanctuary of the Desert Oracle · Sheet 17B of your journal.');
         }
       }
@@ -18638,6 +19743,29 @@
       }
 
       function openWhisperingChasmModal() {
+        const isCairnDone = localStorage.getItem('order_cairn1_completed') === 'true';
+        const isCairnBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+        const isDawnDone = parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 3;
+        const isChasmUnlocked = isCairnDone || isCairnBypassed || isDawnDone;
+        const isChasmAlreadyDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+        const isTester = (typeof window.isAdminTester === 'function' && window.isAdminTester()) || (typeof isCarlesTester === 'function' && isCarlesTester());
+
+        if (!isChasmUnlocked && !isChasmAlreadyDone && !isTester) {
+          if (typeof window.showDesertToast === 'function') {
+            window.showDesertToast('✦ BASECAMP · WATCHTOWER VI ✦ Consult Hermes on the Field Wire to survey the canyon threshold.');
+          }
+          if (typeof activateHubView === 'function') activateHubView('view-field-wire');
+          return;
+        }
+
+        const marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
+        if (!marchOver && !isChasmAlreadyDone && !isTester) {
+          if (typeof window.showDesertToast === 'function') {
+            window.showDesertToast('✦ 26-HOUR TREK IN PROGRESS ✦ Hermes is trekking across the scree slopes to the North Portal. Check the Field Wire for live ETA.');
+          }
+          return;
+        }
+
         if (sfx) sfx.playMechanicalClick();
         if (!modal) return;
         modal.style.display = 'flex';
@@ -18812,9 +19940,15 @@
         if (!(n >= 1 && n <= 5)) return;
         const had = hasSeal(n);
         try { localStorage.setItem('order_seal_cairn_' + n, 'true'); } catch (e) {}
+        if (n === 1 && typeof addRelicToInventory === 'function') {
+          addRelicToInventory('seal_cairn_1');
+        }
         renderSatchel(had ? 0 : n);
         updateSatchelVisibility();
-        if (!had) toast('✦ Seal of Cairn ' + SEAL_ROMAN[n - 1] + ' added to Hermes\'s satchel ✦');
+        if (!had) {
+          const sealName = n === 1 ? 'Wash River Seal' : ('Seal of Cairn ' + SEAL_ROMAN[n - 1]);
+          toast('✦ ' + sealName + ' added to Hermes\'s satchel ✦');
+        }
       };
       window.renderSatchel = renderSatchel;
       window.updateSatchelVisibility = updateSatchelVisibility;
@@ -18855,7 +19989,13 @@
         moves = 0;
         history = [];
         solved = false;
-        if (victoryCard) victoryCard.style.display = 'none';
+        if (victoryCard) {
+          victoryCard.style.display = 'none';
+          const textEl = victoryCard.querySelector('.chasm-victory-text');
+          if (textEl) {
+            textEl.innerHTML = '"Silvia, the last stone settled and something clicked deep inside the base. A hollow opened under the third foundation, and in it lay a flat disc of sandstone: a sun over a wavy line. The Wash River seal. It is in my satchel now."';
+          }
+        }
       }
 
       function render() {
@@ -18864,14 +20004,84 @@
         for (let p = 0; p < 3; p++) {
           const peg = document.createElement('button');
           peg.type = 'button';
-          peg.className = 'c1-peg' + (selected === p ? ' is-source' : '');
+          let pegClass = 'c1-peg' + (selected === p ? ' is-source' : '');
+          if (selected !== -1 && p !== selected) {
+            const isTargetOk = !pegs[p].length || topOf(p) > topOf(selected);
+            pegClass += isTargetOk ? ' is-target-ok' : ' is-target-blocked';
+          }
+          peg.className = pegClass;
           peg.setAttribute('data-label', 'Foundation ' + PEG_ROMAN[p]);
           peg.setAttribute('aria-label', 'Foundation ' + PEG_ROMAN[p] + ', ' + pegs[p].length + ' stones');
           peg.disabled = solved;
+
+          // Drag and drop dropzone on each foundation
+          peg.addEventListener('dragover', (e) => {
+            if (solved) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+          });
+          peg.addEventListener('dragenter', (e) => {
+            if (solved) return;
+            e.preventDefault();
+            if (selected !== -1 && p !== selected) {
+              const isTargetOk = !pegs[p].length || topOf(p) > topOf(selected);
+              peg.classList.add(isTargetOk ? 'is-drag-hover' : 'is-target-blocked');
+            }
+          });
+          peg.addEventListener('dragleave', () => {
+            peg.classList.remove('is-drag-hover');
+          });
+          peg.addEventListener('drop', (e) => {
+            if (solved) return;
+            e.preventDefault();
+            peg.classList.remove('is-drag-hover');
+            const fromStr = e.dataTransfer.getData('text/plain');
+            const fromPeg = parseInt(fromStr, 10);
+            if (!isNaN(fromPeg) && fromPeg >= 0 && fromPeg < 3) {
+              if (fromPeg === p) {
+                selected = -1;
+                if (sfx && typeof sfx.playStoneThud === 'function') sfx.playStoneThud(topOf(p));
+                render();
+                say('Back it goes. Which stone shall I lift instead?');
+              } else {
+                selected = fromPeg;
+                onPeg(p, peg);
+              }
+            }
+          });
+
           pegs[p].forEach((size, i) => {
+            const isTopStone = (i === pegs[p].length - 1);
             const stone = document.createElement('span');
-            stone.className = 'c1-stone' + (selected === p && i === pegs[p].length - 1 ? ' is-lifted' : '') + (solved ? ' is-seal-glow' : '');
+            stone.className = 'c1-stone' + (selected === p && isTopStone ? ' is-lifted' : '') + (solved ? ' is-seal-glow' : '');
             stone.setAttribute('data-size', String(size));
+            if (size === 4) {
+              const glyph = document.createElement('span');
+              glyph.className = 'c1-stone-glyph';
+              glyph.textContent = '— ☉ —';
+              stone.appendChild(glyph);
+            }
+
+            // Dual control: top stone can be dragged directly or clicked
+            if (isTopStone && !solved) {
+              stone.draggable = true;
+              stone.setAttribute('title', 'Click to lift or drag directly to a foundation');
+              stone.addEventListener('dragstart', (e) => {
+                e.stopPropagation();
+                e.dataTransfer.setData('text/plain', String(p));
+                e.dataTransfer.effectAllowed = 'move';
+                selected = p;
+                stone.classList.add('is-dragging');
+                if (sfx && typeof sfx.playStoneLift === 'function') sfx.playStoneLift();
+                else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+                say('I am holding the ' + STONE_NAMES[topOf(p) - 1] + ' stone from the ' + PEG_NAMES[p] + ' foundation. Where should it rest?');
+                setTimeout(() => { render(); }, 10);
+              });
+              stone.addEventListener('dragend', () => {
+                stone.classList.remove('is-dragging');
+              });
+            }
+
             peg.appendChild(stone);
           });
           peg.addEventListener('click', () => onPeg(p, peg));
@@ -18895,13 +20105,16 @@
         if (selected === -1) {
           if (!pegs[p].length) { refuse(pegEl, 'There is no stone on that foundation, Silvia. Pick a pile that has one.'); return; }
           selected = p;
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (sfx && typeof sfx.playStoneLift === 'function') sfx.playStoneLift();
+          else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           render();
           say('I am holding the ' + STONE_NAMES[topOf(p) - 1] + ' stone from the ' + PEG_NAMES[p] + ' foundation. Where should it rest?');
           return;
         }
         if (p === selected) {
           selected = -1;
+          if (sfx && typeof sfx.playStoneThud === 'function') sfx.playStoneThud(topOf(p));
+          else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           render();
           say('Back it goes. Which stone shall I lift instead?');
           return;
@@ -18915,7 +20128,8 @@
         history.push({ from: selected, to: p });
         moves++;
         selected = -1;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (sfx && typeof sfx.playStoneThud === 'function') sfx.playStoneThud(size);
+        else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (pegs[TARGET].length === STONES) {
           solve();
           return;
@@ -18988,13 +20202,32 @@
 
       function solve() {
         solved = true;
-        try { localStorage.setItem('order_cairn1_completed', 'true'); } catch (e) {}
+        try {
+          localStorage.setItem('order_cairn1_completed', 'true');
+          if (moves === 15) {
+            localStorage.setItem('order_cairn1_optimal', 'true');
+          }
+        } catch (e) {}
         if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         render();
-        if (victoryCard) victoryCard.style.display = 'block';
-        say('The whole pile stands on the third foundation, and the base is humming under my hands.');
+        if (victoryCard) {
+          victoryCard.style.display = 'block';
+          const textEl = victoryCard.querySelector('.chasm-victory-text');
+          if (textEl) {
+            if (moves === 15) {
+              textEl.innerHTML = '"Silvia, fifteen lifts—<strong>the exact mathematical minimum of the ancient surveyors!</strong> Not a single stone was lifted in vain. The last stone settled and something clicked deep inside the base. A hollow opened under the third foundation, and in it lay a flat disc of sandstone: a sun over a wavy line. The Wash River seal. It is safe in my satchel now."';
+            } else {
+              textEl.innerHTML = '"Silvia, the last stone settled and something clicked deep inside the base. A hollow opened under the third foundation, and in it lay a flat disc of sandstone: a sun over a wavy line. The Wash River seal. It is in my satchel now."';
+            }
+          }
+        }
+        if (moves === 15) {
+          say('Fifteen lifts! Exactly fifteen—the optimal path of the Order. The whole pile stands on the third foundation, and the base is humming under my hands.');
+        } else {
+          say('The whole pile stands on the third foundation, and the base is humming under my hands.');
+        }
         window.grantCairnSeal(1);
-        document.dispatchEvent(new CustomEvent('dawn:cairn1-solved'));
+        document.dispatchEvent(new CustomEvent('dawn:cairn1-solved', { detail: { moves } }));
       }
 
       function openCairnOneModal() {
@@ -19006,7 +20239,7 @@
           pegs = [[], [], [4, 3, 2, 1]];
           solved = true;
           if (victoryCard) victoryCard.style.display = 'block';
-          say('We lifted every stone together, Silvia. The Seal of Cairn I is safe in my satchel.');
+          say('We lifted every stone together, Silvia. The Wash River seal is safe in my satchel.');
         } else {
           if (solved) fresh();
           if (!history.length && moves === 0) say(START_LINE);
@@ -19051,6 +20284,19 @@
       const acqModal = document.getElementById('modal-item-acquired');
       const btnCollectAcq = document.getElementById('iac-btn-collect');
 
+      const seekerActivePill = document.getElementById('seeker-active-pill');
+      if (seekerActivePill) {
+        seekerActivePill.addEventListener('click', () => {
+          if (typeof window.openSatchelInventoryModal === 'function') window.openSatchelInventoryModal('surveyor_compass');
+        });
+        seekerActivePill.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (typeof window.openSatchelInventoryModal === 'function') window.openSatchelInventoryModal('surveyor_compass');
+          }
+        });
+      }
+
       if (btnOpenInv) btnOpenInv.addEventListener('click', () => {
         if (typeof window.openSatchelInventoryModal === 'function') window.openSatchelInventoryModal();
       });
@@ -19066,6 +20312,103 @@
       if (acqModal) acqModal.addEventListener('click', (e) => {
         if (e.target === acqModal && typeof window.closeItemAcquiredModal === 'function') window.closeItemAcquiredModal();
       });
+
+      // ---------- Servant of Tower II & Cairn I Check Modal Wire-up ----------
+      const servantModal = document.getElementById('modal-servant-cairn-check');
+      const btnCloseServant = document.getElementById('btn-close-servant-cairn');
+      const btnServantRetrace = document.getElementById('btn-servant-retrace');
+      const btnServantRefuse = document.getElementById('btn-servant-refuse');
+      const btnServantConfirmClose = document.getElementById('btn-servant-confirm-close');
+      const servantActions = document.getElementById('servant-cairn-choice-actions');
+      const servantResBox = document.getElementById('servant-cairn-result-box');
+      const servantResText = document.getElementById('servant-cairn-result-text');
+
+      function openServantCairnCheckModal() {
+        if (!servantModal) return;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (servantActions) servantActions.style.display = 'flex';
+        if (servantResBox) servantResBox.style.display = 'none';
+        servantModal.style.display = 'flex';
+        servantModal.classList.remove('closing');
+      }
+
+      function closeServantCairnCheckModal() {
+        if (!servantModal) return;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        servantModal.classList.add('closing');
+        setTimeout(() => {
+          servantModal.style.display = 'none';
+          servantModal.classList.remove('closing');
+        }, 220);
+      }
+
+      window.openServantCairnCheckModal = openServantCairnCheckModal;
+      window.closeServantCairnCheckModal = closeServantCairnCheckModal;
+
+      if (btnCloseServant) btnCloseServant.addEventListener('click', closeServantCairnCheckModal);
+      if (servantModal) servantModal.addEventListener('click', (e) => { if (e.target === servantModal) closeServantCairnCheckModal(); });
+
+      if (btnServantRetrace) {
+        btnServantRetrace.addEventListener('click', () => {
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          try {
+            localStorage.removeItem('order_cairn1_bypassed');
+            localStorage.removeItem('order_cairn1_locked_until_3_cairns');
+          } catch (e) {}
+          closeServantCairnCheckModal();
+          setTimeout(() => {
+            if (typeof window.openCairnOneModal === 'function') window.openCairnOneModal();
+            if (typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
+          }, 240);
+        });
+      }
+
+      if (btnServantRefuse) {
+        btnServantRefuse.addEventListener('click', () => {
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          try {
+            localStorage.setItem('order_cairn1_locked_until_3_cairns', 'true');
+          } catch (e) {}
+          if (servantActions) servantActions.style.display = 'none';
+          if (servantResBox && servantResText) {
+            servantResText.textContent = '"As you command, Silvia. We do not turn back. But the Servant crosses his arms: \'Until you have proven your worth with at least two or three other sacred seals across the desert pilgrimage, the path back to the first cairn will remain closed to you.\'"';
+            servantResBox.style.display = 'block';
+          }
+          if (typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
+        });
+      }
+
+      if (btnServantConfirmClose) {
+        btnServantConfirmClose.addEventListener('click', () => {
+          closeServantCairnCheckModal();
+        });
+      }
+
+      window.checkServantCairnRequirement = function () {
+        const hasSeal1 = localStorage.getItem('order_seal_cairn_1') === 'true' || localStorage.getItem('order_cairn1_completed') === 'true';
+        const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
+        if (!isBypassed || hasSeal1) return false;
+
+        const isLockedTemp = localStorage.getItem('order_cairn1_locked_until_3_cairns') === 'true';
+        const otherSeals = [2, 3, 4, 5].filter(n => localStorage.getItem('order_seal_cairn_' + n) === 'true').length;
+
+        // If locked until 2-3 cairns, check if the player already gathered at least 2 other seals
+        if (isLockedTemp) {
+          if (otherSeals >= 2) {
+            try { localStorage.removeItem('order_cairn1_locked_until_3_cairns'); } catch (e) {}
+            openServantCairnCheckModal();
+            return true;
+          } else {
+            if (typeof window.showDesertToast === 'function') {
+              window.showDesertToast('The Servant of Tower II stands firm: you must gather at least 2–3 other cairn seals before returning to Cairn I.');
+            }
+            return true;
+          }
+        }
+
+        openServantCairnCheckModal();
+        return true;
+      };
 
       fresh();
       renderSatchel(0);
@@ -19158,14 +20501,17 @@
       function state() {
         const wire = parseInt(get('order_field_wire_step') || '0', 10) || 0;
         const cairnDone = get('order_cairn1_completed') === 'true';
+        const isBypassed = get('order_cairn1_bypassed') === 'true';
         const chasmDone = get('order_whispering_chasm_completed') === 'true';
-        const dawn = cairnDone ? 3 : (parseInt(get('order_dawn_step') || '0', 10) || 0);
-        return { reached: wire >= 4 || chasmDone || cairnDone, dawn: dawn };
+        const dawn = (cairnDone || isBypassed) ? 3 : (parseInt(get('order_dawn_step') || '0', 10) || 0);
+        return { reached: wire >= 4 || chasmDone || cairnDone || isBypassed, dawn: dawn };
       }
 
       // The station the map should highlight before the Whispering Chasm
       window.getDawnNodeId = function () {
         const s = state();
+        const isBypassed = get('order_cairn1_bypassed') === 'true';
+        if (isBypassed) return 10;
         return (s.reached && s.dawn >= 1 && s.dawn < 3) ? 22 : 10;
       };
 
@@ -19235,11 +20581,22 @@
         });
 
         // Cairn I marker: a question mark until Hermes finds it, then the stones, then a check
+        const isBypassed = get('order_cairn1_bypassed') === 'true';
         const icon = cairnMark.querySelector('.dawn-mark-icon');
         const text = cairnMark.querySelector('.dawn-mark-text');
-        if (s.dawn >= 3) { icon.textContent = '🪨'; text.textContent = '✓ CAIRN I · SEAL SECURED'; }
-        else if (s.dawn >= 2) { icon.textContent = '🪨'; text.textContent = '✦ CAIRN I ➔'; }
-        else { icon.textContent = '?'; text.textContent = '✦ SOMETHING IN THE DRY RIVER'; }
+        if (isBypassed) {
+          icon.textContent = '?';
+          text.textContent = '✦ DRY WASH · UNEXPLORED';
+        } else if (s.dawn >= 3) {
+          icon.textContent = '🪨';
+          text.textContent = '✓ CAIRN I · SEAL SECURED';
+        } else if (s.dawn >= 2) {
+          icon.textContent = '🪨';
+          text.textContent = '✦ CAIRN I ➔';
+        } else {
+          icon.textContent = '?';
+          text.textContent = '✦ SOMETHING IN THE DRY RIVER';
+        }
 
         const sig = [r1, r2, r3, s.dawn].join(',');
         if (sig !== lastSig && lastSig !== '') {
@@ -20491,17 +21848,17 @@
       }
 
       function getStormTargetTime() {
-        // Target: Saturday Oct 17 2026 at 20:00:00 CEST (1792260000000)
-        const SATURDAY_OCT_17_2026_8PM = window.SATURDAY_OCT_17_2026_8PM || 1792260000000;
+        // Target: Sunday Oct 18 2026 at 14:00:00 CEST (1792324800000)
+        const SUNDAY_OCT_18_2026_2PM = window.SUNDAY_OCT_18_2026_2PM || 1792324800000;
         const seekerNow = (localStorage.getItem('the_eclipse_active_seeker') || activeSeeker || 'Silvia').toLowerCase();
-        // Silvia's live clock is always pinned to Sat 17 20:00; Carles may override for testing
+        // Silvia's live clock is always pinned to Sun 18 14:00; Carles may override for testing
         if (seekerNow === 'silvia') {
-          localStorage.setItem('order_sandstorm_target_time', String(SATURDAY_OCT_17_2026_8PM));
-          return SATURDAY_OCT_17_2026_8PM;
+          localStorage.setItem('order_sandstorm_target_time', String(SUNDAY_OCT_18_2026_2PM));
+          return SUNDAY_OCT_18_2026_2PM;
         }
         let target = parseInt(localStorage.getItem('order_sandstorm_target_time'), 10);
-        if (!target || isNaN(target)) {
-          target = SATURDAY_OCT_17_2026_8PM;
+        if (!target || isNaN(target) || target === 1792260000000) {
+          target = SUNDAY_OCT_18_2026_2PM;
           localStorage.setItem('order_sandstorm_target_time', target.toString());
         }
         return target;
@@ -20531,20 +21888,9 @@
         }
         try { localStorage.removeItem('order_sandstorm_wire_answered'); } catch (e) {}
 
-        // Silvia live: once Station 09 is done, the Hub entry state IS the sandstorm
+        // Silvia live: the storm is over; she has reached Watchtower VI
         if (seekerNow === 'silvia') {
-          const cipherDone = localStorage.getItem('seeker_silvia_cipher_completed') === 'true' ||
-                             localStorage.getItem('order_cipher_completed') === 'true';
-          const marked = localStorage.getItem('seeker_silvia_sandstorm_active') === 'true' ||
-                         localStorage.getItem('order_sandstorm_active') === 'true';
-          if (cipherDone || marked) {
-            try {
-              localStorage.setItem('seeker_silvia_sandstorm_active', 'true');
-              localStorage.setItem('order_sandstorm_active', 'true');
-              localStorage.setItem('order_sandstorm_wire_unlocked', 'true');
-            } catch (e) {}
-            return getRemainingTime() > 0;
-          }
+          return false;
         }
 
         const isMarked = localStorage.getItem('seeker_silvia_sandstorm_active') === 'true' ||
@@ -20878,8 +22224,8 @@
 
       if (btnDevReset) {
         btnDevReset.addEventListener('click', () => {
-          const SATURDAY_OCT_17_2026_8PM = 1792260000000;
-          localStorage.setItem('order_sandstorm_target_time', SATURDAY_OCT_17_2026_8PM.toString());
+          const SUNDAY_OCT_18_2026_2PM = 1792324800000;
+          localStorage.setItem('order_sandstorm_target_time', SUNDAY_OCT_18_2026_2PM.toString());
           localStorage.setItem('order_sandstorm_start_time', Date.now().toString());
           localStorage.setItem('order_sandstorm_active', 'true');
           localStorage.setItem('seeker_silvia_sandstorm_active', 'true');
@@ -20977,18 +22323,21 @@
         if (overlay.style.display !== 'none') setupCanvas();
       });
 
-      // Master Evaluation on Page Load — Silvia enters the Hub into the live sandstorm
+      // Master Evaluation on Page Load — The storm is over; Silvia reaches the Desert Path
       try {
         const seekerBoot = (localStorage.getItem('the_eclipse_active_seeker') || activeSeeker || 'Silvia').toLowerCase();
         if (seekerBoot === 'silvia') {
-          localStorage.setItem('seeker_silvia_sandstorm_active', 'true');
-          localStorage.setItem('order_sandstorm_active', 'true');
+          localStorage.removeItem('seeker_silvia_sandstorm_active');
+          localStorage.removeItem('order_sandstorm_active');
           localStorage.setItem('order_sandstorm_wire_unlocked', 'true');
-          localStorage.removeItem('order_sandstorm_wire_answered');
+          localStorage.setItem('order_storm_tester_bypassed', 'true');
         }
       } catch (e) {}
       if (isStormActive()) {
         activateStormLockout();
+      }
+      if (typeof handleHubUrlHash === 'function') {
+        handleHubUrlHash();
       }
     })();
   </script>

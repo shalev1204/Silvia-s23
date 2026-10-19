@@ -1,0 +1,267 @@
+/* The Grand Desert Map · 3D "unlit" view. Loaded on demand by ensureDesert3D() in index.html. */
+
+
+.desert3d-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1000 / 1220;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 18%, #091427 0%, rgba(5, 10, 22, 0) 70%),
+    radial-gradient(ellipse at 50% 55%, #030711 0%, #010207 100%);
+  touch-action: pan-y;
+  user-select: none;
+}
+.desert3d-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.desert3d-stage.is-ready canvas { opacity: 1; }
+.desert3d-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.45);
+}
+.desert3d-boot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(122, 167, 255, 0.55);
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+.desert3d-stage.is-ready .desert3d-boot { opacity: 0; }
+
+/* ---- HUD ---- */
+.desert3d-hud-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px 7px 11px;
+  border: 1px solid rgba(251, 191, 36, 0.38);
+  border-radius: 999px;
+  background: rgba(3, 7, 17, 0.72);
+  backdrop-filter: blur(6px);
+  font-family: 'Cinzel', serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #fde68a;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 5;
+}
+.desert3d-hud-lamp {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 10px 2px rgba(251, 191, 36, 0.8);
+  animation: d3Lamp 2.6s ease-in-out infinite;
+}
+@keyframes d3Lamp { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+.desert3d-hud-note {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 28px);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: rgba(138, 170, 224, 0.62);
+  text-align: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ---- Markers (projected from the 3D scene every frame) ---- */
+.desert3d-markers { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.d3-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.d3-marker:hover, .d3-marker:focus-within { z-index: 9999 !important; }
+.d3-pin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #fbbf24;
+  background: radial-gradient(circle at 35% 30%, #3a1f0b 0%, #1a0f06 70%);
+  color: #fbbf24;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.45), inset 0 0 8px rgba(0, 0, 0, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.d3-pin:hover, .d3-pin:focus-visible { transform: scale(1.12); outline: none; box-shadow: 0 0 26px rgba(251, 191, 36, 0.75), inset 0 0 8px rgba(0, 0, 0, 0.7); }
+.d3-pin::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(251, 191, 36, 0.45);
+  animation: d3Spin 14s linear infinite;
+  pointer-events: none;
+}
+@keyframes d3Spin { to { transform: rotate(360deg); } }
+
+/* A place Hermes has not reached yet: no icon, no name, no number */
+.d3-marker.is-unknown .d3-pin {
+  width: 34px;
+  height: 34px;
+  border-color: rgba(96, 150, 240, 0.55);
+  background: radial-gradient(circle at 40% 35%, #0a1630 0%, #03060f 75%);
+  color: #7aa7ff;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(60, 110, 220, 0.35), inset 0 0 8px rgba(0, 0, 0, 0.9);
+  animation: d3Unknown 3.6s ease-in-out infinite;
+}
+.d3-marker.is-unknown .d3-pin::after { border-color: rgba(96, 150, 240, 0.28); inset: -7px; animation-duration: 24s; }
+@keyframes d3Unknown { 0%, 100% { opacity: 0.62; } 50% { opacity: 1; } }
+.d3-marker.is-unknown .d3-pin.is-nudged { animation: d3Nudge 0.4s ease; }
+@keyframes d3Nudge { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+/* Tip shown beside an unknown "?" when clicked */
+.d3-unknown-tip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  white-space: nowrap;
+  padding: 4px 9px;
+  border: 1px solid rgba(122, 167, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(4, 10, 22, 0.92);
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a8c4ff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+.d3-unknown-tip.is-visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.d3-marker.is-landmark .d3-pin { width: 30px; height: 30px; font-size: 14px; opacity: 0.92; }
+.d3-marker.is-done .d3-pin {
+  border-color: #6ee7b7;
+  color: #a7f3d0;
+  box-shadow: 0 0 18px rgba(110, 231, 183, 0.4), inset 0 0 8px rgba(0, 0, 0, 0.7);
+}
+.d3-marker.is-done .d3-pin::after { border-color: rgba(110, 231, 183, 0.4); }
+.d3-marker.is-active .d3-pin { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85), inset 0 0 8px rgba(0, 0, 0, 0.7); }
+
+/* Waypoint discovered: dramatic pulse and glowing aura */
+.d3-marker.is-discovered-pulse { z-index: 9999 !important; }
+.d3-marker.is-discovered-pulse .d3-pin {
+  animation: d3DiscoverPulse 1.6s ease-out;
+  border-color: #fff6dc !important;
+  color: #ffffff !important;
+}
+@keyframes d3DiscoverPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.45), inset 0 0 8px rgba(0, 0, 0, 0.7);
+  }
+  28% {
+    transform: scale(1.42);
+    box-shadow: 0 0 50px 10px rgba(251, 191, 36, 1), 0 0 28px 6px #ffffff, inset 0 0 14px rgba(251, 191, 36, 0.85);
+  }
+  55% {
+    transform: scale(1.18);
+    box-shadow: 0 0 32px 6px rgba(251, 191, 36, 0.85);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.45), inset 0 0 8px rgba(0, 0, 0, 0.7);
+  }
+}
+.d3-marker.is-discovered-pulse .d3-label {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+  border-color: #fde68a !important;
+  box-shadow: 0 0 26px rgba(251, 191, 36, 0.8) !important;
+  background: rgba(14, 18, 30, 0.96) !important;
+  color: #fff6dc !important;
+}
+
+.d3-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  padding: 5px 13px;
+  border: 1.3px solid #fbbf24;
+  border-radius: 5px;
+  background: rgba(8, 11, 20, 0.94);
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #fde68a;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.d3-marker.is-done .d3-label { border-color: #6ee7b7; color: #a7f3d0; }
+.d3-marker:hover .d3-label,
+.d3-marker.is-active .d3-label,
+.d3-pin:focus-visible + .d3-label { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Hermes: the lantern the map follows */
+.d3-hermes { z-index: 3; }
+.d3-hermes .d3-orb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6dc 0%, #fbbf24 38%, rgba(245, 158, 11, 0) 72%);
+  box-shadow: 0 0 22px 6px rgba(251, 146, 60, 0.55);
+  animation: d3Lamp 1.9s ease-in-out infinite;
+}
+
+@media (max-width: 720px) {
+  .d3-pin { width: 34px; height: 34px; font-size: 15px; }
+  .d3-marker.is-unknown .d3-pin { width: 30px; height: 30px; }
+  .desert3d-hud-note { font-size: 0.82rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .d3-pin::after, .desert3d-hud-lamp, .d3-hermes .d3-orb, .d3-marker.is-unknown .d3-pin { animation: none; }
+}

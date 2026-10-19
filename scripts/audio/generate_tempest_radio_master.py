@@ -19,9 +19,15 @@ import time
 import urllib.request
 import subprocess
 
-KEY_PATH = os.path.expanduser("~/.gemini_api_key")
-with open(KEY_PATH, "r") as f:
-    API_KEY = f.read().strip()
+API_KEY = os.environ.get("GEMINI_API_KEY")
+if not API_KEY:
+    KEY_PATH = os.path.expanduser("~/.gemini_api_key")
+    if os.path.exists(KEY_PATH):
+        with open(KEY_PATH, "r") as f:
+            API_KEY = f.read().strip()
+    else:
+        print("Error: GEMINI_API_KEY environment variable or ~/.gemini_api_key required!", file=sys.stderr)
+        sys.exit(1)
 
 BASE_AUDIO_DIR = "web/constellation/midnight-calibration/audio"
 STEMS_DIR = os.path.join(BASE_AUDIO_DIR, "stems")

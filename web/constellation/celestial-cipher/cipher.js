@@ -1054,15 +1054,12 @@
       localStorage.setItem('order_cipher_completed', 'true');
       localStorage.setItem('order_sandstorm_triggered', 'true');
       localStorage.setItem('order_sandstorm_active', 'true');
-      const today8pm = new Date();
-      today8pm.setHours(20, 0, 0, 0);
-      const targetTime = today8pm.getTime() + (48 * 60 * 60 * 1000);
-      if (!localStorage.getItem('order_sandstorm_target_time')) {
-        localStorage.setItem('order_sandstorm_target_time', targetTime.toString());
-      }
+      const SUNDAY_OCT_18_2026_2PM = (typeof window !== 'undefined' && window.SUNDAY_OCT_18_2026_2PM) ? window.SUNDAY_OCT_18_2026_2PM : 1792324800000;
+      localStorage.setItem('order_sandstorm_target_time', SUNDAY_OCT_18_2026_2PM.toString());
       if (!localStorage.getItem('order_sandstorm_start_time')) {
-        localStorage.setItem('order_sandstorm_start_time', Date.now().toString());
+        localStorage.setItem('order_sandstorm_start_time', String(SUNDAY_OCT_18_2026_2PM - (48 * 60 * 60 * 1000)));
       }
+      localStorage.setItem('order_sandstorm_wire_unlocked', 'true');
       localStorage.setItem('order_desert_path_unlocked', 'true');
       localStorage.setItem('order_cipher_reward_claimed', 'true');
       const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
@@ -1085,13 +1082,12 @@
   function triggerSandstormHubLockdown() {
     try {
       localStorage.setItem('order_sandstorm_active', 'true');
-      const today8pm = new Date();
-      today8pm.setHours(20, 0, 0, 0);
-      const targetTime = today8pm.getTime() + (48 * 60 * 60 * 1000);
-      localStorage.setItem('order_sandstorm_target_time', targetTime.toString());
+      const SUNDAY_OCT_18_2026_2PM = (typeof window !== 'undefined' && window.SUNDAY_OCT_18_2026_2PM) ? window.SUNDAY_OCT_18_2026_2PM : 1792324800000;
+      localStorage.setItem('order_sandstorm_target_time', SUNDAY_OCT_18_2026_2PM.toString());
       if (!localStorage.getItem('order_sandstorm_start_time')) {
-        localStorage.setItem('order_sandstorm_start_time', Date.now().toString());
+        localStorage.setItem('order_sandstorm_start_time', String(SUNDAY_OCT_18_2026_2PM - (48 * 60 * 60 * 1000)));
       }
+      localStorage.setItem('order_sandstorm_wire_unlocked', 'true');
       const activeSeeker = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
       localStorage.setItem(`seeker_${activeSeeker}_sandstorm_active`, 'true');
       localStorage.setItem('seeker_silvia_sandstorm_active', 'true');

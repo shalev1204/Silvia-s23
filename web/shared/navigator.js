@@ -109,34 +109,23 @@
 
   const isCipherCompleted = localStorage.getItem('order_cipher_completed') === 'true';
   const activeSeekerNav = (localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
-  const isCarlesNav = (activeSeekerNav === 'carles');
+  const silviaCipherDone = localStorage.getItem('seeker_silvia_cipher_completed') === 'true';
+  const carlesCipherDone = localStorage.getItem('seeker_carles_cipher_completed') === 'true';
+  const seekerCipherDone = activeSeekerNav === 'carles' ? (carlesCipherDone || isCipherCompleted) : (silviaCipherDone || isCipherCompleted);
 
   if (isMidnightCompleted) {
-    if (isCarlesNav) {
-      stages.push({
-        id: 'celestial-cipher',
-        folder: 'celestial-cipher',
-        path: 'Station 09 · Constellation Finale',
-        title: 'The Celestial Cipher',
-        icon: '📜',
-        url: root + 'constellation/celestial-cipher/index.html',
-        status: isCipherCompleted ? 'Decrypted ✓' : 'Awaiting Decryption ✦',
-        statusClass: isCipherCompleted ? 'status-completed' : 'status-active',
-        unlocked: true
-      });
-    } else {
-      stages.push({
-        id: 'celestial-cipher',
-        folder: 'celestial-cipher',
-        path: 'Station 09 · Unknown Horizon',
-        title: 'Station 09 · [ Unknown ]',
-        icon: '⏳',
-        url: 'javascript:void(0)',
-        status: 'Sealed Horizon ⏳',
-        statusClass: 'status-active',
-        locked: true
-      });
-    }
+    // Station 09 is available to both seekers — never auto-switch profiles from the sidebar
+    stages.push({
+      id: 'celestial-cipher',
+      folder: 'celestial-cipher',
+      path: 'Station 09 · Constellation Finale',
+      title: 'The Celestial Cipher',
+      icon: '📜',
+      url: root + 'constellation/celestial-cipher/index.html',
+      status: seekerCipherDone ? 'Decrypted ✓' : 'Awaiting Decryption ✦',
+      statusClass: seekerCipherDone ? 'status-completed' : 'status-active',
+      unlocked: true
+    });
   }
 
   function getCurrentStageId(stagesList) {
@@ -220,8 +209,8 @@
             <!-- Navigation Links to Hub Sections -->
             <nav class="order-sidebar-nav">
               <a href="${root}index.html#view-trail" class="order-sidebar-link">
-                <span class="btn-icon">🌌</span>
-                <span>The Star Map</span>
+                <span class="btn-icon">🗺️</span>
+                <span>The Quest Map</span>
               </a>
               <a href="${root}index.html#view-transmissions" class="order-sidebar-link">
                 <span class="btn-icon">📡</span>
@@ -269,7 +258,7 @@
       codexTrigger.id = 'order-codex-trigger';
       codexTrigger.className = 'order-nav-trigger';
       codexTrigger.type = 'button';
-      codexTrigger.title = 'Open Order Codex & Star Map';
+      codexTrigger.title = 'Open Order Codex & Quest Map';
       codexTrigger.innerHTML = `<span class="trigger-icon">◐</span><span>Order Codex</span>`;
       document.body.appendChild(codexTrigger);
     }

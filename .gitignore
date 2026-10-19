@@ -1,15 +1,54 @@
+# macOS & OS metadata
 .DS_Store
-.wrangler/
-node_modules/
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# Secrets, API keys, credentials, certificates & private keys
 .env
 .env.*
-*.log
+*.env
+*.pem
+*.key
+*.pfx
+*.p12
+id_rsa*
+id_ed25519*
+*api_key*
+.gemini_api_key
+credentials.json
+client_secret*.json
+service-account*.json
+token.json
+secrets/
+vault/
 
-# Audio intermedio (stems/foley): se regenera con scripts/audio/ y no se despliega en Cloudflare
+# Python, virtualenvs & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# Node, Wrangler & Logs
+node_modules/
+.wrangler/
+*.log
+npm-debug.log*
+
+# Editors & swap files
+*.swp
+*.swo
+*~
+
+# Intermediate audio & render caches (regenerated via scripts)
 web/**/*.wav
 web/**/*.pcm
-
-# Python y artefactos intermedios del diario
-__pycache__/
-*.pyc
 **/canvases/
+scratch/screenshots/
+*.original.webp

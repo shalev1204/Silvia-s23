@@ -141,4 +141,4 @@ flowchart TD
 5. **Generación de Entregables**:
    - `journal/pageXX/pdf/pageXX_front_A5.pdf` y `pageXX_back_A5.pdf`.
    - `journal/pageXX/mockups/pageXX_front_real_paper_mockup.jpg` y `pageXX_back_real_paper_mockup.jpg`.
-6. **Ensamble Dúplex**: Añadir la hoja al compilador maestro [scripts/journal/build_impresion_master.py](file:///path/to/Silvia's23/scripts/journal/build_impresion_master.py).
+6. **Ensamble Dúplex**: Añadir la hoja al compilador maestro [scripts/journal/build_impresion_master.py](../../scripts/journal/build_impresion_master.py).
