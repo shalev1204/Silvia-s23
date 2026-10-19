@@ -11,7 +11,9 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
   6. Station 15 (The Sandstone Labyrinth): first light, 6-hour walk, sigil, the escape (solved by search), Seal III, debrief.
   7. Station 16 (Cairn IV): dusk scene, 18-hour crossing, sigil, the three verses decoded from the calls, Seal IV, relic, debrief.
   8. Station 17 (Arch of the Solstice): the October dawn solved by its own route search, the night signal, Seal V,
-     the five-seal ceremony, relic and debrief.
+     the five-seal ceremony, relic and debrief; a reload during the finale cannot strand the station.
+  9. Each seeker keeps their own adventure when the profile changes (Carles and Silvia).
+ 10. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -599,6 +601,84 @@ def test_solstice_arch(browser):
     check(not errors, "no JS errors during Station 17", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
+    # A reload in the middle of the finale (last signal answered, light still speaking) finishes the station
+    stuck = dict(seed, order_cairn5_awake="true", order_cairn5_dawn_done="true", order_cairn5_signal_round="4",
+                 order_cairn5_march_bypassed="true", order_field_wire_step="22")
+    ctx, page, errors = new_page(browser, stuck)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    check(page.evaluate("localStorage.getItem('order_arch_solstice_completed')") == "true" and not errors,
+          "a reload during the finale finishes the station instead of stranding it", "; ".join(errors[:2]))
+    ctx.close()
+
+
+def login(page, name):
+    page.click("#btn-seeker-switch")
+    page.wait_for_timeout(300)
+    page.fill("#gate-username", name)
+    page.fill("#gate-password", name)
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(3000)
+
+
+def test_profiles(browser):
+    print("\n9. Each seeker keeps their own adventure")
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    seals = lambda: sum(1 for i in range(1, 6) if get(f"order_seal_cairn_{i}") == "true")
+    page.evaluate("TesterDesert.completeUpTo('s16')")
+    page.reload()
+    page.wait_for_timeout(2500)
+    check(seals() == 4, "Carles reaches Cairn IV with the tester")
+    login(page, "Silvia")
+    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 0 and get("order_field_wire_step") == "4"
+          and "tuning_pebble" not in page.evaluate("window.getOwnedRelicIds()"),
+          "Silvia does not inherit Carles's seals, inventory or chat")
+    page.evaluate("localStorage.setItem('order_dawn_step', '1')")
+    login(page, "Carles")
+    check(seals() == 4 and get("order_cairn_iv_completed") == "true" and get("order_dawn_step") == "3",
+          "Carles's adventure comes back untouched")
+    login(page, "Silvia")
+    check(get("order_dawn_step") == "1" and seals() == 0, "Silvia's own progress comes back")
+    check(not errors, "no JS errors while switching seekers", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+PLAY_JS = """gid => {
+    const i = TesterDesert.games.findIndex(g => g.id === gid);
+    document.querySelectorAll('#tester-rows .tester-row')[i].querySelector('.tester-btn-play').click();
+}"""
+WORLD_JS = """() => ({
+    seals: [1, 2, 3, 4, 5].filter(i => localStorage.getItem('order_seal_cairn_' + i) === 'true').length,
+    relics: window.getOwnedRelicIds(),
+    open: [...document.querySelectorAll('[id^=modal-]')].filter(m => getComputedStyle(m).display !== 'none').map(m => m.id)
+})"""
+
+
+def test_tester_play(browser):
+    print("\n10. Carles's tester: Play any game, forward and back")
+    modals = {"cairn1": "modal-cairn-one", "s14": "modal-sun-monolith", "s15": "modal-sandstone-labyrinth",
+              "s16": "modal-cairn-four", "s17": "modal-solstice-arch"}
+    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4}
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    for gid in ["s17", "s14", "cairn1", "s16", "clepsydra"]:
+        page.evaluate("document.getElementById('tester-panel').open = true")
+        page.evaluate(PLAY_JS, gid)
+        page.wait_for_timeout(600)
+        page.wait_for_load_state("load")
+        page.wait_for_timeout(3200)
+        st = page.evaluate(WORLD_JS)
+        opened = modals[gid] in st["open"] if gid in modals else bool(st["open"])
+        clean = gid == "s17" or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"])
+        check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
+              f"seals {st['seals']}, open {st['open']}, relics {st['relics']}")
+    check(not errors, "no JS errors while jumping between games", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -616,6 +696,8 @@ def main():
         test_sandstone_labyrinth(browser)
         test_cairn_four(browser)
         test_solstice_arch(browser)
+        test_profiles(browser)
+        test_tester_play(browser)
         browser.close()
     server.shutdown()
 

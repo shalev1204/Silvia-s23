@@ -10026,6 +10026,34 @@
 
   <!-- Gate login: standalone and self-contained, so it works even if the big Hub script fails or loads late -->
   <script>
+    // Each seeker keeps their own adventure. Game progress lives in shared keys (order_*, seeker_*, …), so when
+    // the profile changes, everything that belongs to the leaving seeker is packed into their vault and the
+    // arriving seeker's vault is unpacked. Only device settings stay put. A seeker without a vault starts from
+    // the canonical baseline (the Hub's syncWaypointBaseline). Silvia's own browser never switches profile.
+    window.EclipseProfiles = (function () {
+      var VAULT = 'eclipse_profile_vault_';
+      var DEVICE_KEYS = ['the_eclipse_active_seeker', 'the_eclipse_gate_ok_at', 'hub_sidebar_collapsed'];
+      function isDeviceKey(k) { return DEVICE_KEYS.indexOf(k) >= 0 || k.indexOf(VAULT) === 0; }
+      function swap(from, to) {
+        if (!from || !to || from.toLowerCase() === to.toLowerCase()) return false;
+        var progress = {}, keys = [], i, k;
+        for (i = 0; i < localStorage.length; i++) {
+          k = localStorage.key(i);
+          if (k && !isDeviceKey(k)) { progress[k] = localStorage.getItem(k); keys.push(k); }
+        }
+        localStorage.setItem(VAULT + from.toLowerCase(), JSON.stringify(progress));
+        keys.forEach(function (key) { localStorage.removeItem(key); });
+        var saved = null;
+        try { saved = JSON.parse(localStorage.getItem(VAULT + to.toLowerCase()) || 'null'); } catch (e) { saved = null; }
+        if (saved && typeof saved === 'object') {
+          Object.keys(saved).forEach(function (key) { if (!isDeviceKey(key)) localStorage.setItem(key, saved[key]); });
+        }
+        localStorage.removeItem(VAULT + to.toLowerCase());   // the arriving seeker's progress lives in the keys again
+        return true;
+      }
+      return { swap: swap };
+    })();
+
     (function () {
       var ACCOUNTS = { silvia: 'Silvia', carles: 'Carles' };
       var GATE_TTL_MS = 12 * 60 * 60 * 1000;
@@ -10071,6 +10099,8 @@
           if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
           if (errEl) errEl.style.display = 'none';
           try {
+            var before = localStorage.getItem('the_eclipse_active_seeker');
+            if (before && ACCOUNTS[String(before).toLowerCase()]) window.EclipseProfiles.swap(ACCOUNTS[String(before).toLowerCase()], ACCOUNTS[key]);
             localStorage.setItem('the_eclipse_active_seeker', ACCOUNTS[key]);
             localStorage.setItem('the_eclipse_gate_ok_at', String(Date.now()));
             sessionStorage.setItem('the_eclipse_session_authenticated', 'true');
@@ -10305,6 +10335,7 @@
         <div class="tester-panel-body">
           <div class="tester-rows" id="tester-rows"></div>
           <div class="tester-actions">
+            <button type="button" class="tester-btn" id="tester-skip-walks">⏭ Skip every walk</button>
             <button type="button" class="tester-btn" id="tester-complete-all">⏩ Complete every built game</button>
             <button type="button" class="tester-btn tester-btn-warn" id="tester-replay-all">↺ Replay the whole desert</button>
           </div>
@@ -13197,7 +13228,7 @@
           <div class="monolith-card monolith-game is-locked" id="solstice-dawn-game">
             <div class="monolith-card-title">II · The Autumn Dawn</div>
             <div class="monolith-game-inner">
-              <svg class="solstice-court" id="solstice-court" viewBox="-6 -24 102 120" role="group" aria-label="The Courtyard of Rays seen from above: the arch at the top, the bronze mirrors, the fallen pillars and the Solar Altar. Choose a mirror to turn it."></svg>
+              <svg class="solstice-court" id="solstice-court" viewBox="-2 -22 94 116" role="group" aria-label="The Courtyard of Rays seen from above: the arch at the top, the bronze mirrors, the fallen pillars and the Solar Altar. Choose a mirror to turn it."></svg>
               <div class="solstice-clock" aria-hidden="true"><span id="solstice-clock-bar"></span></div>
               <div class="pillars-row">
                 <button type="button" class="monolith-btn monolith-btn-primary" id="btn-solstice-dawn">☀ Await the dawn</button>
@@ -14149,6 +14180,10 @@
 
       function persistActiveSeeker(name) {
         const normalized = normalizeSeekerName(name) || 'Silvia';
+        const previous = normalizeSeekerName(localStorage.getItem('the_eclipse_active_seeker'));
+        if (previous && previous !== normalized && window.EclipseProfiles) {
+          try { window.EclipseProfiles.swap(previous, normalized); } catch (e) {}   // each seeker keeps their own adventure
+        }
         currentSeeker = normalized;
         window.currentSeeker = normalized;
         try { localStorage.setItem('the_eclipse_active_seeker', normalized); } catch (e) {}
@@ -14242,12 +14277,20 @@
         const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
         const del = (k) => { try { localStorage.removeItem(k); } catch (e) {} };
         const dels = (list) => list.forEach(del);
+        // A reset game also takes its relic back out of the satchel (shared and per-seeker inventories)
+        const dropRelic = (id) => {
+          ['order_inventory_relics', 'seeker_silvia_inventory_relics', 'seeker_carles_inventory_relics'].forEach((key) => {
+            let list = null;
+            try { list = JSON.parse(get(key) || 'null'); } catch (e) { list = null; }
+            if (Array.isArray(list) && list.includes(id)) set(key, JSON.stringify(list.filter((x) => x !== id)));
+          });
+        };
 
         const GAMES = [
           {
             id: 'cairn1', tag: 'Dawn', label: 'Cairn I · The Wash River Marker', flag: 'order_cairn1_completed', built: true,
             complete() { set('order_cairn1_completed', 'true'); set('order_cairn1_found', 'true'); set('order_seal_cairn_1', 'true'); set('order_dawn_step', '3'); del('order_cairn1_bypassed'); del('order_cairn1_locked_until_3_cairns'); },
-            reset() { dels(['order_cairn1_completed', 'order_cairn1_found', 'order_seal_cairn_1', 'order_dawn_choices', 'order_cairn1_bypassed', 'order_cairn1_locked_until_3_cairns']); set('order_dawn_step', '0'); }
+            reset() { dels(['order_cairn1_completed', 'order_cairn1_found', 'order_seal_cairn_1', 'order_dawn_choices', 'order_cairn1_bypassed', 'order_cairn1_locked_until_3_cairns', 'order_cairn1_optimal', 'order_five_seals_celebrated', 'order_monolith_gate_seal1']); set('order_dawn_step', '0'); dropRelic('seal_cairn_1'); }
           },
           {
             id: 'chasm', tag: 'Station 10', label: 'The Whispering Chasm', flag: 'order_whispering_chasm_completed', built: true,
@@ -14272,22 +14315,22 @@
           {
             id: 's14', tag: 'Station 14', label: 'The Sun Monolith · Cairn II', flag: 'order_sun_monolith_completed', built: true,
             complete() { set('order_monolith_march_start', '1'); set('order_sun_monolith_awake', 'true'); set('order_sun_monolith_marks', '4'); set('order_sun_monolith_completed', 'true'); set('order_seal_cairn_2', 'true'); },
-            reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_monolith_gate_seal1']); }
+            reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_monolith_gate_seal1', 'order_five_seals_celebrated']); }
           },
           {
             id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', flag: 'order_sandstone_labyrinth_completed', built: true,
             complete() { set('order_labyrinth_march_start', '1'); set('order_labyrinth_awake', 'true'); set('order_labyrinth_star_seen', 'true'); set('order_labyrinth_camp_seen', 'true'); set('order_sandstone_labyrinth_completed', 'true'); set('order_seal_cairn_3', 'true'); },
-            reset() { dels(['order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed']); }
+            reset() { dels(['order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed', 'order_five_seals_celebrated']); }
           },
           {
             id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', flag: 'order_cairn_iv_completed', built: true,
             complete() { set('order_cairn4_march_start', '1'); set('order_cairn4_awake', 'true'); set('order_cairn4_verses', '3'); set('order_cairn_iv_completed', 'true'); set('order_seal_cairn_4', 'true'); },
-            reset() { dels(['order_cairn_iv_completed', 'order_cairn4_awake', 'order_cairn4_verses', 'order_cairn4_key_fails', 'order_cairn4_hint', 'order_cairn4_song_fails', 'order_cairn4_count_hint', 'order_seal_cairn_4', 'order_cairn4_march_start', 'order_cairn4_march_bypassed']); }
+            reset() { dels(['order_cairn_iv_completed', 'order_cairn4_awake', 'order_cairn4_verses', 'order_cairn4_key_fails', 'order_cairn4_hint', 'order_cairn4_song_fails', 'order_cairn4_count_hint', 'order_seal_cairn_4', 'order_cairn4_march_start', 'order_cairn4_march_bypassed', 'order_five_seals_celebrated']); dropRelic('tuning_pebble'); }
           },
           {
             id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', flag: 'order_arch_solstice_completed', built: true,
             complete() { set('order_cairn5_march_start', '1'); set('order_cairn5_awake', 'true'); set('order_cairn5_dawn_done', 'true'); set('order_cairn5_signal_round', '4'); set('order_arch_solstice_completed', 'true'); set('order_seal_cairn_5', 'true'); },
-            reset() { dels(['order_arch_solstice_completed', 'order_cairn5_awake', 'order_cairn5_key_fails', 'order_cairn5_hint', 'order_cairn5_mirrors', 'order_cairn5_dawn_done', 'order_cairn5_dawn_fails', 'order_cairn5_dawn_hint', 'order_cairn5_signal_round', 'order_cairn5_signal_fails', 'order_cairn5_signal_hint', 'order_seal_cairn_5', 'order_cairn5_march_start', 'order_cairn5_march_bypassed', 'order_five_seals_celebrated']); }
+            reset() { dels(['order_arch_solstice_completed', 'order_cairn5_awake', 'order_cairn5_key_fails', 'order_cairn5_hint', 'order_cairn5_mirrors', 'order_cairn5_dawn_done', 'order_cairn5_dawn_fails', 'order_cairn5_dawn_hint', 'order_cairn5_signal_round', 'order_cairn5_signal_fails', 'order_cairn5_signal_hint', 'order_seal_cairn_5', 'order_cairn5_march_start', 'order_cairn5_march_bypassed', 'order_five_seals_celebrated', 'order_cairn5_seals_at_altar']); dropRelic('signal_mirror'); }
           },
           { id: 's18', tag: 'Station 18', label: 'The Polybius Stele', flag: 'order_polybius_stele_completed', built: false, reset() { del('order_polybius_stele_completed'); } },
           { id: 's19', tag: 'Station 19', label: "The Oracle's Horizon", built: false }
@@ -14307,6 +14350,35 @@
         }
 
         function indexOf(id) { return GAMES.findIndex((g) => g.id === id); }
+
+        // Where the story stands the moment Hermes reaches each game: the Hermes chat step, the walk that
+        // leads there (skipped for the tester) and the map node that opens the game.
+        const ARRIVAL = {
+          cairn1: { wire: 4, node: 22, dawn: 2 },
+          chasm: { wire: 4, node: 10, walk: 'order_chasm_march_bypassed' },
+          playa: { wire: 4, node: 21 },
+          lexicon: { wire: 5, node: 11 },
+          clepsydra: { wire: 6, node: 12 },
+          s14: { wire: 10, node: 23, walk: 'order_monolith_march_bypassed' },
+          s15: { wire: 14, node: 24, walk: 'order_labyrinth_march_bypassed' },
+          s16: { wire: 18, node: 25, walk: 'order_cairn4_march_bypassed' },
+          s17: { wire: 22, node: 26, walk: 'order_cairn5_march_bypassed' }
+        };
+        const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed'];
+
+        // Puts the Hermes chat exactly at `step`: the replies before it are kept (first reply if none was saved)
+        function setWire(step) {
+          let hist = [];
+          try { hist = JSON.parse(get('order_field_wire_choices') || '[]') || []; } catch (e) { hist = []; }
+          if (!Array.isArray(hist)) hist = [];
+          hist = hist.slice(0, step);
+          while (hist.length < step) hist.push(0);
+          [2, 0, 1, 0].forEach((v, i) => { if (i < step) hist[i] = v; });   // the storm replies are canon
+          set('order_field_wire_step', String(step));
+          set('order_field_wire_choices', JSON.stringify(hist));
+          set('order_field_wire_completed', 'true');
+          dels(['order_messenger_unread_count', 'order_messenger_last_read_step']);
+        }
 
         return {
           games: GAMES,
@@ -14336,6 +14408,23 @@
             GAMES.forEach((g) => { if (g.built && !isDone(g.id)) g.complete(); });
             syncWire('complete');
           },
+          // Every game before `id` done (with its rewards), `id` and every game after it unsolved, the walk to it
+          // skipped, the chat at the moment Hermes arrives. Returns the map node that opens the game.
+          jumpTo(id) {
+            const idx = indexOf(id), arrival = ARRIVAL[id];
+            if (idx < 0 || !arrival) return null;
+            for (let i = 0; i < idx; i++) if (GAMES[i].built && !isDone(GAMES[i].id)) GAMES[i].complete();
+            for (let i = idx; i < GAMES.length; i++) if (GAMES[i].reset) GAMES[i].reset();
+            if (arrival.walk) set(arrival.walk, 'true');
+            if (typeof arrival.dawn === 'number') {
+              set('order_dawn_step', String(arrival.dawn));
+              set('order_cairn1_found', 'true');
+            }
+            if (idx > indexOf('s14')) set('order_monolith_gate_seal1', String(get('order_seal_cairn_1') === 'true'));
+            setWire(arrival.wire);
+            return arrival.node;
+          },
+          skipWalks() { WALKS.forEach((k) => set(k, 'true')); },
           replayAll() {
             GAMES.forEach((g) => { if (g.reset) g.reset(); });
             dels(['order_field_wire_step', 'order_field_wire_choices', 'order_field_wire_completed', 'order_dawn_step', 'order_dawn_choices',
@@ -14346,9 +14435,9 @@
         };
       })();
 
-      // No automatic tester reset here: desert progress lives in shared order_* keys, so an
-      // automatic wipe would erase Silvia's progress if the tester signs in on her browser.
-      // Carles resets the Desert Path by hand from the tester controls instead.
+      // No automatic tester reset here: each seeker's progress is packed into their own vault when the
+      // profile changes (see window.EclipseProfiles), and Carles moves through the Desert Path by hand from the
+      // tester controls (Play this game, Complete up to here, Skip every walk).
 
       // One-time Silvia live seed: Station 09 done · storm until Sat 17 20:00 · Hermes wire live · desert clean for checkpoint 1
       try {
@@ -14898,7 +14987,7 @@
             };
           }
           const eta = typeof window.getMonolithMarchEta === 'function' ? window.getMonolithMarchEta() : '';
-          const arrived = typeof window.isMonolithMarchOver === 'function' && window.isMonolithMarchOver();
+          const arrived = (typeof window.isMonolithMarchOver === 'function' && window.isMonolithMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
           return {
             badge: 'STATION 14 // DESERT PATH',
             status: arrived ? 'THE RIDGE OF THE SUN REACHED ✦' : (eta ? 'HERMES CROSSING THE GREAT ERG ✦' : 'NORTH-NORTH-EAST OF TOWER II ✦'),
@@ -14942,7 +15031,7 @@
             };
           }
           const eta = typeof window.getLabyrinthMarchEta === 'function' ? window.getLabyrinthMarchEta() : '';
-          const arrived = typeof window.isLabyrinthMarchOver === 'function' && window.isLabyrinthMarchOver();
+          const arrived = (typeof window.isLabyrinthMarchOver === 'function' && window.isLabyrinthMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
           // The bearing is Hermes's to explain at first light (wire step 13): before that, no direction
           const heardAtDawn = (parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0) >= 13;
           return {
@@ -14990,7 +15079,7 @@
             };
           }
           const eta = typeof window.getCairnFourMarchEta === 'function' ? window.getCairnFourMarchEta() : '';
-          const arrived = typeof window.isCairnFourMarchOver === 'function' && window.isCairnFourMarchOver();
+          const arrived = (typeof window.isCairnFourMarchOver === 'function' && window.isCairnFourMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
           return {
             badge: 'STATION 16 // DESERT PATH',
             status: arrived ? 'CAIRN IV REACHED ✦' : (eta ? 'HERMES CROSSING THE HARDPAN ✦' : 'THE SOUTHERN MOUTH OF THE GORGE ✦'),
@@ -15034,7 +15123,7 @@
             };
           }
           const eta = typeof window.getSolsticeMarchEta === 'function' ? window.getSolsticeMarchEta() : '';
-          const arrived = typeof window.isSolsticeMarchOver === 'function' && window.isSolsticeMarchOver();
+          const arrived = (typeof window.isSolsticeMarchOver === 'function' && window.isSolsticeMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
           return {
             badge: 'STATION 17 // DESERT PATH',
             status: arrived ? 'THE ARCH REACHED ✦' : (eta ? 'HERMES WALKING EAST WITHOUT SLEEP ✦' : 'BY THE SANCTUARY, UNDER THE ARCH ✦'),
@@ -17067,8 +17156,14 @@
           if (account && account.pass === password) {
             // Switch Seeker → successful login: the ONLY path that may change the active profile
             if (gateError) gateError.style.display = 'none';
+            const seekerBefore = currentSeeker;
             persistActiveSeeker(account.name);
             sessionStorage.setItem('the_eclipse_session_authenticated', 'true');
+            // A different seeker brings a different adventure: reload so every game reads their progress
+            if (normalizeSeekerName(account.name) !== seekerBefore) {
+              window.location.reload();
+              return;
+            }
             if (typeof sfx !== 'undefined' && sfx.playMechanicalClick) sfx.playMechanicalClick();
             if (gateOverlay) gateOverlay.classList.add('gate-hidden');
             gatePass.value = '';
@@ -17787,7 +17882,7 @@
           // Station 17 debrief: the light answered in the disc's code, then went out; smoke over Tower II
           step: 23,
           get hermesInitial() {
-            const all = sealsAtGates() + 4 >= 5;
+            const all = sealsAtAltar() >= 5;
             return "Silvia, it is dawn again and I have not slept. Let me tell you in order, or I will not be able to tell you at all.\n\nThe light on Tower II asked, and we answered, and it asked again. Then I sent the three short flashes, the pause, the two long ones. The code I made for Aurelia when we were young, for the nights she worked late in the lower observatory. Nobody else in the world knew it. And the light answered it. Not with my code: with the two lines you have now, spelled slowly in the old light-code of the Order, the way a teacher writes on a blackboard.\n\nThen it went out, all at once. When the sky turned grey I saw the smoke. The wagons are at the foot of the Sanctuary steps, and there is no sign of the Servant.\n\n" + (all ? "Five seals, Silvia. Five. The gates of Tower II can no longer refuse me, if there are still gates to open." : "Four seals of five. The first still sleeps by the dry wash, and the Servant will want it. But first the Servant has to be alive to want it.");
           },
           choices: [
@@ -17815,7 +17910,7 @@
           step: 24,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtGates() + 4) + " of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. Write them in your Cipher Ledger; I wrote them on my sleeve.\n\nNow Tower II. If the Servant still stands, his last trial waits in the atrium: the Polybius Stele (Station 18, Sheet 17A). If he does not... then we will learn what the raiders came for. I will wire you from the steps of the Sanctuary.";
+            return sealsPhrase(sealsAtAltar()) + " of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. Write them in your Cipher Ledger; I wrote them on my sleeve.\n\nNow Tower II. If the Servant still stands, his last trial waits in the atrium: the Polybius Stele (Station 18, Sheet 17A). If he does not... then we will learn what the raiders came for. I will wire you from the steps of the Sanctuary.";
           }
         }
       ];
@@ -19105,6 +19200,13 @@
         return saved !== null ? saved === 'true' : localStorage.getItem('order_seal_cairn_1') === 'true';
       }
       const sealsAtGates = () => (hadFirstSealAtGates() ? 1 : 0);
+      // Seals in the satchel when the light went out over Tower II (Cairn I may have been recovered by then).
+      // Saved when the Station 17 debrief first plays, so its replays keep what Hermes said.
+      const ALTAR_SEALS_KEY = 'order_cairn5_seals_at_altar';
+      function sealsAtAltar() {
+        const saved = parseInt(localStorage.getItem(ALTAR_SEALS_KEY) || '', 10);
+        return saved >= 1 && saved <= 5 ? saved : Math.min(5, sealsAtGates() + 4);
+      }
       function sealsPhrase(n) {
         const words = ['No', 'One', 'Two', 'Three', 'Four', 'Five'];
         return (words[n] || String(n)) + (n === 1 ? ' seal' : ' seals');
@@ -19119,7 +19221,7 @@
         18: () => '✦ SEALS ' + (sealsAtGates() + 2) + ' / 5 · ACROSS THE HARDPAN TO CAIRN IV (18 H) · VIA THE NATURAL BRIDGE ✦',
         20: () => '✦ SEAL OF CAIRN IV SECURED · SEALS ' + (sealsAtGates() + 3) + ' / 5 · [S] + [U] = 17 · [S] − [U] = 9 RECORDED ✦',
         22: () => '✦ SEALS ' + (sealsAtGates() + 3) + ' / 5 · EAST TO THE ARCH OF THE SOLSTICE (18 H) · NO SLEEP ✦',
-        24: () => '✦ SEAL OF CAIRN V SECURED · SEALS ' + (sealsAtGates() + 4) + ' / 5 · [Y] − [O] = 2 · [L] + [G] = 23 RECORDED · SMOKE OVER TOWER II ✦'
+        24: () => '✦ SEAL OF CAIRN V SECURED · SEALS ' + sealsAtAltar() + ' / 5 · [Y] − [O] = 2 · [L] + [G] = 23 RECORDED · SMOKE OVER TOWER II ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -20088,6 +20190,9 @@
         }
         if (wireCurrentStep === 22) {
           if (showMarchLeg(MARCH_LEGS[22])) return;
+          if (localStorage.getItem(ALTAR_SEALS_KEY) === null) {
+            try { localStorage.setItem(ALTAR_SEALS_KEY, String(countCairnSeals())); } catch (e) {}
+          }
           advanceTo(23);   // Station 17 solved: the light that answered, and the smoke over Tower II
         }
 
@@ -22239,20 +22344,36 @@
         btnComplete.disabled = !g.built;
         btnComplete.addEventListener('click', () => apply(() => T.completeUpTo(g.id), '✦ Completed up to ' + g.tag + ' ✦'));
 
-        const btnReplay = document.createElement('button');
-        btnReplay.type = 'button';
-        btnReplay.className = 'tester-btn';
-        btnReplay.textContent = '↺ Replay from here';
-        btnReplay.title = g.id === 'cairn1'
-          ? 'Resets Cairn I and everything after it, plus the Hermes chat and expedition inventory'
-          : 'Resets this game and every game after it';
-        btnReplay.disabled = !g.built;
-        btnReplay.addEventListener('click', () => apply(() => T.replayFrom(g.id), '✦ Replaying from ' + g.tag + ' ✦'));
+        const btnPlay = document.createElement('button');
+        btnPlay.type = 'button';
+        btnPlay.className = 'tester-btn tester-btn-play';
+        btnPlay.textContent = '▶ Play this game';
+        btnPlay.title = 'Every game before it done, this game and the ones after it unsolved, no walk to wait for: the game opens at once. Press it again to replay.';
+        btnPlay.disabled = !g.built;
+        btnPlay.addEventListener('click', () => {
+          if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ Playing ' + g.tag + ' ✦');
+          const node = T.jumpTo(g.id);
+          try { if (node) sessionStorage.setItem('eclipse_tester_open_node', String(node)); } catch (e) {}
+          setTimeout(() => window.location.reload(), 450);
+        });
 
+        row.appendChild(btnPlay);
         row.appendChild(btnComplete);
-        row.appendChild(btnReplay);
         rowsEl.appendChild(row);
       });
+
+      const btnSkipWalks = document.getElementById('tester-skip-walks');
+      if (btnSkipWalks) btnSkipWalks.addEventListener('click', () => apply(() => T.skipWalks(), '✦ Hermes arrives at once: every walk skipped ✦'));
+
+      // After "Play this game" the page reloads, then the game opens straight away
+      try {
+        const node = parseInt(sessionStorage.getItem('eclipse_tester_open_node') || '', 10);
+        sessionStorage.removeItem('eclipse_tester_open_node');
+        if (node && typeof window.selectDesertStation === 'function') {
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', false);
+          setTimeout(() => window.selectDesertStation(node), 900);
+        }
+      } catch (e) {}
 
       const btnAll = document.getElementById('tester-complete-all');
       const btnReplayAll = document.getElementById('tester-replay-all');
@@ -25136,7 +25257,7 @@
       const isAwake = () => get(KEYS.awake) === 'true';
       const isDone = () => get(KEYS.done) === 'true';
       const dawnDone = () => isDone() || get(KEYS.dawnDone) === 'true';
-      const roundsDone = () => (isDone() ? ROUNDS.length : Math.max(0, Math.min(ROUNDS.length, parseInt(get(KEYS.round) || '0', 10) || 0)));
+      const roundsDone = () => (isDone() ? ROUNDS.length : Math.max(0, Math.min(ROUNDS.length - 1, parseInt(get(KEYS.round) || '0', 10) || 0)));
 
       let mirrors = (() => {
         const saved = get(KEYS.mirrors);
@@ -25237,8 +25358,10 @@
         mirrors[i] = mirrors[i] === 'f' ? 'b' : 'f';
         set(KEYS.mirrors, mirrors.join(''));
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        const hadFocus = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-i') === String(i);
         checkRay();
         drawCourt();
+        if (hadFocus) { const g = el.court.querySelector('[data-i="' + i + '"]'); if (g) g.focus(); }
       }
 
       // ---- The dawn ----
@@ -25260,6 +25383,17 @@
         if (left <= 0) { dawnSpent(); return; }
         dawn.raf = requestAnimationFrame(tick);
       }
+      let pausedLeft = null;
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          cancelPress();
+          if (dawn.running) { pausedLeft = dawn.deadline - performance.now(); if (dawn.raf) cancelAnimationFrame(dawn.raf); dawn.raf = null; }
+        } else if (dawn.running && pausedLeft !== null) {
+          dawn.deadline = performance.now() + Math.max(0, pausedLeft);
+          pausedLeft = null;
+          tick();
+        }
+      });
       function stopDawn() {
         dawn.running = false;
         if (dawn.raf) cancelAnimationFrame(dawn.raf);
@@ -25353,10 +25487,17 @@
         if (!el.pulses) return;
         el.pulses.textContent = pulses.map((p) => (p === 'S' ? '·' : '—')).join(' ') || ' ';
       }
-      let pressAt = 0;
+      let pressAt = 0, pressPointer = null;
+      function cancelPress() {
+        pressAt = 0; pressPointer = null;
+        if (el.flash) el.flash.classList.remove('is-down');
+        const own = el.night && el.night.querySelector('.solstice-own');
+        if (own) { own.setAttribute('fill', '#b8a07a'); own.setAttribute('r', '2'); }
+      }
       function pressStart(e) {
         if (!dawnDone() || isDone() || finale || pressAt) return;
         if (e) e.preventDefault();
+        pressPointer = e && e.pointerId !== undefined ? e.pointerId : null;
         pressAt = performance.now();
         if (el.flash) el.flash.classList.add('is-down');
         const own = el.night && el.night.querySelector('.solstice-own');
@@ -25364,7 +25505,9 @@
       }
       function pressEnd(e) {
         if (!pressAt) return;
+        if (e && e.pointerId !== undefined && pressPointer !== null && e.pointerId !== pressPointer) return;
         if (e) e.preventDefault();
+        pressPointer = null;
         const held = performance.now() - pressAt;
         pressAt = 0;
         if (el.flash) el.flash.classList.remove('is-down');
@@ -25521,6 +25664,7 @@
         el.flash.addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) pressStart(e); else if (e.key === ' ' || e.key === 'Enter') e.preventDefault(); });
         el.flash.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') pressEnd(e); });
         el.flash.addEventListener('click', (e) => e.preventDefault());
+        el.flash.addEventListener('blur', cancelPress);
       }
       if (el.clear) el.clear.addEventListener('click', () => { pulses = []; renderPulses(); });
       if (el.send) el.send.addEventListener('click', sendSignal);
@@ -25565,6 +25709,7 @@
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (dawn.running) { stopDawn(); dawn.locks = 0; dawn.step = 0; feedback(el.dawnFeedback, 'Hermes looked away and the dawn went by.', ''); }
         if (!finale) stopLight();
+        cancelPress();
         modal.classList.add('closing');
         setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
         if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
@@ -25606,14 +25751,24 @@
           seal.style.animationDelay = (0.35 + i * 0.35) + 's';
           ring.appendChild(seal);
         });
+        ceremonyReturnFocus = document.activeElement;
         overlay.style.display = 'flex';
         if (sfx && sfx.playCelestialChime) setTimeout(() => sfx.playCelestialChime(), 2100);
         const btn = $('btn-five-seals-close');
         if (btn) setTimeout(() => btn.focus(), 80);
       };
-      const closeCeremony = () => { if (overlay) overlay.style.display = 'none'; };
+      let ceremonyReturnFocus = null;
+      const closeCeremony = () => {
+        if (overlay) overlay.style.display = 'none';
+        if (ceremonyReturnFocus && document.contains(ceremonyReturnFocus) && typeof ceremonyReturnFocus.focus === 'function') ceremonyReturnFocus.focus();
+        ceremonyReturnFocus = null;
+      };
       if ($('btn-five-seals-close')) $('btn-five-seals-close').addEventListener('click', closeCeremony);
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlay && overlay.style.display !== 'none') closeCeremony(); });
+      document.addEventListener('keydown', (e) => {
+        if (!overlay || overlay.style.display === 'none') return;
+        if (e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); closeCeremony(); }
+        else if (e.key === 'Tab') { e.preventDefault(); const btn = $('btn-five-seals-close'); if (btn) btn.focus(); }   // the ceremony holds the focus
+      }, true);
 
       // Test hook for scripts/audit/web_smoke.py: the courtyard and signals (they are in this source anyway) and the controls
       window.__cairn5 = {
@@ -25628,6 +25783,8 @@
         send: () => sendSignal()
       };
 
+      // A save that answered the last signal but was closed before the light finished speaking: finish it now
+      if (!isDone() && dawnDone() && (parseInt(get(KEYS.round) || '0', 10) || 0) >= ROUNDS.length) completeStation();
       if (isDone()) applyVictory();
       else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
       render();
