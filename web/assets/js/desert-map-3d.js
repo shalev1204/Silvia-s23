@@ -122,7 +122,7 @@
     { key: 'oasis', x: 1580, y: 2420, lvl: 6, id: 12, icon: '💧', label: '13 · THE OASIS CLEPSYDRA', done: 'clep', doneLabel: '13 · THE OASIS CLEPSYDRA (SOLVED)' },
     { key: 'monolith', x: 1262, y: 430, lvl: 7, id: 23, icon: '☀️', label: '14 · THE SUN MONOLITH', done: 'monolith', doneLabel: '14 · THE SUN MONOLITH (CAIRN II)', revealWhen: 'clep' },
     { key: 'labyrinth', x: 1640, y: 770, lvl: 8, id: 24, icon: '🌀', label: '15 · THE SANDSTONE LABYRINTH', done: 'labyrinth', doneLabel: '15 · THE SANDSTONE LABYRINTH (CAIRN III)', revealWhen: 'monolith' },
-    { key: 'cairn4', x: 130, y: 2150, lvl: 9, icon: '🗿', label: '16 · CAIRN IV · SENTRY OF THE CANYON', done: 'cairn4', soon: 'Station 16: Cairn IV, Sentry of the Canyon · Sheet 15A of your journal.' },
+    { key: 'cairn4', x: 130, y: 2150, lvl: 9, id: 25, icon: '🗿', label: '16 · CAIRN IV · SENTRY OF THE CANYON', done: 'cairn4', doneLabel: '16 · CAIRN IV (THE PILLARS SANG)', revealWhen: 'labyrinth' },
     { key: 'arch', x: 1480, y: 2040, lvl: 10, icon: '🌓', label: '17 · ARCH OF THE SOLSTICE', done: 'arch', soon: 'Station 17: Arch of the Solstice · Sheet 16B of your journal.' },
     { key: 'sanctuary', x: 1560, y: 1660, lvl: 11, id: 14, icon: '🏛️', label: '18–19 · SANDSTONE SANCTUARY', done: 'oracle' }
   ];
@@ -166,13 +166,14 @@
     if (d.playa) lvl = Math.max(lvl, 5);
     if (d.lex) lvl = Math.max(lvl, 6);
     // Station 14: Hermes reaches the Sun Monolith (lvl 7) only when the 12-hour crossing is over.
-    // Station 15: he reaches the Sandstone Labyrinth (lvl 8) only when the 6-hour walk down is over,
-    // and rests there after Cairn III until the road to Station 16 exists.
+    // Station 15: he reaches the Sandstone Labyrinth (lvl 8) only when the 6-hour walk down is over.
     var monolithArrived = d.monolith || (typeof window.isMonolithMarchOver === 'function' && window.isMonolithMarchOver());
     if (d.clep) lvl = Math.max(lvl, monolithArrived ? 7 : 6);
     var labyrinthArrived = d.labyrinth || (typeof window.isLabyrinthMarchOver === 'function' && window.isLabyrinthMarchOver());
     if (d.monolith) lvl = Math.max(lvl, labyrinthArrived ? 8 : 7);
-    if (d.cairn4) lvl = Math.max(lvl, 10);
+    // Station 16: Cairn IV (lvl 9) only when the 18-hour crossing is over
+    var cairnFourArrived = d.cairn4 || (typeof window.isCairnFourMarchOver === 'function' && window.isCairnFourMarchOver());
+    if (d.labyrinth) lvl = Math.max(lvl, cairnFourArrived ? 9 : 8);
     if (d.arch) lvl = Math.max(lvl, 11);
 
     try {   // test hook: ?d3lvl=4 forces a progress level
@@ -201,6 +202,7 @@
     if (st.revealWhen === 'cairnFound') return s.dawn >= 2 || s.done.cairn1;
     if (st.revealWhen === 'clep') return !!s.done.clep;
     if (st.revealWhen === 'monolith') return !!s.done.monolith;
+    if (st.revealWhen === 'labyrinth') return !!s.done.labyrinth;
     return s.lvl >= st.lvl;
   }
 
@@ -717,9 +719,11 @@
     var hub = function (name, fallback) { return typeof window[name] === 'function' ? window[name]() : fallback; };
     function monolithProgress() { return hub('getMonolithMarchProgress', 1); }
     function labyrinthProgress() { return hub('getLabyrinthMarchProgress', 1); }
+    function cairnFourProgress() { return hub('getCairnFourMarchProgress', 1); }
     // The leg Hermes is walking right now, if any:
     // · after Station 13: at the gates of Tower II, then the 12-hour crossing to the Sun Monolith (segment 7, from the gates);
-    // · after Station 14: resting under the Monolith, then the 6-hour walk down to the Sandstone Labyrinth (segment 8).
+    // · after Station 14: resting under the Monolith, then the 6-hour walk down to the Sandstone Labyrinth (segment 8);
+    // · after Station 15: hiding at the Western Cleft, then the 18-hour crossing to Cairn IV (segment 9).
     function currentCrossing() {
       if (state.done.clep && !state.done.monolith && monolithProgress() < 1 && route.gates !== null) {
         var etaM = hub('getMonolithMarchEta', '');
@@ -730,6 +734,11 @@
         var etaL = hub('getLabyrinthMarchEta', '');
         return { progress: labyrinthProgress(), from: route.cum[7], to: route.cum[8],
                  text: etaL ? '🚶 DOWN TO THE SANDSTONE LABYRINTH · ETA: ' + etaL : 'Resting under the Sun Monolith' };
+      }
+      if (state.done.labyrinth && !state.done.cairn4 && cairnFourProgress() < 1) {
+        var eta4 = hub('getCairnFourMarchEta', '');
+        return { progress: cairnFourProgress(), from: route.cum[8], to: route.cum[9],
+                 text: eta4 ? '🚶 ACROSS THE HARDPAN TO CAIRN IV · ETA: ' + eta4 : 'Hiding at the Western Cleft until dark' };
       }
       return null;
     }
@@ -868,7 +877,7 @@
       var marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
       var marchProgress = typeof window.getChasmMarchProgress === 'function' ? window.getChasmMarchProgress() : 1.0;
 
-      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), Math.floor(monolithProgress() * 200), Math.floor(labyrinthProgress() * 200), JSON.stringify(next.done)].join('|');
+      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), Math.floor(monolithProgress() * 200), Math.floor(labyrinthProgress() * 200), Math.floor(cairnFourProgress() * 200), JSON.stringify(next.done)].join('|');
       if (!force && nextSig === sig) return;
       var advanced = next.lvl > state.lvl;
       state = next;

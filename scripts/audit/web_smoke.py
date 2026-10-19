@@ -9,6 +9,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
   4. The Cipher Ledger only lists the desert equations once their station is solved.
   5. Station 14 (The Sun Monolith): gates scene, 12-hour crossing, sigil, walking sun, Seal II, debrief, reload.
   6. Station 15 (The Sandstone Labyrinth): first light, 6-hour walk, sigil, the escape (solved by search), Seal III, debrief.
+  7. Station 16 (Cairn IV): dusk scene, 18-hour crossing, sigil, the three verses decoded from the calls, Seal IV, relic, debrief.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -369,13 +370,101 @@ def test_sandstone_labyrinth(browser):
     open_wire()
     check(get("order_field_wire_step") == "15" and choices() == 3 and "gold leaf" in wire_text(), "debrief: step 15 with the gold star and 3 replies")
     answer_first()
-    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
-    check(get("order_field_wire_step") == "16" and "Seals 3 / 5" in bar, "step 16 shows Seals 3 / 5", bar)
+    check(get("order_field_wire_step") == "17" and "SEALS 3 / 5 · [W] + [A] = 26" in wire_text() and choices() == 3,
+          "step 16 records Seals 3 / 5, then dusk at the hardpan (step 17) opens")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(text.count("First light, Silvia") == 1 and text.count("I am out, Silvia") == 1 and "Three seals of five" in text,
-          "reload replays steps 13-16 once each")
+    check(text.count("First light, Silvia") == 1 and text.count("I am out, Silvia") == 1 and "Three seals of five" in text
+          and text.count("Dusk, Silvia") == 1, "reload replays steps 13-17 once each")
     check(not errors, "no JS errors during Station 15", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+def decode_verse(calls):
+    """The fissures a careful listener names for a verse: side of the pillar, and beats from call to echo × 5 paces.
+    Built from the call data only, as the test can only see what the page plays."""
+    return [c["side"] + str(c["d"]) for c in calls]
+
+
+def test_cairn_four(browser):
+    print("\n7. Station 16 · Cairn IV, the Song of the Pillars, end to end")
+    seed = dict(DESERT_BASE, **DESERT_DONE, order_sun_monolith_completed="true", order_seal_cairn_2="true",
+                order_sandstone_labyrinth_completed="true", order_seal_cairn_3="true", order_monolith_gate_seal1="true",
+                order_cairn4_sound="off", order_field_wire_step="16",
+                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0]")
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    modal_open = lambda: js("getComputedStyle(document.getElementById('modal-cairn-four')).display") != "none"
+    choices = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].length")
+    wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
+
+    def open_wire():
+        js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+        page.wait_for_timeout(2200)
+
+    def answer_first():
+        js("document.querySelector('#wire-choices-grid button').click()")
+        page.wait_for_timeout(9000)
+
+    open_wire()
+    check(get("order_field_wire_step") == "17" and choices() == 3 and "veiled woman" in wire_text(), "dusk at the hardpan: step 17 with the shepherd and 3 replies")
+    js("window.selectDesertStation(25)"); page.wait_for_timeout(500)
+    check(not modal_open(), "Cairn IV sealed before Hermes sets out")
+    open_wire(); answer_first()
+    check(get("order_field_wire_step") == "18" and get("order_cairn4_march_start") and "ACROSS THE HARDPAN TO CAIRN IV (18 H)" in wire_text(),
+          "reply at dusk starts the 18-hour crossing")
+    js("window.selectDesertStation(25)"); page.wait_for_timeout(500)
+    check(not modal_open(), "Cairn IV sealed during the crossing")
+
+    js("localStorage.setItem('order_cairn4_march_start', String(Date.now() - 19 * 3600 * 1000))")
+    js("window.openCairnFourModal()"); page.wait_for_timeout(500)
+    check(modal_open() and js("document.querySelector('#pillars-game .monolith-game-inner').inert") is True, "after 18 h it opens, the song locked until the sigil")
+    for word in ["RESOUNDS", "ROUNDES", "RE SOUN"]:
+        page.fill("#pillars-key-input", word); page.click("#btn-pillars-speak"); page.wait_for_timeout(120)
+    check(get("order_cairn4_hint") == "true" and get("order_cairn4_awake") is None, "3 wrong sigils unlock the hint, pillars stay mute")
+    page.fill("#pillars-key-input", " re-sound "); page.click("#btn-pillars-speak"); page.wait_for_timeout(250)
+    check(get("order_cairn4_awake") == "true", "forgiving sigil 're-sound' wakes the pillars")
+
+    verses = js("window.__cairn4.verses")
+    letters = js("window.__cairn4.letters")
+    words = ["".join(letters[c["side"]][str(c["d"])] for c in v["calls"]) for v in verses]
+    check(words == ["SUN", "ECHO", "STONE"], "the verses spell the founders' words", str(words))
+    js("window.__cairn4.play()"); page.wait_for_timeout(1500)
+    check("playing" in js("document.getElementById('pillars-tape-status').innerText"), "the wind plays verse I on the tape")
+    # A wrong verse is refused and counted
+    for fid in ["L35", "L45", "R25"]:
+        js(f"window.__cairn4.mark('{fid}')")
+    js("window.__cairn4.sing()")
+    check(get("order_cairn4_verses") is None and "2 of 3" in js("document.getElementById('pillars-song-feedback').innerText"),
+          "a wrong verse is refused (2 of 3 echoes rang true)")
+    js("document.getElementById('btn-pillars-undo').click(); document.getElementById('btn-pillars-undo').click(); document.getElementById('btn-pillars-undo').click()")
+    for i, v in enumerate(verses):
+        for fid in decode_verse(v["calls"]):
+            js(f"window.__cairn4.mark('{fid}')")
+        js("window.__cairn4.sing()"); page.wait_for_timeout(200)
+        if i < 2:
+            check(get("order_cairn4_verses") == str(i + 1), f"verse {i + 1} rings true")
+    check(get("order_cairn_iv_completed") == "true" and get("order_seal_cairn_4") == "true", "three verses sung: Seal of Cairn IV granted")
+    check("tuning_pebble" in js("window.getOwnedRelicIds()"), "the Tuning Pebble is in the satchel")
+    page.click("#btn-close-pillars"); page.wait_for_timeout(300)
+
+    js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
+    ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
+    check("eq-item-cairn4-sum" in ids and "eq-item-cairn4-diff" in ids, "Ledger shows [S] + [U] = 17 and [S] − [U] = 9")
+
+    open_wire()
+    check(get("order_field_wire_step") == "19" and choices() == 3 and "Toward Tower II" in wire_text(), "debrief: step 19 (the code, the pebble, the raiders) with 3 replies")
+    answer_first()
+    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+    check(get("order_field_wire_step") == "20" and "Seals 4 / 5" in bar, "step 20 shows Seals 4 / 5", bar)
+    page.reload(); page.wait_for_timeout(2500); open_wire()
+    text = wire_text()
+    check(text.count("Dusk, Silvia") == 1 and text.count("I have not slept") == 1 and "Four seals of five" in text,
+          "reload replays steps 17-20 once each")
+    check(not errors, "no JS errors during Station 16", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
 
@@ -393,6 +482,7 @@ def main():
         test_ledger_gating(browser)
         test_sun_monolith(browser)
         test_sandstone_labyrinth(browser)
+        test_cairn_four(browser)
         browser.close()
     server.shutdown()
 

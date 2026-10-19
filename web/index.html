@@ -3975,6 +3975,65 @@
     @keyframes labyFlash { 0% { box-shadow: inset 0 0 0 999px rgba(239, 68, 68, 0.35); } 100% { box-shadow: inset 0 0 0 999px rgba(239, 68, 68, 0); } }
     @media (prefers-reduced-motion: reduce) { .laby-flash { animation: none; } }
 
+    /* ===================================================================
+       STATION 16 · CAIRN IV, SENTRY OF THE CANYON (THE SONG OF THE PILLARS)
+       Uses the .monolith-* shell of Station 14; only the canyon plan, the chronograph tape and
+       the song controls live here.
+       =================================================================== */
+    .pillars-plan {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 360px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 95%, #3b2a17 0%, #1a120a 80%);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .pillars-plan .pillars-fissure { cursor: pointer; }
+    .pillars-plan .pillars-fissure:focus { outline: none; }
+    .pillars-plan .pillars-fissure:focus-visible rect.pillars-tag,
+    .pillars-plan .pillars-fissure:hover rect.pillars-tag { stroke: #fde68a; stroke-width: 0.9; }
+    .pillars-tape-wrap {
+      margin-top: 10px;
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      background: #efe6d2;
+      scrollbar-width: thin;
+    }
+    .pillars-tape { display: block; height: 96px; }
+    .pillars-tape-caption { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; font-size: 0.72rem; color: #b8a07a; }
+    .pillars-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .pillars-verse-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pillars-verse-tabs .monolith-btn { padding: 6px 12px; }
+    .pillars-verse-tabs .monolith-btn[aria-pressed="true"] { background: rgba(245, 158, 11, 0.35); border-color: #fbbf24; }
+    .pillars-verse-tabs .monolith-btn.is-sung::after { content: ' ✓'; color: #86efac; }
+    .pillars-slots { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pillars-slot {
+      min-width: 52px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px dashed rgba(212, 168, 83, 0.55);
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      color: #fde68a;
+      background: rgba(15, 10, 5, 0.6);
+    }
+    .pillars-slot.is-filled { border-style: solid; background: rgba(245, 158, 11, 0.16); }
+    .pillars-mode .monolith-btn[aria-pressed="true"] { background: rgba(56, 189, 248, 0.2); border-color: #7dd3fc; color: #e0f2fe; }
+    .pillars-words { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .pillars-word {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.25em;
+      color: #7a6a52;
+    }
+    .pillars-word.is-sung { color: #fde68a; border-color: #fbbf24; background: rgba(245, 158, 11, 0.12); }
+
     /* Station 08 Unlock Cinematic Celebration Overlay */
     .station8-unlock-overlay {
       position: fixed;
@@ -13003,6 +13062,114 @@
   </div>
 
   <!-- ===================================================================
+       STATION 16: CAIRN IV, SENTRY OF THE CANYON · THE SONG OF THE PILLARS
+       Part I is the journal (Sheet 15A: the seven echoes of the survey log). Part II only exists here:
+       the wind plays the pillars, and Silvia must tell, by ear or by the chronograph, which fissure
+       each echo came from, verse after verse.
+       =================================================================== -->
+  <div class="monolith-modal-backdrop" id="modal-cairn-four" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pillars-modal-title">
+    <div class="monolith-window">
+      <div class="monolith-header">
+        <div class="monolith-title-wrap">
+          <span class="monolith-title-icon" aria-hidden="true">🗿</span>
+          <div>
+            <h2 class="monolith-title" id="pillars-modal-title">CAIRN IV · SENTRY OF THE CANYON</h2>
+            <div class="monolith-subtitle">Station 16 · The Song of the Pillars · Sheet 15A</div>
+          </div>
+        </div>
+        <button type="button" class="monolith-close-btn" id="btn-close-pillars" aria-label="Close Cairn IV">✕</button>
+      </div>
+
+      <div class="monolith-telemetry">
+        <div>EXPEDITION:<strong>CAIRN IV // THE SOUTHERN MOUTH OF THE GORGE</strong></div>
+        <div>SIGIL:<strong id="pillars-telem-sigil">[ 7 LETTERS ]</strong></div>
+        <div>VERSES:<strong id="pillars-telem-verses">0 / 3</strong></div>
+        <div>SEAL:<strong id="pillars-telem-seal">[ SEALED ]</strong></div>
+      </div>
+
+      <div class="monolith-body">
+        <div class="monolith-panel">
+          <div class="monolith-card" id="pillars-sigil-card">
+            <div class="monolith-card-title">I · The Sigil of the Sentry</div>
+            <p>Solve <strong>Sheet 15A</strong> of your journal: turn each of the seven echoes of the survey log into a distance, find its fissure on the plan, and read the carved letters in order. Speak the seven-letter sigil to wake the pillars.</p>
+            <div class="monolith-key-row">
+              <label class="monolith-sr-only" for="pillars-key-input">The seven-letter sigil of Cairn IV</label>
+              <input type="text" class="monolith-key-input" id="pillars-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
+              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-speak">✦ Speak the Sigil</button>
+            </div>
+            <div class="monolith-feedback" id="pillars-key-feedback" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="monolith-card monolith-game is-locked" id="pillars-game">
+            <div class="monolith-card-title">II · The Song of the Pillars</div>
+            <div class="monolith-game-inner">
+              <div class="pillars-row" style="margin-top: 0;">
+                <div class="pillars-verse-tabs" id="pillars-verse-tabs" role="group" aria-label="Verses of the song"></div>
+                <button type="button" class="monolith-btn" id="btn-pillars-sound" aria-pressed="true">🔊 Sound</button>
+              </div>
+              <svg class="pillars-plan" id="pillars-plan" viewBox="0 0 120 142" role="group" aria-label="Cairn IV seen from above: the two pillars, the rings of paces and the sixteen fissures of the cliffs. Choose a fissure to mark an echo."></svg>
+              <div class="pillars-tape-wrap" id="pillars-tape-wrap">
+                <svg class="pillars-tape" id="pillars-tape" role="img" aria-label="The chronograph tape: one tick per beat, the calls of the pillars and their echoes."></svg>
+              </div>
+              <div class="pillars-tape-caption"><span>▲ Left pillar · ▼ Right pillar · ■ call · ▢ echo</span><span id="pillars-tape-status"></span></div>
+              <div class="pillars-row">
+                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-play">▶ Let the wind play</button>
+                <div class="pillars-mode" role="group" aria-label="What a fissure does when you choose it">
+                  <button type="button" class="monolith-btn" id="btn-pillars-mode-mark" aria-pressed="true">✎ Mark</button>
+                  <button type="button" class="monolith-btn" id="btn-pillars-mode-call" aria-pressed="false">📣 Test call</button>
+                </div>
+              </div>
+              <div class="pillars-row">
+                <div class="pillars-slots" id="pillars-slots" aria-live="polite"></div>
+                <button type="button" class="monolith-btn" id="btn-pillars-undo" aria-label="Remove the last marked echo">⌫</button>
+                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-sing">✦ Sing it back</button>
+              </div>
+              <div class="monolith-feedback" id="pillars-song-feedback" role="status" aria-live="polite"></div>
+            </div>
+            <div class="monolith-lock-note">Speak the sigil of Cairn IV to wake the pillars.</div>
+          </div>
+        </div>
+
+        <div class="monolith-panel">
+          <div class="monolith-card">
+            <div class="monolith-card-title">The Laws of the Echo</div>
+            <ul class="laby-rules">
+              <li>The wind plays one pillar at a time. The Left pillar sings only to the left cliff, the Right pillar only to the right one, each in its own voice.</li>
+              <li>Count the beats of the chronometer from the start of a call to the start of its echo: every beat is 5 paces to the fissure that answered.</li>
+              <li>A long call comes back as a long echo. Listen with headphones if you can; the tape records everything you hear.</li>
+              <li>Mark the fissure of each echo, in the order the wind played them, then sing the verse back. <strong>Test call</strong> lets Hermes shout at a fissure to hear how it answers.</li>
+            </ul>
+            <div class="laby-hint" id="pillars-hint" style="display: none;">✦ Hermes has numbered the beats on the tape for you.</div>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-card-title">The Song of the Sentry</div>
+            <div class="pillars-words" id="pillars-words"></div>
+            <div class="monolith-fragments" id="pillars-fragments"></div>
+          </div>
+
+          <div class="monolith-card monolith-victory" id="pillars-victory" style="display: none;">
+            <div class="monolith-card-title">✦ The Chamber of Cairn IV Opens</div>
+            <p id="pillars-victory-text"></p>
+            <div>
+              <span class="monolith-equation">[S] + [U] = 17</span>
+              <span class="monolith-equation">[S] − [U] = 9</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #b8a07a;">Engraved on the bronze reed of the Left pillar. Record both in your Cipher Ledger.</p>
+            <p style="font-size: 0.82rem;">🪨 <strong>The Tuning Pebble</strong> is in Hermes's satchel.</p>
+            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-finish">🗺️ Return to the Grand Desert Map ➔</button>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // CAIRN IV</div>
+            <div class="monolith-dispatch" id="pillars-dispatch-text" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
        STATION 15: THE SANDSTONE LABYRINTH & CAIRN III · ESCAPE FROM THE BC ASHES
        Part I is the journal (Sheet 14B: the eight arches of the true road). Part II only exists here:
        a turn-based escape through a dark labyrinth patrolled by the raiders' torches.
@@ -13900,7 +14067,11 @@
             complete() { set('order_labyrinth_march_start', '1'); set('order_labyrinth_awake', 'true'); set('order_labyrinth_star_seen', 'true'); set('order_labyrinth_camp_seen', 'true'); set('order_sandstone_labyrinth_completed', 'true'); set('order_seal_cairn_3', 'true'); },
             reset() { dels(['order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed']); }
           },
-          { id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', built: false, reset() { del('order_seal_cairn_4'); } },
+          {
+            id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', flag: 'order_cairn_iv_completed', built: true,
+            complete() { set('order_cairn4_march_start', '1'); set('order_cairn4_awake', 'true'); set('order_cairn4_verses', '3'); set('order_cairn_iv_completed', 'true'); set('order_seal_cairn_4', 'true'); },
+            reset() { dels(['order_cairn_iv_completed', 'order_cairn4_awake', 'order_cairn4_verses', 'order_cairn4_key_fails', 'order_cairn4_hint', 'order_cairn4_song_fails', 'order_cairn4_count_hint', 'order_seal_cairn_4', 'order_cairn4_march_start', 'order_cairn4_march_bypassed']); }
+          },
           { id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', built: false, reset() { del('order_seal_cairn_5'); } },
           { id: 's18', tag: 'Station 18', label: 'The Polybius Stele', flag: 'order_polybius_stele_completed', built: false, reset() { del('order_polybius_stele_completed'); } },
           { id: 's19', tag: 'Station 19', label: "The Oracle's Horizon", built: false }
@@ -13910,9 +14081,9 @@
 
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
-          const lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
-          const cap = lab ? 16 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
+          const c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
+          const cap = c4 ? 20 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -14577,6 +14748,50 @@
               { icon: '🪨', label: 'The Seal of Cairn III', desc: 'Third seal of the five' }
             ],
             btnText: arrived ? '✦ ENTER THE LABYRINTH ➔' : 'Hermes is on his way',
+            btnDisabled: !arrived,
+            action: open
+          };
+        },
+        // Station 16 · Cairn IV, Sentry of the Canyon (node id 25)
+        25: () => {
+          const thumb = './assets/thumbnails/cairn_iv_preview.webp';
+          const open = () => (window.openCairnFourModal ? window.openCairnFourModal() : null);
+          if (localStorage.getItem('order_cairn_iv_completed') === 'true') {
+            return {
+              badge: 'STATION 16 // THE PILLARS SANG',
+              status: 'SEAL OF CAIRN IV SECURED ✓',
+              statusClass: 'status-done-badge',
+              title: 'Cairn IV · Sentry of the Canyon',
+              thumb,
+              lore: 'Silvia spoke the sigil of the seven echoes and then sang the canyon\'s three verses back to it: SUN, ECHO, STONE. The founders\' chamber opened. In the throat of the Left pillar, Hermes found a pebble that the river never put there.',
+              rewards: [
+                { icon: '🪨', label: 'The Seal of Cairn IV', desc: 'Fourth seal of the five' },
+                { icon: '📐', label: 'Ledger: [S] + [U] = 17 · [S] − [U] = 9', desc: 'Engraved on the bronze reed' },
+                { icon: '✶', label: 'The Tuning Pebble', desc: 'In Hermes\'s satchel' }
+              ],
+              btnText: 'Review the Song of the Pillars ➔',
+              action: open
+            };
+          }
+          const eta = typeof window.getCairnFourMarchEta === 'function' ? window.getCairnFourMarchEta() : '';
+          const arrived = typeof window.isCairnFourMarchOver === 'function' && window.isCairnFourMarchOver();
+          return {
+            badge: 'STATION 16 // DESERT PATH',
+            status: arrived ? 'CAIRN IV REACHED ✦' : (eta ? 'HERMES CROSSING THE HARDPAN ✦' : 'THE SOUTHERN MOUTH OF THE GORGE ✦'),
+            statusClass: 'status-live-badge',
+            title: 'Cairn IV · Sentry of the Canyon',
+            thumb,
+            lore: arrived
+              ? 'Two hollow pillars guard the southern mouth of the gorge, under the Sentinel Mesa, and the wind sings inside them. Solve Sheet 15A of your journal, speak the sigil, and learn the song of the pillars.'
+              : (eta
+                ? 'Hermes is crossing the hardpan by night and the Natural Bridge of the Sentinel Mesa, toward the singing pillars. Arrival in ' + eta + '. Keep Sheet 15A close.'
+                : 'Far to the south-west, where the canyon narrows under the Sentinel Mesa, Cairn IV has stood since the founders\' time. Hermes will set out once you answer him on the wire.'),
+            rewards: [
+              { icon: '📖', label: 'Sheet 15A of the Journal', desc: 'The seven echoes of the survey log' },
+              { icon: '🎶', label: 'The Song of the Pillars', desc: 'A second trial, by ear' },
+              { icon: '🪨', label: 'The Seal of Cairn IV', desc: 'Fourth seal of the five' }
+            ],
+            btnText: arrived ? '✦ WAKE THE SENTRY ➔' : 'Hermes is on his way',
             btnDisabled: !arrived,
             action: open
           };
@@ -15759,7 +15974,9 @@
         { id: 'cairn2-df', station: 'Station 14 · Lid of Cairn II', name: 'The Deneb Line', expr: 'D + F', l1: 'D', op: '+', l2: 'F', target: 24, unit: '', requires: 'order_sun_monolith_completed' },
         { id: 'cairn2-ct', station: 'Station 14 · Lid of Cairn II', name: 'The Cygnus Line', expr: 'C − T', l1: 'C', op: '-', l2: 'T', target: 8, unit: '', requires: 'order_sun_monolith_completed' },
         { id: 'cairn3-wa', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The West Wind Line', expr: 'W + A', l1: 'W', op: '+', l2: 'A', target: 26, unit: '', requires: 'order_sandstone_labyrinth_completed' },
-        { id: 'cairn3-ne', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The Wind Rose Line', expr: 'N − E', l1: 'N', op: '-', l2: 'E', target: 9, unit: '', requires: 'order_sandstone_labyrinth_completed' }
+        { id: 'cairn3-ne', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The Wind Rose Line', expr: 'N − E', l1: 'N', op: '-', l2: 'E', target: 9, unit: '', requires: 'order_sandstone_labyrinth_completed' },
+        { id: 'cairn4-sum', station: 'Station 16 · The bronze reed of Cairn IV', name: 'The Rising Echo', expr: 'S + U', l1: 'S', op: '+', l2: 'U', target: 17, unit: '', requires: 'order_cairn_iv_completed' },
+        { id: 'cairn4-diff', station: 'Station 16 · The bronze reed of Cairn IV', name: 'The Falling Echo', expr: 'S − U', l1: 'S', op: '-', l2: 'U', target: 9, unit: '', requires: 'order_cairn_iv_completed' }
       ];
 
       // Desert equations only appear once their station is solved, so the Ledger never spoils them
@@ -17205,7 +17422,71 @@
           step: 16,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtGates() + 2) + " of five, Silvia. The Seal of Cairn III sits next to the second one, and the two lines carved under the copper plate belong in your Cipher Ledger: [W] + [A] = 26 and [N] − [E] = 9.\n\nThe fourth cairn stands far to the south-west, where the canyon narrows: Cairn IV, the Sentry of the Canyon (Station 16). I will wire you when I see its twin pillars.";
+            return sealsPhrase(sealsAtGates() + 2) + " of five, Silvia. The Seal of Cairn III sits next to the second one, and the two lines carved under the copper plate belong in your Cipher Ledger: [W] + [A] = 26 and [N] − [E] = 9.\n\nThe fourth cairn stands far to the south-west, where the canyon narrows: Cairn IV, the Sentry of the Canyon (Station 16). I will hide in the rocks until dark and wire you before I cross the hardpan.";
+          }
+        },
+        {
+          // Dusk at the edge of the hardpan: a shepherd, and the veiled woman who sings to the stars
+          step: 17,
+          hermesInitial: "Dusk, Silvia, and I am not alone. At a seep under the last rocks before the hardpan there is an old shepherd with a dozen black goats. He shared his water and asked me nothing, which is the desert's way of being kind.\n\nHe says the hardpan can be crossed in one night if you walk toward the singing: when the night wind blows, the pillars of Cairn IV can be heard from the Natural Bridge of the Sentinel Mesa. Then he said something I cannot shake off. Every autumn, on the clear nights, a veiled woman comes down from the sandstone and sings to the stars. The herders leave her milk and dates on a flat stone. Nobody has seen her face.\n\nThe raiders' wagons came by here yesterday, he says. Heading south-west, like me.",
+          choices: [
+            {
+              id: "choice-17-veiled",
+              text: "Ask him about the veiled woman.",
+              silviaMsg: "Ask him about the veiled woman, Hermes. What does she sing?",
+              hermesReply: "He hummed it for me. No words, just a few notes rising and falling, the way you would sing to a child. He says the goats go quiet when she sings. I wrote the notes in my log, and my hand was shaking, and I do not know why."
+            },
+            {
+              id: "choice-17-bridge",
+              text: "Ask him the way over the Natural Bridge.",
+              silviaMsg: "Ask him the safest way over the Natural Bridge. Sheets 15B and 16A show switchbacks on the eastern side.",
+              hermesReply: "He laughed. 'The old cart track crosses the bridge on its back,' he said, 'but the switchbacks below are too tight for a loaded wagon. Men on foot, yes. Wagons, never.' If the raiders try it, they will have to choose between their wagons and their road."
+            },
+            {
+              id: "choice-17-raiders",
+              text: "Ask how many raiders he saw.",
+              silviaMsg: "Ask him how many raiders he saw, and whether they had the Astrolabe with them.",
+              hermesReply: "Three wagons and perhaps a dozen men, with ash on their sleeves. One wagon was covered with oilcloth and guarded day and night. He did not see what was under it. I did not need him to."
+            }
+          ]
+        },
+        {
+          step: 18,
+          completed: true,
+          get hermesFinal() {
+            return "I am going now, Silvia. Eighteen hours: across the hardpan by night, over the Natural Bridge of the Sentinel Mesa, down to the southern mouth of the gorge where Cairn IV stands guard. I will sleep in the shade of the rocks when the sun is high.\n\nKeep Sheet 15A close: the survey log of the seven echoes. " + sealsPhrase(sealsAtGates() + 2) + " in my satchel; " + sealsPhrase(3 - sealsAtGates()).toLowerCase() + " still to find.";
+          }
+        },
+        {
+          // Station 16 debrief: the pillars sang the disc's code, Cairn IV never fell, and the raiders split up
+          step: 19,
+          hermesInitial: "Silvia, I have not slept. I have been sitting between the pillars with the pebble in my hand.\n\nThe chamber of Cairn IV opened with the founders' own mechanism: bronze reeds inside the pillars, untouched since before the first road was cut. This cairn never fell. SUN, ECHO, STONE: the cairns are instruments, and the Order measured the whole desert with them.\n\nBut the last verse... three short calls, a pause, two long. The code I engraved on Aurelia's brass disc, the same light I saw blinking from the cliffs in 2016. And wedged in the throat of the Left pillar, a river pebble painted with a small gold star on blue. Someone tuned this canyon to sing that code.\n\nAnd one more thing. From the Natural Bridge, at dawn, I saw the raiders stuck at the switchbacks. They split. A few men on foot are following my tracks. The wagons, and the one under oilcloth, turned back north-east. Toward Tower II.",
+          choices: [
+            {
+              id: "choice-19-pebble",
+              text: "Keep the pebble. It's a message.",
+              silviaMsg: "Keep that pebble safe, Hermes. Nobody tunes a canyon by accident. It's a message, and it's meant for you.",
+              hermesReply: "It is in the brass box with the grain of blue from Cairn II. Two small things, and I feel like I am carrying a whole sky. If it is a message, Silvia, I am afraid to read it to the end."
+            },
+            {
+              id: "choice-19-tower",
+              text: "The Sanctuary is in danger. Hurry.",
+              silviaMsg: "If the wagons are heading to Tower II, the Sanctuary is in danger. The Servant is alone there. You have to hurry.",
+              hermesReply: "The last cairn stands near the Sanctuary, under the Arch of the Solstice. One road for both. I will walk until my legs refuse, and then I will walk a little more."
+            },
+            {
+              id: "choice-19-instruments",
+              text: "The cairns are instruments...",
+              silviaMsg: "Sun, echo, stone... the cairns are instruments. Then the Astrolabe was never meant to work alone, was it?",
+              hermesReply: "No. I think the Astrolabe reads what the cairns measure, the way a musician reads a score. Without the five seals it is only brass. That is why the raiders want the seals, and why they followed me instead of breaking the cairns."
+            }
+          ]
+        },
+        {
+          step: 20,
+          completed: true,
+          get hermesFinal() {
+            return sealsPhrase(sealsAtGates() + 3) + " of five, Silvia. The Seal of Cairn IV rests with the others, and the two lines engraved on the bronze reed belong in your Cipher Ledger: [S] + [U] = 17 and [S] − [U] = 9. Two unknowns, two lines: you know the trick.\n\nThe last cairn is waiting under the Arch of the Solstice, by the Solar Altar, not far from the Sanctuary (Station 17). The raiders' wagons are on the same road. I will wire you when I see the Arch.";
           }
         }
       ];
@@ -17611,6 +17892,27 @@
           category: "Cairn III",
           group: "desert",
           answer: "Two plates, one on top of the other. On top, the copper benchmark I set myself in 1998, pointing 112° to Outer Watchtower VI, without knowing whose stones I was stacking (Sheet 14A). Beneath it, the founders' own copper plate, with eight letter slots and the old groove of 348° cut into the stone. When the eight letters of the true road were spoken it turned on its pin, and the founders' stone was waiting underneath with the Seal of Cairn III and two lines: [W] + [A] = 26 and [N] − [E] = 9."
+        },
+        {
+          id: "inq-seven-echoes",
+          title: "How do I turn the echoes of Sheet 15A into letters?",
+          category: "Cairn IV",
+          group: "desert",
+          answer: "Take one echo at a time. The pillar tells you which cliff answered: Left pillar, left cliff; Right pillar, right cliff, never the other way. The beats tell you how far: each beat is 5 paces, so multiply the beats by five. Find that ring on the survey plan and read the letter carved on that cliff, at that ring. Seven echoes, seven letters, in the order of the log."
+        },
+        {
+          id: "inq-count-echo",
+          title: "How do I count an echo by ear?",
+          category: "Cairn IV",
+          group: "desert",
+          answer: "Do not count the echo; count from the call. The moment a pillar calls, start at zero with the chronometer's ticks and stop when the same voice comes back, softer and further away. The Left pillar sings low and on your left, the Right pillar higher and on your right; a long call comes back long. If two echoes cross, the tape keeps them all: read it after the wind is quiet. I have numbered the beats on it for you."
+        },
+        {
+          id: "inq-tuning-pebble",
+          title: "What is the pebble from the Left pillar?",
+          category: "Cairn IV",
+          group: "desert",
+          answer: "A river pebble, smooth as an egg, with a small eight-point star painted in gold on a ground of blue. It was wedged in the throat of the Left pillar, exactly where it turns the night wind into three short calls and two long ones: the code of Aurelia's disc. The bronze reeds are the founders' work. The pebble is not. Someone came here after them, and knew what they were doing."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -17644,7 +17946,7 @@
       } else {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       }
-      const WIRE_LAST_STEP = 16;   // the last step of the expedition thread written so far (end of Station 15)
+      const WIRE_LAST_STEP = 20;   // the last step of the expedition thread written so far (end of Station 16)
       if (wireCurrentStep > WIRE_LAST_STEP) wireCurrentStep = WIRE_LAST_STEP;
       while (wireHistory.length < wireCurrentStep) {
         wireHistory.push(0);
@@ -17700,7 +18002,10 @@
         monolith: { key: 'order_sun_monolith_completed', label: 'Station 14' },
         labyrinthHint: { key: 'order_labyrinth_hint', label: 'three tries at the sigil of Cairn III' },
         labyrinthTorches: { key: 'order_labyrinth_torch_hint', label: 'three close calls in the labyrinth' },
-        labyrinth: { key: 'order_sandstone_labyrinth_completed', label: 'Station 15' }
+        labyrinth: { key: 'order_sandstone_labyrinth_completed', label: 'Station 15' },
+        cairn4Hint: { key: 'order_cairn4_hint', label: 'three tries at the sigil of Cairn IV' },
+        cairn4Count: { key: 'order_cairn4_count_hint', label: 'three verses that did not ring true' },
+        cairn4: { key: 'order_cairn_iv_completed', label: 'Station 16' }
       };
       const INQUIRY_REQUIREMENTS = {
         'inq-salt-playa': 'chasm',
@@ -17720,7 +18025,10 @@
         'inq-cairn2-niche': 'monolith',
         'inq-labyrinth-arches': 'labyrinthHint',
         'inq-torch-rounds': 'labyrinthTorches',
-        'inq-cairn3-plate': 'labyrinth'
+        'inq-cairn3-plate': 'labyrinth',
+        'inq-seven-echoes': 'cairn4Hint',
+        'inq-count-echo': 'cairn4Count',
+        'inq-tuning-pebble': 'cairn4'
       };
       FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
       const INQUIRY_GROUPS = [
@@ -17764,6 +18072,8 @@
         '13A': { title: 'At the Gates of Tower II', note: 'The Sandstone Sanctuary, its Servant, and the demand of the five seals. The great circuit begins north-north-east.' },
         '13B': { title: 'The Sun Monolith & Cairn II', note: 'Seven noons, seven shadows, seven rings of the dial: the sigil of Cairn II.', thumb: './assets/thumbnails/sun_monolith_preview.webp', path: 'desert', node: 23, nodeLabel: 'Station 14 · The Sun Monolith' },
         '14A': { title: 'The Five Geodetic Cairns', note: 'The markers of the Order, the words of the Servant, and the survey of Cairn III: 112° to Watchtower VI, 348° to the Sun Monolith.' },
+        '15A': { title: 'Cairn IV: Sentry of the Canyon', note: 'Two singing pillars, three laws of the echo and the survey log of seven echoes: the sigil of the Sentry.', thumb: './assets/thumbnails/cairn_iv_preview.webp', path: 'desert', node: 25, nodeLabel: 'Station 16 · Cairn IV' },
+        '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on Sheet 16A).' },
         '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
         '17A': { title: 'The Polybius Stele', note: "The Servant's trial: a keyed 5×5 cipher carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' }
       };
@@ -18001,6 +18311,15 @@
           summary: "A convex tempered optical lens set in a charred brass ring, etched with ash sigils.",
           lore: "Dropped on the bluff edge by the raiders' scouts while surveying the gorge. The optical curvature of the glass is ground specifically to calculate the path of the Grand Eclipse."
         },
+        tuning_pebble: {
+          id: "tuning_pebble",
+          name: "The Tuning Pebble · Cairn IV",
+          category: "Mysterious Token",
+          image: "assets/items/item_tuning_pebble.webp",
+          origin: "Throat of the Left Pillar · Cairn IV · Oct 2026",
+          summary: "A smooth river pebble with a small gold star painted on a ground of lapis blue.",
+          lore: "Wedged in the throat of the Left pillar of Cairn IV, where it turns the night wind into three short calls and two long ones: the code Hermes engraved on Aurelia's brass disc. The founders' bronze reeds are ancient. The pebble is not."
+        },
         seal_cairn_1: {
           id: "seal_cairn_1",
           name: "Wash River Seal · Cairn I",
@@ -18058,6 +18377,7 @@
         if (localStorage.getItem('order_seal_cairn_1') === 'true' || localStorage.getItem('order_cairn1_completed') === 'true') {
           if (!list.includes('seal_cairn_1')) list.push('seal_cairn_1');
         }
+        if (localStorage.getItem('order_cairn_iv_completed') === 'true' && !list.includes('tuning_pebble')) list.push('tuning_pebble');
         return list;
       }
 
@@ -18387,7 +18707,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -18418,7 +18738,9 @@
         10: () => '✦ TOWER II SEALED · SEALS ' + sealsAtGates() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (12 H) ✦',
         12: () => '✦ SEAL OF CAIRN II SECURED · SEALS ' + (sealsAtGates() + 1) + ' / 5 · [D] + [F] = 24 · [C] − [T] = 8 RECORDED ✦',
         14: () => '✦ SEALS ' + (sealsAtGates() + 1) + ' / 5 · DOWN TO THE SANDSTONE LABYRINTH (6 H) · BEARING 168° SSE ✦',
-        16: () => '✦ SEAL OF CAIRN III SECURED · SEALS ' + (sealsAtGates() + 2) + ' / 5 · [W] + [A] = 26 · [N] − [E] = 9 RECORDED ✦'
+        16: () => '✦ SEAL OF CAIRN III SECURED · SEALS ' + (sealsAtGates() + 2) + ' / 5 · [W] + [A] = 26 · [N] − [E] = 9 RECORDED ✦',
+        18: () => '✦ SEALS ' + (sealsAtGates() + 2) + ' / 5 · ACROSS THE HARDPAN TO CAIRN IV (18 H) · VIA THE NATURAL BRIDGE ✦',
+        20: () => '✦ SEAL OF CAIRN IV SECURED · SEALS ' + (sealsAtGates() + 3) + ' / 5 · [S] + [U] = 17 · [S] − [U] = 9 RECORDED ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -18860,6 +19182,14 @@
       window.getLabyrinthMarchEta = labyrinthMarch.eta;
       window.skipLabyrinthMarch = labyrinthMarch.skip;
 
+      // Station 16: the 18-hour crossing of the hardpan and the Natural Bridge to Cairn IV (wire step 17 starts it)
+      const cairnFourMarch = makeMarch(18, { start: 'order_cairn4_march_start', bypassed: 'order_cairn4_march_bypassed', done: 'order_cairn_iv_completed' });
+      window.getCairnFourMarchProgress = cairnFourMarch.progress;
+      window.isCairnFourMarchStarted = cairnFourMarch.started;
+      window.isCairnFourMarchOver = cairnFourMarch.over;
+      window.getCairnFourMarchEta = cairnFourMarch.eta;
+      window.skipCairnFourMarch = cairnFourMarch.skip;
+
       // What the Field Wire shows while each march is under way (wire step → leg), and which answer starts it
       const MARCH_LEGS = {
         10: {
@@ -18877,9 +19207,17 @@
           etaLabel: 'ARRIVAL AT THE SANDSTONE LABYRINTH',
           arrivedTitle: 'Sandstone Labyrinth Reached · Station 15 Awaits',
           arrivedDesc: 'Hermes is at the foot of Cairn III, inside the labyrinth. Open the Grand Desert Map and speak the sigil of its copper plate (Station 15 · Sheet 14B).'
+        },
+        18: {
+          step: 18, march: cairnFourMarch, doneKey: 'order_cairn_iv_completed',
+          walkingTitle: '✦ Across the Hardpan · Over the Natural Bridge to Cairn IV ✦',
+          walkingDesc: 'Hermes walks the hardpan by night and sleeps in the rocks by day, toward the singing pillars. Keep Sheet 15A close.',
+          etaLabel: 'ARRIVAL AT CAIRN IV',
+          arrivedTitle: 'Cairn IV Reached · Station 16 Awaits',
+          arrivedDesc: 'Hermes is between the twin pillars at the southern mouth of the gorge. Open the Grand Desert Map and wake the Sentry of the Canyon (Station 16 · Sheet 15A).'
         }
       };
-      const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch };
+      const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch };
 
       function dawnMessageText(i) {
         const d = DAWN_THREAD[i];
@@ -19270,8 +19608,9 @@
         const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
         const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
 
-        // Steps 8–16: the gates of Tower II (9), the crossing to the Sun Monolith (10), the Station 14 debrief (11),
-        // first light at the Monolith (13), the walk down to the labyrinth (14), the Station 15 debrief (15) and the end of this leg (16)
+        // Steps 8–20: the gates of Tower II (9), the crossing to the Sun Monolith (10), the Station 14 debrief (11),
+        // first light at the Monolith (13), the walk down to the labyrinth (14), the Station 15 debrief (15),
+        // dusk at the hardpan (17), the crossing to Cairn IV (18), the Station 16 debrief (19) and the end of this leg (20)
         const showWaypointBar = (title, desc, persistStep) => {
           wirePromptBox.style.display = 'none';
           wireCompletedBar.style.display = 'flex';
@@ -19285,7 +19624,7 @@
           } catch (e) {}
           return descEl;
         };
-        // Steps 10 and 14: Hermes walks to the next station. The trek bar shows the countdown (refreshed every 30 s),
+        // Steps 10, 14 and 18: Hermes walks to the next station. The trek bar shows the countdown (refreshed every 30 s),
         // then the arrival bar stays until the station is solved. Returns true while that leg is not finished.
         const showMarchLeg = (leg) => {
           leg.march.start();   // a save that stands here without a start time (e.g. after a tester replay) sets out now
@@ -19322,7 +19661,7 @@
         };
 
         if (wireCurrentStep >= WIRE_LAST_STEP) {
-          showWaypointBar('Seal of Cairn III Secured · Seals ' + countCairnSeals() + ' / 5', 'Next: Cairn IV, Sentry of the Canyon (Station 16 · Sheet 15A). Hermes will wire you when he sees its twin pillars.', WIRE_LAST_STEP);
+          showWaypointBar('Seal of Cairn IV Secured · Seals ' + countCairnSeals() + ' / 5', 'Next: the Arch of the Solstice and Cairn V (Station 17 · Sheet 16B). Hermes will wire you when he sees the Arch.', WIRE_LAST_STEP);
           return;
         }
         if (wireCurrentStep === 8) {
@@ -19340,6 +19679,13 @@
         if (wireCurrentStep === 14) {
           if (showMarchLeg(MARCH_LEGS[14])) return;
           advanceTo(15);   // Station 15 solved: the raiders' camp and the gold star
+        }
+        if (wireCurrentStep === 16) {
+          advanceTo(17);   // dusk at the edge of the hardpan: the shepherd and the veiled woman
+        }
+        if (wireCurrentStep === 18) {
+          if (showMarchLeg(MARCH_LEGS[18])) return;
+          advanceTo(19);   // Station 16 solved: the song, the pebble and the raiders splitting up
         }
 
         if (wireCurrentStep === 6) {
@@ -19764,11 +20110,13 @@
                 renderWireChoices();
                 updateMessengerBadge();
               }
-            } else if (justAnsweredStep === 9 || justAnsweredStep === 11 || justAnsweredStep === 13 || justAnsweredStep === 15) {
+            } else if ([9, 11, 13, 15, 17, 19].includes(justAnsweredStep)) {
               // 9: Silvia answered at the gates of Tower II, and the 12-hour crossing to the Sun Monolith begins.
               // 11: Silvia answered the Station 14 debrief.
               // 13: Silvia answered at first light, and the 6-hour walk down to the Sandstone Labyrinth begins.
               // 15: Silvia answered the Station 15 debrief.
+              // 17: Silvia answered at dusk, and the 18-hour crossing to Cairn IV begins.
+              // 19: Silvia answered the Station 16 debrief.
               if (justAnsweredStep === 9) rememberGateSeal();
               if (MARCH_STARTED_BY_ANSWER[justAnsweredStep]) MARCH_STARTED_BY_ANSWER[justAnsweredStep].start();
               const finalStep = justAnsweredStep + 1;
@@ -20195,6 +20543,7 @@
       // Next pending Desert Path station (internal node ids: 10 Chasm, 21 Salt Playa, 11 Lexicon, 12 Clepsydra)
       function getNextDesertNodeId() {
         if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') return typeof window.getDawnNodeId === 'function' ? window.getDawnNodeId() : 10;
+        if (localStorage.getItem('order_sandstone_labyrinth_completed') === 'true') return 25;
         if (localStorage.getItem('order_sun_monolith_completed') === 'true') return 24;
         if (localStorage.getItem('order_oasis_clepsydra_completed') === 'true') return 23;
         if (localStorage.getItem('order_desert_lexicon_completed') === 'true') return 12;
@@ -20359,6 +20708,10 @@
           window.selectMapNode(24, true);
           if (window.openLabyrinthModal) window.openLabyrinthModal();
           else showDesertToast('Station 15: The Sandstone Labyrinth · See Sheet 14B of your physical journal.');
+        } else if (targetId === 25) {
+          window.selectMapNode(25, true);
+          if (window.openCairnFourModal) window.openCairnFourModal();
+          else showDesertToast('Station 16: Cairn IV, Sentry of the Canyon · See Sheet 15A of your physical journal.');
         } else if (targetId === 13) {
           window.selectMapNode(13, true);
           if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
@@ -23681,6 +24034,569 @@
       };
 
       newRun();
+      if (isDone()) applyVictory();
+      else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
+      render();
+    })();
+
+    // =========================================================================
+    // 🗿 STATION 16 · CAIRN IV, SENTRY OF THE CANYON (THE SONG OF THE PILLARS · SHEET 15A)
+    // Part I (journal): the seven-letter sigil wakes the pillars.
+    // Part II (web only): the wind plays three verses. Each call leaves a pillar and comes back from a
+    // fissure of its own cliff after one beat per 5 paces (Sheet 15A). Silvia marks, in order, the fissure
+    // of every echo, by ear (real Web Audio, panned left and right) or by the chronograph tape.
+    // Every verse was checked offline to decode in exactly one way (verse III overlaps its echoes;
+    // the length of each echo tells them apart). Reward: the Seal of Cairn IV, two Ledger equations
+    // and the Tuning Pebble.
+    // =========================================================================
+    (function initSongOfThePillars() {
+      const modal = document.getElementById('modal-cairn-four');
+      if (!modal) return;
+      const sfx = window.sfx || null;
+      const $ = (id) => document.getElementById(id);
+      const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+      const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const KEYS = {
+        awake: 'order_cairn4_awake',
+        done: 'order_cairn_iv_completed',
+        verses: 'order_cairn4_verses',
+        fails: 'order_cairn4_key_fails',
+        hint: 'order_cairn4_hint',
+        songFails: 'order_cairn4_song_fails',
+        countHint: 'order_cairn4_count_hint',
+        sound: 'order_cairn4_sound'
+      };
+      const SIGIL = 'RESOUND';
+      const HINT_AFTER_FAILS = 3;
+      const COUNT_HINT_AFTER = 3;   // wrong verses before Hermes numbers the beats
+      const PACES_PER_BEAT = 5;
+
+      // The carved letters of Sheet 15A, by cliff and distance in paces
+      const WALLS = {
+        L: { 25: 'T', 30: 'S', 35: 'A', 40: 'M', 45: 'U', 50: 'L', 55: 'E', 60: 'C' },
+        R: { 25: 'N', 30: 'B', 35: 'G', 40: 'R', 45: 'P', 50: 'D', 55: 'H', 60: 'O' }
+      };
+      const RINGS = [25, 30, 35, 40, 45, 50, 55, 60];
+      const SIDE_NAME = { L: 'Left', R: 'Right' };
+      // Three verses: when each call leaves (beat), from which pillar, how long, and which fissure answers
+      const VERSES = [
+        { word: 'SUN', beatMs: 560, calls: [
+          { t: 0, side: 'L', len: 'short', d: 30 }, { t: 8, side: 'L', len: 'short', d: 45 }, { t: 19, side: 'R', len: 'short', d: 25 }] },
+        { word: 'ECHO', beatMs: 470, calls: [
+          { t: 0, side: 'L', len: 'short', d: 55 }, { t: 13, side: 'L', len: 'short', d: 60 }, { t: 27, side: 'R', len: 'short', d: 55 }, { t: 40, side: 'R', len: 'short', d: 60 }] },
+        // the night wind: three short calls, a pause, two long ones, and the echoes overlap the calls
+        { word: 'STONE', beatMs: 440, calls: [
+          { t: 0, side: 'L', len: 'short', d: 30 }, { t: 2, side: 'L', len: 'short', d: 25 }, { t: 4, side: 'R', len: 'short', d: 60 },
+          { t: 8, side: 'R', len: 'long', d: 25 }, { t: 11, side: 'L', len: 'long', d: 55 }] }
+      ];
+      const LEN_BEATS = { short: 0.5, long: 2 };
+      const fissureId = (side, d) => side + d;
+      VERSES.forEach((v) => { v.answer = v.calls.map((c) => fissureId(c.side, c.d)); });
+
+      const FOUNDERS = [
+        'We tuned these stones before the first road was cut, and we never let them fall silent.',
+        'The sun measures the day; the echo measures the distance;',
+        'and the stone remembers them both. SUN · ECHO · STONE: so the Order measures the world.'
+      ];
+      const VERSE_DISPATCH = [
+        "SUN. The first verse is ours, Silvia, and where the cliffs answered, a line of the founders is carved into the rock. The pillars are breathing faster now.",
+        "ECHO. Eleven beats, twelve beats... you heard a difference my old ears could not. The wind is rising for the last verse: it will not wait for one echo before it calls again."
+      ];
+
+      const el = {
+        close: $('btn-close-pillars'), sigilCard: $('pillars-sigil-card'), keyInput: $('pillars-key-input'), speak: $('btn-pillars-speak'),
+        keyFeedback: $('pillars-key-feedback'), game: $('pillars-game'), gameInner: document.querySelector('#pillars-game .monolith-game-inner'),
+        tabs: $('pillars-verse-tabs'), sound: $('btn-pillars-sound'), plan: $('pillars-plan'), tape: $('pillars-tape'), tapeWrap: $('pillars-tape-wrap'),
+        tapeStatus: $('pillars-tape-status'), play: $('btn-pillars-play'), modeMark: $('btn-pillars-mode-mark'), modeCall: $('btn-pillars-mode-call'),
+        slots: $('pillars-slots'), undo: $('btn-pillars-undo'), sing: $('btn-pillars-sing'), songFeedback: $('pillars-song-feedback'),
+        hint: $('pillars-hint'), words: $('pillars-words'), fragments: $('pillars-fragments'), victory: $('pillars-victory'),
+        victoryText: $('pillars-victory-text'), finish: $('btn-pillars-finish'), dispatch: $('pillars-dispatch-text'),
+        tSigil: $('pillars-telem-sigil'), tVerses: $('pillars-telem-verses'), tSeal: $('pillars-telem-seal')
+      };
+
+      const isAwake = () => get(KEYS.awake) === 'true';
+      const isDone = () => get(KEYS.done) === 'true';
+      const versesSung = () => (isDone() ? VERSES.length : Math.max(0, Math.min(VERSES.length, parseInt(get(KEYS.verses) || '0', 10) || 0)));
+      const countHintOn = () => get(KEYS.countHint) === 'true';
+      const soundOn = () => get(KEYS.sound) !== 'off';
+
+      let verseIdx = Math.min(versesSung(), VERSES.length - 1);
+      let mode = 'mark';
+      let slots = [];
+
+      function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
+      function feedback(node, text, kind) {
+        if (!node) return;
+        node.textContent = text;
+        node.classList.toggle('is-error', kind === 'error');
+        node.classList.toggle('is-ok', kind === 'ok');
+      }
+      const svgEl = (tag, attrs) => {
+        const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.keys(attrs).forEach((k) => n.setAttribute(k, attrs[k]));
+        return n;
+      };
+      const svgText = (x, y, text, attrs) => {
+        const t = svgEl('text', Object.assign({ x, y, 'text-anchor': 'middle' }, attrs || {}));
+        t.textContent = text;
+        return t;
+      };
+
+      // ---- Sound: each pillar has its own voice; echoes come back quieter and more muffled from far away ----
+      const VOICE_HZ = { L: 196.0, R: 293.66 };   // G3 and D4
+      let audio = null;
+      function ensureAudio() {
+        if (!soundOn()) return null;
+        try {
+          if (sfx && typeof sfx.init === 'function') sfx.init();
+          let ctx = sfx && sfx.ctx;
+          if (!ctx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return null;
+            ctx = (audio && audio.ctx) || new Ctx();
+          }
+          if (ctx.state === 'suspended' && typeof ctx.resume === 'function') Promise.resolve(ctx.resume()).catch(() => {});
+          if (!audio || audio.ctx !== ctx) {
+            const master = ctx.createGain();
+            master.gain.value = 0.9;
+            master.connect(ctx.destination);
+            const noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+            const data = noise.getChannelData(0);
+            for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+            audio = { ctx, master, noise, live: [] };
+          }
+          return audio;
+        } catch (e) { return null; }
+      }
+      function voice(at, side, seconds, distance) {
+        const { ctx, master, noise } = audio;
+        const far = distance ? (distance - 25) / 35 : 0;
+        const level = distance ? 0.3 - 0.13 * far : 0.4;
+        const out = ctx.createGain();
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = distance ? 2600 - 1700 * far : 6000;
+        let tail = lp;
+        if (ctx.createStereoPanner) {
+          const pan = ctx.createStereoPanner();
+          pan.pan.value = (side === 'L' ? -1 : 1) * (distance ? 0.9 : 0.6);
+          lp.connect(pan);
+          tail = pan;
+        }
+        tail.connect(master);
+        out.connect(lp);
+        const release = distance ? 0.55 : 0.25;
+        out.gain.setValueAtTime(0.0001, at);
+        out.gain.exponentialRampToValueAtTime(level, at + 0.03);
+        out.gain.setValueAtTime(level, at + Math.max(0.04, seconds - 0.05));
+        out.gain.exponentialRampToValueAtTime(0.0001, at + seconds + release);
+        const f = VOICE_HZ[side];
+        [[f, 'sine', 1], [f * 2, 'triangle', 0.22], [f * 3.01, 'sine', 0.08]].forEach(([hz, type, g]) => {
+          const o = ctx.createOscillator();
+          const og = ctx.createGain();
+          o.type = type;
+          o.frequency.setValueAtTime(hz, at);
+          og.gain.value = g;
+          o.connect(og); og.connect(out);
+          o.start(at); o.stop(at + seconds + release + 0.05);
+          audio.live.push(o);
+        });
+        // the breath of the wind in the call
+        const n = ctx.createBufferSource();
+        n.buffer = noise;
+        const bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = f * 4; bp.Q.value = 3;
+        const ng = ctx.createGain(); ng.gain.value = distance ? 0.05 : 0.16;
+        n.connect(bp); bp.connect(ng); ng.connect(out);
+        n.start(at); n.stop(at + seconds + release);
+        audio.live.push(n);
+      }
+      function tick(at) {
+        const { ctx, master } = audio;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'square';
+        o.frequency.value = 1900;
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(0.025, at + 0.003);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + 0.03);
+        o.connect(g); g.connect(master);
+        o.start(at); o.stop(at + 0.05);
+        audio.live.push(o);
+      }
+      function silence() {
+        if (!audio) return;
+        audio.live.forEach((n) => { try { n.stop(); } catch (e) {} });
+        audio.live = [];
+      }
+
+      // ---- The chronograph tape ----
+      const BEAT_PX = 14, TAPE_PAD = 12, TAPE_H = 96;
+      let tape = null;   // { events, beats, beatMs, label, start, raf }
+      function eventsOf(calls) {
+        const evs = [];
+        calls.forEach((c) => {
+          evs.push({ beat: c.t, kind: 'call', side: c.side, len: c.len });
+          evs.push({ beat: c.t + c.d / PACES_PER_BEAT, kind: 'echo', side: c.side, len: c.len, d: c.d });
+        });
+        return evs.sort((a, b) => a.beat - b.beat);
+      }
+      function drawTape(nowBeat) {
+        const svg = el.tape;
+        if (!svg) return;
+        svg.textContent = '';
+        const beats = tape ? tape.beats : 24;
+        const width = TAPE_PAD * 2 + beats * BEAT_PX;
+        svg.setAttribute('viewBox', `0 0 ${width} ${TAPE_H}`);
+        svg.setAttribute('width', String(width));
+        const xb = (b) => TAPE_PAD + b * BEAT_PX;
+        svg.appendChild(svgEl('line', { x1: 0, y1: TAPE_H / 2, x2: width, y2: TAPE_H / 2, stroke: '#8a6d3b', 'stroke-width': 0.6 }));
+        for (let b = 0; b <= beats; b++) {
+          svg.appendChild(svgEl('line', { x1: xb(b), y1: TAPE_H / 2 - 5, x2: xb(b), y2: TAPE_H / 2 + 5, stroke: '#5c4524', 'stroke-width': 0.8 }));
+          if (countHintOn()) svg.appendChild(svgText(xb(b), TAPE_H / 2 + 4, String(b), { 'font-size': 6, fill: '#7c5a32', dx: 4 }));
+        }
+        if (!tape) return;
+        tape.events.forEach((ev) => {
+          if (nowBeat !== Infinity && ev.beat > nowBeat) return;
+          const top = ev.side === 'L';
+          const y = top ? 10 : TAPE_H - 30;
+          const w = Math.max(5, LEN_BEATS[ev.len] * BEAT_PX);
+          const color = top ? '#b45309' : '#0f766e';
+          if (ev.kind === 'call') {
+            svg.appendChild(svgEl('rect', { x: xb(ev.beat), y, width: w, height: 20, rx: 2, fill: color }));
+          } else {
+            svg.appendChild(svgEl('rect', { x: xb(ev.beat), y: y + 2, width: w, height: 16, rx: 2, fill: 'none', stroke: color, 'stroke-width': 1.6 }));
+          }
+        });
+        if (nowBeat !== Infinity) svg.appendChild(svgEl('line', { x1: xb(nowBeat), y1: 2, x2: xb(nowBeat), y2: TAPE_H - 2, stroke: '#dc2626', 'stroke-width': 1 }));
+      }
+      function stopTape() {
+        if (tape && tape.raf) cancelAnimationFrame(tape.raf);
+        if (tape) tape.raf = null;
+        silence();
+      }
+      function playCalls(calls, beatMs, label) {
+        stopTape();
+        const events = eventsOf(calls);
+        const last = events.reduce((m, ev) => Math.max(m, ev.beat + LEN_BEATS[ev.len]), 0);
+        tape = { events, beats: Math.ceil(last) + 2, beatMs, label, raf: null, start: performance.now() + 120 };
+        const a = ensureAudio();
+        if (a) {
+          const t0 = a.ctx.currentTime + 0.12;
+          const beatSec = beatMs / 1000;
+          for (let b = 0; b <= tape.beats; b++) tick(t0 + b * beatSec);
+          events.forEach((ev) => voice(t0 + ev.beat * beatSec, ev.side, LEN_BEATS[ev.len] * beatSec, ev.kind === 'echo' ? ev.d : 0));
+        }
+        if (el.tapeStatus) el.tapeStatus.textContent = label + ' · playing…';
+        const frame = () => {
+          const beat = (performance.now() - tape.start) / tape.beatMs;
+          drawTape(Math.max(0, beat));
+          if (el.tapeWrap) {
+            const x = TAPE_PAD + beat * BEAT_PX - el.tapeWrap.clientWidth * 0.6;
+            if (x > el.tapeWrap.scrollLeft) el.tapeWrap.scrollLeft = x;
+          }
+          if (beat < tape.beats) { tape.raf = requestAnimationFrame(frame); return; }
+          tape.raf = null;
+          drawTape(Infinity);
+          if (el.tapeStatus) el.tapeStatus.textContent = label + ' · recorded';
+        };
+        if (el.tapeWrap) el.tapeWrap.scrollLeft = 0;
+        tape.raf = requestAnimationFrame(frame);
+      }
+      function playVerse() {
+        if (!isAwake()) return;
+        const v = VERSES[verseIdx];
+        playCalls(v.calls, v.beatMs, 'Verse ' + ['I', 'II', 'III'][verseIdx]);
+      }
+      function testCall(side, d) {
+        playCalls([{ t: 1, side, len: 'short', d }], VERSES[verseIdx].beatMs, 'Test call · ' + SIDE_NAME[side] + ' cliff, ' + d + ' paces');
+      }
+
+      // ---- The canyon plan ----
+      const PLAN = { wallL: 14, wallR: 106, baseY: 128 };
+      const ringY = (d) => PLAN.baseY - (d - 20) * 2.6;
+      function revealed() {
+        const ids = new Set();
+        VERSES.slice(0, versesSung()).forEach((v) => v.answer.forEach((id) => ids.add(id)));
+        return ids;
+      }
+      function drawPlan() {
+        const svg = el.plan;
+        if (!svg) return;
+        svg.textContent = '';
+        const shown = revealed();
+        // cliffs
+        svg.appendChild(svgEl('path', { d: `M${PLAN.wallL} 6 L${PLAN.wallL} 136`, stroke: '#d4a853', 'stroke-width': 1.6 }));
+        svg.appendChild(svgEl('path', { d: `M${PLAN.wallR} 6 L${PLAN.wallR} 136`, stroke: '#d4a853', 'stroke-width': 1.6 }));
+        // rings of paces
+        RINGS.forEach((d) => {
+          const y = ringY(d);
+          svg.appendChild(svgEl('path', { d: `M${PLAN.wallL} ${y + 7} Q 60 ${y - 9} ${PLAN.wallR} ${y + 7}`, fill: 'none', stroke: '#b8a07a', 'stroke-opacity': 0.45, 'stroke-width': 0.5 }));
+          svg.appendChild(svgText(60, y - 0.6, String(d), { 'font-size': 4.2, fill: '#d6c3a0' }));
+        });
+        // the twin pillars
+        [['L', 50], ['R', 70]].forEach(([side, x]) => {
+          svg.appendChild(svgEl('rect', { x: x - 4, y: PLAN.baseY, width: 8, height: 8, fill: '#3b2a17', stroke: side === 'L' ? '#f59e0b' : '#2dd4bf', 'stroke-width': 0.9 }));
+          svg.appendChild(svgText(x, 141.5, SIDE_NAME[side], { 'font-size': 3.8, fill: '#d6c3a0' }));
+        });
+        // the sixteen fissures
+        ['L', 'R'].forEach((side) => {
+          RINGS.forEach((d) => {
+            const id = fissureId(side, d);
+            const y = ringY(d) + 7;
+            const x = side === 'L' ? PLAN.wallL : PLAN.wallR;
+            const g = svgEl('g', { class: 'pillars-fissure', tabindex: '0', role: 'button', 'data-id': id, 'aria-label': SIDE_NAME[side] + ' cliff, ' + d + ' paces' + (shown.has(id) ? ', letter ' + WALLS[side][d] : '') });
+            g.appendChild(svgEl('path', { d: `M${x} ${y - 3} l${side === 'L' ? 3 : -3} 1.5 l${side === 'L' ? -3 : 3} 1.5 l${side === 'L' ? 3 : -3} 1.5`, fill: 'none', stroke: '#0b0704', 'stroke-width': 1.2 }));
+            const tx = side === 'L' ? x - 8 : x + 8;
+            g.appendChild(svgEl('rect', { class: 'pillars-tag', x: tx - 4.5, y: y - 4.5, width: 9, height: 9, rx: 1, fill: shown.has(id) ? 'rgba(134, 239, 172, 0.18)' : '#1a120a', stroke: side === 'L' ? '#f59e0b' : '#2dd4bf', 'stroke-width': 0.5 }));
+            g.appendChild(svgText(tx, y + 1.8, shown.has(id) ? WALLS[side][d] : '?', { 'font-size': 5, fill: shown.has(id) ? '#86efac' : '#b8a07a' }));
+            g.appendChild(svgEl('rect', { x: side === 'L' ? 0 : x - 6, y: y - 5, width: side === 'L' ? x + 6 : 120 - x + 6, height: 10, fill: 'transparent' }));
+            svg.appendChild(g);
+          });
+        });
+      }
+
+      // ---- Marking and singing back ----
+      function chooseFissure(id) {
+        if (!isAwake() || isDone()) return;
+        const side = id[0], d = parseInt(id.slice(1), 10);
+        if (mode === 'call') { testCall(side, d); return; }
+        const need = VERSES[verseIdx].answer.length;
+        if (slots.length >= need) { feedback(el.songFeedback, 'This verse has ' + need + ' echoes. Remove one (⌫) or sing it back.', 'error'); return; }
+        slots.push(id);
+        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        feedback(el.songFeedback, '', '');
+        renderSlots();
+      }
+      function renderSlots() {
+        if (!el.slots) return;
+        el.slots.textContent = '';
+        const need = VERSES[verseIdx].answer.length;
+        for (let i = 0; i < need; i++) {
+          const div = document.createElement('div');
+          const id = slots[i];
+          div.className = 'pillars-slot' + (id ? ' is-filled' : '');
+          div.textContent = id ? SIDE_NAME[id[0]][0] + ' · ' + id.slice(1) : String(i + 1);
+          el.slots.appendChild(div);
+        }
+        if (el.sing) el.sing.disabled = slots.length !== need || isDone();
+        if (el.undo) el.undo.disabled = !slots.length;
+      }
+      function singBack() {
+        if (!isAwake() || isDone()) return;
+        const v = VERSES[verseIdx];
+        if (slots.length !== v.answer.length) return;
+        if (verseIdx < versesSung()) { feedback(el.songFeedback, 'The pillars already know this verse. Choose the next one.', ''); return; }
+        const right = slots.filter((id, i) => id === v.answer[i]).length;
+        if (right !== v.answer.length) {
+          const fails = (parseInt(get(KEYS.songFails) || '0', 10) || 0) + 1;
+          set(KEYS.songFails, String(fails));
+          if (fails >= COUNT_HINT_AFTER && !countHintOn()) {
+            set(KEYS.countHint, 'true');
+            if (tape) drawTape(tape.raf ? 0 : Infinity);
+          }
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          feedback(el.songFeedback, 'The pillars fall silent. ' + right + ' of ' + v.answer.length + ' echoes rang true.', 'error');
+          render();
+          return;
+        }
+        set(KEYS.verses, String(verseIdx + 1));
+        slots = [];
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        feedback(el.songFeedback, v.word + '. The verse rings true.', 'ok');
+        if (verseIdx + 1 >= VERSES.length) { completeStation(); return; }
+        say(VERSE_DISPATCH[verseIdx]);
+        verseIdx++;
+        render();
+      }
+
+      function completeStation() {
+        set(KEYS.done, 'true');
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(4);
+        else set('order_seal_cairn_4', 'true');
+        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('tuning_pebble');
+        say("STONE... and listen, Silvia. Listen to how the wind played that last verse: three short calls, a pause, two long ones. That is the code I engraved on Aurelia's disc. The same light I saw from the cliffs in 2016. And in the throat of the Left pillar there is a pebble that the river never put there.");
+        applyVictory();
+        render();
+        if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+        if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
+        if (el.finish) setTimeout(() => el.finish.focus(), 60);
+      }
+      function applyVictory() {
+        if (el.victoryText) {
+          el.victoryText.textContent = "Cairn IV never fell: the bronze reeds inside the pillars are the founders' own, and the chamber between them opened the old way, with a song. The Seal of Cairn IV was waiting inside. But the last verse was not the founders' alone. Wedged in the throat of the Left pillar, where it bends the wind into three short calls and two long ones, Hermes found a river pebble painted with a small gold star on blue. He will tell you on the wire.";
+        }
+        if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+      }
+
+      // ---- Part I: the sigil from Sheet 15A ----
+      function speakSigil() {
+        if (isAwake()) return;
+        const typed = (el.keyInput ? el.keyInput.value : '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
+        if (!typed) { feedback(el.keyFeedback, 'Type the seven letters from Sheet 15A.', 'error'); return; }
+        if (typed !== SIGIL) {
+          const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
+          set(KEYS.fails, String(fails));
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
+            set(KEYS.hint, 'true');
+            feedback(el.keyFeedback, 'The pillars stay mute. Hermes left you a note in Ask Hermes about counting echoes.', 'error');
+          } else {
+            feedback(el.keyFeedback, 'The pillars stay mute. Count the seven echoes of Sheet 15A again.', 'error');
+          }
+          return;
+        }
+        set(KEYS.awake, 'true');
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+        feedback(el.keyFeedback, 'RESOUND. The wind finds its way into the pillars.', 'ok');
+        say("RESOUND... and the pillars are singing, Silvia! Not a hum: calls, one pillar and then the other, and the cliffs answering. This cairn never fell; its voice is still whole. It sings its verses and wants them sung back. Count the echoes; I will mark the fissures you name.");
+        render();
+        if (el.play) setTimeout(() => el.play.focus(), 60);
+      }
+
+      function render() {
+        const awake = isAwake(), done = isDone(), sung = versesSung();
+        if (el.tabs) {
+          el.tabs.textContent = '';
+          VERSES.forEach((v, i) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'monolith-btn' + (i < sung ? ' is-sung' : '');
+            b.textContent = 'Verse ' + ['I', 'II', 'III'][i];
+            b.setAttribute('aria-pressed', String(i === verseIdx));
+            b.disabled = i > sung;
+            b.addEventListener('click', () => { if (i === verseIdx) return; stopTape(); tape = null; drawTape(Infinity); verseIdx = i; slots = []; render(); });
+            el.tabs.appendChild(b);
+          });
+        }
+        if (el.sound) { el.sound.textContent = soundOn() ? '🔊 Sound' : '🔇 Sound off'; el.sound.setAttribute('aria-pressed', String(soundOn())); }
+        if (el.modeMark) el.modeMark.setAttribute('aria-pressed', String(mode === 'mark'));
+        if (el.modeCall) el.modeCall.setAttribute('aria-pressed', String(mode === 'call'));
+        drawPlan();
+        if (!tape || !tape.raf) drawTape(Infinity);
+        renderSlots();
+        if (el.words) {
+          el.words.textContent = '';
+          VERSES.forEach((v, i) => {
+            const span = document.createElement('span');
+            span.className = 'pillars-word' + (i < sung ? ' is-sung' : '');
+            span.textContent = i < sung ? v.word : v.word.replace(/./g, '·');
+            el.words.appendChild(span);
+          });
+        }
+        if (el.fragments) {
+          el.fragments.textContent = '';
+          FOUNDERS.forEach((line, i) => {
+            const div = document.createElement('div');
+            div.className = 'monolith-fragment' + (i < sung ? '' : ' is-sealed');
+            div.textContent = i < sung ? '“' + line + '”' : 'A line of the founders, still silent in the rock.';
+            el.fragments.appendChild(div);
+          });
+        }
+        if (el.tSigil) el.tSigil.textContent = awake ? SIGIL + ' ✓' : '[ 7 LETTERS ]';
+        if (el.tVerses) el.tVerses.textContent = sung + ' / ' + VERSES.length;
+        if (el.tSeal) el.tSeal.textContent = done ? 'CAIRN IV ✓' : '[ SEALED ]';
+        if (el.game) el.game.classList.toggle('is-locked', !awake);
+        if (el.gameInner) el.gameInner.inert = !awake;
+        if (el.sigilCard) el.sigilCard.classList.toggle('is-collapsed', awake);
+        const spoken = 'Sigil spoken: ' + SIGIL + ' ✓';
+        if (awake && el.keyFeedback && !el.keyFeedback.textContent) feedback(el.keyFeedback, spoken, 'ok');
+        if (el.play) el.play.textContent = '▶ Let the wind play verse ' + ['I', 'II', 'III'][verseIdx];
+        if (el.hint) el.hint.style.display = countHintOn() && !done ? '' : 'none';
+        if (el.victory) el.victory.style.display = done ? '' : 'none';
+      }
+
+      // ---- Controls ----
+      if (el.plan) {
+        const pick = (e) => {
+          const g = e.target.closest && e.target.closest('.pillars-fissure');
+          if (g) chooseFissure(g.getAttribute('data-id'));
+        };
+        el.plan.addEventListener('click', pick);
+        el.plan.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e); } });
+      }
+      if (el.play) el.play.addEventListener('click', playVerse);
+      if (el.sound) el.sound.addEventListener('click', () => { set(KEYS.sound, soundOn() ? 'off' : 'on'); if (!soundOn()) silence(); render(); });
+      if (el.modeMark) el.modeMark.addEventListener('click', () => { mode = 'mark'; render(); });
+      if (el.modeCall) el.modeCall.addEventListener('click', () => { mode = 'call'; render(); });
+      if (el.undo) el.undo.addEventListener('click', () => { slots.pop(); renderSlots(); });
+      if (el.sing) el.sing.addEventListener('click', singBack);
+      if (el.speak) el.speak.addEventListener('click', speakSigil);
+      if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });
+
+      // ---- Open / close ----
+      function canOpen() {
+        if (isDone()) return true;
+        if (typeof window.isAdminTester === 'function' && window.isAdminTester()) return true;
+        if (get('order_sandstone_labyrinth_completed') !== 'true') return false;
+        return typeof window.isCairnFourMarchOver === 'function' ? window.isCairnFourMarchOver() : false;
+      }
+      let returnFocusTo = null;
+      function openCairnFourModal() {
+        if (!canOpen()) {
+          const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
+          if (!toast) return;
+          if (get('order_sandstone_labyrinth_completed') !== 'true') {
+            toast('✦ TERRA INCOGNITA ✦ Get Hermes out of the Sandstone Labyrinth (Station 15) before the road to Cairn IV opens.');
+          } else if (typeof window.getCairnFourMarchEta === 'function' && window.getCairnFourMarchEta()) {
+            toast('Hermes is crossing the hardpan toward Cairn IV. Arrival in ' + window.getCairnFourMarchEta() + '.');
+          } else {
+            toast('Hermes is hiding in the rocks until dark. Open the Cliffside Workshop: he will wire you before he sets out.');
+          }
+          return;
+        }
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        modal.style.display = 'flex';
+        modal.classList.remove('closing');
+        returnFocusTo = document.activeElement;
+        if (isDone()) applyVictory();
+        else if (!isAwake()) say("Silvia, I am at the southern mouth of the gorge. Two hollow pillars, taller than three men, and the wind already hums inside them. The bronze plate between them asks for the sigil of the seven echoes: Sheet 15A.");
+        else say("The pillars are still singing. Let the wind play, count the echoes, and sing the verse back.");
+        render();
+        const focusTarget = isDone() ? el.finish : isAwake() ? el.play : el.keyInput;
+        if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
+      }
+      function closeCairnFourModal() {
+        if (modal.style.display === 'none') return;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        stopTape();
+        modal.classList.add('closing');
+        setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
+        if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
+        returnFocusTo = null;
+      }
+      window.openCairnFourModal = openCairnFourModal;
+      window.closeCairnFourModal = closeCairnFourModal;
+      if (el.close) el.close.addEventListener('click', closeCairnFourModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeCairnFourModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display !== 'none') closeCairnFourModal(); });
+      if (el.finish) {
+        el.finish.addEventListener('click', () => {
+          closeCairnFourModal();
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+          if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+          if (typeof window.showDesertToast === 'function') {
+            let seals = 0;
+            for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
+            window.showDesertToast('✦ Seal of Cairn IV secured (' + seals + ' of 5) ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
+          }
+        });
+      }
+
+      // Test hook for scripts/audit/web_smoke.py: the verses (they are in this source anyway) and the controls
+      window.__cairn4 = {
+        verses: VERSES.map((v) => ({ word: v.word, beatMs: v.beatMs, calls: v.calls.map((c) => Object.assign({}, c)) })),
+        letters: JSON.parse(JSON.stringify(WALLS)),
+        verse: () => verseIdx,
+        mark: (id) => chooseFissure(id),
+        sing: () => singBack(),
+        play: () => playVerse()
+      };
+
       if (isDone()) applyVictory();
       else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
       render();

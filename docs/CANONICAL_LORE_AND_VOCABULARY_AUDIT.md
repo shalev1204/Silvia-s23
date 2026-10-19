@@ -657,6 +657,17 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$[N] = 9 + 2 \implies \mathbf{N = 11}$$
 - **Asignación en el Ledger**: $\mathbf{W = 19, \quad N = 11}$. Valores aún libres en la tabla (todas las letras asignadas tienen valores distintos).
 
+#### 9. DEDUCCIÓN DE $S$ Y $U$ (Estación 16 · La caña de bronce de Cairn IV, solo en la web)
+- **Origen**: al cantar los tres versos del cañón (Estación 16), las dos líneas grabadas en la caña de bronce del pilar izquierdo aparecen en el Ledger (`requires: 'order_cairn_iv_completed'`). Hermes: *«Two unknowns, two lines: you know the trick.»*
+- **Ecuación 1 (The Rising Echo)**:
+  $$[S] + [U] = 17$$
+- **Ecuación 2 (The Falling Echo)**:
+  $$[S] - [U] = 9$$
+- **Resolución** (sistema de dos ecuaciones, como en §7.B.1–5):
+  $$2[S] = 17 + 9 = 26 \implies \mathbf{S = 13}$$
+  $$[U] = 17 - 13 \implies \mathbf{U = 4}$$
+- **Asignación en el Ledger**: $\mathbf{S = 13, \quad U = 4}$. Valores libres hasta ahora; ninguna letra repite valor.
+
 ---
 
 ## 8. DIRECTORIO GEOGRÁFICO Y ONOMÁSTICO CANÓNICO
@@ -770,7 +781,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara A (14A · Lore)**: **Los 5 Cairns de Peregrinación**. Estudio cartográfico y marcas geodésicas.
   - **Cara B (14B · Juego D6)**: **The Sandstone Labyrinth**. Senda entre arcos y fisuras para conseguir el **Sello de Cairn III**. *(web, Estación 15)* Segunda parte: huida por turnos de las antorchas de los BC Ashes hasta la Western Cleft; bajo la placa de cobre, $[W] + [A] = 26$ y $[N] - [E] = 9$; campamento de los asaltantes y una estrella de pan de oro (ver §12).
 - **Hoja 15**:
-  - **Cara A (15A · Juego D7)**: **Cairn IV (Sentry of the Canyon)**. Custodia de la garganta acústica; obtención del **Sello de Cairn IV**.
+  - **Cara A (15A · Juego D7)**: **Cairn IV (Sentry of the Canyon)**. Custodia de la garganta acústica; obtención del **Sello de Cairn IV**. *(web, Estación 16)* Segunda parte: el canto de los pilares (tres versos con sonido real: SUN, ECHO, STONE); $[S] + [U] = 17$ y $[S] - [U] = 9$; la reliquia *The Tuning Pebble*; el pastor y la mujer velada; los BC Ashes se dividen hacia la Torre II (ver §12).
   - **Cara B (15B · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Izq · Spread 3)**. Elev. 980 varas, arco de roca y desfiladero en alta definición.
 - **Hoja 16**:
   - **Cara A (16A · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Der · Spread 3)**.
@@ -883,7 +894,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **13A / 14** | El Sirviente sonríe al oír el nombre de Hermes (respuesta *choice-9-remember*). | Un anciano que se alegra de una visita. | ✅ Web |
 | **14** | En el nicho de Cairn II, un rastro de **azul cobalto** de lapislázuli molido muy fino. Hermes: *«Aurelia ground her lapis exactly like this»*; se convence de que ve fantasmas. Último fragmento de la tapa: *«And the Oracle, who keeps the sand, will remember.»* | Otro pintor de la Orden; una profecía. | ✅ Web |
 | **15** | Una estrella de pan de oro de ocho puntas sobre fondo de lapislázuli, reciente, en la pared de una fisura del laberinto (casilla por la que pasa toda ruta de huida). Hermes: *«Aurelia gilded her stars exactly like that»*; duda entre un guía y el sol. Su respuesta *choice-15-aurelia* describe la técnica (pincel de ardilla, fondo azul, toque blanco). | Marca de los fundadores; alguien guía a otro. | ✅ Web |
-| **16** | Los nómadas hablan de «la velada que canta a las estrellas en otoño». | Leyenda del desierto. | ⏳ Plan |
+| **16** | Un pastor al borde del *hardpan*: cada otoño, en noches claras, **una mujer velada baja de la arenisca y canta a las estrellas**; le dejan leche y dátiles (paso 17; en *choice-17-veiled* tararea la melodía y a Hermes le tiembla la mano). En Cairn IV el último verso del viento suena con el **código del disco** (tres cortas, pausa, dos largas) porque alguien encajó en el pilar izquierdo **un guijarro con estrella dorada sobre azul** (reliquia *The Tuning Pebble*). | Leyenda del desierto; el viento; un extraño que conoce el código. | ✅ Web |
 | **17** | Desde el Arco del Solsticio, Hermes vuelve a ver de noche el pulso de 2016: tres cortos, pausa, dos largos. | El faro del Santuario. | ⏳ Plan |
 | **18** | El Sirviente, tras la Estela de Polibio: *«She came from the edge of the sky with a disc in her arms and no name.»* | — (la duda ya es seria). | ⏳ Plan |
 | **19** | Audiencia en la Torre II: la Oráculo alza el disco de 24 avistamientos. Silvia (o Hermes) pronuncia el voto y la memoria vuelve en parte. Se entrega el **WHEN**. | Revelación. | ⏳ Plan |
