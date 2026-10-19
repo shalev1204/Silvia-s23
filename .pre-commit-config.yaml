@@ -1,0 +1,7 @@
+# Optional local guard: `pip install pre-commit && pre-commit install`
+# blocks any commit that contains an API key, token or private key.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks

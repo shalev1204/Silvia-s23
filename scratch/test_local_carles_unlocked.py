@@ -9,6 +9,8 @@ Test Local Environment for Carles:
 """
 import sys
 from playwright.sync_api import sync_playwright
+import os
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 def test_local_carles():
     with sync_playwright() as p:
@@ -18,7 +20,7 @@ def test_local_carles():
 
         print("\n--- TEST 1: Load Hub via file:// URL (Local Environment) ---")
         # Load local file path directly
-        file_url = "file:///path/to/Silvia's23/web/index.html"
+        file_url = "file://" + os.path.join(ROOT, "web/index.html")
         page.goto(file_url)
         page.wait_for_timeout(800)
 

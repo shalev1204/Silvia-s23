@@ -1,6 +1,7 @@
 import os
 import time
 from playwright.sync_api import sync_playwright
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 def run_verification():
     html_path = os.path.abspath('web/index.html')
@@ -44,7 +45,7 @@ def run_verification():
         assert constellation_wrap_display == 'none', "Constellation map wrap should be display: none"
         print("✅ Grand Desert Map tab switched successfully!")
 
-        page.screenshot(path='/path/to/Silvia\'s23/scratch/screenshot_desert_map.png')
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshot_desert_map.png"))
 
         # Check Hermes marker at Watchtower VI
         hermes_transform = page.evaluate("document.getElementById('hermes-map-token').getAttribute('transform')")
@@ -67,7 +68,7 @@ def run_verification():
         assert modal_display == 'flex', "Whispering Chasm modal should be display: flex"
         print("✅ Whispering Chasm modal opened!")
 
-        page.screenshot(path='/path/to/Silvia\'s23/scratch/screenshot_chasm_modal_initial.png')
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshot_chasm_modal_initial.png"))
 
         # Test Decoy Cairn 'T' (Blind Chasm)
         print("5. Testing decoy cairn 'T'...")
@@ -112,7 +113,7 @@ def run_verification():
         print(f"   order_whispering_chasm_completed in localStorage: {is_completed}")
         assert is_completed == 'true', "localStorage order_whispering_chasm_completed should be true"
 
-        page.screenshot(path='/path/to/Silvia\'s23/scratch/screenshot_chasm_modal_victory.png')
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshot_chasm_modal_victory.png"))
         print("✅ Victory card displayed and progress saved to localStorage!")
 
         # Click return to Grand Desert Map
@@ -132,7 +133,7 @@ def run_verification():
         print(f"   Trail to oasis display: {trail_oasis_display}")
         assert trail_oasis_display == 'block', "Trail to oasis should be visible"
 
-        page.screenshot(path='/path/to/Silvia\'s23/scratch/screenshot_desert_map_completed.png')
+        page.screenshot(path=os.path.join(ROOT, "scratch/screenshot_desert_map_completed.png"))
         print("✅ Grand Desert Map updated with Hermes at Sunken Oasis Camp VII!")
 
         # 10. Test Inspect Canyon Route from Station 10 inspector

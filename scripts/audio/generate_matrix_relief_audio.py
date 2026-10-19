@@ -6,6 +6,7 @@ Voice: Fenrir (Gemini 2.5 TTS) + Radio Bandpass & Desert Ambience.
 """
 
 import os
+import sys
 import json
 import urllib.request
 import base64
@@ -13,14 +14,18 @@ import subprocess
 import time
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-KEY_PATH = os.path.expanduser("~/.gemini_api_key")
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "web", "constellation", "celestial-matrix")
 TEMP_DIR = os.path.join(PROJECT_ROOT, "assets", "constellation", "celestial-matrix", "stems")
 os.makedirs(TEMP_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-with open(KEY_PATH, "r") as f:
-    api_key = f.read().strip()
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    key_path = os.path.expanduser("~/.gemini_api_key")
+    if not os.path.exists(key_path):
+        sys.exit("Error: set GEMINI_API_KEY or create ~/.gemini_api_key (never commit it).")
+    with open(key_path, "r") as f:
+        api_key = f.read().strip()
 
 lines = [
     ("m1", "Silvia! The signal came through... loud and clear! The console held!"),
@@ -36,7 +41,7 @@ print(f"Generating victory voice stems with {voice} ({model})...")
 stem_wavs = []
 
 for tag, text in lines:
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     payload = {
         "contents": [{"role": "user", "parts": [{"text": text}]}],
         "generationConfig": {
@@ -53,7 +58,7 @@ for tag, text in lines:
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json", "x-goog-api-key": api_key}
     )
     
     success = False

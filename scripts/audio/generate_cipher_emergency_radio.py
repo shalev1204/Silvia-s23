@@ -6,6 +6,7 @@ Voice: Fenrir (Gemini 2.5 TTS) + Howling Sandstorm Wind, Pelting Sand Foley & Ra
 """
 
 import os
+import sys
 import json
 import wave
 import urllib.request
@@ -63,7 +64,7 @@ for tag, text in lines:
         print(f"  ✓ Cached {tag} ({dur:.2f}s)")
         continue
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     payload = {
         "contents": [{"role": "user", "parts": [{"text": text}]}],
         "generationConfig": {
@@ -80,7 +81,7 @@ for tag, text in lines:
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json", "x-goog-api-key": api_key}
     )
     
     success = False

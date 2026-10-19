@@ -1,5 +1,7 @@
 import math
 from playwright.sync_api import sync_playwright
+import os
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 nodes = [
     (200, 970),
@@ -75,7 +77,7 @@ with sync_playwright() as p:
         headless=True
     )
     page = browser.new_page(viewport={'width': 1200, 'height': 1200})
-    page.goto('file:///path/to/Silvia\'s23/scratch/preview_curve_v3.html')
+    page.goto("file://" + os.path.join(ROOT, "scratch/preview_curve_v3.html"))
     page.wait_for_timeout(300)
     page.locator('svg').screenshot(path='scratch/preview_curve_v3.png')
     browser.close()

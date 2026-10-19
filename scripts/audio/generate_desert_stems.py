@@ -1,13 +1,18 @@
 import os
+import sys
 import json
 import urllib.request
 import base64
 import subprocess
 import time
 
-key_path = os.path.expanduser("~/.gemini_api_key")
-with open(key_path, "r") as f:
-    api_key = f.read().strip()
+api_key = os.environ.get("GEMINI_API_KEY")
+if not api_key:
+    key_path = os.path.expanduser("~/.gemini_api_key")
+    if not os.path.exists(key_path):
+        sys.exit("Error: set GEMINI_API_KEY or create ~/.gemini_api_key (never commit it).")
+    with open(key_path, "r") as f:
+        api_key = f.read().strip()
 
 STEM_DIR = "assets/constellation/radio-transmission/audio/stems_desert"
 os.makedirs(STEM_DIR, exist_ok=True)
@@ -37,7 +42,7 @@ for tag, text in lines:
     pcm_path = f"{STEM_DIR}/{tag}.pcm"
     wav_path = f"{STEM_DIR}/{tag}.wav"
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     payload = {
         "contents": [{"role": "user", "parts": [{"text": text}]}],
         "generationConfig": {
@@ -54,7 +59,7 @@ for tag, text in lines:
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json", "x-goog-api-key": api_key}
     )
     
     success = False

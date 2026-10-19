@@ -76,7 +76,7 @@ SHOTS = [
 ]
 
 def submit_shot(shot):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{shot['model']}:predictLongRunning?key={API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{shot['model']}:predictLongRunning"
     payload = {
         "instances": [{"prompt": shot["prompt"]}],
         "parameters": {
@@ -91,7 +91,7 @@ def submit_shot(shot):
             req = urllib.request.Request(
                 url,
                 data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"}
+                headers={"Content-Type": "application/json", "x-goog-api-key": API_KEY}
             )
             with urllib.request.urlopen(req) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
@@ -104,13 +104,14 @@ def submit_shot(shot):
     raise RuntimeError(f"Could not submit shot {shot['id']}")
 
 def poll_and_download(shot, op_name):
-    url = f"https://generativelanguage.googleapis.com/v1beta/{op_name}?key={API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/{op_name}"
     print(f"[{shot['id']}] Polling operation {op_name}...")
     
     start_time = time.time()
     while True:
         try:
-            with urllib.request.urlopen(url) as resp:
+            poll_req = urllib.request.Request(url, headers={"x-goog-api-key": API_KEY})
+            with urllib.request.urlopen(poll_req) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 if data.get("done", False):
                     if "error" in data:
@@ -120,12 +121,10 @@ def poll_and_download(shot, op_name):
                     media_uri = samples[0]["video"]["uri"]
                     print(f"[{shot['id']}] Render complete in {time.time() - start_time:.1f}s! Downloading from: {media_uri}")
                     
-                    download_url = f"{media_uri}&key={API_KEY}" if "?" in media_uri else f"{media_uri}?alt=media&key={API_KEY}"
-                    if "download?alt=media" not in download_url and "alt=media" not in download_url:
-                        download_url = f"{media_uri}:download?alt=media&key={API_KEY}"
+                    download_url = media_uri if "?" in media_uri else f"{media_uri}?alt=media"
 
                     out_file = os.path.join(OUTPUT_DIR, f"{shot['id']}.mp4")
-                    dl_req = urllib.request.Request(download_url)
+                    dl_req = urllib.request.Request(download_url, headers={"x-goog-api-key": API_KEY})
                     with urllib.request.urlopen(dl_req) as dl_resp, open(out_file, "wb") as f_out:
                         f_out.write(dl_resp.read())
                     

@@ -25,6 +25,16 @@ service-account*.json
 token.json
 secrets/
 vault/
+.secrets*
+.dev.vars
+.netrc
+.npmrc
+.pypirc
+*.keystore
+*.jks
+id_dsa*
+id_ecdsa*
+!.env.example
 
 # Python, virtualenvs & bytecode
 __pycache__/
@@ -42,6 +52,8 @@ node_modules/
 npm-debug.log*
 
 # Editors & swap files
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
