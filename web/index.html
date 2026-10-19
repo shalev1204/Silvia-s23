@@ -14472,7 +14472,7 @@
         //   - Step 1: [0] "Call you Hermes..."
         //   - Step 2: [1] "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark..."
         //   - Step 3: [0] "According to your notes on Sheet 7B, the benchmark plate points 112° East toward Outer Watchtower VI."
-        //   - Satchel Item: "1998 Brass Surveyor's Compass" (Cairn III foundation)
+        //   - Satchel Item: "1998 Brass Surveyor's Compass" (trail-head benchmark below Watchtower VI)
         // Waypoint secured at Outer Watchtower VI (wire step 4).
         // The storm has ended. Dawn has broken (The Great Silence).
         // Hermes has sent his morning dispatch (Dawn Step 0).
@@ -14494,7 +14494,7 @@
             id: "surveyor_compass",
             name: "1998 Brass Surveyor's Compass",
             icon: "🧭",
-            desc: "Precision surveyor compass retrieved from the stone foundation of Cairn III."
+            desc: "Precision surveyor compass left in 1998 beside the copper benchmark at the foot of the Watchtower VI trail."
           };
           localStorage.setItem('order_satchel_expedition_item', JSON.stringify(compassItem));
           localStorage.setItem('seeker_silvia_satchel_expedition_item', JSON.stringify(compassItem));
@@ -14820,9 +14820,9 @@
               thumb: './assets/thumbnails/whispering_chasm_preview.webp',
               lore: 'The red sandstorm has subsided into the great dawn silence. Hermes is sheltered inside Outer Watchtower VI by the hearth fire with the 1998 brass surveyor\'s compass. To review his morning dispatch and survey the entrance to the Whispering Chasm, open the field wire relay.',
               rewards: [
-                { icon: '🧭', label: "1998 Surveyor's Compass", desc: 'Retrieved from the stone foundation of Cairn III' },
+                { icon: '🧭', label: "1998 Surveyor's Compass", desc: 'Recovered beside the trail-head benchmark below the tower' },
                 { icon: '📻', label: 'Field Wire Relay Active', desc: 'Direct communications line with Hermes' },
-                { icon: '🏜️', label: 'Wadi al-Hajar Frontier', desc: 'Entrance to the 25×25 sandstone labyrinth' }
+                { icon: '🏜️', label: 'Wadi al-Hajar Frontier', desc: 'The dry wash and the road to the Whispering Chasm' }
               ],
               btnText: '✦ OPEN CLIFFSIDE WORKSHOP WIRE ➔',
               action: () => {
@@ -17550,15 +17550,15 @@
             },
             {
               id: "choice-2-cairns-compass",
-              item: { id: "surveyor_compass", name: "1998 Brass Surveyor's Compass", icon: "🧭", desc: "Precision surveyor compass retrieved from the stone foundation of Cairn III." },
-              text: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. Follow the wash bed to Cairn III, then take the stamped bearing up to the watchtower.",
-              silviaMsg: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. You raised three stone cairns along the canyon wash pointing south-southeast. Beneath the foundation slab of Cairn III is the copper benchmark plate that points the bearing to Watchtower VI!",
+              item: { id: "surveyor_compass", name: "1998 Brass Surveyor's Compass", icon: "🧭", desc: "Precision surveyor compass left in 1998 beside the copper benchmark at the foot of the Watchtower VI trail." },
+              text: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. Keep to the wash bed you surveyed in 1998 and find your benchmark at the foot of the watchtower trail.",
+              silviaMsg: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. Before climbing to Watchtower VI in 1998, you surveyed the dry wash bed below it. And you wrote that the plate under Cairn III was the FIRST copper benchmark, so there must be another one. Follow the wash bed to the foot of the watchtower trail!",
               beats: [
-                "The Three Cairns in the canyon wash! You found my notes from 1998, Silvia! Twenty-eight years of desert winds haven't moved an inch of those bedrock boulders. I'm sliding down into the sheltered wash bed, keeping my back to the gale, following the line of cairns pointing south-southeast...",
-                "I reached Cairn III! The stone mound held firm against the squall. Tucked into a dry stone niche at its foundation, wrapped tight in oiled canvas, was my precision surveyor's brass compass from 1998! The blued-steel needle floated straight true the moment I lifted the latch. Not a speck of rust.",
-                "I secured the brass compass in my satchel and brushed the silt from the flat sandstone slab at the base of Cairn III. The buried copper benchmark plate is right here.\n\nLook closely at Sheet 7B in your journal: what compass heading was stamped on that plate to guide me up to Watchtower VI?"
+                "Section III! You read my notes from 1998 more closely than I wrote them, Silvia. 'The first copper benchmark'... I had forgotten that word. I'm sliding down into the sheltered wash bed, keeping my back to the gale. My three cairns run south-south-east from here, the last of them days down the wash; the nearest one was swallowed by flood silt long ago, and I cannot find it in this dust. But tonight I don't need them.",
+                "Here it is: the trail-head benchmark at the foot of the bluff, the second copper plate I set that autumn so whoever came after me could find the watchtower. And tucked into a dry stone niche beside it, wrapped tight in oiled canvas, was my precision brass surveyor's compass! I left it there the day I climbed out of this canyon in 1998. The blued-steel needle floated straight true the moment I lifted the latch. Not a speck of rust.",
+                "I secured the brass compass in my satchel and brushed the silt from the flat sandstone slab. The copper plate is right here, the twin of the first one I buried under Cairn III, stamped with the same bearing.\n\nLook closely at Sheet 7B in your journal: what compass heading was stamped on that plate to guide me up to Watchtower VI?"
               ],
-              hermesReply: "The Three Cairns in the wash! Twenty-eight years of desert gales haven't moved those stone mounds. Following your guidance from Sheet 7B, I reached Cairn III and found my 1998 brass surveyor's compass preserved in a dry stone niche! Beneath the foundation slab rests the copper plate.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on the copper plate to guide me to Watchtower VI?"
+              hermesReply: "The first copper benchmark... so you noticed there was a second! My three cairns run on down the wash, the last of them days to the south and far beyond reach in this storm, but I followed the wash bed to the foot of the watchtower trail and found the second plate. In a dry stone niche beside it, wrapped in oiled canvas, was my 1998 brass surveyor's compass! The plate is the twin of the one under Cairn III, stamped with the same bearing.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on the copper plate to guide me to Watchtower VI?"
             },
             {
               id: "choice-2-lookout-spyglass",
@@ -18112,7 +18112,7 @@
           title: "What is the Autumn 1998 Field Log?",
           category: "Old Journal",
           group: "astrolabe",
-          answer: "Twenty-eight years ago, in 1998, I surveyed this desert. I built the three stone cairns and buried the 112° compass marker so that someone could follow my trail years later. That someone is you, Silvia."
+          answer: "Twenty-eight years ago, in 1998, I surveyed this desert. I built the three stone cairns and buried the first 112° copper marker under the third of them, and its twin at the foot of the watchtower trail, so that someone could follow my trail years later. That someone is you, Silvia."
         },
         {
           id: "inq-languages",
@@ -18760,9 +18760,9 @@
           name: "1998 Brass Surveyor's Compass",
           category: "Survey Instrument",
           image: "assets/items/item_brass_compass.png",
-          origin: "Cairn III · Wash Survey of 1998",
+          origin: "Watchtower VI Trail · Wash Survey of 1998",
           summary: "A heavy brass pocket compass engraved with celestial degree coordinates.",
-          lore: "Hermes's precision field compass from twenty-eight years ago, preserved inside a dry stone niche at the foundation of Cairn III. Guided by the 112° E copper benchmark plate buried beneath its slab, it guided Hermes through the blinding sandstorm up the ridge to Outer Watchtower VI. Its balanced blued-steel needle still responds with absolute fidelity to the desert's magnetic meridians."
+          lore: "Hermes's precision field compass from twenty-eight years ago, left in a dry stone niche beside the second copper benchmark he set at the foot of the watchtower trail (the first lies under Cairn III, far down the wash). Set to the 112° E bearing stamped on that plate, it guided Hermes through the blinding sandstorm up the ridge to Outer Watchtower VI. Its balanced blued-steel needle still responds with absolute fidelity to the desert's magnetic meridians."
         },
         spyglass_lens: {
           id: "spyglass_lens",
@@ -18811,7 +18811,7 @@
           id: "surveyor_compass",
           name: "1998 Brass Surveyor's Compass",
           icon: "🧭",
-          desc: "Precision surveyor compass retrieved from the stone foundation of Cairn III."
+          desc: "Precision surveyor compass left in 1998 beside the copper benchmark at the foot of the Watchtower VI trail."
         };
       }
 
@@ -20515,7 +20515,7 @@
                           setTimeout(() => {
                             showTyping(false);
                             if (sfx) sfx.playCelestialChime();
-                            // Beat 3: Cairn III arrival & asking for bearing
+                            // Beat 3: at the copper benchmark, asking for the bearing
                             appendWireMessage(getCartographerTitle(), choice.beats[2], false, true, () => {
                               renderWireChoices();
                               updateMessengerBadge();

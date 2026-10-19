@@ -461,7 +461,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
   2. Al pulsar, se activa el teletipo de campaña. Hermes envía sus primeros mensajes tras la tormenta: está a salvo en la base del cañón pero desorientado, rodeado de polvo y sin referencias.
   3. Si Silvia tiene dudas, puede abrir `Field Inquiries` y consultar cualquier concepto antes de avanzar.
   4. En el chat de misión, Hermes pregunta por las notas de 1998 en su cuaderno. Silvia consulta la **Hoja 7 Cara B** y la **Hoja 8 Cara A**.
-  5. Silvia selecciona las claves del diario: orientarlo hacia los **Tres Mojones**, seguir el **Cauce Seco** y fijar la mira a **112° hacia el Este** bajo la losa de **Cairn III**.
+  5. Silvia selecciona las claves del diario: orientarlo hacia los **Tres Mojones**, seguir el **Cauce Seco** y fijar la mira a **112° hacia el Este**, el rumbo de la *primera* placa (bajo **Cairn III**, días al sur), que Hermes lee en su **placa gemela** al pie de la senda de la atalaya. Si Silvia elige la Sección III, Hermes recupera además su brújula de 1998 de un nicho junto a esa placa.
   6. Esta primera triangulación permite al Cartógrafo encontrar el primer refugio de piedra, despejar la arena de su equipo de campaña y desbloquear la visualización del primer cuadrante del **Gran Mapa del Desierto**.
 
 ### 4. Comprehensive Desert Odyssey Bible (Stations 10 to 19)
