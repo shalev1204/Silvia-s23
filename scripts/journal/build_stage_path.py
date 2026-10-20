@@ -140,9 +140,9 @@ LETTER_19A = [
 LETTER_PT, LETTER_LH = 38, 55   # the letter is the heart of the page: larger than the notes around it
 
 AURELIA_NOTE_19A = (
-    "Silvia, I found this in the cedar chest of the Sanctuary, under the oldest charts. The Oracle before "
-    "me wrote it centuries ago to the Mirror Speaker of Tower III, and never sent it. She wrote it the way "
-    "the glass sees, as the people of the mirror do. Hold the page up to a mirror and read it."
+    "Silvia, I found this in the cedar chest of the Sanctuary, under the oldest charts. An Oracle of long "
+    "ago wrote it, centuries before me, to the Mirror Speaker of Tower III, and never sent it. She wrote it "
+    "the way the glass sees, as the people of the mirror do. Hold the page up to a mirror and read it."
 )
 
 

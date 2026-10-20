@@ -21,9 +21,10 @@
 | 8–9 oct → dom 18 oct 14:00 | Tormenta de arena tras la Estación 09 (el Email 5 del 10 oct llega en plena tormenta). El Hub fija su final el dom 18 oct 14:00 (constante `SUNDAY_OCT_18_2026_2PM`). Para Silvia ya ha terminado. |
 | En curso | Desert Path (Estaciones 10–19, Hojas 08–18): completo y jugable en el Hub. La Estación 19 entrega el WHEN. |
 | **18–20 dic 2026** | **El WHEN** (1ª gran pista, Estación 19): las fechas de la cita. El WHERE llegará con el Stage Path. |
+| En curso | Stage Path (Estaciones 20–28, Hojas 19–26, que Silvia recibe juntas): Estación 20 (The Gate of a Thousand Masks, Fragmento I) jugable; 18 h de travesía desde la Torre II. |
 | Día final | **Cumpleaños (23)**: revelación final y entradas de ballet. |
 
-Pendiente: el Stage Path (Torre III, el WHERE) y la Bóveda del Gran Eclipse (Torre I, el WHAT).
+Pendiente: el resto del Stage Path (Estaciones 21–28, Torre III, el WHERE) y la Bóveda del Gran Eclipse (Torre I, el WHAT).
 
 ---
 

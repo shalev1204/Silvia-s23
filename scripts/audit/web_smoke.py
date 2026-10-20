@@ -19,6 +19,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  11. Each seeker keeps their own adventure when the profile changes (Carles and Silvia).
  12. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
  13. The Stage Path: hidden until Station 19, then the Living Mirror (rooms, keyboard, fragments, the WHERE when whole).
+ 14. Station 20 (The Gate of a Thousand Masks): departure, 18-hour crossing, word, drawing by hand, Fragment I, debrief.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -944,11 +945,12 @@ def test_oracle_horizon(browser):
           "debrief: step 31 (Aurelia) with 3 replies")
     answer_first()
     bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
-    check(get("order_field_wire_step") == "32" and "Desert Path Is Complete" in bar and "[Z] + [D] = 23" in wire_text(),
-          "step 32: the Desert Path is complete", bar)
+    check(get("order_field_wire_step") == "33" and "THE DESERT PATH IS COMPLETE" in wire_text() and "[Z] + [D] = 23" in wire_text()
+          and "Sheet 19A" in wire_text() and choices() == 3,
+          "step 32 closes the Desert Path, and the morning of departure for Tower III follows (step 33)", bar)
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(text.count("mint tea") == 1 and text.count("She did not die in 1971") == 1, "reload replays steps 29-32 once each")
+    check(text.count("mint tea") == 1 and text.count("She did not die in 1971") == 1 and text.count("A whole day at the Sanctuary") == 1, "reload replays steps 29-33 once each")
     check(not errors, "no JS errors during Station 19", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
@@ -1030,12 +1032,13 @@ WORLD_JS = """() => ({
 def test_tester_play(browser):
     print("\n12. Carles's tester: Play any game, forward and back")
     modals = {"cairn1": "modal-cairn-one", "s14": "modal-sun-monolith", "s15": "modal-sandstone-labyrinth",
-              "s16": "modal-cairn-four", "s17": "modal-solstice-arch", "s18": "modal-polybius-stele", "s19": "modal-oracle-horizon"}
-    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5, "s19": 5}
+              "s16": "modal-cairn-four", "s17": "modal-solstice-arch", "s18": "modal-polybius-stele", "s19": "modal-oracle-horizon",
+              "s20": "modal-masks-gate"}
+    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5, "s19": 5, "s20": 5}
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
-    for gid in ["s19", "s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
+    for gid in ["s20", "s19", "s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
         page.evaluate("document.getElementById('tester-panel').open = true")
         page.evaluate(PLAY_JS, gid)
         page.wait_for_timeout(600)
@@ -1043,7 +1046,7 @@ def test_tester_play(browser):
         page.wait_for_timeout(3200)
         st = page.evaluate(WORLD_JS)
         opened = modals[gid] in st["open"] if gid in modals else bool(st["open"])
-        clean = "gilded_star" not in st["relics"] and (gid == "s19" or "servant_key" not in st["relics"]) and (gid in ("s17", "s18", "s19") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
+        clean = (gid == "s20" or "gilded_star" not in st["relics"]) and (gid in ("s19", "s20") or "servant_key" not in st["relics"]) and (gid in ("s17", "s18", "s19", "s20") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
         check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
               f"seals {st['seals']}, open {st['open']}, relics {st['relics']}")
     check(not errors, "no JS errors while jumping between games", "; ".join(sorted(set(errors))[:3]))
@@ -1114,6 +1117,94 @@ def test_stage_mirror(browser):
     ctx.close()
 
 
+def test_masks_gate(browser):
+    print("\n14. Station 20 · The Gate of a Thousand Masks, end to end")
+    seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true",
+            "order_field_wire_step": "32", "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 28)}
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    modal_open = lambda: js("getComputedStyle(document.getElementById('modal-masks-gate')).display") != "none"
+    choices = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].length")
+    wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
+    feedback = lambda node: js(f"document.getElementById('{node}').innerText")
+    bar = lambda: js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+
+    def open_wire():
+        js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+        page.wait_for_timeout(2200)
+
+    def answer_first():
+        js("document.querySelector('#wire-choices-grid button').click()")
+        page.wait_for_timeout(9000)
+
+    open_wire()
+    check(get("order_field_wire_step") == "33" and choices() == 3 and "Sheet 19A" in wire_text(),
+          "the Stage Path begins on the wire: step 33, the letter and the new sheets, 3 replies")
+    js("window.selectStageStation(40)"); page.wait_for_timeout(500)
+    check(not modal_open(), "the gate stays out of reach before Silvia answers")
+    open_wire(); answer_first()
+    check(get("order_field_wire_step") == "34" and get("order_masks_march_start") is not None and "Third Tower" in bar(),
+          "the answer starts the 18-hour crossing to Tower III", bar())
+    js("window.selectStageStation(40)"); page.wait_for_timeout(500)
+    check(not modal_open() and "CROSSING THE PLATEAU" in js("document.getElementById('view-trail').innerText"),
+          "while they walk, the card counts the hours and the gate stays shut")
+    js("localStorage.setItem('order_masks_march_bypassed', 'true')")
+    js("window.selectStageStation(40)"); page.wait_for_timeout(500)
+    check(modal_open() and js("document.querySelector('#masks-draw-game .monolith-game-inner').inert") is True,
+          "they arrive: the gate opens its modal, the drawing locked until the word")
+    for word in ["SILVIA", "MASKS", "SILVERS"]:
+        page.fill("#masks-key-input", word); page.click("#btn-masks-speak"); page.wait_for_timeout(120)
+    check(get("order_masks_hint") == "true" and get("order_masks_gate_awake") is None, "3 wrong words unlock the hint, the gate stays shut")
+    page.fill("#masks-key-input", " sil-ver "); page.click("#btn-masks-speak"); page.wait_for_timeout(250)
+    check(get("order_masks_gate_awake") == "true", "the word SILVER, typed loosely, opens the gate")
+
+    js("window.__masks.drawHalf()"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
+    check("missing" in feedback("masks-draw-feedback") and js("window.__masks.carved()") == 0, "an outline without its eye is refused")
+    js("window.__masks.drawWrong()"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
+    check(js("window.__masks.carved()") == 0, "the carved half drawn again on its own side is refused")
+    page.click("#btn-masks-clear"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
+    check(get("order_masks_draw_hint") == "true" and js("getComputedStyle(document.getElementById('masks-help-row')).display") != "none",
+          "after three tries the guide appears, and the Mirror Speaker offers to carve it")
+
+    # A shaking hand: the true half drawn by the real mouse, each point off by a few units
+    box = page.locator("#masks-canvas").bounding_box()
+    w, h = js("window.__masks.size")
+    for k, stroke in enumerate(js("window.__masks.targets()")):
+        pts = [(box["x"] + (x + 5 * ((i * 7 + k) % 3 - 1)) * box["width"] / w, box["y"] + (y + 5 * ((i * 5 + k) % 3 - 1)) * box["height"] / h)
+               for i, (x, y) in enumerate(stroke)]
+        page.mouse.move(*pts[0]); page.mouse.down()
+        for q in pts[1:]:
+            page.mouse.move(*q, steps=2)
+        page.mouse.up()
+    page.click("#btn-masks-hold"); page.wait_for_timeout(1700)
+    check(js("window.__masks.carved()") == 1 and get("order_masks_draw_fails") == "0", "a shaking hand, drawn with the mouse, makes the first mask whole")
+    js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(1700)
+    js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(2600)
+    check(get("order_masks_gate_completed") == "true" and js("getComputedStyle(document.getElementById('masks-victory')).display") != "none"
+          and js("document.querySelectorAll('#masks-fragment-svg path').length") > 3,
+          "three masks whole: the gate is open and Fragment I is drawn")
+    page.click("#btn-masks-finish-station"); page.wait_for_timeout(900)
+    st = js("""() => ({ path: document.documentElement.dataset.mapPath, set: document.querySelectorAll('.sm-shard.is-set').length,
+        fresh: document.querySelectorAll('.sm-shard.is-new').length })""")
+    check(st["path"] == "stage" and st["set"] == 1 and st["fresh"] == 1, "Fragment I flashes into the Living Mirror", str(st))
+
+    open_wire()
+    check(get("order_field_wire_step") == "35" and choices() == 3 and "sealed with ash" in wire_text(),
+          "debrief: step 35, the reflection, Fragment I and the note sealed with ash")
+    answer_first()
+    check(get("order_field_wire_step") == "36" and "FRAGMENT I SET" in wire_text() and "Fragment I Is Set" in bar(),
+          "the night behind the gate closes the wire: Fragment I set, 1 of 9", bar())
+    page.reload(); page.wait_for_timeout(2500)
+    js("window.selectStageStation(40)"); page.wait_for_timeout(500)
+    check(modal_open() and js("getComputedStyle(document.getElementById('masks-victory')).display") != "none",
+          "after a reload the gate stays open")
+    check(not errors, "no JS errors at the gate", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--chromium", help="path to a Chromium/Chrome binary (default: Playwright's own)")
@@ -1135,6 +1226,7 @@ def main():
         test_profiles(browser)
         test_tester_play(browser)
         test_stage_mirror(browser)
+        test_masks_gate(browser)
         browser.close()
     server.shutdown()
 

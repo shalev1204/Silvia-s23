@@ -4260,6 +4260,37 @@
     @media (max-width: 640px) { .oracle-disc-row { grid-template-columns: 1fr; } .oracle-sky { max-width: 220px; margin: 0 auto; } }
 
     /* From the desert to the stage: shown once, when the Oracle remembers */
+    /* ---- The rooms of Tower III wear the velvet of the Stage ---- */
+    .is-stage-room .monolith-window { background: #170811; border-color: #c99a3b; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95), 0 0 35px rgba(168, 85, 247, 0.28); }
+    .is-stage-room .monolith-header { background: rgba(40, 11, 32, 0.98); }
+    .is-stage-room .monolith-telemetry { background: rgba(26, 7, 20, 0.92); }
+    .is-stage-room .monolith-card { background: rgba(44, 13, 36, 0.78); border-color: rgba(201, 154, 59, 0.32); }
+    /* ---- Station 20 · The Gate of a Thousand Masks ---- */
+    .masks-draw-lead { margin: 0 0 8px; font-size: 0.84rem; }
+    .masks-stage { display: flex; justify-content: center; }
+    .masks-canvas {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      aspect-ratio: 300 / 380;
+      border-radius: 12px;
+      border: 1px solid rgba(201, 154, 59, 0.45);
+      background: radial-gradient(ellipse at 30% 40%, #2a0b24 0%, #12040e 75%);
+      touch-action: none;
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .masks-canvas.is-carved { cursor: default; }
+    .masks-fragment-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; align-items: center; margin: 10px 0; }
+    .masks-fragment { width: 120px; height: 120px; display: block; }
+    .masks-fragment-row span { display: block; font-size: 0.8rem; color: #d9bfd1; }
+    .masks-fragment-name { display: block; font-family: 'Cinzel', serif; color: #f7dc8c; letter-spacing: 0.06em; }
+    .masks-speaker-line { font-style: italic; color: #e9d5ff; font-size: 0.88rem; margin: 10px 0; }
+    .masks-speaker-sign { display: block; width: 72px; height: 0; margin: 8px 0 0 auto; border-top: 2px solid rgba(233, 213, 255, 0.8); }
+    @media (prefers-reduced-motion: reduce) { .masks-canvas { transition: none; } }
+
     .stage-passage-overlay {
       position: fixed;
       inset: 0;
@@ -13779,6 +13810,96 @@
     </div>
   </div>
 
+  <!-- Station 20 · The Gate of a Thousand Masks (Tower III, Stage Path) -->
+  <div class="monolith-modal-backdrop is-stage-room" id="modal-masks-gate" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="masks-modal-title">
+    <div class="monolith-window">
+      <div class="monolith-header">
+        <div class="monolith-title-wrap">
+          <span class="monolith-title-icon" aria-hidden="true">🎭</span>
+          <div>
+            <h2 class="monolith-title" id="masks-modal-title">THE GATE OF A THOUSAND MASKS</h2>
+            <div class="monolith-subtitle">Station 20 · Tower III · The Word of the Gate · The Missing Halves · Sheet 19B</div>
+          </div>
+        </div>
+        <button type="button" class="monolith-close-btn" id="btn-close-masks" aria-label="Close The Gate of a Thousand Masks">✕</button>
+      </div>
+
+      <div class="monolith-telemetry">
+        <div>EXPEDITION:<strong>TOWER III // THE GATE</strong></div>
+        <div>WORD:<strong id="masks-telem-word">[ 6 LETTERS ]</strong></div>
+        <div>MASKS:<strong id="masks-telem-masks">[ 0 / 3 ]</strong></div>
+        <div>FRAGMENT I:<strong id="masks-telem-fragment">[ MISSING ]</strong></div>
+      </div>
+
+      <div class="monolith-body">
+        <div class="monolith-panel">
+          <div class="monolith-card" id="masks-word-card">
+            <div class="monolith-card-title">I · The Word of the Gate</div>
+            <p>Solve <strong>Sheet 19B</strong> of your journal: find the six masks that lie, whose two halves are not equal, and read the letters on their foreheads from left to right, row by row. Speak the word at the gate.</p>
+            <div class="monolith-key-row">
+              <label class="monolith-sr-only" for="masks-key-input">The six-letter word of the gate</label>
+              <input type="text" class="monolith-key-input" id="masks-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · ·">
+              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-masks-speak">✦ Speak the Word</button>
+            </div>
+            <div class="monolith-feedback" id="masks-key-feedback" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="monolith-card monolith-game is-locked" id="masks-draw-game">
+            <div class="monolith-card-title">II · The Missing Halves · <span id="masks-draw-count">Mask 1 of 3</span></div>
+            <div class="monolith-game-inner">
+              <p class="masks-draw-lead" id="masks-draw-lead">Behind the gate hang masks carved only on one side. Draw the other half, the way a mirror would show it, with your finger or the mouse.</p>
+              <div class="masks-stage">
+                <canvas class="masks-canvas" id="masks-canvas" width="300" height="380" role="img" aria-label="A mask carved only on its left half, beside a mirror. Draw its right half."></canvas>
+              </div>
+              <div class="pillars-row">
+                <button type="button" class="monolith-btn" id="btn-masks-undo" aria-label="Rub out the last line">⌫ Rub out</button>
+                <button type="button" class="monolith-btn" id="btn-masks-clear" aria-label="Rub out the whole half">✕ Start again</button>
+                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-masks-hold">✦ Hold it to the mirror</button>
+              </div>
+              <div class="pillars-row" id="masks-help-row" style="display: none;">
+                <button type="button" class="monolith-btn" id="btn-masks-finish" aria-label="Let the Mirror Speaker carve this half for you">✦ Let the Mirror Speaker carve it</button>
+              </div>
+              <div class="monolith-feedback" id="masks-draw-feedback" role="status" aria-live="polite"></div>
+            </div>
+            <div class="monolith-lock-note">Speak the word of the gate first.</div>
+          </div>
+        </div>
+
+        <div class="monolith-panel">
+          <div class="monolith-card">
+            <div class="monolith-card-title">The House of the Mirror</div>
+            <ul class="laby-rules">
+              <li>A true face is the same on both sides. On Sheet 19B, six of the twelve masks lie: one of their halves is different.</li>
+              <li>Their forehead letters, read in order, make the word that opens the gate.</li>
+              <li>Inside, three masks wait with one half missing. Draw the missing half on the mirror side, as if the carved half were reflected in the glass.</li>
+              <li>The mirror forgives a shaking hand, but not a missing eye.</li>
+            </ul>
+            <div class="laby-hint" id="masks-hint" style="display: none;"></div>
+          </div>
+
+          <div class="monolith-card monolith-victory" id="masks-victory" style="display: none;">
+            <div class="monolith-card-title">✦ The Gate Is Open</div>
+            <p id="masks-victory-text"></p>
+            <div class="masks-fragment-row">
+              <svg class="masks-fragment" id="masks-fragment-svg" viewBox="0 0 100 100" role="img" aria-label="Fragment I of the mirror of Tower III, with a small moon in it."></svg>
+              <div>
+                <strong class="masks-fragment-name">Fragment I</strong>
+                <span>One ninth of the mirror of Tower III. Nine pieces make one glass, and the whole glass shows the way.</span>
+              </div>
+            </div>
+            <p class="masks-speaker-line" id="masks-speaker-line">"You saw what was not equal. Come in, and be patient with this house."<span class="masks-speaker-sign" aria-label="signed with a horizontal line"></span></p>
+            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-masks-finish-station">✦ Set Fragment I in the Mirror ➔</button>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE GATE OF TOWER III</div>
+            <div class="monolith-dispatch" id="masks-dispatch-text" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- From the desert to the stage (shown once, after the audience with the Oracle) -->
   <div class="stage-passage-overlay" id="stage-passage-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="stage-passage-title">
     <div class="stage-passage-card">
@@ -14850,6 +14971,11 @@
             id: 's19', tag: 'Station 19', label: "The Oracle's Horizon · Aurelia", flag: 'order_oracle_horizon_completed', built: true,
             complete() { set('order_oracle_stair_start', '1'); set('order_oracle_awake', 'true'); set('order_oracle_disc', '000'); set('order_oracle_when_read', 'true'); set('order_oracle_horizon_completed', 'true'); },
             reset() { dels(['order_oracle_horizon_completed', 'order_oracle_awake', 'order_oracle_key_fails', 'order_oracle_hint', 'order_oracle_disc', 'order_oracle_disc_turns', 'order_oracle_disc_hint', 'order_oracle_when_read', 'order_oracle_read_fails', 'order_oracle_vow_fails', 'order_oracle_vow_hint', 'order_oracle_stair_start', 'order_oracle_stair_bypassed', 'order_stage_passage_seen']); dropRelic('gilded_star'); }
+          },
+          {
+            id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
+            complete() { set('order_masks_march_start', '1'); set('order_masks_gate_awake', 'true'); set('order_masks_carved', '3'); set('order_masks_gate_completed', 'true'); },
+            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen']); }
           }
         ];
 
@@ -14857,9 +14983,9 @@
 
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
-          const a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
-          const cap = a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
+          const a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
+          const cap = a20 ? 36 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -14881,9 +15007,10 @@
           s16: { wire: 18, node: 25, walk: 'order_cairn4_march_bypassed' },
           s17: { wire: 22, node: 26, walk: 'order_cairn5_march_bypassed' },
           s18: { wire: 26, node: 13, walk: 'order_stele_march_bypassed' },
-          s19: { wire: 30, node: 14, walk: 'order_oracle_stair_bypassed' }
+          s19: { wire: 30, node: 14, walk: 'order_oracle_stair_bypassed' },
+          s20: { wire: 34, node: 40, walk: 'order_masks_march_bypassed' }
         };
-        const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed'];
+        const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
 
         // Puts the Hermes chat exactly at `step`: the replies before it are kept (first reply if none was saved)
         function setWire(step) {
@@ -15711,7 +15838,7 @@
         ...(() => {
           const cards = {};
           const rooms = [
-            [40, 20, 'The Gate of a Thousand Masks', '19B', 'A thousand faces guard the theatre of the Order. Only one of them lies.'],
+            [40, 20, 'The Gate of a Thousand Masks', '19B', 'A thousand faces guard the theatre of the Order, and six of them lie.'],
             [41, 21, 'The Camera Obscura', '20A', 'A dark room where the whole city appears upside down on the wall.'],
             [42, 22, 'The Whispering Gallery', '20B', 'A gallery where a whisper at one end is heard at the other.'],
             [43, 23, 'The Automaton Orchestra', '21B', 'A brass orchestra that plays only what its cylinder remembers.'],
@@ -18637,7 +18764,66 @@
           completed: true,
           get hermesFinal() {
             return "Two lines were scratched on the back of the disc, Silvia, under my old engraving, in a hand I would know anywhere: [Z] + [D] = 23 and [I] + [E] = 12. Into your Cipher Ledger with them.\n\nAnd she sent you something: a star of gold leaf on a card of lapis blue, painted while we talked. 'For the navigator who brought him back,' she said.\n\nThe Desert Path is done. The first truth is yours: the WHEN, the eighteenth to the twentieth of December. The second waits at the Stage Tower, with the Mirror Speaker. The road ends where the curtain rises.";
-          }
+          }        },
+        {
+          // The Stage Path begins: the morning of departure from Tower II, with the unsent letter and the new sheets
+          step: 33,
+          hermesInitial: "Silvia. A whole day at the Sanctuary, the best one I have had since 1971. She showed me her charts, and I watched her hands.\n\nAt dawn we leave, Aurelia and I, east across the plateau, after the raiders' ruts. The Servant stays to guard the Sanctuary. He packed us bread, dates and a lamp, and would not hear a word of thanks.\n\nAurelia brought something from the cedar chest of the Sanctuary: a letter an Oracle of long ago wrote to the Mirror Speaker of Tower III, and never sent. It is written backwards. And this morning a pigeon of the Order landed on the stair with a packet for you: eight new sheets for your journal, 19 to 26. Open Sheet 19A, Silvia, and find a mirror.",
+          choices: [
+            {
+              id: "choice-33-go",
+              text: "I have the sheets. Let's go to the third tower.",
+              silviaMsg: "I have the new sheets, Hermes, and a mirror. Sheet 19A is in front of me. Let's go to the third tower.",
+              hermesReply: "Then we walk. Eighteen hours to the gate of Tower III, if the plateau is kind. Aurelia walks faster than I do. She says I have grown slow. She is right."
+            },
+            {
+              id: "choice-33-aurelia",
+              text: "How is Aurelia this morning?",
+              silviaMsg: "How is Aurelia this morning, Hermes?",
+              hermesReply: "She hums when she walks, and she stops to draw things: a lizard, a cloud, the back of my head. She asked me if we used to argue. I said yes, about the stars. She laughed and said she was probably right. She was."
+            },
+            {
+              id: "choice-33-letter",
+              text: "What does the letter say?",
+              silviaMsg: "What does the letter say, Hermes? Have you read it?",
+              hermesReply: "Aurelia read it to me in the lid of my compass, slowly, and then she was quiet for a long time. Read it yourself, Silvia. Then tell me what you make of the last line, and of the Ashes."
+            }
+          ]
+        },
+        {
+          step: 34,
+          completed: true,
+          hermesFinal: "East, then. We set out at first light with the raiders' ruts in front of us and the sun in our eyes: eighteen hours across the plateau to the third tower, with a short sleep at noon in the shade of their last camp.\n\nKeep Sheet 19B close, Silvia. Aurelia says the old charts of the Sanctuary draw the gate of Tower III as a wall of masks, and that the last line of the letter is about it: 'Only the one who sees what is not equal will find it.'"
+        },
+        {
+          // Station 20 debrief: inside the gate, the Mirror Speaker's reflection, Fragment I and a note sealed with ash
+          step: 35,
+          hermesInitial: "SILVER. The word was SILVER, Silvia, and the wall of masks opened like a curtain.\n\nInside it is dark and warm and smells of candle wax and old velvet: a long corridor of mirrors. In every one of them, behind our own reflections, a woman in a grey gown walks beside us. When I turn round, there is no one there. Only in the glass. She has not said a word. She raised her hand and drew a line in the air, straight and flat as a horizon. Aurelia says that is how the Mirror Speaker signs.\n\nAnd the first piece of her mirror is in my hands. Fragment I: cold, heavy, with a little moon in it that is not in the sky.\n\nThere is something else. On the last mask, someone had pinned a note. Not the Mirror Speaker: the paper smells of smoke, and it is sealed with ash. A circle, with a line across it.",
+          choices: [
+            {
+              id: "choice-35-note",
+              text: "What does the note say?",
+              silviaMsg: "What does the note say, Hermes? Read it to me.",
+              hermesReply: "Six words, in a fine and careful hand: 'Let her through. She is the treasure.' Then the seal. Aurelia went pale. She says the Ashes have a leader, and that he never writes to anyone. He has just written about you."
+            },
+            {
+              id: "choice-35-speaker",
+              text: "The Mirror Speaker: is she real?",
+              silviaMsg: "The Mirror Speaker... is she real, Hermes? Or only a reflection?",
+              hermesReply: "Real enough to cast a reflection, Silvia, which is more than I can say for some people I have met. Aurelia says the Mirror Speakers never show themselves: only their reflection, and only to those who come in peace. She drew her line again just now, in the glass beside me. I think she is listening to us."
+            },
+            {
+              id: "choice-35-fragment",
+              text: "Keep the fragment safe.",
+              silviaMsg: "Keep Fragment I safe, Hermes. Wrap it well.",
+              hermesReply: "It is wrapped in my scarf, next to the Gilded Star, against my heart. Eight more, Silvia. Aurelia says every room of this theatre keeps one, and every room has its own trick."
+            }
+          ]
+        },
+        {
+          step: 36,
+          completed: true,
+          hermesFinal: "We sleep tonight behind the gate, in the old dressing rooms, on piles of costumes, with the lamp turned low. Aurelia found a crown of paper stars and put it on my head. I have not taken it off.\n\nThe note sealed with ash is in my coat. Whoever wrote it knew you were coming, Silvia. Let us find out what they want before they find out what we have.\n\nFragment I is set in the mirror. Look at Path III on your map: the glass has begun to remember."
         }
       ];
 
@@ -19149,6 +19335,34 @@
           category: "Tower II",
           group: "desert",
           answer: "She did not die in 1971. A deep dune at the foot of the cliff caught her fall, and days later the Servant found her in the dry wash with the brass disc in her arms and no memory of who she was. The Oracle before her had died in the same earthquake, and the Servant took her for a sign. She has worn the veil ever since: she painted the charts, tuned the pillars, answered my light. When I said the vow she remembered my voice, the fire and the terrace. The rest is still coming back, slowly, from below."
+        },
+        {
+          id: "inq-unsent-letter",
+          title: "Who wrote the unsent letter of Sheet 19A?",
+          category: "Tower III",
+          group: "stage",
+          answer: "An Oracle of Tower II, centuries ago, to the Mirror Speaker of her time. Aurelia found it in the cedar chest of the Sanctuary, under the oldest charts. It is written the way a mirror sees, from right to left: hold the page up to a mirror and it reads plainly. It asks forgiveness, it tells how the two of them broke the mirror of Tower III into nine pieces so that no one could turn the Astrolabe alone, and it warns about the Ashes. The last line is a riddle about the gate."
+        },
+        {
+          id: "inq-masks-lie",
+          title: "How do I find the masks that lie on Sheet 19B?",
+          category: "Tower III",
+          group: "stage",
+          answer: "Look at each mask as if a line ran down the middle of its face, through the letter on the forehead and the nose. A true mask is the same on both sides: what is on the left is on the right, at the same height. A mask that lies has something on one side only, or something missing on one side: a tear, a feather, a crack, an eyebrow, a ribbon, an eye of a different shape. Careful: a mask with two tears, or two feathers, is telling the truth. There are six liars. Read their letters left to right, row by row."
+        },
+        {
+          id: "inq-masks-halves",
+          title: "How do I give a mask its other half?",
+          category: "Tower III",
+          group: "stage",
+          answer: "Pretend the dotted line is the edge of a mirror. Every point of the gold half has a twin on the other side: as far from the line, at the same height. Start with the outline, from the top of the forehead down to the chin, then the eye, the eyebrow and whatever else that mask carries. You do not need a steady hand, only every line. If you rub out too much, start again: the mask does not mind waiting."
+        },
+        {
+          id: "inq-ash-note",
+          title: "Who left the note sealed with ash?",
+          category: "Tower III",
+          group: "stage",
+          answer: "We do not know yet. The note was pinned on the last mask of the gate: 'Let her through. She is the treasure.' The seal is a circle of ash with a line across it, a little like the sign of the Order, but not quite. Aurelia says the Ashes are older than the Order, and that they obey one leader they never name. Whoever he is, he wanted you to pass. I do not know whether that should comfort me."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -19182,7 +19396,7 @@
       } else {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       }
-      const WIRE_LAST_STEP = 32;   // the last step of the expedition thread (end of Station 19 and of the Desert Path)
+      const WIRE_LAST_STEP = 36;   // the last step of the expedition thread (end of Station 20, the Gate of a Thousand Masks)
       if (wireCurrentStep > WIRE_LAST_STEP) wireCurrentStep = WIRE_LAST_STEP;
       while (wireHistory.length < wireCurrentStep) {
         wireHistory.push(0);
@@ -19253,7 +19467,10 @@
         oracleHint: { key: 'order_oracle_hint', label: 'three tries at the sigil of the Oracle' },
         oracleDisc: { key: 'order_oracle_disc_hint', label: 'a long time at the disc' },
         oracleVow: { key: 'order_oracle_vow_hint', label: 'three tries at the vow' },
-        oracle: { key: 'order_oracle_horizon_completed', label: 'Station 19' }
+        oracle: { key: 'order_oracle_horizon_completed', label: 'Station 19' },
+        masksHint: { key: 'order_masks_hint', label: 'three tries at the word of the gate' },
+        masksDraw: { key: 'order_masks_draw_hint', label: 'three tries at the missing halves' },
+        masks: { key: 'order_masks_gate_completed', label: 'Station 20' }
       };
       const INQUIRY_REQUIREMENTS = {
         'inq-salt-playa': 'chasm',
@@ -19288,12 +19505,17 @@
         'inq-oracle-mirrors': 'oracleHint',
         'inq-oracle-disc': 'oracleDisc',
         'inq-oracle-vow': 'oracleVow',
-        'inq-oracle-aurelia': 'oracle'
+        'inq-oracle-aurelia': 'oracle',
+        'inq-unsent-letter': 'oracle',
+        'inq-masks-lie': 'masksHint',
+        'inq-masks-halves': 'masksDraw',
+        'inq-ash-note': 'masks'
       };
       FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
       const INQUIRY_GROUPS = [
         { id: 'all', label: 'All Questions' },
         { id: 'desert', label: 'The Desert' },
+        { id: 'stage', label: 'The Stage' },
         { id: 'constellation', label: 'The Constellation' },
         { id: 'astrolabe', label: 'The Astrolabe' },
         { id: 'workshop', label: 'The Workshop' }
@@ -20001,7 +20223,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -20053,7 +20275,9 @@
         26: () => '✦ SEALS ' + sealsAtAltar() + ' / 5 · TO TOWER II, TOWARD THE SMOKE (6 H) · ARRIVAL AFTER DARK ✦',
         28: () => '✦ THE SERVANT IS SAFE · [H] − [U] = 16 · [M] + [T] = 25 RECORDED · BEARING 348° NNW · SEALS ' + sealsAtWell() + ' / 5 ✦',
         30: () => '✦ SEALS 5 / 5 · DOWN THE INNER STAIR OF TOWER II · AUDIENCE WITH THE ORACLE ✦',
-        32: () => '✦ THE FIRST TRUTH · WHEN: 18 – 20 DECEMBER · [Z] + [D] = 23 · [I] + [E] = 12 RECORDED · THE DESERT PATH IS COMPLETE ✦'
+        32: () => '✦ THE FIRST TRUTH · WHEN: 18 – 20 DECEMBER · [Z] + [D] = 23 · [I] + [E] = 12 RECORDED · THE DESERT PATH IS COMPLETE ✦',
+        34: () => '✦ SHEETS 19 – 26 RECEIVED · EAST ACROSS THE PLATEAU TO TOWER III (18 H) · KEEP SHEET 19B CLOSE ✦',
+        36: () => '✦ THE GATE OPENED · SILVER · FRAGMENT I SET · 1 / 9 · A NOTE SEALED IN ASH ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -20534,6 +20758,14 @@
       })();
       window.isOracleStairOver = oracleStair.over;
 
+      // Station 20: the 18-hour crossing of the plateau from Tower II to the gate of Tower III (wire step 33 starts it)
+      const masksMarch = makeMarch(18, { start: 'order_masks_march_start', bypassed: 'order_masks_march_bypassed', done: 'order_masks_gate_completed' });
+      window.getMasksMarchProgress = masksMarch.progress;
+      window.isMasksMarchStarted = masksMarch.started;
+      window.isMasksMarchOver = masksMarch.over;
+      window.getMasksMarchEta = masksMarch.eta;
+      window.skipMasksMarch = masksMarch.skip;
+
       // What the Field Wire shows while each march is under way (wire step → leg), and which answer starts it
       const MARCH_LEGS = {
         10: {
@@ -20583,9 +20815,17 @@
           etaLabel: 'AT THE DOOR',
           arrivedTitle: "The Inner Chamber · Station 19 Awaits",
           arrivedDesc: "Hermes is at the door of the Oracle, at the bottom of the inner stair. Open the Grand Desert Map and speak the sigil of the Oracle (Station 19 · Sheet 18A)."
+        },
+        34: {
+          step: 34, march: masksMarch, doneKey: 'order_masks_gate_completed',
+          walkingTitle: '✦ East Across the Plateau · To the Third Tower ✦',
+          walkingDesc: 'Hermes and Aurelia are walking east after the raiders\' ruts. Read Sheet 19A in a mirror, and keep Sheet 19B close.',
+          etaLabel: 'ARRIVAL AT TOWER III',
+          arrivedTitle: 'Tower III · The Gate of a Thousand Masks · Station 20 Awaits',
+          arrivedDesc: 'Hermes and Aurelia are at the gate of Tower III. Open Path III on the Quest Map and speak the word of the gate (Station 20 · Sheet 19B).'
         }
       };
-      const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair };
+      const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair, 33: masksMarch };
 
       function dawnMessageText(i) {
         const d = DAWN_THREAD[i];
@@ -21030,7 +21270,7 @@
         };
 
         if (wireCurrentStep >= WIRE_LAST_STEP) {
-          showWaypointBar('The Desert Path Is Complete · The WHEN: 18 – 20 December', 'Next: Path III, the Stage Tower, where the Mirror Speaker keeps the WHERE. The raiders went east with the Astrolabe.', WIRE_LAST_STEP);
+          showWaypointBar('Fragment I Is Set · 1 of 9', 'Next: The Camera Obscura (Station 21). The Mirror Speaker has not opened that room yet.', WIRE_LAST_STEP);
           return;
         }
         if (wireCurrentStep === 8) {
@@ -21087,6 +21327,13 @@
         if (wireCurrentStep === 30) {
           if (showMarchLeg(MARCH_LEGS[30])) return;
           advanceTo(31);   // Station 19 solved: Aurelia, the WHEN, and the raiders gone east
+        }
+        if (wireCurrentStep === 32) {
+          advanceTo(33);   // the Stage Path begins: the morning of departure, the letter and the new sheets
+        }
+        if (wireCurrentStep === 34) {
+          if (showMarchLeg(MARCH_LEGS[34])) return;
+          advanceTo(35);   // Station 20 solved: inside the gate, Fragment I and the note sealed with ash
         }
 
         if (wireCurrentStep === 6) {
@@ -21511,7 +21758,7 @@
                 renderWireChoices();
                 updateMessengerBadge();
               }
-            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31].includes(justAnsweredStep)) {
+            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35].includes(justAnsweredStep)) {
               // 9: Silvia answered at the gates of Tower II, and the 12-hour crossing to the Sun Monolith begins.
               // 11: Silvia answered the Station 14 debrief.
               // 13: Silvia answered at first light, and the 6-hour walk down to the Sandstone Labyrinth begins.
@@ -21524,6 +21771,8 @@
               // 27: Silvia answered the Station 18 debrief.
               // 29: Silvia answered at the inner stair, and Hermes goes down to the Oracle's door.
               // 31: Silvia answered the Station 19 debrief.
+              // 33: Silvia answered at the morning of departure, and the 18-hour crossing to Tower III begins.
+              // 35: Silvia answered the Station 20 debrief.
               if (justAnsweredStep === 9) rememberGateSeal();
               if (MARCH_STARTED_BY_ANSWER[justAnsweredStep]) MARCH_STARTED_BY_ANSWER[justAnsweredStep].start();
               const finalStep = justAnsweredStep + 1;
@@ -23320,7 +23569,11 @@
       try {
         const node = parseInt(sessionStorage.getItem('eclipse_tester_open_node') || '', 10);
         sessionStorage.removeItem('eclipse_tester_open_node');
-        if (node && typeof window.selectDesertStation === 'function') {
+        if (node >= 40 && node <= 48 && typeof window.selectStageStation === 'function') {
+          // a room of Tower III: the stage, then its game
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('stage', false);
+          setTimeout(() => window.selectStageStation(node), 900);
+        } else if (node && typeof window.selectDesertStation === 'function') {
           if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', false);
           setTimeout(() => window.selectDesertStation(node), 900);
         }
@@ -27936,6 +28189,508 @@
       if (isDone()) applyVictory();
       else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
       render();
+    })();
+
+    // =========================================================================
+    // STATION 20 · THE GATE OF A THOUSAND MASKS (Tower III, Stage Path · node 40)
+    // Part I (journal): six of the twelve masks of Sheet 19B lie; their forehead letters spell SILVER.
+    // Part II (web only), The Missing Halves: three masks carved on one side only. Silvia draws the other
+    // half, as a mirror would show it. The drawing is held to the mirror: it must cover every carved line
+    // (coverage) without wandering off them (precision). After three tries the Mirror Speaker shows a guide.
+    // Reward: Fragment I of the mirror of Tower III (the Living Mirror of Path III sets it).
+    // =========================================================================
+    (function initMasksGate() {
+      const modal = document.getElementById('modal-masks-gate');
+      if (!modal) return;
+      const sfx = window.sfx || null;
+      const $ = (id) => document.getElementById(id);
+      const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+      const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const KEYS = {
+        awake: 'order_masks_gate_awake',
+        done: 'order_masks_gate_completed',
+        fails: 'order_masks_key_fails',
+        hint: 'order_masks_hint',
+        carved: 'order_masks_carved',
+        drawFails: 'order_masks_draw_fails',
+        drawHint: 'order_masks_draw_hint'
+      };
+      const WORD = 'SILVER';
+      const HINT_AFTER_FAILS = 3;
+      const NODE = 40;
+
+      // ---- The masks: right halves in mask units (x ≥ 0 from the axis, y down from the centre) ----
+      const W = 300, H = 380, AX = 150, CY = 196;
+      function smooth(pts, n) {
+        // Catmull-Rom through the control points, n samples per span
+        const out = [], P = [pts[0]].concat(pts, [pts[pts.length - 1]]);
+        for (let i = 1; i < P.length - 2; i++) {
+          for (let k = 0; k < n; k++) {
+            const t = k / n, t2 = t * t, t3 = t2 * t;
+            out.push([0, 1].map((j) => 0.5 * (2 * P[i][j] + (-P[i - 1][j] + P[i + 1][j]) * t + (2 * P[i - 1][j] - 5 * P[i][j] + 4 * P[i + 1][j] - P[i + 2][j]) * t2 + (-P[i - 1][j] + 3 * P[i][j] - 3 * P[i + 1][j] + P[i + 2][j]) * t3)));
+          }
+        }
+        out.push(pts[pts.length - 1]);
+        return out;
+      }
+      const almond = (cx, cy, w, h) => {
+        const pts = [];
+        for (let i = 0; i <= 16; i++) pts.push([cx - w / 2 + w * i / 16, cy - h * 0.62 * Math.sin(Math.PI * i / 16)]);
+        for (let i = 1; i <= 16; i++) pts.push([cx + w / 2 - w * i / 16, cy + h * 0.45 * Math.sin(Math.PI * i / 16)]);
+        return pts;
+      };
+      const arc = (x0, x1, y, lift) => Array.from({ length: 15 }, (_, i) => [x0 + (x1 - x0) * i / 14, y - lift * Math.sin(Math.PI * i / 14)]);
+      const VOLTO = smooth([[0, -150], [44, -147], [82, -133], [106, -106], [114, -64], [112, -17], [106, 27], [93, 70], [72, 106], [44, 131], [19, 145], [0, 149]], 5);
+      const MOON = Array.from({ length: 31 }, (_, i) => [118 * Math.sin(Math.PI * i / 30), -140 * Math.cos(Math.PI * i / 30)]);
+      const MASKS = [
+        { name: 'the plain mask', strokes: [VOLTO, almond(44, -32, 50, 22), arc(14, 78, -58, 10)] },
+        { name: 'the weeping mask', strokes: [VOLTO, almond(44, -32, 50, 22), arc(14, 78, -58, 10),
+          [[0, 72], [9, 68], [18, 70], [38, 77]], [[38, 77], [22, 87], [0, 90]],
+          [[48, 0], [54, 16], [56, 28], [48, 37], [40, 28], [42, 16], [48, 0]]] },
+        { name: 'the feathered mask', strokes: [MOON, almond(42, -30, 48, 22), arc(12, 74, -56, 12),
+          [[0, 74], [10, 70], [20, 72], [36, 78]], [[36, 78], [20, 88], [0, 91]],
+          [[64, 26], [76, 44], [64, 62], [52, 44], [64, 26]],
+          smooth([[58, -134], [74, -156], [96, -168], [124, -170]], 4),
+          smooth([[58, -134], [86, -146], [112, -156], [124, -170]], 4)] }
+      ];
+      const TOL = 15;              // how far from a carved line the mirror forgives (mask units)
+      const NEED_COVER = 0.72;     // share of the carved half the drawing must reach
+      const NEED_EACH = 0.45;      // ... and of every single line (no missing eye)
+      const NEED_PRECISE = 0.7;    // share of the drawing that must lie on a carved line
+
+      const el = {
+        close: $('btn-close-masks'), wordCard: $('masks-word-card'), keyInput: $('masks-key-input'), speak: $('btn-masks-speak'),
+        keyFeedback: $('masks-key-feedback'), game: $('masks-draw-game'), inner: document.querySelector('#masks-draw-game .monolith-game-inner'),
+        canvas: $('masks-canvas'), count: $('masks-draw-count'), lead: $('masks-draw-lead'), undo: $('btn-masks-undo'), clear: $('btn-masks-clear'),
+        hold: $('btn-masks-hold'), helpRow: $('masks-help-row'), finish: $('btn-masks-finish'), drawFeedback: $('masks-draw-feedback'),
+        hint: $('masks-hint'), victory: $('masks-victory'), victoryText: $('masks-victory-text'), fragment: $('masks-fragment-svg'),
+        done: $('btn-masks-finish-station'), dispatch: $('masks-dispatch-text'),
+        tWord: $('masks-telem-word'), tMasks: $('masks-telem-masks'), tFragment: $('masks-telem-fragment')
+      };
+
+      const isAwake = () => get(KEYS.awake) === 'true';
+      const isDone = () => get(KEYS.done) === 'true';
+      const carved = () => (isDone() ? MASKS.length : Math.max(0, Math.min(MASKS.length, parseInt(get(KEYS.carved) || '0', 10) || 0)));
+      const drawFails = () => parseInt(get(KEYS.drawFails) || '0', 10) || 0;
+      const guideShown = () => drawFails() >= HINT_AFTER_FAILS;
+      let strokes = [];       // Silvia's lines for the current mask, in mask units
+      let current = null;     // the line being drawn
+      let revealed = false;   // the current mask has just been carved true (shown for a moment)
+      let justSet = false;    // Fragment I has just been won and the mirror has not shown it yet
+
+      function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
+      function feedback(node, text, kind) {
+        if (!node) return;
+        node.textContent = text;
+        node.classList.toggle('is-error', kind === 'error');
+        node.classList.toggle('is-ok', kind === 'ok');
+      }
+      const letters = (s) => String(s || '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
+
+      // ---- Geometry: sample lines every few units, measure distances ----
+      function resample(pts, step) {
+        const out = [];
+        for (let i = 0; i < pts.length - 1; i++) {
+          const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+          const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / step));
+          for (let k = 0; k < n; k++) out.push([x0 + (x1 - x0) * k / n, y0 + (y1 - y0) * k / n]);
+        }
+        if (pts.length) out.push(pts[pts.length - 1]);
+        return out;
+      }
+      const toCanvas = (sgn) => (p) => [AX + sgn * p[0], CY + p[1]];
+      function nearAny(p, pts) {
+        for (let i = 0; i < pts.length; i++) if (Math.hypot(pts[i][0] - p[0], pts[i][1] - p[1]) <= TOL) return true;
+        return false;
+      }
+      // How well Silvia's half matches the mirror image of the carved half
+      function judge(mask) {
+        const drawn = [].concat(...strokes.map((s) => resample(s, 3)));
+        if (drawn.length < 4) return { empty: true };
+        const targets = mask.strokes.map((s) => resample(s.map(toCanvas(1)), 3));
+        const all = [].concat(...targets);
+        const each = targets.map((t) => t.filter((p) => nearAny(p, drawn)).length / t.length);
+        const cover = all.filter((p) => nearAny(p, drawn)).length / all.length;
+        const precise = drawn.filter((p) => nearAny(p, all)).length / drawn.length;
+        return { cover, precise, worst: Math.min(...each), ok: cover >= NEED_COVER && precise >= NEED_PRECISE && Math.min(...each) >= NEED_EACH };
+      }
+
+      // ---- Drawing ----
+      let ctx = null, scale = 1;
+      function sizeCanvas() {
+        if (!el.canvas) return;
+        const r = el.canvas.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const w = Math.max(1, Math.round((r.width || W) * dpr));
+        el.canvas.width = w;
+        el.canvas.height = Math.round(w * H / W);
+        scale = w / W;
+        ctx = el.canvas.getContext('2d');
+        draw();
+      }
+      function path(pts, close) {
+        ctx.beginPath();
+        pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])));
+        if (close) ctx.closePath();
+      }
+      function draw() {
+        if (!ctx) return;
+        const idx = Math.min(carved(), MASKS.length - 1);
+        const mask = MASKS[idx];
+        const solvedNow = revealed || isDone();
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        // the mirror: a pale glass on the right half
+        const g = ctx.createLinearGradient(AX, 0, W, H);
+        g.addColorStop(0, 'rgba(216, 180, 254, 0.10)');
+        g.addColorStop(0.5, 'rgba(255, 255, 255, 0.04)');
+        g.addColorStop(1, 'rgba(216, 180, 254, 0.12)');
+        ctx.fillStyle = g;
+        ctx.fillRect(AX, 0, W - AX, H);
+        ctx.strokeStyle = 'rgba(247, 220, 140, 0.55)';
+        ctx.setLineDash([6, 6]);
+        ctx.lineWidth = 1;
+        path([[AX, 8], [AX, H - 8]]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        // the carved half, in gold
+        ctx.strokeStyle = '#f7dc8c';
+        ctx.lineWidth = 3;
+        mask.strokes.forEach((s) => { path(s.map(toCanvas(-1))); ctx.stroke(); });
+        // the guide the Mirror Speaker shows after three tries
+        if (guideShown() && !solvedNow) {
+          ctx.strokeStyle = 'rgba(233, 213, 255, 0.45)';
+          ctx.setLineDash([2, 7]);
+          ctx.lineWidth = 2.5;
+          mask.strokes.forEach((s) => { path(s.map(toCanvas(1))); ctx.stroke(); });
+          ctx.setLineDash([]);
+        }
+        if (solvedNow) {
+          // carved true: the mirror shows the whole face in gold
+          ctx.shadowColor = 'rgba(247, 220, 140, 0.8)';
+          ctx.shadowBlur = 10;
+          ctx.strokeStyle = '#f7dc8c';
+          ctx.lineWidth = 3;
+          mask.strokes.forEach((s) => { path(s.map(toCanvas(1))); ctx.stroke(); });
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.strokeStyle = '#e9e4f5';
+          ctx.lineWidth = 3;
+          strokes.concat(current ? [current] : []).forEach((s) => {
+            if (s.length === 1) { ctx.beginPath(); ctx.arc(s[0][0], s[0][1], 1.5, 0, 2 * Math.PI); ctx.fillStyle = '#e9e4f5'; ctx.fill(); return; }
+            path(s); ctx.stroke();
+          });
+        }
+      }
+      function pointAt(e) {
+        const r = el.canvas.getBoundingClientRect();
+        return [(e.clientX - r.left) * W / r.width, (e.clientY - r.top) * H / r.height];
+      }
+      const canDraw = () => isAwake() && !isDone() && !revealed;
+      if (el.canvas) {
+        el.canvas.addEventListener('pointerdown', (e) => {
+          if (!canDraw()) return;
+          e.preventDefault();
+          try { el.canvas.setPointerCapture(e.pointerId); } catch (err) {}
+          current = [pointAt(e)];
+          draw();
+        });
+        el.canvas.addEventListener('pointermove', (e) => {
+          if (!current) return;
+          const p = pointAt(e), last = current[current.length - 1];
+          if (Math.hypot(p[0] - last[0], p[1] - last[1]) >= 1.5) { current.push(p); draw(); }
+        });
+        const end = () => {
+          if (!current) return;
+          strokes.push(current);
+          current = null;
+          feedback(el.drawFeedback, '', null);
+          render();
+        };
+        el.canvas.addEventListener('pointerup', end);
+        el.canvas.addEventListener('pointercancel', end);
+      }
+
+      function holdToMirror() {
+        if (!canDraw()) return;
+        const mask = MASKS[carved()];
+        const res = judge(mask);
+        if (res.ok) { carveTrue(); return; }
+        const fails = drawFails() + 1;
+        set(KEYS.drawFails, String(fails));
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        let msg;
+        if (res.empty) msg = 'The mirror shows nothing yet. Draw the missing half on the glass, to the right of the dotted line.';
+        else if (res.precise < NEED_PRECISE) msg = 'The mirror shows lines the carved half does not have. Rub them out and follow the gold more closely.';
+        else if (res.worst < NEED_EACH) msg = 'Something is missing: every line of the carved half needs its twin in the glass.';
+        else msg = 'Close, but the face does not close yet. Reach a little further along each line.';
+        if (fails === HINT_AFTER_FAILS) {
+          set(KEYS.drawHint, 'true');
+          msg += ' The Mirror Speaker has breathed on the glass: a faint guide shows where the lines go.';
+        }
+        feedback(el.drawFeedback, msg, 'error');
+        render();
+      }
+      function carveTrue() {
+        const n = carved() + 1;
+        revealed = true;
+        set(KEYS.drawFails, '0');
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        feedback(el.drawFeedback, 'The mirror closes the face: ' + MASKS[n - 1].name + ' is whole.', 'ok');
+        if (n >= MASKS.length) {
+          set(KEYS.carved, String(MASKS.length));
+          render();
+          setTimeout(() => { revealed = false; completeStation(); }, 1100);
+          return;
+        }
+        set(KEYS.carved, String(n));
+        render();
+        const lines = [
+          "One face whole, Silvia. The mask turned on its nail by itself, all the way round, and stopped facing the corridor. Aurelia says that means 'pass'.",
+          "Two. That one wept on both sides, as it should. The candles along the corridor all leaned toward the glass at once, though there is no wind in here."
+        ];
+        say(lines[n - 1]);
+        setTimeout(() => {
+          revealed = false;
+          strokes = [];
+          feedback(el.drawFeedback, '', null);
+          render();
+        }, 1300);
+      }
+      // After three tries, anyone (a keyboard, a shaking hand) may let the Mirror Speaker carve the half
+      function letSpeakerCarve() {
+        if (!canDraw() || !guideShown()) return;
+        strokes = MASKS[carved()].strokes.map((s) => s.map(toCanvas(1)));
+        carveTrue();
+      }
+
+      function completeStation() {
+        set(KEYS.done, 'true');
+        set(KEYS.carved, String(MASKS.length));
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        applyVictory();
+        render();
+        justSet = true;   // the mirror is refreshed once the modal closes, so its flash is seen
+        if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
+        if (el.done) setTimeout(() => el.done.focus(), 60);
+        say("The third mask closed, and the whole wall breathed out, Silvia. Behind the last mask there was a little niche, and in it, wrapped in black velvet, a piece of mirror the size of my hand. Fragment I. There is a moon in it that is not in the sky. And in the glass beside us, for one moment, a woman in a grey gown raised her hand and drew a straight line in the air.");
+      }
+      function drawFragment() {
+        const D = window.STAGE_MIRROR;
+        if (!el.fragment || !D || el.fragment.childNodes.length) return;
+        const pts = D.shards[0].points;
+        const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+        const x0 = Math.min(...xs), y0 = Math.min(...ys), s = Math.max(Math.max(...xs) - x0, Math.max(...ys) - y0);
+        el.fragment.setAttribute('viewBox', (x0 - 6) + ' ' + (y0 - 6) + ' ' + (s + 12) + ' ' + (s + 12));
+        const ns = 'http://www.w3.org/2000/svg';
+        const mk = (tag, attrs, parent) => { const n = document.createElementNS(ns, tag); Object.keys(attrs).forEach((k) => n.setAttribute(k, attrs[k])); (parent || el.fragment).appendChild(n); return n; };
+        const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ') + ' Z';
+        const defs = mk('defs', {});
+        const clip = mk('clipPath', { id: 'masks-frag-clip' }, defs);
+        mk('path', { d }, clip);
+        const grad = mk('linearGradient', { id: 'masks-frag-glass', x1: '0', y1: '0', x2: '1', y2: '1' }, defs);
+        mk('stop', { offset: '0', 'stop-color': '#4a2a18' }, grad);
+        mk('stop', { offset: '0.6', 'stop-color': '#2a1430' }, grad);
+        mk('stop', { offset: '1', 'stop-color': '#120a1c' }, grad);
+        mk('path', { d, fill: 'url(#masks-frag-glass)' });
+        const lines = mk('g', { 'clip-path': 'url(#masks-frag-clip)', fill: 'none', stroke: '#f6e3b0', 'stroke-width': 2, 'stroke-linecap': 'round' });
+        D.facade.forEach((pl) => mk('path', { d: pl.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join(' ') }, lines));
+        mk('path', { d, fill: 'none', stroke: '#f7dc8c', 'stroke-width': 3 });
+      }
+      function applyVictory() {
+        if (el.victoryText) {
+          el.victoryText.textContent = 'Silvia found the six masks that lie on Sheet 19B and spoke their word, SILVER, and the wall of masks opened like a curtain. Inside, she gave three half-carved masks their missing halves, the way a mirror would. Behind the last one waited the first piece of the mirror of Tower III. On the same mask, someone had pinned a note sealed with ash.';
+        }
+        if (el.keyInput) { el.keyInput.value = WORD; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+        drawFragment();
+      }
+
+      // ---- Part I: the word from Sheet 19B ----
+      function speakWord() {
+        if (isAwake()) return;
+        const typed = letters(el.keyInput && el.keyInput.value);
+        if (!typed) { feedback(el.keyFeedback, 'Type the six letters from Sheet 19B.', 'error'); return; }
+        if (typed !== WORD) {
+          const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
+          set(KEYS.fails, String(fails));
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
+            set(KEYS.hint, 'true');
+            feedback(el.keyFeedback, 'The masks stay still. Hermes left you a note in Ask Hermes about the masks that lie.', 'error');
+          } else {
+            feedback(el.keyFeedback, 'The masks stay still. Look again at the two halves of each mask on Sheet 19B.', 'error');
+          }
+          return;
+        }
+        set(KEYS.awake, 'true');
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (el.keyInput) { el.keyInput.value = WORD; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+        feedback(el.keyFeedback, 'SILVER. The wall of masks opens like a curtain.', 'ok');
+        say("SILVER... and the whole wall moved, Silvia, every mask turning on its nail at once, like a theatre full of heads turning to look at us. Then it opened down the middle like a curtain. Inside: a corridor of mirrors, and three masks hanging in it, carved on one side only. The other side is smooth and blank, as if it were waiting. Aurelia says the house wants us to finish them.");
+        render();
+        if (el.hold) setTimeout(() => el.hold.focus(), 60);
+      }
+
+      function render() {
+        const awake = isAwake(), done = isDone(), n = carved();
+        if (el.count) el.count.textContent = done ? 'All three masks whole' : 'Mask ' + (Math.min(n, MASKS.length - 1) + 1) + ' of ' + MASKS.length;
+        [el.undo, el.clear].forEach((b) => { if (b) b.disabled = !awake || done || revealed || !strokes.length; });
+        if (el.hold) el.hold.disabled = !awake || done || revealed;
+        if (el.helpRow) el.helpRow.style.display = awake && !done && guideShown() ? '' : 'none';
+        if (el.canvas) {
+          el.canvas.classList.toggle('is-carved', done);
+          const mask = MASKS[Math.min(n, MASKS.length - 1)];
+          el.canvas.setAttribute('aria-label', done
+            ? 'Three masks made whole in the mirror.'
+            : 'Mask ' + (Math.min(n, MASKS.length - 1) + 1) + ' of 3, ' + mask.name + ': carved on its left half only, beside a mirror. Draw its right half as the mirror would show it. ' + strokes.length + (strokes.length === 1 ? ' line' : ' lines') + ' drawn.');
+        }
+        if (el.tWord) el.tWord.textContent = awake ? WORD + ' ✓' : '[ 6 LETTERS ]';
+        if (el.tMasks) el.tMasks.textContent = done ? '3 / 3 ✓' : '[ ' + n + ' / 3 ]';
+        if (el.tFragment) el.tFragment.textContent = done ? 'SET ✓' : '[ MISSING ]';
+        if (el.game) el.game.classList.toggle('is-locked', !awake);
+        if (el.inner) el.inner.inert = !awake;
+        if (el.wordCard) el.wordCard.classList.toggle('is-collapsed', awake);
+        if (awake && el.keyFeedback && !el.keyFeedback.textContent) feedback(el.keyFeedback, 'Word spoken: ' + WORD + ' ✓', 'ok');
+        if (el.hint) {
+          let hint = '';
+          if (!done && awake && guideShown()) hint = '✦ Aurelia: fold the page in your mind along the dotted line. Every point of the gold half lands just as far on the other side, at the same height.';
+          el.hint.style.display = hint ? '' : 'none';
+          el.hint.textContent = hint;
+        }
+        if (el.victory) el.victory.style.display = done ? '' : 'none';
+        draw();
+      }
+
+      // ---- Controls ----
+      if (el.speak) el.speak.addEventListener('click', speakWord);
+      if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakWord(); });
+      if (el.undo) el.undo.addEventListener('click', () => { strokes.pop(); feedback(el.drawFeedback, '', null); render(); });
+      if (el.clear) el.clear.addEventListener('click', () => { strokes = []; feedback(el.drawFeedback, '', null); render(); });
+      if (el.hold) el.hold.addEventListener('click', holdToMirror);
+      if (el.finish) el.finish.addEventListener('click', letSpeakerCarve);
+
+      // ---- Open / close ----
+      const marchOver = () => typeof window.isMasksMarchOver === 'function' && window.isMasksMarchOver();
+      function canOpen() {
+        if (isDone()) return true;
+        if (typeof window.isAdminTester === 'function' && window.isAdminTester()) return true;
+        return get('order_oracle_horizon_completed') === 'true' && marchOver();
+      }
+      let returnFocusTo = null;
+      function openMasksModal() {
+        if (!canOpen()) {
+          const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
+          if (!toast) return;
+          const eta = typeof window.getMasksMarchEta === 'function' ? window.getMasksMarchEta() : '';
+          if (get('order_oracle_horizon_completed') !== 'true') toast('✦ THE CURTAIN IS DOWN ✦ The Stage Path opens after the audience with the Oracle (Station 19).');
+          else if (eta) toast('Hermes and Aurelia are crossing the plateau toward the third tower. Arrival in ' + eta + '. Keep Sheet 19B close.');
+          else toast('Hermes and Aurelia will leave Tower II once you answer him on the wire: eighteen hours east to the third tower.');
+          return;
+        }
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        modal.style.display = 'flex';
+        modal.classList.remove('closing');
+        returnFocusTo = document.activeElement;
+        if (isDone()) { applyVictory(); say("We sleep tonight behind the gate, Silvia, in the dressing rooms, on piles of old costumes. The masks have all turned back to face the corridor. Every one of them is smiling now."); }
+        else if (!isAwake()) say("Silvia, we are at the gate of Tower III. It is not a door: it is a wall of masks, hundreds of them, from the ground to the top of the arch, all white, all staring. Aurelia says the old charts of the Sanctuary call it the Gate of a Thousand Masks. Six of these lie, she says, and the letter knew it. Sheet 19B, please.");
+        else say("The three masks are waiting, Silvia, each carved on one side only. Give each its other half. Aurelia is holding the lamp.");
+        sizeCanvas();
+        render();
+        const focusTarget = isDone() ? el.done : (!isAwake() ? el.keyInput : el.hold);
+        if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
+      }
+      function closeMasksModal() {
+        if (modal.style.display === 'none') return;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        current = null;
+        modal.classList.add('closing');
+        setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
+        if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
+        returnFocusTo = null;
+        if (justSet) { justSet = false; showMirror(); }
+      }
+      // Path III on the Quest Map, with Fragment I flashing into its place
+      function showMirror() {
+        if (document.documentElement.dataset.mapPath !== 'stage' && typeof window.switchMapPath === 'function') window.switchMapPath('stage', true);
+        else if (window.StageMirror && typeof window.StageMirror.refresh === 'function') window.StageMirror.refresh();
+        const wrap = document.getElementById('stage-map-canvas-wrap');
+        if (wrap && wrap.offsetParent) setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'center' }), 260);
+      }
+      function finishStation() {
+        justSet = true;
+        closeMasksModal();
+      }
+      window.openMasksModal = openMasksModal;
+      window.closeMasksModal = closeMasksModal;
+      window.STAGE_OPENERS = window.STAGE_OPENERS || {};
+      window.STAGE_OPENERS[NODE] = openMasksModal;
+      if (el.close) el.close.addEventListener('click', closeMasksModal);
+      if (el.done) el.done.addEventListener('click', finishStation);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeMasksModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display !== 'none') closeMasksModal(); });
+      window.addEventListener('resize', () => { if (modal.style.display !== 'none') sizeCanvas(); });
+
+      // ---- The card of the room on the Quest Map ----
+      window.STAGE_CARDS = window.STAGE_CARDS || {};
+      window.STAGE_CARDS[NODE] = () => {
+        const thumb = './assets/thumbnails/masks_gate_preview.webp';
+        if (isDone()) {
+          return {
+            badge: 'STATION 20 // FRAGMENT I',
+            status: 'THE GATE OPENED ✓',
+            statusClass: 'status-done-badge',
+            title: 'The Gate of a Thousand Masks · Tower III',
+            thumb,
+            lore: 'Silvia found the six masks that lie and spoke their word, and the wall of masks opened like a curtain. She gave three half-carved masks their missing halves, the way a mirror would, and the first piece of the mirror of Tower III was hers.',
+            rewards: [
+              { icon: '🪞', label: 'Fragment I', desc: 'Set in the mirror of Tower III' },
+              { icon: '✉️', label: 'A Note Sealed in Ash', desc: 'Pinned on the last mask' }
+            ],
+            btnText: 'Revisit the Gate ➔',
+            action: openMasksModal,
+            hideReturnBtn: true
+          };
+        }
+        const eta = typeof window.getMasksMarchEta === 'function' ? window.getMasksMarchEta() : '';
+        const arrived = marchOver() || (typeof window.isAdminTester === 'function' && window.isAdminTester());
+        return {
+          badge: 'STATION 20 // STAGE PATH',
+          status: arrived ? 'AT THE GATE OF TOWER III ✦' : (eta ? 'CROSSING THE PLATEAU ✦' : 'AT TOWER II, READY TO LEAVE ✦'),
+          statusClass: 'status-live-badge',
+          title: 'The Gate of a Thousand Masks · Tower III',
+          thumb,
+          lore: arrived
+            ? 'The gate of Tower III is a wall of masks, and six of them lie. Solve Sheet 19B of your journal and speak the word of the gate. Inside, three masks wait to be made whole.'
+            : (eta
+              ? 'Hermes and Aurelia are walking east across the plateau, after the raiders\' ruts. Arrival at the third tower in ' + eta + '. Keep Sheet 19B close.'
+              : 'Hermes and Aurelia will leave Tower II once you answer him on the wire: eighteen hours east to the third tower. Begin with Sheet 19A.'),
+          rewards: [
+            { icon: '🎭', label: 'The Word of the Gate', desc: 'Sheet 19B · twelve masks, six that lie' },
+            { icon: '✍️', label: 'The Missing Halves', desc: 'A second trial, at the mirror' },
+            { icon: '🪞', label: 'Fragment I', desc: 'One ninth of the mirror of Tower III' }
+          ],
+          btnText: arrived ? '✦ SPEAK AT THE GATE ➔' : 'Hermes is on his way',
+          btnDisabled: !arrived,
+          action: openMasksModal,
+          hideReturnBtn: true
+        };
+      };
+
+      // For the smoke tests: the state of the drawing, and a perfect or a wrong drawing on demand
+      window.__masks = {
+        carved, strokes: () => strokes.length,
+        targets: () => MASKS[Math.min(carved(), MASKS.length - 1)].strokes.map((s) => s.map(toCanvas(1))),
+        size: [W, H],
+        drawTrue: () => { strokes = MASKS[carved()].strokes.map((s) => s.map(toCanvas(1))); render(); },
+        setStrokes: (list) => { strokes = list; render(); },
+        drawHalf: () => { strokes = [MASKS[carved()].strokes[0].map(toCanvas(1))]; render(); },
+        drawWrong: () => { strokes = MASKS[carved()].strokes.map((s) => s.map(toCanvas(-1))); render(); },
+        judge: () => judge(MASKS[carved()])
+      };
     })();
 
     (function initSandstormLockdown() {

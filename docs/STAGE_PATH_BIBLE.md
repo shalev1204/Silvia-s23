@@ -143,6 +143,14 @@ Cada cara de juego lleva además un **fragmento dibujado**: su silueta y el troz
 | Pieza | Estado |
 | :--- | :--- |
 | Biblia del Stage Path | ✅ Este documento |
-| Base web (pestaña, mapa del espejo + caleidoscopio, chat, probador) | ⏳ |
-| Hojas 19 a 26 (impresión) | ⏳ |
-| Estaciones 20 a 28 | ⏳ |
+| Base web (pestaña, mapa del espejo + caleidoscopio, chat, probador) | ✅ Espejo Vivo (`stage-mirror.js`), pestaña Path III, Field Wire 33–36, probador `s20` |
+| Hojas 19 a 26 (impresión) | ✅ Hoja 19 (19A, 19B) · ⏳ Hojas 20 a 26 · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
+| Estaciones 20 a 28 | ✅ Estación 20 · ⏳ Estaciones 21 a 28 |
+
+### Estación 20 · The Gate of a Thousand Masks (Hoja 19B · Fragmento I)
+
+- **Hoja 19A** *(The Unsent Letter)*: carta de una Oráculo de hace siglos a la Mirror Speaker de su tiempo, en escritura de espejo (perdón; el espejo roto en 9 piezas para que nadie pueda girar el Astrolabio solo; aviso sobre los Ashes, más antiguos que la Orden; «The first piece sleeps behind a thousand faces. Only the one who sees what is not equal will find it.»). Nota de Aurelia, nota de Hermes (Leonardo escribía igual), espejo de mano que muestra el principio leído al derecho.
+- **Hoja 19B**: 12 máscaras venecianas, 6 mienten (lágrima, ceja ausente, pluma, grieta, ojo distinto, cinta: siempre en un solo lado). Señuelos simétricos (dos lágrimas, dos plumas, dos cintas). Letras de las mentirosas en orden de lectura: **SILVER**. Las 12 letras: M S A I L O T V H E R U. Fragmento I dibujado y su lugar en el espejo.
+- **Web**: palabra `SILVER` (tolerante con espacios y guiones; 3 fallos → pista en Ask Hermes). Después, **The Missing Halves**: tres máscaras talladas en una mitad; Silvia dibuja la otra mitad, en espejo, con el dedo o el ratón. Se acepta si el dibujo cubre el 72 % de la mitad reflejada, cada línea al menos el 45 % y el 70 % de lo dibujado cae sobre una línea (tolerancia 15 unidades sobre 300). Un pulso tembloroso pasa; copiar sin reflejar, desplazar, agrandar o garabatear no. Tras 3 intentos: guía punteada y el botón «Let the Mirror Speaker carve it» (camino de teclado).
+- **Premio**: Fragmento I (destella en el Espejo Vivo al cerrar el modal). Sin ecuación (J, Q y X llegan en 22, 24 y 27).
+- **Field Wire**: 33 partida (las hojas 19–26 llegan con una paloma de la Orden) → 18 h → 35 balance: el reflejo de la Mirror Speaker (firma con una línea), el Fragmento I y **la primera nota de Pope-E**, clavada en la última máscara: *«Let her through. She is the treasure.»*, sello de ceniza (círculo cruzado por una línea). 36 cierre.
