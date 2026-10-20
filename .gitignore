@@ -50,6 +50,7 @@ node_modules/
 .wrangler/
 *.log
 npm-debug.log*
+scripts/audit/smoke_report.json
 
 # Editors & swap files
 .vscode/

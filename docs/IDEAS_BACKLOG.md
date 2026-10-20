@@ -40,7 +40,14 @@
 - Cada perfil guarda su propia aventura (`window.EclipseProfiles`): las funciones nuevas con estado deben respetarlo y el modo Carles debe poder verlas todas.
 - Cualquier cambio en `web/index.html` pasa por `python3 scripts/audit/web_smoke.py` y `lint_lore_and_vocabulary.py` antes de darse por hecho.
 
-## Dependencias y orden sugerido (a confirmar con el Operador)
+## Decisiones de planificación del Operador (20-10-2026)
+
+- **Orden**: infraestructura primero; después la experiencia de Silvia y las estaciones 21–28.
+- **Dividir `index.html` (#17)**: antes de construir las estaciones nuevas.
+- **Dispositivo de Silvia**: portátil o iPad. Háptica (#5) y PWA (#21) pasan a **opcionales** (se hacen al final, si se quiere); suben teclado, sonido, contraste y táctil de iPad.
+- **Orden interno de la infraestructura**: 18 (smoke rápido, la red de seguridad) → 17 (dividir el Hub) → 19 (guardado) → 22 (registro local). Se pone 18 antes que 17 porque dividir 29.000 líneas sin una prueba corta es el cambio más arriesgado del plan.
+
+## Dependencias y orden sugerido
 
 - **Infraestructura primero** (condiciona al resto): 17 (dividir el Hub), 18 (smoke rápido), 19 (guardado), 22 (registro local).
 - **Alimentan a otras**: 22 → 9 y 11 (necesitan saber cómo juega Silvia); 6 → 11 (usar pistas); 19 → 1 y 2 (necesitan estado persistente); 2 → 12 (galería de cartas).
@@ -99,11 +106,38 @@ Pendiente de especificar.
 ### 16. Vista previa de impresión de las 8 hojas (S)
 Pendiente de especificar.
 
-### 17. Dividir `index.html` (L)
-Pendiente de especificar.
+### 17. Dividir `index.html` (L) · especificada
+**Punto de partida**: CSS ~10.200 líneas en un `<style>` (196 comentarios de sección); HTML ~4.000; JS principal ~15.000 en un `<script>`: un núcleo de ~7.900 líneas (una sola clausura) seguido de 16 IIFE ya aisladas (`initGrandDesertMapAndChasm`, `initTesterPanel`, `initSunMonolith` … `initMasksGate`, `initSandstormLockdown`), que se comunican por `window.*`. El Operador abre el Hub por `file://`: no se pueden usar módulos ES.
 
-### 18. Smoke más rápido (M)
-Pendiente de especificar.
+**Decisiones (20-10-2026)**
+- **Sin build**: `<script src>` clásicos y `<link rel="stylesheet">` en el mismo orden que hoy. Funciona igual en `file://` y en Cloudflare; la CSP no cambia (todo del mismo origen).
+- **Extracción mecánica**: un archivo JS por cada IIFE aislada y el núcleo entero como `hub-core.js`; el CSS cortado por sus secciones (base, vistas, mapas, una hoja por estación). **Ni una línea de lógica cambia**: al concatenar los archivos en orden sale exactamente el código de hoy (se comprueba con un script).
+- **El HTML de vistas y modales se queda en `index.html`** (pasa de ~29.000 a ~4.500 líneas).
+- **Carpetas**: `web/hub/css/` y `web/hub/js/` (núcleo, `stations/sNN-nombre.js`, piezas como el tester). `web/assets/js/` sigue con el mapa 3D y el Espejo Vivo.
+- **Estaciones nuevas** (21–28): nacen ya como `web/hub/js/stations/sNN-*.js` + `web/hub/css/stations/sNN-*.css`.
+
+**Fuera de alcance**: partir el núcleo de 7.900 líneas (pasada posterior, si hace falta), inyectar el HTML de los modales desde JS, minificar.
+**Verificación**: concatenación idéntica al original (JS y CSS); smoke completo en verde con el mismo número de comprobaciones; lint de lore; abrir el Hub por `file://` sin errores en consola.
+
+### 18. Smoke más rápido (M) · implementada y verificada (20-10-2026)
+**Decisiones (20-10-2026)**
+- **Paralelo por procesos**: cada una de las 14 secciones de `web_smoke.py` corre en su propio proceso con su propio navegador y un único servidor compartido. Opción `--jobs N` (por defecto, los núcleos del Mac). Se mantiene la API síncrona de Playwright y el código de cada sección no cambia.
+- **Pasada corta (`--quick`)**, para antes de cada commit: páginas sin errores ni CSP, vistas del Hub, gating del chat y del Ledger, perfiles, *Play this game* del Tester, Espejo Vivo y la última estación construida. Sin los juegos largos del desierto. Objetivo: 1–2 minutos.
+- **Selección manual**: `--only` con los nombres de sección (útil al construir una estación).
+- **Salida**: el informe de consola de siempre más `smoke_report.json` (por sección: resultado, duración y fallos), ignorado por git.
+- **Sin CI**: sigue siendo un script local; el completo se pasa a mano antes de desplegar.
+
+**Fuera de alcance**: reescribir esperas, reintentos automáticos, GitHub Actions.
+**Verificación**: el completo en paralelo da el mismo número de comprobaciones y el mismo resultado que en serie; `--quick` en verde; tiempos antes y después anotados aquí.
+
+**Resultado (20-10-2026, Mac de 8 núcleos)**
+- Completo: **699 s en serie → 359 s con 2 procesos**, 206 comprobaciones en verde en ambos casos.
+- `--quick` (8 secciones, 69 comprobaciones): 259 s con 1 proceso, **190 s con 2**. No llega al objetivo de 1–2 min: lo que pesa son las esperas fijas de cada prueba (ver «Pendiente»).
+- **Procesos por defecto: 2.** Con 3, los shaders WebGL del mapa 3D fallan por la carga (falsos rojos); con 4 todo va más lento que en serie.
+- **Navegador**: el Chromium de Playwright (instalado el 20-10-2026). Con el Chrome de escritorio, varios a la vez se pueden quedar parados ~15 min; en serie funciona.
+- El servidor local ahora acepta una cola de 256 conexiones (la de 5 por defecto rechazaba conexiones con varios navegadores).
+
+**Pendiente (si se quiere bajar de 3 min)**: sustituir las esperas fijas (`wait_for_timeout`, ~136) por esperas por condición en las secciones de `--quick`.
 
 ### 19. Guardado con exportación e importación (S)
 Pendiente de especificar.

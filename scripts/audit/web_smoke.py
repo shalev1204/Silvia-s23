@@ -24,16 +24,26 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
 Options:       --chromium /path/to/chrome   use a specific browser binary
+               --quick                      short pass before each commit (no long desert games)
+               --only s20,mirror            run only these sections (keys in SECTIONS)
+               --jobs N                     sections run in parallel, one browser per process (default 2; more chokes)
+Each run writes scripts/audit/smoke_report.json (per section: result, seconds, failures); git ignores it.
 """
 
 import argparse
+import concurrent.futures
+import contextlib
 import functools
 import glob
 import http.server
+import io
 import json
+import multiprocessing
 import os
 import sys
 import threading
+import time
+import traceback
 
 from playwright.sync_api import sync_playwright
 
@@ -88,7 +98,10 @@ def start_server():
             except (ConnectionResetError, BrokenPipeError):
                 pass
 
-    server = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), functools.partial(Handler, directory=WEB))
+    class Server(http.server.ThreadingHTTPServer):
+        request_queue_size = 256  # the default backlog of 5 refuses connections when several browsers load at once
+
+    server = Server(("127.0.0.1", PORT), functools.partial(Handler, directory=WEB))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server
 
@@ -1222,33 +1235,80 @@ def test_masks_gate(browser):
     ctx.close()
 
 
+SECTIONS = {
+    "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
+    "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
+    "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
+    "mirror": test_stage_mirror, "s20": test_masks_gate,
+}
+# The short pass skips the long desert games; keep the newest built station at the end of this list
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "mirror", "s20"]
+REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
+
+
+def run_section(key, chromium):
+    """Runs one section in its own process and browser; the shared server lives in the parent."""
+    out, start = io.StringIO(), time.time()
+    failures.clear()  # a pool worker may run several sections one after another
+    with contextlib.redirect_stdout(out):
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(executable_path=chromium) if chromium else p.chromium.launch()
+                SECTIONS[key](browser)
+                browser.close()
+        except Exception:
+            check(False, f"{key}: section crashed", traceback.format_exc(limit=3).strip().splitlines()[-1])
+    text = out.getvalue()
+    return {"section": key, "ok": not failures, "seconds": round(time.time() - start, 1),
+            "checks": sum(line.startswith(("  ✓", "  ✗")) for line in text.splitlines()),
+            "failures": list(failures), "output": text}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--chromium", help="path to a Chromium/Chrome binary (default: Playwright's own)")
+    parser.add_argument("--quick", action="store_true", help="short pass: " + ", ".join(QUICK))
+    parser.add_argument("--only", help="comma-separated section keys: " + ", ".join(SECTIONS))
+    # Measured on the Operator's Mac (8 cores, Playwright's Chromium, 20-10-2026): --quick takes 259 s with 1 job,
+    # 190 s with 2; with 3 the 3D map's WebGL shaders fail under load, and the desktop Chrome can stall for minutes
+    parser.add_argument("--jobs", type=int, default=2, help="sections run at the same time (default 2; 1 = in this process)")
     args = parser.parse_args()
 
-    server = start_server()
-    with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=args.chromium) if args.chromium else p.chromium.launch()
-        test_pages(browser)
-        test_hub_views(browser)
-        test_wire_gating(browser)
-        test_ledger_gating(browser)
-        test_sun_monolith(browser)
-        test_sandstone_labyrinth(browser)
-        test_cairn_four(browser)
-        test_solstice_arch(browser)
-        test_polybius_stele(browser)
-        test_oracle_horizon(browser)
-        test_profiles(browser)
-        test_tester_play(browser)
-        test_stage_mirror(browser)
-        test_masks_gate(browser)
-        browser.close()
+    keys = args.only.split(",") if args.only else QUICK if args.quick else list(SECTIONS)
+    unknown = [k for k in keys if k not in SECTIONS]
+    if unknown:
+        parser.error(f"unknown section(s) {', '.join(unknown)}; choose from {', '.join(SECTIONS)}")
+
+    server, start = start_server(), time.time()
+    results = []
+    if args.jobs <= 1:  # in this process, one section after another
+        for key in keys:
+            result = run_section(key, args.chromium)
+            print(result["output"], end="", flush=True)
+            results.append(result)
+    else:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=args.jobs,
+                                                    mp_context=multiprocessing.get_context("spawn")) as pool:
+            futures = [pool.submit(run_section, key, args.chromium) for key in keys]
+            for future in futures:  # printed in section order, whatever order they finish in
+                result = future.result()
+                print(result["output"], end="", flush=True)
+                results.append(result)
     server.shutdown()
 
-    print("\n" + ("✅ ALL GREEN: safe to deploy." if not failures else f"❌ {len(failures)} FAILED: do not deploy yet."))
-    return 1 if failures else 0
+    failed = [f"{r['section']}: {f}" for r in results for f in r["failures"]]
+    total = round(time.time() - start, 1)
+    print("\nSeconds per section: " + " · ".join(f"{r['section']} {r['seconds']}" for r in results) + f" · total {total}")
+    with open(REPORT, "w", encoding="utf-8") as f:
+        json.dump({"ok": not failed, "seconds": total, "checks": sum(r["checks"] for r in results),
+                   "sections": [{k: v for k, v in r.items() if k != "output"} for r in results]}, f, indent=2)
+    partial = len(keys) < len(SECTIONS)
+    if failed:
+        print(f"\n❌ {len(failed)} FAILED: do not deploy yet.")
+    else:
+        print("\n✅ ALL GREEN" + (f" ({len(keys)} of {len(SECTIONS)} sections): run the full smoke before deploying."
+                                  if partial else ": safe to deploy."))
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":
