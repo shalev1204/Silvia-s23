@@ -12,8 +12,10 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
   7. Station 16 (Cairn IV): dusk scene, 18-hour crossing, sigil, the three verses decoded from the calls, Seal IV, relic, debrief.
   8. Station 17 (Arch of the Solstice): the October dawn solved by its own route search, the night signal, Seal V,
      the five-seal ceremony, relic and debrief; a reload during the finale cannot strand the station.
-  9. Each seeker keeps their own adventure when the profile changes (Carles and Silvia).
- 10. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
+  9. Station 18 (The Polybius Stele): noon scene, 6-hour walk, proverb, the knocks decoded here from the grid and
+     the Law of the Inverted Mirage, the burning atrium solved by its own search, relic, Ledger and debrief.
+ 10. Each seeker keeps their own adventure when the profile changes (Carles and Silvia).
+ 11. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -592,12 +594,12 @@ def test_solstice_arch(browser):
     open_wire()
     check(get("order_field_wire_step") == "23" and choices() == 3 and "smoke" in wire_text(), "debrief: step 23 (the light, the smoke) with 3 replies")
     answer_first()
-    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
-    check(get("order_field_wire_step") == "24" and "Seals 5 / 5" in bar, "step 24 shows Seals 5 / 5", bar)
+    check(get("order_field_wire_step") == "25" and "SEALS 5 / 5 · [Y] − [O] = 2" in wire_text() and choices() == 3,
+          "step 24 records Seals 5 / 5, and noon under the Arch (step 25) follows with 3 replies")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(text.count("Dusk again, Silvia") == 1 and text.count("it is dawn again and I have not slept") == 1 and "Five seals of five" in text,
-          "reload replays steps 21-24 once each")
+    check(text.count("Dusk again, Silvia") == 1 and text.count("it is dawn again and I have not slept") == 1 and "Five seals of five" in text
+          and text.count("I meant to leave at dawn") == 1, "reload replays steps 21-25 once each")
     check(not errors, "no JS errors during Station 17", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
@@ -612,6 +614,230 @@ def test_solstice_arch(browser):
     ctx.close()
 
 
+def atrium_search(atrium):
+    """Every fact about the burning atrium, worked out from its map alone (independent of the page's code):
+    the shortest crossing, and whether every crossing in time walks on ash. Fire: a fuel flagstone catches
+    at its distance from the library through fuel, burns for `burn` turns, then is ash."""
+    from collections import deque
+    rows, burn, limit = atrium["map"], atrium["burn"], atrium["breath"]
+    H, W = len(rows), len(rows[0])
+    cell = lambda x, y: rows[y][x] if 0 <= x < W and 0 <= y < H else None
+    ig, queue = {}, deque()
+    for y in range(H):
+        for x in range(W):
+            if cell(x, y) == "L":
+                ig[(x, y)] = 0
+                queue.append((x, y))
+    while queue:
+        x, y = queue.popleft()
+        for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0)):
+            n = (x + dx, y + dy)
+            if cell(*n) == "f" and n not in ig:
+                ig[n] = ig[(x, y)] + 1
+                queue.append(n)
+    burning = lambda p, t: cell(*p) == "L" or (cell(*p) == "f" and p in ig and ig[p] <= t < ig[p] + burn)
+    ash = lambda p, t: cell(*p) == "f" and p in ig and t >= ig[p] + burn
+    ok = lambda p: cell(*p) not in (None, "#", "L")
+    start, goal = tuple(atrium["start"]), tuple(atrium["hatch"])
+    steps = ((0, -1), (1, 0), (0, 1), (-1, 0), (0, 0))
+    # shortest crossing, with the moves
+    prev, queue = {(start, 0): None}, deque([(start, 0)])
+    best = None
+    while queue:
+        p, t = queue.popleft()
+        if p == goal:
+            best, node = [], (p, t)
+            while prev[node]:
+                b = prev[node]
+                best.append((node[0][0] - b[0][0], node[0][1] - b[0][1]))
+                node = b
+            best.reverse()
+            break
+        if t >= limit:
+            continue
+        for dx, dy in steps:
+            n = (p[0] + dx, p[1] + dy)
+            if ok(n) and not burning(n, t + 1) and (n, t + 1) not in prev:
+                prev[(n, t + 1)] = (p, t)
+                queue.append((n, t + 1))
+    # is there any crossing in time that never steps on ash? (search over square × turn, ash forbidden)
+    seen, queue, dodge = {(start, 0)}, deque([(start, 0)]), False
+    while queue:
+        p, t = queue.popleft()
+        if p == goal:
+            dodge = True
+            break
+        if t >= limit:
+            continue
+        for dx, dy in steps:
+            n = (p[0] + dx, p[1] + dy)
+            if ok(n) and not burning(n, t + 1) and not ash(n, t + 1) and (n, t + 1) not in seen:
+                seen.add((n, t + 1))
+                queue.append((n, t + 1))
+    return best, dodge
+
+
+def test_polybius_stele(browser):
+    print("\n9. Station 18 · The Polybius Stele (Tower II in flames), end to end")
+    seed = dict(DESERT_BASE, **DESERT_DONE, order_sun_monolith_completed="true", order_seal_cairn_2="true",
+                order_sandstone_labyrinth_completed="true", order_seal_cairn_3="true", order_monolith_gate_seal1="true",
+                order_cairn_iv_completed="true", order_seal_cairn_4="true", order_cairn4_sound="off",
+                order_arch_solstice_completed="true", order_seal_cairn_5="true", order_five_seals_celebrated="true",
+                order_cairn5_seals_at_altar="5", order_stele_sound="off", order_field_wire_step="24",
+                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]")
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    modal_open = lambda: js("getComputedStyle(document.getElementById('modal-polybius-stele')).display") != "none"
+    choices = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].length")
+    wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
+
+    def open_wire():
+        js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+        page.wait_for_timeout(2200)
+
+    def answer_first():
+        js("document.querySelector('#wire-choices-grid button').click()")
+        page.wait_for_timeout(9000)
+
+    open_wire()
+    check(get("order_field_wire_step") == "25" and choices() == 3 and "black tree" in wire_text(), "noon under the Arch: step 25 (the smoke) with 3 replies")
+    js("window.selectDesertStation(13)"); page.wait_for_timeout(500)
+    check(not modal_open(), "Tower II sealed before Hermes sets out")
+    open_wire(); answer_first()
+    check(get("order_field_wire_step") == "26" and get("order_stele_march_start") and "TO TOWER II, TOWARD THE SMOKE (6 H)" in wire_text(),
+          "reply at noon starts the 6-hour walk")
+    js("window.selectDesertStation(13)"); page.wait_for_timeout(500)
+    check(not modal_open(), "still sealed while Hermes walks")
+    js("localStorage.setItem('order_stele_march_start', String(Date.now() - 7 * 3600 * 1000))")
+    js("window.openSteleModal()"); page.wait_for_timeout(500)
+    check(modal_open() and js("document.querySelector('#stele-knock-game .monolith-game-inner').inert") is True
+          and js("document.querySelector('#stele-fire-game .monolith-game-inner').inert") is True,
+          "after 6 h it opens, the knocks and the atrium locked until the proverb")
+    for words in ["STARS GUIDE THOSE WHO SEEK", "STARS GUIDE THOSE WHO SEEK TRUTHS", "GUIDE STARS THOSE WHO SEEK TRUTH"]:
+        page.fill("#stele-key-input", words); page.click("#btn-stele-speak"); page.wait_for_timeout(120)
+    check(get("order_stele_hint") == "true" and get("order_stele_awake") is None, "3 wrong proverbs unlock the hint, the stele stays still")
+    page.fill("#stele-key-input", "stars, guide those who seek truth!"); page.click("#btn-stele-speak"); page.wait_for_timeout(300)
+    check(get("order_stele_awake") == "true" and "348" in js("document.getElementById('stele-telem-proverb').innerText"),
+          "the proverb (any case and punctuation) turns the stele: 348° NNW")
+
+    # The knocks, decoded here from the grid of Sheet 17A and the Law of the Inverted Mirage
+    grid = js("window.__stele.grid")
+    stanzas = js("window.__stele.stanzas")
+    check(grid == "PHOENIXABCDFGKLMQRSTUVWYZ" and [s["word"] for s in stanzas] == ["WHO", "SEEK", "WELL", "ASH"],
+          "the grid of the stele (PHOENIX, no J) and the four stanzas")
+
+    def knocks(word, moon):
+        out = []
+        for ch in word:
+            k = grid.index(ch)
+            row, col = k // 5 + 1, k % 5 + 1
+            out += [col, row] if moon else [row, col]
+        return out
+
+    check(js("window.__stele.knocksOf('ASH', true)") == knocks("ASH", True) == [3, 2, 4, 4, 2, 1],
+          "the page knocks ASH as the mirage says: column first in an even stanza")
+    page.wait_for_timeout(1800)
+    check(js("window.__stele.state().playing") is True, "the Servant starts knocking as soon as the stele turns")
+    for _ in range(40):
+        if not js("window.__stele.state().playing"):
+            break
+        page.wait_for_timeout(500)
+    tape = js("[...document.querySelectorAll('#stele-tape .stele-group')].map(g => g.children.length)")
+    check(tape == knocks("WHO", False), "every knock of WHO is chalked on the floor (5·3 1·2 1·3)", str(tape))
+    js("window.__stele.read('LID')")
+    check(get("order_stele_knock_fails") == "1" and "other reading" in js("document.getElementById('stele-knock-feedback').innerText"),
+          "reading stanza I through the mirage (LID) is refused with a pointer to the law")
+    js("window.__stele.read('who')")
+    check(js("window.__stele.state().knocks") == 1 and js("getComputedStyle(document.getElementById('stele-reply-panel')).display") != "none",
+          "WHO understood: now it is Silvia's stanza")
+    js(f"window.__stele.answer({json.dumps(knocks('SEEK', False))})")
+    check(js("window.__stele.state().knocks") == 1 and "not in the order" in js("document.getElementById('stele-knock-feedback').innerText"),
+          "SEEK knocked without the mirage is not understood")
+    js(f"window.__stele.answer({json.dumps(knocks('HERMES', True))})")
+    check(js("window.__stele.state().knocks") == 1 and get("order_stele_knock_hint") == "true", "a third miss (his name) unlocks the hint")
+    # the real knock pad: Knock, Pause, Knock... then Send
+    js("window.__stele.stop()")
+    for i, count in enumerate(knocks("SEEK", True)):
+        for _ in range(count):
+            page.click("#btn-stele-knock")
+        page.click("#btn-stele-pause")
+    page.click("#btn-stele-send")
+    for _ in range(40):
+        if js("window.__stele.state().knocks") == 2:
+            break
+        page.wait_for_timeout(500)
+    check(js("window.__stele.state().knocks") == 2, "SEEK knocked on the pad, column first: Hermes knocks it, and he understood")
+    js("window.__stele.stop()")
+    page.wait_for_timeout(2500)
+    check(js("window.__stele.state().playing") is True, "the Servant knocks WELL on his own")
+    js("window.__stele.read('WELL')")   # read before he has finished: the next stanza still starts by itself
+    page.wait_for_timeout(2200)
+    check(js("window.__stele.state().playing") is True and js("document.querySelectorAll('#stele-tape .stele-group').length") <= 6,
+          "WELL read early: the old knocks stop and ASH starts on its own")
+    js("window.__stele.stop()")
+    js("window.__stele.read('FSI')")
+    check(js("window.__stele.state().knocks") == 3 and get("order_stele_knock_fails") == "4", "WELL read; ASH read without the mirage (FSI) is refused")
+    js("window.__stele.read('ash')")
+    st = js("window.__stele.state()")
+    check(st["knocks"] == 4 and st["run"] == {"x": 4, "y": 8, "t": 0} and js("document.querySelector('#stele-fire-game .monolith-game-inner').inert") is False,
+          "ASH: the burning atrium opens, Hermes at the side door")
+
+    # The burning atrium, solved by its own search
+    atrium = js("window.__stele.atrium")
+    moves, dodge = atrium_search(atrium)
+    check(moves is not None and len(moves) == 13 and atrium["breath"] == 15, "the shortest crossing takes 13 turns; the Servant holds on for 15",
+          str(len(moves) if moves else None))
+    check(not dodge, "no crossing in time avoids the ash")
+    run = lambda: js("window.__stele.state().run")
+    # waiting at the side door forever: the Servant runs out of breath
+    for _ in range(15):
+        js("window.__stele.move(0, 0)")
+    check(run() == {"x": 4, "y": 8, "t": 0} and get("order_stele_fire_fails") == "1" and "Too slow" in js("document.getElementById('stele-move-feedback').innerText"),
+          "holding still for 15 turns: too slow, back to the side door")
+    # three steps north and a pause: the flagstone to the west is burning now and next turn, so it is refused
+    for d in ((0, -1), (0, -1), (0, -1), (0, 0)):
+        js(f"window.__stele.move({d[0]}, {d[1]})")
+    js("window.__stele.move(-1, 0)")
+    check(run() == {"x": 4, "y": 5, "t": 4} and "burning" in js("document.getElementById('stele-move-feedback').innerText"),
+          "a burning flagstone cannot be entered")
+    js("window.__stele.move(0, 0)")
+    check(run()["t"] == 0 and get("order_stele_fire_fails") == "2", "standing on the mats as the fire arrives: caught")
+    js("window.__stele.move(0, -1)")
+    for _ in range(6):
+        js("window.__stele.move(0, 0)")
+    check(get("order_stele_fire_fails") == "3" and get("order_stele_fire_hint") == "true" and js("[...document.querySelectorAll('#stele-atrium text')].length") > 10,
+          "three failed crossings: every flagstone shows when it catches")
+    for dx, dy in moves:
+        js(f"window.__stele.move({dx}, {dy})")
+    page.wait_for_timeout(500)
+    check(get("order_polybius_stele_completed") == "true", "the searched route reaches the hatch: the Servant is alive")
+    check("servant_key" in js("window.getOwnedRelicIds()"), "the Servant's Key is in the satchel")
+    check(js("getComputedStyle(document.getElementById('stele-victory')).display") != "none", "the victory card shows")
+    page.click("#btn-close-stele"); page.wait_for_timeout(300)
+
+    js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
+    ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
+    check("eq-item-stele-hu" in ids and "eq-item-stele-mt" in ids, "Ledger shows [H] − [U] = 16 and [M] + [T] = 25")
+
+    open_wire()
+    text = wire_text()
+    check(get("order_field_wire_step") == "27" and choices() == 3 and "edge of the sky with a disc in her arms" in text,
+          "debrief: step 27 (the Servant's words) with 3 replies")
+    answer_first()
+    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+    check(get("order_field_wire_step") == "28" and "Servant Is Safe" in bar and "[H] − [U] = 16" in wire_text() and "with the five seals, she will receive you" in wire_text(),
+          "step 28: the equations, the key and the audience at dawn", bar)
+    page.reload(); page.wait_for_timeout(2500); open_wire()
+    text = wire_text()
+    check(text.count("I meant to leave at dawn") == 1 and text.count("he is alive. He is sitting next to me") == 1,
+          "reload replays steps 25-28 once each")
+    check(not errors, "no JS errors during Station 18", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 def login(page, name):
     page.click("#btn-seeker-switch")
     page.wait_for_timeout(300)
@@ -622,7 +848,7 @@ def login(page, name):
 
 
 def test_profiles(browser):
-    print("\n9. Each seeker keeps their own adventure")
+    print("\n10. Each seeker keeps their own adventure")
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -658,14 +884,14 @@ WORLD_JS = """() => ({
 
 
 def test_tester_play(browser):
-    print("\n10. Carles's tester: Play any game, forward and back")
+    print("\n11. Carles's tester: Play any game, forward and back")
     modals = {"cairn1": "modal-cairn-one", "s14": "modal-sun-monolith", "s15": "modal-sandstone-labyrinth",
-              "s16": "modal-cairn-four", "s17": "modal-solstice-arch"}
-    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4}
+              "s16": "modal-cairn-four", "s17": "modal-solstice-arch", "s18": "modal-polybius-stele"}
+    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5}
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
-    for gid in ["s17", "s14", "cairn1", "s16", "clepsydra"]:
+    for gid in ["s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
         page.evaluate("document.getElementById('tester-panel').open = true")
         page.evaluate(PLAY_JS, gid)
         page.wait_for_timeout(600)
@@ -673,7 +899,7 @@ def test_tester_play(browser):
         page.wait_for_timeout(3200)
         st = page.evaluate(WORLD_JS)
         opened = modals[gid] in st["open"] if gid in modals else bool(st["open"])
-        clean = gid == "s17" or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"])
+        clean = "servant_key" not in st["relics"] and (gid in ("s17", "s18") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
         check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
               f"seals {st['seals']}, open {st['open']}, relics {st['relics']}")
     check(not errors, "no JS errors while jumping between games", "; ".join(sorted(set(errors))[:3]))
@@ -696,6 +922,7 @@ def main():
         test_sandstone_labyrinth(browser)
         test_cairn_four(browser)
         test_solstice_arch(browser)
+        test_polybius_stele(browser)
         test_profiles(browser)
         test_tester_play(browser)
         browser.close()

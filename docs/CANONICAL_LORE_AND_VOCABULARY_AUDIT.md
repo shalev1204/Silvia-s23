@@ -680,6 +680,18 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$[L] = 23 - 22 \implies \mathbf{L = 1}$$
 - **Asignación en el Ledger**: $\mathbf{Y = 25, \quad L = 1}$. Valores libres; ninguna letra repite valor.
 
+#### 11. DEDUCCIÓN DE $H$ Y $M$ (Estación 18 · Bajo la tapa del pozo del atrio, solo en la web)
+- **Origen**: al cruzar el atrio en llamas y levantar la tapa de bronce del pozo (Estación 18), en su cara inferior hay dos líneas talladas por los fundadores; aparecen en el Ledger con `requires: 'order_polybius_stele_completed'`.
+- **Ecuación 1 (The Line of the Well)**:
+  $$[H] - [U] = 16$$
+- **Ecuación 2 (The Line of the Hatch)**:
+  $$[M] + [T] = 25$$
+- **Resolución** (con $U = 4$ de §7.B.9 y $T = 16$ de §7.B.5):
+  $$[H] = 16 + 4 \implies \mathbf{H = 20}$$
+  $$[M] = 25 - 16 \implies \mathbf{M = 9}$$
+- **Asignación en el Ledger**: $\mathbf{H = 20, \quad M = 9}$. Valores libres; ninguna letra repite valor.
+- **Letras aún sin ecuación (solo Operador)**: $I, J, Q, X, Z$; quedan libres exactamente los valores $5, 8, 10, 14, 15$.
+
 ---
 
 ## 8. DIRECTORIO GEOGRÁFICO Y ONOMÁSTICO CANÓNICO
@@ -799,7 +811,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara A (16A · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Der · Spread 3)**.
   - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. *(web, Estación 17)* Amanecer de octubre (espejos reorientados en 4 pasos del sol), la señal nocturna con la Torre II (código del disco), $[Y] - [O] = 2$ y $[L] + [G] = 23$, *The Signal Mirror*, ceremonia de los cinco sellos y humo sobre el Santuario (ver §12). Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
 - **Hoja 17**:
-  - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$.
+  - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$. *(web, Estación 18)* La Torre II arde (los BC Ashes quemaron la biblioteca del atrio) y el Sirviente ha desaparecido; el proverbio gira la estela (en su dorso, 348° NNW). Segunda parte: el Sirviente, escondido en el pozo bajo el atrio, golpea en la cuadrícula de la estela con la Ley del Espejismo Invertido (WHO · SEEK, la respuesta de Silvia · WELL · ASH). Tercera parte: el atrio en llamas, por turnos, hasta la tapa del pozo. $[H] - [U] = 16$ y $[M] + [T] = 25$; la reliquia *The Servant's Key*; la frase del Sirviente sobre la Oráculo (ver §12).
   - **Cara B (17B · Lore)**: **The Desert Oracle** (impresa). Nota de la expedición de 1998: Hermes observa durante horas desde una cresta al hombre que cree el Oráculo (en realidad el Sirviente del Santuario, §8.A.5), junto a su refugio bajo un saliente de arenisca; no puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen». Menciona el Astrolabio recuperado. No revela el WHEN ni menciona Vega.
 - **Hoja 18**:
   - **Cara A (18A · Juego D10)**: **The Oracle's Horizon**. Ante la Oráculo, Silvia recibe la primera gran pista impresa: el **WHEN** («the hour and season ordained under the stars»). Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path).
@@ -910,7 +922,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **15** | Una estrella de pan de oro de ocho puntas sobre fondo de lapislázuli, reciente, en la pared de una fisura del laberinto (casilla por la que pasa toda ruta de huida). Hermes: *«Aurelia gilded her stars exactly like that»*; duda entre un guía y el sol. Su respuesta *choice-15-aurelia* describe la técnica (pincel de ardilla, fondo azul, toque blanco). | Marca de los fundadores; alguien guía a otro. | ✅ Web |
 | **16** | Un pastor al borde del *hardpan*: cada otoño, en noches claras, **una mujer velada baja de la arenisca y canta a las estrellas**; le dejan leche y dátiles (paso 17; en *choice-17-veiled* tararea la melodía y a Hermes le tiembla la mano). En Cairn IV el último verso del viento suena con el **código del disco** (tres cortas, pausa, dos largas) porque alguien encajó en el pilar izquierdo **un guijarro con estrella dorada sobre azul** (reliquia *The Tuning Pebble*). | Leyenda del desierto; el viento; un extraño que conoce el código. | ✅ Web |
 | **17** | Desde el Arco del Solsticio, una luz en la Torre II dialoga con el espejo de Hermes; él envía **tres cortos, pausa, dos largos** y la luz **responde** deletreando dos líneas en el código de luz de la Orden, con la calma de quien lo ha hecho muchas veces. Hermes: el código era solo suyo y de Aurelia. Luego la luz se apaga de golpe y amanece con humo sobre el Santuario. | Alguien dentro de la Torre II conoce el código; ¿lo aprendió de otro? | ✅ Web |
-| **18** | El Sirviente, tras la Estela de Polibio: *«She came from the edge of the sky with a disc in her arms and no name.»* | — (la duda ya es seria). | ⏳ Plan |
+| **18** | Tras sacarlo del pozo del atrio en llamas, Hermes le pregunta quién conoce el código de Aurelia, y el Sirviente responde: *«She came from the edge of the sky with a disc in her arms and no name.»* No dice nada más (*«The rest is hers to tell»*, respuesta *choice-27-disc*). Los asaltantes quemaron la biblioteca buscando las cartas de la Oráculo, la «mitad terrestre» del Astrolabio; el Sirviente las salvó en el pozo. | — (la duda ya es seria). | ✅ Web |
 | **19** | Audiencia en la Torre II: la Oráculo alza el disco de 24 avistamientos. Silvia (o Hermes) pronuncia el voto y la memoria vuelve en parte. Se entrega el **WHEN**. | Revelación. | ⏳ Plan |
 
 **Invariantes**: el disco y el voto (§2.B) no cambian; la Oráculo sigue siendo «she» (§8.A.3); no se escribe «Aurelia es la Oráculo» en material de Silvia antes de la Estación 19.

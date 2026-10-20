@@ -19,7 +19,7 @@
 | jue 8 oct 22:22 | Despacho · *[INTERCEPTED SIGNAL]* «Silvia, the beacon at the southern cliff (Station 09) has just responded.» (apertura de la Estación 09). |
 | 10 oct | Email 5 · *[Emergency Carrier · 142.85 MHz] A signal cuts through the sandstorm*. |
 | 8–9 oct → dom 18 oct 14:00 | Tormenta de arena tras la Estación 09 (el Email 5 del 10 oct llega en plena tormenta). El Hub fija su final el dom 18 oct 14:00 (constante `SUNDAY_OCT_18_2026_2PM`). Para Silvia ya ha terminado. |
-| En curso | Desert Path (Estaciones 10–19, Hojas 08–18). Estaciones 10 a 17 ya jugables en el Hub. |
+| En curso | Desert Path (Estaciones 10–19, Hojas 08–18). Estaciones 10 a 18 ya jugables en el Hub. |
 | Día final | **Cumpleaños (23)**: revelación final y entradas de ballet. |
 
 Pendiente: Estaciones 18–19 del Desert Path, el Stage Path (Torre III) y la Bóveda del Gran Eclipse.
