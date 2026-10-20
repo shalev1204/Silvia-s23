@@ -1,7 +1,8 @@
 """
 build_impresion_master.py:
 Assembles print-ready duplex PDFs for all 18 sheets and the unified
-complete 36-page master journal PDF in `journal/impresion/`.
+complete 36-page master journal PDF in `journal/impresion/`, plus the Stage Path
+bundle (sheets 19 to 26), which Silvia receives all together.
 """
 
 import os
@@ -31,6 +32,31 @@ SHEETS = [
     (17, 'Hoja_17_Codice_Tormenta_y_Climax_Oraculo_Base.pdf', 'page17/pdf/page17_front_A5.pdf', 'page17/pdf/page17_back_A5.pdf'),
     (18, 'Hoja_18_Juego_D10_Horizonte_Oraculo_y_Transicion_Escenario.pdf', 'page18/pdf/page18_front_A5.pdf', 'page18/pdf/page18_back_A5.pdf'),
 ]
+
+# The Stage Path (Tower III): sheets 19 to 26, delivered to Silvia all together in their own bundle.
+STAGE_SHEETS = [
+    (19, 'Hoja_19_Carta_Nunca_Enviada_y_Juego_S1_Puerta_Mascaras.pdf', 'page19/pdf/page19_front_A5.pdf', 'page19/pdf/page19_back_A5.pdf'),
+]
+STAGE_TOTAL = 8
+
+
+def build_stage_bundle() -> None:
+    """Duplex PDFs for each Stage Path sheet and one bundle with every sheet built so far."""
+    os.makedirs(HOJAS_DIR, exist_ok=True)
+    bundle = pypdf.PdfWriter()
+    for num, name, front_rel, back_rel in STAGE_SHEETS:
+        sheet_writer = pypdf.PdfWriter()
+        for rel in (front_rel, back_rel):
+            page = pypdf.PdfReader(os.path.join(PROJECT_ROOT, 'journal', rel)).pages[0]
+            sheet_writer.add_page(page)
+            bundle.add_page(page)
+        with open(os.path.join(HOJAS_DIR, name), 'wb') as fh:
+            sheet_writer.write(fh)
+        print(f"  [OK] Sheet {num:02d}: {name}")
+    bundle_path = os.path.join(IMPRESION_DIR, '01_STAGE_PATH_HOJAS_19_A_26_A5.pdf')
+    with open(bundle_path, 'wb') as fh:
+        bundle.write(fh)
+    print(f"  -> Stage Path bundle ({len(STAGE_SHEETS)} of {STAGE_TOTAL} sheets): {bundle_path}")
 
 
 def build_impresion_master() -> None:
@@ -65,3 +91,4 @@ def build_impresion_master() -> None:
 
 if __name__ == '__main__':
     build_impresion_master()
+    build_stage_bundle()

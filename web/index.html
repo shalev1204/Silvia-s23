@@ -27,6 +27,8 @@
   <script src="./assets/vendor/three.min.js"></script>
   <script src="./assets/maps/desert_relief_data.js"></script>
   <script src="./assets/js/desert-map-3d.js"></script>
+  <script src="./assets/js/stage-mirror-data.js"></script>
+  <script src="./assets/js/stage-mirror.js"></script>
 
   <!-- Preload Critical Archival Plates (WebP Optimized for Instant Load) -->
   <link rel="preload" as="image" href="./assets/emails/email-01-parchment.webp" type="image/webp">
@@ -233,7 +235,7 @@
 
     /* =========================================================================
        PATH THEMES · the map view (view-trail) takes the look of the active path
-       html[data-map-path="constellation" | "desert"] is set by switchMapPath()
+       html[data-map-path="constellation" | "desert" | "stage"] is set by switchMapPath()
        ========================================================================= */
     .hub-theme-backdrop {
       position: fixed;
@@ -338,6 +340,80 @@
     html[data-map-path="desert"] body[data-active-view="view-trail"] .sidebar-collapse-btn,
     html[data-map-path="desert"] body[data-active-view="view-trail"] .btn-floating-sidebar-toggle { background: rgba(44, 25, 12, 0.92); }
     html[data-map-path="desert"] body[data-active-view="view-trail"] #desert-map-canvas-wrap { background: #02040a; }
+    /* Stage: a velvet house, curtains drawn back, footlights glowing */
+    .hub-theme-backdrop.is-stage {
+      background:
+        radial-gradient(ellipse 50% 30% at 50% 100%, rgba(255, 196, 120, 0.28) 0%, transparent 70%),
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.22) 0 26px, rgba(255, 255, 255, 0.025) 26px 52px),
+        radial-gradient(ellipse 70% 60% at 50% 40%, #3a0f2e 0%, #1e0718 55%, #0b0309 100%);
+    }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .hub-theme-backdrop.is-stage { opacity: 1; }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .cosmic-nebula-layer { opacity: 0; animation: none; }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .cosmic-vignette {
+      background: radial-gradient(circle at 50% 50%, transparent 46%, rgba(10, 2, 8, 0.8) 100%);
+    }
+    /* ---- Stage chrome: velvet and gilt ---- */
+    html[data-map-path="stage"] body[data-active-view="view-trail"] {
+      --bg-darkest: #10040c;
+      --bg-panel: rgba(36, 10, 30, 0.93);
+      --bg-panel-hover: rgba(52, 16, 42, 0.97);
+      --brass-bright: #f7dc8c;
+      --brass-base: #c99a3b;
+      --brass-dim: rgba(201, 154, 59, 0.35);
+      --brass-glow: rgba(247, 220, 140, 0.45);
+      --cyan-beam: #d8b4fe;
+      --cyan-glow: rgba(216, 180, 254, 0.45);
+      --parchment: #f6e9f2;
+      --parchment-dim: #d9bfd1;
+      --parchment-muted: #9d7f93;
+      --border-brass: 1.5px solid rgba(201, 154, 59, 0.42);
+      --border-brass-bright: 1.5px solid rgba(247, 220, 140, 0.65);
+    }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .hub-sidebar {
+      background: linear-gradient(180deg, rgba(42, 11, 34, 0.97) 0%, rgba(18, 5, 14, 0.99) 100%);
+    }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .star-inspector-panel {
+      background: linear-gradient(180deg, rgba(48, 14, 40, 0.94) 0%, rgba(24, 6, 20, 0.97) 100%);
+    }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .inspector-relics-card { background: rgba(58, 18, 48, 0.55); border-color: rgba(216, 180, 254, 0.35); }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .relic-chip { background: rgba(30, 8, 24, 0.88); border-color: rgba(216, 180, 254, 0.38); }
+    html[data-map-path="stage"] body[data-active-view="view-trail"] .relic-chip-text { color: #f3d9ff; }
+
+    /* ===================================================================
+       THE LIVING MIRROR · map of the Stage Path (assets/js/stage-mirror.js)
+       =================================================================== */
+    #stage-map-canvas-wrap { padding: 18px 12px 22px; background: radial-gradient(ellipse at 50% 30%, #2a0b24 0%, #0b0309 75%); border-radius: 12px; }
+    .stage-mirror { max-width: 560px; margin: 0 auto; outline: none; }
+    .stage-mirror:focus-visible .stage-mirror-glass { box-shadow: 0 0 0 2px var(--brass-bright); }
+    .stage-mirror-glass { position: relative; width: 100%; aspect-ratio: 680 / 920; border-radius: 14px; touch-action: pan-y; cursor: grab; }
+    .stage-mirror-glass:active { cursor: grabbing; }
+    .stage-mirror-kaleido, .stage-mirror-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .stage-mirror-svg .sm-shard { cursor: pointer; outline: none; }
+    .stage-mirror-svg .sm-edge { stroke: rgba(247, 220, 140, 0); stroke-width: 3; transition: stroke 0.2s ease; }
+    .stage-mirror-svg .sm-shard:hover .sm-edge, .stage-mirror-svg .sm-shard:focus-visible .sm-edge { stroke: rgba(247, 220, 140, 0.95); }
+    .stage-mirror-svg .sm-shard.is-next .sm-edge { stroke: rgba(216, 180, 254, 0.9); stroke-dasharray: 8 6; animation: smNext 1.8s linear infinite; }
+    @keyframes smNext { to { stroke-dashoffset: -28; } }
+    .stage-mirror-svg .sm-roman { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; fill: rgba(246, 233, 242, 0.55); pointer-events: none; }
+    .stage-mirror-svg .sm-shard.is-next .sm-roman { fill: #f3d9ff; }
+    .stage-mirror-svg .sm-cartouche { font-family: 'Cinzel', serif; font-size: 17px; font-weight: 700; letter-spacing: 1.5px; fill: #2a1405; }
+    .stage-mirror-svg .sm-shard.is-new .sm-sheen { animation: smSheen 2.2s ease-out 0.3s both; }
+    @keyframes smSheen { 0% { opacity: 0; } 25% { opacity: 0.85; } 100% { opacity: 0; } }
+    .stage-mirror.is-complete .stage-mirror-kaleido { opacity: 0.15; transition: opacity 1.6s ease; }
+    .stage-mirror-caption { margin: 12px 0 6px; text-align: center; font-family: 'Cinzel', serif; font-size: 0.82rem; letter-spacing: 0.05em; color: var(--parchment-dim); }
+    .stage-mirror-ribbon { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+    .stage-mirror-ribbon .sm-room {
+      min-width: 40px; height: 34px; padding: 0 8px; border-radius: 17px;
+      border: 1px solid rgba(201, 154, 59, 0.4); background: rgba(30, 8, 24, 0.85);
+      font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--parchment-muted); cursor: pointer;
+    }
+    .stage-mirror-ribbon .sm-room.is-set { color: #2a1405; background: linear-gradient(135deg, #f7dc8c, #c99a3b); border-color: #f7dc8c; }
+    .stage-mirror-ribbon .sm-room.is-next { color: #f3d9ff; border-color: #d8b4fe; box-shadow: 0 0 12px rgba(216, 180, 254, 0.5); }
+    .stage-mirror-ribbon .sm-room.is-next::before { content: '🏮 '; }
+    .stage-mirror-ribbon .sm-room:focus-visible { outline: 2px solid var(--brass-bright); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      .stage-mirror-svg .sm-shard.is-next .sm-edge, .stage-mirror-svg .sm-shard.is-new .sm-sheen { animation: none; }
+    }
+
     /* The Journal already prints this map: the Hub shows the 3D unlit version (assets/js/desert-map-3d.js). The flat map is only a no-WebGL fallback. */
     #desert-map-canvas-wrap .desert-map-layers-frame { display: none; }
     #desert-map-canvas-wrap.desert3d-fallback .desert-map-layers-frame {
@@ -4219,10 +4295,9 @@
     .stage-passage-motto { font-family: 'Cinzel', serif; font-style: italic; color: #fde68a; letter-spacing: 0.04em; }
     @media (prefers-reduced-motion: reduce) { .stage-passage-overlay, .stage-passage-card .stage-curtain { animation: none; } }
     /* Path III sits on its own row under the first two paths, low and sealed */
-    .map-path-tab-btn.is-sealed { grid-column: 1 / -1; min-height: 0; padding: 12px 22px; border-style: dashed; border-color: rgba(196, 181, 253, 0.6); }
-    .map-path-tab-btn.is-sealed .path-tab-emblem { width: 46px; height: 46px; font-size: 1.45rem; border-color: #c4b5fd; }
-    .map-path-tab-btn.is-sealed .path-tab-state { color: #c4b5fd; border-color: rgba(196, 181, 253, 0.6); }
-    .map-path-tab-btn.is-sealed .path-tab-count { white-space: normal; }
+    .map-path-tab-btn.is-stage { grid-column: 1 / -1; min-height: 0; padding: 12px 22px; border-color: rgba(196, 181, 253, 0.6); }
+    .map-path-tab-btn.is-stage .path-tab-emblem { width: 46px; height: 46px; font-size: 1.45rem; border-color: #c4b5fd; }
+    .map-path-tab-btn.is-stage .path-tab-count { white-space: normal; }
 
     /* The five seals come home: shown once, when the fifth seal joins the others */
     .five-seals-overlay {
@@ -10365,6 +10440,7 @@
 
   <!-- Path-themed backdrops for the map view: night sky (Constellation) and golden-hour dunes (Desert) -->
   <div class="hub-theme-backdrop is-constellation" aria-hidden="true"></div>
+  <div class="hub-theme-backdrop is-stage" aria-hidden="true"></div>
   <div class="hub-theme-backdrop is-desert" aria-hidden="true">
     <svg class="desert-scenery" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -10550,14 +10626,17 @@
             </span>
             <span class="path-tab-state" id="path-state-desert">Open path</span>
           </button>
-          <button type="button" class="map-path-tab-btn is-sealed" id="btn-tab-path-stage" data-path="stage" style="display: none;">
+          <button type="button" class="map-path-tab-btn is-stage" id="btn-tab-path-stage" data-path="stage" style="display: none;">
             <span class="path-tab-emblem">🎭</span>
             <span class="path-tab-body">
               <span class="path-tab-kicker">Path III · The Stage Tower</span>
               <span class="path-tab-name">The Velvet Stage</span>
-              <span class="path-tab-progress"><span class="path-tab-count">The Mirror Speaker keeps the WHERE</span></span>
+              <span class="path-tab-progress">
+                <span class="path-tab-bar"><span class="path-tab-bar-fill" id="path-progress-stage"></span></span>
+                <span class="path-tab-count" id="path-count-stage">—</span>
+              </span>
             </span>
-            <span class="path-tab-state">Curtain closed</span>
+            <span class="path-tab-state" id="path-state-stage">Open path</span>
           </button>
         </nav>
 
@@ -11368,6 +11447,11 @@
                 <text class="node-title-svg" id="node-9-title" x="810" y="190" style="fill:#ffffff; font-weight:600;" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))">The Celestial Cipher</text>
               </g>
             </svg>
+          </div>
+
+          <!-- The Stage Path map: the Living Mirror of Tower III (assets/js/stage-mirror.js) -->
+          <div id="stage-map-canvas-wrap" style="display: none;">
+            <div id="stage-mirror-mount"></div>
           </div>
 
           <!-- The Grand Desert Map Container (Two-Act Odyssey & 4-Quadrant Survey) -->
@@ -15623,6 +15707,44 @@
             action: open
           };
         },
+        // Stage Path · the nine rooms of Tower III (nodes 40–48). A built room replaces its card in STAGE_CARDS.
+        ...(() => {
+          const cards = {};
+          const rooms = [
+            [40, 20, 'The Gate of a Thousand Masks', '19B', 'A thousand faces guard the theatre of the Order. Only one of them lies.'],
+            [41, 21, 'The Camera Obscura', '20A', 'A dark room where the whole city appears upside down on the wall.'],
+            [42, 22, 'The Whispering Gallery', '20B', 'A gallery where a whisper at one end is heard at the other.'],
+            [43, 23, 'The Automaton Orchestra', '21B', 'A brass orchestra that plays only what its cylinder remembers.'],
+            [44, 24, 'The Fly Tower', '22A', 'High above the stage, ropes, pulleys and counterweights hold the scenery.'],
+            [45, 25, 'The Shadow Theatre', '23A', 'A silk screen, a row of lamps, and figures that live only as shadows.'],
+            [46, 26, 'The Hall of Mirrors', '24A', 'A maze where you see everyone, and nobody is where you see them.'],
+            [47, 27, 'The Kaleidoscope Lantern', '25A', 'The great lantern of the theatre, its glass waiting to be set.'],
+            [48, 28, 'The Stage of the Mirror Speaker', '26A', 'The last room: the stage where the mirror of Tower III hangs.']
+          ];
+          rooms.forEach(([node, station, room, sheet, teaser], i) => {
+            cards[node] = () => {
+              const builtCard = window.STAGE_CARDS && window.STAGE_CARDS[node];
+              if (typeof builtCard === 'function') return builtCard();
+              const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][i];
+              return {
+                badge: 'STATION ' + station + ' // STAGE PATH',
+                status: 'FRAGMENT ' + roman + ' · NOT YET ✦',
+                statusClass: 'status-live-badge',
+                title: room,
+                thumb: './assets/thumbnails/stage_mirror_preview.webp',
+                lore: teaser + ' The Mirror Speaker has not opened this room yet.',
+                rewards: [
+                  { icon: '📖', label: 'Sheet ' + sheet + ' of the Journal', desc: 'The game of this room' },
+                  { icon: '🪞', label: 'Fragment ' + roman, desc: 'One ninth of the mirror of Tower III' }
+                ],
+                btnText: 'The door is still closed',
+                btnDisabled: true,
+                action: () => null
+              };
+            };
+          });
+          return cards;
+        })(),
         // Station 19 · The Oracle's Horizon (node id 14)
         14: () => {
           const open = () => (window.openOracleModal ? window.openOracleModal() : null);
@@ -15875,7 +15997,7 @@
         if (inspBtnReset) {
           const isMidnightDone = getSeekerMidnightCompleted();
           const targetStation = isMidnightDone ? 9 : 8;
-          if (id == targetStation || data.hideReturnBtn) {
+          if (id == targetStation || data.hideReturnBtn || (+id >= 40 && +id <= 48)) {   // the Stage rooms keep their own ribbon
             inspBtnReset.style.display = 'none';
           } else {
             inspBtnReset.style.display = 'inline-flex';
@@ -21776,6 +21898,7 @@
       const tabDesert = document.getElementById('btn-tab-path-desert');
       const constellationMapWrap = document.querySelector('.constellation-map-frame .map-canvas-wrap');
       const desertMapWrap = document.getElementById('desert-map-canvas-wrap');
+      const stageMapWrap = document.getElementById('stage-map-canvas-wrap');
       const viewHeader = document.querySelector('#view-trail .view-header');
       const viewTagline = viewHeader ? viewHeader.querySelector('.view-tagline') : null;
       const viewTitle = viewHeader ? viewHeader.querySelector('.view-title') : null;
@@ -21810,9 +21933,12 @@
           'order_oracle_horizon_completed'
         ].filter(done).length;
 
+        const stageStations = window.StageMirror ? window.StageMirror.stations : [];
+        const stageDone = stageStations.filter((st) => done(st.flag)).length;
         const paths = [
           { id: 'constellation', cleared: constellationDone, total: 9 },
-          { id: 'desert', cleared: desertDone, total: 12 }
+          { id: 'desert', cleared: desertDone, total: 12 },
+          { id: 'stage', cleared: stageDone, total: 9 }
         ];
         paths.forEach((p) => {
           const fill = document.getElementById('path-progress-' + p.id);
@@ -21828,7 +21954,26 @@
       try {
         const savedPath = localStorage.getItem('order_active_map_path');
         if (savedPath === 'desert') currentMapPath = 'desert';
+        else if (savedPath === 'stage' && localStorage.getItem('order_oracle_horizon_completed') === 'true') currentMapPath = 'stage';
       } catch (e) {}
+
+      // Next room of the Stage Path (map nodes 40–48 are Stations 20–28)
+      function getNextStageNodeId() {
+        const stations = window.StageMirror ? window.StageMirror.stations : [];
+        const next = stations.find((st) => localStorage.getItem(st.flag) !== 'true');
+        return next ? next.node : 48;
+      }
+      // Each built room registers how to open its game: window.STAGE_OPENERS[node] = fn
+      window.STAGE_OPENERS = window.STAGE_OPENERS || {};
+      window.selectStageStation = function (node) {
+        if (!window.StageMirror) return;
+        const st = window.StageMirror.stations.find((x) => x.node === node);
+        if (!st) return;
+        if (typeof window.selectMapNode === 'function') window.selectMapNode(node, true);
+        const opener = window.STAGE_OPENERS[node];
+        if (typeof opener === 'function') opener();
+        else showDesertToast('Station ' + st.station + ' · ' + st.room + ': the Mirror Speaker has not opened this room yet.');
+      };
 
       // Next pending Desert Path station (internal node ids: 10 Chasm, 21 Salt Playa, 11 Lexicon, 12 Clepsydra,
       // 23–26 Stations 14–17, 13 the Polybius Stele, 14 the Oracle)
@@ -21874,13 +22019,25 @@
       function switchMapPath(path, autoSelectNode = true) {
         currentMapPath = path;
         try { localStorage.setItem('order_active_map_path', path); } catch (e) {}
-        document.documentElement.setAttribute('data-map-path', path === 'desert' ? 'desert' : 'constellation');
+        document.documentElement.setAttribute('data-map-path', path === 'desert' || path === 'stage' ? path : 'constellation');
         updatePathTabsUI();
 
         if (tabConstellation) tabConstellation.classList.toggle('active', path === 'constellation');
         if (tabDesert) tabDesert.classList.toggle('active', path === 'desert');
+        const tabStageBtn = document.getElementById('btn-tab-path-stage');
+        if (tabStageBtn) tabStageBtn.classList.toggle('active', path === 'stage');
+        if (stageMapWrap) stageMapWrap.style.display = path === 'stage' ? 'block' : 'none';
 
-        if (path === 'desert') {
+        if (path === 'stage') {
+          if (constellationMapWrap) constellationMapWrap.style.display = 'none';
+          if (desertMapWrap) desertMapWrap.style.display = 'none';
+          if (viewTagline) viewTagline.textContent = '✦ Stage Progression · The Mirror Sanctuary ✦';
+          if (viewTitle) viewTitle.textContent = 'The Velvet Stage';
+          const divLabel = document.querySelector('.map-divider-label');
+          if (divLabel) divLabel.textContent = '✦ The Mirror of Tower III ✦';
+          if (window.StageMirror) window.StageMirror.mount(document.getElementById('stage-mirror-mount'));
+          if (autoSelectNode && typeof window.selectMapNode === 'function') window.selectMapNode(getNextStageNodeId(), false);
+        } else if (path === 'desert') {
           if (constellationMapWrap) constellationMapWrap.style.display = 'none';
           if (desertMapWrap) desertMapWrap.style.display = 'block';
 
@@ -22060,7 +22217,7 @@
       const tabStage = document.getElementById('btn-tab-path-stage');
       if (tabStage) tabStage.addEventListener('click', () => {
         if (sfx) sfx.playMechanicalClick();
-        showDesertToast('✦ PATH III · THE STAGE TOWER ✦ The curtain has not risen yet. The raiders are on their way there with the Astrolabe; the Order will write to you when the Mirror Speaker is ready.');
+        switchMapPath('stage', true);
       });
 
       window.switchMapPath = switchMapPath;
@@ -22517,7 +22674,12 @@
       const urlParams = new URLSearchParams(window.location.search);
       const forceDesert = urlParams.get('path') === 'desert';
       const silviaDesertLive = !isCarles && (wireDone || desertUnlocked || sandstormLive || cipherDone);
-      if (forceDesert || currentMapPath === 'desert' || silviaDesertLive) {
+      const stageOpen = localStorage.getItem('order_oracle_horizon_completed') === 'true';
+      if (urlParams.get('path') === 'stage' && stageOpen) {
+        switchMapPath('stage', true);
+      } else if (currentMapPath === 'stage' || (stageOpen && !isCarles && !forceDesert)) {
+        switchMapPath('stage', true);
+      } else if (forceDesert || currentMapPath === 'desert' || silviaDesertLive) {
         switchMapPath('desert', true);
       } else {
         switchMapPath('constellation', false);
@@ -27735,6 +27897,7 @@
         if (!el.passage || el.passage.style.display === 'none') return;
         el.passage.style.display = 'none';
         if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
+        if (typeof window.switchMapPath === 'function') window.switchMapPath('stage', true);   // the curtain rises on Path III
         const tab = document.getElementById('btn-tab-path-stage');
         const back = tab && tab.offsetParent ? tab : passageReturnFocus;
         if (back && document.contains(back) && typeof back.focus === 'function') back.focus();

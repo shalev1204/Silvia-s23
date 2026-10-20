@@ -77,6 +77,7 @@ from scripts.journal.build_desert_odyssey_expanded import (
     render_game_d10_oracle_horizon,
     render_art_18b_stage_path_transition,
 )
+from scripts.journal.build_stage_path import STAGE_SHEETS
 
 GRAPHITE_COLOR = (46, 42, 38)
 FONT_PATH = os.path.join(PROJECT_ROOT, "assets", "fonts", "Fondamento.ttf")
@@ -529,6 +530,8 @@ def build_entire_journal() -> None:
          ("Hoja 18 · Cara A (Game D10: The Oracle's Horizon & Triple Triangulation)", render_game_d10_oracle_horizon, "page18_front", False, True),
          ("Hoja 18 · Cara B (Art: Transition to the Stage Path)", render_art_18b_stage_path_transition, "page18_back", True, True)),
     ]
+    # Sheets 19 to 26: the Stage Path (Tower III), built in build_stage_path.py
+    sheets += STAGE_SHEETS
 
     all_canvases = {}
 

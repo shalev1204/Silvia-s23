@@ -18,6 +18,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
      the WHEN, the vow, the passage to the Stage Path, Ledger and debrief; without Cairn I the audience waits.
  11. Each seeker keeps their own adventure when the profile changes (Carles and Silvia).
  12. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
+ 13. The Stage Path: hidden until Station 19, then the Living Mirror (rooms, keyboard, fragments, the WHERE when whole).
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1049,6 +1050,70 @@ def test_tester_play(browser):
     ctx.close()
 
 
+STAGE_FLAGS = ["order_masks_gate_completed", "order_camera_obscura_completed", "order_whispering_gallery_completed",
+               "order_automaton_orchestra_completed", "order_fly_tower_completed", "order_shadow_theatre_completed",
+               "order_hall_of_mirrors_completed", "order_kaleidoscope_lantern_completed", "order_mirror_stage_completed"]
+MIRROR_JS = """() => ({
+    path: document.documentElement.dataset.mapPath,
+    tab: !!document.getElementById('btn-tab-path-stage').offsetParent,
+    shown: !!document.getElementById('stage-map-canvas-wrap').offsetParent,
+    shards: document.querySelectorAll('.stage-mirror-svg .sm-shard').length,
+    set: document.querySelectorAll('.stage-mirror-svg .sm-shard.is-set').length,
+    next: document.querySelector('.stage-mirror-svg .sm-shard.is-next')?.dataset.node || null,
+    canvas: document.querySelector('.stage-mirror-kaleido')?.width || 0,
+    cartouche: document.querySelector('.stage-mirror-svg .sm-cartouche')?.textContent || '',
+    complete: !!document.querySelector('.stage-mirror.is-complete'),
+    title: document.getElementById('insp-title').textContent,
+    text: document.getElementById('view-trail').innerText })"""
+
+
+def stage_page(browser, extra):
+    seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_field_wire_step": "32", **extra}
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    return ctx, page, errors
+
+
+def test_stage_mirror(browser):
+    print("\n13. The Stage Path: the Living Mirror of Tower III")
+    ctx, page, errors = stage_page(browser, {})
+    st = page.evaluate(MIRROR_JS)
+    check(not st["tab"] and st["path"] != "stage" and not st["shown"], "before the Oracle's Horizon the Stage stays hidden", str(st)[:160])
+    ctx.close()
+
+    ctx, page, errors = stage_page(browser, {"order_oracle_horizon_completed": "true"})
+    st = page.evaluate(MIRROR_JS)
+    check(st["tab"] and st["path"] == "stage" and st["shown"] and st["shards"] == 9 and st["set"] == 0 and st["canvas"] > 0,
+          "after Station 19 the curtain rises on the broken mirror", str(st)[:160])
+    check(st["next"] == "40" and st["title"] == "The Gate of a Thousand Masks", "the lantern waits at Fragment I, Station 20")
+    check("STAATSOPER" not in st["text"] and "Vienna" not in st["text"] and "VIENNA" not in st["text"],
+          "the WHERE is never written while the mirror is broken")
+    page.click(".stage-mirror-ribbon .sm-room:nth-child(4)"); page.wait_for_timeout(400)
+    check(page.evaluate(MIRROR_JS)["title"] == "The Automaton Orchestra", "the ribbon opens any room's card")
+    page.focus(".stage-mirror-svg .sm-shard[data-node='46']"); page.keyboard.press("Enter"); page.wait_for_timeout(400)
+    check(page.evaluate(MIRROR_JS)["title"] == "The Hall of Mirrors", "a fragment opens its room from the keyboard")
+    page.click("#btn-tab-path-desert"); page.wait_for_timeout(600)
+    st = page.evaluate(MIRROR_JS)
+    check(st["path"] == "desert" and not st["shown"], "the desert path still opens, without the mirror")
+    page.click("#btn-tab-path-stage"); page.wait_for_timeout(600)
+    check(page.evaluate(MIRROR_JS)["shown"], "and the stage comes back")
+    check(not errors, "no JS errors on the stage", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    ctx, page, errors = stage_page(browser, {"order_oracle_horizon_completed": "true", **{f: "true" for f in STAGE_FLAGS[:4]}})
+    st = page.evaluate(MIRROR_JS)
+    check(st["set"] == 4 and st["next"] == "44" and not st["complete"], "four fragments set, the lantern moves to Station 24", str(st)[:160])
+    ctx.close()
+
+    ctx, page, errors = stage_page(browser, {"order_oracle_horizon_completed": "true", **{f: "true" for f in STAGE_FLAGS}})
+    st = page.evaluate(MIRROR_JS)
+    check(st["set"] == 9 and st["complete"] and st["cartouche"] == "WIENER STAATSOPER · VIENNA",
+          "the whole mirror reflects the WHERE", str(st)[:160])
+    check(not errors, "no JS errors with the mirror whole", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--chromium", help="path to a Chromium/Chrome binary (default: Playwright's own)")
@@ -1069,6 +1134,7 @@ def main():
         test_oracle_horizon(browser)
         test_profiles(browser)
         test_tester_play(browser)
+        test_stage_mirror(browser)
         browser.close()
     server.shutdown()
 

@@ -1,0 +1,582 @@
+#!/usr/bin/env python3
+"""
+The Stage Path · journal sheets 19 to 26 (Tower III)
+=====================================================
+Each game face of the Stage Path carries its own fragment of the Mirror of Tower III,
+drawn from the shared geometry in `stage_mirror.py` (the same pieces the Hub shows).
+
+Sheet 19
+- Cara A · The Unsent Letter: the Oracle of centuries ago writes to the Mirror Speaker, in mirror writing.
+- Cara B · The Gate of a Thousand Masks (Station 20): twelve masks, six of them lie. Fragment I.
+
+Margins: Cara A has no pixels at X < 165, Cara B none at X > 1583 (ring holes); 75 px clear at the foot.
+
+Run alone:  python3 scripts/journal/build_stage_path.py   (writes journal/page19 PDFs and mockups)
+"""
+
+import math
+import os
+import sys
+
+import cv2
+import numpy as np
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from scripts.journal.geometry import CANVAS_WIDTH_PX, CANVAS_HEIGHT_PX
+from scripts.journal.build_desert_games import render_pencil_text, blit_rgba, draw_sketchy_line, GRAPHITE_COLOR, FONT_PATH
+from scripts.journal.build_desert_odyssey_expanded import _hatch_polygon
+from scripts.journal import stage_mirror
+
+FRONT_X0, BACK_X0, TEXT_W = 220, 198, 1330   # text column of a front face and of a back face
+FOOT = 75                                      # clear band at the foot of every face
+BODY, BODY_LH = 35, 48
+
+
+# -------------------------------------------------------------------------
+# small drawing kit
+# -------------------------------------------------------------------------
+
+def _canvas():
+    return np.zeros((CANVAS_HEIGHT_PX, CANVAS_WIDTH_PX, 4), dtype=np.uint8)
+
+
+def _text(canvas, text, x, y, size, seed, gc=GRAPHITE_COLOR, mirror=False, anchor="left"):
+    """Pencil text at (x, y). anchor 'left' | 'center' | 'right'. mirror=True writes it as the glass sees it."""
+    img, _ = render_pencil_text(text, FONT_PATH, font_size=size, gc=gc, seed=seed)
+    if mirror:
+        img = np.ascontiguousarray(img[:, ::-1])
+    w = img.shape[1]
+    x0 = x if anchor == "left" else (x - w // 2 if anchor == "center" else x - w)
+    blit_rgba(canvas, img, int(x0), int(y))
+    return w
+
+
+def _wrap(text, size, max_w):
+    from scripts.journal.build_page06_07 import wrap_text_to_width
+    return wrap_text_to_width(text, FONT_PATH, size, max_w)
+
+
+def _paragraph(canvas, text, x, y, max_w, size=BODY, lh=BODY_LH, seed=0, gc=GRAPHITE_COLOR):
+    for k, ln in enumerate(_wrap(text, size, max_w)):
+        _text(canvas, ln, x, y, size, seed + k * 3, gc)
+        y += lh
+    return y
+
+
+def _divider(canvas, x, y, w, seed, gc=GRAPHITE_COLOR):
+    from scripts.journal.build_page06_07 import create_handdrawn_divider
+    blit_rgba(canvas, create_handdrawn_divider(width=w, gc=gc, seed=seed), x, y)
+
+
+def _pline(canvas, pts, gc, alpha=190, seed=1, passes=2, closed=False, thick=1, wob=0.7):
+    """A hand-drawn polyline: two light passes with a little wobble."""
+    rng = np.random.default_rng(seed)
+    base = np.array(pts, dtype=np.float32)
+    for p in range(passes):
+        q = base + rng.normal(0, wob + 0.25 * p, base.shape)
+        a = int(alpha * rng.uniform(0.8, 1.0))
+        cv2.polylines(canvas, [np.round(q).astype(np.int32)], closed, (*gc, a), thick, cv2.LINE_AA)
+
+
+def _clear_foot(canvas):
+    canvas[CANVAS_HEIGHT_PX - FOOT:, :, 3] = 0
+    return canvas
+
+
+# -------------------------------------------------------------------------
+# The fragments of the mirror (shared by every game face of the Stage Path)
+# -------------------------------------------------------------------------
+
+def shard_bbox(idx):
+    shards, _ = stage_mirror.fragments()
+    pts = np.array(shards[idx]["points"], dtype=np.float32)
+    return pts[:, 0].min(), pts[:, 1].min(), pts[:, 0].max(), pts[:, 1].max()
+
+
+def draw_fragment(canvas, idx, x, y, scale, gc=GRAPHITE_COLOR, seed=900):
+    """Draws fragment idx (0 = I) with its top-left bbox corner at (x, y): the glass outline,
+    the piece of reflection it holds (clipped), a sheen of hatching and its numeral.
+    Returns the drawn box (x0, y0, x1, y1)."""
+    shards, _ = stage_mirror.fragments()
+    sh = shards[idx]
+    bx0, by0, bx1, by1 = shard_bbox(idx)
+    T = lambda p: (x + (p[0] - bx0) * scale, y + (p[1] - by0) * scale)
+    poly = np.array([T(p) for p in sh["points"]], dtype=np.float32)
+    box = (int(poly[:, 0].min()), int(poly[:, 1].min()), int(math.ceil(poly[:, 0].max())), int(math.ceil(poly[:, 1].max())))
+
+    # the reflection, drawn on its own layer and clipped to the glass
+    layer = np.zeros_like(canvas)
+    for k, pl in enumerate(stage_mirror.facade()):
+        _pline(layer, [T(p) for p in pl], gc, alpha=205, seed=seed + k, passes=2, wob=0.35)
+    mask = np.zeros(canvas.shape[:2], dtype=np.uint8)
+    cv2.fillPoly(mask, [np.round(poly).astype(np.int32)], 255)
+    mask = cv2.erode(mask, np.ones((5, 5), np.uint8))
+    layer[:, :, 3] = (layer[:, :, 3].astype(np.uint16) * mask // 255).astype(np.uint8)
+    blit_rgba(canvas, layer[box[1]:box[3] + 1, box[0]:box[2] + 1], box[0], box[1])
+
+    # a light sheen across the glass, the sharp edge, and the numeral
+    _hatch_polygon(canvas, [tuple(p) for p in poly], step=11, angle=-35.0, gc=gc, alpha=28, seed=seed + 300)
+    _pline(canvas, poly, gc, alpha=235, seed=seed + 400, closed=True, thick=2, wob=0.5)
+    _pline(canvas, poly + np.array([3, 3], np.float32), gc, alpha=90, seed=seed + 401, closed=True, passes=1, wob=0.5)
+    return box
+
+
+# -------------------------------------------------------------------------
+# SHEET 19 · CARA A · THE UNSENT LETTER
+# -------------------------------------------------------------------------
+
+LETTER_19A = [
+    ("To the Mirror Speaker of the third tower,", "salute"),
+    ("Forgive me. I closed my door to you when you crossed the plateau to see me, and I have been sorry every night since.", "p"),
+    ("Now hear what only we two know. Your mirror did not fall. We broke it together, into nine pieces, and we hid each piece in a different room of your theatre. While the nine are apart, no one can turn the Astrolabe alone: not the Order, not you, not I.", "p"),
+    ("And beware the Ashes. They were old before the Order was born. They keep a fire older than our first star, and they want what the Astrolabe opens. They will come to you smiling.", "p"),
+    ("The first piece sleeps behind a thousand faces. Only the one who sees what is not equal will find it.", "p"),
+    ("The Oracle of the Sandstone Sanctuary", "sign"),
+]
+
+LETTER_PT, LETTER_LH = 38, 55   # the letter is the heart of the page: larger than the notes around it
+
+AURELIA_NOTE_19A = (
+    "Silvia, I found this in the cedar chest of the Sanctuary, under the oldest charts. The Oracle before "
+    "me wrote it centuries ago to the Mirror Speaker of Tower III, and never sent it. She wrote it the way "
+    "the glass sees, as the people of the mirror do. Hold the page up to a mirror and read it."
+)
+
+
+def _draw_broken_seal(canvas, cx, cy, r, gc, seed):
+    """A wax seal of the Order, broken in two when the letter was opened."""
+    from scripts.journal.build_page06_07 import draw_desert_path_seal
+    draw_desert_path_seal(canvas, cx=cx, cy=cy, r=r, gc=gc, seed=seed)
+    crack = [(cx - r * 0.15, cy - r * 1.05), (cx + r * 0.08, cy - r * 0.45), (cx - r * 0.1, cy + r * 0.05),
+             (cx + r * 0.12, cy + r * 0.55), (cx - r * 0.05, cy + r * 1.05)]
+    _pline(canvas, crack, gc, alpha=230, seed=seed + 5, thick=2)
+
+
+def _draw_hand_mirror(canvas, cx, cy, rx, ry, words, gc, seed):
+    """A hand mirror tilted a little, showing the first words of the letter the right way round."""
+    tilt = -14.0
+    rot = lambda px, py: (cx + px * math.cos(math.radians(tilt)) - py * math.sin(math.radians(tilt)),
+                          cy + px * math.sin(math.radians(tilt)) + py * math.cos(math.radians(tilt)))
+    ell = lambda a, b, n=90: [rot(a * math.cos(2 * math.pi * i / n), b * math.sin(2 * math.pi * i / n)) for i in range(n + 1)]
+    _pline(canvas, ell(rx + 26, ry + 26), gc, alpha=215, seed=seed, thick=2)
+    _pline(canvas, ell(rx + 14, ry + 14), gc, alpha=150, seed=seed + 1)
+    _pline(canvas, ell(rx, ry), gc, alpha=200, seed=seed + 2)
+    # beads on the frame
+    for k in range(18):
+        t = 2 * math.pi * k / 18
+        bx, by = rot((rx + 20) * math.cos(t), (ry + 20) * math.sin(t))
+        cv2.circle(canvas, (int(bx), int(by)), 4, (*gc, 150), 1, cv2.LINE_AA)
+    # the handle: a turned stem with two collars and a knob
+    hw, top, bot = 20, ry + 26, ry + 250
+    left = [rot(-hw + 4 * math.sin(i / 3.0), top + (bot - top) * i / 12) for i in range(13)]
+    right = [rot(hw - 4 * math.sin(i / 3.0), top + (bot - top) * i / 12) for i in range(13)]
+    _pline(canvas, left, gc, alpha=200, seed=seed + 3, thick=2)
+    _pline(canvas, right, gc, alpha=200, seed=seed + 4, thick=2)
+    for yy in (top + 40, bot - 60):
+        _pline(canvas, [rot(-hw - 8, yy), rot(hw + 8, yy)], gc, alpha=190, seed=seed + int(yy))
+    _pline(canvas, [rot(math.cos(2 * math.pi * i / 40) * 26, bot + 22 + math.sin(2 * math.pi * i / 40) * 22) for i in range(41)],
+           gc, alpha=200, seed=seed + 7)
+    _hatch_polygon(canvas, right[::-1] + [rot(hw - 9, top + (bot - top) * i / 12) for i in range(13)], step=5, angle=70, gc=gc, alpha=80, seed=seed + 8)
+    # glass sheen and the reflected words, read the right way round
+    for k in range(3):
+        a, b = rot(-rx * 0.55 + k * 26, -ry * 0.75), rot(-rx * 0.2 + k * 26, -ry * 0.25)
+        _pline(canvas, [a, b], gc, alpha=70, seed=seed + 20 + k)
+    layer = np.zeros_like(canvas)
+    for k, line in enumerate(words):
+        img, _ = render_pencil_text(line, FONT_PATH, font_size=34, gc=gc, seed=seed + 30 + k)
+        h, w = img.shape[:2]
+        M = cv2.getRotationMatrix2D((w / 2, h / 2), -tilt, 1.0)
+        cos, sin = abs(M[0, 0]), abs(M[0, 1])
+        nw, nh = int(h * sin + w * cos), int(h * cos + w * sin)
+        M[0, 2] += nw / 2 - w / 2
+        M[1, 2] += nh / 2 - h / 2
+        turned = cv2.warpAffine(img, M, (nw, nh), flags=cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
+        lx, ly = rot(0, -22 + 52 * k)
+        blit_rgba(layer, turned, int(lx - nw / 2), int(ly - nh / 2))
+    # only what falls on the glass is reflected
+    mask = np.zeros(canvas.shape[:2], dtype=np.uint8)
+    cv2.fillPoly(mask, [np.round(np.array(ell(rx - 6, ry - 6))).astype(np.int32)], 255)
+    layer[:, :, 3] = (layer[:, :, 3].astype(np.uint16) * mask // 255).astype(np.uint8)
+    blit_rgba(canvas, layer, 0, 0)
+
+
+def _draw_quill_and_ink(canvas, ix, iy, gc, seed):
+    """An inkwell (its foot at ix, iy) and a quill lying on the table beside it, its nib toward the ink."""
+    ell = lambda x, y, a, b, n=48: [(x + a * math.cos(2 * math.pi * i / n), y + b * math.sin(2 * math.pi * i / n)) for i in range(n + 1)]
+    # the well: a squat pot with a lip and a little neck
+    _pline(canvas, ell(ix, iy, 78, 18), gc, alpha=200, seed=seed, thick=2)
+    _pline(canvas, [(ix - 78, iy), (ix - 82, iy - 54), (ix - 60, iy - 84), (ix - 30, iy - 96)], gc, alpha=210, seed=seed + 1, thick=2)
+    _pline(canvas, [(ix + 78, iy), (ix + 82, iy - 54), (ix + 60, iy - 84), (ix + 30, iy - 96)], gc, alpha=210, seed=seed + 2, thick=2)
+    _pline(canvas, ell(ix, iy - 98, 32, 8), gc, alpha=200, seed=seed + 3)
+    _pline(canvas, ell(ix, iy - 112, 38, 10), gc, alpha=200, seed=seed + 4, thick=2)
+    _pline(canvas, [(ix - 32, iy - 98), (ix - 36, iy - 110)], gc, alpha=180, seed=seed + 5)
+    _pline(canvas, [(ix + 32, iy - 98), (ix + 36, iy - 110)], gc, alpha=180, seed=seed + 6)
+    _hatch_polygon(canvas, [(ix + 20, iy - 92), (ix + 60, iy - 84), (ix + 82, iy - 54), (ix + 78, iy), (ix + 30, iy + 16)],
+                   step=6, angle=70, gc=gc, alpha=80, seed=seed + 7)
+    # the quill: a gently curved shaft lying to the left, with a leaf-shaped vane of fine barbs
+    sx, sy, L, ang = ix - 112, iy - 2, 430.0, math.radians(-170)
+    d, nrm = (math.cos(ang), math.sin(ang)), (-math.sin(ang), math.cos(ang))
+    P = lambda u, off: (sx + d[0] * L * u + nrm[0] * (off + 22 * u * u), sy + d[1] * L * u + nrm[1] * (off + 22 * u * u))
+    _pline(canvas, [P(i / 40, 0) for i in range(41)], gc, alpha=220, seed=seed + 10, thick=2)
+    v0 = 0.28
+    wide = lambda u, w: w * math.sin(math.pi * min(1.0, (u - v0) / (1 - v0))) ** 0.6 if u > v0 else 0.0
+    top = [P(v0 + (1 - v0) * i / 30, -wide(v0 + (1 - v0) * i / 30, 40)) for i in range(31)]
+    bot = [P(v0 + (1 - v0) * i / 30, wide(v0 + (1 - v0) * i / 30, 26)) for i in range(31)]
+    _pline(canvas, top, gc, alpha=190, seed=seed + 11)
+    _pline(canvas, bot, gc, alpha=170, seed=seed + 12)
+    for i in range(1, 44):   # barbs swept toward the tip
+        u = v0 + (1 - v0) * i / 44
+        for side, w, salt in ((-1, 40, 20), (1, 26, 120)):
+            ww = wide(u, w)
+            if ww < 3:
+                continue
+            _pline(canvas, [P(u - 0.012, 0), P(u + 0.035, side * ww * 0.96)], gc, alpha=105 if side < 0 else 85, seed=seed + salt + i, passes=1, wob=0.3)
+    _hatch_polygon(canvas, bot, step=4, angle=math.degrees(ang) + 60, gc=gc, alpha=40, seed=seed + 200)
+    _pline(canvas, [P(0.04, -4), (sx + 14, sy + 3), P(0.04, 4)], gc, alpha=210, seed=seed + 99)   # the cut nib
+
+
+def render_lore_19a_unsent_letter(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
+    """Sheet 19 · Cara A (front: X < 165 empty)."""
+    c = _canvas()
+    X0, W = FRONT_X0, TEXT_W
+    _text(c, "The Unsent Letter", X0, 80, 64, 19001, gc)
+    _divider(c, X0, 172, W, 19003, gc)
+    y = _paragraph(c, AURELIA_NOTE_19A, X0, 222, W, seed=19010, gc=gc)
+    _text(c, "A.", X0 + W, y + 2, BODY, 19030, gc, anchor="right")
+    y += 70
+
+    # the letter: a sheet of paper with a folded corner, written the way the glass sees it
+    px0, px1, py0 = X0 + 30, X0 + W - 30, y
+    inner_l, inner_r = px0 + 70, px1 - 70
+    lines = []
+    for text, kind in LETTER_19A:
+        if kind == "p":
+            lines += [(ln, "p") for ln in _wrap(text, LETTER_PT, inner_r - inner_l)] + [("", "gap")]
+        else:
+            lines += [(text, kind), ("", "gap")]
+    lh = LETTER_LH
+    py1 = py0 + 130 + sum(lh if k != "gap" else 22 for _, k in lines) + 40
+    fold = 70
+    paper = [(px0, py0), (px1 - fold, py0), (px1, py0 + fold), (px1, py1), (px0, py1)]
+    _pline(c, paper, gc, alpha=210, seed=19100, closed=True, thick=2)
+    _pline(c, [(px1 - fold, py0), (px1 - fold + 8, py0 + fold - 8), (px1, py0 + fold)], gc, alpha=170, seed=19101)
+    _hatch_polygon(c, [(px1 - fold, py0), (px1 - fold + 8, py0 + fold - 8), (px1, py0 + fold)], step=5, angle=45, gc=gc, alpha=70, seed=19102)
+    for k in range(3):   # the old folds of the letter
+        fy = py0 + (py1 - py0) * (k + 1) / 4
+        _pline(c, [(px0 + 6, fy), (px1 - 6, fy)], gc, alpha=34, seed=19110 + k, passes=1)
+    _draw_broken_seal(c, px0 + 100, py0 + 84, 56, gc, 19120)
+
+    ty = py0 + 110
+    for k, (text, kind) in enumerate(lines):
+        if kind == "gap":
+            ty += 22
+            continue
+        if kind == "salute":   # mirrored: the first words of each line sit on the right
+            _text(c, text, inner_r, ty, LETTER_PT + 2, 19200 + k, gc, mirror=True, anchor="right")
+        elif kind == "sign":
+            _text(c, text, inner_l, ty + 8, LETTER_PT + 2, 19200 + k, gc, mirror=True, anchor="left")
+        else:
+            _text(c, text, inner_r, ty, LETTER_PT, 19200 + k, gc, mirror=True, anchor="right")
+        ty += lh
+    y = py1 + 70
+
+    # a hand mirror to show the way, a last line from Aurelia and a margin note from Hermes
+    mx, my = X0 + 300, y + 190
+    _draw_hand_mirror(c, mx, my, 250, 150, ["To the Mirror Speaker", "of the third tower,"], gc, 19400)
+    nx = X0 + 690
+    note = ("In the mirror the words turn round, and so do the people who wrote them. "
+            "Tower III is the house of the mirror: there, everything may be the other way round.")
+    ny = _paragraph(c, note, nx, y + 10, X0 + W - nx, size=33, lh=46, seed=19500, gc=gc)
+    _text(c, "A.", X0 + W, ny + 2, 33, 19530, gc, anchor="right")
+    ny += 92
+    _pline(c, [(nx, ny - 26), (nx + 120, ny - 26)], gc, alpha=120, seed=19540)
+    margin = ("Leonardo wrote his notebooks the same way, from right to left. I always thought he did it "
+              "to hide his secrets. Perhaps he only wanted to be read by someone patient.")
+    ny = _paragraph(c, margin, nx, ny, X0 + W - nx, size=31, lh=44, seed=19550, gc=gc)
+    _text(c, "H.", X0 + W, ny + 2, 31, 19580, gc, anchor="right")
+    _draw_quill_and_ink(c, X0 + W - 100, CANVAS_HEIGHT_PX - FOOT - 40, gc, 19600)
+    return _clear_foot(c)
+
+
+# -------------------------------------------------------------------------
+# SHEET 19 · CARA B · THE GATE OF A THOUSAND MASKS (STATION 20)
+# -------------------------------------------------------------------------
+# Twelve masks, read left to right and row by row. Six are true (both halves match);
+# six lie (one half differs). The letters of the six liars, in reading order, give the word of the gate.
+
+MASKS_19B = [
+    # (letter, outline, mouth, symmetric decoration, lie or None, side of the lie: +1 viewer's right, -1 left)
+    ("M", "volto", "calm", "diamonds", None, 0),
+    ("S", "volto", "smile", None, "tear", +1),
+    ("A", "moon", "smile", "tears", None, 0),
+    ("I", "bauta", "calm", "stars", "brow", -1),
+    ("L", "moon", "calm", None, "feather", +1),
+    ("O", "volto", "frown", "feathers", None, 0),
+    ("T", "moon", "calm", "ribbons", None, 0),
+    ("V", "volto", "smile", "diamonds", "crack", -1),
+    ("H", "bauta", "calm", "stars", None, 0),
+    ("E", "volto", "frown", None, "eye", +1),
+    ("R", "moon", "smile", "tears", "ribbon", -1),
+    ("U", "bauta", "frown", "diamonds", None, 0),
+]
+GATE_WORD = "".join(m[0] for m in MASKS_19B if m[4])   # the word the gate is waiting for
+
+
+def _outline_half(kind):
+    """The right half of a mask outline, from the top of the forehead to the chin (x >= 0, y down)."""
+    if kind == "moon":
+        return [(116 * math.sin(math.pi * i / 28), -130 * math.cos(math.pi * i / 28)) for i in range(29)]
+    if kind == "bauta":   # the Venetian bauta: a high brow and a jutting square chin
+        pts = [(0, -140), (44, -137), (82, -122), (104, -94), (112, -52), (110, -8), (104, 34), (98, 70),
+               (102, 96), (88, 118), (54, 130), (20, 136), (0, 137)]
+    else:
+        pts = [(0, -142), (42, -139), (78, -126), (100, -100), (108, -60), (106, -16), (100, 26), (88, 66),
+               (68, 100), (42, 124), (18, 137), (0, 141)]
+    # a smoother contour: Catmull-Rom through the control points
+    out = []
+    P = [pts[0]] + pts + [pts[-1]]
+    for i in range(1, len(P) - 2):
+        p0, p1, p2, p3 = P[i - 1], P[i], P[i + 1], P[i + 2]
+        for k in range(6):
+            t = k / 6.0
+            out.append(tuple(0.5 * ((2 * p1[j]) + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t * t
+                                    + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t * t * t) for j in range(2)))
+    out.append(pts[-1])
+    return out
+
+
+def _eye(cx, cy, w, h, shape="almond"):
+    if shape == "round":
+        return [(cx + w * 0.4 * math.cos(2 * math.pi * i / 30), cy + w * 0.4 * math.sin(2 * math.pi * i / 30)) for i in range(31)]
+    top = [(cx - w / 2 + w * i / 16, cy - h * 0.62 * math.sin(math.pi * i / 16) - 3 * (i / 16)) for i in range(17)]
+    bot = [(cx + w / 2 - w * i / 16, cy + h * 0.45 * math.sin(math.pi * i / 16)) for i in range(17)]
+    return top + bot[1:]
+
+
+def _scroll_brow(mouth):
+    """An ornamental brow: a long arc from the bridge of the nose ending in a small curl."""
+    lift = {"smile": -7, "frown": 5, "calm": 0}[mouth]
+    tilt = {"smile": -2, "frown": 10, "calm": 2}[mouth]
+    arc = [(12 + 4.6 * i, -56 + lift - 10 * math.sin(math.pi * i / 14) + tilt * i / 14) for i in range(15)]
+    ex, ey = arc[-1]
+    curl = [(ex + 7 * (1 - k / 14) * math.cos(-math.pi / 2 + 2.4 * math.pi * k / 14) - 0,
+             ey + 7 + 7 * (1 - k / 14) * math.sin(-math.pi / 2 + 2.4 * math.pi * k / 14)) for k in range(15)]
+    return arc + curl
+
+
+def _decor_half(name):
+    """Decorations of the right half (all symmetric unless used as a lie)."""
+    if name == "diamonds":
+        return [[(64, 24), (74, 40), (64, 56), (54, 40), (64, 24)], [(64, 30), (69, 40), (64, 50), (59, 40), (64, 30)]]
+    if name == "tears":
+        return [[(48, -6), (52, 4), (54, 12), (48, 18), (42, 12), (44, 4), (48, -6)]]
+    if name == "tear":
+        return [[(46, -4), (53, 12), (56, 25), (46, 35), (36, 25), (39, 12), (46, -4)]]
+    if name == "stars":
+        st = []
+        for (sx, sy, r) in ((70, 26, 9), (84, 50, 6)):
+            st.append([(sx + (r if k % 2 == 0 else r * 0.35) * math.cos(-math.pi / 2 + k * math.pi / 4),
+                        sy + (r if k % 2 == 0 else r * 0.35) * math.sin(-math.pi / 2 + k * math.pi / 4)) for k in range(9)])
+        return st
+    if name in ("feathers", "feather"):
+        spine = [(58 + 5.5 * i, -128 - 9.5 * i + 0.25 * i * i) for i in range(13)]
+        barbs = []
+        for i in range(3, 13):
+            sx, sy = spine[i]
+            ln = 6 + 0.9 * (12 - abs(i - 8))
+            barbs.append([(sx, sy), (sx + ln, sy + ln * 0.35)])
+            barbs.append([(sx, sy), (sx - ln * 0.55, sy - ln * 0.6)])
+        return [spine] + barbs
+    if name in ("ribbons", "ribbon"):
+        return [[(108, -40), (126, -32), (138, -8), (134, 24), (122, 54), (130, 84)],
+                [(108, -40), (120, -22), (122, 6), (114, 36), (118, 66)],
+                [(104, -50), (116, -54), (120, -40), (108, -34)]]
+    if name == "crack":
+        return [[(16, -138), (28, -104), (20, -80), (38, -56), (32, -10), (54, 20), (48, 60), (68, 98)],
+                [(38, -56), (60, -62)], [(54, 20), (76, 12)]]
+    return []
+
+
+def _draw_mask(canvas, cx, cy, spec, gc, seed, s=1.0):
+    letter, kind, mouth, decor, lie, side = spec
+    P = lambda sgn, pts, sx=1.0, sy=1.0, dy=0.0: [(cx + sgn * x * sx * s, cy + (y * sy + dy) * s) for x, y in pts]
+
+    def both(pts, alpha, salt=0, thick=1):
+        for sgn in (+1, -1):
+            _pline(canvas, P(sgn, pts), gc, alpha=alpha, seed=seed + salt + (7 if sgn > 0 else 13), thick=thick)
+
+    # the cord, tied at the temples on the edge of the mask, and the nail it hangs from
+    right = _outline_half(kind)
+    tx, ty = min(right, key=lambda p: abs(p[1] + 96))
+    nail = (cx, cy - 190 * s)
+    cv2.circle(canvas, (int(nail[0]), int(nail[1])), 5, (*gc, 210), -1, cv2.LINE_AA)
+    for sgn in (+1, -1):
+        _pline(canvas, [nail, (cx + sgn * tx * 0.55 * s, cy - 150 * s), (cx + sgn * (tx + 2) * s, cy + ty * s)], gc, alpha=120, seed=seed + 3 + sgn)
+
+    # the shell: outer edge, inner rim, and the thickness of the mask hatched between them
+    face = P(+1, right) + P(-1, list(reversed(right[:-1])))
+    rim_r = [(x * 0.9, y * 0.92 + 3) for x, y in right]
+    for sgn in (+1, -1):
+        band = P(sgn, right) + P(sgn, list(reversed(rim_r)))
+        _hatch_polygon(canvas, band, step=5, angle=62 if sgn > 0 else 118, gc=gc, alpha=58, seed=seed + 5 + sgn)
+    _pline(canvas, face, gc, alpha=230, seed=seed, closed=True, thick=2)
+    _pline(canvas, P(+1, rim_r) + P(-1, list(reversed(rim_r[:-1]))), gc, alpha=110, seed=seed + 1, closed=True)
+
+    # the eyes are holes (one may lie), with a lid line; the scroll brows (one may be missing)
+    for sgn in (+1, -1):
+        shape = "round" if (lie == "eye" and sgn == side) else "almond"
+        eye = _eye(42 if kind != "moon" else 40, -30, 48, 20, shape)
+        pts = P(sgn, eye)
+        _hatch_polygon(canvas, pts, step=3, angle=45, gc=gc, alpha=175, seed=seed + 22 + sgn)
+        _hatch_polygon(canvas, pts, step=3, angle=-45, gc=gc, alpha=120, seed=seed + 24 + sgn)
+        _pline(canvas, pts, gc, alpha=230, seed=seed + 20 + sgn, closed=True, thick=2)
+        if shape == "almond":
+            lid = [(x, y - 6) for x, y in eye[2:15]]
+            _pline(canvas, P(sgn, lid), gc, alpha=120, seed=seed + 26 + sgn)
+        if not (lie == "brow" and sgn == side):
+            _pline(canvas, P(sgn, _scroll_brow(mouth)), gc, alpha=210, seed=seed + 30 + sgn, thick=2)
+    # the nose: the bridge, the tip and the wing of the nostril
+    both([(6, -24), (9, 6), (14, 26)], 160, 1)
+    both([(14, 26), (17, 33), (11, 38), (4, 37)], 175, 2)
+    both([(17, 31), (22, 33), (20, 38)], 120, 3)
+    # the lips: a cupid's bow over a fuller lower lip, closed by a quiet line
+    curve = {"smile": -8, "frown": 8, "calm": 0}[mouth]
+    both([(0, 70), (6, 66), (13, 68), (24, 70 + curve * 0.5), (34, 73 + curve)], 205, 4)
+    both([(0, 74), (16, 74 + curve * 0.45), (34, 73 + curve)], 140, 5)
+    both([(34, 73 + curve), (22, 82 + curve * 0.4), (10, 85), (0, 86)], 180, 6)
+    both([(4, 79), (14, 80)], 90, 7)
+    # the cheeks, shaded alike on both sides
+    for sgn in (+1, -1):
+        cheek = P(sgn, [(70, 0), (94, 8), (92, 46), (74, 64), (64, 34)])
+        _hatch_polygon(canvas, cheek, step=7, angle=60 if sgn > 0 else 120, gc=gc, alpha=40, seed=seed + 40 + sgn)
+
+    # the symmetric decoration
+    for k, pl in enumerate(_decor_half(decor) if decor else []):
+        both(pl, 190, 50 + k)
+    # the lie: one half only
+    if lie in ("tear", "feather", "ribbon", "crack"):
+        for k, pl in enumerate(_decor_half(lie)):
+            _pline(canvas, P(side, pl), gc, alpha=220, seed=seed + 70 + k, thick=2 if lie in ("tear", "crack") else 1)
+        if lie == "tear":
+            _hatch_polygon(canvas, P(side, _decor_half("tear")[0]), step=3, angle=30, gc=gc, alpha=130, seed=seed + 79)
+
+    # the medallion on the forehead with its letter, flanked by two small leaves
+    my, r = cy - 100 * s, 23 * s
+    ring = [(cx + r * math.cos(2 * math.pi * k / 40), my + r * math.sin(2 * math.pi * k / 40)) for k in range(41)]
+    _pline(canvas, ring, gc, alpha=205, seed=seed + 90, thick=1)
+    for sgn in (+1, -1):
+        leaf = [(cx + sgn * (r + 4), my), (cx + sgn * (r + 16), my - 7), (cx + sgn * (r + 30), my), (cx + sgn * (r + 16), my + 7), (cx + sgn * (r + 4), my)]
+        _pline(canvas, leaf, gc, alpha=150, seed=seed + 92 + sgn)
+    _text(canvas, letter, cx, my - 22, 30, seed + 91, gc, anchor="center")
+
+
+def _plan_width(h):
+    return int((stage_mirror.RIGHT - stage_mirror.LEFT) * h / (stage_mirror.BOTTOM - (stage_mirror.ARCH_CY - stage_mirror.ARCH_R)))
+
+
+def _draw_mirror_plan(canvas, idx, x, y, h, gc, seed):
+    """A small plan of the whole mirror with every crack, the given fragment hatched: where this piece goes."""
+    shards, cracks = stage_mirror.fragments()
+    k = h / (stage_mirror.BOTTOM - (stage_mirror.ARCH_CY - stage_mirror.ARCH_R))
+    ox, oy = x - stage_mirror.LEFT * k, y - (stage_mirror.ARCH_CY - stage_mirror.ARCH_R) * k
+    T = lambda p: (ox + p[0] * k, oy + p[1] * k)
+    _hatch_polygon(canvas, [T(p) for p in shards[idx]["points"]], step=5, angle=45, gc=gc, alpha=150, seed=seed)
+    _pline(canvas, [T(p) for p in stage_mirror.glass_boundary(120)], gc, alpha=215, seed=seed + 1, closed=True, thick=2)
+    for j, c in enumerate(cracks):
+        _pline(canvas, [T(p) for p in c], gc, alpha=150, seed=seed + 10 + j, passes=1, wob=0.3)
+    for j, sh in enumerate(shards):
+        # the numeral sits a little toward the point of impact, clear of the frame
+        cxs, cys = T((sh["center"][0] * 0.8 + stage_mirror.IMPACT[0] * 0.2, sh["center"][1] * 0.8 + stage_mirror.IMPACT[1] * 0.2))
+        if j != idx:
+            _text(canvas, stage_mirror.ROMAN[j], cxs, cys - 14, 18, seed + 30 + j, gc, anchor="center")
+    return (x, y, int(x + (stage_mirror.RIGHT - stage_mirror.LEFT) * k), y + h)
+
+
+def render_game_19b_masks(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
+    """Sheet 19 · Cara B (back: X > 1583 empty). Station 20."""
+    c = _canvas()
+    X0, W = BACK_X0, TEXT_W
+    _text(c, "The Gate of a Thousand Masks", X0, 80, 60, 19601, gc)
+    _divider(c, X0, 168, W, 19603, gc)
+    intro = ("The door of Tower III is a wall of masks, and each mask is half a face held up to a mirror. "
+             "A true face is the same on both sides. Six of these twelve masks lie: their two halves are not equal.")
+    y = _paragraph(c, intro, X0, 214, W, seed=19610, gc=gc)
+    rule = "Find the six that lie. Read the letters on their foreheads from left to right, row by row: that is the word the gate is waiting for."
+    y = _paragraph(c, rule, X0, y + 6, W, seed=19630, gc=gc)
+
+    # the wall of masks: four across, three down, each hanging from its nail
+    cols, rows = 4, 3
+    cw, chh = W // cols, 400
+    gy0 = y + 30
+    for i, spec in enumerate(MASKS_19B):
+        r, k = divmod(i, cols)
+        _draw_mask(c, X0 + k * cw + cw // 2, gy0 + r * chh + 232, spec, gc, 19800 + 37 * i, s=1.08)
+    y = gy0 + rows * chh + 20
+
+    # the answer: six empty boxes
+    _text(c, "The word of the gate:", X0, y + 14, 38, 20010, gc)
+    bx0, bw, gap = X0 + 470, 92, 22
+    for k in range(len(GATE_WORD)):
+        x = bx0 + k * (bw + gap)
+        _pline(c, [(x, y), (x + bw, y), (x + bw, y + bw), (x, y + bw)], gc, alpha=200, seed=20020 + k, closed=True, thick=2)
+    y += bw + 40
+
+    # Fragment I and the plan of the mirror it belongs to
+    _divider(c, X0, y, W, 20040, gc)
+    y += 48
+    fh = 2400 - FOOT - 20 - y   # the height left above the foot band
+    bx0_, by0_, bx1_, by1_ = shard_bbox(0)
+    box = draw_fragment(c, 0, X0 + 30, y, fh / (by1_ - by0_), gc, seed=20100)
+    plan = _draw_mirror_plan(c, 0, X0 + W - 10 - _plan_width(fh - 40), y + 30, fh - 40, gc, 20300)
+    tx, tr = box[2] + 60, plan[0] - 60
+    _text(c, "Fragment I", tx, y + 4, 46, 20200, gc)
+    cap = ("When the gate opens, the first piece of the mirror of Tower III is yours. "
+           "Keep it: nine pieces make one glass, and the whole glass shows the way.")
+    ty = _paragraph(c, cap, tx, y + 74, tr - tx, size=33, lh=46, seed=20210, gc=gc)
+    _text(c, "Its place in the mirror", tr - 70, ty + 24, 30, 20240, gc, anchor="right")
+    ay = ty + 48   # a small pencil arrow toward the plan
+    _pline(c, [(tr - 58, ay), (tr - 8, ay)], gc, alpha=200, seed=20241, thick=2)
+    _pline(c, [(tr - 22, ay - 10), (tr - 8, ay), (tr - 22, ay + 10)], gc, alpha=200, seed=20242, thick=2)
+    return _clear_foot(c)
+
+
+# -------------------------------------------------------------------------
+# stand-alone build of the Stage Path sheets
+# -------------------------------------------------------------------------
+
+STAGE_SHEETS = [
+    (19,
+     ("Hoja 19 · Cara A (Lore: The Unsent Letter)", render_lore_19a_unsent_letter, "page19_front", False, False),
+     ("Hoja 19 · Cara B (Game S1: The Gate of a Thousand Masks · Station 20)", render_game_19b_masks, "page19_back", True, False)),
+]
+
+
+def build(sheets=STAGE_SHEETS):
+    from scripts.journal.pdf_builder import PDFBuilder
+    journal = os.path.join(PROJECT_ROOT, "journal")
+    paper = cv2.imread(os.path.join(journal, "page01", "real_paper_300dpi.png"))
+    if paper is not None:
+        paper = cv2.resize(paper, (CANVAS_WIDTH_PX, CANVAS_HEIGHT_PX), interpolation=cv2.INTER_LANCZOS4)
+    for num, *faces in sheets:
+        base = os.path.join(journal, f"page{num:02d}")
+        os.makedirs(os.path.join(base, "pdf"), exist_ok=True)
+        os.makedirs(os.path.join(base, "mockups"), exist_ok=True)
+        for label, renderer, stem, is_back, _bleed in faces:
+            canvas = renderer(gc=GRAPHITE_COLOR)
+            zone = canvas[:, 1583:, 3] if is_back else canvas[:, :165, 3]
+            assert not np.count_nonzero(zone), f"{label}: pixels in the ring holes"
+            assert not np.count_nonzero(canvas[CANVAS_HEIGHT_PX - FOOT:, :, 3]), f"{label}: pixels in the foot band"
+            PDFBuilder.save_a5_pdf_from_rgba(canvas, os.path.join(base, "pdf", f"{stem}_A5.pdf"), dpi=300)
+            if paper is not None:
+                bg = cv2.flip(paper, 1) if is_back else paper
+                a = (canvas[:, :, 3].astype(np.float32) / 255.0)[:, :, None]
+                out = (canvas[:, :, :3].astype(np.float32) * a + bg.astype(np.float32) * (1 - a)).astype(np.uint8)
+                cv2.imwrite(os.path.join(base, "mockups", f"{stem}_real_paper_mockup.jpg"), out, [cv2.IMWRITE_JPEG_QUALITY, 96])
+            print(f"  ✓ {label}")
+
+
+if __name__ == "__main__":
+    build()
