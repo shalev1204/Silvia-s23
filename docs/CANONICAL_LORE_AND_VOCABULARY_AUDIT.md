@@ -939,3 +939,13 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 
 **Invariantes**: el disco y el voto (§2.B) no cambian; la Oráculo sigue siendo «she» (§8.A.3); no se escribe «Aurelia es la Oráculo» en material de Silvia antes de la Estación 19. Desde la Estación 19 (web) Silvia ya lo sabe: la revelación es canon visible. Su memoria completa queda pendiente para la Torre I / la Bóveda.
 
+
+---
+
+## 13. CANON SECRETO DEL OPERADOR: EL STAGE PATH Y POPE-E
+
+> ⚠️ **Solo para el Operador.** Detalle completo en `docs/STAGE_PATH_BIBLE.md` §9.
+
+- **«BC» de *BC Ashes* = *Before Christ***: una secta antiquísima, anterior a Cristo, que se dice guardiana del primer fuego. Se revela a Silvia en la Hoja 22B.
+- **Pope-E**, el jefe enmascarado de la secta, **es Carles**. Silvia sabe que existe un jefe, pero no quién es hasta la **Torre I**. Robó el Astrolabio porque el verdadero tesoro del juego es Silvia: el mensaje oculto del Email 1, *«YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE»*. Solo se siembran pistas sutiles, que se entienden en retrospectiva.
+- **El WHERE** (Estación 28) es **Viena · Wiener Staatsoper**. Nunca en texto plano antes de que Silvia lo descubra.

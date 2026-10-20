@@ -18,6 +18,8 @@ Al iniciar una nueva sesión en este repositorio, **TODO AGENTE DE IA (Cursor, C
    - Estándar estético renacentista ("currado", Da Vinci/Kepler/Dürer), márgenes obligatorios de troquelado A5 ($X < 165$ px en Cara A y $X > 1583$ px en Cara B), espaciados mínimos y cero colisiones texto-dibujo.
 4. **[docs/DESERT_ODYSSEY_BIBLE.md](docs/DESERT_ODYSSEY_BIBLE.md)**:
    - Especificaciones para la continuidad de las Estaciones 10 a 19 (The Desert Path), con la tabla Estación ↔ Juego ↔ Hoja.
+5. **[docs/STAGE_PATH_BIBLE.md](docs/STAGE_PATH_BIBLE.md)**:
+   - El Stage Path (Estaciones 20 a 28, Hojas 19 a 26): caras, fragmentos de espejo, mapa del Espejo Roto Vivo, personajes y canon secreto del Operador.
 
 ---
 
