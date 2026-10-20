@@ -1,0 +1,955 @@
+    /* ===================================================================
+       WORKSHOP CHAT: message experience, journal sheet cards, Ask Hermes archive
+       =================================================================== */
+    .chat-bubble-wrap.incoming { animation-name: bubbleSlideInLeft; }
+    .chat-bubble-wrap.outgoing { animation-name: bubbleSlideInRight; }
+    .chat-bubble-wrap.system-event { animation-name: bubbleFadeScale; }
+    @keyframes bubbleSlideInLeft { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes bubbleSlideInRight { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes bubbleFadeScale { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+    .messenger-chat-body.is-restoring .chat-bubble-wrap { animation: none; }
+
+    /* Typing indicator as a bubble inside the conversation */
+    .chat-typing-wrap .chat-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+    }
+    .chat-typing-wrap .typing-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #cdb9a5;
+    }
+    .chat-typing-wrap .typing-key {
+      display: inline-block;
+      animation: telegraphKeyTap 0.5s steps(2, end) infinite;
+    }
+    @keyframes telegraphKeyTap { 0% { transform: translateY(0); } 50% { transform: translateY(2px); } 100% { transform: translateY(0); } }
+
+    /* Telegraph Protocol Warning Banner */
+    .chat-protocol-banner {
+      margin: 8px 14px 20px;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, rgba(38, 28, 20, 0.95) 0%, rgba(24, 18, 13, 0.98) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.5);
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 3px rgba(212, 168, 83, 0.25);
+      text-align: center;
+      position: relative;
+    }
+    .chat-protocol-banner .cpb-header {
+      margin-bottom: 7px;
+    }
+    .chat-protocol-banner .cpb-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #f7d59b;
+      text-shadow: 0 0 8px rgba(247, 213, 155, 0.4);
+      text-transform: uppercase;
+    }
+    .chat-protocol-banner .cpb-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.81rem;
+      line-height: 1.52;
+      color: #e2d1c1;
+      margin: 0 auto 10px;
+      max-width: 680px;
+    }
+    .chat-protocol-banner .cpb-status-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: #a89a8c;
+      text-transform: uppercase;
+    }
+    .chat-protocol-banner .cpb-sep {
+      color: #d4a76a;
+    }
+
+    /* Shelter Waiting Box (48h Cataclysmic Storm Hold) */
+    .shelter-storm-wait-box {
+      margin: 18px 14px;
+      padding: 20px 22px;
+      background: linear-gradient(180deg, rgba(42, 30, 22, 0.98) 0%, rgba(22, 16, 12, 0.99) 100%);
+      border: 1.5px solid #d4a76a;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), inset 0 1px 3px rgba(212, 168, 83, 0.3);
+      text-align: center;
+      animation: bubbleFadeScale 0.25s ease-out;
+    }
+    .shelter-storm-wait-box .ssw-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin-bottom: 8px;
+    }
+    .shelter-storm-wait-box .ssw-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #f7d59b;
+      text-shadow: 0 0 10px rgba(247, 213, 155, 0.4);
+    }
+    .shelter-storm-wait-box .ssw-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: #e2d1c1;
+      max-width: 620px;
+      margin: 0 auto 14px;
+    }
+    .shelter-storm-wait-box .ssw-timer-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 18px;
+      background: rgba(14, 10, 7, 0.88);
+      border: 1px solid rgba(212, 168, 83, 0.45);
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .shelter-storm-wait-box .ssw-timer-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #d4a76a;
+    }
+    .shelter-storm-wait-box .ssw-countdown {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fffef8;
+    }
+    .shelter-storm-wait-box .ssw-cd-segment {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 1px;
+    }
+    .shelter-storm-wait-box .ssw-cd-segment strong {
+      font-size: 0.95rem;
+      color: #fce7b2;
+    }
+    .shelter-storm-wait-box .ssw-cd-segment small {
+      font-size: 0.62rem;
+      color: #c4a88a;
+    }
+    .shelter-storm-wait-box .ssw-cd-sep {
+      color: #d4a76a;
+      font-weight: 700;
+      margin: 0 2px;
+    }
+    .shelter-storm-wait-box .ssw-subtext {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      color: #a89a8c;
+    }
+
+    /* Telegraph Compass Bearing Input Console */
+    .telegraph-compass-console {
+      background: linear-gradient(180deg, rgba(34, 26, 19, 0.96) 0%, rgba(22, 16, 12, 0.98) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.5);
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55), inset 0 1px 3px rgba(212, 168, 83, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .telegraph-compass-console .tcc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+      padding-bottom: 8px;
+    }
+    .telegraph-compass-console .tcc-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #f7d59b;
+      text-transform: uppercase;
+    }
+    .telegraph-compass-console .tcc-ref {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.70rem;
+      color: #c4a88a;
+    }
+    .telegraph-compass-console .tcc-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #e5d3c0;
+      margin: 0;
+    }
+    .telegraph-compass-console .tcc-fields-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .telegraph-compass-console .tcc-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .telegraph-compass-console .tcc-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #cdb496;
+      text-transform: uppercase;
+    }
+    .telegraph-compass-console .tcc-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .telegraph-compass-console .tcc-input {
+      background: rgba(14, 11, 8, 0.9);
+      border: 1.5px solid rgba(196, 168, 138, 0.4);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: #fff9ed;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .telegraph-compass-console .tcc-input:focus {
+      border-color: #f59e0b;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+    }
+    .telegraph-compass-console .tcc-input-deg {
+      width: 105px;
+      padding-right: 28px;
+      text-align: center;
+    }
+    .telegraph-compass-console .tcc-deg-symbol {
+      position: absolute;
+      right: 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f7d59b;
+      pointer-events: none;
+    }
+    .telegraph-compass-console .tcc-input-dir {
+      width: 140px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .telegraph-compass-console .btn-tcc-transmit {
+      background: linear-gradient(180deg, #b45309 0%, #78350f 100%);
+      border: 1.5px solid #f59e0b;
+      border-radius: 6px;
+      padding: 10px 20px;
+      color: #fffaf0;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      height: 44px;
+    }
+    .telegraph-compass-console .btn-tcc-transmit:hover:not(:disabled) {
+      background: linear-gradient(180deg, #d97706 0%, #92400e 100%);
+      border-color: #fbbf24;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+      transform: translateY(-1px);
+    }
+    .telegraph-compass-console .btn-tcc-transmit:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    .telegraph-compass-console .btn-tcc-transmit:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .telegraph-compass-console .tcc-feedback {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(185, 28, 28, 0.22);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      color: #fca5a5;
+      line-height: 1.4;
+      display: none;
+      animation: shakeFeedback 0.35s ease;
+    }
+    @media (max-width: 600px) {
+      .telegraph-compass-console .tcc-fields-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .telegraph-compass-console .tcc-field-group {
+        width: 100%;
+      }
+      .telegraph-compass-console .tcc-input-deg,
+      .telegraph-compass-console .tcc-input-dir {
+        width: 100%;
+      }
+      .telegraph-compass-console .btn-tcc-transmit {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* Journal sheet card (opens from any "Sheet NN" in the chat) */
+    .journal-sheet-popover {
+      position: fixed;
+      z-index: 9000;
+      width: 320px;
+      max-width: calc(100vw - 24px);
+      padding: 16px 18px 16px;
+      background: linear-gradient(180deg, rgba(46, 34, 24, 0.99) 0%, rgba(26, 19, 13, 0.99) 100%);
+      border: 1.5px solid #d4a76a;
+      border-radius: 12px;
+      color: #f0e2d0;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.8), 0 0 24px rgba(212, 168, 83, 0.18);
+      animation: bubbleFadeScale 0.18s ease-out;
+    }
+    .journal-sheet-popover .jsp-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(196, 168, 138, 0.4);
+      background: rgba(30, 22, 16, 0.9);
+      color: #ebd8c5;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+    .journal-sheet-popover .jsp-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #d4a76a;
+      margin-bottom: 4px;
+    }
+    .journal-sheet-popover .jsp-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff5e8;
+      margin-bottom: 10px;
+      padding-right: 22px;
+    }
+    .journal-sheet-popover .jsp-thumb {
+      display: block;
+      width: 100%;
+      max-height: 170px;
+      object-fit: cover;
+      object-position: top;
+      border-radius: 6px;
+      border: 1px solid rgba(196, 168, 138, 0.35);
+      margin-bottom: 10px;
+    }
+    .journal-sheet-popover .jsp-note {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.4;
+      color: #e6d6c2;
+      margin-bottom: 12px;
+    }
+    .journal-sheet-popover .jsp-go {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1.5px solid #d4a76a;
+      background: linear-gradient(180deg, rgba(104, 76, 48, 0.95) 0%, rgba(70, 50, 32, 0.98) 100%);
+      color: #fff5e8;
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+    .journal-sheet-popover .jsp-go:hover { border-color: #ffd8a8; }
+
+    /* Ask Hermes: search, progress and locked questions */
+    .inquiry-search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .inquiry-search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 9px 14px;
+      background: rgba(24, 20, 16, 0.78);
+      border: 1px solid rgba(184, 152, 118, 0.38);
+      border-radius: 8px;
+      color: #f0e2d0;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+    }
+    .inquiry-search-input::placeholder { color: #9d8a76; font-style: italic; }
+    .inquiry-search-input:focus { outline: none; border-color: #d4a76a; box-shadow: 0 0 0 2px rgba(212, 167, 106, 0.2); }
+    .inquiry-progress {
+      flex: 0 0 auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: #c9b49f;
+      white-space: nowrap;
+    }
+    .messenger-faq-chip.is-locked {
+      opacity: 0.55;
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+    .messenger-faq-chip.is-locked:hover { transform: none; }
+    .inquiry-lock-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.08em;
+      color: #d4a76a;
+    }
+    .messenger-faq-empty {
+      grid-column: 1 / -1;
+      padding: 22px;
+      text-align: center;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-style: italic;
+      color: #b9a690;
+    }
+
+    /* Teletype Cursor */
+    .telegraph-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 14px;
+      background-color: #d4a76a;
+      margin-left: 3px;
+      vertical-align: middle;
+      box-shadow: 0 0 6px rgba(212, 167, 106, 0.8);
+      animation: telegraphBlink 0.5s infinite;
+    }
+
+    @keyframes telegraphBlink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* Soft Focus Accent Pulse */
+    @keyframes bubbleHighlightGlow {
+      0% {
+        box-shadow: 0 0 0 3px rgba(229, 197, 161, 0.95), 0 0 28px rgba(212, 168, 83, 0.75);
+        border-color: #eed6bf;
+      }
+      50% {
+        box-shadow: 0 0 0 2px rgba(229, 197, 161, 0.6), 0 0 16px rgba(212, 168, 83, 0.4);
+      }
+      100% {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65), 0 0 18px rgba(184, 142, 98, 0.16);
+      }
+    }
+
+    .chat-bubble.highlight-pulse {
+      animation: bubbleHighlightGlow 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Typing Indicator Bar */
+    .messenger-typing-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      background: rgba(30, 22, 16, 0.96);
+      border-top: 1px solid rgba(196, 168, 138, 0.32);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #dfcbba;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #c4ad94;
+      box-shadow: 0 0 6px #c4ad94;
+      animation: typingDotPulse 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typingDotPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* Bottom Reply Deck */
+    .messenger-reply-deck {
+      background: linear-gradient(180deg, rgba(32, 24, 18, 0.96) 0%, rgba(22, 16, 12, 0.98) 100%);
+      border-top: 1.5px solid rgba(196, 168, 138, 0.35);
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .messenger-reply-header {
+      font-family: 'Cinzel', serif;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f0decc;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .messenger-choices-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Choice Option: Natural Decision Row (De-encapsulated) */
+    .messenger-choice-pill {
+      background: rgba(28, 24, 20, 0.76);
+      border: 1px solid rgba(196, 168, 138, 0.35);
+      border-radius: 8px;
+      padding: 14px 20px;
+      color: #fffaf0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.01rem;
+      font-weight: 500;
+      line-height: 1.55;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+      position: relative;
+    }
+
+    .messenger-choice-pill:hover:not(:disabled) {
+      background: rgba(48, 38, 28, 0.92);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      transform: none !important;
+      box-shadow: inset 0 0 0 1px rgba(229, 197, 161, 0.3), 0 4px 14px rgba(0, 0, 0, 0.55);
+    }
+
+    .messenger-choice-pill:hover:not(:disabled) .messenger-choice-tag {
+      color: #fff5e8;
+    }
+
+    .messenger-choice-pill:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .messenger-choice-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      background: transparent;
+      color: #d4a76a;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+      flex-shrink: 0;
+      box-shadow: none;
+      letter-spacing: 0.05em;
+      transition: color 0.18s ease;
+    }
+
+    .messenger-choice-text {
+      flex: 1;
+    }
+
+    /* Waypoint Secured Card */
+    .messenger-waypoint-card {
+      background: linear-gradient(180deg, rgba(58, 44, 32, 0.88) 0%, rgba(38, 28, 20, 0.94) 100%);
+      border: 1.5px solid rgba(196, 168, 138, 0.5);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .messenger-waypoint-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .messenger-waypoint-icon {
+      font-size: 1.6rem;
+    }
+
+    .messenger-waypoint-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #fffaf0;
+      letter-spacing: 0.04em;
+    }
+
+    .messenger-waypoint-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      color: #d9c5b2;
+      margin-top: 2px;
+    }
+
+    .btn-messenger-to-map {
+      background: linear-gradient(135deg, #6b513a, #4a3726);
+      border: 1.5px solid #d4ba9f;
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease;
+    }
+
+    .btn-messenger-to-map:hover {
+      background: linear-gradient(135deg, #826348, #5c442f);
+      border-color: #eed6bf;
+      box-shadow: 0 0 16px rgba(196, 168, 138, 0.45);
+      transform: none;
+    }
+
+    /* Workshop Inquiries Grid Panel: Archival Tabs (De-encapsulated) */
+    .inquiry-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding: 2px 0 10px 0;
+      border-bottom: 1px solid rgba(196, 168, 138, 0.18);
+    }
+
+    .inquiry-filter-pill {
+      background: rgba(24, 20, 16, 0.68);
+      border: 1px solid rgba(184, 152, 118, 0.3);
+      color: #c9b49f;
+      font-family: 'Cinzel', serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .inquiry-filter-pill:hover {
+      background: rgba(42, 34, 26, 0.88);
+      border-color: #e5c5a1;
+      color: #ffffff;
+    }
+
+    .inquiry-filter-pill.active {
+      background: linear-gradient(180deg, rgba(72, 54, 38, 0.95) 0%, rgba(50, 36, 26, 0.98) 100%);
+      border-color: #d4a76a;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 240, 220, 0.18);
+    }
+
+    .messenger-faq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      max-height: none;
+      overflow: visible;
+      padding: 6px;
+    }
+
+    /* FAQ Chip: Natural Correspondence Cards (De-encapsulated) */
+    .messenger-faq-chip {
+      background: rgba(28, 23, 19, 0.76);
+      border: 1px solid rgba(196, 168, 138, 0.32);
+      border-radius: 8px;
+      padding: 13px 16px;
+      color: #fffaf0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.96rem;
+      font-weight: 500;
+      line-height: 1.45;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+      position: relative;
+    }
+
+    .messenger-faq-chip:hover {
+      background: rgba(48, 38, 30, 0.92);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      transform: none !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(229, 197, 161, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.55);
+    }
+
+    /* FAQ Chip Read State & Gold Ribete */
+    .messenger-faq-chip.is-read {
+      border-color: rgba(212, 168, 83, 0.75);
+      background: linear-gradient(180deg, rgba(46, 36, 26, 0.94) 0%, rgba(32, 24, 18, 0.96) 100%);
+      box-shadow: inset 0 0 14px rgba(212, 168, 83, 0.08), 0 3px 8px rgba(0, 0, 0, 0.45);
+    }
+
+    .messenger-faq-chip-title {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+    }
+
+    .messenger-faq-chip-cat {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #d9c2ab;
+      opacity: 0.95;
+      margin-left: 17px;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: calc(100% - 17px);
+      gap: 8px;
+    }
+
+    .inquiry-read-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #f7d59b;
+      background: rgba(212, 168, 83, 0.16);
+      border: 1px solid rgba(212, 168, 83, 0.45);
+      border-radius: 4px;
+      padding: 1px 6px;
+      letter-spacing: 0.03em;
+      margin-left: auto;
+    }
+
+
+    /* Brass Astrolabe View */
+    .astrolabe-view-card {
+      background: rgba(10, 16, 28, 0.94);
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .astrolabe-bench-header {
+      background: rgba(4, 7, 12, 0.95);
+      border-bottom: 1px solid rgba(212, 168, 83, 0.25);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .astrolabe-bench-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.05em;
+    }
+
+    .astrolabe-bench-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      background: rgba(212, 168, 83, 0.15);
+      color: #ffd885;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .astrolabe-bench-content {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .astrolabe-bench-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .astrolabe-preview-container {
+      background: rgba(4, 6, 10, 0.9);
+      border: 1px solid rgba(212, 168, 83, 0.2);
+      border-radius: 8px;
+      min-height: 480px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .astrolabe-launch-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 480px;
+    }
+
+    .astrolabe-seal-img {
+      width: 120px;
+      height: 120px;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 16px rgba(212, 168, 83, 0.3));
+    }
+
+    .btn-astrolabe-engage-full {
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.35), rgba(122, 84, 28, 0.6));
+      border: 1px solid var(--brass-bright);
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 12px 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s ease;
+    }
+
+    .btn-astrolabe-engage-full:hover {
+      background: linear-gradient(135deg, rgba(255, 224, 153, 0.45), rgba(160, 110, 35, 0.7));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(212, 168, 83, 0.3);
+    }
+
+    .astrolabe-sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .star-pointers-card {
+      background: rgba(6, 10, 18, 0.8);
+      border: 1px solid rgba(212, 168, 83, 0.22);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .star-pointers-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.15);
+      padding-bottom: 6px;
+    }
+
+    .star-pointers-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .star-pointer-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--parchment-dim);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+      padding-bottom: 4px;
+    }
+
+    .star-pointer-item strong {
+      color: var(--brass-bright);
+    }
+
+    .astrolabe-warning-card {
+      background: rgba(246, 173, 85, 0.08);
+      border: 1px solid rgba(246, 173, 85, 0.3);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: #ffd885;
+    }
+

@@ -1,0 +1,302 @@
+    /* =========================================================================
+       VIEW 1: THE CONSTELLATION OVERWORLD (PANORAMIC ADVENTURE EXPEDITION MAP)
+       ========================================================================= */
+    .constellation-map-frame {
+      background: linear-gradient(135deg, rgba(4, 9, 22, 0.99) 0%, rgba(14, 13, 24, 0.98) 45%, rgba(48, 19, 8, 0.99) 100%);
+      border: 1.5px solid var(--brass-base);
+      border-radius: 12px;
+      padding: 16px 14px 20px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(212, 168, 83, 0.18);
+      position: relative;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    /* Renaissance Brass Corner Accents */
+    .map-frame-corner {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--brass-bright);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .corner-tl { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .corner-tr { top: 8px; right: 8px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 8px; left: 8px; border-right: none; border-top: none; }
+    .corner-br { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    .map-canvas-wrap {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+
+    #trail-svg-map {
+      width: 100%;
+      height: auto;
+      display: block;
+      user-select: none;
+    }
+
+    /* Expedition Terrestrial Trail & Terrain Detailing */
+    .expedition-road-casing {
+      fill: none;
+      stroke: rgba(212, 168, 83, 0.18);
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .expedition-road-core {
+      fill: none;
+      stroke: rgba(245, 158, 11, 0.35);
+      stroke-width: 2.2;
+      stroke-dasharray: 5, 5;
+      stroke-linecap: round;
+    }
+
+    .map-terrain-hatching {
+      stroke: rgba(212, 168, 83, 0.22);
+      stroke-width: 0.8;
+      fill: none;
+    }
+
+    /* Filaments & Flowing Energy Particles */
+    .constellation-filament {
+      fill: none !important;
+      stroke: rgba(212, 168, 83, 0.35);
+      stroke-width: 2;
+      stroke-dasharray: 6, 6;
+      transition: stroke 0.5s ease;
+    }
+
+    .constellation-filament.lit {
+      fill: none !important;
+      stroke: var(--brass-bright);
+      stroke-width: 2.5;
+      stroke-dasharray: 8, 4;
+      animation: lightPulseFlow 12s linear infinite;
+      filter: drop-shadow(0 0 8px rgba(255, 224, 153, 0.85));
+    }
+
+    /* Lightning & Storm SVG animations */
+    @keyframes lightningFlash {
+      0%, 90%, 98%, 100% { opacity: 0.28; }
+      91%, 93% { opacity: 0.98; filter: drop-shadow(0 0 16px #fbbf24) drop-shadow(0 0 5px #ffffff); }
+      92% { opacity: 0.45; }
+      94%, 96% { opacity: 0.92; filter: drop-shadow(0 0 12px #fde68a); }
+      95% { opacity: 0.35; }
+    }
+
+    .storm-lightning-bolt {
+      animation: lightningFlash 4.5s infinite ease-in-out;
+    }
+
+    .storm-lightning-bolt.fast {
+      animation: lightningFlash 3.0s infinite ease-in-out 1.2s;
+    }
+
+    .storm-lightning-bolt.alt {
+      animation: lightningFlash 5.2s infinite ease-in-out 2.1s;
+    }
+
+    /* Station 08 Electrostatic Surge Ring Pulse */
+    @keyframes stormRingPulse {
+      0%, 100% { opacity: 0.30; stroke-width: 1.2px; }
+      50% { opacity: 0.70; stroke-width: 2.2px; filter: drop-shadow(0 0 8px #f59e0b); }
+    }
+
+    .storm-pulse-ring {
+      animation: stormRingPulse 3.2s ease-in-out infinite;
+    }
+
+    /* Gale Squall Texture Shimmer */
+    @keyframes galeSquallShimmer {
+      0%, 100% { opacity: 0.28; transform: translateX(0); }
+      50% { opacity: 0.55; transform: translateX(-6px); }
+    }
+
+    .storm-gale-squall {
+      animation: galeSquallShimmer 5s ease-in-out infinite;
+    }
+
+    /* Sand Dust Drift */
+    @keyframes sandDustDrift {
+      0% { transform: translateX(0); opacity: 0.4; }
+      50% { transform: translateX(-15px); opacity: 0.8; }
+      100% { transform: translateX(0); opacity: 0.4; }
+    }
+
+    .sand-dust-layer {
+      animation: sandDustDrift 8s ease-in-out infinite;
+    }
+
+    @keyframes lightPulseFlow {
+      from { stroke-dashoffset: 240; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Star Nodes (Smooth, Non-jumping hover) */
+    .map-node-trigger {
+      cursor: pointer;
+      outline: none;
+    }
+
+    .node-outer-gear {
+      fill: none;
+      stroke: var(--brass-base);
+      stroke-width: 1.2;
+      stroke-dasharray: 4, 3;
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+
+    .map-node-trigger:hover .node-outer-gear {
+      stroke: var(--cyan-beam);
+      opacity: 0.95;
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 8px var(--cyan-beam));
+    }
+
+    .node-orbit-ring {
+      fill: none;
+      stroke: var(--brass-bright);
+      stroke-width: 1;
+      opacity: 0.3;
+      transition: all 0.25s ease;
+    }
+
+    .map-node-trigger:hover .node-orbit-ring {
+      stroke: var(--cyan-beam);
+      opacity: 0.9;
+      stroke-width: 1.8;
+    }
+
+    .node-dot-completed {
+      fill: var(--brass-bright);
+      filter: drop-shadow(0 0 9px rgba(255, 224, 153, 0.9));
+    }
+
+    /* Active Node: Keplerian Orbital Rings */
+    .node-dot-active {
+      fill: var(--cyan-beam);
+      filter: drop-shadow(0 0 16px var(--cyan-beam));
+    }
+
+    .active-beacon-pulse {
+      fill: none;
+      stroke: var(--cyan-beam);
+      stroke-width: 1.5;
+      animation: beaconWave 2.8s infinite cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes beaconWave {
+      0% { r: 14; opacity: 1; }
+      100% { r: 48; opacity: 0; }
+    }
+
+
+    .node-dot-veiled {
+      fill: #141c28;
+      stroke: #334155;
+      stroke-width: 1.5;
+    }
+
+    .node-dot-future {
+      fill: #1a150e;
+      stroke: #e2b069;
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 10px rgba(226, 176, 105, 0.7));
+    }
+
+    .future-filament {
+      stroke: #e2b069;
+      stroke-width: 1.8;
+      stroke-dasharray: 4, 6;
+      animation: dashFlow 2.4s linear infinite;
+    }
+
+    @keyframes dashFlow {
+      from { stroke-dashoffset: 20; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Inspector Countdown Bar */
+    .inspector-countdown-bar {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin: 14px 0 8px 0;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(226, 176, 105, 0.08) 0%, rgba(10, 16, 26, 0.95) 100%);
+      border: 1px solid rgba(226, 176, 105, 0.35);
+      border-radius: 8px;
+      box-shadow: inset 0 0 15px rgba(226, 176, 105, 0.05);
+    }
+
+    .countdown-top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .countdown-pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: #e2b069;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px #e2b069;
+      animation: liveBlink 1.4s infinite;
+    }
+
+    .countdown-title-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: #e2b069;
+      font-weight: 700;
+    }
+
+    .countdown-station-ref {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: rgba(226, 232, 240, 0.5);
+    }
+
+    .countdown-digits-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #ffe099;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .countdown-unit-box {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    .countdown-unit-box small {
+      font-size: 0.65rem;
+      color: rgba(255, 224, 153, 0.65);
+      text-transform: uppercase;
+    }
+
+    .countdown-footer-msg {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.76rem;
+      color: rgba(226, 232, 240, 0.75);
+      line-height: 1.4;
+      font-style: italic;
+    }
+

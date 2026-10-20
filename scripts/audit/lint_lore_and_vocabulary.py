@@ -29,7 +29,7 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # Files/Directories to inspect
 TARGET_DIRS = ["docs", "emails", "journal", "scripts", "web", ".agents", ".cursor"]
-TARGET_EXTS = {".md", ".html", ".js", ".json", ".py", ".mdc"}
+TARGET_EXTS = {".md", ".html", ".js", ".css", ".json", ".py", ".mdc"}  # .css: the Hub's styles live in web/hub/css
 
 # Ignore paths
 IGNORE_DIRS = {".git", ".gemini", "scratch", "node_modules", ".wrangler"}

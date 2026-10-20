@@ -1,0 +1,244 @@
+    /* ===================================================================
+       STATION 14 · THE SUN MONOLITH & CAIRN II (THE WALKING SUN)
+       The .monolith-* shell (backdrop, window, header, telemetry, cards, buttons, sigil input,
+       feedback, lock note, victory, equations, dispatch) is shared by Station 15.
+       =================================================================== */
+    .monolith-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: radial-gradient(circle at 50% 20%, rgba(38, 24, 10, 0.96) 0%, rgba(8, 5, 2, 0.99) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+      animation: unlockFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .monolith-modal-backdrop.closing { animation: unlockFadeIn 0.25s reverse forwards; }
+    .monolith-window {
+      width: 100%;
+      max-width: 1240px;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      background: #17100a;
+      border: 2px solid #d4a853;
+      border-radius: 12px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95), 0 0 35px rgba(245, 158, 11, 0.25);
+      overflow: hidden;
+    }
+    .monolith-header {
+      padding: 14px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1.5px solid rgba(212, 168, 83, 0.35);
+      background: rgba(28, 19, 10, 0.98);
+    }
+    .monolith-title-wrap { display: flex; align-items: center; gap: 12px; }
+    .monolith-title-icon { font-size: 1.6rem; }
+    .monolith-title { margin: 0; font-family: 'Cinzel', serif; font-size: 1.15rem; letter-spacing: 0.08em; color: #fde68a; }
+    .monolith-subtitle { font-size: 0.78rem; color: #d6c3a0; margin-top: 2px; }
+    .monolith-close-btn {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 168, 83, 0.5);
+      background: rgba(212, 168, 83, 0.1);
+      color: #fde68a;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .monolith-close-btn:hover { background: rgba(212, 168, 83, 0.25); }
+    .monolith-telemetry {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      padding: 9px 22px;
+      font-size: 0.74rem;
+      letter-spacing: 0.04em;
+      color: #b8a07a;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.18);
+      background: rgba(20, 13, 7, 0.9);
+    }
+    .monolith-telemetry strong { color: #fde68a; margin-left: 4px; }
+    .monolith-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 16px;
+      padding: 16px 22px 20px;
+      overflow-y: auto;
+    }
+    @media (max-width: 980px) {
+      .monolith-body { grid-template-columns: minmax(0, 1fr); padding: 12px 14px 16px; }
+      .monolith-header, .monolith-telemetry { padding-left: 14px; padding-right: 14px; }
+    }
+    .monolith-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+    .monolith-card {
+      border: 1px solid rgba(212, 168, 83, 0.28);
+      border-radius: 10px;
+      background: rgba(32, 22, 12, 0.85);
+      padding: 12px 14px;
+    }
+    .monolith-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      color: #fbbf24;
+      margin-bottom: 6px;
+    }
+    .monolith-card p { margin: 0 0 8px; font-size: 0.84rem; line-height: 1.5; color: #e7d9bf; }
+    .monolith-key-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .monolith-key-input {
+      flex: 1 1 160px;
+      min-width: 0;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 168, 83, 0.55);
+      background: #0f0a05;
+      color: #fde68a;
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+    .monolith-key-input:focus { outline: 2px solid #f59e0b; outline-offset: 1px; }
+    .monolith-btn {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid #d4a853;
+      background: rgba(212, 168, 83, 0.16);
+      color: #fde68a;
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .monolith-btn:hover:not(:disabled) { background: rgba(212, 168, 83, 0.3); transform: translateY(-1px); }
+    .monolith-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .monolith-btn-primary { background: rgba(245, 158, 11, 0.24); border-color: #f59e0b; }
+    .monolith-feedback { min-height: 1.2em; margin-top: 6px; font-size: 0.8rem; color: #d6c3a0; }
+    .monolith-feedback.is-error { color: #fca5a5; }
+    .monolith-feedback.is-ok { color: #86efac; }
+    .monolith-game { position: relative; }
+    .monolith-game.is-locked .monolith-game-inner { filter: grayscale(0.9) brightness(0.45); pointer-events: none; }
+    .monolith-lock-note {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: max-content;
+      max-width: calc(100% - 32px);
+      text-align: center;
+      padding: 12px 18px;
+      background: #1a120b;
+      border: 1px solid rgba(212, 168, 83, 0.55);
+      border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+      font-family: 'Cinzel', serif;
+      font-size: 0.86rem;
+      letter-spacing: 0.06em;
+      color: #fde68a;
+      pointer-events: none;
+    }
+    .monolith-game:not(.is-locked) .monolith-lock-note { display: none; }
+    .monolith-card.is-collapsed p,
+    .monolith-card.is-collapsed .monolith-key-row { display: none; }
+    .monolith-card.is-collapsed .monolith-feedback { margin-top: 0; }
+    .monolith-sky {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 130px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #1e2a44 0%, #6b4a2a 85%, #3a2614 100%);
+      touch-action: none;
+      cursor: grab;
+    }
+    .monolith-pavement {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 380px;
+      margin-top: 8px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 70%, #3b2a17 0%, #1f160c 75%);
+    }
+    .monolith-time-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    /* right-to-left so the thumb moves with the sun: east (morning) on the right, west (evening) on the left */
+    .monolith-time-row input[type="range"] { flex: 1; min-width: 0; accent-color: #f59e0b; direction: rtl; }
+    .monolith-time-label { min-width: 4.4em; text-align: center; font-family: 'Cinzel', serif; color: #fde68a; }
+    .monolith-step-btn { padding: 6px 9px; font-size: 0.75rem; }
+    .monolith-mark-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .monolith-inscription { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+    .monolith-inscription li {
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: #e7d9bf;
+      padding-left: 1.6em;
+      position: relative;
+    }
+    .monolith-inscription li::before {
+      content: attr(data-num);
+      position: absolute;
+      left: 0;
+      font-family: 'Cinzel', serif;
+      color: #b8a07a;
+    }
+    .monolith-inscription li.is-found { color: #a7f3d0; }
+    .monolith-inscription li.is-found::before { content: '✓'; color: #86efac; }
+    .monolith-fragments { display: grid; gap: 8px; }
+    .monolith-fragment {
+      border-left: 3px solid #f59e0b;
+      padding: 6px 10px;
+      background: rgba(245, 158, 11, 0.07);
+      font-style: italic;
+      font-size: 0.85rem;
+      color: #fde68a;
+      border-radius: 0 6px 6px 0;
+    }
+    .monolith-fragment.is-sealed { border-left-color: rgba(212, 168, 83, 0.25); background: transparent; color: #7a6a52; font-style: normal; }
+    .monolith-dispatch { font-size: 0.82rem; line-height: 1.5; color: #e7d9bf; font-style: italic; }
+    .monolith-dispatch-sender { font-size: 0.7rem; letter-spacing: 0.08em; color: #b8a07a; margin-bottom: 4px; font-style: normal; }
+    .monolith-victory { border-color: #86efac; background: rgba(20, 40, 25, 0.55); }
+    .monolith-victory .monolith-card-title { color: #86efac; }
+    .monolith-equation {
+      display: inline-block;
+      margin: 2px 8px 6px 0;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(253, 230, 138, 0.45);
+      font-family: 'Cinzel', serif;
+      color: #fde68a;
+      letter-spacing: 0.06em;
+    }
+    .monolith-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .monolith-svg-mark { cursor: default; }
+    .monolith-svg-mark.is-awake circle { stroke: #86efac; fill: rgba(134, 239, 172, 0.22); }
+    .monolith-svg-mark.is-near circle { stroke: #fbbf24; fill: rgba(251, 191, 36, 0.25); }
+    @media (prefers-reduced-motion: reduce) {
+      .monolith-modal-backdrop, .monolith-modal-backdrop.closing { animation: none; }
+      .monolith-btn { transition: none; }
+    }
+

@@ -1,0 +1,322 @@
+    /* =====================================================================
+       SANCTUARY GATE — SEEKER AUTHENTICATION MODAL & PROFILE CONTROLLER
+       ===================================================================== */
+    .sanctuary-gate-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: radial-gradient(circle at center, rgba(12, 18, 32, 0.94) 0%, rgba(3, 6, 12, 0.98) 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
+    }
+
+    .sanctuary-gate-overlay.gate-hidden {
+      display: none !important;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .sanctuary-gate-card {
+      width: 100%;
+      max-width: 440px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(9, 14, 26, 0.98) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.45);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 168, 83, 0.2);
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: gatePopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes gatePopIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .sanctuary-gate-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 15%;
+      right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--brass-bright), transparent);
+    }
+
+    .gate-sigil-emblem {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 168, 83, 0.15) 0%, rgba(5, 10, 18, 0.9) 80%);
+      border: 1.5px solid var(--brass-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 18px;
+      box-shadow: 0 0 20px rgba(212, 168, 83, 0.25);
+    }
+
+    .gate-sigil-ring {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px dashed rgba(212, 168, 83, 0.35);
+      animation: spinSigil 30s linear infinite;
+    }
+
+    @keyframes spinSigil {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .gate-sigil-inner {
+      font-size: 2rem;
+      color: var(--brass-bright);
+      line-height: 1;
+      text-shadow: 0 0 10px rgba(223, 178, 86, 0.5);
+    }
+
+    .gate-header {
+      margin-bottom: 24px;
+    }
+
+    .gate-order-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--cyan-beam);
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .gate-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 8px;
+      letter-spacing: 0.06em;
+    }
+
+    .gate-desc {
+      font-family: 'Lora', serif;
+      font-size: 0.88rem;
+      color: var(--parchment-dim);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .gate-auth-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+    }
+
+    .gate-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .gate-field-group label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--brass-bright);
+    }
+
+    .gate-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .gate-input-icon {
+      position: absolute;
+      left: 14px;
+      font-size: 1rem;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .gate-input-wrap input {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      background: rgba(4, 7, 14, 0.95);
+      border: 1.5px solid rgba(212, 168, 83, 0.35);
+      border-radius: 8px;
+      color: #ffffff;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .gate-input-wrap input:focus {
+      border-color: var(--cyan-beam);
+      box-shadow: 0 0 16px rgba(79, 227, 193, 0.4);
+      background: #02050b;
+    }
+
+    .gate-error-msg {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      color: #fca5a5;
+      background: rgba(248, 113, 113, 0.15);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-align: center;
+      animation: shakeCard 0.3s ease;
+    }
+
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .gate-submit-btn {
+      margin-top: 6px;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.25) 0%, rgba(184, 134, 11, 0.4) 100%);
+      border: 1.5px solid var(--brass-bright);
+      border-radius: 8px;
+      color: #ffffff;
+      font-family: 'Cinzel', serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    .gate-submit-btn:hover {
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.45) 0%, rgba(79, 227, 193, 0.35) 100%);
+      border-color: var(--cyan-beam);
+      box-shadow: 0 0 20px rgba(79, 227, 193, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .gate-footer-note {
+      margin-top: 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: rgba(212, 168, 83, 0.45);
+      text-transform: uppercase;
+    }
+
+    /* Header Profile Pill & Switch Button */
+    .viewport-header-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .seeker-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      background: rgba(14, 22, 38, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.4);
+      border-radius: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.76rem;
+      color: var(--brass-bright);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .seeker-pill:hover {
+      border-color: var(--brass-bright);
+      box-shadow: 0 0 12px rgba(212, 168, 83, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .seeker-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan-beam);
+      box-shadow: 0 0 8px var(--cyan-beam);
+    }
+
+    .seeker-pill.is-carles .seeker-dot {
+      background: #fbbf24;
+      box-shadow: 0 0 8px #fbbf24;
+    }
+
+    .btn-seeker-switch {
+      background: rgba(212, 168, 83, 0.12);
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      color: var(--parchment-dim);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-seeker-switch:hover {
+      background: rgba(212, 168, 83, 0.25);
+      color: #ffffff;
+      border-color: var(--brass-bright);
+      transform: translateY(-1px);
+    }
+
+    .btn-dev-storm-toggle-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(35, 12, 5, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      border-radius: 6px;
+      color: #fde68a;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-dev-storm-toggle-header:hover {
+      background: rgba(70, 25, 10, 0.95);
+      border-color: #fbbf24;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+

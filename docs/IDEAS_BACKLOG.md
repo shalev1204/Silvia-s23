@@ -106,7 +106,7 @@ Pendiente de especificar.
 ### 16. Vista previa de impresión de las 8 hojas (S)
 Pendiente de especificar.
 
-### 17. Dividir `index.html` (L) · especificada
+### 17. Dividir `index.html` (L) · implementada y verificada (20-10-2026)
 **Punto de partida**: CSS ~10.200 líneas en un `<style>` (196 comentarios de sección); HTML ~4.000; JS principal ~15.000 en un `<script>`: un núcleo de ~7.900 líneas (una sola clausura) seguido de 16 IIFE ya aisladas (`initGrandDesertMapAndChasm`, `initTesterPanel`, `initSunMonolith` … `initMasksGate`, `initSandstormLockdown`), que se comunican por `window.*`. El Operador abre el Hub por `file://`: no se pueden usar módulos ES.
 
 **Decisiones (20-10-2026)**
@@ -118,6 +118,13 @@ Pendiente de especificar.
 
 **Fuera de alcance**: partir el núcleo de 7.900 líneas (pasada posterior, si hace falta), inyectar el HTML de los modales desde JS, minificar.
 **Verificación**: concatenación idéntica al original (JS y CSS); smoke completo en verde con el mismo número de comprobaciones; lint de lore; abrir el Hub por `file://` sin errores en consola.
+
+**Resultado (20-10-2026)**
+- `web/index.html`: **29.247 → 4.039 líneas**. 27 hojas en `web/hub/css/` (8 de estación en `stations/`) y 18 scripts en `web/hub/js/` (`hub-core.js` de 7.868 líneas, `profiles.js`, 11 de estación en `stations/` y 5 piezas: mapa del amanecer, alforja y Cairn I, tester, atajos y tormenta). El pequeño script del `<head>` que fija el tema antes de pintar sigue en línea.
+- **Prueba de identidad**: al volver a meter cada archivo en línea sale, byte a byte, el `index.html` anterior. Único cambio de texto: 3 `url('./assets/…')` del CSS pasan a `../../assets/…`, porque en una hoja externa la ruta se resuelve desde su carpeta.
+- Smoke completo: **206 comprobaciones en verde** (382 s). `lint_lore_and_vocabulary.py` limpio y ahora también revisa `.css` (antes el CSS estaba dentro del HTML y sí se revisaba). Por `file://`: carga sin errores, 30 hojas, perfiles y Espejo Vivo presentes.
+- Actualizados `docs/HANDOFF_STAGE_PATH.md` (patrón por estación), `docs/WEB_ECOSYSTEM.md`, `docs/REPOSITORY_STRUCTURE.md` y `web/README.md`.
+- Nota: un error en un archivo ya no detiene a los siguientes (antes, un fallo en el núcleo paraba todo el `<script>`).
 
 ### 18. Smoke más rápido (M) · implementada y verificada (20-10-2026)
 **Decisiones (20-10-2026)**

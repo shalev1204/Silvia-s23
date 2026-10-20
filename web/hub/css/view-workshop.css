@@ -1,0 +1,940 @@
+    /* =========================================================================
+       VIEW: THE CLIFFSIDE WORKSHOP (ARTISAN ROCK RELAY & SALVAGED MECHANICS)
+       ========================================================================= */
+    #view-field-wire {
+      position: relative;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0 0 50px;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    #view-field-wire::before {
+      display: none;
+    }
+
+    #view-field-wire > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    #view-field-wire .view-header {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    #view-field-wire .view-tagline {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: #dbe8c3;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding: 6px 22px;
+      background: rgba(18, 24, 17, 0.7);
+      border: 1px solid rgba(163, 179, 130, 0.4);
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 16px rgba(163, 179, 130, 0.2);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 12px rgba(184, 199, 153, 0.4);
+    }
+
+    #view-field-wire .view-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2.35rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #f7f2e7;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95), 0 0 28px rgba(184, 199, 153, 0.35);
+      margin-bottom: 12px;
+    }
+
+    #view-field-wire .view-desc {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 1.06rem;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.68;
+      letter-spacing: 0.01em;
+      color: #faf5ed;
+      max-width: 840px;
+      margin: 0 auto;
+      padding: 0;
+      background: none;
+      border: none;
+      border-radius: 0;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      box-shadow: none;
+      text-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.98),
+        0 1px 2px rgba(0, 0, 0, 1),
+        0 0 16px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Messenger Main Container */
+    .camp-messenger-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    /* Handcrafted Rock Workshop Chassis - Outer Container Box Removed */
+    .rig-chassis-desert.rig-chassis-workshop {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Forged Iron Corner Brackets hidden since outer chassis box is removed */
+    .rig-corner-bracket {
+      display: none !important;
+    }
+
+    .screw-slot {
+      display: none !important;
+    }
+
+
+
+    /* Messenger Frame (The Display Viewport Screen) - Handcrafted Warm Artisan Brown Palette */
+    .messenger-app-window {
+      background: linear-gradient(180deg, rgba(30, 22, 16, 0.9) 0%, rgba(20, 14, 10, 0.94) 100%);
+      border: 1.5px solid rgba(196, 168, 138, 0.48);
+      border-radius: 16px;
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.78),
+        0 0 35px rgba(84, 58, 38, 0.35),
+        inset 0 1px 0 rgba(240, 222, 198, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: auto;
+      height: auto;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* Top Bar (Contact Info & Controls) */
+    .messenger-top-bar {
+      position: relative;
+      background: 
+        radial-gradient(ellipse 420px 80px at 8% 50%, rgba(212, 168, 83, 0.16) 0%, transparent 75%),
+        radial-gradient(ellipse 360px 80px at 50% 50%, rgba(184, 152, 118, 0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 420px 80px at 92% 50%, rgba(140, 105, 75, 0.14) 0%, transparent 75%),
+        linear-gradient(180deg, rgba(46, 34, 25, 0.98) 0%, rgba(28, 20, 14, 0.98) 100%);
+      border-bottom: 1.5px solid rgba(196, 168, 138, 0.38);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .messenger-top-bar > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Decorative Renaissance Cartography & Astrolabe Header Filigree across the entire width */
+    .messenger-top-bar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        /* Precision Astrolabe / Vernier Graduated Ruler Scale along the bottom edge */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='9' viewBox='0 0 160 9' fill='none'%3E%3Cline x1='0' y1='8' x2='160' y2='8' stroke='rgba(214,188,160,0.30)' stroke-width='1'/%3E%3Cline x1='0' y1='0' x2='0' y2='8' stroke='rgba(235,214,190,0.55)' stroke-width='1.2'/%3E%3Cline x1='16' y1='4' x2='16' y2='8' stroke='rgba(214,188,160,0.22)' stroke-width='0.8'/%3E%3Cline x1='32' y1='4' x2='32' y2='8' stroke='rgba(214,188,160,0.22)' stroke-width='0.8'/%3E%3Cline x1='48' y1='4' x2='48' y2='8' stroke='rgba(214,188,160,0.22)' stroke-width='0.8'/%3E%3Cline x1='64' y1='2' x2='64' y2='8' stroke='rgba(214,188,160,0.38)' stroke-width='1'/%3E%3Cline x1='80' y1='0' x2='80' y2='8' stroke='rgba(235,214,190,0.50)' stroke-width='1.2'/%3E%3Cline x1='96' y1='4' x2='96' y2='8' stroke='rgba(214,188,160,0.22)' stroke-width='0.8'/%3E%3Cline x1='112' y1='4' x2='112' y2='8' stroke='rgba(214,188,160,0.22)' stroke-width='0.8'/%3E%3Cline x1='128' y1='4' x2='128' y2='8' stroke='rgba(214,188,160,0.22)' stroke-width='0.8'/%3E%3Cline x1='144' y1='2' x2='144' y2='8' stroke='rgba(214,188,160,0.38)' stroke-width='1'/%3E%3C/svg%3E"),
+        /* Celestial Meridian Grid, Orbital Radii & Cartographic Dunes spanning full width */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='68' viewBox='0 0 1000 68' fill='none'%3E%3Cpath d='M0 34h1000' stroke='rgba(214,188,160,0.06)' stroke-width='0.8' stroke-dasharray='4 8'/%3E%3Cpath d='M0 18c160 12 340-12 500 0s340 12 500 0' stroke='rgba(212,168,83,0.09)' stroke-width='0.9'/%3E%3Cpath d='M0 50c180-14 320 14 500 0s320-14 500 0' stroke='rgba(212,168,83,0.07)' stroke-width='0.9'/%3E%3Ccircle cx='46' cy='34' r='88' stroke='rgba(212,168,83,0.12)' stroke-width='0.8' stroke-dasharray='3 5'/%3E%3Ccircle cx='46' cy='34' r='54' stroke='rgba(212,168,83,0.09)' stroke-width='0.8'/%3E%3Ccircle cx='46' cy='34' r='140' stroke='rgba(214,188,160,0.06)' stroke-width='0.8' stroke-dasharray='6 8'/%3E%3Ccircle cx='954' cy='34' r='90' stroke='rgba(212,168,83,0.09)' stroke-width='0.8' stroke-dasharray='4 6'/%3E%3Ccircle cx='500' cy='34' r='180' stroke='rgba(214,188,160,0.05)' stroke-width='0.8' stroke-dasharray='2 6'/%3E%3Cpath d='M280 20l3 3-3 3-3-3z' fill='rgba(247,213,155,0.18)'/%3E%3Cpath d='M720 46l3 3-3 3-3-3z' fill='rgba(247,213,155,0.16)'/%3E%3C/svg%3E");
+      background-position: bottom left, center center;
+      background-repeat: repeat-x, repeat-x;
+      background-size: 160px 9px, 1000px 68px;
+      opacity: 0.92;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .messenger-contact-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .workshop-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #56412f, #261a12);
+      border: 2px solid #b89876;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fffaf0;
+      box-shadow: 0 0 14px rgba(184, 152, 118, 0.35);
+      position: relative;
+    }
+
+    .avatar-gear-ring {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(214, 188, 160, 0.7);
+      animation: gearSpinClockwise 24s linear infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .messenger-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #483424, #261a12);
+      border: 2px solid #d4ba9f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(184, 152, 118, 0.35);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .messenger-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .messenger-online-badge {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #7e946a;
+      border: 2px solid #241912;
+      box-shadow: 0 0 6px rgba(126, 148, 106, 0.85);
+      z-index: 3;
+    }
+
+    /* Header Contact Name (Displays Chosen Name between avatar and status) */
+    .messenger-contact-name-wrap {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 4px;
+      animation: contactNameFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes contactNameFadeIn {
+      from { opacity: 0; transform: translateY(-2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .messenger-contact-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.94rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff9ed;
+      text-shadow: 0 0 10px rgba(247, 213, 155, 0.45);
+      white-space: nowrap;
+      transition: font-size 0.25s ease, letter-spacing 0.25s ease;
+    }
+    .messenger-contact-name.long-title {
+      font-size: 0.73rem;
+      letter-spacing: 0.025em;
+    }
+    @media (max-width: 650px) {
+      .messenger-contact-name {
+        font-size: 0.76rem;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .messenger-contact-name.long-title {
+        font-size: 0.65rem;
+        max-width: 130px;
+      }
+    }
+
+    /* Hermes Online/Offline Toggle Button (Compact) */
+    .btn-hermes-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 23px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.35s ease;
+    }
+
+    /* Online State (Always Emerald Green) */
+    .btn-hermes-status.online {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(74, 222, 128, 0.45);
+      color: #86efac;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4), 0 0 6px rgba(34, 197, 94, 0.22);
+    }
+
+    .btn-hermes-status.online:hover {
+      background: rgba(34, 197, 94, 0.20);
+      border-color: rgba(74, 222, 128, 0.75);
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.45);
+    }
+
+    .btn-hermes-status.online .status-indicator-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 6px rgba(74, 222, 128, 0.95);
+      animation: onlineBeaconPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes onlineBeaconPulse {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 10px rgba(74, 222, 128, 1); }
+    }
+
+    /* Offline State */
+    .btn-hermes-status.offline {
+      background: rgba(40, 32, 26, 0.85) !important;
+      border: 1px solid rgba(168, 140, 115, 0.35) !important;
+      color: #a89a8c !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    .btn-hermes-status.offline:hover {
+      background: rgba(56, 44, 36, 0.9) !important;
+      border-color: rgba(214, 188, 160, 0.5) !important;
+      color: #d6ccc2 !important;
+    }
+
+    .btn-hermes-status.offline .status-indicator-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #78716c !important;
+      box-shadow: none !important;
+      animation: none !important;
+    }
+
+
+
+    /* Analog Signal Meter (Galvanometer / Brass Carrier Signal) */
+    .telegraph-signal-meter {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 6px;
+      user-select: none;
+    }
+
+    .signal-gauge-housing {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .signal-indicator-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 14px;
+    }
+
+    .signal-indicator-bars .signal-bar {
+      width: 4px;
+      background: rgba(184, 152, 118, 0.25);
+      border-radius: 1px;
+      transition: background 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease;
+    }
+
+    .signal-indicator-bars .signal-bar:nth-child(1) { height: 5px; }
+    .signal-indicator-bars .signal-bar:nth-child(2) { height: 8px; }
+    .signal-indicator-bars .signal-bar:nth-child(3) { height: 11px; }
+    .signal-indicator-bars .signal-bar:nth-child(4) { height: 14px; }
+
+    .signal-indicator-bars .signal-bar.active {
+      background: linear-gradient(180deg, #f7d59b, #d4a76a);
+      box-shadow: 0 0 5px rgba(212, 167, 106, 0.6);
+    }
+
+    .signal-indicator-bars .signal-bar.pulse {
+      background: linear-gradient(180deg, #ffe0a3, #e59866);
+      animation: signalBarFlicker 2.5s infinite ease-in-out;
+    }
+
+    /* Signal Meter dynamic color tiers (Galvanic Copper to Radiant Emerald) */
+    /* Level 1 · Sandstorm / Low: Warm Copper Amber (Filamento de Cobre Cálido) */
+    .telegraph-signal-meter[data-level="1"] .signal-bar.active {
+      background: linear-gradient(180deg, #f3b179, #cf6e2b);
+      box-shadow: 0 0 5px rgba(207, 110, 43, 0.65);
+    }
+    .telegraph-signal-meter[data-level="1"] .signal-bar.pulse {
+      background: linear-gradient(180deg, #f8c9a0, #e58c42);
+    }
+    .telegraph-signal-meter[data-level="1"] .signal-beacon-dot {
+      background: #e58c42;
+      border-color: #3d2215;
+      box-shadow: 0 0 7px rgba(229, 140, 66, 0.85);
+    }
+    .telegraph-signal-meter[data-level="1"] .signal-val {
+      color: #f7d5b8;
+    }
+
+    /* Level 2 · Mid-Low: Antique Brass / Old Gold (Oro Viejo / Latón) */
+    .telegraph-signal-meter[data-level="2"] .signal-bar.active {
+      background: linear-gradient(180deg, #fde49e, #cfa041);
+      box-shadow: 0 0 5px rgba(207, 160, 65, 0.65);
+    }
+    .telegraph-signal-meter[data-level="2"] .signal-bar.pulse {
+      background: linear-gradient(180deg, #fff0c2, #d4a853);
+    }
+    .telegraph-signal-meter[data-level="2"] .signal-beacon-dot {
+      background: #d4a853;
+      border-color: #362914;
+      box-shadow: 0 0 7px rgba(212, 168, 83, 0.85);
+    }
+    .telegraph-signal-meter[data-level="2"] .signal-val {
+      color: #fef0cd;
+    }
+
+    /* Level 3 · Good: Soft Sage Malachite (Verde Salvia / Pátina Noble) */
+    .telegraph-signal-meter[data-level="3"] .signal-bar.active {
+      background: linear-gradient(180deg, #cce8bf, #6e9f5a);
+      box-shadow: 0 0 5px rgba(110, 159, 90, 0.65);
+    }
+    .telegraph-signal-meter[data-level="3"] .signal-bar.pulse {
+      background: linear-gradient(180deg, #dcf2d2, #86b374);
+    }
+    .telegraph-signal-meter[data-level="3"] .signal-beacon-dot {
+      background: #86b374;
+      border-color: #1e2c1a;
+      box-shadow: 0 0 7px rgba(134, 179, 116, 0.85);
+    }
+    .telegraph-signal-meter[data-level="3"] .signal-val {
+      color: #e4f4dc;
+    }
+
+    /* Level 4 · Optimal: Radiant Emerald (Verde Esmeralda Resonante) */
+    .telegraph-signal-meter[data-level="4"] .signal-bar.active {
+      background: linear-gradient(180deg, #a7f3d0, #22c55e);
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.75);
+    }
+    .telegraph-signal-meter[data-level="4"] .signal-bar.pulse {
+      background: linear-gradient(180deg, #bbf7d0, #4ade80);
+    }
+    .telegraph-signal-meter[data-level="4"] .signal-beacon-dot {
+      background: #4ade80;
+      border-color: #122416;
+      box-shadow: 0 0 8px rgba(74, 222, 128, 0.95);
+    }
+    .telegraph-signal-meter[data-level="4"] .signal-val {
+      color: #d1fae5;
+    }
+
+    @keyframes signalBarFlicker {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 0.35; }
+    }
+
+    .signal-beacon-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #7e946a;
+      border: 1.5px solid #241912;
+      box-shadow: 0 0 7px rgba(126, 148, 106, 0.85);
+      animation: carrierPulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes carrierPulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 6px rgba(126, 148, 106, 0.85); }
+      50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px rgba(126, 148, 106, 1); }
+    }
+
+    .signal-meta-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: #dfcbba;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      flex-wrap: nowrap;
+    }
+
+    .signal-meta-text .signal-val {
+      color: #ffe8cc;
+      font-weight: 700;
+    }
+
+    @media (max-width: 960px) {
+      .messenger-top-bar {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .messenger-controls-group {
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .messenger-mode-switcher {
+        height: 32px;
+      }
+      .messenger-toggle-btn {
+        min-width: 84px;
+        padding: 0 10px;
+        font-size: 0.73rem;
+      }
+    }
+
+    /* Segmented Mode Switcher Keys */
+    .messenger-controls-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .messenger-mode-switcher {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      background: rgba(22, 16, 12, 0.94);
+      border: 1.5px solid rgba(196, 168, 138, 0.45);
+      border-radius: 999px;
+      padding: 2px;
+      gap: 3px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    .messenger-toggle-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      height: 100%;
+      padding: 0 14px;
+      min-width: 100px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.77rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: #d9c5b2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .messenger-toggle-btn:hover {
+      color: #ffffff;
+      background: rgba(184, 152, 118, 0.12);
+    }
+
+    .messenger-toggle-btn.active {
+      background: linear-gradient(180deg, rgba(92, 70, 52, 0.95) 0%, rgba(68, 50, 36, 0.95) 100%);
+      color: #ffffff;
+      border: 1px solid #c9aa8b;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .messenger-btn-restart {
+      background: rgba(38, 28, 20, 0.9);
+      border: 1.5px solid rgba(184, 152, 118, 0.45);
+      color: #ebd8c5;
+      font-size: 1rem;
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+    }
+
+    .messenger-btn-restart:hover {
+      background: rgba(64, 48, 34, 0.98);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(229, 197, 161, 0.4), 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Global replay button removed for everyone */
+    #btn-wire-replay {
+      display: none !important;
+    }
+
+    /* Mini Rewind Button beside messages: Exclusively for Carles (Tester Sandbox) */
+    .carles-rewind-btn {
+      display: none;
+      width: 26px;
+      height: 26px;
+      min-width: 26px;
+      min-height: 26px;
+      border-radius: 6px;
+      background: rgba(38, 28, 20, 0.9);
+      border: 1.5px solid rgba(184, 152, 118, 0.45);
+      color: #ebd8c5;
+      font-size: 0.85rem;
+      line-height: 1;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, color 0.16s ease, transform 0.16s ease;
+      flex-shrink: 0;
+      align-self: center;
+      user-select: none;
+    }
+
+    .carles-rewind-btn:hover {
+      background: rgba(64, 48, 34, 0.98);
+      border-color: #e5c5a1;
+      color: #ffffff;
+      box-shadow: inset 0 0 0 1px rgba(229, 197, 161, 0.4), 0 2px 8px rgba(0, 0, 0, 0.5);
+      transform: scale(1.15);
+    }
+
+    .carles-rewind-btn:active {
+      transform: scale(0.92);
+    }
+
+    body[data-active-seeker="carles"] .carles-rewind-btn {
+      display: inline-flex;
+    }
+
+    body:not([data-active-seeker="carles"]) .carles-rewind-btn {
+      display: none !important;
+    }
+
+    body[data-active-seeker="carles"] .chat-bubble-wrap {
+      max-width: 88%;
+    }
+
+    /* Chat Messages Canvas: Semi-transparent Textured Slate Gray (Natural Workshop Bedrock Relay) */
+    .messenger-chat-body {
+      flex: none;
+      padding: 26px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 280px;
+      height: auto;
+      max-height: none;
+      overflow: visible;
+      background-color: rgba(18, 22, 28, 0.65);
+      background-image:
+        radial-gradient(ellipse at 50% 8%, rgba(200, 215, 235, 0.08) 0%, rgba(10, 14, 20, 0.72) 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0px, rgba(255, 255, 255, 0.014) 1px, transparent 1px, transparent 4px),
+        linear-gradient(rgba(180, 195, 215, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(180, 195, 215, 0.035) 1px, transparent 1px);
+      background-size: 100% 100%, 4px 4px, 28px 28px, 28px 28px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: inset 0 2px 20px rgba(0, 0, 0, 0.65), inset 0 0 0 1px rgba(180, 195, 215, 0.08);
+    }
+
+    /* Ask Hermes Inquiries Chat: Clean Empty Standby State */
+    #wire-inquiries-stream:empty {
+      min-height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #wire-inquiries-stream:empty::after {
+      content: '✦ Telegraph frequency ready · Tap any question below to ask Hermes ✦';
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      color: rgba(229, 197, 161, 0.42);
+      text-transform: uppercase;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    /* Date Separator: Natural Editorial Rule (De-encapsulated) */
+    .messenger-date-pill {
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 6px 0;
+      color: #b8aba0;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .messenger-date-pill::before,
+    .messenger-date-pill::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(196, 168, 138, 0.32), transparent);
+    }
+
+    /* Message Bubbles */
+    .chat-bubble-wrap {
+      display: flex;
+      flex-direction: column;
+      max-width: 84%;
+      animation: bubbleSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes bubbleSlideIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-bubble-wrap.incoming {
+      align-self: flex-start;
+    }
+
+    .chat-bubble-wrap.outgoing {
+      align-self: flex-end;
+    }
+
+    .chat-bubble-wrap.system-event {
+      align-self: center;
+      max-width: 92%;
+    }
+
+    /* Sender Name: Natural Calligraphic Label (No heavy capsule box) */
+    .chat-sender-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      padding: 0;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chat-bubble-wrap.incoming .chat-sender-name {
+      color: #e5c5a1;
+      align-self: flex-start;
+      margin-left: 2px;
+    }
+
+    .chat-bubble-wrap.outgoing .chat-sender-name {
+      color: #f0b594;
+      align-self: flex-end;
+      margin-right: 48px;
+    }
+
+    .chat-bubble {
+      padding: 16px 22px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.02rem;
+      font-style: normal;
+      font-weight: 450;
+      line-height: 1.7;
+      letter-spacing: -0.005em;
+      position: relative;
+      word-break: break-word;
+      -webkit-font-smoothing: antialiased;
+      border-radius: 8px;
+    }
+
+    /* Hermes Message: Natural Warm Slate-Parchment Draft with Fine Brass Trim */
+    .chat-bubble-wrap.incoming .chat-bubble {
+      background:
+        linear-gradient(180deg, rgba(30, 26, 22, 0.92) 0%, rgba(22, 19, 16, 0.94) 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 4px);
+      color: #fffef8;
+      border: 1px solid rgba(214, 185, 155, 0.38);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 240, 220, 0.16);
+    }
+
+    /* Silvia Message: Natural Terracotta-Copper Draft */
+    .chat-bubble-wrap.outgoing .chat-bubble {
+      background:
+        linear-gradient(135deg, rgba(54, 34, 24, 0.92) 0%, rgba(38, 24, 18, 0.94) 100%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0px, rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 4px);
+      color: #ffffff;
+      border: 1px solid rgba(240, 160, 120, 0.42);
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 245, 235, 0.18);
+    }
+
+    .chat-bubble-wrap.system-event .chat-bubble {
+      background: linear-gradient(180deg, rgba(52, 40, 29, 0.94) 0%, rgba(36, 26, 18, 0.96) 100%);
+      border: 1.5px dashed rgba(214, 185, 155, 0.65);
+      border-radius: 10px;
+      text-align: center;
+      color: #faebd7;
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 11px 20px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    .chat-bubble-text p {
+      margin: 0 0 12px 0;
+    }
+
+    .chat-bubble-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .chat-bubble-time {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #d6beaa;
+      margin-top: 10px;
+    }
+
+    /* Message Row & Silvia Navigator Stamp */
+    .chat-bubble-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .chat-bubble-wrap.outgoing .chat-bubble-row {
+      justify-content: flex-end;
+    }
+
+    .silvia-avatar-stamp {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #8c4a2a, #3d1f11);
+      border: 2px solid #e59866;
+      box-shadow: 0 0 10px rgba(229, 152, 102, 0.45), 0 3px 8px rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      margin-bottom: 3px;
+      user-select: none;
+    }
+
+    .silvia-avatar-stamp::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(240, 180, 135, 0.65);
+      pointer-events: none;
+      animation: gearSpinClockwise 30s linear infinite;
+      z-index: 2;
+    }
+
+    .silvia-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .silvia-seal-glyph {
+      font-size: 1.15rem;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+    }
+
+    /* Physical Journal Callout: Natural Illuminated Manuscript Citation (De-encapsulated) */
+    .journal-ref-pill {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      background: rgba(229, 197, 161, 0.12);
+      border: none;
+      border-bottom: 1.5px solid #d4a76a;
+      color: #fff5e8;
+      font-family: inherit;
+      font-size: 0.98em;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin: 0 2px;
+      vertical-align: baseline;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      box-shadow: none;
+    }
+
+    .journal-ref-pill:hover {
+      background: rgba(229, 197, 161, 0.22);
+      border-bottom-color: #ffd8a8;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(229, 197, 161, 0.2);
+    }
+
+    .journal-ref-pill .pill-icon {
+      font-size: 0.92em;
+      margin-right: 2px;
+    }
+

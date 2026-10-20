@@ -10,7 +10,10 @@
 
 ```text
 web/
-├── index.html                      ← HUB CENTRAL (≈16.000 líneas, HTML+CSS+JS en un solo archivo)
+├── index.html                      ← HUB CENTRAL (~4.000 líneas: solo el HTML de vistas y modales)
+├── hub/                            ← CSS y JS del Hub, sin build (<link> y <script src> clásicos: también va por file://)
+│   ├── css/                        ← base, temas, vistas, chat… y stations/sNN-*.css
+│   └── js/                         ← hub-core.js (vistas, chat, Field Wire, Ledger, tester), profiles.js y stations/sNN-*.js
 ├── README.md                       ← Índice rápido de la carpeta
 ├── assets/                         ← Mapas del desierto, miniaturas, fondos, branding y tarjetas de email
 │   └── maps/                       ← Cuadrantes NO/NE/SO/SE y mosaico 2×2 (sincronizados desde el diario)
@@ -96,7 +99,7 @@ web/
 ## 5. Notas de Coherencia
 
 - La **Estación 07** (Constellation Path) vive en `web/constellation/zodiac-engine/`. Hasta octubre 2026 estuvo en `web/desert/zodiac-engine/`; se movió para alinear la carpeta con el canon.
-- Los juegos del desierto (Estaciones 10–13) son módulos del Hub; si crecen, conviene extraerlos a `web/desert/<juego>/` para aligerar `index.html`.
+- Los juegos del Desert y del Stage Path (Estaciones 10–20) son módulos del Hub: su JS y CSS están en `web/hub/js/stations/` y `web/hub/css/stations/`, y su modal en `index.html`. Las estaciones nuevas siguen ese mismo patrón.
 
 ---
 

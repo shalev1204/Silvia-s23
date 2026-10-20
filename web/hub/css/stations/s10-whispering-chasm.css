@@ -1,0 +1,414 @@
+    /* ===================================================================
+       THE WHISPERING CHASM TACTICAL MODAL
+       =================================================================== */
+    .chasm-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: radial-gradient(circle at center, rgba(14, 10, 6, 0.96) 0%, rgba(3, 4, 6, 0.99) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+      animation: unlockFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .chasm-modal-backdrop.closing {
+      animation: unlockFadeIn 0.25s reverse forwards;
+    }
+
+    .chasm-workbench-window {
+      width: 100%;
+      max-width: 1320px;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      background: #120e0a;
+      border: 2px solid var(--brass-bright);
+      border-radius: 12px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95), 0 0 35px rgba(212, 168, 83, 0.25);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chasm-header-bar {
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid rgba(212, 168, 83, 0.35);
+      background: rgba(22, 16, 10, 0.98);
+    }
+
+    .chasm-header-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chasm-header-icon {
+      font-size: 1.5rem;
+    }
+
+    .chasm-header-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.08em;
+    }
+
+    .chasm-header-subtitle {
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      color: var(--parchment-dim);
+      font-style: italic;
+    }
+
+    .chasm-close-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      font-size: 1.2rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .chasm-close-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    .chasm-telemetry-strip {
+      padding: 10px 24px;
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: rgba(10, 8, 5, 0.94);
+      border-bottom: 1px solid rgba(212, 168, 83, 0.18);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #ffe099;
+    }
+
+    .chasm-telemetry-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212, 168, 83, 0.08);
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(212, 168, 83, 0.18);
+    }
+
+    .chasm-telemetry-pill strong {
+      color: #fff;
+    }
+
+    .chasm-workbench-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 20px;
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      background: radial-gradient(circle at 30% 20%, rgba(26, 18, 12, 0.95) 0%, rgba(12, 9, 6, 0.98) 100%);
+    }
+
+    @media (max-width: 980px) {
+      .chasm-workbench-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Labyrinth Canvas Frame */
+    .chasm-maze-frame {
+      background: #18130e;
+      border: 1.5px solid var(--brass-base);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .chasm-maze-canvas-wrap {
+      width: 100%;
+      max-width: 620px;
+      position: relative;
+    }
+
+    .chasm-svg-maze {
+      width: 100%;
+      height: auto;
+      display: block;
+      user-select: none;
+    }
+
+    /* Desk Panel */
+    .chasm-desk-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(22, 16, 11, 0.65);
+      border: 1px solid rgba(212, 168, 83, 0.22);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .chasm-desk-header {
+      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .chasm-desk-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+    }
+
+    .chasm-desk-rule {
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      color: var(--parchment-base);
+      line-height: 1.45;
+      margin-top: 4px;
+    }
+
+    /* Nomad's Passphrase Answer Slots */
+    .chasm-passphrase-slots-box {
+      background: rgba(10, 8, 5, 0.7);
+      border: 1px solid rgba(212, 168, 83, 0.25);
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+
+    .chasm-slots-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      color: #ffe099;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chasm-slots-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .chasm-slot-box {
+      width: 52px;
+      height: 60px;
+      background: #1f170f;
+      border: 2px dashed rgba(212, 168, 83, 0.4);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .chasm-slot-box.filled {
+      border-style: solid;
+      border-color: var(--brass-bright);
+      background: linear-gradient(135deg, #2b1f13 0%, #1a120b 100%);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+      color: #fff;
+    }
+
+    .chasm-slot-idx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: rgba(212, 168, 83, 0.55);
+      position: absolute;
+      bottom: 3px;
+    }
+
+    /* Cairn Selector Keypad */
+    .chasm-cairns-keypad-box {
+      background: rgba(15, 12, 8, 0.6);
+      border: 1px solid rgba(212, 168, 83, 0.2);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .chasm-keypad-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      color: var(--parchment-dim);
+      margin-bottom: 8px;
+    }
+
+    .chasm-cairns-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .chasm-cairn-btn {
+      background: #1d1610;
+      border: 1.5px solid rgba(212, 168, 83, 0.35);
+      color: var(--parchment-base);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .chasm-cairn-btn:hover:not(:disabled) {
+      border-color: var(--brass-bright);
+      background: rgba(212, 168, 83, 0.18);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .chasm-cairn-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-color: rgba(212, 168, 83, 0.15);
+    }
+
+    .chasm-cairn-btn.visited {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+      color: #86efac;
+    }
+
+    .chasm-cairn-btn.decoy-hit {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* Live Dispatch Ticker from Hermes */
+    .chasm-dispatch-box {
+      background: rgba(8, 6, 4, 0.85);
+      border-left: 3px solid var(--brass-bright);
+      border-radius: 4px;
+      padding: 12px 14px;
+      font-family: 'EB Garamond', serif;
+      font-size: 1.05rem;
+      color: var(--parchment-base);
+      line-height: 1.5;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .chasm-dispatch-sender {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #f59e0b;
+      margin-bottom: 4px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Actions Bar */
+    .chasm-actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .btn-chasm-reset {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-chasm-reset:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fff;
+    }
+
+    /* Victory Card */
+    .chasm-victory-card {
+      background: linear-gradient(135deg, rgba(30, 22, 13, 0.95) 0%, rgba(14, 11, 7, 0.98) 100%);
+      border: 2px solid #22c55e;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 0 28px rgba(34, 197, 94, 0.25);
+      animation: unlockFadeIn 0.5s ease forwards;
+    }
+
+    .chasm-victory-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #86efac;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .chasm-victory-text {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.05rem;
+      color: var(--parchment-base);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .btn-chasm-finish {
+      background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+      border: 1.5px solid #86efac;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-chasm-finish:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+    }
+

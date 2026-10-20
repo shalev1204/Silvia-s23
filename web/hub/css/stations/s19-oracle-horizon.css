@@ -1,0 +1,49 @@
+    /* ===================================================================
+       STATION 19 · THE ORACLE'S HORIZON (THE DISC OF 24 SIGHTINGS · THE VOW)
+       Uses the .monolith-* shell of Station 14; the disc, the sky card, the vow tiles,
+       the passage to the Stage Path and the third path card live here.
+       =================================================================== */
+    .oracle-disc-row { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 12px; align-items: start; }
+    .oracle-disc, .oracle-sky {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .oracle-disc { background: radial-gradient(circle, #1a1208 0%, #0b0703 70%); }
+    .oracle-sky { background: radial-gradient(circle, #0f1a33 0%, #050816 75%); }
+    .oracle-sky-cap { margin: 4px 0 0; text-align: center; font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.06em; color: #b8a07a; }
+    .oracle-disc .oracle-glow { opacity: 0; transition: opacity 0.18s ease; }
+    .oracle-disc.is-pulse .oracle-glow { opacity: 1; }
+    .oracle-ring-ctrls { display: grid; gap: 6px; margin-top: 8px; }
+    .oracle-ring-ctrl { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; align-items: center; }
+    .oracle-ring-ctrl span { text-align: center; font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.04em; color: #e7d9bf; }
+    .oracle-ring-ctrl .monolith-btn { padding: 6px 0; }
+    .oracle-when {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(253, 230, 138, 0.55);
+      background: rgba(253, 230, 138, 0.07);
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      color: #fde68a;
+      letter-spacing: 0.08em;
+    }
+    .oracle-when strong { display: block; font-size: 1.35rem; letter-spacing: 0.12em; margin-top: 4px; }
+    .oracle-tiles, .oracle-said { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; min-height: 44px; align-items: center; }
+    .oracle-said { padding: 8px; border-radius: 8px; border: 1px dashed rgba(212, 168, 83, 0.4); }
+    .oracle-said:empty::before { content: attr(data-empty); color: #7a6a52; font-size: 0.8rem; }
+    .oracle-tile { font-family: 'Cinzel', serif; letter-spacing: 0.08em; padding: 8px 12px; min-height: 40px; }
+    .oracle-tile[aria-pressed="true"] { opacity: 0.35; }
+    .monolith-key-input.oracle-text-input { letter-spacing: 0.1em; font-size: 0.98rem; }
+    @media (max-width: 640px) { .oracle-disc-row { grid-template-columns: 1fr; } .oracle-sky { max-width: 220px; margin: 0 auto; } }
+
+    /* From the desert to the stage: shown once, when the Oracle remembers */
+    /* ---- The rooms of Tower III wear the velvet of the Stage ---- */
+    .is-stage-room .monolith-window { background: #170811; border-color: #c99a3b; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95), 0 0 35px rgba(168, 85, 247, 0.28); }
+    .is-stage-room .monolith-header { background: rgba(40, 11, 32, 0.98); }
+    .is-stage-room .monolith-telemetry { background: rgba(26, 7, 20, 0.92); }
+    .is-stage-room .monolith-card { background: rgba(44, 13, 36, 0.78); border-color: rgba(201, 154, 59, 0.32); }

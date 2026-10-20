@@ -1,0 +1,96 @@
+    /* ===================================================================
+       THE LIVING MIRROR · map of the Stage Path (assets/js/stage-mirror.js)
+       =================================================================== */
+    #stage-map-canvas-wrap { padding: 18px 12px 22px; background: radial-gradient(ellipse at 50% 30%, #2a0b24 0%, #0b0309 75%); border-radius: 12px; }
+    .stage-mirror { max-width: 560px; margin: 0 auto; outline: none; }
+    .stage-mirror:focus-visible .stage-mirror-glass { box-shadow: 0 0 0 2px var(--brass-bright); }
+    .stage-mirror-glass { position: relative; width: 100%; aspect-ratio: 680 / 920; border-radius: 14px; touch-action: pan-y; cursor: grab; }
+    .stage-mirror-glass:active { cursor: grabbing; }
+    .stage-mirror-kaleido, .stage-mirror-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .stage-mirror-svg .sm-shard { cursor: pointer; outline: none; }
+    .stage-mirror-svg .sm-edge { stroke: rgba(247, 220, 140, 0); stroke-width: 3; transition: stroke 0.2s ease; }
+    .stage-mirror-svg .sm-shard:hover .sm-edge, .stage-mirror-svg .sm-shard:focus-visible .sm-edge { stroke: rgba(247, 220, 140, 0.95); }
+    .stage-mirror-svg .sm-shard.is-next .sm-edge { stroke: rgba(216, 180, 254, 0.9); stroke-dasharray: 8 6; animation: smNext 1.8s linear infinite; }
+    @keyframes smNext { to { stroke-dashoffset: -28; } }
+    .stage-mirror-svg .sm-roman { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700; fill: rgba(246, 233, 242, 0.55); pointer-events: none; }
+    .stage-mirror-svg .sm-shard.is-next .sm-roman { fill: #f3d9ff; }
+    .stage-mirror-svg .sm-cartouche { font-family: 'Cinzel', serif; font-size: 17px; font-weight: 700; letter-spacing: 1.5px; fill: #2a1405; }
+    .stage-mirror-svg .sm-shard.is-new .sm-sheen { animation: smSheen 2.2s ease-out 0.3s both; }
+    @keyframes smSheen { 0% { opacity: 0; } 25% { opacity: 0.85; } 100% { opacity: 0; } }
+    .stage-mirror.is-complete .stage-mirror-kaleido { opacity: 0.15; transition: opacity 1.6s ease; }
+    .stage-mirror-caption { margin: 12px 0 6px; text-align: center; font-family: 'Cinzel', serif; font-size: 0.82rem; letter-spacing: 0.05em; color: var(--parchment-dim); }
+    .stage-mirror-ribbon { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+    .stage-mirror-ribbon .sm-room {
+      min-width: 40px; height: 34px; padding: 0 8px; border-radius: 17px;
+      border: 1px solid rgba(201, 154, 59, 0.4); background: rgba(30, 8, 24, 0.85);
+      font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--parchment-muted); cursor: pointer;
+    }
+    .stage-mirror-ribbon .sm-room.is-set { color: #2a1405; background: linear-gradient(135deg, #f7dc8c, #c99a3b); border-color: #f7dc8c; }
+    .stage-mirror-ribbon .sm-room.is-next { color: #f3d9ff; border-color: #d8b4fe; box-shadow: 0 0 12px rgba(216, 180, 254, 0.5); }
+    .stage-mirror-ribbon .sm-room.is-next::before { content: '🏮 '; }
+    .stage-mirror-ribbon .sm-room:focus-visible { outline: 2px solid var(--brass-bright); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      .stage-mirror-svg .sm-shard.is-next .sm-edge, .stage-mirror-svg .sm-shard.is-new .sm-sheen { animation: none; }
+    }
+
+    /* The Journal already prints this map: the Hub shows the 3D unlit version (assets/js/desert-map-3d.js). The flat map is only a no-WebGL fallback. */
+    #desert-map-canvas-wrap .desert-map-layers-frame { display: none; }
+    #desert-map-canvas-wrap.desert3d-fallback .desert-map-layers-frame {
+      display: block;
+      filter: invert(1) hue-rotate(180deg) brightness(0.65) contrast(1.15);
+      background: #02040a;
+    }
+    #desert-map-canvas-wrap.desert3d-fallback .desert3d-stage { display: none; }
+    .desert3d-stage { position: relative; width: 100%; aspect-ratio: 1000 / 1220; background: #02040a; }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .map-section-divider {
+      margin: 10px 0 10px 0;
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"] .constellation-map-frame {
+      padding: 10px 12px 14px;
+      margin-bottom: 14px;
+    }
+    /* Tester panel: Carles only, and only on Desert Trail */
+    html:not([data-map-path="desert"]) .tester-panel,
+    html[data-map-path="desert"] body:not([data-active-view="view-trail"]) .tester-panel,
+    body:not([data-active-seeker="carles"]) .tester-panel {
+      display: none !important;
+    }
+    html[data-map-path="desert"] body[data-active-view="view-trail"][data-active-seeker="carles"] .tester-panel {
+      display: block;
+      margin: 0 0 10px 0;
+      max-width: none;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* ---- Constellation chrome: midnight indigo with silver-gold accents ---- */
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] {
+      --bg-darkest: #02030a;
+      --bg-panel: rgba(8, 12, 34, 0.93);
+      --bg-panel-hover: rgba(14, 20, 50, 0.97);
+      --cyan-beam: #7fd4ff;
+      --cyan-glow: rgba(127, 212, 255, 0.5);
+      --parchment-dim: #a9b8dd;
+    }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .hub-sidebar {
+      background: linear-gradient(180deg, rgba(6, 9, 30, 0.97) 0%, rgba(3, 4, 16, 0.99) 100%);
+    }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .nav-menu-btn:not(.active) { background: rgba(14, 18, 52, 0.5); }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .star-inspector-panel {
+      background: linear-gradient(180deg, rgba(12, 16, 44, 0.95) 0%, rgba(4, 6, 20, 0.98) 100%);
+    }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .inspector-relics-card { background: rgba(16, 22, 56, 0.6); }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .relic-chip { background: rgba(6, 9, 28, 0.88); }
+    html[data-map-path="constellation"] body[data-active-view="view-trail"] .constellation-map-frame {
+      background: linear-gradient(135deg, rgba(3, 6, 24, 0.99) 0%, rgba(10, 10, 36, 0.98) 55%, rgba(24, 10, 40, 0.99) 100%);
+    }
+
+    /* Master Layout */
+    .game-hub-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+

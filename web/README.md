@@ -16,6 +16,7 @@ web/
 │   ├── zodiac-engine/         ← Station 07
 │   ├── midnight-calibration/  ← Station 08
 │   └── celestial-cipher/      ← Station 09
+├── hub/                       ← The Hub's CSS and JS (core + one file per station)
 ├── desert/                    ← Reserved: THE DESERT PATH (currently inside the Hub)
 ├── shared/                    ← navigator.js / navigator.css (the "Order Codex" drawer)
 └── stage/                     ← Reserved: The Mirror Speaker
@@ -23,6 +24,6 @@ web/
 
 ## Notes
 
-- The **Desert Path** games (Stations 10 to 13) are modals inside `index.html`.
+- The Hub's own CSS and JS live in `hub/css/` and `hub/js/` (one file per station in `stations/`), loaded as plain `<link>` and `<script src>` tags so the Hub also opens from `file://`. The Desert and Stage Path games (Stations 10 to 20) keep their modals in `index.html`.
 - Intermediate audio stems (`*.wav`, `*.pcm`) are neither versioned nor deployed.
 - Public routes: `https://YOUR-DOMAIN.pages.dev/` (Hub) and `https://YOUR-DOMAIN.pages.dev/constellation/<game>/`.

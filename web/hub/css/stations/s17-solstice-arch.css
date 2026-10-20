@@ -1,0 +1,45 @@
+    /* ===================================================================
+       STATION 17 · THE ARCH OF THE SOLSTICE & CAIRN V (THE AUTUMN DAWN · THE NIGHT SIGNAL)
+       Uses the .monolith-* shell of Station 14; the courtyard, the dawn clock, the night horizon
+       and the five-seal ceremony live here.
+       =================================================================== */
+    .solstice-court {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 440px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #120c06 0%, #22170c 100%);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .solstice-court.is-dawn { background: linear-gradient(180deg, #4a2c14 0%, #2b1b0d 30%, #22170c 100%); }
+    .solstice-court .solstice-mirror { cursor: pointer; }
+    .solstice-court .solstice-mirror:focus { outline: none; }
+    .solstice-court .solstice-mirror:focus-visible rect { stroke: #fde68a; stroke-width: 1.2; }
+    .solstice-clock { height: 8px; border-radius: 4px; background: rgba(212, 168, 83, 0.18); overflow: hidden; margin-top: 8px; }
+    .solstice-clock span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #f59e0b, #fde68a); transition: width 0.2s linear; }
+    .solstice-locks { display: flex; gap: 6px; align-items: center; font-family: 'Cinzel', serif; font-size: 0.78rem; color: #b8a07a; }
+    .solstice-locks b { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #b8a07a; }
+    .solstice-locks b.is-on { background: radial-gradient(circle, #fde68a, #f59e0b); border-color: #fde68a; box-shadow: 0 0 8px rgba(251, 191, 36, 0.7); }
+    .solstice-night {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 230px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #050816 0%, #0f1a33 60%, #1c160f 100%);
+    }
+    .solstice-flash-btn {
+      width: 100%;
+      min-height: 64px;
+      margin-top: 10px;
+      font-size: 1rem;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .solstice-flash-btn.is-down { background: rgba(253, 230, 138, 0.45); box-shadow: 0 0 22px rgba(253, 230, 138, 0.6); }
+    .solstice-pulses { display: flex; gap: 6px; flex-wrap: wrap; min-height: 26px; align-items: center; font-family: 'Cinzel', serif; font-size: 1.15rem; color: #fde68a; letter-spacing: 0.15em; }
+    .solstice-message { font-family: 'Cinzel', serif; color: #fde68a; letter-spacing: 0.06em; min-height: 1.4em; }
+

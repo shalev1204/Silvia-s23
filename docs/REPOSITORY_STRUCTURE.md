@@ -16,7 +16,8 @@ Silvia's23/
 ├── PROJECT_MASTER.md                                  ← Índice maestro y registro de decisiones
 │
 ├── web/                       ← ECOSISTEMA DIGITAL (se despliega en Cloudflare Pages)
-│   ├── index.html             ← Hub Central
+│   ├── index.html             ← Hub Central (HTML de vistas y modales)
+│   ├── hub/                   ← css/ y js/ del Hub (núcleo + un archivo por estación en stations/)
 │   ├── assets/                ← Mapas, miniaturas, fondos, branding
 │   ├── constellation/         ← celestial-flower, celestial-flower-2, radio-transmission,
 │   │                            celestial-matrix, zodiac-engine, midnight-calibration, celestial-cipher
@@ -76,7 +77,7 @@ Silvia's23/
 
 ## 2. Notas
 
-- **Desert Path en el Hub:** las Estaciones 10 a 13 son modales de `web/index.html`; el diseño de cada juego está en `docs/DESERT_ODYSSEY_BIBLE.md`.
+- **Hub dividido (20-10-2026):** `web/index.html` guarda solo el HTML (vistas y modales de las Estaciones 10–20); el CSS vive en `web/hub/css/` y el JS en `web/hub/js/` (`hub-core.js`, un archivo por estación en `stations/` y piezas como `tester-panel.js`), cargados con `<link>` y `<script src>` clásicos, sin build, para que funcione también por `file://`. El diseño de cada juego está en `docs/DESERT_ODYSSEY_BIBLE.md` y `docs/STAGE_PATH_BIBLE.md`.
 - **Regeneración del diario:** `python3 -m scripts.journal.build_entire_journal` desde la raíz reescribe las 36 caras y sincroniza los mapas en `web/assets/maps/`. Es determinista: una cara solo cambia si cambia su script.
 - **`journal/impresion/`:** contiene los PDFs de impresión doble cara actualizados para las 18 hojas (`hojas_doble_cara/`) y el diario unificado de 36 páginas (`00_DIARIO_COMPLETO_36_PAGINAS_A5.pdf`), generados con `python3 scripts/journal/build_impresion_master.py`.
 - **Audio:** los `*.wav` / `*.pcm` de `web/` están en `.gitignore`; solo se versionan los `.mp3` / `.mp4` finales.

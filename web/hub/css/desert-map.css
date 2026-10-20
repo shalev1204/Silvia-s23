@@ -1,0 +1,302 @@
+    /* ===================================================================
+       THE GRAND DESERT MAP & THE WHISPERING CHASM TACTICAL VIEW (STATION 10)
+       =================================================================== */
+    /* Path switcher: two wide cards above the station deck */
+    .map-path-tabs-bar {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 4px 0 22px;
+    }
+
+    .map-path-tab-btn {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px;
+      min-height: 118px;
+      padding: 18px 22px;
+      text-align: left;
+      color: var(--parchment);
+      background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(0, 0, 0, 0.35) 100%);
+      border: 1.5px solid var(--brass-dim);
+      border-radius: 12px;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    .map-path-tab-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--brass-base) 50%, transparent 100%);
+      opacity: 0.35;
+      transition: opacity 0.25s ease;
+    }
+
+    .map-path-tab-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--brass-base);
+    }
+
+    .map-path-tab-btn:focus { outline: none; }
+    .map-path-tab-btn:focus-visible { outline: 2px solid var(--brass-bright); outline-offset: 3px; }
+
+    .map-path-tab-btn.active {
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.24) 0%, var(--bg-panel) 62%);
+      border-color: var(--brass-bright);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 26px var(--brass-glow);
+    }
+
+    .map-path-tab-btn.active::before { opacity: 1; }
+
+    .path-tab-emblem {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.9rem;
+      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.14) 0%, rgba(0, 0, 0, 0.45) 100%);
+      border: 1.5px solid var(--brass-base);
+      box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.6);
+    }
+
+    .map-path-tab-btn.active .path-tab-emblem {
+      border-color: var(--brass-bright);
+      box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.5), 0 0 16px var(--brass-glow);
+    }
+
+    .path-tab-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .path-tab-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cyan-beam);
+    }
+
+    .path-tab-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+
+    .path-tab-tagline {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.35;
+      color: var(--parchment-dim);
+    }
+
+    .path-tab-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .path-tab-bar {
+      flex: 0 0 200px;
+      height: 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.09);
+      overflow: hidden;
+    }
+
+    .path-tab-bar-fill {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--brass-base) 0%, var(--cyan-beam) 100%);
+      transition: width 0.6s ease;
+    }
+
+    .path-tab-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--parchment-dim);
+      white-space: nowrap;
+    }
+
+    .path-tab-state {
+      align-self: start;
+      min-width: 112px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--brass-dim);
+      color: var(--parchment-dim);
+      white-space: nowrap;
+    }
+
+    .map-path-tab-btn.active .path-tab-state {
+      background: var(--brass-bright);
+      border-color: var(--brass-bright);
+      color: #1e1306;
+    }
+
+    @media (max-width: 860px) {
+      .map-path-tabs-bar { grid-template-columns: 1fr; }
+      .map-path-tab-btn { grid-template-columns: auto minmax(0, 1fr); min-height: 0; }
+      .path-tab-state { display: none; }
+    }
+
+    /* Grand Desert Map Container */
+    #desert-map-canvas-wrap {
+      width: 100%;
+      height: auto;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #181109;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+      user-select: none;
+    }
+
+    /* Desert Act Selector Navigation Bar */
+    .desert-map-layers-frame {
+      position: relative;
+      width: 100%;
+      height: auto;
+    }
+
+    .desert-map-layer {
+      position: relative;
+      width: 100%;
+      height: auto;
+    }
+
+    .desert-map-base-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+      filter: contrast(1.05) brightness(0.92);
+    }
+
+    .desert-map-svg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+    }
+
+    /* Hermes Animated Explorer Marker */
+    .hermes-map-marker {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .hermes-beacon-ring {
+      animation: stormRingPulse 2.4s ease-in-out infinite;
+    }
+
+    .hermes-campfire-glow {
+      animation: lightningFlash 3.5s infinite ease-in-out;
+    }
+
+    /* Station 10 Whispering Chasm Interactive Node */
+    .chasm-gateway-node {
+      cursor: pointer;
+      outline: none;
+    }
+
+    .chasm-vortex-ring {
+      animation: stormRingPulse 2.8s ease-in-out infinite;
+    }
+
+    .chasm-gateway-node:hover .chasm-vortex-ring {
+      stroke: #fbbf24;
+      stroke-width: 3.5px;
+      filter: drop-shadow(0 0 12px #f59e0b);
+    }
+
+    /* Desert Map Station Nodes & Mystery Nodes */
+    .desert-station-node {
+      cursor: pointer;
+      outline: none;
+      transition: opacity 0.3s ease, filter 0.3s ease;
+    }
+
+    .desert-station-node.incognita-node {
+      opacity: 0.68;
+    }
+
+    .desert-station-node.incognita-node:hover {
+      opacity: 0.95;
+    }
+
+    .desert-station-node.incognita-node .mystery-ring {
+      stroke: #78716c;
+      stroke-dasharray: 4, 4;
+      animation: stormRingPulse 4s ease-in-out infinite;
+    }
+
+    .desert-station-node.incognita-node:hover .mystery-ring {
+      stroke: #a8a29e;
+      stroke-width: 2.8px;
+      filter: drop-shadow(0 0 10px rgba(168, 162, 158, 0.45));
+    }
+
+    .desert-station-node.unlocked-node .active-ring {
+      animation: stormRingPulse 2.6s ease-in-out infinite;
+    }
+
+    .desert-station-node.unlocked-node:hover .active-ring {
+      filter: drop-shadow(0 0 14px currentColor);
+    }
+
+    /* Desert Toast Atmospheric Banner */
+    .desert-toast-banner {
+      position: fixed;
+      top: 88px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-24px);
+      z-index: 999999;
+      background: radial-gradient(circle at center, #1c150e 0%, #0d0a07 100%);
+      border: 1.5px solid var(--brass-bright);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.88), 0 0 24px rgba(212, 168, 83, 0.3);
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-family: 'Cinzel', serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #fde68a;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      max-width: 90vw;
+    }
+
+    .desert-toast-banner.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+

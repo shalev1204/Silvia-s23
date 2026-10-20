@@ -1,0 +1,468 @@
+    /* =========================================================================
+       🌪️ THE SHIFTING TEMPEST — CATACLYSMIC SANDSTORM LOCKDOWN (48-HOUR TIMEOUT)
+       ========================================================================= */
+    body.sandstorm-lockout-active {
+      overflow: hidden !important;
+      animation: stormRumble 6s infinite ease-in-out;
+    }
+
+    body.sandstorm-lockout-active .game-hub-container,
+    body.sandstorm-lockout-active #hub-dynamic-backdrop,
+    body.sandstorm-lockout-active #ambient-stars,
+    body.sandstorm-lockout-active .cosmic-nebula-layer {
+      filter: blur(6px) brightness(0.72) contrast(1.2) sepia(0.25) !important;
+      opacity: 0.88 !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      animation: hubGlitchTremor 4.5s infinite ease-in-out !important;
+    }
+
+    @keyframes hubGlitchTremor {
+      0%, 84%, 100% {
+        transform: translate(0, 0);
+        filter: blur(6px) brightness(0.72) contrast(1.2) sepia(0.25);
+      }
+      85% {
+        transform: translate(-3px, 1.5px);
+        filter: blur(5px) brightness(0.85) contrast(1.35) sepia(0.35);
+      }
+      86% {
+        transform: translate(3px, -2px);
+        filter: blur(8px) brightness(0.55) contrast(1.1) sepia(0.2);
+      }
+      87% {
+        transform: translate(-1.5px, 2px);
+        filter: blur(6px) brightness(0.75) contrast(1.25) sepia(0.3);
+      }
+      88% {
+        transform: translate(0, 0);
+        filter: blur(6px) brightness(0.72) contrast(1.2) sepia(0.25);
+      }
+    }
+
+    @keyframes stormRumble {
+      0%, 88%, 100% { transform: translate(0, 0); }
+      90% { transform: translate(-1.5px, 0.8px); }
+      92% { transform: translate(1.8px, -1.2px); }
+      94% { transform: translate(-1px, -0.6px); }
+      96% { transform: translate(1.2px, 1px); }
+    }
+
+    .sandstorm-lockout-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000020;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      padding: 24px;
+      box-sizing: border-box;
+      overflow: hidden;
+      background: radial-gradient(circle at center, rgba(30, 10, 3, 0.3) 0%, rgba(15, 5, 2, 0.55) 65%, rgba(6, 2, 1, 0.78) 100%);
+      backdrop-filter: blur(2px);
+      animation: stormFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes stormFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #sandstorm-lockout-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000021;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .storm-sky-gradient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000019;
+      background: radial-gradient(circle at 75% 20%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
+                  radial-gradient(circle at 20% 80%, rgba(185, 28, 28, 0.15) 0%, transparent 65%);
+      mix-blend-mode: screen;
+    }
+
+    .storm-crt-scanlines {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000022;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.4) 0px,
+        rgba(0, 0, 0, 0.4) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      opacity: 0.75;
+      animation: scanlineJitter 8s linear infinite;
+    }
+
+    @keyframes scanlineJitter {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 400px; }
+    }
+
+    .storm-static-noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000023;
+      background-image: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 80%);
+      mix-blend-mode: overlay;
+      opacity: 0.6;
+      animation: noiseFlicker 0.25s steps(3) infinite;
+    }
+
+    @keyframes noiseFlicker {
+      0% { opacity: 0.5; }
+      50% { opacity: 0.75; }
+      100% { opacity: 0.6; }
+    }
+
+    .storm-vignette-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000023;
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(5, 2, 1, 0.88) 100%),
+                  radial-gradient(ellipse at 50% 100%, rgba(153, 27, 27, 0.25) 0%, transparent 60%);
+    }
+
+    .storm-lightning-flash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000024;
+      background: radial-gradient(circle at 60% 30%, rgba(254, 215, 170, 0.45) 0%, rgba(245, 158, 11, 0.2) 50%, transparent 80%);
+      opacity: 0;
+      transition: opacity 0.08s ease-out;
+    }
+
+    /* Floating Audio Toggle in Top Right */
+    .storm-audio-toggle-floating {
+      position: fixed;
+      top: 24px;
+      right: 28px;
+      z-index: 1000030;
+    }
+
+    .btn-storm-audio-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(25, 10, 4, 0.85);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 30px;
+      color: #fef3c7;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: all 0.2s ease;
+    }
+
+    .btn-storm-audio-toggle:hover {
+      background: rgba(55, 22, 9, 0.95);
+      border-color: #f59e0b;
+      transform: translateY(-1px);
+    }
+
+    /* UNBOXED FLOATING CENTER ALERT */
+    .storm-unboxed-alert {
+      position: relative;
+      z-index: 1000025;
+      max-width: 820px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      pointer-events: auto;
+      animation: alertBreathe 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes alertBreathe {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-4px); }
+    }
+
+    .storm-status-beacon {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.22em;
+      color: #f87171;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 14px;
+      text-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+    }
+
+    .strobe-dot-red {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 14px #ef4444, 0 0 25px #dc2626;
+      animation: pulseRedStrobe 1s infinite alternate;
+    }
+
+    @keyframes pulseRedStrobe {
+      from { opacity: 0.4; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1.25); }
+    }
+
+    .storm-alert-title {
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 1.1;
+      color: #ffffff;
+      background: linear-gradient(180deg, #ffffff 0%, #fee2e2 25%, #fca5a5 50%, #ef4444 85%, #991b1b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 35px rgba(239, 68, 68, 0.55));
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .storm-alert-message {
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(1.2rem, 2.1vw, 1.45rem);
+      line-height: 1.45;
+      color: #fbf5ed;
+      font-style: italic;
+      max-width: 660px;
+      margin: 0 auto 20px;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.95), 0 0 30px rgba(0, 0, 0, 0.9);
+      letter-spacing: 0.02em;
+    }
+
+    /* THE 48-HOUR LIVE COUNTDOWN READOUT */
+    .storm-countdown-readout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 110px;
+    }
+
+    .countdown-unit .digit-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.8rem, 6.5vw, 4.2rem);
+      font-weight: 800;
+      line-height: 1;
+      color: #fffbeb;
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.9), 0 0 45px rgba(245, 158, 11, 0.6), 0 0 70px rgba(217, 119, 6, 0.4);
+      letter-spacing: -0.02em;
+    }
+
+    .countdown-unit .digit-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      color: #f59e0b;
+      font-weight: 700;
+      margin-top: 8px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    }
+
+    .countdown-colon {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      color: #f59e0b;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: -16px;
+      text-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+      animation: pulseColon 1s infinite alternate;
+    }
+
+    @keyframes pulseColon {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+
+    .storm-progress-minimal {
+      width: 100%;
+      max-width: 440px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0 auto 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .storm-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #dc2626 0%, #f59e0b 50%, #fef08a 100%);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.9);
+      border-radius: 999px;
+      transition: width 1s linear;
+    }
+
+    .storm-timer-note {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: #d4a853;
+      text-transform: uppercase;
+      opacity: 0.9;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    /* EMERGENCY 24H TELEGRAPH BEACON CARD (ACTIVE AT <= 24H REMAINING) */
+    .storm-emergency-wire-card {
+      margin: 20px auto 75px;
+      max-width: 580px;
+      padding: 16px 24px;
+      background: radial-gradient(circle at 50% 0%, rgba(180, 83, 9, 0.42) 0%, rgba(28, 11, 4, 0.92) 100%);
+      border: 1.5px solid rgba(245, 158, 11, 0.75);
+      border-radius: 12px;
+      box-shadow: 0 0 35px rgba(245, 158, 11, 0.3), 0 10px 30px rgba(0, 0, 0, 0.85);
+      animation: wireCardPulse 3s ease-in-out infinite alternate;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    @keyframes wireCardPulse {
+      from { border-color: rgba(245, 158, 11, 0.55); box-shadow: 0 0 25px rgba(245, 158, 11, 0.25); }
+      to { border-color: rgba(251, 191, 36, 0.95); box-shadow: 0 0 50px rgba(245, 158, 11, 0.5); }
+    }
+
+    .wire-card-beacon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.16em;
+      color: #fde68a;
+      text-transform: uppercase;
+    }
+
+    .strobe-dot-amber {
+      width: 9px;
+      height: 9px;
+      background: #f59e0b;
+      border-radius: 50%;
+      box-shadow: 0 0 12px #f59e0b, 0 0 24px #f59e0b;
+      animation: amberStrobe 0.8s infinite alternate;
+    }
+
+    @keyframes amberStrobe {
+      from { opacity: 0.4; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1.2); }
+    }
+
+    .wire-card-desc {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.15rem;
+      line-height: 1.45;
+      color: #fef3c7;
+      font-style: italic;
+      margin: 0;
+      text-align: center;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+    }
+
+    .btn-storm-answer-wire {
+      position: relative;
+      z-index: 1000030;
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 26px;
+      background: linear-gradient(180deg, #d97706 0%, #b45309 60%, #92400e 100%);
+      color: #ffffff;
+      border: 1.5px solid #fbbf24;
+      border-radius: 30px;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.5), 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: all 0.25s ease;
+      margin-top: 4px;
+    }
+
+    .btn-storm-answer-wire:hover {
+      background: linear-gradient(180deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(245, 158, 11, 0.8), 0 6px 20px rgba(0, 0, 0, 0.8);
+      color: #fffbeb;
+    }
+
+    /* Dedicated Dev Sandbox Controls — Carles only (JS may set display:flex) */
+    .storm-dev-controls {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000030;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 6, 3, 0.9);
+      border: 1px dashed rgba(245, 158, 11, 0.35);
+      border-radius: 20px;
+      padding: 6px 14px;
+      backdrop-filter: blur(6px);
+    }
+
+    .storm-dev-controls .dev-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+
+    .btn-dev-storm {
+      padding: 4px 10px;
+      background: rgba(35, 14, 6, 0.9);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      color: #fde68a;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-dev-storm:hover {
+      background: rgba(70, 25, 10, 1);
+      border-color: #fbbf24;
+      color: #fff;
+    }

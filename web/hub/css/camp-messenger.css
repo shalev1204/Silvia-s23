@@ -1,0 +1,1112 @@
+    /* =========================================================================
+       CAMP MESSENGER (DISCREET HEADER TRIGGER & NOTIFICATIONS)
+       ========================================================================= */
+
+    .viewport-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-header-messenger {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      border-radius: 50%;
+      cursor: pointer;
+      color: #ffd885;
+      font-size: 1.18rem;
+      line-height: 1;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .btn-header-messenger:hover {
+      background: rgba(138, 150, 107, 0.22);
+      border-color: #a3ad82;
+      transform: translateY(-1px) scale(1.05);
+      box-shadow: 0 0 16px rgba(138, 150, 107, 0.35);
+    }
+
+    .btn-header-messenger:active {
+      transform: translateY(0) scale(0.96);
+    }
+
+    .btn-header-messenger.active {
+      background: rgba(68, 77, 54, 0.55);
+      border-color: #a3ad82;
+      box-shadow: 0 0 16px rgba(138, 150, 107, 0.4), inset 0 0 8px rgba(138, 150, 107, 0.25);
+    }
+
+    .btn-header-messenger .messenger-btn-icon {
+      display: inline-block;
+      transition: transform 0.2s ease;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+    }
+
+    .btn-header-messenger:hover .messenger-btn-icon {
+      transform: scale(1.1);
+    }
+
+    .btn-header-messenger .messenger-btn-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 19px;
+      height: 19px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ef4444 0%, #ea580c 100%);
+      border: 2px solid #0d131f;
+      color: #ffffff;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.7);
+      animation: messengerBadgePulse 2.4s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    /* ---- Tester controls (admin profile only; placed above hub-viewport-header) ---- */
+    .tester-panel {
+      max-width: none;
+      width: 100%;
+      margin: 0 0 10px 0;
+      background: rgba(10, 16, 28, 0.88);
+      border: 1px dashed rgba(212, 168, 83, 0.45);
+      border-radius: 10px;
+      font-family: 'EB Garamond', serif;
+      color: var(--parchment);
+      position: relative;
+      z-index: 5;
+      box-sizing: border-box;
+    }
+    .tester-panel::before,
+    .tester-panel::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-color: rgba(212, 168, 83, 0.75);
+      border-style: solid;
+      pointer-events: none;
+    }
+    .tester-panel::before {
+      top: -1px;
+      left: -1px;
+      border-width: 2px 0 0 2px;
+      border-radius: 10px 0 0 0;
+    }
+    .tester-panel::after {
+      top: -1px;
+      right: -1px;
+      border-width: 2px 2px 0 0;
+      border-radius: 0 10px 0 0;
+    }
+    .tester-panel > summary {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 14px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .tester-panel > summary::-webkit-details-marker { display: none; }
+    .tester-panel-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brass-bright);
+    }
+    .tester-panel-hint { font-size: 0.85rem; font-style: italic; color: var(--parchment-muted); }
+    .tester-panel[open] > summary { border-bottom: 1px solid rgba(212, 168, 83, 0.25); }
+    .tester-panel-body { padding: 10px 14px 14px; }
+    .tester-row {
+      display: grid;
+      grid-template-columns: 92px 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.12);
+    }
+    .tester-row:last-child { border-bottom: 0; }
+    .tester-row-tag { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--parchment-dim); text-transform: uppercase; }
+    .tester-row-label { font-size: 1rem; }
+    .tester-row-label .tester-state { margin-left: 8px; font-size: 0.78rem; color: var(--parchment-muted); }
+    .tester-row.is-done .tester-state { color: #86efac; }
+    .tester-row.is-unbuilt { opacity: 0.55; }
+    .tester-btn {
+      padding: 5px 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: var(--brass-bright);
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.18s ease, border-color 0.18s ease;
+    }
+    .tester-btn:hover:not(:disabled) { background: rgba(60, 40, 14, 0.7); border-color: var(--brass-bright); }
+    .tester-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .tester-btn-warn { color: #fca5a5; border-color: rgba(252, 165, 165, 0.45); }
+    .tester-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+    @media (max-width: 640px) {
+      .tester-panel-hint { display: none; }
+      .tester-row { grid-template-columns: 1fr auto auto; }
+      .tester-row-tag { grid-column: 1 / -1; }
+    }
+
+    /* ---- Dawn route on the Grand Desert Map ---- */
+    #dawn-map-layer .dawn-route-halo { fill: none; stroke: rgba(255, 244, 214, 0.85); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
+    #dawn-map-layer .dawn-route-line { fill: none; stroke: #9a3412; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1 14; }
+    #dawn-map-layer .dawn-route-line.is-latest { animation: dawnRouteFlow 1.6s linear infinite; }
+    @keyframes dawnRouteFlow { to { stroke-dashoffset: -15; } }
+    #dawn-map-layer .dawn-fade { animation: unlockFadeIn 0.8s ease both; }
+    #dawn-map-layer .dawn-mark { cursor: pointer; }
+    #dawn-map-layer .dawn-mark:hover circle.dawn-mark-core { stroke: #fff3c4; }
+
+    /* ---- Dawn segment: satchel, chat sketches and the Cairn I stone-stacking game ---- */
+    .satchel-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+      padding: 4px 10px 4px 12px;
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      border-radius: 22px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      vertical-align: middle;
+      overflow: visible;
+      z-index: 40;
+    }
+    .satchel-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--parchment-dim);
+      margin-right: 2px;
+    }
+    .satchel-slot-anchor {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+    }
+    .satchel-slot {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(212, 168, 83, 0.35);
+      background: rgba(5, 8, 17, 0.7);
+      color: rgba(212, 168, 83, 0.4);
+      font-family: 'Cinzel', serif;
+      font-size: 0.62rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .satchel-slot:hover { transform: translateY(-1px); }
+    /* Tiny tip under the clicked Cairn (relative to that seal, not the page toast) */
+    .satchel-slot-tip {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 8px);
+      transform: translateX(-50%) translateY(-3px);
+      white-space: nowrap;
+      padding: 3px 7px;
+      border: 1px solid rgba(212, 168, 83, 0.45);
+      border-radius: 999px;
+      background: rgba(8, 10, 18, 0.94);
+      font-family: 'Cinzel', serif;
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #e8d2a0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      z-index: 50;
+    }
+    .satchel-slot-tip.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .satchel-slot.filled {
+      border: 1.5px solid var(--brass-bright);
+      background: radial-gradient(circle at 35% 30%, #e9c98a 0%, #b88a46 55%, #7a541c 100%);
+      color: #2a1a06;
+      box-shadow: 0 0 10px var(--brass-glow);
+    }
+    .satchel-slot.just-added { animation: satchelPop 0.9s ease-out 1; }
+    .satchel-slot.satchel-tool-slot {
+      border: 1.5px solid rgba(229, 152, 102, 0.7);
+      background: radial-gradient(circle at 35% 30%, #4a2c1b 0%, #26160d 75%);
+      color: #ffd8a8;
+      font-size: 0.85rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 8px rgba(229, 152, 102, 0.4);
+    }
+    .satchel-slot.satchel-tool-slot:hover {
+      border-color: #f6ad55;
+      box-shadow: 0 0 12px rgba(246, 173, 85, 0.6);
+      transform: translateY(-1px) scale(1.08);
+    }
+    @keyframes satchelPop {
+      0% { transform: scale(0.4); box-shadow: 0 0 0 rgba(255, 224, 153, 0); }
+      55% { transform: scale(1.35); box-shadow: 0 0 22px var(--brass-glow); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 640px) {
+      .satchel-label { display: none; }
+      .satchel-wrap { margin-left: 6px; padding: 3px 6px; gap: 4px; }
+      .satchel-slot { width: 24px; height: 24px; }
+    }
+
+    /* ---- Header Inventory Button (Frameless, Refined Typography) ---- */
+    .btn-satchel-inventory {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 12px;
+      padding: 4px 6px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid transparent;
+      border-radius: 0;
+      color: #d4a853;
+      font-family: 'Cinzel', serif;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: none;
+      transition: all 0.2s ease;
+      vertical-align: middle;
+    }
+    .btn-satchel-inventory:hover {
+      color: #ffffff;
+      border-bottom-color: rgba(212, 168, 83, 0.7);
+      background: transparent;
+      transform: translateY(-1px);
+      text-shadow: 0 0 10px rgba(212, 168, 83, 0.45);
+      box-shadow: none;
+    }
+    .btn-satchel-inventory .bsi-text {
+      display: inline-block;
+    }
+    .btn-satchel-inventory .bsi-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #f6ad55;
+      letter-spacing: 0;
+    }
+    .btn-satchel-inventory .bsi-badge::before {
+      content: '(';
+      color: rgba(212, 168, 83, 0.55);
+      margin-right: 1px;
+    }
+    .btn-satchel-inventory .bsi-badge::after {
+      content: ')';
+      color: rgba(212, 168, 83, 0.55);
+      margin-left: 1px;
+    }
+    .btn-satchel-inventory:hover .bsi-badge {
+      color: #ffd8a8;
+    }
+
+    /* ---- Cinematic Item Acquired Popup (Center Screen) ---- */
+    .item-acquired-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: radial-gradient(circle at center, rgba(8, 12, 22, 0.88) 0%, rgba(3, 5, 10, 0.96) 100%);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: iacFadeIn 0.35s ease-out;
+    }
+    @keyframes iacFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .item-acquired-card {
+      position: relative;
+      width: min(480px, 94vw);
+      background: linear-gradient(165deg, #182236 0%, #0d1320 60%, #080c15 100%);
+      border: 1.5px solid rgba(229, 178, 106, 0.7);
+      border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(229, 152, 102, 0.25), inset 0 1px 1px rgba(255, 230, 180, 0.3);
+      padding: 26px 24px 22px;
+      text-align: center;
+      animation: iacCardZoom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes iacCardZoom {
+      0% { transform: scale(0.75) translateY(20px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    .iac-frame-corner {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #e5b26a;
+      pointer-events: none;
+    }
+    .iac-frame-corner.corner-tl { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+    .iac-frame-corner.corner-tr { top: 6px; right: 6px; border-left: none; border-bottom: none; }
+    .iac-frame-corner.corner-bl { bottom: 6px; left: 6px; border-right: none; border-top: none; }
+    .iac-frame-corner.corner-br { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+
+    .iac-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      color: #e5b26a;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(229, 178, 106, 0.6);
+    }
+    .iac-sparkles {
+      color: rgba(229, 178, 106, 0.6);
+      font-size: 0.7rem;
+    }
+    .iac-art-wrap {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+    .iac-art-glow {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(229, 178, 106, 0.45) 0%, rgba(229, 152, 102, 0.15) 50%, transparent 70%);
+      animation: iacGlowPulse 2.8s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes iacGlowPulse {
+      0% { opacity: 0.5; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+    .iac-art-img {
+      width: 95%;
+      height: 95%;
+      object-fit: contain;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 20px rgba(255, 216, 168, 0.4));
+      position: relative;
+      z-index: 1;
+      animation: iacItemFloat 3.5s ease-in-out infinite alternate;
+    }
+    @keyframes iacItemFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-8px) rotate(1.5deg); }
+    }
+    .iac-info {
+      margin-bottom: 18px;
+    }
+    .iac-category {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      color: #9cb3d8;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .iac-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffd8a8;
+      margin: 0 0 6px 0;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    }
+    .iac-origin {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #c99367;
+      margin-bottom: 10px;
+    }
+    .iac-lore {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 0.98rem;
+      line-height: 1.45;
+      color: #e4d5c4;
+      margin: 0;
+      text-align: center;
+      padding: 0 8px;
+    }
+    .iac-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 6px;
+    }
+    .iac-btn-collect {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #b88a46 0%, #7a541c 100%);
+      border: 1.5px solid #ffdf9e;
+      border-radius: 24px;
+      color: #1a0f04;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(184, 138, 70, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+    .iac-btn-collect:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(255, 223, 158, 0.6);
+      background: linear-gradient(135deg, #d4a359 0%, #8f6424 100%);
+    }
+
+    /* ---- Satchel Relics Inventory Modal ---- */
+    .satchel-inventory-window {
+      position: relative;
+      width: min(840px, 95vw);
+      max-height: 88vh;
+      background: linear-gradient(165deg, #141c2c 0%, #0b101c 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.6);
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .satchel-inventory-body {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 16px;
+      padding: 18px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    @media (max-width: 720px) {
+      .satchel-inventory-body {
+        grid-template-columns: 1fr;
+      }
+    }
+    .si-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: #d6beaa;
+      text-transform: uppercase;
+    }
+    .si-count-pill {
+      background: rgba(212, 168, 83, 0.15);
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: #ffd8a8;
+      font-size: 0.65rem;
+    }
+    .si-items-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .si-items-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 14px;
+      background: rgba(10, 15, 26, 0.95);
+      border: 2px solid #060910;
+      border-top-color: #04060b;
+      border-left-color: #04060b;
+      border-right-color: rgba(212, 168, 83, 0.35);
+      border-bottom-color: rgba(212, 168, 83, 0.35);
+      border-radius: 8px;
+      box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.95), 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+    .si-mc-slot {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: #0d1422;
+      border-top: 2.5px solid #05080f;
+      border-left: 2.5px solid #05080f;
+      border-right: 2.5px solid rgba(212, 168, 83, 0.28);
+      border-bottom: 2.5px solid rgba(212, 168, 83, 0.28);
+      box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.95);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      cursor: default;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+    .si-mc-slot.is-filled {
+      cursor: pointer;
+    }
+    .si-mc-slot.is-filled:hover {
+      background: #182338;
+      border-right-color: #f6ad55;
+      border-bottom-color: #f6ad55;
+      box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2), 0 0 12px rgba(229, 178, 106, 0.45);
+      transform: translateY(-1px);
+    }
+    .si-mc-slot.active {
+      background: #202e4a;
+      border: 2.5px solid #ffd8a8 !important;
+      box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.5), 0 0 16px rgba(255, 216, 168, 0.75);
+      transform: scale(1.05);
+      z-index: 2;
+    }
+    .si-mc-thumb {
+      width: 88%;
+      height: 88%;
+      object-fit: contain;
+      pointer-events: none;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.9));
+      transition: transform 0.15s ease;
+    }
+    .si-mc-slot.is-filled:hover .si-mc-thumb {
+      transform: scale(1.12);
+    }
+    .si-mc-slot.is-empty {
+      opacity: 0.4;
+    }
+    .si-mc-slot.is-empty:hover {
+      opacity: 0.6;
+      background: #111a2c;
+    }
+    .si-mc-empty-mark {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(212, 168, 83, 0.2);
+      box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+    .si-grid-legend {
+      margin-top: 10px;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: #9cb3d8;
+      letter-spacing: 0.05em;
+    }
+
+    .si-inspect-panel {
+      background: rgba(10, 15, 26, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .si-inspect-art-wrap {
+      width: min(240px, 100%);
+      aspect-ratio: 1 / 1;
+      margin-bottom: 16px;
+      border-radius: 50%;
+      overflow: visible;
+      border: none;
+      box-shadow: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle, rgba(229, 178, 106, 0.16) 0%, rgba(20, 28, 44, 0.6) 50%, transparent 70%);
+      position: relative;
+    }
+    .si-inspect-img {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 16px rgba(229, 178, 106, 0.25));
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .si-inspect-art-wrap:hover .si-inspect-img {
+      transform: scale(1.08) translateY(-4px);
+    }
+    .si-inspect-category {
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      color: #9cb3d8;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .si-inspect-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffd8a8;
+      margin: 0 0 6px 0;
+    }
+    .si-inspect-origin {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #c99367;
+      margin-bottom: 12px;
+    }
+    .si-inspect-desc {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #e4d5c4;
+      max-width: 440px;
+      text-align: center;
+    }
+
+    .chat-sketch-bubble { padding: 8px 8px 6px; max-width: min(460px, 86%); }
+    .chat-sketch-bubble img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+    }
+    .chat-sketch-cap {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--parchment-dim);
+      margin: 6px 4px 2px;
+    }
+
+    .c1-board-wrap {
+      width: 100%;
+      padding: 24px 16px 20px;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.12) 0%, transparent 65%),
+        linear-gradient(180deg, rgba(32, 22, 14, 0.88) 0%, rgba(18, 12, 8, 0.95) 75%, rgba(12, 8, 5, 0.98) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.3);
+      border-radius: 10px;
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.85), 0 8px 24px rgba(0, 0, 0, 0.65);
+      position: relative;
+      overflow: hidden;
+    }
+    .c1-board-wrap::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 48px;
+      background: linear-gradient(180deg, transparent 0%, rgba(55, 36, 18, 0.4) 60%, rgba(35, 22, 10, 0.85) 100%);
+      pointer-events: none;
+      border-bottom: 2px solid rgba(212, 168, 83, 0.25);
+    }
+    .c1-pegs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      min-height: 350px;
+      position: relative;
+      z-index: 2;
+    }
+    .c1-peg {
+      position: relative;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 4px;
+      padding: 0 6px 42px;
+      background: transparent;
+      border: 1.5px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+    /* Celestial meridian plumb-line alignment guide */
+    .c1-peg::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 42px;
+      width: 2px;
+      height: 75%;
+      transform: translateX(-50%);
+      background: repeating-linear-gradient(180deg, rgba(212, 168, 83, 0.32) 0, rgba(212, 168, 83, 0.32) 6px, transparent 6px, transparent 12px);
+      box-shadow: 0 0 6px rgba(212, 168, 83, 0.15);
+      pointer-events: none;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .c1-peg:hover::before {
+      background: repeating-linear-gradient(180deg, rgba(251, 191, 36, 0.6) 0, rgba(251, 191, 36, 0.6) 6px, transparent 6px, transparent 12px);
+      box-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+    }
+    /* Carved stone plinth / altar pedestal */
+    .c1-peg::after {
+      content: attr(data-label);
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      height: 32px;
+      line-height: 30px;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--brass-bright);
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(255, 230, 160, 0.2) 0%, transparent 70%),
+        linear-gradient(180deg, #422d16 0%, #291b0d 60%, #170e06 100%);
+      border: 1.5px solid #7a541c;
+      border-top: 2px solid var(--brass-bright);
+      border-radius: 4px 4px 6px 6px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+      transition: all 0.2s ease;
+    }
+    .c1-peg:hover::after {
+      border-color: var(--brass-bright);
+      box-shadow: 0 0 14px rgba(212, 168, 83, 0.4), 0 4px 8px rgba(0, 0, 0, 0.7);
+    }
+    .c1-peg.is-source::after {
+      border-color: #fbbf24;
+      background: linear-gradient(180deg, #593d1f 0%, #3a2613 60%, #1f1308 100%);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
+      color: #fff;
+    }
+    .c1-peg.is-source {
+      border-color: rgba(251, 191, 36, 0.4);
+      background: radial-gradient(circle at 50% 40%, rgba(251, 191, 36, 0.08) 0%, transparent 70%);
+    }
+    .c1-peg.is-target-ok:hover::after {
+      border-color: #86efac;
+      box-shadow: 0 0 16px rgba(134, 239, 172, 0.45);
+      color: #86efac;
+    }
+    .c1-peg.is-target-blocked:hover {
+      cursor: not-allowed;
+    }
+    .c1-peg.is-target-blocked:hover::after {
+      border-color: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .c1-peg.shake { animation: c1Shake 0.32s ease; }
+    @keyframes c1Shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    .c1-peg.is-drag-hover::after {
+      border-color: #fbbf24;
+      background: linear-gradient(180deg, #593d1f 0%, #3a2613 60%, #1f1308 100%);
+      box-shadow: 0 0 18px rgba(251, 191, 36, 0.65);
+      color: #fff;
+    }
+    .c1-stone[draggable="true"] {
+      cursor: grab;
+    }
+    .c1-stone[draggable="true"]:active {
+      cursor: grabbing;
+    }
+    .c1-stone.is-dragging {
+      opacity: 0.4;
+      filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.5));
+    }
+    .c1-stone {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.2s ease, filter 0.2s ease;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.75));
+    }
+    .c1-stone::before {
+      content: '';
+      position: absolute;
+      inset: 2px 4px;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0.65;
+      mix-blend-mode: overlay;
+    }
+    .c1-stone::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 10%;
+      right: 10%;
+      height: 35%;
+      border-radius: 50% / 100% 100% 0 0;
+      background: linear-gradient(180deg, rgba(255, 250, 230, 0.5) 0%, rgba(255, 250, 230, 0) 100%);
+      pointer-events: none;
+    }
+    /* SIZE 1 · Smallest River Pebble */
+    .c1-stone[data-size="1"] {
+      width: 32%;
+      height: 34px;
+      border-radius: 46% 54% 50% 50% / 62% 48% 52% 38%;
+      transform: rotate(-1.5deg);
+      background:
+        radial-gradient(ellipse at 35% 25%, rgba(255, 252, 240, 0.6) 0%, transparent 45%),
+        radial-gradient(ellipse at 70% 75%, rgba(40, 25, 12, 0.5) 0%, transparent 55%),
+        linear-gradient(172deg, #e0be8a 0%, #be965e 40%, #876231 85%, #5a3c18 100%);
+      border: 1.5px solid #4a3012;
+      box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.65),
+        inset 0 2px 3px rgba(255, 255, 255, 0.5),
+        inset 0 -3px 5px rgba(30, 18, 8, 0.6);
+    }
+    .c1-stone[data-size="1"]::before {
+      background: linear-gradient(110deg, transparent 35%, rgba(255, 245, 215, 0.45) 42%, rgba(70, 42, 16, 0.5) 45%, transparent 55%);
+    }
+    /* SIZE 2 · Weathered Sandstone River Slab */
+    .c1-stone[data-size="2"] {
+      width: 50%;
+      height: 40px;
+      border-radius: 54% 46% 58% 42% / 46% 56% 44% 54%;
+      transform: rotate(1deg);
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(255, 245, 220, 0.5) 0%, transparent 40%),
+        repeating-linear-gradient(174deg, transparent 0, transparent 7px, rgba(95, 60, 25, 0.22) 8px, transparent 10px),
+        linear-gradient(180deg, #d2a86e 0%, #b3854b 38%, #805724 85%, #523412 100%);
+      border: 1.5px solid #4c3010;
+      box-shadow:
+        0 5px 8px rgba(0, 0, 0, 0.7),
+        inset 0 2px 4px rgba(255, 255, 255, 0.45),
+        inset 0 -4px 6px rgba(32, 19, 8, 0.65);
+    }
+    .c1-stone[data-size="2"]::before {
+      background:
+        linear-gradient(168deg, transparent 48%, rgba(60, 36, 14, 0.45) 50%, rgba(255, 240, 200, 0.35) 52%, transparent 56%),
+        radial-gradient(circle at 75% 30%, rgba(255, 225, 170, 0.3) 0%, transparent 35%);
+    }
+    /* SIZE 3 · Desert Quartzite Boulder */
+    .c1-stone[data-size="3"] {
+      width: 68%;
+      height: 48px;
+      border-radius: 45% 55% 42% 58% / 54% 44% 56% 46%;
+      transform: rotate(-0.6deg);
+      background:
+        radial-gradient(ellipse at 38% 22%, rgba(255, 242, 215, 0.5) 0%, transparent 45%),
+        radial-gradient(ellipse at 80% 65%, rgba(35, 20, 8, 0.45) 0%, transparent 50%),
+        linear-gradient(135deg, transparent 35%, rgba(180, 80, 30, 0.16) 42%, transparent 50%),
+        linear-gradient(182deg, #c6995c 0%, #a2753a 45%, #714a19 88%, #442a0b 100%);
+      border: 1.5px solid #44280b;
+      box-shadow:
+        0 6px 10px rgba(0, 0, 0, 0.75),
+        inset 0 3px 5px rgba(255, 255, 255, 0.4),
+        inset 0 -5px 7px rgba(28, 16, 6, 0.7);
+    }
+    .c1-stone[data-size="3"]::before {
+      background:
+        linear-gradient(125deg, transparent 20%, rgba(255, 235, 190, 0.3) 24%, rgba(65, 38, 15, 0.5) 26%, transparent 32%),
+        repeating-linear-gradient(178deg, transparent 0, transparent 9px, rgba(80, 48, 18, 0.18) 10px, transparent 12px);
+    }
+    /* SIZE 4 · Ancient Foundation Megalith (The Base Stone) */
+    .c1-stone[data-size="4"] {
+      width: 88%;
+      height: 56px;
+      border-radius: 50% 50% 56% 44% / 40% 46% 54% 60%;
+      transform: rotate(0.3deg);
+      background:
+        radial-gradient(ellipse at 32% 18%, rgba(255, 238, 200, 0.45) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 70%, rgba(30, 18, 7, 0.55) 0%, transparent 55%),
+        linear-gradient(180deg, #ba8c50 0%, #94662d 42%, #633e13 85%, #382006 100%);
+      border: 1.5px solid #3c2207;
+      box-shadow:
+        0 8px 14px rgba(0, 0, 0, 0.8),
+        inset 0 3px 6px rgba(255, 255, 255, 0.35),
+        inset 0 -6px 8px rgba(24, 13, 4, 0.75);
+    }
+    .c1-stone[data-size="4"]::before {
+      background:
+        linear-gradient(172deg, transparent 40%, rgba(50, 30, 10, 0.55) 42%, rgba(255, 230, 175, 0.28) 44%, transparent 50%),
+        repeating-linear-gradient(105deg, transparent 0, transparent 14px, rgba(70, 40, 15, 0.15) 15px, transparent 18px);
+    }
+    .c1-stone-glyph {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: rgba(255, 230, 160, 0.32);
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8), 0 -1px 1px rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Lifted State with volumetric floating shadow */
+    .c1-stone.is-lifted {
+      transform: translateY(-26px) scale(1.03) rotate(-2deg) !important;
+      filter: drop-shadow(0 20px 24px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 16px rgba(251, 191, 36, 0.45));
+      z-index: 10;
+      animation: stoneHoverPulse 2.4s ease-in-out infinite alternate;
+    }
+    @keyframes stoneHoverPulse {
+      0% { transform: translateY(-26px) scale(1.03) rotate(-2deg); }
+      100% { transform: translateY(-30px) scale(1.04) rotate(-1deg); }
+    }
+    /* Solved Seal Glow */
+    .c1-stone.is-seal-glow {
+      box-shadow:
+        0 0 22px rgba(134, 239, 172, 0.65),
+        inset 0 0 14px rgba(134, 239, 172, 0.35),
+        inset 0 -4px 6px rgba(60, 35, 10, 0.45) !important;
+      border-color: #86efac;
+    }
+    .c1-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .c1-btn-row .chasm-cairn-btn { flex: 1 1 140px; font-size: 0.85rem; }
+    .c1-seal-disc {
+      display: inline-block;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      margin: 4px 0 10px;
+      background: radial-gradient(circle at 35% 30%, #efd9a8 0%, #c79a55 55%, #7a541c 100%);
+      border: 2px solid var(--brass-bright);
+      box-shadow: 0 0 18px var(--brass-glow);
+      text-align: center;
+      line-height: 50px;
+      font-size: 1.6rem;
+      color: #3a2508;
+    }
+
+    /* Centered Victory Popup for Cairn 1 / The Wash River Marker */
+    #cairn1-victory-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10010;
+      width: min(580px, calc(100vw - 36px));
+      max-height: 88vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      background: linear-gradient(135deg, rgba(28, 20, 12, 0.98) 0%, rgba(14, 11, 7, 0.99) 100%);
+      border: 2px solid #22c55e;
+      border-radius: 14px;
+      padding: 30px 32px 26px;
+      box-shadow:
+        0 0 0 100vmax rgba(0, 0, 0, 0.72),
+        0 0 45px rgba(34, 197, 94, 0.4),
+        0 25px 60px rgba(0, 0, 0, 0.95);
+      text-align: center;
+      animation: cairnVictoryPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    #cairn1-victory-card .chasm-victory-title {
+      justify-content: center;
+      font-size: 1.45rem;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      color: #86efac;
+      text-shadow: 0 0 16px rgba(134, 239, 172, 0.4);
+    }
+
+    #cairn1-victory-card .c1-seal-disc {
+      margin: 10px auto 18px;
+      display: block;
+      width: 62px;
+      height: 62px;
+      line-height: 58px;
+      font-size: 1.85rem;
+      box-shadow: 0 0 24px rgba(212, 168, 83, 0.6);
+    }
+
+    #cairn1-victory-card .chasm-victory-text {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.15rem;
+      line-height: 1.65;
+      margin-bottom: 24px;
+      color: #f3eedd;
+      text-align: center;
+    }
+
+    #cairn1-victory-card .btn-chasm-finish {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      padding: 13px 26px;
+      font-size: 1.05rem;
+      letter-spacing: 0.8px;
+      border-radius: 8px;
+      box-shadow: 0 4px 18px rgba(21, 128, 61, 0.45);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    #cairn1-victory-card .btn-chasm-finish:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(34, 197, 94, 0.6);
+    }
+
+    @keyframes cairnVictoryPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -46%) scale(0.92);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    @keyframes messengerBadgePulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.7);
+      }
+      50% {
+        transform: scale(1.14);
+        box-shadow: 0 0 14px rgba(239, 68, 68, 0.95);
+      }
+    }
+

@@ -1,0 +1,257 @@
+    /* =========================================================================
+       VIEW 3: CHRONICLES OF THE RAID (HISTORICAL WEBS)
+       ========================================================================= */
+    .chronicles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .chronicle-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-brass);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .chronicle-card:hover {
+      border-color: var(--brass-bright);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.85), 0 0 24px rgba(212, 168, 83, 0.2);
+    }
+
+    .chronicle-thumb-wrap {
+      width: 100%;
+      height: 140px;
+      overflow: hidden;
+      position: relative;
+      background: #050811;
+      border-bottom: 1px solid var(--border-brass);
+    }
+
+    .chronicle-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: brightness(0.96) contrast(1.04);
+      transition: transform 0.4s ease, filter 0.4s ease;
+    }
+
+    .chronicle-card:hover .chronicle-thumb-wrap img {
+      transform: scale(1.05);
+      filter: brightness(1.08) contrast(1.06);
+    }
+
+    .chronicle-body {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .chronicle-step-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--brass-base);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .chronicle-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      margin-bottom: 10px;
+    }
+
+    .chronicle-text {
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1.05rem;
+      color: var(--parchment-dim);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .btn-historical-web {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(212, 168, 83, 0.15);
+      border: 1px solid var(--brass-base);
+      border-radius: 4px;
+      color: var(--brass-bright);
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-historical-web:hover {
+      background: var(--brass-base);
+      color: #03050a;
+      box-shadow: 0 0 16px rgba(226, 185, 111, 0.5);
+    }
+
+    .chronicle-card.chronicle-locked-card {
+      border: 1px dashed rgba(226, 176, 105, 0.45);
+      background: linear-gradient(180deg, rgba(14, 18, 28, 0.95) 0%, rgba(8, 10, 18, 0.98) 100%);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .chronicle-countdown-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      background: rgba(10, 14, 24, 0.85);
+      border: 1px solid rgba(226, 176, 105, 0.35);
+      border-radius: 6px;
+    }
+
+    .chronicle-cd-unit {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3px;
+      font-family: 'Space Mono', monospace;
+      color: #e2b069;
+    }
+
+    .chronicle-cd-unit strong {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .chronicle-cd-unit small {
+      font-size: 0.75rem;
+      color: var(--brass-base);
+      text-transform: uppercase;
+    }
+
+    .btn-chronicle-locked {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 11px 20px;
+      background: rgba(226, 176, 105, 0.1);
+      border: 1px solid rgba(226, 176, 105, 0.4);
+      border-radius: 4px;
+      color: #e2b069;
+      font-family: 'Cinzel', serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: default;
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 2, 5, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .lightbox-modal.open {
+      display: flex;
+    }
+
+    .lightbox-img-wrap {
+      position: relative;
+      min-width: 320px;
+      min-height: 420px;
+      max-width: 92vw;
+      max-height: 90vh;
+      border: 2px solid #b45309;
+      border-radius: 10px;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.98), inset 0 0 40px rgba(0, 0, 0, 0.9);
+      overflow: auto;
+      background: #080402;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-img-wrap img {
+      max-width: 100%;
+      max-height: 85vh;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+      filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.95));
+    }
+
+    .lightbox-img-wrap.loaded img {
+      opacity: 1;
+    }
+
+    .lightbox-skeleton {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(35, 20, 11, 0.98) 0%, rgba(10, 5, 2, 0.99) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      pointer-events: none;
+    }
+
+    .lightbox-img-wrap.loaded .lightbox-skeleton {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: -16px;
+      right: -16px;
+      background: #1a0d06;
+      border: 2px solid #ffd580;
+      color: #ffd580;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0,0,0,0.95), 0 0 10px rgba(245, 158, 11, 0.4);
+      z-index: 100000;
+      transition: all 0.2s ease;
+    }
+
+    .lightbox-close-btn:hover {
+      background: #ffd580;
+      color: #1a0d06;
+      transform: scale(1.1);
+    }
+

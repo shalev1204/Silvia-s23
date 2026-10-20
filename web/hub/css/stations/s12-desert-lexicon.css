@@ -1,0 +1,570 @@
+    /* ===================================================================
+       THE DESERT LEXICON & AL-QIBLA TACTICAL MODAL (STATION 12)
+       =================================================================== */
+    .lexicon-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: radial-gradient(circle at center, rgba(14, 10, 6, 0.96) 0%, rgba(3, 4, 6, 0.99) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+      animation: unlockFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .lexicon-modal-backdrop.closing {
+      animation: unlockFadeIn 0.25s reverse forwards;
+    }
+
+    .lexicon-workbench-window {
+      width: 100%;
+      max-width: 1360px;
+      max-height: 94vh;
+      display: flex;
+      flex-direction: column;
+      background: #120e0a;
+      border: 2px solid var(--brass-bright);
+      border-radius: 12px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.95), 0 0 35px rgba(56, 189, 248, 0.25);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .lexicon-header-bar {
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid rgba(212, 168, 83, 0.35);
+      background: rgba(22, 16, 10, 0.98);
+    }
+
+    .lexicon-header-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lexicon-header-icon {
+      font-size: 1.5rem;
+    }
+
+    .lexicon-header-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.08em;
+    }
+
+    .lexicon-header-subtitle {
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      color: var(--parchment-dim);
+      font-style: italic;
+    }
+
+    .lexicon-close-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      font-size: 1.2rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .lexicon-close-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    .lexicon-telemetry-strip {
+      padding: 10px 24px;
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: rgba(10, 8, 5, 0.94);
+      border-bottom: 1px solid rgba(212, 168, 83, 0.18);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #ffe099;
+    }
+
+    .lexicon-telemetry-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212, 168, 83, 0.08);
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(212, 168, 83, 0.18);
+    }
+
+    .lexicon-telemetry-pill strong {
+      color: #fff;
+    }
+
+    .lexicon-workbench-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 16px;
+      padding: 14px 20px;
+      overflow-y: auto;
+      flex: 1;
+      background: radial-gradient(circle at 30% 20%, rgba(26, 18, 12, 0.95) 0%, rgba(12, 9, 6, 0.98) 100%);
+    }
+
+    @media (max-width: 1024px) {
+      .lexicon-workbench-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left: Sandstone Stele Crossword Frame */
+    .lexicon-stele-frame {
+      background: #18130e;
+      border: 1.5px solid var(--brass-base);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .lexicon-stele-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+      padding-bottom: 6px;
+    }
+
+    .lexicon-stele-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+    }
+
+    .lexicon-grid-container {
+      width: 100%;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+      padding: 4px 0;
+    }
+
+    .lexicon-crossword-table {
+      border-collapse: separate;
+      border-spacing: 2px;
+      user-select: none;
+    }
+
+    .lexicon-cw-cell {
+      width: 29px;
+      height: 29px;
+      text-align: center;
+      vertical-align: middle;
+      font-family: 'Cinzel', serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      position: relative;
+      border-radius: 3px;
+    }
+
+    .lexicon-cw-cell.empty {
+      background: rgba(18, 12, 8, 0.4);
+      border: 1px solid transparent;
+    }
+
+    .lexicon-cw-cell.active {
+      background: #251a11;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      color: #fef08a;
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lexicon-cw-cell.active:hover {
+      background: #38271a;
+      border-color: #fbbf24;
+    }
+
+    .lexicon-cw-cell.selected {
+      background: #451a03 !important;
+      border-color: #f59e0b !important;
+      color: #fff !important;
+    }
+
+    .lexicon-cw-cell.circled {
+      border: 2px solid #f59e0b !important;
+      background: #2c1a0c !important;
+    }
+
+    .lexicon-cell-badge {
+      position: absolute;
+      top: 1px;
+      left: 2px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .lexicon-cell-circle-num {
+      position: absolute;
+      bottom: 1px;
+      right: 2px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: #fbbf24;
+      background: #180e07;
+      padding: 0 2px;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    /* Clues List */
+    .lexicon-clues-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      background: rgba(14, 10, 6, 0.6);
+      border: 1px solid rgba(212, 168, 83, 0.15);
+      border-radius: 6px;
+      padding: 12px;
+      max-height: 230px;
+      overflow-y: auto;
+    }
+
+    .lexicon-clue-col-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+      padding-bottom: 4px;
+    }
+
+    .lexicon-clue-item {
+      font-size: 0.8rem;
+      color: var(--parchment-dim);
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      gap: 6px;
+      transition: background 0.15s ease;
+      line-height: 1.3;
+    }
+
+    .lexicon-clue-item:hover {
+      background: rgba(212, 168, 83, 0.1);
+      color: #fff;
+    }
+
+    .lexicon-clue-item.active {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fde68a;
+      border-left: 2px solid #f59e0b;
+    }
+
+    .lexicon-clue-item.solved {
+      color: #86efac;
+    }
+
+    .lexicon-clue-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--brass-bright);
+      min-width: 18px;
+    }
+
+    /* Stele Input Bar */
+    .lexicon-stele-input-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(20, 14, 9, 0.8);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 168, 83, 0.2);
+    }
+
+    .lexicon-word-input {
+      flex: 1;
+      background: #0d0905;
+      border: 1px solid rgba(212, 168, 83, 0.4);
+      color: #fff;
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 4px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .lexicon-word-input:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-carve-word {
+      background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+      border: 1px solid #f59e0b;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-carve-word:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    /* Right: Desk Panel & Al-Qibla Table */
+    .lexicon-desk-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(22, 16, 11, 0.65);
+      border: 1px solid rgba(212, 168, 83, 0.22);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .lexicon-sigil-slots-box {
+      background: rgba(14, 10, 6, 0.8);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .lexicon-slots-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      color: var(--brass-bright);
+      margin-bottom: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .lexicon-slots-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .lexicon-slot-box {
+      width: 44px;
+      height: 52px;
+      background: #191007;
+      border: 1.5px dashed rgba(212, 168, 83, 0.45);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+
+    .lexicon-slot-box.filled {
+      border-style: solid;
+      border-color: #f59e0b;
+      background: #331e0c;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .lexicon-slot-box .slot-letter {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fde68a;
+    }
+
+    .lexicon-slot-box .slot-idx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      color: #94a3b8;
+      position: absolute;
+      bottom: 2px;
+    }
+
+    /* Al-Qibla Sun Compass */
+    .lexicon-compass-box {
+      background: rgba(14, 10, 6, 0.8);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    .lexicon-compass-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      letter-spacing: 0.06em;
+    }
+
+    .lexicon-compass-dial-wrap {
+      width: 140px;
+      height: 140px;
+      position: relative;
+    }
+
+    .lexicon-compass-svg {
+      width: 100%;
+      height: 100%;
+      transform-origin: center;
+    }
+
+    .lexicon-compass-bearing-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #38bdf8;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    /* Math Stele Box */
+    .lexicon-math-box {
+      background: rgba(15, 12, 8, 0.9);
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      border-left: 3px solid #f59e0b;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .lexicon-math-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #f59e0b;
+      margin-bottom: 4px;
+    }
+
+    .lexicon-math-formula {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fde68a;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 4px 0;
+    }
+
+    /* Dispatch Box */
+    .lexicon-dispatch-box {
+      background: rgba(10, 8, 5, 0.85);
+      border: 1px solid rgba(212, 168, 83, 0.25);
+      border-left: 3px solid #38bdf8;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: #fef08a;
+      line-height: 1.45;
+    }
+
+    .lexicon-dispatch-sender {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #38bdf8;
+      margin-bottom: 4px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Victory Card */
+    .lexicon-victory-card {
+      background: linear-gradient(135deg, rgba(16, 28, 35, 0.95) 0%, rgba(9, 17, 22, 0.98) 100%);
+      border: 2px solid #38bdf8;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 0 28px rgba(56, 189, 248, 0.25);
+      animation: unlockFadeIn 0.5s ease forwards;
+    }
+
+    .lexicon-victory-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #7dd3fc;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .lexicon-victory-text {
+      font-family: 'EB Garamond', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      color: #e0f2fe;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .btn-lexicon-finish {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border: 1.5px solid #38bdf8;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-lexicon-finish:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+    }
+

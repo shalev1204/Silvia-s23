@@ -1,0 +1,59 @@
+    /* ===================================================================
+       STATION 16 · CAIRN IV, SENTRY OF THE CANYON (THE SONG OF THE PILLARS)
+       Uses the .monolith-* shell of Station 14; only the canyon plan, the chronograph tape and
+       the song controls live here.
+       =================================================================== */
+    .pillars-plan {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 360px;
+      border-radius: 8px;
+      background: radial-gradient(circle at 50% 95%, #3b2a17 0%, #1a120a 80%);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .pillars-plan .pillars-fissure { cursor: pointer; }
+    .pillars-plan .pillars-fissure:focus { outline: none; }
+    .pillars-plan .pillars-fissure:hover rect.pillars-tag { stroke: #fde68a; stroke-width: 0.9; }
+    .pillars-plan .pillars-fissure:focus-visible rect.pillars-tag { stroke: #fde68a; stroke-width: 1.6; filter: drop-shadow(0 0 1.5px #fbbf24); }
+    .pillars-tape-wrap {
+      margin-top: 10px;
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      background: #efe6d2;
+      scrollbar-width: thin;
+    }
+    .pillars-tape { display: block; height: 96px; }
+    .pillars-tape-caption { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; font-size: 0.72rem; color: #b8a07a; }
+    .pillars-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+    .pillars-verse-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pillars-verse-tabs .monolith-btn { padding: 6px 12px; }
+    .pillars-verse-tabs .monolith-btn[aria-pressed="true"] { background: rgba(245, 158, 11, 0.35); border-color: #fbbf24; }
+    .pillars-verse-tabs .monolith-btn.is-sung::after { content: ' ✓'; color: #86efac; }
+    .pillars-slots { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pillars-slot {
+      min-width: 52px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px dashed rgba(212, 168, 83, 0.55);
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      color: #fde68a;
+      background: rgba(15, 10, 5, 0.6);
+    }
+    .pillars-slot.is-filled { border-style: solid; background: rgba(245, 158, 11, 0.16); }
+    .pillars-mode .monolith-btn[aria-pressed="true"] { background: rgba(56, 189, 248, 0.2); border-color: #7dd3fc; color: #e0f2fe; }
+    .pillars-words { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .pillars-word {
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.25em;
+      color: #7a6a52;
+    }
+    .pillars-word.is-sung { color: #fde68a; border-color: #fbbf24; background: rgba(245, 158, 11, 0.12); }
+

@@ -1,0 +1,60 @@
+    /* ---- Station 20 · The Gate of a Thousand Masks ---- */
+    .masks-draw-lead { margin: 0 0 8px; font-size: 0.84rem; }
+    .masks-stage { display: flex; justify-content: center; }
+    .masks-canvas {
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      aspect-ratio: 300 / 380;
+      border-radius: 12px;
+      border: 1px solid rgba(201, 154, 59, 0.45);
+      background: radial-gradient(ellipse at 30% 40%, #2a0b24 0%, #12040e 75%);
+      touch-action: none;
+      cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .masks-canvas.is-carved { cursor: default; }
+    .masks-fragment-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; align-items: center; margin: 10px 0; }
+    .masks-fragment { width: 120px; height: 120px; display: block; }
+    .masks-fragment-row span { display: block; font-size: 0.8rem; color: #d9bfd1; }
+    .masks-fragment-name { display: block; font-family: 'Cinzel', serif; color: #f7dc8c; letter-spacing: 0.06em; }
+    .masks-speaker-line { font-style: italic; color: #e9d5ff; font-size: 0.88rem; margin: 10px 0; }
+    .masks-speaker-sign { display: block; width: 72px; height: 0; margin: 8px 0 0 auto; border-top: 2px solid rgba(233, 213, 255, 0.8); }
+    @media (prefers-reduced-motion: reduce) { .masks-canvas { transition: none; } }
+
+    .stage-passage-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: radial-gradient(ellipse at 50% 30%, rgba(76, 29, 149, 0.55) 0%, rgba(5, 3, 2, 0.94) 70%);
+      animation: stagePassageIn 0.6s ease-out;
+    }
+    @keyframes stagePassageIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .stage-passage-card {
+      position: relative;
+      width: min(560px, 100%);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      padding: 28px 24px 22px;
+      border-radius: 14px;
+      border: 1.5px solid #c4b5fd;
+      background: linear-gradient(180deg, #1b1030 0%, #0e0905 100%);
+      text-align: center;
+      color: #ede9fe;
+      box-shadow: 0 0 40px rgba(167, 139, 250, 0.35);
+    }
+    .stage-passage-card svg { display: block; width: 100%; max-width: 360px; height: auto; margin: 0 auto 10px; }
+    .stage-passage-card .stage-curtain { transform-origin: top center; animation: stageCurtain 2.4s ease-in-out 0.4s both; }
+    .stage-passage-card .stage-curtain.is-right { animation-name: stageCurtainRight; }
+    @keyframes stageCurtain { 0% { transform: translateX(0); } 100% { transform: translateX(-34%); } }
+    @keyframes stageCurtainRight { 0% { transform: translateX(0); } 100% { transform: translateX(34%); } }
+    .stage-passage-title { margin: 0 0 8px; font-family: 'Cinzel', serif; font-size: 1.25rem; letter-spacing: 0.12em; color: #ddd6fe; }
+    .stage-passage-card p { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.5; }
+    .stage-passage-motto { font-family: 'Cinzel', serif; font-style: italic; color: #fde68a; letter-spacing: 0.04em; }
+    @media (prefers-reduced-motion: reduce) { .stage-passage-overlay, .stage-passage-card .stage-curtain { animation: none; } }

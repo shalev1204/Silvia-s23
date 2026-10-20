@@ -1,0 +1,102 @@
+    /* ===================================================================
+       THE SALT PLAYA TACTICAL MODAL (STATION 11) · reuses the .chasm-* chrome
+       =================================================================== */
+    .playa-board-wrap { width: 100%; max-width: 620px; }
+    .playa-col-heads, .playa-row {
+      display: grid;
+      grid-template-columns: 34px repeat(7, minmax(0, 1fr));
+      gap: 6px;
+      align-items: center;
+    }
+    .playa-col-heads {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(212, 168, 83, 0.7);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .playa-row { margin-bottom: 6px; padding: 3px 0; border-radius: 6px; transition: background 0.25s ease; }
+    .playa-row.current { background: rgba(212, 168, 83, 0.10); box-shadow: inset 0 0 0 1px rgba(212, 168, 83, 0.35); }
+    .playa-row-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--brass-bright);
+      text-align: center;
+    }
+    .playa-slab {
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      border: 1.5px solid rgba(60, 50, 35, 0.55);
+      background: linear-gradient(145deg, #efe8d6 0%, #d9cfb6 100%);
+      color: #3a2f1c;
+      font-family: 'Cinzel', serif;
+      cursor: pointer;
+      position: relative;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      line-height: 1.05;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.18), 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    .playa-slab::after {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border-radius: 5px;
+      background:
+        linear-gradient(135deg, transparent 46%, rgba(80, 64, 40, 0.18) 47%, transparent 49%),
+        linear-gradient(60deg, transparent 62%, rgba(80, 64, 40, 0.14) 63%, transparent 65%);
+      pointer-events: none;
+    }
+    .playa-num { font-size: 1.3rem; font-weight: 700; }
+    .playa-let { font-size: 0.72rem; font-weight: 700; color: #6b4f1d; letter-spacing: 0.04em; }
+    .playa-slab.reachable { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.9), 0 0 14px rgba(245, 158, 11, 0.5); }
+    .playa-slab:hover:not(.sink):not(.chosen) { transform: translateY(-2px); }
+    .playa-slab.chosen {
+      background: linear-gradient(145deg, #fde68a 0%, #d4a853 100%);
+      border-color: #92661a;
+      box-shadow: 0 0 0 2px #fbbf24, 0 0 16px rgba(251, 191, 36, 0.55);
+    }
+    .playa-slab.sink {
+      background: repeating-linear-gradient(135deg, #2a1d12 0 5px, #120c07 5px 10px);
+      border-color: #5b3a1d;
+      color: #8a5530;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .playa-slab.sink::after { display: none; }
+    .playa-step-badge {
+      position: absolute;
+      top: 2px;
+      right: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      color: #5a3d0f;
+    }
+    .playa-slab.shake { animation: playaShake 0.35s; }
+    @keyframes playaShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+    .playa-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .playa-btn-row .chasm-cairn-btn { flex: 1 1 140px; font-size: 0.85rem; }
+    .playa-keyword-row { display: flex; gap: 8px; }
+    .playa-keyword-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      background: #1d1610;
+      border: 1.5px solid rgba(212, 168, 83, 0.35);
+      color: var(--parchment-base);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+    .playa-keyword-input:focus { outline: none; border-color: var(--brass-bright); }
+    .playa-keyword-input.shake { animation: playaShake 0.35s; }
+    .playa-keyword-row .chasm-cairn-btn { flex: 0 0 auto; }
+
