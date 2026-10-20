@@ -4,23 +4,39 @@
 
 ## Dónde está todo
 
-- Rama de trabajo: `claude/repo-security-audit-3vuwrl` (remoto `origin`). Último commit: `Station 20: The Gate of a Thousand Masks`.
-- `main` sigue en `5d077e4` (hasta la Estación 19). **Falta fusionar** la rama a `main` cuando el smoke esté en verde y la revisión independiente esté aplicada:
-  `git fetch origin && git merge-base --is-ancestor origin/main HEAD && git push origin HEAD:main`
-- Despliegue (lo hace el Operador desde su Mac): `git pull origin main` y `npx wrangler pages deploy web --project-name=the-eclipse-order`.
+- `main` y la rama `claude/repo-security-audit-3vuwrl` están **idénticas** (`24b795c`, "Station 20: fixes from the independent review"). No queda nada sin fusionar ni sin subir.
+- Para continuar en local: `git checkout main && git pull origin main` (o crea tu rama de trabajo desde `main`).
+- Despliegue (lo hace el Operador desde su Mac): `git pull origin main` y `npx wrangler pages deploy web --project-name=the-eclipse-order`. **Pendiente de desplegar** la Estación 20 y la Hoja 19.
+- Dependencias para generar hojas: `pip install opencv-python-headless pypdf pillow numpy`.
 
-## Hecho
+## Hecho y verificado
 
-- Estación 20 y Hojas 19A/19B (SILVER, máscaras, mitades en espejo, Fragmento I), Espejo Vivo del Path III, Field Wire 33–36, tester `s20`, Ask Hermes del Stage, smoke secciones 13 y 14, docs.
-- Hoja 19 generada: `python3 scripts/journal/build_stage_path.py` (PDF + mockups en `journal/page19/`), paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` con `build_impresion_master.py`. Requiere `pip install opencv-python-headless pypdf pillow numpy`.
+- Estación 20 (The Gate of a Thousand Masks) y Hojas 19A/19B (SILVER, máscaras, mitades en espejo, Fragmento I), Espejo Vivo del Path III, Field Wire pasos 33–36, tester `s20`, Ask Hermes del Stage, docs.
+- Revisión independiente aplicada (7 hallazgos, con pruebas de regresión).
+- Suite completa `python3 scripts/audit/web_smoke.py`: **206 comprobaciones en verde** (~11 min; en el entorno cloud: `--chromium /opt/pw-browsers/chromium-1194/chrome-linux/chrome`). Secciones 13 (Espejo) y 14 (Máscaras) incluidas.
+- `python3 scripts/audit/lint_lore_and_vocabulary.py` limpio; sin "Staatsoper"/"Vienna" en claro en `web/` (solo invertido en el JS).
+- Hoja 19: `python3 scripts/journal/build_stage_path.py` (PDF y mockups en `journal/page19/`); paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` con `build_impresion_master.py`.
 
-## Pendiente inmediato (antes de fusionar)
+## Pendiente inmediato
 
-1. Pasar la suite completa: `python3 scripts/audit/web_smoke.py` (unos 11 min; en el entorno cloud: `--chromium /opt/pw-browsers/chromium-1194/chrome-linux/chrome`). La última ejecución completa estaba en curso; la sección 14 y la 13 pasaron por separado.
-2. Aplicar los hallazgos de la revisión independiente de la Estación 20 (un agente la estaba haciendo; si no consta, repetir la revisión: Field Wire 32→33, cierre del modal a mitad de trazo o de los `setTimeout` de `carveTrue`, `inert`, tester, mirror `justSet`).
-3. `python3 scripts/audit/lint_lore_and_vocabulary.py` y comprobar que "Staatsoper"/"Vienna" no aparecen en claro en `web/` (en el JS solo invertido).
+Nada. Lo siguiente es la Estación 21. Última pregunta abierta al Operador: ¿empezar por *The Camera Obscura* (Hoja 20A, Fragmento II)? Antes de construir, preguntarle las decisiones de diseño en formato test.
 
 ## Siguiente trabajo (Estaciones 21–28, Hojas 20–26)
+
+Mapa acordado con el Operador (estación → cara de hoja → fragmento):
+
+| Est. | Nodo | Juego | Cara | Extra |
+|---|---|---|---|---|
+| 21 | 41 | The Camera Obscura | 20A | Fragmento II |
+| 22 | 42 | The Whispering Gallery | 20B | III + Ledger J = 8 |
+| 23 | 43 | The Automaton Orchestra | 21B | IV |
+| 24 | 44 | The Fly Tower | 22A | V + Ledger Q = 14 |
+| 25 | 45 | The Shadow Theatre | 23A | VI + reliquia |
+| 26 | 46 | The Hall of Mirrors | 24A | VII; reflejo de Pope-E visto de espaldas |
+| 27 | 47 | The Kaleidoscope Lantern | 25A | VIII + Ledger X = 15 |
+| 28 | 48 | Stage of the Mirror Speaker | 26A | IX + revelación del WHERE |
+
+Caras de historia: 21A Cuaderno de Aurelia I (observatorio, 1970) · 22B The Ashes Before Christ (secta BC, sello de Pope-E) · 23B Cuaderno II (disco y voto) · 24B Doctrina de la Mirror Speaker · 25B Cuaderno III (terraza bajo las estrellas) · 26B Back to the Peaks. Pope-E: notas 2 y 3 (Estaciones 22/26 aprox.), reflejo en la 26. Más allá: Torre I y Bóveda.
 
 Patrón por estación (ver Estación 20 como plantilla en `web/index.html`: buscar `initMasksGate`):
 1. Preguntar al Operador las decisiones de diseño en formato test (una estación cada vez), como en las anteriores.
