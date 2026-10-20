@@ -125,7 +125,7 @@
     { key: 'cairn4', x: 130, y: 2150, lvl: 9, id: 25, icon: '🗿', label: '16 · CAIRN IV · SENTRY OF THE CANYON', done: 'cairn4', doneLabel: '16 · CAIRN IV (THE PILLARS SANG)', revealWhen: 'labyrinth' },
     { key: 'arch', x: 1480, y: 2040, lvl: 10, id: 26, icon: '🌓', label: '17 · ARCH OF THE SOLSTICE', done: 'arch', doneLabel: '17 · ARCH OF THE SOLSTICE (CAIRN V)', revealWhen: 'cairn4' },
     { key: 'stele', x: 1560, y: 1660, lvl: 11, id: 13, icon: '🔥', label: '18 · TOWER II · THE POLYBIUS STELE', done: 'stele', doneLabel: '18 · THE POLYBIUS STELE (THE SERVANT SAVED)', revealWhen: 'arch' },
-    { key: 'sanctuary', x: 1640, y: 1590, lvl: 11, id: 14, icon: '🏛️', label: '19 · THE ORACLE OF TOWER II', done: 'oracle', revealWhen: 'stele' }
+    { key: 'sanctuary', x: 1640, y: 1590, lvl: 11, id: 14, icon: '🏛️', label: '19 · THE ORACLE OF TOWER II', done: 'oracle', doneLabel: '19 · THE ORACLE (THE WHEN)', revealWhen: 'stele' }
   ];
 
   function stormOver() {

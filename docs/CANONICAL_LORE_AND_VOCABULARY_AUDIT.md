@@ -690,7 +690,19 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$[H] = 16 + 4 \implies \mathbf{H = 20}$$
   $$[M] = 25 - 16 \implies \mathbf{M = 9}$$
 - **Asignación en el Ledger**: $\mathbf{H = 20, \quad M = 9}$. Valores libres; ninguna letra repite valor.
-- **Letras aún sin ecuación (solo Operador)**: $I, J, Q, X, Z$; quedan libres exactamente los valores $5, 8, 10, 14, 15$.
+- **Letras aún sin ecuación (solo Operador)**: tras la §7.B.12, $J, Q, X$; quedan libres exactamente los valores $8, 14, 15$.
+
+#### 12. DEDUCCIÓN DE $Z$ E $I$ (Estación 19 · El dorso del disco de Aurelia, solo en la web)
+- **Origen**: tras la audiencia con la Oráculo (Estación 19), en el dorso del disco de latón, bajo el grabado antiguo de Hermes, hay dos líneas arañadas con la letra de Aurelia; aparecen en el Ledger con `requires: 'order_oracle_horizon_completed'`.
+- **Ecuación 1 (The Line of the Rim)**:
+  $$[Z] + [D] = 23$$
+- **Ecuación 2 (The Line of the Heart)**:
+  $$[I] + [E] = 12$$
+- **Resolución** (con $D = 18$ de §7.B.7 y $E = 2$ de §7.B.4):
+  $$[Z] = 23 - 18 \implies \mathbf{Z = 5}$$
+  $$[I] = 12 - 2 \implies \mathbf{I = 10}$$
+- **Asignación en el Ledger**: $\mathbf{Z = 5, \quad I = 10}$. Valores libres; ninguna letra repite valor.
+- **Letras aún sin ecuación (solo Operador)**: $J, Q, X$, con los valores libres $8, 14, 15$ (para el Stage Path).
 
 ---
 
@@ -814,7 +826,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$. *(web, Estación 18)* La Torre II arde (los BC Ashes quemaron la biblioteca del atrio) y el Sirviente ha desaparecido; el proverbio gira la estela (en su dorso, 348° NNW). Segunda parte: el Sirviente, escondido en el pozo bajo el atrio, golpea en la cuadrícula de la estela con la Ley del Espejismo Invertido (WHO · SEEK, la respuesta de Silvia · WELL · ASH). Tercera parte: el atrio en llamas, por turnos, hasta la tapa del pozo. $[H] - [U] = 16$ y $[M] + [T] = 25$; la reliquia *The Servant's Key*; la frase del Sirviente sobre la Oráculo (ver §12).
   - **Cara B (17B · Lore)**: **The Desert Oracle** (impresa). Nota de la expedición de 1998: Hermes observa durante horas desde una cresta al hombre que cree el Oráculo (en realidad el Sirviente del Santuario, §8.A.5), junto a su refugio bajo un saliente de arenisca; no puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen». Menciona el Astrolabio recuperado. No revela el WHEN ni menciona Vega.
 - **Hoja 18**:
-  - **Cara A (18A · Juego D10)**: **The Oracle's Horizon**. Ante la Oráculo, Silvia recibe la primera gran pista impresa: el **WHEN** («the hour and season ordained under the stars»). Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path).
+  - **Cara A (18A · Juego D10)**: **The Oracle's Horizon**. Ante la Oráculo, Silvia recibe la primera gran pista impresa: el **WHEN** («the hour and season ordained under the stars»). Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path). *(web, Estación 19)* El sigilo `OVERTURE` abre la cámara interior; la Oráculo velada alza el disco de 24 avistamientos y, ajustado al cielo, da el **WHEN: 18–20 de diciembre** (`DECEMBER EIGHTEEN TO TWENTY`, 24 letras). Silvia recompone el voto, Hermes lo pronuncia y la Oráculo se quita el velo: **es Aurelia**, con la memoria a medias. $[Z] + [D] = 23$ y $[I] + [E] = 12$; la reliquia *The Gilded Star*; los BC Ashes huyen al este con el Astrolabio, hacia la Torre III.
   - **Cara B (18B · Arte de Transición)**: **Dibujo de Transición al Stage Path**. Obra estética inspirada en el boceto artístico (pliegues teatrales violetas, columnas chevron en perspectiva, espirales, estrellas y malla geométrica escénica).
 
 ---
@@ -923,7 +935,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **16** | Un pastor al borde del *hardpan*: cada otoño, en noches claras, **una mujer velada baja de la arenisca y canta a las estrellas**; le dejan leche y dátiles (paso 17; en *choice-17-veiled* tararea la melodía y a Hermes le tiembla la mano). En Cairn IV el último verso del viento suena con el **código del disco** (tres cortas, pausa, dos largas) porque alguien encajó en el pilar izquierdo **un guijarro con estrella dorada sobre azul** (reliquia *The Tuning Pebble*). | Leyenda del desierto; el viento; un extraño que conoce el código. | ✅ Web |
 | **17** | Desde el Arco del Solsticio, una luz en la Torre II dialoga con el espejo de Hermes; él envía **tres cortos, pausa, dos largos** y la luz **responde** deletreando dos líneas en el código de luz de la Orden, con la calma de quien lo ha hecho muchas veces. Hermes: el código era solo suyo y de Aurelia. Luego la luz se apaga de golpe y amanece con humo sobre el Santuario. | Alguien dentro de la Torre II conoce el código; ¿lo aprendió de otro? | ✅ Web |
 | **18** | Tras sacarlo del pozo del atrio en llamas, Hermes le pregunta quién conoce el código de Aurelia, y el Sirviente responde: *«She came from the edge of the sky with a disc in her arms and no name.»* No dice nada más (*«The rest is hers to tell»*, respuesta *choice-27-disc*). Los asaltantes quemaron la biblioteca buscando las cartas de la Oráculo, la «mitad terrestre» del Astrolabio; el Sirviente las salvó en el pozo. | — (la duda ya es seria). | ✅ Web |
-| **19** | Audiencia en la Torre II: la Oráculo alza el disco de 24 avistamientos. Silvia (o Hermes) pronuncia el voto y la memoria vuelve en parte. Se entrega el **WHEN**. | Revelación. | ⏳ Plan |
+| **19** | Audiencia en la Torre II: la Oráculo velada alza el disco de 24 avistamientos; Silvia lo ajusta al cielo y lee el **WHEN** (18–20 de diciembre). La Oráculo susurra palabras sueltas; Silvia recompone el voto (*«You were always the treasure»*) y Hermes lo pronuncia. Ella se quita el velo: **es Aurelia**. Recuerda la voz de Hermes, el fuego del observatorio y el frío de la terraza, pero no el puente; dice su propio nombre despacio (memoria a medias, el resto «volverá desde abajo», en las cumbres). El balance (paso 31) cuenta la verdad de 1971 (§12.A). | Revelación. | ✅ Web |
 
-**Invariantes**: el disco y el voto (§2.B) no cambian; la Oráculo sigue siendo «she» (§8.A.3); no se escribe «Aurelia es la Oráculo» en material de Silvia antes de la Estación 19.
+**Invariantes**: el disco y el voto (§2.B) no cambian; la Oráculo sigue siendo «she» (§8.A.3); no se escribe «Aurelia es la Oráculo» en material de Silvia antes de la Estación 19. Desde la Estación 19 (web) Silvia ya lo sabe: la revelación es canon visible. Su memoria completa queda pendiente para la Torre I / la Bóveda.
 

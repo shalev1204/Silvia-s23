@@ -161,7 +161,7 @@ Este documento constituye la referencia absoluta y vinculante para el diseño de
      * **Longitud Segundos (22")**: `[F] + [T]` ($6 + 16 = 22$)
    
    - **Tabla Maestra Canónica Aleatoria (Alfabeto 1..26)** · ⚠️ *Referencia interna del Operador: estos valores NO deben mostrarse nunca en la web, el diario ni los emails (Regla 9).*
-   - ⚠️ **Tabla histórica, sustituida**: los valores vigentes son los de la Biblia Maestra §7.B (por ejemplo, D = 18, W = 19, N = 11, S = 13, U = 4, Y = 25, L = 1, H = 20, M = 9). Si esta tabla y la §7.B no coinciden, manda la §7.B.
+   - ⚠️ **Tabla histórica, sustituida**: los valores vigentes son los de la Biblia Maestra §7.B (por ejemplo, D = 18, W = 19, N = 11, S = 13, U = 4, Y = 25, L = 1, H = 20, M = 9, Z = 5, I = 10). Si esta tabla y la §7.B no coinciden, manda la §7.B.
      ```
      A = 7      H = 11     O = 23     V = 12
      B = 17     I = 10     P = 21     W = 5

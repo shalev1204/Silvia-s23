@@ -48,8 +48,9 @@ Abre la web en un Chromium real con las cabeceras de `web/_headers` y comprueba 
 7. la Estación 16 (Cairn IV) funciona de principio a fin: anochecer en el *hardpan*, travesía de 18 h, sigilo, los tres versos del canto, Sello de Cairn IV, la reliquia, balance y recarga;
 8. la Estación 17 (Arch of the Solstice) funciona de principio a fin: el amanecer de octubre (el test resuelve cada paso con su propia búsqueda de rutas), la señal nocturna, el Sello de Cairn V, la ceremonia de los cinco sellos, la reliquia y el balance;
 9. la Estación 18 (The Polybius Stele) funciona de principio a fin: mediodía bajo el Arco, marcha de 6 h, proverbio, los golpes del Sirviente (el test los descifra por su cuenta con la cuadrícula PHOENIX y la Ley del Espejismo Invertido), el atrio en llamas (el test calcula su propia ruta y comprueba que ninguna ruta a tiempo evita la ceniza), la reliquia, el Ledger y el balance;
-10. cada perfil (Silvia y Carles) conserva su propia aventura;
-11. el «Play this game» de Carles deja el mundo en la llegada de cada juego, adelante y atrás (unos 8 minutos en total).
+10. la Estación 19 (The Oracle's Horizon) funciona de principio a fin: escalera interior, sigilo, el disco ajustado al cielo y leído desde el norte (el test lo lee por su cuenta), el WHEN, el voto, el paso al Stage Path, el Ledger y el balance; sin el sello de Cairn I la audiencia espera;
+11. cada perfil (Silvia y Carles) conserva su propia aventura;
+12. el «Play this game» de Carles deja el mundo en la llegada de cada juego, adelante y atrás (unos 9 minutos en total).
 
 Si termina con `✅ ALL GREEN`, se puede desplegar; si sale `❌`, no despliegues y revisa la línea marcada con ✗.
 También conviene pasar `python3 scripts/audit/lint_lore_and_vocabulary.py` (vocabulario y nombres canónicos).

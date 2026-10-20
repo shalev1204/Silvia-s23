@@ -14,8 +14,10 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
      the five-seal ceremony, relic and debrief; a reload during the finale cannot strand the station.
   9. Station 18 (The Polybius Stele): noon scene, 6-hour walk, proverb, the knocks decoded here from the grid and
      the Law of the Inverted Mirage, the burning atrium solved by its own search, relic, Ledger and debrief.
- 10. Each seeker keeps their own adventure when the profile changes (Carles and Silvia).
- 11. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
+ 10. Station 19 (The Oracle's Horizon): the inner stair, sigil, the disc set by the sky and read from the north,
+     the WHEN, the vow, the passage to the Stage Path, Ledger and debrief; without Cairn I the audience waits.
+ 11. Each seeker keeps their own adventure when the profile changes (Carles and Silvia).
+ 12. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -827,14 +829,134 @@ def test_polybius_stele(browser):
     check(get("order_field_wire_step") == "27" and choices() == 3 and "edge of the sky with a disc in her arms" in text,
           "debrief: step 27 (the Servant's words) with 3 replies")
     answer_first()
-    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
-    check(get("order_field_wire_step") == "28" and "Servant Is Safe" in bar and "[H] − [U] = 16" in wire_text() and "with the five seals, she will receive you" in wire_text(),
-          "step 28: the equations, the key and the audience at dawn", bar)
+    check(get("order_field_wire_step") == "29" and "[H] − [U] = 16" in wire_text() and "with the five seals, she will receive you" in wire_text()
+          and choices() == 3 and "mint tea" in wire_text(), "step 28: the equations, the key, then dawn at the inner stair (step 29)")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(text.count("I meant to leave at dawn") == 1 and text.count("he is alive. He is sitting next to me") == 1,
-          "reload replays steps 25-28 once each")
+    check(text.count("I meant to leave at dawn") == 1 and text.count("he is alive. He is sitting next to me") == 1 and text.count("mint tea") == 1,
+          "reload replays steps 25-29 once each")
     check(not errors, "no JS errors during Station 18", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+ORACLE_SEED_EXTRA = dict(order_sun_monolith_completed="true", order_seal_cairn_2="true",
+                         order_sandstone_labyrinth_completed="true", order_seal_cairn_3="true", order_monolith_gate_seal1="true",
+                         order_cairn_iv_completed="true", order_seal_cairn_4="true", order_cairn4_sound="off",
+                         order_arch_solstice_completed="true", order_seal_cairn_5="true", order_five_seals_celebrated="true",
+                         order_cairn5_seals_at_altar="5", order_polybius_stele_completed="true", order_stele_awake="true",
+                         order_stele_knocks="4", order_stele_march_start="1", order_stele_seals_at_well="5",
+                         order_field_wire_step="28", order_field_wire_choices=json.dumps([2, 0, 1, 0] + [0] * 24))
+
+
+def test_oracle_horizon(browser):
+    print("\n10. Station 19 · The Oracle's Horizon, end to end")
+    seed = dict(DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA)
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    modal_open = lambda: js("getComputedStyle(document.getElementById('modal-oracle-horizon')).display") != "none"
+    choices = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].length")
+    wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
+    feedback = lambda node: js(f"document.getElementById('{node}').innerText")
+
+    def open_wire():
+        js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+        page.wait_for_timeout(2200)
+
+    def answer_first():
+        js("document.querySelector('#wire-choices-grid button').click()")
+        page.wait_for_timeout(9000)
+
+    open_wire()
+    check(get("order_field_wire_step") == "29" and choices() == 3 and "mint tea" in wire_text(), "dawn at the inner stair: step 29 with 3 replies")
+    js("window.selectDesertStation(14)"); page.wait_for_timeout(500)
+    check(not modal_open(), "the Oracle's door stays shut before Silvia answers")
+    open_wire(); answer_first()
+    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+    check(get("order_field_wire_step") == "30" and "DOWN THE INNER STAIR" in wire_text() and "Station 19 Awaits" in bar,
+          "the answer sends Hermes down the stair: Station 19 awaits", bar)
+    js("window.openOracleModal()"); page.wait_for_timeout(500)
+    check(modal_open() and js("document.querySelector('#oracle-disc-game .monolith-game-inner').inert") is True
+          and js("document.querySelector('#oracle-vow-game .monolith-game-inner').inert") is True,
+          "the chamber opens, the disc and the vow locked until the sigil")
+    for word in ["OVERTURN", "OVERTUREE", "ORACLE"]:
+        page.fill("#oracle-key-input", word); page.click("#btn-oracle-speak"); page.wait_for_timeout(120)
+    check(get("order_oracle_hint") == "true" and get("order_oracle_awake") is None, "3 wrong sigils unlock the hint, the door stays shut")
+    page.fill("#oracle-key-input", " over-ture "); page.click("#btn-oracle-speak"); page.wait_for_timeout(250)
+    check(get("order_oracle_awake") == "true", "forgiving sigil 'over-ture' opens the inner chamber")
+
+    # The disc, set by the sky the page draws (Aldebaran south-west, Vega north-west, Arcturus north-east)
+    sky = js("document.getElementById('oracle-sky').getAttribute('aria-label')")
+    check("Aldebaran to the south-west" in sky and "Vega to the north-west" in sky and "Arcturus to the north-east" in sky,
+          "the sky card says where the three stars stand")
+    sky_spoke = {"Aldebaran": 5, "Vega": 7, "Arcturus": 1}
+    stars = js("window.__oracle.stars")
+    check(not js("getComputedStyle(document.getElementById('oracle-read-panel')).display") != "none", "the disc cannot be read while it is crooked")
+    for ring, star in enumerate(stars):
+        while (star["spoke"] + js("window.__oracle.rot()")[ring]) % 8 != sky_spoke[star["name"]]:
+            js(f"window.__oracle.turn({ring}, 1)")
+    reading = "".join(js(f"window.__oracle.letterAt({ring}, {k})") for k in range(8) for ring in range(3))
+    check(js("window.__oracle.rot()") == [0, 0, 0] and reading == "DECEMBEREIGHTEENTOTWENTY",
+          "three stars set to the sky: read from the north, rim to heart, the disc says DECEMBER EIGHTEEN TO TWENTY")
+    check(js("getComputedStyle(document.getElementById('oracle-read-panel')).display") != "none", "the shining disc can be read")
+    js("window.__oracle.read('DECEMBER EIGHTEEN')")
+    check(get("order_oracle_when_read") is None and get("order_oracle_read_fails") == "1", "half the reading is refused")
+    js("window.__oracle.read('december 18 - 20')")
+    check(get("order_oracle_when_read") == "true" and "18 – 20 DECEMBER" in js("document.getElementById('oracle-telem-when').innerText"),
+          "the WHEN read as a date is accepted: 18 – 20 December")
+
+    # The vow, from the words she half remembers
+    tiles = js("window.__oracle.tiles")
+    say = lambda words: [js(f"window.__oracle.say({tiles.index(w)})") for w in words]
+    say(["YOU", "WERE", "NEVER", "ONLY", "THE", "SEEKER"]); js("window.__oracle.vow()")
+    check("first half" in feedback("oracle-vow-feedback") and get("order_oracle_horizon_completed") is None,
+          "the prophecy's first half is not the vow")
+    for words in (["THE", "TREASURE", "YOU", "WERE", "ALWAYS"], ["YOU", "WERE", "ALWAYS", "THE"]):
+        say(words); js("window.__oracle.vow()")
+    check(get("order_oracle_vow_hint") == "true", "three wrong vows unlock the hint")
+    say(["YOU", "WERE", "ALWAYS", "THE", "TREASURE"]); js("window.__oracle.vow()")
+    page.wait_for_timeout(400)
+    check(get("order_oracle_horizon_completed") == "true" and "Aurelia" in feedback("oracle-dispatch-text"),
+          "the vow is said: the veil comes off")
+    check("gilded_star" in js("window.getOwnedRelicIds()"), "the Gilded Star is in the satchel")
+    page.click("#btn-oracle-finish"); page.wait_for_timeout(1200)
+    check(js("getComputedStyle(document.getElementById('stage-passage-overlay')).display") != "none" and get("order_stage_passage_seen") == "true",
+          "from the desert to the stage: the passage plays once")
+    page.click("#btn-stage-passage-close"); page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('btn-tab-path-stage')).display") != "none", "Path III · The Stage Tower appears on the map")
+
+    js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
+    ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
+    check("eq-item-oracle-zd" in ids and "eq-item-oracle-ie" in ids, "Ledger shows [Z] + [D] = 23 and [I] + [E] = 12")
+
+    open_wire()
+    check(get("order_field_wire_step") == "31" and choices() == 3 and "She did not die in 1971" in wire_text(),
+          "debrief: step 31 (Aurelia) with 3 replies")
+    answer_first()
+    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+    check(get("order_field_wire_step") == "32" and "Desert Path Is Complete" in bar and "[Z] + [D] = 23" in wire_text(),
+          "step 32: the Desert Path is complete", bar)
+    page.reload(); page.wait_for_timeout(2500); open_wire()
+    text = wire_text()
+    check(text.count("mint tea") == 1 and text.count("She did not die in 1971") == 1, "reload replays steps 29-32 once each")
+    check(not errors, "no JS errors during Station 19", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # Without the Seal of Cairn I, the Oracle receives no one
+    four = dict(seed, order_cairn1_completed="false", order_cairn1_bypassed="true", order_stele_seals_at_well="4")
+    four.pop("order_seal_cairn_1", None)
+    ctx, page, errors = new_page(browser, four)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    page.evaluate("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+    page.wait_for_timeout(2200)
+    bar = page.evaluate("document.querySelector('.messenger-waypoint-desc')?.innerText || ''")
+    page.evaluate("window.openOracleModal()"); page.wait_for_timeout(400)
+    shut = page.evaluate("getComputedStyle(document.getElementById('modal-oracle-horizon')).display") == "none"
+    check(page.evaluate("localStorage.getItem('order_field_wire_step')") == "28" and "five seals" in bar and shut and not errors,
+          "with four seals the audience waits for Cairn I", bar + "; ".join(errors[:2]))
     ctx.close()
 
 
@@ -848,7 +970,7 @@ def login(page, name):
 
 
 def test_profiles(browser):
-    print("\n10. Each seeker keeps their own adventure")
+    print("\n11. Each seeker keeps their own adventure")
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -884,14 +1006,14 @@ WORLD_JS = """() => ({
 
 
 def test_tester_play(browser):
-    print("\n11. Carles's tester: Play any game, forward and back")
+    print("\n12. Carles's tester: Play any game, forward and back")
     modals = {"cairn1": "modal-cairn-one", "s14": "modal-sun-monolith", "s15": "modal-sandstone-labyrinth",
-              "s16": "modal-cairn-four", "s17": "modal-solstice-arch", "s18": "modal-polybius-stele"}
-    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5}
+              "s16": "modal-cairn-four", "s17": "modal-solstice-arch", "s18": "modal-polybius-stele", "s19": "modal-oracle-horizon"}
+    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5, "s19": 5}
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
-    for gid in ["s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
+    for gid in ["s19", "s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
         page.evaluate("document.getElementById('tester-panel').open = true")
         page.evaluate(PLAY_JS, gid)
         page.wait_for_timeout(600)
@@ -899,7 +1021,7 @@ def test_tester_play(browser):
         page.wait_for_timeout(3200)
         st = page.evaluate(WORLD_JS)
         opened = modals[gid] in st["open"] if gid in modals else bool(st["open"])
-        clean = "servant_key" not in st["relics"] and (gid in ("s17", "s18") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
+        clean = "gilded_star" not in st["relics"] and (gid == "s19" or "servant_key" not in st["relics"]) and (gid in ("s17", "s18", "s19") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
         check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
               f"seals {st['seals']}, open {st['open']}, relics {st['relics']}")
     check(not errors, "no JS errors while jumping between games", "; ".join(sorted(set(errors))[:3]))
@@ -923,6 +1045,7 @@ def main():
         test_cairn_four(browser)
         test_solstice_arch(browser)
         test_polybius_stele(browser)
+        test_oracle_horizon(browser)
         test_profiles(browser)
         test_tester_play(browser)
         browser.close()

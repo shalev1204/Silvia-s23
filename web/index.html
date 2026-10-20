@@ -4140,6 +4140,89 @@
       .stele-floor .stele-ripple, .stele-atrium .stele-flame, .stele-atrium .stele-ember { animation: none; }
     }
 
+    /* ===================================================================
+       STATION 19 · THE ORACLE'S HORIZON (THE DISC OF 24 SIGHTINGS · THE VOW)
+       Uses the .monolith-* shell of Station 14; the disc, the sky card, the vow tiles,
+       the passage to the Stage Path and the third path card live here.
+       =================================================================== */
+    .oracle-disc-row { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 12px; align-items: start; }
+    .oracle-disc, .oracle-sky {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .oracle-disc { background: radial-gradient(circle, #1a1208 0%, #0b0703 70%); }
+    .oracle-sky { background: radial-gradient(circle, #0f1a33 0%, #050816 75%); }
+    .oracle-sky-cap { margin: 4px 0 0; text-align: center; font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.06em; color: #b8a07a; }
+    .oracle-disc .oracle-glow { opacity: 0; transition: opacity 0.18s ease; }
+    .oracle-disc.is-pulse .oracle-glow { opacity: 1; }
+    .oracle-ring-ctrls { display: grid; gap: 6px; margin-top: 8px; }
+    .oracle-ring-ctrl { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; align-items: center; }
+    .oracle-ring-ctrl span { text-align: center; font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.04em; color: #e7d9bf; }
+    .oracle-ring-ctrl .monolith-btn { padding: 6px 0; }
+    .oracle-when {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(253, 230, 138, 0.55);
+      background: rgba(253, 230, 138, 0.07);
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      color: #fde68a;
+      letter-spacing: 0.08em;
+    }
+    .oracle-when strong { display: block; font-size: 1.35rem; letter-spacing: 0.12em; margin-top: 4px; }
+    .oracle-tiles, .oracle-said { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; min-height: 44px; align-items: center; }
+    .oracle-said { padding: 8px; border-radius: 8px; border: 1px dashed rgba(212, 168, 83, 0.4); }
+    .oracle-said:empty::before { content: attr(data-empty); color: #7a6a52; font-size: 0.8rem; }
+    .oracle-tile { font-family: 'Cinzel', serif; letter-spacing: 0.08em; padding: 8px 12px; min-height: 40px; }
+    .oracle-tile[aria-pressed="true"] { opacity: 0.35; }
+    .monolith-key-input.oracle-text-input { letter-spacing: 0.1em; font-size: 0.98rem; }
+    @media (max-width: 640px) { .oracle-disc-row { grid-template-columns: 1fr; } .oracle-sky { max-width: 220px; margin: 0 auto; } }
+
+    /* From the desert to the stage: shown once, when the Oracle remembers */
+    .stage-passage-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: radial-gradient(ellipse at 50% 30%, rgba(76, 29, 149, 0.55) 0%, rgba(5, 3, 2, 0.94) 70%);
+      animation: stagePassageIn 0.6s ease-out;
+    }
+    @keyframes stagePassageIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+    .stage-passage-card {
+      position: relative;
+      width: min(560px, 100%);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      padding: 28px 24px 22px;
+      border-radius: 14px;
+      border: 1.5px solid #c4b5fd;
+      background: linear-gradient(180deg, #1b1030 0%, #0e0905 100%);
+      text-align: center;
+      color: #ede9fe;
+      box-shadow: 0 0 40px rgba(167, 139, 250, 0.35);
+    }
+    .stage-passage-card svg { display: block; width: 100%; max-width: 360px; height: auto; margin: 0 auto 10px; }
+    .stage-passage-card .stage-curtain { transform-origin: top center; animation: stageCurtain 2.4s ease-in-out 0.4s both; }
+    .stage-passage-card .stage-curtain.is-right { animation-name: stageCurtainRight; }
+    @keyframes stageCurtain { 0% { transform: translateX(0); } 100% { transform: translateX(-34%); } }
+    @keyframes stageCurtainRight { 0% { transform: translateX(0); } 100% { transform: translateX(34%); } }
+    .stage-passage-title { margin: 0 0 8px; font-family: 'Cinzel', serif; font-size: 1.25rem; letter-spacing: 0.12em; color: #ddd6fe; }
+    .stage-passage-card p { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.5; }
+    .stage-passage-motto { font-family: 'Cinzel', serif; font-style: italic; color: #fde68a; letter-spacing: 0.04em; }
+    @media (prefers-reduced-motion: reduce) { .stage-passage-overlay, .stage-passage-card .stage-curtain { animation: none; } }
+    /* Path III sits on its own row under the first two paths, low and sealed */
+    .map-path-tab-btn.is-sealed { grid-column: 1 / -1; min-height: 0; padding: 12px 22px; border-style: dashed; border-color: rgba(196, 181, 253, 0.6); }
+    .map-path-tab-btn.is-sealed .path-tab-emblem { width: 46px; height: 46px; font-size: 1.45rem; border-color: #c4b5fd; }
+    .map-path-tab-btn.is-sealed .path-tab-state { color: #c4b5fd; border-color: rgba(196, 181, 253, 0.6); }
+
     /* The five seals come home: shown once, when the fifth seal joins the others */
     .five-seals-overlay {
       position: fixed;
@@ -10466,6 +10549,15 @@
             </span>
             <span class="path-tab-state" id="path-state-desert">Open path</span>
           </button>
+          <button type="button" class="map-path-tab-btn is-sealed" id="btn-tab-path-stage" data-path="stage" style="display: none;">
+            <span class="path-tab-emblem">🎭</span>
+            <span class="path-tab-body">
+              <span class="path-tab-kicker">Path III · The Stage Tower</span>
+              <span class="path-tab-name">The Velvet Stage</span>
+              <span class="path-tab-progress"><span class="path-tab-count">The Mirror Speaker keeps the WHERE</span></span>
+            </span>
+            <span class="path-tab-state">Curtain closed</span>
+          </button>
         </nav>
 
         <!-- Current / Inspected Mission Deck (Positioned directly below the path cards) -->
@@ -13483,6 +13575,148 @@
     </div>
   </div>
 
+  <!-- ===================================================================
+       STATION 19: THE ORACLE'S HORIZON · THE AUDIENCE IN TOWER II
+       Part I is the journal (Sheet 18A: eight beacons across the three mirrors of the horizon, the sigil OVERTURE).
+       Part II only exists here: the Oracle raises a brass disc of 24 sightings; Silvia sets its three rings to
+       the sky over the Sanctuary and reads the WHEN from its spokes.
+       Part III: the Oracle half-remembers some words; Silvia puts the vow back together, and Hermes says it.
+       =================================================================== -->
+  <div class="monolith-modal-backdrop" id="modal-oracle-horizon" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="oracle-modal-title">
+    <div class="monolith-window">
+      <div class="monolith-header">
+        <div class="monolith-title-wrap">
+          <span class="monolith-title-icon" aria-hidden="true">🏛️</span>
+          <div>
+            <h2 class="monolith-title" id="oracle-modal-title">THE ORACLE'S HORIZON</h2>
+            <div class="monolith-subtitle">Station 19 · Tower II · The Disc of 24 Sightings · The Vow · Sheet 18A</div>
+          </div>
+        </div>
+        <button type="button" class="monolith-close-btn" id="btn-close-oracle" aria-label="Close The Oracle's Horizon">✕</button>
+      </div>
+
+      <div class="monolith-telemetry">
+        <div>EXPEDITION:<strong>TOWER II // THE INNER CHAMBER</strong></div>
+        <div>SIGIL:<strong id="oracle-telem-sigil">[ 8 LETTERS ]</strong></div>
+        <div>DISC:<strong id="oracle-telem-disc">[ DARK ]</strong></div>
+        <div>WHEN:<strong id="oracle-telem-when">[ SEALED ]</strong></div>
+        <div>THE ORACLE:<strong id="oracle-telem-oracle">[ VEILED ]</strong></div>
+      </div>
+
+      <div class="monolith-body">
+        <div class="monolith-panel">
+          <div class="monolith-card" id="oracle-sigil-card">
+            <div class="monolith-card-title">I · The Sigil of the Oracle</div>
+            <p>Solve <strong>Sheet 18A</strong> of your journal: send the eight beacons east across the three mirrors of the horizon, and read the letters where they land, in order. Speak the eight-letter sigil at the door of the inner chamber.</p>
+            <div class="monolith-key-row">
+              <label class="monolith-sr-only" for="oracle-key-input">The eight-letter sigil of the Oracle</label>
+              <input type="text" class="monolith-key-input" id="oracle-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-speak">✦ Speak the Sigil</button>
+            </div>
+            <div class="monolith-feedback" id="oracle-key-feedback" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="monolith-card monolith-game is-locked" id="oracle-disc-game">
+            <div class="monolith-card-title">II · The Disc of 24 Sightings</div>
+            <div class="monolith-game-inner">
+              <div class="oracle-disc-row">
+                <svg class="oracle-disc" id="oracle-disc" viewBox="-60 -60 120 120" role="img" aria-label="The brass disc of 24 sightings: three rings of eight letters around a central jewel, each ring with one star engraved on it. North is at the top."></svg>
+                <div>
+                  <svg class="oracle-sky" id="oracle-sky" viewBox="-60 -60 120 120" role="img" aria-label="The sky over Tower II before dawn, drawn like a compass with north at the top: Aldebaran to the south-west, Vega to the north-west and Arcturus to the north-east."></svg>
+                  <p class="oracle-sky-cap">The sky over Tower II before dawn, as Hermes drew it on the sand</p>
+                </div>
+              </div>
+              <div class="oracle-ring-ctrls" role="group" aria-label="Turn the rings of the disc">
+                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r0-l" aria-label="Turn the outer ring to the left">⟲</button><span id="oracle-r0-label">Outer ring · Aldebaran</span><button type="button" class="monolith-btn" id="btn-oracle-r0-r" aria-label="Turn the outer ring to the right">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r1-l" aria-label="Turn the middle ring to the left">⟲</button><span id="oracle-r1-label">Middle ring · Vega</span><button type="button" class="monolith-btn" id="btn-oracle-r1-r" aria-label="Turn the middle ring to the right">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r2-l" aria-label="Turn the inner ring to the left">⟲</button><span id="oracle-r2-label">Inner ring · Arcturus</span><button type="button" class="monolith-btn" id="btn-oracle-r2-r" aria-label="Turn the inner ring to the right">⟳</button></div>
+              </div>
+              <div id="oracle-read-panel" style="display: none;">
+                <div class="monolith-key-row" style="margin-top: 10px;">
+                  <label class="monolith-sr-only" for="oracle-when-input">What the disc says</label>
+                  <input type="text" class="monolith-key-input oracle-text-input" id="oracle-when-input" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Read the 24 sightings">
+                  <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-read">✦ Read it aloud</button>
+                </div>
+              </div>
+              <div class="oracle-when" id="oracle-when" style="display: none;">The First Truth · the WHEN<strong>18 – 20 December</strong></div>
+              <div class="monolith-feedback" id="oracle-disc-feedback" role="status" aria-live="polite"></div>
+            </div>
+            <div class="monolith-lock-note">Speak the sigil of the Oracle first.</div>
+          </div>
+
+          <div class="monolith-card monolith-game is-locked" id="oracle-vow-game">
+            <div class="monolith-card-title">III · The Vow</div>
+            <div class="monolith-game-inner">
+              <p style="margin: 0; font-size: 0.84rem;">She remembers some words, and not their order. Choose the words Hermes should say to her, in the right order.</p>
+              <div class="oracle-said" id="oracle-said" data-empty="Hermes's words will appear here." aria-live="polite"></div>
+              <div class="oracle-tiles" id="oracle-tiles" role="group" aria-label="The words she remembers"></div>
+              <div class="pillars-row">
+                <button type="button" class="monolith-btn" id="btn-oracle-unsay" aria-label="Take back the last word">⌫ Take back</button>
+                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-vow">✦ Let Hermes say it</button>
+              </div>
+              <div class="monolith-feedback" id="oracle-vow-feedback" role="status" aria-live="polite"></div>
+            </div>
+            <div class="monolith-lock-note">Read the WHEN on the disc first.</div>
+          </div>
+        </div>
+
+        <div class="monolith-panel">
+          <div class="monolith-card">
+            <div class="monolith-card-title">The Disc of Aurelia</div>
+            <ul class="laby-rules">
+              <li>The disc has three rings of eight sightings, one letter each, around a jewel. Each ring carries one star, engraved beside one of its letters.</li>
+              <li>Turn each ring until its star points where that star stands in the sky over Tower II. North is at the top of the disc, as on the sky Hermes drew.</li>
+              <li>When all three point true, the disc answers. Hermes engraved it to be read from the north, sunwise: each spoke from the rim to the heart, three letters a spoke.</li>
+              <li>Then, the vow: choose the words she half remembers, in the right order, and let Hermes say them.</li>
+            </ul>
+            <div class="laby-hint" id="oracle-hint" style="display: none;"></div>
+          </div>
+
+          <div class="monolith-card monolith-victory" id="oracle-victory" style="display: none;">
+            <div class="monolith-card-title">✦ The Oracle Remembers</div>
+            <p id="oracle-victory-text"></p>
+            <div class="oracle-when">The First Truth · the WHEN<strong>18 – 20 December</strong></div>
+            <div style="margin-top: 10px;">
+              <span class="monolith-equation">[Z] + [D] = 23</span>
+              <span class="monolith-equation">[I] + [E] = 12</span>
+            </div>
+            <p style="font-size: 0.78rem; color: #b8a07a;">Scratched on the back of the disc, in a hand Hermes knows. Record both in your Cipher Ledger.</p>
+            <p style="font-size: 0.82rem;">⭐ <strong>The Gilded Star</strong> is in your satchel: she painted it for you.</p>
+            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-finish">✦ From the Desert to the Stage ➔</button>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE INNER CHAMBER</div>
+            <div class="monolith-dispatch" id="oracle-dispatch-text" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- From the desert to the stage (shown once, after the audience with the Oracle) -->
+  <div class="stage-passage-overlay" id="stage-passage-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="stage-passage-title">
+    <div class="stage-passage-card">
+      <svg viewBox="0 0 200 110" aria-hidden="true">
+        <rect x="0" y="0" width="200" height="110" fill="#0e0905"></rect>
+        <path d="M0 96 L200 96" stroke="#3b2a17" stroke-width="1"></path>
+        <path d="M20 96 L100 66 L180 96" fill="none" stroke="#4c1d95" stroke-width="0.6"></path>
+        <path d="M60 96 L100 66 L140 96" fill="none" stroke="#4c1d95" stroke-width="0.6"></path>
+        <circle cx="100" cy="40" r="12" fill="none" stroke="#fde68a" stroke-width="0.8"></circle>
+        <path d="M100 30 L102.5 37.5 L110 40 L102.5 42.5 L100 50 L97.5 42.5 L90 40 L97.5 37.5 Z" fill="#fde68a"></path>
+        <path d="M84 96 Q90 90 96 96 Q102 90 108 96 Q114 90 120 96" fill="none" stroke="#b8a07a" stroke-width="0.6"></path>
+        <g class="stage-curtain"><path d="M0 0 L100 0 L100 8 Q86 50 96 110 L0 110 Z" fill="#5b21b6"></path><path d="M20 0 Q30 55 18 110 M45 0 Q55 55 44 110 M70 0 Q80 55 70 110" stroke="#3b0764" stroke-width="2" fill="none"></path></g>
+        <g class="stage-curtain is-right"><path d="M200 0 L100 0 L100 8 Q114 50 104 110 L200 110 Z" fill="#5b21b6"></path><path d="M180 0 Q170 55 182 110 M155 0 Q145 55 156 110 M130 0 Q120 55 130 110" stroke="#3b0764" stroke-width="2" fill="none"></path></g>
+        <path d="M0 0 L200 0 L200 8 Q150 16 100 8 Q50 16 0 8 Z" fill="#7c3aed"></path>
+      </svg>
+      <h2 class="stage-passage-title" id="stage-passage-title">FROM THE DESERT TO THE STAGE</h2>
+      <p>The Desert Path is complete. The Oracle of Tower II has given you the first truth: <strong>the WHEN, 18 – 20 December</strong>.</p>
+      <p>The raiders have gone east with the Astrolabe, toward the third tower. There, the Mirror Speaker keeps the second truth: the WHERE.</p>
+      <p class="stage-passage-motto">"The road ends where the curtain rises."</p>
+      <button type="button" class="monolith-btn monolith-btn-primary" id="btn-stage-passage-close">✦ Path III · The Stage Tower</button>
+    </div>
+  </div>
+
   <!-- The five seals come home (shown once, whenever the fifth seal joins the satchel) -->
   <div class="five-seals-overlay" id="five-seals-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="five-seals-title">
     <div class="five-seals-card">
@@ -14527,16 +14761,20 @@
             complete() { set('order_stele_march_start', '1'); set('order_stele_awake', 'true'); set('order_stele_knocks', '4'); set('order_polybius_stele_completed', 'true'); },
             reset() { dels(['order_polybius_stele_completed', 'order_stele_awake', 'order_stele_key_fails', 'order_stele_hint', 'order_stele_knocks', 'order_stele_knock_fails', 'order_stele_knock_hint', 'order_stele_fire_fails', 'order_stele_fire_hint', 'order_stele_march_start', 'order_stele_march_bypassed', 'order_stele_seals_at_well']); dropRelic('servant_key'); }
           },
-          { id: 's19', tag: 'Station 19', label: "The Oracle's Horizon", built: false }
+          {
+            id: 's19', tag: 'Station 19', label: "The Oracle's Horizon · Aurelia", flag: 'order_oracle_horizon_completed', built: true,
+            complete() { set('order_oracle_stair_start', '1'); set('order_oracle_awake', 'true'); set('order_oracle_disc', '000'); set('order_oracle_when_read', 'true'); set('order_oracle_horizon_completed', 'true'); },
+            reset() { dels(['order_oracle_horizon_completed', 'order_oracle_awake', 'order_oracle_key_fails', 'order_oracle_hint', 'order_oracle_disc', 'order_oracle_disc_turns', 'order_oracle_disc_hint', 'order_oracle_when_read', 'order_oracle_read_fails', 'order_oracle_vow_fails', 'order_oracle_vow_hint', 'order_oracle_stair_start', 'order_oracle_stair_bypassed', 'order_stage_passage_seen']); dropRelic('gilded_star'); }
+          }
         ];
 
         const isDone = (id) => { const g = GAMES.find((x) => x.id === id); return !!(g && g.flag && get(g.flag) === 'true'); };
 
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
-          const a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
-          const cap = a18 ? 28 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
+          const a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
+          const cap = a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -14557,9 +14795,10 @@
           s15: { wire: 14, node: 24, walk: 'order_labyrinth_march_bypassed' },
           s16: { wire: 18, node: 25, walk: 'order_cairn4_march_bypassed' },
           s17: { wire: 22, node: 26, walk: 'order_cairn5_march_bypassed' },
-          s18: { wire: 26, node: 13, walk: 'order_stele_march_bypassed' }
+          s18: { wire: 26, node: 13, walk: 'order_stele_march_bypassed' },
+          s19: { wire: 30, node: 14, walk: 'order_oracle_stair_bypassed' }
         };
-        const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed'];
+        const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed'];
 
         // Puts the Hermes chat exactly at `step`: the replies before it are kept (first reply if none was saved)
         function setWire(step) {
@@ -15383,24 +15622,49 @@
             action: open
           };
         },
+        // Station 19 · The Oracle's Horizon (node id 14)
         14: () => {
+          const open = () => (window.openOracleModal ? window.openOracleModal() : null);
+          if (localStorage.getItem('order_oracle_horizon_completed') === 'true') {
+            return {
+              badge: 'STATION 19 // THE FIRST TRUTH',
+              status: 'THE ORACLE REMEMBERS ✓',
+              statusClass: 'status-done-badge',
+              title: "The Oracle's Horizon · Tower II",
+              thumb: './assets/thumbnails/oracle_horizon_preview.webp',
+              lore: 'Silvia sealed the horizon of Sheet 18A, set the brass disc of 24 sightings to the sky and read the first truth on it: the WHEN. Then she gave the vow back to the Oracle, and the Oracle lifted her veil. She was Aurelia.',
+              rewards: [
+                { icon: '📅', label: 'The WHEN', desc: '18 – 20 December' },
+                { icon: '⭐', label: 'The Gilded Star', desc: 'Painted for the navigator' },
+                { icon: '🧮', label: '2 New Equations', desc: '[Z] + [D] = 23 · [I] + [E] = 12' }
+              ],
+              btnText: 'Revisit the Inner Chamber ➔',
+              action: open
+            };
+          }
+          const seals = [1, 2, 3, 4, 5].filter((i) => localStorage.getItem('order_seal_cairn_' + i) === 'true').length;
+          const tester = typeof window.isAdminTester === 'function' && window.isAdminTester();
+          const ready = localStorage.getItem('order_polybius_stele_completed') === 'true' && seals === 5 && typeof window.isOracleStairOver === 'function' && window.isOracleStairOver();
+          const arrived = ready || tester;
           return {
             badge: 'STATION 19 // TOWER II · THE ORACLE',
-            status: 'SANCTUARY THRESHOLD REACHED ✦',
+            status: arrived ? 'THE INNER STAIR ✦' : (seals < 5 && localStorage.getItem('order_polybius_stele_completed') === 'true' ? 'FOUR SEALS OF FIVE ✦' : 'THE ORACLE WAITS ✦'),
             statusClass: 'status-live-badge',
-            title: 'The Sandstone Sanctuary of the Oracle',
-            thumb: './assets/thumbnails/polybius_stele_preview.webp',
-            lore: 'Tower II: The Sandstone Sanctuary of the Desert Oracle (Sheets 17B and 18A of the physical journal). Final destination of the Desert Path. Hermes stands before the great bronze gates, ready to triangulate the Three Ancient Towers.',
+            title: "The Oracle's Horizon",
+            thumb: './assets/thumbnails/oracle_horizon_preview.webp',
+            lore: arrived
+              ? 'At the bottom of the inner stair of Tower II, a door carved with the horizon. Solve Sheet 18A of your journal, speak the sigil of the Oracle, and stand before her.'
+              : (seals < 5 && localStorage.getItem('order_polybius_stele_completed') === 'true'
+                ? "'She receives no one until the five seals are home.' The first seal still sleeps by the dry wash, at Cairn I."
+                : 'Deep in Tower II the Oracle keeps the first truth. Save the Servant of the atrium, and wait for Hermes on the wire.'),
             rewards: [
-              { icon: '🏛️', label: 'The Gates of Tower II', desc: 'The Second Sanctuary revealed' },
-              { icon: '☀️', label: 'The Desert Oracle', desc: 'Prophetic encounter and secret coordinates' },
-              { icon: '🗝️', label: 'Second Master Key', desc: 'Toward the Vault of the Grand Eclipse' }
+              { icon: '📖', label: 'Sheet 18A of the Journal', desc: 'The three mirrors of the horizon' },
+              { icon: '🪙', label: 'The Disc of 24 Sightings', desc: 'A second trial, set by the sky' },
+              { icon: '💬', label: 'The Vow', desc: 'A third trial, in words' }
             ],
-            btnText: 'Enter the Sanctuary of Tower II ➔',
-            action: () => {
-              if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
-              if (window.showDesertToast) window.showDesertToast('Station 19: The Sandstone Sanctuary of the Desert Oracle awaits on Sheet 18A.');
-            }
+            btnText: arrived ? '✦ DESCEND THE INNER STAIR ➔' : 'The door is still closed',
+            btnDisabled: !arrived,
+            action: open
           };
         },
         21: () => {
@@ -16529,7 +16793,9 @@
         { id: 'cairn5-yo', station: 'Station 17 · The light on Tower II', name: 'The First Line of Light', expr: 'Y − O', l1: 'Y', op: '-', l2: 'O', target: 2, unit: '', requires: 'order_arch_solstice_completed' },
         { id: 'cairn5-lg', station: 'Station 17 · The light on Tower II', name: 'The Second Line of Light', expr: 'L + G', l1: 'L', op: '+', l2: 'G', target: 23, unit: '', requires: 'order_arch_solstice_completed' },
         { id: 'stele-hu', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Well', expr: 'H − U', l1: 'H', op: '-', l2: 'U', target: 16, unit: '', requires: 'order_polybius_stele_completed' },
-        { id: 'stele-mt', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Hatch', expr: 'M + T', l1: 'M', op: '+', l2: 'T', target: 25, unit: '', requires: 'order_polybius_stele_completed' }
+        { id: 'stele-mt', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Hatch', expr: 'M + T', l1: 'M', op: '+', l2: 'T', target: 25, unit: '', requires: 'order_polybius_stele_completed' },
+        { id: 'oracle-zd', station: 'Station 19 · The back of the disc', name: 'The Line of the Rim', expr: 'Z + D', l1: 'Z', op: '+', l2: 'D', target: 23, unit: '', requires: 'order_oracle_horizon_completed' },
+        { id: 'oracle-ie', station: 'Station 19 · The back of the disc', name: 'The Line of the Heart', expr: 'I + E', l1: 'I', op: '+', l2: 'E', target: 12, unit: '', requires: 'order_oracle_horizon_completed' }
       ];
 
       // Desert equations only appear once their station is solved, so the Ledger never spoils them
@@ -18181,8 +18447,73 @@
               ? "'At dawn,' he said, 'with the five seals, she will receive you.' Station 19, Silvia: the Oracle's Horizon, Sheet 18A."
               : "But he counted the seals in my coat, and there are " + sealsPhrase(seals).toLowerCase() + ". 'She receives no one until the five seals are home.' The first still sleeps by the dry wash. Station 19, the Oracle's Horizon (Sheet 18A), waits for it.");
           }
+        },
+        {
+          // Dawn at the inner stair of Tower II, with the Servant's key: the audience is about to begin
+          step: 29,
+          hermesInitial: "Dawn, Silvia. The Servant woke me before first light with a cup of mint tea and the bronze key, and walked me to a door at the back of the atrium I had never noticed: the inner stair, cut down into the rock.\n\nThe raiders' fires at the foot of the steps are cold. Their wagons are gone, and the wheel ruts run east, toward the sunrise. The one under the oilcloth went with them.\n\nAt the bottom of the stair there is a second door: a slab of sandstone carved with a horizon, three mirrors and eight small sockets. Sheet 18A. And behind it, Silvia, someone is humming. The same tune the shepherd hummed for me on the hardpan.",
+          choices: [
+            {
+              id: "choice-29-ready",
+              text: "I'm ready. Let's seal the horizon.",
+              silviaMsg: "I'm ready, Hermes. Sheet 18A is open. Let's seal the horizon together.",
+              hermesReply: "Together, then. I have climbed down a thousand stairs in my life, Silvia, and never one as short as this. My knees are shaking like a schoolboy's."
+            },
+            {
+              id: "choice-29-hermes",
+              text: "Are you all right, Hermes?",
+              silviaMsg: "Before you go down: are you all right, Hermes? Really?",
+              hermesReply: "No. And yes. I have been afraid of the wrong things for fifty-five years, Silvia: of the dark, of the sand, of being forgotten. This morning I am only afraid of a door. Stay on the wire."
+            },
+            {
+              id: "choice-29-raiders",
+              text: "And the raiders? The Astrolabe?",
+              silviaMsg: "And the raiders? They still have the Astrolabe, Hermes.",
+              hermesReply: "They do, and they have gone east with it, toward the dawn. One thing at a time, Silvia. Whatever is behind this door has waited longer than they have."
+            }
+          ]
+        },
+        {
+          step: 30,
+          completed: true,
+          get hermesFinal() {
+            return "Down the inner stair, then. The Servant stays at the top with a lamp; he says this door is not his to open.\n\nSheet 18A, Silvia: eight beacons sent east across the three mirrors of the horizon, and the eight letters where they land. When the horizon is sealed, the door will open. " + sealsPhrase(countCairnSeals()) + " in my coat, and the Servant's key in my hand.";
+          }
+        },
+        {
+          // Station 19 debrief: Aurelia, the WHEN, and the raiders gone east with the Astrolabe
+          step: 31,
+          hermesInitial: "Silvia. I have been sitting beside her for an hour, and I still cannot believe my own eyes.\n\nShe did not die in 1971. A deep dune at the foot of the cliff caught her, the Servant found her days later in the dry wash, with no name and no memory, holding the disc to her chest. The Oracle before her had died in the same earthquake. She took the veil, and she has kept this desert ever since: the charts, the songs, the light on the tower. The gold stars. The lapis blue. It was her, all of it, all along.\n\nShe remembers pieces: the fire in the observatory, the cold of the terrace, my voice. Not the bridge. Not yet. When she says my name she says it carefully, the way you carry something full to the brim.\n\nAnd the disc gave you the first truth, Silvia: the WHEN. December, the eighteenth to the twentieth.",
+          choices: [
+            {
+              id: "choice-31-stay",
+              text: "Stay with her, Hermes. The rest can wait.",
+              silviaMsg: "Stay with her, Hermes. The raiders, the Astrolabe, the next tower: all of it can wait a day.",
+              hermesReply: "A day, then. She wants to show me her charts, and I want to watch her hands while she does. She still grinds the lapis exactly the way she did by our fire."
+            },
+            {
+              id: "choice-31-memory",
+              text: "Will her memory come back?",
+              silviaMsg: "Will her memory come back, Hermes? All of it?",
+              hermesReply: "The Servant says it comes back like water into a dry well: slowly, and from below. She remembered the vow when she heard it. She says the rest is waiting somewhere high and cold. I think I know where."
+            },
+            {
+              id: "choice-31-follow",
+              text: "Then we follow the raiders to the Stage.",
+              silviaMsg: "Then we follow them. The Astrolabe is going to the third tower, and so are we.",
+              hermesReply: "East, toward the Stage Tower, where the Mirror Speaker keeps the WHERE. They have the Astrolabe; we have the seals, the charts and the first truth. And this time, Silvia, I am not going alone."
+            }
+          ]
+        },
+        {
+          step: 32,
+          completed: true,
+          get hermesFinal() {
+            return "Two lines were scratched on the back of the disc, Silvia, under my old engraving, in a hand I would know anywhere: [Z] + [D] = 23 and [I] + [E] = 12. Into your Cipher Ledger with them.\n\nAnd she sent you something: a star of gold leaf on a card of lapis blue, painted this morning. 'For the navigator who brought him back,' she said.\n\nThe Desert Path is done. The first truth is yours: the WHEN, the eighteenth to the twentieth of December. The second waits at the Stage Tower, with the Mirror Speaker. The road ends where the curtain rises.";
+          }
         }
       ];
+
 
 
       // =======================================================================
@@ -18663,6 +18994,34 @@
           category: "Tower II",
           group: "desert",
           answer: "The raiders came at dusk and asked for the Oracle and her charts, the earth half of the Astrolabe. The Servant refused. They burned the library of the atrium to smoke out whoever was hiding, and he went down into the old well with the charts and shut the hatch over his head. He heard me speak the proverb at the stele and answered in its grid, and you answered him. The Oracle is safe, deeper in the rock than any fire can reach. About who answered my light, he said only this: 'She came from the edge of the sky with a disc in her arms and no name.'"
+        },
+        {
+          id: "inq-oracle-mirrors",
+          title: "How do the three mirrors of Sheet 18A work?",
+          category: "Tower II",
+          group: "desert",
+          answer: "Take one beacon at a time and fold it across each mirror in turn, as if the chart were paper. Mirror I is the upright line on column 4: a beacon three columns to its left lands three columns to its right, on the same row. Mirror II is the horizon of the Sanctuary: in column 6 it lies on Row D, everywhere else on Row F, and a beacon two rows above it lands two rows below it, in the same column. Mirror III, on column 10, works like Mirror I. After the third fold, write down the letter the beacon lands on. Eight beacons, eight letters, in order."
+        },
+        {
+          id: "inq-oracle-disc",
+          title: "How do I set the disc of 24 sightings?",
+          category: "Tower II",
+          group: "desert",
+          answer: "Each ring has one small gold star engraved beside one of its letters: Aldebaran on the outer ring, Vega in the middle, Arcturus on the inner one. Look at the sky I drew beside the disc, with north at the top, and turn each ring until its star points the same way as the real star. When all three point true, the jewel answers. Then read it the way I engraved it: start at the north spoke, read rim, middle, heart, then move sunwise to the next spoke. Three letters a spoke, eight spokes."
+        },
+        {
+          id: "inq-oracle-vow",
+          title: "Which words does she remember?",
+          category: "Tower II",
+          group: "desert",
+          answer: "Some of the words she remembers belong to the long prophecy of the Order: 'You were never only the seeker.' Those are true, but they were not mine. Mine were the five you sent me from the cliffs, the night the storm began, the words that gave me back my name. Put those five in order, and I will say them to her."
+        },
+        {
+          id: "inq-oracle-aurelia",
+          title: "What happened to Aurelia?",
+          category: "Tower II",
+          group: "desert",
+          answer: "She did not die in 1971. A deep dune at the foot of the cliff caught her fall, and days later the Servant found her in the dry wash with the brass disc in her arms and no memory of who she was. The Oracle before her had died in the same earthquake, and the Servant took her for a sign. She has worn the veil ever since: she painted the charts, tuned the pillars, answered my light. When I said the vow she remembered my voice, the fire and the terrace. The rest is still coming back, slowly, from below."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -18696,7 +19055,7 @@
       } else {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       }
-      const WIRE_LAST_STEP = 28;   // the last step of the expedition thread written so far (end of Station 18)
+      const WIRE_LAST_STEP = 32;   // the last step of the expedition thread (end of Station 19 and of the Desert Path)
       if (wireCurrentStep > WIRE_LAST_STEP) wireCurrentStep = WIRE_LAST_STEP;
       while (wireHistory.length < wireCurrentStep) {
         wireHistory.push(0);
@@ -18763,7 +19122,11 @@
         steleHint: { key: 'order_stele_hint', label: 'three tries at the proverb of the stele' },
         steleKnocks: { key: 'order_stele_knock_hint', label: 'three answers the stone did not accept' },
         steleFire: { key: 'order_stele_fire_hint', label: 'three tries at the burning atrium' },
-        stele: { key: 'order_polybius_stele_completed', label: 'Station 18' }
+        stele: { key: 'order_polybius_stele_completed', label: 'Station 18' },
+        oracleHint: { key: 'order_oracle_hint', label: 'three tries at the sigil of the Oracle' },
+        oracleDisc: { key: 'order_oracle_disc_hint', label: 'a long time at the disc' },
+        oracleVow: { key: 'order_oracle_vow_hint', label: 'three tries at the vow' },
+        oracle: { key: 'order_oracle_horizon_completed', label: 'Station 19' }
       };
       const INQUIRY_REQUIREMENTS = {
         'inq-salt-playa': 'chasm',
@@ -18794,7 +19157,11 @@
         'inq-stele-stanzas': 'steleHint',
         'inq-stele-knocks': 'steleKnocks',
         'inq-burning-atrium': 'steleFire',
-        'inq-servant-well': 'stele'
+        'inq-servant-well': 'stele',
+        'inq-oracle-mirrors': 'oracleHint',
+        'inq-oracle-disc': 'oracleDisc',
+        'inq-oracle-vow': 'oracleVow',
+        'inq-oracle-aurelia': 'oracle'
       };
       FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
       const INQUIRY_GROUPS = [
@@ -18843,6 +19210,8 @@
         '15A': { title: 'Cairn IV: Sentry of the Canyon', note: 'Two singing pillars, three laws of the echo and the survey log of seven echoes: the sigil of the Sentry.', thumb: './assets/thumbnails/cairn_iv_preview.webp', path: 'desert', node: 25, nodeLabel: 'Station 16 · Cairn IV' },
         '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on Sheet 16A).' },
         '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
+        '18A': { title: "The Oracle's Horizon", note: 'Eight beacons sent east across the three mirrors of the horizon: the sigil of the Oracle, and the first truth.', thumb: './assets/thumbnails/oracle_horizon_preview.webp', path: 'desert', node: 14, nodeLabel: "Station 19 · The Oracle's Horizon" },
+        '18B': { title: 'From the Desert to the Stage', note: 'Curtains, columns and the floor of a stage: the passage to the third tower.' },
         '17A': { title: 'The Polybius Stele', note: "The Servant's trial: the founders' 5 × 5 grid, keyed with PHOENIX, and six stanzas carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' }
       };
       let sheetPopover = null;
@@ -19097,6 +19466,15 @@
           summary: "A small bronze hand mirror with a sun-ray rim and an eclipse engraved at the top.",
           lore: "One of the founders' bronze mirrors, worked loose from its post in the Courtyard of Rays. With it Hermes answered the light on Tower II in the code he made for Aurelia, and the light answered back."
         },
+        gilded_star: {
+          id: "gilded_star",
+          name: "The Gilded Star · Tower II",
+          category: "Gift of the Oracle",
+          image: "assets/items/item_gilded_star.webp",
+          origin: "The Inner Chamber · Tower II · Oct 2026",
+          summary: "An eight-pointed star of gold leaf on a small card of lapis blue.",
+          lore: "Painted by Aurelia the morning after the audience, with a squirrel-hair brush and her breath held so the gold would not fly away: a ground of lapis, then the gold, then a touch of white at the tip of every point. 'For the navigator who brought him back.'"
+        },
         servant_key: {
           id: "servant_key",
           name: "The Servant's Key · Tower II",
@@ -19166,6 +19544,7 @@
         if (localStorage.getItem('order_cairn_iv_completed') === 'true' && !list.includes('tuning_pebble')) list.push('tuning_pebble');
         if (localStorage.getItem('order_arch_solstice_completed') === 'true' && !list.includes('signal_mirror')) list.push('signal_mirror');
         if (localStorage.getItem('order_polybius_stele_completed') === 'true' && !list.includes('servant_key')) list.push('servant_key');
+        if (localStorage.getItem('order_oracle_horizon_completed') === 'true' && !list.includes('gilded_star')) list.push('gilded_star');
         return list;
       }
 
@@ -19495,7 +19874,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -19545,7 +19924,9 @@
         22: () => '✦ SEALS ' + (sealsAtGates() + 3) + ' / 5 · EAST TO THE ARCH OF THE SOLSTICE (18 H) · NO SLEEP ✦',
         24: () => '✦ SEAL OF CAIRN V SECURED · SEALS ' + sealsAtAltar() + ' / 5 · [Y] − [O] = 2 · [L] + [G] = 23 RECORDED · SMOKE OVER TOWER II ✦',
         26: () => '✦ SEALS ' + sealsAtAltar() + ' / 5 · TO TOWER II, TOWARD THE SMOKE (6 H) · ARRIVAL AFTER DARK ✦',
-        28: () => '✦ THE SERVANT IS SAFE · [H] − [U] = 16 · [M] + [T] = 25 RECORDED · BEARING 348° NNW · SEALS ' + sealsAtWell() + ' / 5 ✦'
+        28: () => '✦ THE SERVANT IS SAFE · [H] − [U] = 16 · [M] + [T] = 25 RECORDED · BEARING 348° NNW · SEALS ' + sealsAtWell() + ' / 5 ✦',
+        30: () => '✦ SEALS 5 / 5 · DOWN THE INNER STAIR OF TOWER II · AUDIENCE WITH THE ORACLE ✦',
+        32: () => '✦ THE FIRST TRUTH · WHEN: 18 – 20 DECEMBER · [Z] + [D] = 23 · [I] + [E] = 12 RECORDED · THE DESERT PATH IS COMPLETE ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -20011,6 +20392,21 @@
       window.getSteleMarchEta = steleMarch.eta;
       window.skipSteleMarch = steleMarch.skip;
 
+      // Station 19: no walk. The inner stair opens at dawn, once Silvia answers Hermes at step 29.
+      const oracleStair = (() => {
+        const keys = { start: 'order_oracle_stair_start', bypassed: 'order_oracle_stair_bypassed', done: 'order_oracle_horizon_completed' };
+        const over = () => ['bypassed', 'done'].some((k) => localStorage.getItem(keys[k]) === 'true') || !!localStorage.getItem(keys.start);
+        return {
+          progress: () => (over() ? 1.0 : 0.0),
+          started: over,
+          over,
+          eta: () => '',
+          start: () => { if (!localStorage.getItem(keys.start)) { try { localStorage.setItem(keys.start, String(Date.now())); } catch (e) {} } },
+          skip: () => { localStorage.setItem(keys.bypassed, 'true'); renderWireExpedition(); }
+        };
+      })();
+      window.isOracleStairOver = oracleStair.over;
+
       // What the Field Wire shows while each march is under way (wire step → leg), and which answer starts it
       const MARCH_LEGS = {
         10: {
@@ -20052,9 +20448,17 @@
           etaLabel: 'ARRIVAL AT TOWER II',
           arrivedTitle: 'Tower II in Flames · Station 18 Awaits',
           arrivedDesc: 'Hermes is inside the burning atrium of the Sanctuary, by the stele. Open the Grand Desert Map and speak its proverb (Station 18 · Sheet 17A).'
+        },
+        30: {
+          step: 30, march: oracleStair, doneKey: 'order_oracle_horizon_completed',
+          walkingTitle: '✦ Down the Inner Stair ✦',
+          walkingDesc: 'Hermes is going down the inner stair of Tower II.',
+          etaLabel: 'AT THE DOOR',
+          arrivedTitle: "The Inner Chamber · Station 19 Awaits",
+          arrivedDesc: "Hermes is at the door of the Oracle, at the bottom of the inner stair. Open the Grand Desert Map and speak the sigil of the Oracle (Station 19 · Sheet 18A)."
         }
       };
-      const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch };
+      const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair };
 
       function dawnMessageText(i) {
         const d = DAWN_THREAD[i];
@@ -20499,7 +20903,7 @@
         };
 
         if (wireCurrentStep >= WIRE_LAST_STEP) {
-          showWaypointBar('The Servant Is Safe · Seals ' + countCairnSeals() + ' / 5', 'Next: the audience with the Oracle of Tower II. The Oracle\'s Horizon (Station 19 · Sheet 18A).', WIRE_LAST_STEP);
+          showWaypointBar('The Desert Path Is Complete · The WHEN: 18 – 20 December', 'Next: Path III, the Stage Tower, where the Mirror Speaker keeps the WHERE. The raiders went east with the Astrolabe.', WIRE_LAST_STEP);
           return;
         }
         if (wireCurrentStep === 8) {
@@ -20544,6 +20948,18 @@
             try { localStorage.setItem(WELL_SEALS_KEY, String(countCairnSeals())); } catch (e) {}
           }
           advanceTo(27);   // Station 18 solved: the Servant by the well, and what he said about the light
+        }
+        if (wireCurrentStep === 28) {
+          // 'She receives no one until the five seals are home': without Cairn I the audience waits
+          if (countCairnSeals() < 5) {
+            showWaypointBar('The Servant Is Safe · Seals ' + countCairnSeals() + ' / 5', 'The Oracle receives no one until the five seals are home. The first still sleeps by the dry wash: return to Cairn I on the Grand Desert Map.', 28);
+            return;
+          }
+          advanceTo(29);   // dawn at the inner stair of Tower II
+        }
+        if (wireCurrentStep === 30) {
+          if (showMarchLeg(MARCH_LEGS[30])) return;
+          advanceTo(31);   // Station 19 solved: Aurelia, the WHEN, and the raiders gone east
         }
 
         if (wireCurrentStep === 6) {
@@ -20968,7 +21384,7 @@
                 renderWireChoices();
                 updateMessengerBadge();
               }
-            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27].includes(justAnsweredStep)) {
+            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31].includes(justAnsweredStep)) {
               // 9: Silvia answered at the gates of Tower II, and the 12-hour crossing to the Sun Monolith begins.
               // 11: Silvia answered the Station 14 debrief.
               // 13: Silvia answered at first light, and the 6-hour walk down to the Sandstone Labyrinth begins.
@@ -20979,6 +21395,8 @@
               // 23: Silvia answered the Station 17 debrief.
               // 25: Silvia answered at noon under the Arch, and the 6-hour walk to Tower II begins.
               // 27: Silvia answered the Station 18 debrief.
+              // 29: Silvia answered at the inner stair, and Hermes goes down to the Oracle's door.
+              // 31: Silvia answered the Station 19 debrief.
               if (justAnsweredStep === 9) rememberGateSeal();
               if (MARCH_STARTED_BY_ANSWER[justAnsweredStep]) MARCH_STARTED_BY_ANSWER[justAnsweredStep].start();
               const finalStep = justAnsweredStep + 1;
@@ -21361,6 +21779,10 @@
       // Progress and state shown on the two path cards
       function updatePathTabsUI() {
         const done = (key) => localStorage.getItem(key) === 'true';
+        // Path III appears once the Oracle has given the WHEN (Station 19)
+        const stageTab = document.getElementById('btn-tab-path-stage');
+        const stageOpen = done('order_oracle_horizon_completed');
+        if (stageTab) stageTab.style.display = stageOpen ? '' : 'none';
         const seeker = (window.currentSeeker || localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
         const midnightVal = localStorage.getItem('seeker_' + seeker + '_midnight_completed');
         const midnightDone = midnightVal === null ? true : midnightVal === 'true';
@@ -21589,8 +22011,8 @@
           else showDesertToast('Station 18: The Polybius Stele (Tower II atrium) · See Sheet 17A of your physical journal.');
         } else if (targetId === 14) {
           window.selectMapNode(14, true);
-          if (window.checkServantCairnRequirement && window.checkServantCairnRequirement()) return;
-          showDesertToast('Station 19: Tower II · The Sandstone Sanctuary of the Desert Oracle · Sheet 18A of your journal.');
+          if (window.openOracleModal) window.openOracleModal();
+          else showDesertToast('Station 19: Tower II · The Sandstone Sanctuary of the Desert Oracle · Sheet 18A of your journal.');
         }
       }
       window.selectDesertStation = selectDesertStation;
@@ -21628,6 +22050,12 @@
       if (tabDesert) tabDesert.addEventListener('click', () => {
         if (sfx) sfx.playMechanicalClick();
         switchMapPath('desert', true);
+      });
+
+      const tabStage = document.getElementById('btn-tab-path-stage');
+      if (tabStage) tabStage.addEventListener('click', () => {
+        if (sfx) sfx.playMechanicalClick();
+        showDesertToast('✦ PATH III · THE STAGE TOWER ✦ The curtain has not risen yet. The raiders are on their way there with the Astrolabe; the Order will write to you when the Mirror Speaker is ready.');
       });
 
       window.switchMapPath = switchMapPath;
@@ -26857,6 +27285,478 @@
       if (isDone()) applyVictory();
       else if (isAwake() && el.keyInput) { el.keyInput.value = PROVERB; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
       drawFloor();
+      render();
+    })();
+
+    // =========================================================================
+    // 🏛️ STATION 19 · THE ORACLE'S HORIZON · THE AUDIENCE IN TOWER II (SHEET 18A)
+    // Part I (journal): the sigil OVERTURE (eight beacons across the three mirrors) opens the inner chamber.
+    // Part II (web only), The Disc of 24 Sightings: the veiled Oracle raises the brass disc Hermes engraved
+    // for Aurelia. Three rings of eight letters; each ring carries a star (Aldebaran, Vega, Arcturus) that
+    // must point where that star stands in the sky before dawn (SW, NW, NE). Set true, the disc reads from
+    // the north, sunwise, rim to heart: DECEMBER EIGHTEEN TO TWENTY (24 letters), the WHEN.
+    // Part III (web only), The Vow: she half remembers some words; Silvia orders them into the vow,
+    // YOU WERE ALWAYS THE TREASURE, and Hermes says it. The veil comes off; her memory comes back in part.
+    // Reward: the WHEN, two Ledger equations, the Gilded Star, and the passage to the Stage Path.
+    // =========================================================================
+    (function initOracleHorizon() {
+      const modal = document.getElementById('modal-oracle-horizon');
+      if (!modal) return;
+      const sfx = window.sfx || null;
+      const $ = (id) => document.getElementById(id);
+      const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+      const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const KEYS = {
+        awake: 'order_oracle_awake',
+        done: 'order_oracle_horizon_completed',
+        fails: 'order_oracle_key_fails',
+        hint: 'order_oracle_hint',
+        disc: 'order_oracle_disc',
+        turns: 'order_oracle_disc_turns',
+        discHint: 'order_oracle_disc_hint',
+        when: 'order_oracle_when_read',
+        readFails: 'order_oracle_read_fails',
+        vowFails: 'order_oracle_vow_fails',
+        vowHint: 'order_oracle_vow_hint',
+        passage: 'order_stage_passage_seen'
+      };
+      const SIGIL = 'OVERTURE';
+      const HINT_AFTER_FAILS = 3;
+      const DISC_HINT_AFTER_TURNS = 40;
+
+      // ---- The disc: spoke k (0 = north, sunwise) reads outer, middle, inner ----
+      const WHEN_WORDS = 'DECEMBER EIGHTEEN TO TWENTY';
+      const WHEN_LETTERS = WHEN_WORDS.replace(/ /g, '');   // 24 letters, one for each sighting
+      const RINGS = [0, 1, 2].map((r) => Array.from({ length: 8 }, (_, k) => WHEN_LETTERS[3 * k + r]));
+      // Where each ring's star is engraved (its spoke when the ring is set true) and where that star stands in the sky
+      const STARS = [
+        { name: 'Aldebaran', ring: 'Outer ring', spoke: 5, where: 'south-west' },
+        { name: 'Vega', ring: 'Middle ring', spoke: 7, where: 'north-west' },
+        { name: 'Arcturus', ring: 'Inner ring', spoke: 1, where: 'north-east' }
+      ];
+      const START = [3, 6, 2];   // how the Oracle holds the disc when she raises it
+      const SPOKE_NAMES = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
+      const R = [46, 34, 22];   // radius of each ring of letters
+
+      // ---- The vow ----
+      const VOW = ['YOU', 'WERE', 'ALWAYS', 'THE', 'TREASURE'];
+      const TILES = ['ALWAYS', 'SEEKER', 'YOU', 'THE', 'NEVER', 'TREASURE', 'WERE', 'ONLY'];
+
+      const el = {
+        close: $('btn-close-oracle'), sigilCard: $('oracle-sigil-card'), keyInput: $('oracle-key-input'), speak: $('btn-oracle-speak'),
+        keyFeedback: $('oracle-key-feedback'), discGame: $('oracle-disc-game'), discInner: document.querySelector('#oracle-disc-game .monolith-game-inner'),
+        disc: $('oracle-disc'), sky: $('oracle-sky'), readPanel: $('oracle-read-panel'), whenInput: $('oracle-when-input'), read: $('btn-oracle-read'),
+        when: $('oracle-when'), discFeedback: $('oracle-disc-feedback'), vowGame: $('oracle-vow-game'), vowInner: document.querySelector('#oracle-vow-game .monolith-game-inner'),
+        said: $('oracle-said'), tiles: $('oracle-tiles'), unsay: $('btn-oracle-unsay'), vow: $('btn-oracle-vow'), vowFeedback: $('oracle-vow-feedback'),
+        hint: $('oracle-hint'), victory: $('oracle-victory'), victoryText: $('oracle-victory-text'), finish: $('btn-oracle-finish'), dispatch: $('oracle-dispatch-text'),
+        tSigil: $('oracle-telem-sigil'), tDisc: $('oracle-telem-disc'), tWhen: $('oracle-telem-when'), tOracle: $('oracle-telem-oracle'),
+        ringBtns: [0, 1, 2].map((r) => [$('btn-oracle-r' + r + '-l'), $('btn-oracle-r' + r + '-r')]),
+        ringLabels: [0, 1, 2].map((r) => $('oracle-r' + r + '-label')),
+        passage: $('stage-passage-overlay'), passageClose: $('btn-stage-passage-close')
+      };
+
+      const isAwake = () => get(KEYS.awake) === 'true';
+      const isDone = () => get(KEYS.done) === 'true';
+      const whenRead = () => isDone() || get(KEYS.when) === 'true';
+      let rot = (() => {
+        const saved = get(KEYS.disc);
+        return saved && /^[0-7]{3}$/.test(saved) ? saved.split('').map(Number) : START.slice();
+      })();
+      const discTrue = () => isDone() || get(KEYS.when) === 'true' || rot.every((r) => r === 0);
+      let said = [];   // indexes into TILES
+      let pulsing = null;
+
+      function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
+      function feedback(node, text, kind) {
+        if (!node) return;
+        node.textContent = text;
+        node.classList.toggle('is-error', kind === 'error');
+        node.classList.toggle('is-ok', kind === 'ok');
+      }
+      const svgEl = (tag, attrs) => {
+        const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
+        Object.keys(attrs).forEach((k) => n.setAttribute(k, attrs[k]));
+        return n;
+      };
+      const letters = (s) => String(s || '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
+      const at = (spoke, r) => [r * Math.sin(spoke * Math.PI / 4), -r * Math.cos(spoke * Math.PI / 4)];
+      const letterAt = (ring, spoke) => RINGS[ring][((spoke - rot[ring]) % 8 + 8) % 8];
+      const starSpoke = (ring) => (STARS[ring].spoke + rot[ring]) % 8;
+      function starPath(x, y, r) {
+        let d = '';
+        for (let i = 0; i < 10; i++) {
+          const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.42 : r;
+          d += (i ? 'L' : 'M') + (x + rr * Math.cos(a)).toFixed(2) + ' ' + (y + rr * Math.sin(a)).toFixed(2) + ' ';
+        }
+        return d + 'Z';
+      }
+
+      // ---- Drawing the disc and the sky ----
+      function drawDisc() {
+        const svg = el.disc;
+        if (!svg) return;
+        svg.textContent = '';
+        const lit = discTrue();
+        svg.appendChild(svgEl('circle', { class: 'oracle-glow', cx: 0, cy: 0, r: 57, fill: 'rgba(253, 230, 138, 0.18)' }));
+        svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: 54, fill: '#6b4a22', stroke: '#d4a853', 'stroke-width': 1.2 }));
+        for (let i = 0; i < 48; i++) {   // the bevelled rim
+          const [x1, y1] = at(i / 6, 51), [x2, y2] = at(i / 6, i % 6 === 0 ? 47.5 : 49.5);
+          svg.appendChild(svgEl('line', { x1, y1, x2, y2, stroke: '#3b2410', 'stroke-width': i % 6 === 0 ? 0.9 : 0.4 }));
+        }
+        svg.appendChild(svgEl('path', { d: 'M0 -58 L3 -52 L-3 -52 Z', fill: '#fde68a' }));   // north
+        [40, 28, 16].forEach((r, i) => svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r, fill: i % 2 ? '#7c5a2a' : '#8a6334', stroke: '#3b2410', 'stroke-width': 0.5 })));
+        [52, 40, 28, 16].forEach((r) => svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r, fill: 'none', stroke: '#d4a853', 'stroke-width': 0.35 })));
+        for (let k = 0; k < 8; k++) {   // the spokes
+          const [x1, y1] = at(k + 0.5, 16), [x2, y2] = at(k + 0.5, 52);
+          svg.appendChild(svgEl('line', { x1, y1, x2, y2, stroke: '#3b2410', 'stroke-width': 0.35 }));
+        }
+        for (let ring = 0; ring < 3; ring++) {
+          for (let k = 0; k < 8; k++) {
+            const [x, y] = at(k, R[ring]);
+            const t = svgEl('text', { x, y: y + 2.4, 'text-anchor': 'middle', 'font-size': 7, 'font-family': 'Cinzel, serif', 'font-weight': 700, fill: lit ? '#fff7d6' : '#2b1b0d' });
+            t.textContent = letterAt(ring, k);
+            svg.appendChild(t);
+          }
+          const [sx, sy] = at(starSpoke(ring) + 0.3, R[ring] + 1.5);
+          svg.appendChild(svgEl('path', { d: starPath(sx, sy, 2.6), fill: '#fde68a', stroke: '#7c2d12', 'stroke-width': 0.3 }));
+        }
+        svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: 7, fill: lit ? '#fde68a' : '#3b2410', stroke: '#d4a853', 'stroke-width': 0.8 }));
+        svg.appendChild(svgEl('path', { d: starPath(0, 0, 4.5), fill: lit ? '#b45309' : '#8a6334' }));
+        const desc = [0, 1, 2].map((ring) => STARS[ring].ring + ': its star points ' + SPOKE_NAMES[starSpoke(ring)] + '; reading from the north: ' + Array.from({ length: 8 }, (_, k) => letterAt(ring, k)).join(' ')).join('. ');
+        svg.setAttribute('aria-label', 'The brass disc of 24 sightings, north at the top. ' + desc + '.' + (lit ? ' The disc is shining.' : ''));
+      }
+      function drawSky() {
+        const svg = el.sky;
+        if (!svg || svg.firstChild) return;
+        svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: 54, fill: 'none', stroke: '#3b4a6b', 'stroke-width': 0.8 }));
+        for (let i = 0; i < 34; i++) {   // faint background stars, scattered by a fixed hash so they never form lines
+          const a = (Math.sin(i * 12.9898) * 43758.5453) % 1, d = (Math.sin(i * 78.233) * 12345.678) % 1;
+          const ang = Math.abs(a) * Math.PI * 2, rad = 6 + Math.abs(d) * 44;
+          svg.appendChild(svgEl('circle', { cx: rad * Math.cos(ang), cy: rad * Math.sin(ang), r: i % 5 === 0 ? 0.7 : 0.4, fill: '#94a3b8', opacity: 0.7 }));
+        }
+        [['N', 0], ['E', 2], ['S', 4], ['W', 6]].forEach(([l, k]) => {
+          const [x, y] = at(k, 48);
+          const t = svgEl('text', { x, y: y + 2.4, 'text-anchor': 'middle', 'font-size': 7, 'font-family': 'Cinzel, serif', fill: '#b8a07a' });
+          t.textContent = l;
+          svg.appendChild(t);
+        });
+        STARS.forEach((s) => {
+          const [x, y] = at(s.spoke, 32);
+          svg.appendChild(svgEl('path', { d: starPath(x, y, 4), fill: '#fde68a' }));
+          const t = svgEl('text', { x, y: y + 10, 'text-anchor': 'middle', 'font-size': 5.4, 'font-family': 'Cinzel, serif', fill: '#e7e5e4' });
+          t.textContent = s.name;
+          svg.appendChild(t);
+        });
+        svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: 1.6, fill: '#e7e5e4' }));
+      }
+
+      // ---- Turning the rings ----
+      function turn(ring, dir) {
+        if (!isAwake() || whenRead() || ring < 0 || ring > 2) return;
+        rot[ring] = (rot[ring] + dir + 8) % 8;
+        set(KEYS.disc, rot.join(''));
+        const turns = (parseInt(get(KEYS.turns) || '0', 10) || 0) + 1;
+        set(KEYS.turns, String(turns));
+        if (turns >= DISC_HINT_AFTER_TURNS) set(KEYS.discHint, 'true');
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (rot.every((r) => r === 0)) {
+          feedback(el.discFeedback, 'The three stars point true. The jewel of the disc wakes.', 'ok');
+          say("Silvia... the jewel. Three short flashes, a pause, two long ones: the code I engraved in it, more than fifty years ago. And every sighting is lit. Read it the way I made it to be read: from the north, sunwise, each spoke from the rim to the heart.");
+          pulseCode();
+          if (el.whenInput) setTimeout(() => el.whenInput.focus(), 60);
+        } else {
+          feedback(el.discFeedback, STARS[ring].ring + ': ' + STARS[ring].name + ' points ' + SPOKE_NAMES[starSpoke(ring)] + '.', '');
+        }
+        render();
+      }
+      // three short, a pause, two long: the code of the disc
+      function pulseCode() {
+        stopPulse();
+        if (!el.disc) return;
+        pulsing = [];
+        let t = 200;
+        [220, 220, 220, 0, 700, 700].forEach((len) => {
+          if (!len) { t += 600; return; }
+          pulsing.push(setTimeout(() => el.disc.classList.add('is-pulse'), t));
+          t += len;
+          pulsing.push(setTimeout(() => el.disc.classList.remove('is-pulse'), t));
+          t += 260;
+        });
+      }
+      function stopPulse() {
+        if (pulsing) pulsing.forEach((x) => clearTimeout(x));
+        pulsing = null;
+        if (el.disc) el.disc.classList.remove('is-pulse');
+      }
+      function readWhen() {
+        if (!isAwake() || whenRead() || !discTrue()) return;
+        const typed = letters(el.whenInput && el.whenInput.value);
+        const raw = String(el.whenInput && el.whenInput.value || '').toUpperCase();
+        if (!typed && !/\d/.test(raw)) { feedback(el.discFeedback, 'Type the 24 letters of the disc, spoke by spoke.', 'error'); return; }
+        const asWords = typed === WHEN_LETTERS;
+        const asDate = /DEC/.test(typed) && /\b18\b/.test(raw.replace(/[^0-9]+/g, ' ')) && /\b20\b/.test(raw.replace(/[^0-9]+/g, ' '));
+        if (!asWords && !asDate) {
+          const fails = (parseInt(get(KEYS.readFails) || '0', 10) || 0) + 1;
+          set(KEYS.readFails, String(fails));
+          if (fails >= HINT_AFTER_FAILS) set(KEYS.discHint, 'true');
+          feedback(el.discFeedback, 'Hermes frowns: that is not what the disc says. Start at the north spoke, read rim, middle, heart, then go sunwise.', 'error');
+          render();
+          return;
+        }
+        set(KEYS.when, 'true');
+        stopPulse();
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        feedback(el.discFeedback, 'DECEMBER EIGHTEEN TO TWENTY. The first truth: the WHEN.', 'ok');
+        say("December, the eighteenth to the twentieth. The hour and the season, Silvia: the first truth, written on a disc I made with my own hands, and I never knew what it would say. She is holding it out to you. And now she is looking at me through her veil, and she is saying words, very softly, as if she were trying to remember a song. Help me, Silvia. I think I know which words they are.");
+        render();
+        const first = el.tiles && el.tiles.querySelector('button');
+        if (first) setTimeout(() => first.focus(), 60);
+      }
+
+      // ---- The vow ----
+      function drawTiles() {
+        if (el.tiles) {
+          el.tiles.textContent = '';
+          TILES.forEach((w, i) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'monolith-btn oracle-tile';
+            b.textContent = w;
+            b.setAttribute('aria-pressed', String(said.includes(i)));
+            b.disabled = !whenRead() || isDone() || said.includes(i);
+            b.addEventListener('click', () => sayWord(i));
+            el.tiles.appendChild(b);
+          });
+        }
+        if (el.said) {
+          el.said.textContent = '';
+          (isDone() ? VOW.map((w) => TILES.indexOf(w)) : said).forEach((i) => {
+            const s = document.createElement('span');
+            s.className = 'monolith-equation';
+            s.textContent = TILES[i];
+            el.said.appendChild(s);
+          });
+        }
+      }
+      function sayWord(i) {
+        if (!whenRead() || isDone() || said.includes(i) || said.length >= TILES.length) return;
+        said.push(i);
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        render();
+        const next = el.tiles && el.tiles.querySelector('button:not([disabled])');
+        if (next) next.focus();
+      }
+      function unsay() {
+        if (isDone() || !said.length) return;
+        said.pop();
+        render();
+      }
+      function speakVow() {
+        if (!whenRead() || isDone()) return;
+        if (!said.length) { feedback(el.vowFeedback, 'Choose the words first.', 'error'); return; }
+        const words = said.map((i) => TILES[i]);
+        if (words.join(' ') !== VOW.join(' ')) {
+          const fails = (parseInt(get(KEYS.vowFails) || '0', 10) || 0) + 1;
+          set(KEYS.vowFails, String(fails));
+          if (fails >= HINT_AFTER_FAILS) set(KEYS.vowHint, 'true');
+          const full = words.join(' ') === 'YOU WERE NEVER ONLY THE SEEKER';
+          feedback(el.vowFeedback, full
+            ? 'She tilts her head: those words are true, but they are only the first half. They were never the words he said to her.'
+            : 'She listens, and shakes her head slowly. Close, but not hers.', 'error');
+          said = [];
+          render();
+          return;
+        }
+        completeStation();
+        say("I said it, Silvia. 'You were always the treasure.' And her hands let go of the disc, and she lifted the veil herself. It is her. It is Aurelia. Older, with a white streak in her hair and lapis blue under her nails, and her eyes are exactly the same. She does not remember everything. She remembers my voice, and the fire, and the cold of the terrace. She said her own name slowly, like a word in a language she used to speak. I cannot write any more right now.");
+      }
+      function completeStation() {
+        set(KEYS.done, 'true');
+        set(KEYS.when, 'true');
+        stopPulse();
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('gilded_star');
+        applyVictory();
+        render();
+        if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+        if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
+        if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
+      }
+      function applyVictory() {
+        if (el.victoryText) {
+          el.victoryText.textContent = "The horizon was sealed with OVERTURE and the inner chamber opened. The veiled Oracle raised a brass disc of 24 sightings; set to the sky before dawn, it gave the first truth, the WHEN. Then Hermes said the vow, and the Oracle lifted her veil: Aurelia, alive, remembering the fire, the terrace and his voice, though not yet everything. At dawn the raiders left east with the Astrolabe, toward the Stage.";
+        }
+        if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+      }
+
+      // ---- Part I: the sigil from Sheet 18A ----
+      function speakSigil() {
+        if (isAwake()) return;
+        const typed = letters(el.keyInput && el.keyInput.value);
+        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from Sheet 18A.', 'error'); return; }
+        if (typed !== SIGIL) {
+          const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
+          set(KEYS.fails, String(fails));
+          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
+            set(KEYS.hint, 'true');
+            feedback(el.keyFeedback, 'The door stays shut. Hermes left you a note in Ask Hermes about the three mirrors.', 'error');
+          } else {
+            feedback(el.keyFeedback, 'The door stays shut. Send the eight beacons across the mirrors of Sheet 18A again.', 'error');
+          }
+          return;
+        }
+        set(KEYS.awake, 'true');
+        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
+        if (el.speak) el.speak.disabled = true;
+        feedback(el.keyFeedback, 'OVERTURE. The horizon is sealed, and the door of the inner chamber opens.', 'ok');
+        say("OVERTURE... and the door opened, Silvia. The chamber is round, with an opening in the roof and a beam of grey light on a stone altar. She is there. Veiled, in a worn hooded robe, standing very still. She has not said a word. She is holding up a brass disc, Silvia. My disc. Twenty-four sightings, three rings. She turns it toward me as if she wanted me to read it, and its rings are all crooked.");
+        render();
+        const b = el.ringBtns[0] && el.ringBtns[0][1];
+        if (b) setTimeout(() => b.focus(), 60);
+      }
+
+      function render() {
+        const awake = isAwake(), done = isDone(), wRead = whenRead(), dTrue = discTrue();
+        drawDisc();
+        drawSky();
+        drawTiles();
+        el.ringBtns.forEach((pair) => pair.forEach((b) => { if (b) b.disabled = !awake || wRead; }));
+        el.ringLabels.forEach((n, ring) => { if (n) n.textContent = STARS[ring].ring + ' · ' + STARS[ring].name + (awake ? ' → ' + SPOKE_NAMES[starSpoke(ring)] : ''); });
+        if (el.readPanel) el.readPanel.style.display = awake && dTrue && !wRead ? '' : 'none';
+        if (el.when) el.when.style.display = wRead ? '' : 'none';
+        if (el.unsay) el.unsay.disabled = !wRead || done || !said.length;
+        if (el.vow) el.vow.disabled = !wRead || done;
+        if (el.tSigil) el.tSigil.textContent = awake ? SIGIL + ' ✓' : '[ 8 LETTERS ]';
+        if (el.tDisc) el.tDisc.textContent = dTrue && awake ? 'SET TRUE ✓' : (awake ? 'CROOKED' : '[ DARK ]');
+        if (el.tWhen) el.tWhen.textContent = wRead ? '18 – 20 DECEMBER ✓' : '[ SEALED ]';
+        if (el.tOracle) el.tOracle.textContent = done ? 'SHE REMEMBERS ✓' : (awake ? 'VEILED, LISTENING' : '[ VEILED ]');
+        if (el.discGame) el.discGame.classList.toggle('is-locked', !awake);
+        if (el.discInner) el.discInner.inert = !awake;
+        if (el.vowGame) el.vowGame.classList.toggle('is-locked', !wRead);
+        if (el.vowInner) el.vowInner.inert = !wRead;
+        if (el.sigilCard) el.sigilCard.classList.toggle('is-collapsed', awake);
+        if (awake && el.keyFeedback && !el.keyFeedback.textContent) feedback(el.keyFeedback, 'Sigil spoken: ' + SIGIL + ' ✓', 'ok');
+        if (el.hint) {
+          let hint = '';
+          if (!done && wRead && get(KEYS.vowHint) === 'true') hint = '✦ Hermes: they are the words you sent me from the cliffs, the night the storm began. Only the last five.';
+          else if (!done && awake && !wRead && get(KEYS.discHint) === 'true') hint = '✦ Hermes: turn each ring until its little star points the same way as that star in the sky beside it. Then read north first, rim to heart, and go sunwise.';
+          el.hint.style.display = hint ? '' : 'none';
+          el.hint.textContent = hint;
+        }
+        if (el.victory) el.victory.style.display = done ? '' : 'none';
+      }
+
+      // ---- Controls ----
+      el.ringBtns.forEach((pair, ring) => {
+        if (pair[0]) pair[0].addEventListener('click', () => turn(ring, -1));
+        if (pair[1]) pair[1].addEventListener('click', () => turn(ring, 1));
+      });
+      if (el.speak) el.speak.addEventListener('click', speakSigil);
+      if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });
+      if (el.read) el.read.addEventListener('click', readWhen);
+      if (el.whenInput) el.whenInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') readWhen(); });
+      if (el.unsay) el.unsay.addEventListener('click', unsay);
+      if (el.vow) el.vow.addEventListener('click', speakVow);
+
+      // ---- Open / close ----
+      const fiveSeals = () => [1, 2, 3, 4, 5].every((i) => get('order_seal_cairn_' + i) === 'true');
+      function canOpen() {
+        if (isDone()) return true;
+        if (typeof window.isAdminTester === 'function' && window.isAdminTester()) return true;
+        if (get('order_polybius_stele_completed') !== 'true' || !fiveSeals()) return false;
+        return typeof window.isOracleStairOver === 'function' ? window.isOracleStairOver() : false;
+      }
+      let returnFocusTo = null;
+      function openOracleModal() {
+        if (!canOpen()) {
+          const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
+          if (!toast) return;
+          if (get('order_polybius_stele_completed') !== 'true') toast('✦ TERRA INCOGNITA ✦ Save the Servant of Tower II (Station 18) before the inner stair opens.');
+          else if (!fiveSeals()) toast("'She receives no one until the five seals are home.' The first seal still sleeps by the dry wash, at Cairn I.");
+          else toast('Hermes is waiting for dawn by the inner stair. Open the Cliffside Workshop: he will wire you before he goes down.');
+          return;
+        }
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        modal.style.display = 'flex';
+        modal.classList.remove('closing');
+        returnFocusTo = document.activeElement;
+        if (isDone()) applyVictory();
+        else if (!isAwake()) say("Silvia, I am at the bottom of the inner stair, with the Servant's key in my hand. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. The Servant says it opens only for the sigil of the Oracle. Sheet 18A, please. I can hear someone humming behind it.");
+        else if (!whenRead()) say("She is still holding the disc up for us, Silvia, patient as stone. Set the rings by the sky.");
+        else say("She is waiting, Silvia, with her lips moving on words she cannot quite find. Give them back to her.");
+        render();
+        const focusTarget = isDone() ? el.finish : (!isAwake() ? el.keyInput : (!whenRead() ? (discTrue() ? el.whenInput : el.ringBtns[0][1]) : el.tiles && el.tiles.querySelector('button:not([disabled])')));
+        if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
+      }
+      function closeOracleModal() {
+        if (modal.style.display === 'none') return;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        stopPulse();
+        modal.classList.add('closing');
+        setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
+        if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
+        returnFocusTo = null;
+      }
+      window.openOracleModal = openOracleModal;
+      window.closeOracleModal = closeOracleModal;
+      if (el.close) el.close.addEventListener('click', closeOracleModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeOracleModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display !== 'none') closeOracleModal(); });
+
+      // ---- From the desert to the stage (once) ----
+      let passageReturnFocus = null;
+      function showStagePassage() {
+        if (!el.passage) return;
+        passageReturnFocus = document.activeElement;
+        el.passage.style.display = 'flex';
+        set(KEYS.passage, 'true');
+        if (sfx && sfx.playCelestialChime) setTimeout(() => sfx.playCelestialChime(), 1600);
+        if (el.passageClose) setTimeout(() => el.passageClose.focus(), 80);
+      }
+      function closeStagePassage() {
+        if (!el.passage || el.passage.style.display === 'none') return;
+        el.passage.style.display = 'none';
+        if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
+        const tab = document.getElementById('btn-tab-path-stage');
+        const back = tab && tab.offsetParent ? tab : passageReturnFocus;
+        if (back && document.contains(back) && typeof back.focus === 'function') back.focus();
+        passageReturnFocus = null;
+      }
+      window.showStagePassage = showStagePassage;
+      if (el.passageClose) el.passageClose.addEventListener('click', closeStagePassage);
+      document.addEventListener('keydown', (e) => {
+        if (!el.passage || el.passage.style.display === 'none') return;
+        if (e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); closeStagePassage(); }
+        else if (e.key === 'Tab') { e.preventDefault(); if (el.passageClose) el.passageClose.focus(); }   // the passage holds the focus
+      }, true);
+      if (el.finish) {
+        el.finish.addEventListener('click', () => {
+          closeOracleModal();
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+          if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+          if (get(KEYS.passage) !== 'true') showStagePassage();
+          else if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ The Desert Path is complete ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
+        });
+      }
+
+      // Test hook for scripts/audit/web_smoke.py: the disc and the vow (they are in this source anyway) and the controls
+      window.__oracle = {
+        rings: RINGS.map((r) => r.join('')),
+        stars: STARS.map((s) => ({ name: s.name, spoke: s.spoke })),
+        tiles: TILES.slice(),
+        rot: () => rot.slice(),
+        letterAt: (ring, spoke) => letterAt(ring, spoke),
+        turn: (ring, dir) => turn(ring, dir),
+        read: (text) => { if (el.whenInput) el.whenInput.value = text; readWhen(); },
+        say: (i) => sayWord(i),
+        vow: () => speakVow()
+      };
+
+      if (isDone()) applyVictory();
+      else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
       render();
     })();
 
