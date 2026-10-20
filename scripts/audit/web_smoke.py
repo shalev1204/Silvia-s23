@@ -776,7 +776,10 @@ def test_polybius_stele(browser):
     page.wait_for_timeout(2500)
     check(js("window.__stele.state().playing") is True, "the Servant knocks WELL on his own")
     js("window.__stele.read('WELL')")   # read before he has finished: the next stanza still starts by itself
-    page.wait_for_timeout(2200)
+    for _ in range(12):   # ASH starts 1.6 s later (polled: a busy machine can delay the timer)
+        page.wait_for_timeout(400)
+        if js("window.__stele.state().playing"):
+            break
     check(js("window.__stele.state().playing") is True and js("document.querySelectorAll('#stele-tape .stele-group').length") <= 6,
           "WELL read early: the old knocks stop and ASH starts on its own")
     js("window.__stele.stop()")
@@ -887,13 +890,14 @@ def test_oracle_horizon(browser):
     page.fill("#oracle-key-input", " over-ture "); page.click("#btn-oracle-speak"); page.wait_for_timeout(250)
     check(get("order_oracle_awake") == "true", "forgiving sigil 'over-ture' opens the inner chamber")
 
-    # The disc, set by the sky the page draws (Aldebaran south-west, Vega north-west, Arcturus north-east)
+    # The disc, set by the sky the page draws: before dawn on 20 October at 30° N, Aldebaran stands in the west
+    # (azimuth about 264°), Capella in the north-west (about 310°) and Polaris in the north
     sky = js("document.getElementById('oracle-sky').getAttribute('aria-label')")
-    check("Aldebaran to the south-west" in sky and "Vega to the north-west" in sky and "Arcturus to the north-east" in sky,
+    check("Aldebaran to the west" in sky and "Capella to the north-west" in sky and "Polaris to the north" in sky,
           "the sky card says where the three stars stand")
-    sky_spoke = {"Aldebaran": 5, "Vega": 7, "Arcturus": 1}
+    sky_spoke = {"Aldebaran": 6, "Capella": 7, "Polaris": 0}
     stars = js("window.__oracle.stars")
-    check(not js("getComputedStyle(document.getElementById('oracle-read-panel')).display") != "none", "the disc cannot be read while it is crooked")
+    check(js("getComputedStyle(document.getElementById('oracle-read-panel')).display") == "none", "the disc cannot be read while it is crooked")
     for ring, star in enumerate(stars):
         while (star["spoke"] + js("window.__oracle.rot()")[ring]) % 8 != sky_spoke[star["name"]]:
             js(f"window.__oracle.turn({ring}, 1)")
@@ -903,9 +907,12 @@ def test_oracle_horizon(browser):
     check(js("getComputedStyle(document.getElementById('oracle-read-panel')).display") != "none", "the shining disc can be read")
     js("window.__oracle.read('DECEMBER EIGHTEEN')")
     check(get("order_oracle_when_read") is None and get("order_oracle_read_fails") == "1", "half the reading is refused")
-    js("window.__oracle.read('december 18 - 20')")
+    for wrong in ["december 2018 2020", "18 december 2020"]:
+        js(f"window.__oracle.read('{wrong}')")
+    check(get("order_oracle_when_read") is None, "years are not days: 2018 / 2020 are refused")
+    js("window.__oracle.read('the eighteenth to the twentieth of December')")
     check(get("order_oracle_when_read") == "true" and "18 – 20 DECEMBER" in js("document.getElementById('oracle-telem-when').innerText"),
-          "the WHEN read as a date is accepted: 18 – 20 December")
+          "the WHEN read in Hermes's own words is accepted: 18 – 20 December")
 
     # The vow, from the words she half remembers
     tiles = js("window.__oracle.tiles")
@@ -955,8 +962,22 @@ def test_oracle_horizon(browser):
     bar = page.evaluate("document.querySelector('.messenger-waypoint-desc')?.innerText || ''")
     page.evaluate("window.openOracleModal()"); page.wait_for_timeout(400)
     shut = page.evaluate("getComputedStyle(document.getElementById('modal-oracle-horizon')).display") == "none"
-    check(page.evaluate("localStorage.getItem('order_field_wire_step')") == "28" and "five seals" in bar and shut and not errors,
-          "with four seals the audience waits for Cairn I", bar + "; ".join(errors[:2]))
+    check(page.evaluate("localStorage.getItem('order_field_wire_step')") == "28" and "five seals" in bar and shut,
+          "with four seals the audience waits for Cairn I", bar)
+    servant = page.evaluate("getComputedStyle(document.getElementById('modal-servant-cairn-check')).display") != "none"
+    check(servant, "knocking at the Oracle's door, the Servant offers the way back to Cairn I")
+    page.click("#btn-servant-retrace"); page.wait_for_timeout(900)
+    check(page.evaluate("getComputedStyle(document.getElementById('modal-cairn-one')).display") != "none"
+          and page.evaluate("localStorage.getItem('order_cairn1_bypassed')") is None, "retracing opens Cairn I")
+    page.evaluate("window.closeCairnOneModal ? window.closeCairnOneModal() : document.getElementById('modal-cairn-one').style.display = 'none'")
+    page.evaluate("localStorage.setItem('order_cairn1_completed', 'true'); window.grantCairnSeal(1)")   # as if Silvia solved it
+    page.wait_for_timeout(1500)
+    page.evaluate("document.getElementById('btn-five-seals-close') && document.getElementById('btn-five-seals-close').click()")
+    page.reload(); page.wait_for_timeout(2500)   # back to the Workshop later (its header button toggles, so start from a fresh page)
+    page.evaluate("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+    page.wait_for_timeout(2500)
+    check(page.evaluate("localStorage.getItem('order_field_wire_step')") == "29" and not errors,
+          "with the fifth seal home the wire goes on to the inner stair", "; ".join(errors[:2]))
     ctx.close()
 
 

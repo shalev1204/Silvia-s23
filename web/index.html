@@ -4222,6 +4222,7 @@
     .map-path-tab-btn.is-sealed { grid-column: 1 / -1; min-height: 0; padding: 12px 22px; border-style: dashed; border-color: rgba(196, 181, 253, 0.6); }
     .map-path-tab-btn.is-sealed .path-tab-emblem { width: 46px; height: 46px; font-size: 1.45rem; border-color: #c4b5fd; }
     .map-path-tab-btn.is-sealed .path-tab-state { color: #c4b5fd; border-color: rgba(196, 181, 253, 0.6); }
+    .map-path-tab-btn.is-sealed .path-tab-count { white-space: normal; }
 
     /* The five seals come home: shown once, when the fifth seal joins the others */
     .five-seals-overlay {
@@ -13622,19 +13623,19 @@
               <div class="oracle-disc-row">
                 <svg class="oracle-disc" id="oracle-disc" viewBox="-60 -60 120 120" role="img" aria-label="The brass disc of 24 sightings: three rings of eight letters around a central jewel, each ring with one star engraved on it. North is at the top."></svg>
                 <div>
-                  <svg class="oracle-sky" id="oracle-sky" viewBox="-60 -60 120 120" role="img" aria-label="The sky over Tower II before dawn, drawn like a compass with north at the top: Aldebaran to the south-west, Vega to the north-west and Arcturus to the north-east."></svg>
+                  <svg class="oracle-sky" id="oracle-sky" viewBox="-60 -60 120 120" role="img" aria-label="The sky over Tower II before dawn, drawn like a compass with north at the top: Aldebaran to the west, Capella to the north-west and Polaris to the north."></svg>
                   <p class="oracle-sky-cap">The sky over Tower II before dawn, as Hermes drew it on the sand</p>
                 </div>
               </div>
               <div class="oracle-ring-ctrls" role="group" aria-label="Turn the rings of the disc">
-                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r0-l" aria-label="Turn the outer ring to the left">⟲</button><span id="oracle-r0-label">Outer ring · Aldebaran</span><button type="button" class="monolith-btn" id="btn-oracle-r0-r" aria-label="Turn the outer ring to the right">⟳</button></div>
-                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r1-l" aria-label="Turn the middle ring to the left">⟲</button><span id="oracle-r1-label">Middle ring · Vega</span><button type="button" class="monolith-btn" id="btn-oracle-r1-r" aria-label="Turn the middle ring to the right">⟳</button></div>
-                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r2-l" aria-label="Turn the inner ring to the left">⟲</button><span id="oracle-r2-label">Inner ring · Arcturus</span><button type="button" class="monolith-btn" id="btn-oracle-r2-r" aria-label="Turn the inner ring to the right">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r0-l" aria-label="Turn the outer ring counter-clockwise">⟲</button><span id="oracle-r0-label">Outer ring · Aldebaran</span><button type="button" class="monolith-btn" id="btn-oracle-r0-r" aria-label="Turn the outer ring clockwise">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r1-l" aria-label="Turn the middle ring counter-clockwise">⟲</button><span id="oracle-r1-label">Middle ring · Capella</span><button type="button" class="monolith-btn" id="btn-oracle-r1-r" aria-label="Turn the middle ring clockwise">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r2-l" aria-label="Turn the inner ring counter-clockwise">⟲</button><span id="oracle-r2-label">Inner ring · Polaris</span><button type="button" class="monolith-btn" id="btn-oracle-r2-r" aria-label="Turn the inner ring clockwise">⟳</button></div>
               </div>
               <div id="oracle-read-panel" style="display: none;">
                 <div class="monolith-key-row" style="margin-top: 10px;">
                   <label class="monolith-sr-only" for="oracle-when-input">What the disc says</label>
-                  <input type="text" class="monolith-key-input oracle-text-input" id="oracle-when-input" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Read the 24 sightings">
+                  <input type="text" class="monolith-key-input oracle-text-input" id="oracle-when-input" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Read the 24 sightings">
                   <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-read">✦ Read it aloud</button>
                 </div>
               </div>
@@ -13666,7 +13667,7 @@
             <ul class="laby-rules">
               <li>The disc has three rings of eight sightings, one letter each, around a jewel. Each ring carries one star, engraved beside one of its letters.</li>
               <li>Turn each ring until its star points where that star stands in the sky over Tower II. North is at the top of the disc, as on the sky Hermes drew.</li>
-              <li>When all three point true, the disc answers. Hermes engraved it to be read from the north, sunwise: each spoke from the rim to the heart, three letters a spoke.</li>
+              <li>When all three point true, the disc answers. Hermes engraved it to be read from the north, clockwise: each spoke from the rim to the heart, three letters a spoke.</li>
               <li>Then, the vow: choose the words she half remembers, in the right order, and let Hermes say them.</li>
             </ul>
             <div class="laby-hint" id="oracle-hint" style="display: none;"></div>
@@ -15646,24 +15647,28 @@
           const tester = typeof window.isAdminTester === 'function' && window.isAdminTester();
           const ready = localStorage.getItem('order_polybius_stele_completed') === 'true' && seals === 5 && typeof window.isOracleStairOver === 'function' && window.isOracleStairOver();
           const arrived = ready || tester;
+          const steleDone = localStorage.getItem('order_polybius_stele_completed') === 'true';
+          const fourSeals = steleDone && seals < 5 && !tester;
           return {
             badge: 'STATION 19 // TOWER II · THE ORACLE',
-            status: arrived ? 'THE INNER STAIR ✦' : (seals < 5 && localStorage.getItem('order_polybius_stele_completed') === 'true' ? 'FOUR SEALS OF FIVE ✦' : 'THE ORACLE WAITS ✦'),
+            status: arrived ? 'THE INNER STAIR ✦' : (fourSeals ? 'FOUR SEALS OF FIVE ✦' : 'THE ORACLE WAITS ✦'),
             statusClass: 'status-live-badge',
             title: "The Oracle's Horizon",
             thumb: './assets/thumbnails/oracle_horizon_preview.webp',
             lore: arrived
               ? 'At the bottom of the inner stair of Tower II, a door carved with the horizon. Solve Sheet 18A of your journal, speak the sigil of the Oracle, and stand before her.'
-              : (seals < 5 && localStorage.getItem('order_polybius_stele_completed') === 'true'
-                ? "'She receives no one until the five seals are home.' The first seal still sleeps by the dry wash, at Cairn I."
-                : 'Deep in Tower II the Oracle keeps the first truth. Save the Servant of the atrium, and wait for Hermes on the wire.'),
+              : (fourSeals
+                ? "'She receives no one until the five seals are home.' The first seal still sleeps by the dry wash, at Cairn I: the Servant will show you the way back."
+                : (steleDone
+                  ? 'Hermes is waiting for dawn by the inner stair. Open the Cliffside Workshop: he will wire you before he goes down.'
+                  : 'Deep in Tower II the Oracle keeps the first truth. Save the Servant of the atrium, and wait for Hermes on the wire.')),
             rewards: [
               { icon: '📖', label: 'Sheet 18A of the Journal', desc: 'The three mirrors of the horizon' },
               { icon: '🪙', label: 'The Disc of 24 Sightings', desc: 'A second trial, set by the sky' },
               { icon: '💬', label: 'The Vow', desc: 'A third trial, in words' }
             ],
-            btnText: arrived ? '✦ DESCEND THE INNER STAIR ➔' : 'The door is still closed',
-            btnDisabled: !arrived,
+            btnText: arrived ? '✦ DESCEND THE INNER STAIR ➔' : (fourSeals ? 'Speak with the Servant ➔' : 'The door is still closed'),
+            btnDisabled: !arrived && !fourSeals,
             action: open
           };
         },
@@ -18509,7 +18514,7 @@
           step: 32,
           completed: true,
           get hermesFinal() {
-            return "Two lines were scratched on the back of the disc, Silvia, under my old engraving, in a hand I would know anywhere: [Z] + [D] = 23 and [I] + [E] = 12. Into your Cipher Ledger with them.\n\nAnd she sent you something: a star of gold leaf on a card of lapis blue, painted this morning. 'For the navigator who brought him back,' she said.\n\nThe Desert Path is done. The first truth is yours: the WHEN, the eighteenth to the twentieth of December. The second waits at the Stage Tower, with the Mirror Speaker. The road ends where the curtain rises.";
+            return "Two lines were scratched on the back of the disc, Silvia, under my old engraving, in a hand I would know anywhere: [Z] + [D] = 23 and [I] + [E] = 12. Into your Cipher Ledger with them.\n\nAnd she sent you something: a star of gold leaf on a card of lapis blue, painted while we talked. 'For the navigator who brought him back,' she said.\n\nThe Desert Path is done. The first truth is yours: the WHEN, the eighteenth to the twentieth of December. The second waits at the Stage Tower, with the Mirror Speaker. The road ends where the curtain rises.";
           }
         }
       ];
@@ -19007,7 +19012,7 @@
           title: "How do I set the disc of 24 sightings?",
           category: "Tower II",
           group: "desert",
-          answer: "Each ring has one small gold star engraved beside one of its letters: Aldebaran on the outer ring, Vega in the middle, Arcturus on the inner one. Look at the sky I drew beside the disc, with north at the top, and turn each ring until its star points the same way as the real star. When all three point true, the jewel answers. Then read it the way I engraved it: start at the north spoke, read rim, middle, heart, then move sunwise to the next spoke. Three letters a spoke, eight spokes."
+          answer: "Each ring has one small gold star engraved beside one of its letters: Aldebaran on the outer ring, Capella in the middle, Polaris on the inner one. Look at the sky I drew beside the disc, with north at the top, and turn each ring until its star points the same way as the real star. When all three point true, the jewel answers. Then read it the way I engraved it: start at the north spoke, read rim, middle, heart, then move clockwise to the next spoke. Three letters a spoke, eight spokes."
         },
         {
           id: "inq-oracle-vow",
@@ -19473,7 +19478,7 @@
           image: "assets/items/item_gilded_star.webp",
           origin: "The Inner Chamber · Tower II · Oct 2026",
           summary: "An eight-pointed star of gold leaf on a small card of lapis blue.",
-          lore: "Painted by Aurelia the morning after the audience, with a squirrel-hair brush and her breath held so the gold would not fly away: a ground of lapis, then the gold, then a touch of white at the tip of every point. 'For the navigator who brought him back.'"
+          lore: "Painted by Aurelia while Hermes told her about the journey, with a squirrel-hair brush and her breath held so the gold would not fly away: a ground of lapis, then the gold, then a touch of white at the tip of every point. 'For the navigator who brought him back.'"
         },
         servant_key: {
           id: "servant_key",
@@ -20952,7 +20957,7 @@
         if (wireCurrentStep === 28) {
           // 'She receives no one until the five seals are home': without Cairn I the audience waits
           if (countCairnSeals() < 5) {
-            showWaypointBar('The Servant Is Safe · Seals ' + countCairnSeals() + ' / 5', 'The Oracle receives no one until the five seals are home. The first still sleeps by the dry wash: return to Cairn I on the Grand Desert Map.', 28);
+            showWaypointBar('The Servant Is Safe · Seals ' + countCairnSeals() + ' / 5', 'The Oracle receives no one until the five seals are home. The first still sleeps by the dry wash: open Station 19 on the Grand Desert Map, and the Servant will show you the way back to Cairn I.', 28);
             return;
           }
           advanceTo(29);   // dawn at the inner stair of Tower II
@@ -27292,9 +27297,10 @@
     // 🏛️ STATION 19 · THE ORACLE'S HORIZON · THE AUDIENCE IN TOWER II (SHEET 18A)
     // Part I (journal): the sigil OVERTURE (eight beacons across the three mirrors) opens the inner chamber.
     // Part II (web only), The Disc of 24 Sightings: the veiled Oracle raises the brass disc Hermes engraved
-    // for Aurelia. Three rings of eight letters; each ring carries a star (Aldebaran, Vega, Arcturus) that
-    // must point where that star stands in the sky before dawn (SW, NW, NE). Set true, the disc reads from
-    // the north, sunwise, rim to heart: DECEMBER EIGHTEEN TO TWENTY (24 letters), the WHEN.
+    // for Aurelia. Three rings of eight letters; each ring carries a star (Aldebaran, Capella, Polaris) that
+    // must point where that star stands before dawn in late October at 30° N (W, NW, N: worked out from the
+    // stars' positions, not guessed). Set true, the disc reads from the north, clockwise, rim to heart:
+    // DECEMBER EIGHTEEN TO TWENTY (24 letters), the WHEN.
     // Part III (web only), The Vow: she half remembers some words; Silvia orders them into the vow,
     // YOU WERE ALWAYS THE TREASURE, and Hermes says it. The veil comes off; her memory comes back in part.
     // Reward: the WHEN, two Ledger equations, the Gilded Star, and the passage to the Stage Path.
@@ -27324,15 +27330,15 @@
       const HINT_AFTER_FAILS = 3;
       const DISC_HINT_AFTER_TURNS = 40;
 
-      // ---- The disc: spoke k (0 = north, sunwise) reads outer, middle, inner ----
+      // ---- The disc: spoke k (0 = north, clockwise) reads outer, middle, inner ----
       const WHEN_WORDS = 'DECEMBER EIGHTEEN TO TWENTY';
       const WHEN_LETTERS = WHEN_WORDS.replace(/ /g, '');   // 24 letters, one for each sighting
       const RINGS = [0, 1, 2].map((r) => Array.from({ length: 8 }, (_, k) => WHEN_LETTERS[3 * k + r]));
       // Where each ring's star is engraved (its spoke when the ring is set true) and where that star stands in the sky
       const STARS = [
-        { name: 'Aldebaran', ring: 'Outer ring', spoke: 5, where: 'south-west' },
-        { name: 'Vega', ring: 'Middle ring', spoke: 7, where: 'north-west' },
-        { name: 'Arcturus', ring: 'Inner ring', spoke: 1, where: 'north-east' }
+        { name: 'Aldebaran', ring: 'Outer ring', spoke: 6, where: 'west' },
+        { name: 'Capella', ring: 'Middle ring', spoke: 7, where: 'north-west' },
+        { name: 'Polaris', ring: 'Inner ring', spoke: 0, where: 'north' }
       ];
       const START = [3, 6, 2];   // how the Oracle holds the disc when she raises it
       const SPOKE_NAMES = ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'];
@@ -27400,7 +27406,7 @@
         svg.appendChild(svgEl('circle', { class: 'oracle-glow', cx: 0, cy: 0, r: 57, fill: 'rgba(253, 230, 138, 0.18)' }));
         svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: 54, fill: '#6b4a22', stroke: '#d4a853', 'stroke-width': 1.2 }));
         for (let i = 0; i < 48; i++) {   // the bevelled rim
-          const [x1, y1] = at(i / 6, 51), [x2, y2] = at(i / 6, i % 6 === 0 ? 47.5 : 49.5);
+          const [x1, y1] = at(i / 6 + 0.5, 52.5), [x2, y2] = at(i / 6 + 0.5, i % 6 === 0 ? 50 : 51.5);   // ticks sit between the letters
           svg.appendChild(svgEl('line', { x1, y1, x2, y2, stroke: '#3b2410', 'stroke-width': i % 6 === 0 ? 0.9 : 0.4 }));
         }
         svg.appendChild(svgEl('path', { d: 'M0 -58 L3 -52 L-3 -52 Z', fill: '#fde68a' }));   // north
@@ -27417,8 +27423,8 @@
             t.textContent = letterAt(ring, k);
             svg.appendChild(t);
           }
-          const [sx, sy] = at(starSpoke(ring) + 0.3, R[ring] + 1.5);
-          svg.appendChild(svgEl('path', { d: starPath(sx, sy, 2.6), fill: '#fde68a', stroke: '#7c2d12', 'stroke-width': 0.3 }));
+          const [sx, sy] = at(starSpoke(ring), R[ring] - 5.6);   // on its letter's spoke, just inside the glyph
+          svg.appendChild(svgEl('path', { d: starPath(sx, sy, 1.9), fill: '#fde68a', stroke: '#7c2d12', 'stroke-width': 0.3 }));
         }
         svg.appendChild(svgEl('circle', { cx: 0, cy: 0, r: 7, fill: lit ? '#fde68a' : '#3b2410', stroke: '#d4a853', 'stroke-width': 0.8 }));
         svg.appendChild(svgEl('path', { d: starPath(0, 0, 4.5), fill: lit ? '#b45309' : '#8a6334' }));
@@ -27461,7 +27467,7 @@
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (rot.every((r) => r === 0)) {
           feedback(el.discFeedback, 'The three stars point true. The jewel of the disc wakes.', 'ok');
-          say("Silvia... the jewel. Three short flashes, a pause, two long ones: the code I engraved in it, more than fifty years ago. And every sighting is lit. Read it the way I made it to be read: from the north, sunwise, each spoke from the rim to the heart.");
+          say("Silvia... the jewel. Three short flashes, a pause, two long ones: the code I engraved in it, more than fifty years ago. And every sighting is lit. Read it the way I made it to be read: from the north, clockwise, each spoke from the rim to the heart.");
           pulseCode();
           if (el.whenInput) setTimeout(() => el.whenInput.focus(), 60);
         } else {
@@ -27491,15 +27497,19 @@
       function readWhen() {
         if (!isAwake() || whenRead() || !discTrue()) return;
         const typed = letters(el.whenInput && el.whenInput.value);
-        const raw = String(el.whenInput && el.whenInput.value || '').toUpperCase();
+        const raw = String(el.whenInput && el.whenInput.value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
         if (!typed && !/\d/.test(raw)) { feedback(el.discFeedback, 'Type the 24 letters of the disc, spoke by spoke.', 'error'); return; }
         const asWords = typed === WHEN_LETTERS;
-        const asDate = /DEC/.test(typed) && /\b18\b/.test(raw.replace(/[^0-9]+/g, ' ')) && /\b20\b/.test(raw.replace(/[^0-9]+/g, ' '));
+        // ...or as a date: the days 18 and 20 (in figures or words) and December (by name, or 12 as a month)
+        const spelled = raw.replace(/EIGHTEENTH|EIGHTEEN|DIECIOCHO/g, ' 18 ').replace(/TWENTIETH|TWENTY|VEINTE/g, ' 20 ');
+        const nums = spelled.match(/\d+/g) || [];
+        const month = /\b(DEC|DECEMBER|DIC|DICIEMBRE)\b/.test(spelled.replace(/[^A-Z0-9]+/g, ' ')) || nums.filter((n) => n === '12').length > 0;
+        const asDate = month && nums.includes('18') && nums.includes('20');
         if (!asWords && !asDate) {
           const fails = (parseInt(get(KEYS.readFails) || '0', 10) || 0) + 1;
           set(KEYS.readFails, String(fails));
           if (fails >= HINT_AFTER_FAILS) set(KEYS.discHint, 'true');
-          feedback(el.discFeedback, 'Hermes frowns: that is not what the disc says. Start at the north spoke, read rim, middle, heart, then go sunwise.', 'error');
+          feedback(el.discFeedback, 'Hermes frowns: that is not what the disc says. Start at the north spoke, read rim, middle, heart, then go clockwise.', 'error');
           render();
           return;
         }
@@ -27568,6 +27578,7 @@
           return;
         }
         completeStation();
+        if (el.finish) setTimeout(() => el.finish.focus(), 60);
         say("I said it, Silvia. 'You were always the treasure.' And her hands let go of the disc, and she lifted the veil herself. It is her. It is Aurelia. Older, with a white streak in her hair and lapis blue under her nails, and her eyes are exactly the same. She does not remember everything. She remembers my voice, and the fire, and the cold of the terrace. She said her own name slowly, like a word in a language she used to speak. I cannot write any more right now.");
       }
       function completeStation() {
@@ -27642,7 +27653,7 @@
         if (el.hint) {
           let hint = '';
           if (!done && wRead && get(KEYS.vowHint) === 'true') hint = '✦ Hermes: they are the words you sent me from the cliffs, the night the storm began. Only the last five.';
-          else if (!done && awake && !wRead && get(KEYS.discHint) === 'true') hint = '✦ Hermes: turn each ring until its little star points the same way as that star in the sky beside it. Then read north first, rim to heart, and go sunwise.';
+          else if (!done && awake && !wRead && get(KEYS.discHint) === 'true') hint = '✦ Hermes: turn each ring until its little star points the same way as that star in the sky beside it. Then read north first, rim to heart, and go clockwise.';
           el.hint.style.display = hint ? '' : 'none';
           el.hint.textContent = hint;
         }
@@ -27675,7 +27686,11 @@
           const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
           if (!toast) return;
           if (get('order_polybius_stele_completed') !== 'true') toast('✦ TERRA INCOGNITA ✦ Save the Servant of Tower II (Station 18) before the inner stair opens.');
-          else if (!fiveSeals()) toast("'She receives no one until the five seals are home.' The first seal still sleeps by the dry wash, at Cairn I.");
+          else if (!fiveSeals()) {
+            // The Servant leads the seeker back to Cairn I (and lifts its lock: four seals are more than enough)
+            if (typeof window.checkServantCairnRequirement === 'function' && window.checkServantCairnRequirement()) return;
+            toast("'She receives no one until the five seals are home.' The first seal still sleeps by the dry wash, at Cairn I.");
+          }
           else toast('Hermes is waiting for dawn by the inner stair. Open the Cliffside Workshop: he will wire you before he goes down.');
           return;
         }
@@ -27683,7 +27698,7 @@
         modal.style.display = 'flex';
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
-        if (isDone()) applyVictory();
+        if (isDone()) { applyVictory(); say("She is grinding lapis by the altar, Silvia, and humming. Every now and then she looks up at me as if to check that I am still here. I am."); }
         else if (!isAwake()) say("Silvia, I am at the bottom of the inner stair, with the Servant's key in my hand. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. The Servant says it opens only for the sigil of the Oracle. Sheet 18A, please. I can hear someone humming behind it.");
         else if (!whenRead()) say("She is still holding the disc up for us, Silvia, patient as stone. Set the rings by the sky.");
         else say("She is waiting, Silvia, with her lips moving on words she cannot quite find. Give them back to her.");
