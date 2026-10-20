@@ -25,10 +25,10 @@
 | 16 | Vista previa de impresión con las 8 hojas | S | medio | Parcial: `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
 | 17 | Dividir `web/index.html` (~29.000 líneas) | L | alto (largo plazo) | No existe; el Hub es un único archivo HTML+CSS+JS |
 | 18 | Smoke más rápido | M | alto | `web_smoke.py` (1.255 líneas, ~11 min, 206 comprobaciones); sin pasada corta |
-| 19 | Guardado con exportación e importación | S | alto | No existe export/import; sí hay baúl por perfil en `localStorage` (`eclipse_profile_vault_<perfil>`) |
+| 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Cliente hecho y probado** (`web/hub/js/cloud-save.js`, smoke `cloud`); falta crear el proyecto Supabase, aplicar la migración y rellenar `cloud-config.js` |
 | 20 | Accesibilidad | M | alto | Parcial: `prefers-reduced-motion` en 7 puntos del Hub, ~97 `aria-label`; sin tamaño de letra ajustable ni auditoría de contraste/teclado |
 | 21 | PWA offline | M | medio | No existe (sin manifest ni service worker) |
-| 22 | Telemetría local sin red | S | medio | Las «telemetry» actuales son pastillas de interfaz de cada juego, no un registro; la CSP ya fija `connect-src 'self'` |
+| 22 | Registro de juego (va con la #19) | S | medio | **Hecho con la #19**: cada cambio, sesión y vista viaja como evento a `eclipse_events` |
 
 ## Restricciones transversales (valen para todas)
 
@@ -146,8 +146,36 @@ Pendiente de especificar.
 
 **Pendiente (si se quiere bajar de 3 min)**: sustituir las esperas fijas (`wait_for_timeout`, ~136) por esperas por condición en las secciones de `--quick`.
 
-### 19. Guardado con exportación e importación (S)
-Pendiente de especificar.
+### 19. Guardado automático en la nube (M) · cliente implementado; falta el proyecto Supabase
+> Sustituye a «exportación e importación»: el Operador no quiere que Silvia descargue ni haga nada (20-10-2026).
+
+**Decisiones del Operador (20-10-2026)**
+- **Automático y continuo**: se guarda cada vez que Silvia avanza, aunque sea un solo mensaje del Field Wire. Ella no ve botones ni archivos.
+- **En Supabase**, creado y gestionado desde Claude con el conector oficial (MCP). El progreso «llega» a dos sitios: a **Claude**, que lo lee en sesiones futuras con el conector, y a **Carles**, en un panel del Hub (#9).
+- **Recuperación sola**: si Silvia entra en un navegador sin partida (dispositivo nuevo o navegador borrado), el Hub descarga su último guardado y sigue donde lo dejó.
+- **Seguridad «escritura cerrada, lectura por función»**: desde el navegador solo se puede **añadir** filas; no se puede leer, editar ni borrar las tablas. La recuperación usa una función que devuelve solo el último guardado de un perfil. Claude y Carles leen todo con acceso privado (conector, o clave fuera del repo). Riesgo aceptado: quien encontrara la URL podría añadir filas falsas.
+
+**Diseño técnico**
+- Tablas `eclipse_saves` (instantánea completa de la partida: las claves que no son de dispositivo, las mismas que ya separa `EclipseProfiles`) y `eclipse_events` (#22). RLS activado; solo política de `insert` para `anon`, con perfil `silvia`/`carles` y tamaño máximo. Función `eclipse_latest_save(seeker)` (`security definer`) para la recuperación. Poda automática: se conservan las últimas instantáneas de cada perfil.
+- SQL versionado en `supabase/migrations/`.
+- Cliente `web/hub/js/cloud-save.js` (sin dependencias, `fetch` a la API REST): detecta cada escritura de una clave de partida en `localStorage`, espera 2 s sin cambios y envía la instantánea; si no hay red, reintenta y guarda los eventos pendientes en el dispositivo. Al cerrar la pestaña envía lo pendiente con `keepalive`.
+- Configuración pública (URL del proyecto y clave *publishable*, pública por diseño) en `web/hub/js/cloud-config.js`. Ninguna clave privada en el repo.
+- CSP (`web/_headers`): `connect-src` se abre solo a la URL del proyecto de Supabase.
+- Desactivado en `127.0.0.1`/`localhost` (smoke) salvo `?cloud=1`; el smoke prueba el guardado y la recuperación con la red simulada (Playwright intercepta las llamadas).
+
+**Implementado (20-10-2026)**
+- `web/hub/js/cloud-save.js`, cargado el primero en `<head>` tras `cloud-config.js`. Envuelve `localStorage.setItem/removeItem`; las claves de dispositivo (`the_eclipse_*`, `hub_sidebar_collapsed`, `eclipse_profile_vault_*`, `eclipse_cloud_*`) no cuentan.
+- Activo solo en `https` sin `?admin`, `?tester`, `?carles` ni `?dev`; `?cloud=1` lo fuerza (smoke) y `?cloud=0` lo apaga. Con `cloud-config.js` vacío está apagado.
+- **Nada se envía hasta que el dispositivo ha preguntado una vez a la nube** (`eclipse_cloud_ready_<perfil>`): así un arranque vacío nunca pasa a ser «el último guardado». Si la nube no responde, el Hub funciona igual y reintenta cada 15 s.
+- Recuperación: navegador sin partida → aviso «Recovering your journey…» → se escriben las claves del último guardado → recarga. Mientras recarga, el Hub que arranca debajo no puede sobrescribirlas.
+- Al cambiar de perfil (`EclipseProfiles.swap`) se envía lo pendiente del perfil que sale y se deja de registrar: el reempaquetado no es progreso.
+- Las escrituras hechas desde iframes (juegos de Constellation) no se detectan al momento; entran en la siguiente instantánea.
+- Smoke `cloud` (en `--quick`), contra un Supabase falso: 11 comprobaciones verdes. La de cambio de perfil se ha comprobado que falla sin la protección (34 bajas falsas).
+
+**Pendiente**: crear el proyecto con el conector de Supabase, aplicar `supabase/migrations/20261020000000_eclipse_cloud_save.sql`, rellenar `cloud-config.js`, abrir `connect-src` en `web/_headers` a esa URL, y probar en real.
+
+**Fuera de alcance**: login real de Supabase, exportar a archivo, avisos por email/Telegram.
+**Verificación**: smoke nuevo (guardado tras avanzar, recuperación en navegador vacío, sin red no se pierde nada, Carles no pisa a Silvia); prueba real contra Supabase con el conector; CSP sin bloqueos.
 
 ### 20. Accesibilidad (M)
 Pendiente de especificar.
@@ -155,5 +183,6 @@ Pendiente de especificar.
 ### 21. PWA offline (M)
 Pendiente de especificar.
 
-### 22. Telemetría local (S)
-Pendiente de especificar.
+### 22. Registro de juego (S) · implementada con la #19
+**Decisión del Operador (20-10-2026)**: el registro no se queda en el dispositivo: viaja a Supabase con el guardado (#19) y lo leen Claude (conector) y Carles (panel #9).
+**Primera versión, sin tocar las estaciones**: cada cambio de una clave de partida en `localStorage` es un evento (`key`, valor nuevo, hora del dispositivo), más el inicio de cada sesión y la vista abierta. Con eso se reconstruyen cuándo llegó a cada estación, cuánto tardó, qué respondió en el Field Wire y cuándo pidió pistas. Los intentos fallidos que hoy no se guardan se añaden con la #6 (pistas progresivas).

@@ -5,9 +5,11 @@
     window.EclipseProfiles = (function () {
       var VAULT = 'eclipse_profile_vault_';
       var DEVICE_KEYS = ['the_eclipse_active_seeker', 'the_eclipse_gate_ok_at', 'hub_sidebar_collapsed'];
-      function isDeviceKey(k) { return DEVICE_KEYS.indexOf(k) >= 0 || k.indexOf(VAULT) === 0; }
+      // eclipse_cloud_*: the cloud save's own queue and flags (hub/js/cloud-save.js) belong to the device
+      function isDeviceKey(k) { return DEVICE_KEYS.indexOf(k) >= 0 || k.indexOf(VAULT) === 0 || k.indexOf('eclipse_cloud_') === 0; }
       function swap(from, to) {
         if (!from || !to || from.toLowerCase() === to.toLowerCase()) return false;
+        if (window.EclipseCloud && window.EclipseCloud.hold) window.EclipseCloud.hold();   // repacking is not progress
         var progress = {}, keys = [], i, k;
         for (i = 0; i < localStorage.length; i++) {
           k = localStorage.key(i);

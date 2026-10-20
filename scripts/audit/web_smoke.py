@@ -20,6 +20,8 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  12. Carles's "Play this game" puts the world at the arrival of any game, forward or back, and opens it.
  13. The Stage Path: hidden until Station 19, then the Living Mirror (rooms, keyboard, fragments, the WHERE when whole).
  14. Station 20 (The Gate of a Thousand Masks): departure, 18-hour crossing, word, drawing by hand, Fragment I, debrief.
+ 15. Cloud save (against a fake Supabase): snapshot and events on every change, recovery in an empty browser,
+     nothing sent while the cloud is unreachable or on a local copy, a profile switch is not reported as progress.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1235,14 +1237,107 @@ def test_masks_gate(browser):
     ctx.close()
 
 
+CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
+
+
+def cloud_page(browser, seed, query="?cloud=1", saved=None, fail_rpc=False):
+    """The Hub with cloud-config.js pointed at a fake Supabase that records every call."""
+    ctx, page, errors = new_page(browser, seed)
+    calls = []
+
+    def fake_cloud(route):
+        req = route.request
+        path = req.url.split("/rest/v1/", 1)[-1]
+        calls.append({"path": path, "body": json.loads(req.post_data or "null"), "key": req.headers.get("apikey")})
+        if path == "rpc/eclipse_latest_save":
+            if fail_rpc:
+                return route.fulfill(status=503, body="")
+            body = json.dumps({"saved_at": "2026-10-20T10:00:00Z", "progress": saved} if saved else None)
+            return route.fulfill(status=200, content_type="application/json", body=body)
+        route.fulfill(status=201, body="")
+
+    page.route("**/hub/js/cloud-config.js", lambda r: r.fulfill(status=200, content_type="text/javascript", body=CLOUD_JS))
+    page.route("**/__cloud/rest/v1/**", fake_cloud)
+    page.goto(f"{BASE}/index.html{query}", wait_until="load")
+    return ctx, page, errors, calls
+
+
+def test_cloud_save(browser):
+    print("\n15. Cloud save: every advance reaches the cloud, an empty browser gets the journey back")
+    saves = lambda calls: [c["body"] for c in calls if c["path"] == "eclipse_saves"]
+    events = lambda calls: [e for c in calls if c["path"] == "eclipse_events" for e in c["body"]]
+
+    ctx, page, errors, calls = cloud_page(browser, DESERT_BASE)
+    page.wait_for_timeout(4500)
+    first = saves(calls)
+    check(calls and calls[0]["path"] == "rpc/eclipse_latest_save" and calls[0]["key"] == "smoke-key",
+          "the device asks the cloud before it sends anything", str([c["path"] for c in calls][:3]))
+    check(first and first[-1]["seeker"] == "silvia" and first[-1]["progress"].get("order_field_wire_step") == "4"
+          and "the_eclipse_active_seeker" not in first[-1]["progress"],
+          "the whole journey goes up as one snapshot, without the device settings")
+    page.evaluate("localStorage.setItem('order_dawn_step', '2')")
+    page.wait_for_timeout(3000)
+    ev = events(calls)
+    check(len(saves(calls)) > len(first) and saves(calls)[-1]["progress"].get("order_dawn_step") == "2",
+          "a single new step is saved within seconds")
+    check(any(e["kind"] == "key" and e["key"] == "order_dawn_step" and e["value"] == "2" for e in ev)
+          and any(e["kind"] == "session" for e in ev) and any(e["kind"] == "view" for e in ev),
+          "the change, the session and the open view arrive as events", str(ev[-3:]))
+    check(not errors, "no JS errors with the cloud on", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # A new browser: only the seeker is known. The latest save comes back before the Hub is played
+    ctx, page, errors, calls = cloud_page(browser, {"the_eclipse_active_seeker": "Silvia"}, saved=DESERT_BASE)
+    page.wait_for_timeout(6000)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    check(get("order_field_wire_step") == "4" and get("order_whispering_chasm_completed") == "true"
+          and get("eclipse_cloud_ready_silvia") == "1",
+          "an empty browser recovers Silvia's journey on its own")
+    rpc = [c for c in calls if c["path"] == "rpc/eclipse_latest_save"]
+    check(len(rpc) == 1 and saves(calls) and saves(calls)[0]["progress"].get("order_field_wire_step") == "4",
+          "after the reload it asks no more and saves the recovered journey, not an empty start")
+    check(not page.evaluate("[...document.querySelectorAll('[role=status]')].some(e => /Recovering/.test(e.textContent))"),
+          "the recovery notice is gone")
+    ctx.close()
+
+    # The cloud does not answer: nothing may be sent, or an empty start could hide the real save
+    ctx, page, errors, calls = cloud_page(browser, {"the_eclipse_active_seeker": "Silvia"}, fail_rpc=True)
+    page.wait_for_timeout(4500)
+    check(not saves(calls) and page.evaluate("document.body.innerText.indexOf('Recovering') < 0"),
+          "if the cloud is down the Hub still opens and sends nothing")
+    ctx.close()
+
+    # Off unless asked: http(s) only on the published site, never on the smoke's local server
+    ctx, page, errors, calls = cloud_page(browser, DESERT_BASE, query="")
+    page.wait_for_timeout(3000)
+    page.evaluate("localStorage.setItem('order_dawn_step', '2')")
+    page.wait_for_timeout(2500)
+    check(not calls and page.evaluate("!window.EclipseCloud.state.enabled"), "a local copy of the Hub never writes to the cloud")
+    ctx.close()
+
+    # Carles switching to Silvia on the same device: the repacking is not reported as progress
+    # (a device where Silvia has played before: her vault and her cloud check are already there)
+    ctx, page, errors, calls = cloud_page(browser, {"the_eclipse_active_seeker": "Carles", "order_dawn_step": "3",
+                                                    "eclipse_profile_vault_silvia": json.dumps(DESERT_BASE),
+                                                    "eclipse_cloud_ready_silvia": "1", "eclipse_cloud_ready_carles": "1"})
+    page.wait_for_timeout(4000)
+    switched_at = page.evaluate("new Date().toISOString()")
+    login(page, "Silvia")
+    page.wait_for_timeout(3500)
+    removed = [e for e in events(calls) if e["seeker"] == "carles" and e.get("removed") and e["client_at"] >= switched_at]
+    check(not removed and all(s["seeker"] == "silvia" for s in saves(calls)[-1:]),
+          "a profile switch sends no false removals and the next save is Silvia's", f"{len(removed)} removals")
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
     "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
-    "mirror": test_stage_mirror, "s20": test_masks_gate,
+    "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 
