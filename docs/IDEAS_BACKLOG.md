@@ -25,7 +25,7 @@
 | 16 | Vista previa de impresión con las 8 hojas | S | medio | Parcial: `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
 | 17 | Dividir `web/index.html` (~29.000 líneas) | L | alto (largo plazo) | No existe; el Hub es un único archivo HTML+CSS+JS |
 | 18 | Smoke más rápido | M | alto | `web_smoke.py` (1.255 líneas, ~11 min, 206 comprobaciones); sin pasada corta |
-| 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Cliente hecho y probado** (`web/hub/js/cloud-save.js`, smoke `cloud`); falta crear el proyecto Supabase, aplicar la migración y rellenar `cloud-config.js` |
+| 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Hecho y probado contra Supabase real** (proyecto `aoochekcbugawaurllco`); llega a Silvia con el próximo despliegue |
 | 20 | Accesibilidad | M | alto | Parcial: `prefers-reduced-motion` en 7 puntos del Hub, ~97 `aria-label`; sin tamaño de letra ajustable ni auditoría de contraste/teclado |
 | 21 | PWA offline | M | medio | No existe (sin manifest ni service worker) |
 | 22 | Registro de juego (va con la #19) | S | medio | **Hecho con la #19**: cada cambio, sesión y vista viaja como evento a `eclipse_events` |
@@ -146,7 +146,7 @@ Pendiente de especificar.
 
 **Pendiente (si se quiere bajar de 3 min)**: sustituir las esperas fijas (`wait_for_timeout`, ~136) por esperas por condición en las secciones de `--quick`.
 
-### 19. Guardado automático en la nube (M) · cliente implementado; falta el proyecto Supabase
+### 19. Guardado automático en la nube (M) · implementada y verificada (falta desplegar)
 > Sustituye a «exportación e importación»: el Operador no quiere que Silvia descargue ni haga nada (20-10-2026).
 
 **Decisiones del Operador (20-10-2026)**
@@ -172,7 +172,12 @@ Pendiente de especificar.
 - Las escrituras hechas desde iframes (juegos de Constellation) no se detectan al momento; entran en la siguiente instantánea.
 - Smoke `cloud` (en `--quick`), contra un Supabase falso: 11 comprobaciones verdes. La de cambio de perfil se ha comprobado que falla sin la protección (34 bajas falsas).
 
-**Pendiente**: crear el proyecto con el conector de Supabase, aplicar `supabase/migrations/20261020000000_eclipse_cloud_save.sql`, rellenar `cloud-config.js`, abrir `connect-src` en `web/_headers` a esa URL, y probar en real.
+**Supabase (20-10-2026)**: proyecto «Silvia's23», ref `aoochekcbugawaurllco` (eu-west-1). Migración `eclipse_cloud_save` aplicada con el conector; `cloud-config.js` lleva la URL y la clave *publishable*; `connect-src` de `web/_headers` abierto solo a esa URL.
+- Permisos comprobados con la clave pública: insertar guardados y eventos sí (201); leer, modificar o borrar tablas no (`permission denied`); perfil distinto de silvia/carles rechazado por RLS; la función de poda no es accesible por la API. Único aviso del *advisor*: `eclipse_latest_save` ejecutable por `anon`, que es el diseño elegido.
+- Prueba real: el Hub en Chromium como Carles (`?cloud=1`) envió sesión, vista, las claves del arranque y dos instantáneas (la segunda con el cambio, a los 6 s). Las filas de prueba se borraron: la base queda vacía.
+- Leer el progreso (Claude, conector): `select * from eclipse_saves where seeker='silvia' order by saved_at desc limit 1;` y `eclipse_events` por `client_at`.
+
+**Pendiente**: desplegar (`wrangler pages deploy web`) cuando el Operador lo decida; hasta entonces Silvia sigue sin guardado en la nube.
 
 **Fuera de alcance**: login real de Supabase, exportar a archivo, avisos por email/Telegram.
 **Verificación**: smoke nuevo (guardado tras avanzar, recuperación en navegador vacío, sin red no se pierde nada, Carles no pisa a Silvia); prueba real contra Supabase con el conector; CSP sin bloqueos.

@@ -32,8 +32,8 @@ alter table public.eclipse_events enable row level security;
 
 drop policy if exists eclipse_saves_insert  on public.eclipse_saves;
 drop policy if exists eclipse_events_insert on public.eclipse_events;
-create policy eclipse_saves_insert  on public.eclipse_saves  for insert to anon with check (true);
-create policy eclipse_events_insert on public.eclipse_events for insert to anon with check (true);
+create policy eclipse_saves_insert  on public.eclipse_saves  for insert to anon with check (seeker in ('silvia', 'carles'));
+create policy eclipse_events_insert on public.eclipse_events for insert to anon with check (seeker in ('silvia', 'carles'));
 
 revoke all on public.eclipse_saves, public.eclipse_events from anon, authenticated;
 grant insert on public.eclipse_saves, public.eclipse_events to anon;
@@ -52,7 +52,8 @@ as $$
   order by s.saved_at desc, s.id desc
   limit 1;
 $$;
-revoke all on function public.eclipse_latest_save(text) from public;
+-- Supabase grants execute on new functions to anon and authenticated by name, not only through public
+revoke all on function public.eclipse_latest_save(text) from public, anon, authenticated;
 grant execute on function public.eclipse_latest_save(text) to anon;
 
 -- Keep the table small: the latest 300 snapshots of each seeker, plus one per day for the history
@@ -77,5 +78,6 @@ begin
 end;
 $$;
 drop trigger if exists eclipse_saves_prune on public.eclipse_saves;
+revoke all on function public.eclipse_prune_saves() from public, anon, authenticated;
 create trigger eclipse_saves_prune after insert on public.eclipse_saves
   for each row execute function public.eclipse_prune_saves();
