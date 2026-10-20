@@ -1181,8 +1181,25 @@ def test_masks_gate(browser):
         page.mouse.up()
     page.click("#btn-masks-hold"); page.wait_for_timeout(1700)
     check(js("window.__masks.carved()") == 1 and get("order_masks_draw_fails") == "0", "a shaking hand, drawn with the mouse, makes the first mask whole")
+    # during the reveal the mask that was just closed is the one shown, not the next one
+    js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(250)
+    check(get("order_masks_carved") == "2" and "Mask 2 of 3" in js("document.getElementById('masks-draw-count').innerText")
+          and "weeping mask" in js("document.getElementById('masks-canvas').getAttribute('aria-label')"),
+          "while the second mask closes, the screen still shows the second mask")
+    page.wait_for_timeout(1500)
+    # the last mask is saved at once: a reload in the middle of its reveal cannot strand the station
+    js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
+    check(get("order_masks_gate_completed") == "true", "the third mask is saved the moment it closes")
+    page.reload(); page.wait_for_timeout(2500)
+    js("window.selectStageStation(40)"); page.wait_for_timeout(500)
+    check(modal_open() and js("getComputedStyle(document.getElementById('masks-victory')).display") != "none",
+          "a reload in the middle of the last reveal still ends with the gate open")
+    js("localStorage.setItem('order_masks_gate_completed', 'x'); localStorage.setItem('order_masks_carved', '3')")
+    page.reload(); page.wait_for_timeout(2500)
+    js("window.selectStageStation(40)"); page.wait_for_timeout(500)
     js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(1700)
-    js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(2600)
+    check(get("order_masks_gate_completed") == "true", "a save of 3 masks without the done flag can still be finished")
+    page.wait_for_timeout(1000)
     check(get("order_masks_gate_completed") == "true" and js("getComputedStyle(document.getElementById('masks-victory')).display") != "none"
           and js("document.querySelectorAll('#masks-fragment-svg path').length") > 3,
           "three masks whole: the gate is open and Fragment I is drawn")

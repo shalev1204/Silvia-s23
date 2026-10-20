@@ -290,6 +290,7 @@
       if (reducedMotion() || complete()) drawKaleidoscope(performance.now());
     });
     window.addEventListener('pointerup', function () { setTimeout(function () { drag = null; }, 0); });
+    window.addEventListener('pointercancel', function () { setTimeout(function () { drag = null; }, 0); });
     root.addEventListener('keydown', function (e) {
       if (e.target !== root) return;
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {

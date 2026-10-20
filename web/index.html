@@ -18804,7 +18804,7 @@
               id: "choice-35-note",
               text: "What does the note say?",
               silviaMsg: "What does the note say, Hermes? Read it to me.",
-              hermesReply: "Six words, in a fine and careful hand: 'Let her through. She is the treasure.' Then the seal. Aurelia went pale. She says the Ashes have a leader, and that he never writes to anyone. He has just written about you."
+              hermesReply: "Seven words, in a fine and careful hand: 'Let her through. She is the treasure.' Then the seal. Aurelia went pale. She says the Ashes have a leader, and that he never writes to anyone. He has just written about you."
             },
             {
               id: "choice-35-speaker",
@@ -28277,6 +28277,10 @@
       let current = null;     // the line being drawn
       let revealed = false;   // the current mask has just been carved true (shown for a moment)
       let justSet = false;    // Fragment I has just been won and the mirror has not shown it yet
+      let revealIdx = -1;     // the mask being shown whole during a reveal (the saved count has already moved on)
+      let activePointer = null;
+      const maskIdx = () => Math.min(carved(), MASKS.length - 1);
+      const shownIdx = () => (revealed && revealIdx >= 0 ? revealIdx : maskIdx());
 
       function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
       function feedback(node, text, kind) {
@@ -28335,8 +28339,7 @@
       }
       function draw() {
         if (!ctx) return;
-        const idx = Math.min(carved(), MASKS.length - 1);
-        const mask = MASKS[idx];
+        const mask = MASKS[shownIdx()];
         const solvedNow = revealed || isDone();
         ctx.setTransform(scale, 0, 0, scale, 0, 0);
         ctx.clearRect(0, 0, W, H);
@@ -28391,21 +28394,24 @@
       const canDraw = () => isAwake() && !isDone() && !revealed;
       if (el.canvas) {
         el.canvas.addEventListener('pointerdown', (e) => {
-          if (!canDraw()) return;
+          if (!canDraw() || activePointer !== null) return;   // one finger at a time
+          if (e.pointerType === 'mouse' && e.button !== 0) return;
           e.preventDefault();
+          activePointer = e.pointerId;
           try { el.canvas.setPointerCapture(e.pointerId); } catch (err) {}
           current = [pointAt(e)];
           draw();
         });
         el.canvas.addEventListener('pointermove', (e) => {
-          if (!current) return;
+          if (!current || e.pointerId !== activePointer) return;
           const p = pointAt(e), last = current[current.length - 1];
           if (Math.hypot(p[0] - last[0], p[1] - last[1]) >= 1.5) { current.push(p); draw(); }
         });
-        const end = () => {
-          if (!current) return;
+        const end = (e) => {
+          if (!current || (e && e.pointerId !== activePointer)) return;
           strokes.push(current);
           current = null;
+          activePointer = null;
           feedback(el.drawFeedback, '', null);
           render();
         };
@@ -28415,7 +28421,7 @@
 
       function holdToMirror() {
         if (!canDraw()) return;
-        const mask = MASKS[carved()];
+        const mask = MASKS[maskIdx()];
         const res = judge(mask);
         if (res.ok) { carveTrue(); return; }
         const fails = drawFails() + 1;
@@ -28434,15 +28440,15 @@
         render();
       }
       function carveTrue() {
-        const n = carved() + 1;
+        const i = maskIdx(), n = i + 1;
         revealed = true;
+        revealIdx = i;
         set(KEYS.drawFails, '0');
         if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
-        feedback(el.drawFeedback, 'The mirror closes the face: ' + MASKS[n - 1].name + ' is whole.', 'ok');
+        feedback(el.drawFeedback, 'The mirror closes the face: ' + MASKS[i].name + ' is whole.', 'ok');
         if (n >= MASKS.length) {
-          set(KEYS.carved, String(MASKS.length));
-          render();
-          setTimeout(() => { revealed = false; completeStation(); }, 1100);
+          completeStation();   // saved at once: a reload during the reveal must not strand the station
+          setTimeout(() => { revealed = false; revealIdx = -1; render(); }, 1300);
           return;
         }
         set(KEYS.carved, String(n));
@@ -28451,18 +28457,20 @@
           "One face whole, Silvia. The mask turned on its nail by itself, all the way round, and stopped facing the corridor. Aurelia says that means 'pass'.",
           "Two. That one wept on both sides, as it should. The candles along the corridor all leaned toward the glass at once, though there is no wind in here."
         ];
-        say(lines[n - 1]);
+        say(lines[i]);
         setTimeout(() => {
           revealed = false;
+          revealIdx = -1;
           strokes = [];
           feedback(el.drawFeedback, '', null);
           render();
+          if (modal.style.display !== 'none' && el.hold && !el.hold.disabled) el.hold.focus();   // keyboard users keep their place
         }, 1300);
       }
       // After three tries, anyone (a keyboard, a shaking hand) may let the Mirror Speaker carve the half
       function letSpeakerCarve() {
         if (!canDraw() || !guideShown()) return;
-        strokes = MASKS[carved()].strokes.map((s) => s.map(toCanvas(1)));
+        strokes = MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(1)));
         carveTrue();
       }
 
@@ -28472,9 +28480,13 @@
         if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         applyVictory();
         render();
-        justSet = true;   // the mirror is refreshed once the modal closes, so its flash is seen
         if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
-        if (el.done) setTimeout(() => el.done.focus(), 60);
+        if (modal.style.display !== 'none') {
+          justSet = true;   // the mirror is refreshed once the modal closes, so its flash is seen
+          if (el.done) setTimeout(() => el.done.focus(), 60);
+        } else {
+          showMirror();     // the modal was closed during the reveal: show the mirror now
+        }
         say("The third mask closed, and the whole wall breathed out, Silvia. Behind the last mask there was a little niche, and in it, wrapped in black velvet, a piece of mirror the size of my hand. Fragment I. There is a moon in it that is not in the sky. And in the glass beside us, for one moment, a woman in a grey gown raised her hand and drew a straight line in the air.");
       }
       function drawFragment() {
@@ -28537,16 +28549,16 @@
 
       function render() {
         const awake = isAwake(), done = isDone(), n = carved();
-        if (el.count) el.count.textContent = done ? 'All three masks whole' : 'Mask ' + (Math.min(n, MASKS.length - 1) + 1) + ' of ' + MASKS.length;
+        if (el.count) el.count.textContent = done ? 'All three masks whole' : 'Mask ' + (shownIdx() + 1) + ' of ' + MASKS.length;
         [el.undo, el.clear].forEach((b) => { if (b) b.disabled = !awake || done || revealed || !strokes.length; });
         if (el.hold) el.hold.disabled = !awake || done || revealed;
         if (el.helpRow) el.helpRow.style.display = awake && !done && guideShown() ? '' : 'none';
         if (el.canvas) {
           el.canvas.classList.toggle('is-carved', done);
-          const mask = MASKS[Math.min(n, MASKS.length - 1)];
+          const mask = MASKS[shownIdx()];
           el.canvas.setAttribute('aria-label', done
             ? 'Three masks made whole in the mirror.'
-            : 'Mask ' + (Math.min(n, MASKS.length - 1) + 1) + ' of 3, ' + mask.name + ': carved on its left half only, beside a mirror. Draw its right half as the mirror would show it. ' + strokes.length + (strokes.length === 1 ? ' line' : ' lines') + ' drawn.');
+            : 'Mask ' + (shownIdx() + 1) + ' of 3, ' + mask.name + ': carved on its left half only, beside a mirror. Draw its right half as the mirror would show it. ' + strokes.length + (strokes.length === 1 ? ' line' : ' lines') + ' drawn.');
         }
         if (el.tWord) el.tWord.textContent = awake ? WORD + ' ✓' : '[ 6 LETTERS ]';
         if (el.tMasks) el.tMasks.textContent = done ? '3 / 3 ✓' : '[ ' + n + ' / 3 ]';
@@ -28683,13 +28695,13 @@
       // For the smoke tests: the state of the drawing, and a perfect or a wrong drawing on demand
       window.__masks = {
         carved, strokes: () => strokes.length,
-        targets: () => MASKS[Math.min(carved(), MASKS.length - 1)].strokes.map((s) => s.map(toCanvas(1))),
+        targets: () => MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(1))),
         size: [W, H],
-        drawTrue: () => { strokes = MASKS[carved()].strokes.map((s) => s.map(toCanvas(1))); render(); },
+        drawTrue: () => { strokes = MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(1))); render(); },
         setStrokes: (list) => { strokes = list; render(); },
-        drawHalf: () => { strokes = [MASKS[carved()].strokes[0].map(toCanvas(1))]; render(); },
-        drawWrong: () => { strokes = MASKS[carved()].strokes.map((s) => s.map(toCanvas(-1))); render(); },
-        judge: () => judge(MASKS[carved()])
+        drawHalf: () => { strokes = [MASKS[maskIdx()].strokes[0].map(toCanvas(1))]; render(); },
+        drawWrong: () => { strokes = MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(-1))); render(); },
+        judge: () => judge(MASKS[maskIdx()])
       };
     })();
 
