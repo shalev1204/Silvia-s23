@@ -27,8 +27,6 @@
         camp: 'order_labyrinth_camp_seen'
       };
       const SIGIL = 'WINDROSE';
-      const HINT_AFTER_FAILS = 3;
-      const TORCH_HINT_AFTER = 3;   // captures before Hermes has learnt the rounds
       const LIVES = 3;              // close calls per run
       const LAMP = 2;               // Hermes's lamp: squares around him (in both axes)
       const REACH = 2;              // a torch lights its square and this many squares ahead
@@ -106,6 +104,27 @@
       const isAwake = () => get(KEYS.awake) === 'true';
       const isDone = () => get(KEYS.done) === 'true';
       const torchHintOn = () => get(KEYS.torchHint) === 'true';
+
+      // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
+      const hints = window.EclipseHints;
+      const sigilHints = hints.define({
+        id: 's15-sigil', station: 'Station 15', title: 'the sigil of the true road', group: 'desert',
+        anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
+        texts: [
+          'Start at the Southern Mouth of Sheet 14B, not at the cairn. Only the arches that stand on the one true road count, in the order you pass beneath them.',
+          'I wrote down how to find the true road. It is in Ask Hermes: "How do I find the true road of Sheet 14B?"',
+          'Let us start together. Put your pencil on the Southern Mouth and shade in every dead end you leave behind; the side fissures have arches too, to fool the hurried. The first arch on the true road carries a W: if your pencil reaches another letter first, you have strayed. Seven arches more, up to the cairn.'
+        ]
+      });
+      const torchHints = hints.define({
+        id: 's15-torches', station: 'Station 15', title: 'the torches in the labyrinth', group: 'desert',
+        anchor: el.moveFeedback, solved: isDone, active: isAwake, legacyKey: KEYS.torchHint,
+        texts: [
+          'Watch the torches before you move. Each one walks the same round again and again, and it only lights what is in front of it.',
+          'I have drawn their rounds on your board. My note is in Ask Hermes: "How do the raiders\' torches move?"',
+          'Let us pass the first torch together. When one comes into view, hold still in the dark and count the turns until it is back on the same square: that is its round. Step into its corridor just after it has passed you and turned away, and keep behind it. Every road out passes the gold star and the raiders\' camp: make for the star first.'
+        ]
+      });
 
       // One run of the escape. It lives only while the page is open; a reload starts again at Cairn III.
       let run = null;
@@ -241,6 +260,7 @@
         Object.values(el.pad).forEach((btn) => { if (btn) btn.disabled = !awake || done; });
         if (el.hint) el.hint.style.display = torchHintOn() && !done ? '' : 'none';
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        sigilHints.refresh(); torchHints.refresh();
       }
 
       // ---- Part I: the sigil from Sheet 14B ----
@@ -252,12 +272,8 @@
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
-            set(KEYS.hint, 'true');
-            feedback(el.keyFeedback, 'The copper plate does not move. Hermes left you a note in Ask Hermes about reading the arches.', 'error');
-          } else {
-            feedback(el.keyFeedback, 'The copper plate does not move. Walk the one true road of Sheet 14B again.', 'error');
-          }
+          feedback(el.keyFeedback, 'The copper plate does not move. Walk the one true road of Sheet 14B again.', 'error');
+          sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
@@ -308,7 +324,7 @@
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         const captures = (parseInt(get(KEYS.captures) || '0', 10) || 0) + 1;
         set(KEYS.captures, String(captures));
-        if (captures >= TORCH_HINT_AFTER && !torchHintOn()) set(KEYS.torchHint, 'true');
+        torchHints.fail();
         if (el.board) { el.board.classList.remove('laby-flash'); void el.board.getBoundingClientRect(); el.board.classList.add('laby-flash'); }
         run.lives--;
         if (run.lives <= 0) {

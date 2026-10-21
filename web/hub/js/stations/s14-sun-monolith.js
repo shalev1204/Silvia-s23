@@ -21,7 +21,6 @@
         minute: 'order_monolith_sun_minute'
       };
       const SIGIL = 'SUNDIAL';
-      const HINT_AFTER_FAILS = 3;
 
       // ---- The sky model (one fixed day at the latitude of the Ridge) ----
       const MONOLITH_HEIGHT = 24;   // paces (Sheet 13B)
@@ -93,6 +92,27 @@
       const isAwake = () => get(KEYS.awake) === 'true';
       const isDone = () => get(KEYS.done) === 'true';
       const marksFound = () => Math.max(0, Math.min(MARKS.length, parseInt(get(KEYS.marks) || '0', 10) || 0));
+
+      // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
+      const hints = window.EclipseHints;
+      const sigilHints = hints.define({
+        id: 's14-sigil', station: 'Station 14', title: 'the sigil of the seven noons', group: 'desert',
+        anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
+        texts: [
+          'Each of the seven noons of Sheet 13B gives one letter. You only know the shadow of my staff: the shadow of the Monolith is the one the dial needs.',
+          'I wrote down how my staff and the Monolith share the sun. It is in Ask Hermes: "How do I read the shadows of Sheet 13B?"',
+          'Let us do the first noon together. My staff\'s shadow at Noon I is 1.5 paces. The Monolith is twelve times taller than my staff, so its shadow is 12 × 1.5 = 18 paces. On the dial, the ring of 18 paces carries S. Now Noon II, the same way.'
+        ]
+      });
+      const shadowHints = hints.define({
+        id: 's14-shadow', station: 'Station 14', title: 'the walking sun', group: 'desert',
+        anchor: el.markFeedback, solved: isDone, active: isAwake,
+        texts: [
+          'Read the inscription line by line before you move the sun. Each line tells you where the shadow must fall, not what time it is, and the stone only answers the marks it names, in its order.',
+          'Some carved marks lie on the shadow\'s path but the inscription never names them. My note on how a shadow moves through the day is in Ask Hermes: "How does a shadow move during the day?"',
+          'Let us find the first moment together. The sun sets in the west, so a shadow leaning toward the sunset falls west, and that happens in the morning, with the sun in the east. Drag the sun early into the morning and stop when the tip of the shadow touches the mark on the outermost ring. Then line II, the same way.'
+        ]
+      });
       let minute = Math.max(FIRST_MINUTE, Math.min(LAST_MINUTE, parseInt(get(KEYS.minute) || String(FIRST_MINUTE), 10) || FIRST_MINUTE));
 
       const fmt = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
@@ -216,6 +236,7 @@
           });
         }
         if (el.victory) el.victory.style.display = isDone() ? '' : 'none';
+        sigilHints.refresh(); shadowHints.refresh();
       }
 
       function setMinute(m, persist) {
@@ -233,12 +254,8 @@
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
-            set(KEYS.hint, 'true');
-            feedback(el.keyFeedback, 'The Monolith stays silent. Hermes left you a note in Ask Hermes about reading shadows.', 'error');
-          } else {
-            feedback(el.keyFeedback, 'The Monolith stays silent. Check the seven noons on Sheet 13B.', 'error');
-          }
+          feedback(el.keyFeedback, 'The Monolith stays silent. Check the seven noons on Sheet 13B.', 'error');
+          sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
@@ -261,6 +278,7 @@
         }
         if (TRAPS.indexOf(touched) >= 0) {
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          shadowHints.fail();
           if (found > 0) {
             set(KEYS.marks, '0');
             feedback(el.markFeedback, 'The inscription never names ' + touched.name + '. The awakened marks sink back to sleep: begin again with the morning shadow.', 'error');
@@ -279,6 +297,7 @@
         if (idx !== found) {
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.markFeedback, 'The stone stays silent. The inscription names another moment first.', 'error');
+          shadowHints.fail();
           return;
         }
         set(KEYS.marks, String(found + 1));

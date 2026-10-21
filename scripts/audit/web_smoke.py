@@ -232,7 +232,12 @@ def test_sun_monolith(browser):
     check(js("document.querySelector('#monolith-game .monolith-game-inner').inert") is True, "sun controls inert while the stone sleeps")
     for word in ["SUNDAY", "DIALSUN", "SUN DIAL X"]:
         page.fill("#monolith-key-input", word); page.click("#btn-monolith-speak"); page.wait_for_timeout(120)
-    check(get("order_monolith_hint") == "true" and get("order_sun_monolith_awake") is None, "3 wrong sigils unlock the hint, stone stays asleep")
+    check(get("order_hint_s14-sigil_level") == "1" and get("order_monolith_hint") is None
+          and "note 1 of 3" in js("document.querySelector('#monolith-key-feedback + .hint-ladder').textContent"),
+          "3 wrong sigils: Hermes's first note under the Monolith")
+    for word in ["SUNDAY", "DIALSUN", "SUN DIAL X"]:
+        page.fill("#monolith-key-input", word); page.click("#btn-monolith-speak"); page.wait_for_timeout(120)
+    check(get("order_monolith_hint") == "true" and get("order_sun_monolith_awake") is None, "6 wrong sigils unlock the older hint, stone stays asleep")
     page.fill("#monolith-key-input", " sun-dial "); page.click("#btn-monolith-speak"); page.wait_for_timeout(250)
     check(get("order_sun_monolith_awake") == "true", "forgiving sigil 'sun-dial' wakes the stone")
 
@@ -244,6 +249,10 @@ def test_sun_monolith(browser):
     check(get("order_sun_monolith_marks") == "0" and "never names" in feedback(), "an unnamed mark (10:00) puts the marks back to sleep")
     js("window.__sunMonolith.setMinute(720)"); page.click("#btn-monolith-mark")
     check(get("order_sun_monolith_marks") in (None, "0"), "noon before the morning mark is rejected")
+    js("window.__sunMonolith.setMinute(720)"); page.click("#btn-monolith-mark")
+    check(get("order_hint_s14-shadow_level") == "1" and get("order_hint_s14-shadow_fails") == "3"
+          and "note 1 of 3" in js("document.querySelector('#monolith-mark-feedback + .hint-ladder').textContent"),
+          "3 wrong marks (sand does not count): Hermes's first note under the dial")
     for minute in [480, 720, 900, 990]:
         js(f"window.__sunMonolith.setMinute({minute})"); page.click("#btn-monolith-mark"); page.wait_for_timeout(120)
     check(get("order_sun_monolith_completed") == "true" and get("order_seal_cairn_2") == "true", "four marks in order: Seal of Cairn II granted")
@@ -355,7 +364,12 @@ def test_sandstone_labyrinth(browser):
           "after 6 h it opens, escape locked until the sigil")
     for word in ["WINDROWS", "ROSEWIND", "WIND ROSE X"]:
         page.fill("#laby-key-input", word); page.click("#btn-laby-speak"); page.wait_for_timeout(120)
-    check(get("order_labyrinth_hint") == "true" and get("order_labyrinth_awake") is None, "3 wrong sigils unlock the hint, plate stays shut")
+    check(get("order_hint_s15-sigil_level") == "1" and get("order_labyrinth_hint") is None
+          and "note 1 of 3" in js("document.querySelector('#laby-key-feedback + .hint-ladder').textContent"),
+          "3 wrong sigils: Hermes's first note under the copper plate")
+    for word in ["WINDROWS", "ROSEWIND", "WIND ROSE X"]:
+        page.fill("#laby-key-input", word); page.click("#btn-laby-speak"); page.wait_for_timeout(120)
+    check(get("order_labyrinth_hint") == "true" and get("order_labyrinth_awake") is None, "6 wrong sigils unlock the older hint, plate stays shut")
     page.fill("#laby-key-input", " wind-rose "); page.click("#btn-laby-speak"); page.wait_for_timeout(250)
     check(get("order_labyrinth_awake") == "true", "forgiving sigil 'wind-rose' opens the copper plate")
 
@@ -376,6 +390,7 @@ def test_sandstone_labyrinth(browser):
         js(f"window.__labyrinth.step({dx}, {dy})")
     check(int(get("order_labyrinth_captures") or 0) >= 1, "the road that ignores the torches gets caught",
           f"captures={get('order_labyrinth_captures')}")
+    check(get("order_hint_s15-torches_fails") == get("order_labyrinth_captures"), "every close call climbs Hermes's notes on the torches")
     js("""['order_sandstone_labyrinth_completed', 'order_seal_cairn_3', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen',
           'order_labyrinth_captures', 'order_labyrinth_torch_hint'].forEach(k => localStorage.removeItem(k))""")
 
@@ -450,7 +465,12 @@ def test_cairn_four(browser):
     check(modal_open() and js("document.querySelector('#pillars-game .monolith-game-inner').inert") is True, "after 18 h it opens, the song locked until the sigil")
     for word in ["RESOUNDS", "ROUNDES", "RE SOUN"]:
         page.fill("#pillars-key-input", word); page.click("#btn-pillars-speak"); page.wait_for_timeout(120)
-    check(get("order_cairn4_hint") == "true" and get("order_cairn4_awake") is None, "3 wrong sigils unlock the hint, pillars stay mute")
+    check(get("order_hint_s16-sigil_level") == "1" and get("order_cairn4_hint") is None
+          and "note 1 of 3" in js("document.querySelector('#pillars-key-feedback + .hint-ladder').textContent"),
+          "3 wrong sigils: Hermes's first note under the pillars")
+    for word in ["RESOUNDS", "ROUNDES", "RE SOUN"]:
+        page.fill("#pillars-key-input", word); page.click("#btn-pillars-speak"); page.wait_for_timeout(120)
+    check(get("order_cairn4_hint") == "true" and get("order_cairn4_awake") is None, "6 wrong sigils unlock the older hint, pillars stay mute")
     page.fill("#pillars-key-input", " re-sound "); page.click("#btn-pillars-speak"); page.wait_for_timeout(250)
     check(get("order_cairn4_awake") == "true", "forgiving sigil 're-sound' wakes the pillars")
 
@@ -466,6 +486,11 @@ def test_cairn_four(browser):
     js("window.__cairn4.sing()")
     check(get("order_cairn4_verses") is None and "2 of 3" in js("document.getElementById('pillars-song-feedback').innerText"),
           "a wrong verse is refused (2 of 3 echoes rang true)")
+    for _ in range(5):
+        js("window.__cairn4.sing()")
+    check(get("order_cairn4_count_hint") == "true" and get("order_hint_s16-song_level") == "2"
+          and js("getComputedStyle(document.getElementById('pillars-hint')).display") != "none",
+          "6 wrong verses: Hermes numbers the beats on the tape")
     js("document.getElementById('btn-pillars-undo').click(); document.getElementById('btn-pillars-undo').click(); document.getElementById('btn-pillars-undo').click()")
     for i, v in enumerate(verses):
         for fid in decode_verse(v["calls"]):
@@ -567,7 +592,12 @@ def test_solstice_arch(browser):
           "after 18 h it opens, the courtyard locked until the sigil")
     for word in ["DAYBREAKS", "BREAKDAY", "DAY BRAKE"]:
         page.fill("#solstice-key-input", word); page.click("#btn-solstice-speak"); page.wait_for_timeout(120)
-    check(get("order_cairn5_hint") == "true" and get("order_cairn5_awake") is None, "3 wrong sigils unlock the hint, the altar stays closed")
+    check(get("order_hint_s17-sigil_level") == "1" and get("order_cairn5_hint") is None
+          and "note 1 of 3" in js("document.querySelector('#solstice-key-feedback + .hint-ladder').textContent"),
+          "3 wrong sigils: Hermes's first note under the altar")
+    for word in ["DAYBREAKS", "BREAKDAY", "DAY BRAKE"]:
+        page.fill("#solstice-key-input", word); page.click("#btn-solstice-speak"); page.wait_for_timeout(120)
+    check(get("order_cairn5_hint") == "true" and get("order_cairn5_awake") is None, "6 wrong sigils unlock the older hint, the altar stays closed")
     page.fill("#solstice-key-input", " day-break "); page.click("#btn-solstice-speak"); page.wait_for_timeout(250)
     check(get("order_cairn5_awake") == "true", "forgiving sigil 'day-break' wakes the altar")
 
@@ -584,6 +614,14 @@ def test_solstice_arch(browser):
     # a dawn that runs out is spent and keeps the mirrors
     js("window.__cairn5.startDawn()"); js("window.__cairn5.expireStep()"); page.wait_for_timeout(300)
     check(not js("window.__cairn5.state().running") and get("order_cairn5_dawn_fails") == "1", "a dawn that runs out is spent")
+    def spend(n):
+        for _ in range(n):
+            js("window.__cairn5.startDawn()"); js("window.__cairn5.expireStep()"); page.wait_for_timeout(150)
+    spend(2)
+    check(get("order_hint_s17-dawn_level") == "1" and get("order_cairn5_dawn_hint") is None, "3 spent dawns: Hermes's first note, the rays not yet slower")
+    spend(3)
+    check(get("order_cairn5_dawn_hint") == "true" and "45 seconds" in js("document.getElementById('solstice-hint').textContent"),
+          "6 spent dawns: each ray waits 45 seconds")
     js("window.__cairn5.startDawn()")
     for k, r in enumerate(routes):
         aim(r[0])
@@ -594,6 +632,9 @@ def test_solstice_arch(browser):
     rounds = js("window.__cairn5.rounds")
     js("window.__cairn5.flash('L')"); js("window.__cairn5.send()")
     check(get("order_cairn5_signal_round") is None and get("order_cairn5_signal_fails") == "1", "a wrong answer to the light is refused")
+    for _ in range(5):
+        js("window.__cairn5.flash('L')"); js("window.__cairn5.send()")
+    check(get("order_cairn5_signal_hint") == "true" and get("order_hint_s17-signal_level") == "2", "6 wrong answers: Hermes writes the pattern in his log")
     for pattern in rounds:
         for p in pattern:
             js(f"window.__cairn5.flash('{p}')")
