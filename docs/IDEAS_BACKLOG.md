@@ -12,7 +12,7 @@
 | 3 | Momentos de pausa tras cada fragmento | S | medio | No existe |
 | 4 | Sonido ambiental por estación | M | alto | Hay Web Audio en varias salas (tormenta, Cairn IV, Estela); no hay bucle ambiental por ruta |
 | 5 | Háptica en móvil | S | medio | No existe (`navigator.vibrate`: 0 usos) |
-| 6 | Pistas progresivas en 3 niveles | L | alto | **Especificada (21-10-2026)**, en implementación: motor común + Estaciones 10–20 (luego 21–28) |
+| 6 | Pistas progresivas en 3 niveles | L | alto | **Implementada en Cairn I y Estaciones 10–20 (21-10-2026)**; las 21–28 nacerán con ella |
 | 7 | Variedad de mecánicas en 21–28 | M | alto | Ya fijado en `STAGE_PATH_BIBLE.md` §6; falta cerrar cada diseño |
 | 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | No existe (varios juegos web ya se apoyan en la hoja, ninguno exige un dato exclusivo del papel) |
 | 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
@@ -73,7 +73,7 @@ Pendiente de especificar.
 ### 5. Háptica en móvil (S)
 Pendiente de especificar.
 
-### 6. Pistas progresivas en 3 niveles (L) · especificada (21-10-2026)
+### 6. Pistas progresivas en 3 niveles (L) · implementada en Cairn I y 10–20 (21-10-2026)
 **Decisiones del Operador (21-10-2026)**
 - **Llegan solas, por fallos o por tiempo**: nivel 1 tras 3 fallos o 10 min atascada; nivel 2 tras 6 fallos o 20 min; nivel 3 tras 9 fallos o 35 min. Silvia no tiene que pedirlas.
 - **Método, nunca la respuesta**: 1 = hacia dónde mirar; 2 = qué regla usar; 3 = el primer paso hecho con ella. Silvia sigue resolviendo sola.
@@ -89,7 +89,9 @@ Pendiente de especificar.
 - Tester: «Play this game» y los reinicios borran también las pistas de esa estación y las siguientes.
 - Reglas: inglés para Silvia, voz de Hermes, Regla 9 (nunca valores de letras), sin el DÓNDE ni Pope-E.
 
-**Verificación**: smoke `hints` (fallos → niveles 1, 2 y 3, la nota en el modal y en *Ask Hermes*; tiempo simulado; el reinicio del tester las borra) y las secciones de cada estación siguen verdes.
+**Estado (21-10-2026)**: hechas Cairn I y las Estaciones 10–20, 22 puzzles en total (ids `cairn1-stones`, `s10-chasm`, `s11-playa`, `s12-lexicon`, `s13-wells`, `s14-sigil`/`s14-shadow`, `s15-sigil`/`s15-torches`, `s16-sigil`/`s16-song`, `s17-sigil`/`s17-dawn`/`s17-signal`, `s18-proverb`/`s18-knocks`/`s18-fire`, `s19-sigil`/`s19-disc`/`s19-vow`, `s20-word`/`s20-halves`). Las ayudas antiguas de 14–20 se abren ahora a los 6 fallos, no a los 3. Los textos del nivel 3 se comprobaron contra la solución de cada hoja (o contra la búsqueda de la ruta, en el atrio y el patio del solsticio). El paseo al sol de la 14 no tenía ayuda propia: cuenta como fallo marcar un signo no nombrado o fuera de orden. Las 21–28 se construirán ya con su escalera.
+
+**Verificación**: smoke `hints` (fallos → niveles 1, 2 y 3, la nota en el modal y en *Ask Hermes*; tiempo simulado; el reinicio del tester las borra) y las secciones de cada estación siguen verdes, comprobando la nota 1 a los 3 fallos y la ayuda antigua a los 6; smoke `early` (Cairn I y 10–13: fallos contados, nota 1 visible, el reinicio del tester las borra).
 
 ### 7. Variedad de mecánicas en 21–28 (M)
 Pendiente de especificar.

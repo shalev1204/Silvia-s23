@@ -126,6 +126,17 @@
       let solved = false;
 
       const say = (text) => { if (dispatchEl) dispatchEl.textContent = '"' + text + '"'; };
+
+      // Hints climb three levels (hub/js/hint-ladder.js): a big stone set on a small one is a miss
+      const cairnHints = window.EclipseHints.define({
+        id: 'cairn1-stones', station: 'Cairn I', title: 'the four stones', group: 'desert',
+        anchor: () => modal.querySelector('.chasm-cairns-keypad-box'), solved: cairnOneDone,
+        texts: [
+          'Watch the smallest stone, Silvia. It can always move, and after each of its moves there is only one other lift the law of the stones allows.',
+          'To carry a pile, first carry the stones above its largest stone out of the way, onto the foundation you are not aiming for. Then the largest stone goes where it must, and the smaller pile comes back on top of it. A pile of three moves the same way, and so does a pile of two.',
+          'Let us begin together. With four stones the smallest goes first to the middle foundation, not to the third. Then the second stone goes to the third foundation, and the smallest climbs on top of it. Now the two smallest are out of the way of the third stone: carry on from there.'
+        ]
+      });
       const topOf = (p) => pegs[p][pegs[p].length - 1];
 
       function fresh() {
@@ -267,6 +278,7 @@
         const size = topOf(selected);
         if (pegs[p].length && topOf(p) < size) {
           refuse(pegEl, 'A big stone on a small one would crush it, and the law of the stones forbids it. Try another foundation.');
+          cairnHints.fail();
           return;
         }
         pegs[p].push(pegs[selected].pop());
@@ -372,6 +384,7 @@
           say('The whole pile stands on the third foundation, and the base is humming under my hands.');
         }
         window.grantCairnSeal(1);
+        cairnHints.refresh();
         document.dispatchEvent(new CustomEvent('dawn:cairn1-solved', { detail: { moves } }));
       }
 

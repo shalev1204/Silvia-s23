@@ -23,6 +23,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  15. Cloud save (against a fake Supabase): snapshot and events on every change, recovery in an empty browser,
      nothing sent while the cloud is unreachable or on a local copy, a profile switch is not reported as progress.
  16. Hint ladder: hints climb with time on screen (not off it), stay in Ask Hermes, and a tester reset clears them.
+ 17. Early hints: Stations 10 to 13 and Cairn I count their misses and show Hermes's first note after three.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1338,6 +1339,61 @@ def test_hint_ladder(browser):
     ctx.close()
 
 
+def test_early_hints(browser):
+    print("\n17. Early hints: Stations 10 to 13 and Cairn I count their misses into Hermes's notes")
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    get = lambda key: js("k => localStorage.getItem(k)", key)
+    note = lambda modal, sel: js(f"(() => {{ const a = document.querySelector('#{modal} {sel}'); const b = a && a.nextElementSibling;"
+                                 " return b && b.classList.contains('hint-ladder') && b.offsetParent ? b.textContent : ''; })()")
+
+    js("window.openCairnOneModal()"); page.wait_for_timeout(400)
+    peg = lambda i: page.click(f"#cairn1-pegs .c1-peg >> nth={i}")
+    peg(0); peg(1); peg(0)   # the smallest stone to the middle, then lift the second
+    for _ in range(3):
+        peg(1)               # the second stone on the smallest: refused
+    check(get("order_hint_cairn1-stones_fails") == "3" and "note 1 of 3" in note("modal-cairn-one", ".chasm-cairns-keypad-box"),
+          "Cairn I: three stones set on smaller ones bring the first note")
+    js("window.closeCairnOneModal()"); page.wait_for_timeout(300)
+
+    js("window.openWhisperingChasmModal()"); page.wait_for_timeout(400)
+    for letter in "TKI":     # two trap markers, one out of order
+        js(f"window.handleChasmCairnClick('{letter}')")
+    check(get("order_hint_s10-chasm_level") == "1" and "note 1 of 3" in note("modal-whispering-chasm", ".chasm-cairns-keypad-box"),
+          "Station 10: trap and skipped markers bring the first note")
+    js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(300)
+
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
+    for _ in range(3):
+        page.click('#playa-board .playa-slab[data-r="0"][data-c="0"]')
+    check(get("order_hint_s11-playa_level") == "1" and "note 1 of 3" in note("modal-salt-playa", "#playa-board"),
+          "Station 11: three refused strides bring the first note")
+    js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
+
+    js("window.openDesertLexiconModal()"); page.wait_for_timeout(400)
+    for _ in range(3):
+        page.fill("#lexicon-word-input", "WRONG"); page.click("#btn-carve-word")
+    page.fill("#lexicon-word-input", ""); page.click("#btn-carve-word")   # an empty carve is not a miss
+    check(get("order_hint_s12-lexicon_fails") == "3" and "note 1 of 3" in note("modal-desert-lexicon", ".lexicon-stele-input-bar"),
+          "Station 12: three refused words bring the first note")
+    js("window.closeDesertLexiconModal()"); page.wait_for_timeout(300)
+
+    js("window.openOasisClepsydraModal()"); page.wait_for_timeout(400)
+    for _ in range(3):
+        page.fill("#clepsydra-key-input", "XX"); page.click("#btn-clepsydra-engage")
+    check(get("order_hint_s13-wells_level") == "1" and "note 1 of 3" in note("modal-oasis-clepsydra", "#btn-clepsydra-engage"),
+          "Station 13: three refused keys bring the first note")
+    js("window.closeOasisClepsydraModal()"); page.wait_for_timeout(300)
+
+    js("TesterDesert.replayFrom('cairn1')")
+    check(all(get(f"order_hint_{i}_level") is None for i in ["cairn1-stones", "s10-chasm", "s11-playa", "s12-lexicon", "s13-wells"]),
+          "a tester replay from Cairn I forgets all five")
+    check(not errors, "no JS errors with the early hints", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1436,10 +1492,10 @@ SECTIONS = {
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
     "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
-    "hints": test_hint_ladder,
+    "hints": test_hint_ladder, "early": test_early_hints,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

@@ -275,8 +275,20 @@
         }
       }
 
+      // Hints climb three levels (hub/js/hint-ladder.js): a refused key or a seeker out of place is a miss
+      const clepsydraHints = window.EclipseHints.define({
+        id: 's13-wells', station: 'Station 13', title: 'the four wells', group: 'desert',
+        anchor: btnEngage, solved: () => localStorage.getItem('order_oasis_clepsydra_completed') === 'true',
+        texts: [
+          'Do not start with the hours, Silvia. Two clues on Sheet 12B name a seeker and their relic outright: begin with those, and mark them in the matrix.',
+          'Each seeker has exactly one well, one relic and one hour, and no two share any of them. A ✓ in the matrix means ✕ in every other box of its row and column, in that group. Earlier and later compare the hours: III, then VI, then IX, then XII. The key is the four arrival hours added together, in Roman numerals.',
+          'Let us take clue IV together. The Astronomer carried the Gold Scarab and reached the Well of the Serpent: two ✓ in the Astronomer\'s row, and ✕ for everyone else under the Gold Scarab and the Serpent. They arrived at Hour IX or later, so cross out III and VI in their row. Now clue V, the same way.'
+        ]
+      });
+
       function applyCompleteState() {
         updateBasinVisuals(true);
+        clepsydraHints.refresh();
         if (telemWells) {
           telemWells.textContent = '4 / 4 BALANCED';
           telemWells.style.color = '#34d399';
@@ -311,6 +323,7 @@
           if (dispatchText) {
             dispatchText.textContent = `"The hydraulic counterweights resist! The key is the sum of the four arrival hours from Sheet 12B, written in Roman numerals."`;
           }
+          clepsydraHints.fail();
           return false;
         }
 
@@ -338,6 +351,7 @@
           if (dispatchText) {
             dispatchText.textContent = `"The subterranean siphons rattle! ${mismatchCount} seeker(s) are not aligned with their true well, relic, or shadow-hour according to Sheet 12B. Verify your deductions in the matrix!"`;
           }
+          clepsydraHints.fail();
           return false;
         }
 

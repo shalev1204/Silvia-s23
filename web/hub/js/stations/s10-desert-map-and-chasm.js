@@ -402,6 +402,18 @@
       ];
 
       let chasmStepIndex = 0;
+
+      // Hints climb three levels (hub/js/hint-ladder.js): a trap marker or a marker out of order is a miss
+      const chasmHints = window.EclipseHints.define({
+        id: 's10-chasm', station: 'Station 10', title: 'the whispering chasm', group: 'desert',
+        anchor: () => modal && modal.querySelector('.chasm-cairns-keypad-box'),
+        solved: () => localStorage.getItem('order_whispering_chasm_completed') === 'true',
+        texts: [
+          'Trace the gorge of Sheet 9B with your pencil, from the North Portal, before you send me anywhere. Only the markers on the road that goes through count, in the order you reach them.',
+          'The canyon walkers have two laws: never retrace your steps, and never take a side passage that skips a marker. A marker at the end of a dead corridor (the Blind Chasm, the Salt Basin, the Sands of Thirst) is a trap. Six markers, in the order your pencil meets them.',
+          'Let us find the first marker together. From the North Portal, at the top left of the sheet, the gorge runs to the right along the top before it winds down. Follow it without turning back: the first stone pile your pencil meets is M. Then keep going the same way.'
+        ]
+      });
       let walkedPathCoords = [[1, 0]];
       let isWalking = false;
 
@@ -620,6 +632,7 @@
                     localStorage.setItem('order_whispering_chasm_completed', 'true');
                     localStorage.setItem('order_desert_station_active', '11');
                   } catch (e) {}
+                  chasmHints.refresh();
 
                   updateDesertMapMarkers();
                   if (typeof window.selectMapNode === 'function') {
@@ -642,6 +655,7 @@
             setTimeout(() => btn.classList.remove('decoy-hit'), 1200);
           }
           if (dispatchText) dispatchText.textContent = `"${decoy.text}"`;
+          chasmHints.fail();
           return;
         }
 
@@ -652,6 +666,7 @@
           if (dispatchText) {
             dispatchText.textContent = `"Hold on, Silvia! That marker skips ahead. The Law of the Canyon Walkers requires discovering the sacred runes in strict sequence. Which marker comes next in the word?"`;
           }
+          chasmHints.fail();
         }
       };
 
