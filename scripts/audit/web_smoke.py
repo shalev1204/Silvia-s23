@@ -24,6 +24,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
      nothing sent while the cloud is unreachable or on a local copy, a profile switch is not reported as progress.
  16. Hint ladder: hints climb with time on screen (not off it), stay in Ask Hermes, and a tester reset clears them.
  17. Early hints: Stations 10 to 13 and Cairn I count their misses and show Hermes's first note after three.
+ 18. «Previously on…»: after 12 hours away the recap tells the last thing, where things stand and what next; Ask Hermes keeps it.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1394,6 +1395,55 @@ def test_early_hints(browser):
     ctx.close()
 
 
+PREVIOUSLY_JS = """() => { const o = document.querySelector('.previously-overlay');
+    return o ? [...o.querySelectorAll('.previously-section')].map(s => s.innerText.replace(/\\s+/g, ' ')).join(' | ') : ''; }"""
+
+
+def test_previously(browser):
+    print("\n18. «Previously on…» after 12 hours away: last time, where things stand, next, and Ask Hermes")
+    hours_ago = lambda h: str(int(time.time() * 1000) - h * 3600 * 1000)
+
+    def recap(extra, wait=3000):
+        ctx, page, errors = new_page(browser, dict(DESERT_BASE, **extra))
+        page.goto(f"{BASE}/index.html", wait_until="load")
+        page.wait_for_timeout(wait)
+        return ctx, page, errors, page.evaluate(PREVIOUSLY_JS)
+
+    ctx, page, errors, text = recap({"order_last_seen_at": hours_ago(13)})
+    check("Salt Playa" in text.split("|")[0] and "Salt Playa Crossed" in text and "Station 12 · Sheet 11A" in text.split("|")[-1],
+          "13 hours away: the Salt Playa last time, the Nomad Ruins next", text[:240])
+    page.click(".previously-continue"); page.wait_for_timeout(300)
+    seen = int(page.evaluate("localStorage.getItem('order_last_seen_at')") or 0)
+    check(not page.evaluate(PREVIOUSLY_JS) and time.time() * 1000 - seen < 60000, "Continue closes it, and the visit is stamped")
+    page.evaluate("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
+    page.evaluate("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(600)
+    page.click("#inquiries-questions-grid .messenger-faq-chip >> nth=0"); page.wait_for_timeout(4000)
+    stream = page.evaluate("document.getElementById('wire-inquiries-stream') ? document.getElementById('wire-inquiries-stream').innerText : ''")
+    check("Previously on The Eclipse Order" in stream and "Station 12" in stream, "Ask Hermes keeps the recap at the top of the list", stream[-200:])
+    page.reload(wait_until="load"); page.wait_for_timeout(3000)
+    check(not page.evaluate(PREVIOUSLY_JS), "a reload straight after does not show it again")
+    check(not errors, "no JS errors with the recap", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    ctx, page, errors, text = recap({"order_last_seen_at": hours_ago(11)})
+    check(not text, "11 hours away: no recap")
+    ctx.close()
+    ctx, page, errors, text = recap({})
+    check(not text and page.evaluate("!!localStorage.getItem('order_last_seen_at')"), "the very first visit: no recap, only the stamp")
+    ctx.close()
+
+    ctx, page, errors, text = recap(dict(DESERT_DONE, order_field_wire_step="10", order_monolith_march_start=hours_ago(1),
+                                         order_last_seen_at=hours_ago(20)))
+    check("Four Wells" in text.split("|")[0] and ("He arrives in 10 h 5" in text or "He arrives in 11 h 00" in text) and "Keep Sheet 13B close" in text.split("|")[-1],
+          "on the crossing to the Sun Monolith: the hours left and the sheet to keep close", text[:240])
+    ctx.close()
+
+    ctx, page, errors, text = recap({"order_desert_lexicon_completed": "true", "order_last_seen_at": hours_ago(30)})
+    check("Camp VII" in text.split("|")[0] and "Open the Field Wire" in text, "Hermes waiting on the wire: answer him", text[:240])
+    check(not errors, "no JS errors on the walk or the wire", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1492,10 +1542,10 @@ SECTIONS = {
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
     "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
-    "hints": test_hint_ladder, "early": test_early_hints,
+    "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

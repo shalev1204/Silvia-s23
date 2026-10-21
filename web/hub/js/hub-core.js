@@ -5263,9 +5263,11 @@
         { id: 'astrolabe', label: 'The Astrolabe' },
         { id: 'workshop', label: 'The Workshop' }
       ];
-      // Hermes's notes from the hint ladder (hub/js/hint-ladder.js) join the list once the first is unlocked
+      // «Previously on…» (hub/js/previously.js) leads the list; Hermes's notes from the hint ladder
+      // (hub/js/hint-ladder.js) join it once the first is unlocked
       function allInquiries() {
-        return FIELD_INQUIRIES.concat(window.EclipseHints ? window.EclipseHints.inquiries() : []);
+        return (window.EclipsePreviously ? [window.EclipsePreviously.inquiry()] : [])
+          .concat(FIELD_INQUIRIES, window.EclipseHints ? window.EclipseHints.inquiries() : []);
       }
       function isInquiryUnlocked(inq) {
         if (typeof inq.unlocked === 'function') return inq.unlocked();

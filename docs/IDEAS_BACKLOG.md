@@ -7,7 +7,7 @@
 
 | # | Idea | Esfuerzo | Impacto | Estado hoy |
 |---|------|:---:|:---:|---|
-| 1 | Resumen «Previously on…» al volver | S | alto | No existe (solo hay 3 menciones sueltas de la palabra) |
+| 1 | Resumen «Previously on…» al volver | S | alto | **Implementada (21-10-2026)**: `web/hub/js/previously.js` |
 | 2 | Diario de campo automático (pestaña) | M | alto | No existe; ya hay vistas `archives` y `chronicles` en el Hub que conviene revisar antes |
 | 3 | Momentos de pausa tras cada fragmento | S | medio | No existe |
 | 4 | Sonido ambiental por estación | M | alto | Hay Web Audio en varias salas (tormenta, Cairn IV, Estela); no hay bucle ambiental por ruta |
@@ -58,8 +58,23 @@
 
 > Cada ficha se completa durante la conversación con las decisiones del Operador. Formato: **Decisiones** · **Alcance** · **Fuera de alcance** · **Verificación**.
 
-### 1. «Previously on…» (S)
-Pendiente de especificar.
+### 1. «Previously on…» (S) · implementada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Cuándo**: al volver tras **12 horas o más** fuera del Hub (no en cada recarga ni en la primera visita).
+- **Forma**: narrador de serie, tarjeta «Previously on *The Eclipse Order…*», en tercera persona.
+- **Contenido**: lo último que pasó, dónde está Hermes ahora y qué hacer a continuación (sin recuento de progreso).
+- **Releer**: queda como primera entrada de *Ask Hermes* («Previously on The Eclipse Order…»), siempre al día.
+
+**Diseño técnico**
+- `web/hub/js/previously.js` (`window.EclipsePreviously`), cargado al final; estilos en `web/hub/css/previously.css`.
+- **Tiempo fuera**: `order_last_seen_at` (viaja con el guardado en la nube, así cuenta entre dispositivos). Se sella al cargar, al ocultar la pestaña y cada 5 min con ella visible (como mucho una escritura cada 5 min, para no llenar la nube de eventos). Al cargar o al volver a la pestaña, si han pasado ≥ 12 h, aparece la tarjeta. Detrás de la puerta de acceso no cuenta: la llegada real es la recarga tras entrar.
+- **«Last time»**: una frase de narrador por juego resuelto (Cairn I, 10–20), escrita a partir de los mensajes de Hermes del Field Wire; antes del Cairn I, la tormenta en Watchtower VI.
+- **«Where things stand» y «Next»**: se leen del aviso de ruta del Field Wire (título, descripción y hora de llegada de la marcha), así el resumen nunca contradice al chat. Si el chat espera respuesta: «Open the Field Wire and reply to him».
+- *Ask Hermes*: su id cambia con el último juego y el paso del chat, así un capítulo nuevo vuelve a salir como no leído.
+- Tester (Carles): botón «🎬 Show «Previously on…»» en el panel.
+- Reglas: inglés para Silvia, sin respuestas, sin el DÓNDE ni Pope-E.
+
+**Verificación**: `web_smoke.py --only previously` (sección 18): 13 h fuera muestra último juego, lugar y siguiente paso; «Continue» cierra y sella; *Ask Hermes* lo guarda; una recarga no lo repite; 11 h fuera y primera visita no lo muestran; en plena marcha da las horas que faltan y la hoja; con el chat pendiente manda al Field Wire. Revisado a 1280 px y 390 px.
 
 ### 2. Diario de campo automático (M)
 Pendiente de especificar.
