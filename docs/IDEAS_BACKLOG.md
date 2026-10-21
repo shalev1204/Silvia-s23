@@ -8,7 +8,7 @@
 | # | Idea | Esfuerzo | Impacto | Estado hoy |
 |---|------|:---:|:---:|---|
 | 1 | Resumen «Previously on…» al volver | S | alto | **Implementada (21-10-2026)**: `web/hub/js/previously.js` |
-| 2 | Diario de campo automático (pestaña) | M | alto | No existe; ya hay vistas `archives` y `chronicles` en el Hub que conviene revisar antes |
+| 2 | Diario de campo automático (pestaña) | M | alto | **Implementada (21-10-2026)**: cuaderno de Hermes al pie de Chronicles (`web/hub/js/field-journal.js`) |
 | 3 | Momentos de pausa tras cada fragmento | S | medio | No existe |
 | 4 | Sonido ambiental por estación | M | alto | Hay Web Audio en varias salas (tormenta, Cairn IV, Estela); no hay bucle ambiental por ruta |
 | 5 | Háptica en móvil | S | medio | No existe (`navigator.vibrate`: 0 usos) |
@@ -76,8 +76,20 @@
 
 **Verificación**: `web_smoke.py --only previously` (sección 18): 13 h fuera muestra último juego, lugar y siguiente paso; «Continue» cierra y sella; *Ask Hermes* lo guarda; una recarga no lo repite; 11 h fuera y primera visita no lo muestran; en plena marcha da las horas que faltan y la hoja; con el chat pendiente manda al Field Wire. Revisado a 1280 px y 390 px.
 
-### 2. Diario de campo automático (M)
-Pendiente de especificar.
+### 2. Diario de campo automático (M) · implementada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Dónde**: se amplía *Chronicles*; bajo las tarjetas 03–09 va «Hermes’s Field Notebook», una página por juego resuelto del desierto (Cairn I, 10–20 y los que vengan). Sin pestaña nueva.
+- **Voz**: cuaderno de Hermes, en primera persona, breve y con fecha.
+- **Cada página lleva**: fecha y hora real en que Silvia lo resolvió y cuánto después de que Hermes llegara; lo que se ganó (sello, reliquia, líneas del Ledger, el rumbo, el CUÁNDO, el fragmento); cómo lo resolvió (fallos y notas de Hermes, sin juzgar); un boceto y una cita corta de su mensaje en el Field Wire.
+- **Pasado**: rescatar las fechas de Supabase. **Comprobado el 21-10-2026: `eclipse_saves` y `eclipse_events` están vacías** (Silvia aún no ha abierto el Hub publicado desde la #19, y su partida viva no ha resuelto nada del desierto), así que no hay nada que rescatar: todas sus páginas se fecharán en directo.
+
+**Diseño técnico**
+- `web/hub/js/field-journal.js` (`window.EclipseNotebook`), estilos en `web/hub/css/field-journal.css`, contenedor `#field-notebook` al final de `#view-chronicles`.
+- Estado: `order_journal` = `{ juego: { at, fails, notes, arrived } }` (viaja con la nube). Cada 1,5 s compara qué juegos de `TesterDesert.games` están hechos; cuando uno pasa de no hecho a hecho, escribe su página con la hora, los fallos y niveles de pista de sus puzzles (escalera #6) y la llegada de Hermes (inicio de la marcha + sus horas; sin hora si la marcha se saltó). Un juego ya hecho cuando el cuaderno lo vio por primera vez sale sin fecha («Before this notebook was opened»). Un reinicio del tester arranca la página.
+- Bocetos: los dos del amanecer (Cairn I, Chasm) y, para el resto, la miniatura de la hoja de la estación. Citas tomadas de los mensajes de Hermes del Field Wire (las Estaciones 10–13 no llevan cita).
+- Reglas: inglés para Silvia, sin respuestas (las líneas del Ledger salen por nombre, sin valores), sin el DÓNDE ni Pope-E.
+
+**Verificación**: `web_smoke.py --only notebook` (sección 19): páginas sin fecha para lo ya resuelto y en orden de historia; Estación 12 resuelta en directo con fecha, 2 fallos, el rumbo y su línea del Ledger; Estación 14 con su sello, «first try» y las 2 h desde la llegada; un reinicio del tester la quita; cabe en 390 px. Revisado a 1280 y 390 px.
 
 ### 3. Momentos de pausa (S)
 Pendiente de especificar.

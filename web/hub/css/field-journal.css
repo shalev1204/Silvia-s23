@@ -1,0 +1,69 @@
+    /* Hermes's Field Notebook at the foot of Chronicles (hub/js/field-journal.js, docs/IDEAS_BACKLOG.md #2) */
+    .field-notebook { margin-top: 40px; }
+    .notebook-head { text-align: center; margin-bottom: 20px; }
+    .notebook-head-title {
+      margin: 6px 0 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.05em;
+      color: #fde68a;
+    }
+    .notebook-head-desc, .notebook-empty {
+      margin: 0;
+      font-family: 'EB Garamond', Georgia, serif;
+      font-size: 1rem;
+      color: #c9b48a;
+    }
+    .notebook-empty { text-align: center; font-style: italic; padding: 18px 0; }
+    .notebook-pages { display: flex; flex-direction: column; gap: 18px; }
+    .notebook-page {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 20px;
+      padding: 18px;
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(38, 28, 16, 0.92), rgba(22, 16, 10, 0.92));
+      color: #ead9b4;
+      font-family: 'EB Garamond', Georgia, serif;
+    }
+    .notebook-sketch img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      filter: sepia(0.35);
+    }
+    .notebook-date {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #d4a853;
+    }
+    .notebook-title { margin: 4px 0 8px; font-family: 'Cinzel', serif; font-size: 1.08rem; color: #fde68a; }
+    .notebook-note { margin: 0; font-size: 1.05rem; line-height: 1.5; }
+    .notebook-quote {
+      margin: 10px 0 0;
+      padding-left: 12px;
+      border-left: 2px solid rgba(212, 168, 83, 0.5);
+      font-style: italic;
+      color: #f3e3bd;
+    }
+    .notebook-quote-src { font-style: normal; font-size: 0.85rem; color: #a89270; }
+    .notebook-earned { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+    .notebook-earned li {
+      padding: 3px 10px;
+      border: 1px solid rgba(212, 168, 83, 0.4);
+      border-radius: 999px;
+      background: rgba(212, 168, 83, 0.1);
+      font-size: 0.88rem;
+      color: #fde68a;
+    }
+    .notebook-how { margin: 10px 0 0; font-size: 0.92rem; color: #b9a47c; }
+    @media (max-width: 640px) {
+      .notebook-page { grid-template-columns: 1fr; gap: 12px; padding: 14px; }
+      .notebook-sketch img { aspect-ratio: 16 / 9; }
+    }

@@ -25,6 +25,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  16. Hint ladder: hints climb with time on screen (not off it), stay in Ask Hermes, and a tester reset clears them.
  17. Early hints: Stations 10 to 13 and Cairn I count their misses and show Hermes's first note after three.
  18. «Previously on…»: after 12 hours away the recap tells the last thing, where things stand and what next; Ask Hermes keeps it.
+ 19. Hermes's Field Notebook: a dated page per solved game (misses, notes, time since arrival, rewards); resets tear it out.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1444,6 +1445,45 @@ def test_previously(browser):
     ctx.close()
 
 
+NOTEBOOK_JS = """() => [...document.querySelectorAll('#field-notebook .notebook-page')].map(p => ({
+    id: p.dataset.game, text: p.textContent.replace(/\\s+/g, ' ') }))"""
+
+
+def test_notebook(browser):
+    print("\n19. Hermes's Field Notebook in Chronicles: a dated page the moment a game is solved")
+    hours_ago = lambda h: str(int(time.time() * 1000) - h * 3600 * 1000)
+    ctx, page, errors = new_page(browser, dict(DESERT_BASE, **{"order_hint_s12-lexicon_fails": "2",
+                                 "order_monolith_march_start": hours_ago(14)}))
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("document.querySelector('[data-view=\"view-chronicles\"]').click()"); page.wait_for_timeout(600)
+    pages = js(NOTEBOOK_JS)
+    check([p["id"] for p in pages] == ["cairn1", "chasm", "playa"] and all("Before this notebook was opened" in p["text"] for p in pages),
+          "games solved before the notebook: undated pages, in story order", str([p["id"] for p in pages]))
+
+    js("localStorage.setItem('order_desert_lexicon_completed', 'true')"); page.wait_for_timeout(2500)
+    lex = next((p["text"] for p in js(NOTEBOOK_JS) if p["id"] == "lexicon"), "")
+    entry = js("JSON.parse(localStorage.getItem('order_journal') || '{}').lexicon") or {}
+    check(entry.get("fails") == 2 and time.time() * 1000 - entry.get("at", 0) < 60000 and "after 2 misses" in lex
+          and "The Al-Qibla bearing" in lex and "Stargazer Proportion" in lex and "Before this notebook" not in lex,
+          "Station 12 solved now: dated page, two misses, the bearing and its Ledger line", lex[:200])
+
+    js("['order_oasis_clepsydra_completed', 'order_sun_monolith_completed', 'order_seal_cairn_2'].forEach(k => localStorage.setItem(k, 'true'))"); page.wait_for_timeout(2500)
+    mono = next((p["text"] for p in js(NOTEBOOK_JS) if p["id"] == "s14"), "")
+    check("Seal of Cairn II" in mono and "first try" in mono and ("1 h 59 min after I got there" in mono or "2 h after I got there" in mono),
+          "Station 14: the seal, the first try, and the two hours since Hermes arrived", mono[:240])
+
+    js("TesterDesert.replayFrom('s14')"); page.wait_for_timeout(2500)
+    ids = [p["id"] for p in js(NOTEBOOK_JS)]
+    check("s14" not in ids and "clepsydra" in ids and "s14" not in (js("localStorage.getItem('order_journal')") or ""),
+          "a tester replay tears the Station 14 page out", str(ids))
+    page.set_viewport_size({"width": 390, "height": 800}); page.wait_for_timeout(400)
+    check(js("document.documentElement.scrollWidth") <= 390, "the notebook fits a phone")
+    check(not errors, "no JS errors with the notebook", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1543,9 +1583,10 @@ SECTIONS = {
     "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
+    "notebook": test_notebook,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 
