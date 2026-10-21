@@ -25,7 +25,7 @@
 | 16 | Vista previa de impresión con las 8 hojas | S | medio | Parcial: `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
 | 17 | Dividir `web/index.html` (~29.000 líneas) | L | alto (largo plazo) | No existe; el Hub es un único archivo HTML+CSS+JS |
 | 18 | Smoke más rápido | M | alto | `web_smoke.py` (1.255 líneas, ~11 min, 206 comprobaciones); sin pasada corta |
-| 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Hecho y probado contra Supabase real** (proyecto `aoochekcbugawaurllco`); llega a Silvia con el próximo despliegue |
+| 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Hecho, probado y desplegado** (Supabase `aoochekcbugawaurllco`, 21-10-2026) |
 | 20 | Accesibilidad | M | alto | Parcial: `prefers-reduced-motion` en 7 puntos del Hub, ~97 `aria-label`; sin tamaño de letra ajustable ni auditoría de contraste/teclado |
 | 21 | PWA offline | M | medio | No existe (sin manifest ni service worker) |
 | 22 | Registro de juego (va con la #19) | S | medio | **Hecho con la #19**: cada cambio, sesión y vista viaja como evento a `eclipse_events` |
@@ -146,7 +146,7 @@ Pendiente de especificar.
 
 **Pendiente (si se quiere bajar de 3 min)**: sustituir las esperas fijas (`wait_for_timeout`, ~136) por esperas por condición en las secciones de `--quick`.
 
-### 19. Guardado automático en la nube (M) · implementada y verificada (falta desplegar)
+### 19. Guardado automático en la nube (M) · implementada, verificada y desplegada (21-10-2026)
 > Sustituye a «exportación e importación»: el Operador no quiere que Silvia descargue ni haga nada (20-10-2026).
 
 **Decisiones del Operador (20-10-2026)**
@@ -177,7 +177,7 @@ Pendiente de especificar.
 - Prueba real: el Hub en Chromium como Carles (`?cloud=1`) envió sesión, vista, las claves del arranque y dos instantáneas (la segunda con el cambio, a los 6 s). Las filas de prueba se borraron: la base queda vacía.
 - Leer el progreso (Claude, conector): `select * from eclipse_saves where seeker='silvia' order by saved_at desc limit 1;` y `eclipse_events` por `client_at`.
 
-**Pendiente**: desplegar (`wrangler pages deploy web`) cuando el Operador lo decida; hasta entonces Silvia sigue sin guardado en la nube.
+**Desplegado (21-10-2026)**: prueba real desde `the-eclipse-order.pages.dev` como Carles (CORS y CSP correctos, sin errores); filas de prueba borradas. El primer guardado de Silvia llegará la próxima vez que abra el Hub.
 
 **Fuera de alcance**: login real de Supabase, exportar a archivo, avisos por email/Telegram.
 **Verificación**: smoke nuevo (guardado tras avanzar, recuperación en navegador vacío, sin red no se pierde nada, Carles no pisa a Silvia); prueba real contra Supabase con el conector; CSP sin bloqueos.

@@ -6,7 +6,7 @@
 
 - `main` y la rama `claude/repo-security-audit-3vuwrl` están **idénticas** (`24b795c`, "Station 20: fixes from the independent review"). No queda nada sin fusionar ni sin subir.
 - Para continuar en local: `git checkout main && git pull origin main` (o crea tu rama de trabajo desde `main`).
-- Despliegue (lo hace el Operador desde su Mac): `git pull origin main` y `npx wrangler pages deploy web --project-name=the-eclipse-order`. **Pendiente de desplegar** la Estación 20 y la Hoja 19.
+- Despliegue (lo hace el Operador desde su Mac): `git pull origin main` y `npx wrangler pages deploy web --project-name=the-eclipse-order`. **Desplegado el 21-10-2026** (`main` en `a6a3371`): Estación 20, Hub dividido en `web/hub/`, guardado en la nube (IDEAS_BACKLOG #19) y la interfaz que el Operador tenía sin commitear (barra lateral fija, cabecera del Workshop). Su «checkpoint v5», que borraba el progreso del desierto, quedó fuera por decisión suya y está en la rama local `backup/operator-hub-ui-2026-10-20`.
 - Dependencias para generar hojas: `pip install opencv-python-headless pypdf pillow numpy`.
 
 ## Hecho y verificado
