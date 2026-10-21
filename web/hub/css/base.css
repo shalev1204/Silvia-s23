@@ -32,7 +32,7 @@
       color: var(--parchment);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      overflow-x: hidden;
+      overflow-x: clip;
       display: flex;
     }
 

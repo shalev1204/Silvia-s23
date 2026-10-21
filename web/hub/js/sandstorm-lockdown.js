@@ -530,6 +530,81 @@
       if (isStormActive()) {
         activateStormLockout();
       }
+      // =======================================================================
+      // SMART STICKY VIEWPORT HEADER (REVEAL ON SCROLL UP · HIDE ON SCROLL DOWN)
+      // =======================================================================
+      function initSmartStickyHeader() {
+        const header = document.querySelector('.hub-viewport-header');
+        if (!header) return;
+
+        let lastScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+        let accumulatedDelta = 0;
+        let ticking = false;
+        const SCROLL_THRESHOLD = 50;
+
+        function updateHeaderVisibility() {
+          // Smart Sticky HUD ONLY operates inside The Cliffside Workshop (view-field-wire)
+          if (document.body.getAttribute('data-active-view') !== 'view-field-wire') {
+            header.classList.remove('header-nav-hidden', 'header-nav-floating');
+            accumulatedDelta = 0;
+            ticking = false;
+            return;
+          }
+
+          const currentScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+          const delta = currentScrollY - lastScrollY;
+
+          // If scroll direction reversed, reset accumulator
+          if ((delta > 0 && accumulatedDelta < 0) || (delta < 0 && accumulatedDelta > 0)) {
+            accumulatedDelta = 0;
+          }
+          accumulatedDelta += delta;
+
+          // At the top: return to natural flow header
+          if (currentScrollY <= 25) {
+            header.classList.remove('header-nav-hidden', 'header-nav-floating');
+            accumulatedDelta = 0;
+            lastScrollY = currentScrollY;
+            ticking = false;
+            return;
+          }
+
+          // Scrolling DOWN past threshold: hide header to keep reading area clear
+          if (accumulatedDelta > 10 && currentScrollY > SCROLL_THRESHOLD) {
+            header.classList.add('header-nav-hidden');
+            header.classList.add('header-nav-floating');
+            accumulatedDelta = 0;
+          }
+          // Scrolling UP ("aunque sea un poco"): reveal header immediately
+          else if (accumulatedDelta < -4) {
+            header.classList.remove('header-nav-hidden');
+            header.classList.add('header-nav-floating');
+            accumulatedDelta = 0;
+          }
+
+          lastScrollY = currentScrollY;
+          ticking = false;
+        }
+
+        function onScroll() {
+          if (!ticking) {
+            window.requestAnimationFrame(updateHeaderVisibility);
+            ticking = true;
+          }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Reset header to visible state whenever view changes
+        window.resetStickyHeader = function () {
+          header.classList.remove('header-nav-hidden', 'header-nav-floating');
+          lastScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+          accumulatedDelta = 0;
+        };
+      }
+
+      initSmartStickyHeader();
+
       if (typeof handleHubUrlHash === 'function') {
         handleHubUrlHash();
       }

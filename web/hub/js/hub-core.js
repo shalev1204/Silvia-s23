@@ -375,6 +375,7 @@
           btnHeaderMessenger.setAttribute('title', inWorkshop ? 'Close The Cliffside Workshop and go back' : btnHeaderMessenger.dataset.openTitle);
         }
 
+        if (typeof window.resetStickyHeader === 'function') window.resetStickyHeader();
         if (targetView === 'view-trail' && typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
 
         if (targetView === 'view-field-wire') {
@@ -5203,9 +5204,11 @@
         masks: { key: 'order_masks_gate_completed', label: 'Station 20' }
       };
       const INQUIRY_REQUIREMENTS = {
+        'inq-desert-oracle': 'lexicon',
+        'inq-chasm': 'cairn1',
         'inq-salt-playa': 'chasm',
-        'inq-bc-ashes': 'lexicon',
-        'inq-oasis-steles': 'lexicon',
+        'inq-bc-ashes': 'playa',
+        'inq-oasis-steles': 'playa',
         'inq-al-qibla': 'lexicon',
         'inq-phoenix-sigil': 'lexicon',
         'inq-four-wells': 'lexicon',
@@ -5252,8 +5255,9 @@
       ];
       function isInquiryUnlocked(inq) {
         if (!inq.requires) return true;
-        if ((currentSeeker || 'Silvia').toLowerCase() === 'carles') return true; // sandbox
-        return localStorage.getItem(INQUIRY_UNLOCKS[inq.requires].key) === 'true';
+        const rule = INQUIRY_UNLOCKS[inq.requires];
+        if (!rule) return true;
+        return localStorage.getItem(rule.key) === 'true';
       }
 
       // Physical Journal Callout Highlight Helper: Natural Illuminated Citation
@@ -7555,8 +7559,9 @@
       function renderInquiryFilterBar() {
         const filterBar = document.getElementById('inquiry-filter-bar');
         if (!filterBar) return;
+        const visibleList = FIELD_INQUIRIES.filter(i => isInquiryUnlocked(i));
         filterBar.innerHTML = INQUIRY_GROUPS.map((g) => {
-          const count = g.id === 'all' ? FIELD_INQUIRIES.length : FIELD_INQUIRIES.filter(i => i.group === g.id).length;
+          const count = g.id === 'all' ? visibleList.length : visibleList.filter(i => i.group === g.id).length;
           return `<button type="button" class="inquiry-filter-pill${g.id === currentInquiryFilter ? ' active' : ''}" data-filter="${g.id}">${g.label} (${count})</button>`;
         }).join('');
       }
@@ -7568,7 +7573,9 @@
         renderInquiryFilterBar();
 
         const query = currentInquirySearch.trim().toLowerCase();
-        const filtered = FIELD_INQUIRIES.filter((inq) => {
+        // Only visible, unlocked inquiries are displayed (no spoilers or locked placeholders)
+        const visibleList = FIELD_INQUIRIES.filter(inq => isInquiryUnlocked(inq));
+        const filtered = visibleList.filter((inq) => {
           if (filter !== 'all' && inq.group !== filter) return false;
           if (!query) return true;
           return (inq.title + ' ' + inq.category).toLowerCase().includes(query);
@@ -7576,32 +7583,21 @@
 
         filtered.forEach((inq) => {
           const isRead = readInquiriesSet.has(inq.id);
-          const unlocked = isInquiryUnlocked(inq);
           const card = document.createElement('button');
           card.type = 'button';
-          card.className = 'messenger-faq-chip' + (isRead ? ' is-read' : '') + (unlocked ? '' : ' is-locked');
+          card.className = 'messenger-faq-chip' + (isRead ? ' is-read' : '');
           card.id = `inq-card-${inq.id}`;
-          if (!unlocked) {
-            card.setAttribute('aria-disabled', 'true');
-            card.title = 'Unlocks after ' + INQUIRY_UNLOCKS[inq.requires].label;
-          }
           card.innerHTML = `
             <div class="messenger-faq-chip-title">
-              <span>${unlocked ? '✦' : '🔒'}</span>
-              <span>${unlocked ? inq.title : 'Sealed question'}</span>
+              <span>✦</span>
+              <span>${inq.title}</span>
             </div>
             <div class="messenger-faq-chip-cat">
               <span>${inq.category}</span>
-              ${unlocked
-                ? (isRead ? '<span class="inquiry-read-badge">✓ Answered</span>' : '')
-                : `<span class="inquiry-lock-badge">UNLOCKS AFTER ${INQUIRY_UNLOCKS[inq.requires].label.toUpperCase()}</span>`}
+              ${isRead ? '<span class="inquiry-read-badge">✓ Answered</span>' : ''}
             </div>
           `;
           card.addEventListener('click', () => {
-            if (!unlocked) {
-              if (sfx) sfx.playMechanicalClick();
-              return;
-            }
             handleInquiryClick(inq);
           });
           inquiriesQuestionsGrid.appendChild(card);
@@ -7610,14 +7606,14 @@
         if (filtered.length === 0) {
           const empty = document.createElement('div');
           empty.className = 'messenger-faq-empty';
-          empty.textContent = query ? 'No question matches "' + currentInquirySearch.trim() + '". Try another word.' : 'No questions here yet.';
+          empty.textContent = query ? 'No question matches "' + currentInquirySearch.trim() + '". Try another word.' : 'No questions available in this section yet.';
           inquiriesQuestionsGrid.appendChild(empty);
         }
 
         const progressEl = document.getElementById('inquiry-progress');
         if (progressEl) {
-          const answered = FIELD_INQUIRIES.filter(i => readInquiriesSet.has(i.id)).length;
-          progressEl.textContent = answered + ' / ' + FIELD_INQUIRIES.length + ' ANSWERED';
+          const answered = visibleList.filter(i => readInquiriesSet.has(i.id)).length;
+          progressEl.textContent = answered + ' / ' + visibleList.length + ' ANSWERED';
         }
       }
 
@@ -7654,7 +7650,9 @@
         // Keep the "answered" counter in step with the read state
         const progressEl = document.getElementById('inquiry-progress');
         if (progressEl) {
-          progressEl.textContent = FIELD_INQUIRIES.filter(i => readInquiriesSet.has(i.id)).length + ' / ' + FIELD_INQUIRIES.length + ' ANSWERED';
+          const visibleList = FIELD_INQUIRIES.filter(i => isInquiryUnlocked(i));
+          const answered = visibleList.filter(i => readInquiriesSet.has(i.id)).length;
+          progressEl.textContent = answered + ' / ' + visibleList.length + ' ANSWERED';
         }
 
         // 2. Mark card visually with gold ribete and Answered badge

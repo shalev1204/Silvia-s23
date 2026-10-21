@@ -1,16 +1,16 @@
     /* =========================================================================
-       VIEW: TRANSMISSIONS (VINTAGE RADIO STATION / OBSERVATORY DESK ATMOSPHERE)
+       VIEW 2: TRANSMISSIONS (VINTAGE SHORTWAVE DESK & VACUUM-TUBE ATMOSPHERE)
        ========================================================================= */
     #view-transmissions {
       position: relative;
       background:
-        radial-gradient(circle at 14% 24%, rgba(255, 170, 20, 0.32) 0%, transparent 42%),
-        radial-gradient(circle at 86% 28%, rgba(255, 210, 90, 0.36) 0%, transparent 45%),
-        radial-gradient(circle at 50% 50%, rgba(6, 11, 20, 0.15) 0%, rgba(3, 6, 12, 0.65) 85%),
+        radial-gradient(circle at 14% 24%, rgba(255, 170, 20, 0.38) 0%, transparent 42%),
+        radial-gradient(circle at 86% 28%, rgba(255, 210, 90, 0.40) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(24, 14, 7, 0.32) 0%, rgba(10, 6, 3, 0.78) 85%),
         url('../../assets/radio_station_bg.jpg') no-repeat center top / cover;
       border-radius: 16px;
       padding: 24px 20px 40px;
-      box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.75), 0 10px 40px rgba(0, 0, 0, 0.8);
+      box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.85), 0 10px 40px rgba(0, 0, 0, 0.85);
       overflow: hidden;
     }
 
@@ -18,7 +18,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 30%, rgba(4, 7, 14, 0.05) 0%, rgba(2, 5, 10, 0.35) 70%, rgba(1, 3, 6, 0.72) 100%);
+      background: radial-gradient(circle at 50% 30%, rgba(24, 15, 8, 0.12) 0%, rgba(12, 7, 4, 0.45) 70%, rgba(4, 2, 1, 0.82) 100%);
       pointer-events: none;
       z-index: 1;
     }
@@ -26,6 +26,21 @@
     #view-transmissions > * {
       position: relative;
       z-index: 2;
+    }
+
+    #view-transmissions .view-tagline {
+      color: #f5c26b !important;
+      text-shadow: 0 0 12px rgba(245, 175, 40, 0.55);
+      letter-spacing: 0.22em;
+    }
+
+    #view-transmissions .view-title {
+      color: #ffe099;
+      text-shadow: 0 0 24px rgba(245, 175, 40, 0.35), 0 2px 6px rgba(0, 0, 0, 0.9);
+    }
+
+    #view-transmissions .view-desc {
+      color: #dfd0b5 !important;
     }
 
     .transmissions-embedded-container {
@@ -47,28 +62,14 @@
       position: relative;
       width: 100%;
       max-width: 1140px;
-      background: rgba(6, 10, 18, 0.70);
-      border: 1.5px solid var(--border-brass-bright);
+      background: linear-gradient(165deg, rgba(24, 16, 10, 0.86) 0%, rgba(14, 9, 5, 0.92) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.45);
       border-radius: 14px;
       padding: 26px 28px;
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.92), 0 0 45px rgba(212, 168, 83, 0.22), inset 0 0 25px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95), 0 0 50px rgba(230, 140, 20, 0.18), inset 0 1px 0 rgba(255, 220, 140, 0.2), inset 0 0 35px rgba(10, 6, 3, 0.8);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
-
-    /* Tactical Corner Brackets */
-    .tactical-corner {
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      border-color: var(--brass-bright);
-      pointer-events: none;
-      box-shadow: 0 0 10px rgba(212, 168, 83, 0.35);
-    }
-    .tc-tl { top: -2px; left: -2px; border-top: 2.5px solid; border-left: 2.5px solid; border-top-left-radius: 4px; }
-    .tc-tr { top: -2px; right: -2px; border-top: 2.5px solid; border-right: 2.5px solid; border-top-right-radius: 4px; }
-    .tc-bl { bottom: -2px; left: -2px; border-bottom: 2.5px solid; border-left: 2.5px solid; border-bottom-left-radius: 4px; }
-    .tc-br { bottom: -2px; right: -2px; border-bottom: 2.5px solid; border-right: 2.5px solid; border-bottom-right-radius: 4px; }
 
     .tx-dossier-header {
       display: flex;
@@ -85,9 +86,9 @@
       font-family: 'Cinzel', serif;
       font-size: 1.45rem;
       font-weight: 700;
-      color: var(--brass-bright);
+      color: #ffe099;
       letter-spacing: 0.14em;
-      text-shadow: 0 0 16px rgba(212, 168, 83, 0.5), 0 2px 4px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 0 18px rgba(245, 175, 40, 0.5), 0 2px 4px rgba(0, 0, 0, 0.9);
       display: flex;
       align-items: center;
       gap: 10px;
@@ -96,7 +97,7 @@
     .tx-dossier-subtitle {
       font-family: 'Space Mono', monospace;
       font-size: 0.78rem;
-      color: #ffd978;
+      color: #d6b885;
       letter-spacing: 0.14em;
       margin-top: 6px;
       text-transform: uppercase;
@@ -106,31 +107,44 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(79, 227, 193, 0.12);
-      border: 1px solid rgba(79, 227, 193, 0.4);
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 175, 40, 0.5);
       border-radius: 20px;
       padding: 5px 14px;
       font-family: 'Space Mono', monospace;
       font-size: 0.72rem;
       font-weight: 700;
-      color: var(--cyan-beam);
+      color: #ffe099;
       letter-spacing: 0.12em;
-      box-shadow: 0 0 14px rgba(79, 227, 193, 0.2);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.22);
     }
 
     .tx-live-pulse-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: var(--cyan-beam);
-      box-shadow: 0 0 8px var(--cyan-beam);
-      animation: pulseDot 1.8s infinite;
+      background: #ffaa22;
+      box-shadow: 0 0 8px #ffaa22, 0 0 16px #ff7700;
+      animation: pulseAmberFilament 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseAmberFilament {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 8px #ffaa22, 0 0 16px #ff7700;
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(0.85);
+        box-shadow: 0 0 4px #ff9e24, 0 0 8px rgba(255, 119, 0, 0.4);
+      }
     }
 
     /* Analog Radio Tuner Strip */
     .radio-tuner-strip {
-      background: rgba(3, 7, 14, 0.85);
-      border: 1px solid rgba(212, 168, 83, 0.35);
+      background: linear-gradient(180deg, rgba(22, 15, 9, 0.95) 0%, rgba(12, 8, 4, 0.98) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.4);
       border-radius: 6px;
       padding: 7px 14px;
       margin-bottom: 20px;
@@ -138,7 +152,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.8), 0 2px 10px rgba(0, 0, 0, 0.5);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9), 0 4px 14px rgba(0, 0, 0, 0.6);
     }
 
     .tuner-scale-track {
@@ -146,11 +160,12 @@
       display: flex;
       align-items: center;
       height: 22px;
-      background: linear-gradient(180deg, rgba(16, 26, 42, 0.92) 0%, rgba(6, 11, 18, 0.95) 100%);
-      border: 1px solid rgba(212, 168, 83, 0.2);
+      background: linear-gradient(180deg, rgba(38, 24, 12, 0.95) 0%, rgba(18, 11, 5, 0.98) 100%);
+      border: 1px solid rgba(212, 168, 83, 0.28);
       border-radius: 4px;
       padding: 0 10px;
       overflow: hidden;
+      box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.15);
     }
 
     .tuner-scale-ticks {
@@ -160,20 +175,20 @@
       width: 100%;
       font-family: 'Space Mono', monospace;
       font-size: 0.65rem;
-      color: rgba(212, 168, 83, 0.6);
+      color: rgba(212, 168, 83, 0.65);
       letter-spacing: 0.05em;
     }
 
     .tuner-scale-ticks .tick.active-beacon {
-      color: var(--cyan-beam);
+      color: #ffe6a0;
       font-weight: 700;
-      text-shadow: 0 0 8px var(--cyan-beam);
+      text-shadow: 0 0 12px rgba(255, 200, 70, 0.9);
     }
 
     .tuner-scale-ticks .tick.active-amber {
-      color: #fde68a;
+      color: #ffcc66;
       font-weight: 700;
-      text-shadow: 0 0 8px #f59e0b;
+      text-shadow: 0 0 10px #ff9e24;
     }
 
     .tuner-status-pill {
@@ -183,20 +198,21 @@
       font-family: 'Space Mono', monospace;
       font-size: 0.68rem;
       font-weight: 700;
-      color: var(--brass-bright);
-      background: rgba(212, 168, 83, 0.12);
-      border: 1px solid rgba(212, 168, 83, 0.3);
+      color: #ffe099;
+      background: rgba(212, 168, 83, 0.16);
+      border: 1px solid rgba(212, 168, 83, 0.45);
       padding: 3px 10px;
       border-radius: 4px;
       letter-spacing: 0.08em;
       white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
     }
 
     .tx-dossier-desc {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.08rem;
-      line-height: 1.5;
-      color: #cbd5e1;
+      font-size: 1.12rem;
+      line-height: 1.55;
+      color: #e5d6be;
       font-style: italic;
       margin-bottom: 22px;
     }
@@ -228,6 +244,7 @@
       }
     }
 
+    /* Authentic Vintage Radio Casing & Vacuum Tube Transmission Card */
     .tx-log-card {
       position: relative;
       aspect-ratio: 1 / 1;
@@ -236,14 +253,14 @@
       flex-direction: column;
       justify-content: space-between;
       box-sizing: border-box;
-      background: linear-gradient(155deg, rgba(14, 22, 38, 0.90) 0%, rgba(6, 11, 20, 0.95) 100%);
-      border: 1.5px solid rgba(212, 168, 83, 0.35);
+      background: linear-gradient(160deg, rgba(30, 20, 13, 0.93) 0%, rgba(18, 12, 7, 0.96) 65%, rgba(11, 7, 4, 0.99) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.4);
       border-radius: 10px;
       padding: 16px 16px 14px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       overflow: hidden;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75), inset 0 0 20px rgba(212, 168, 83, 0.05);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.88), inset 0 1px 0 rgba(255, 220, 140, 0.2), inset 0 0 24px rgba(0, 0, 0, 0.65);
       backdrop-filter: blur(8px);
     }
 
@@ -258,21 +275,21 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.6), transparent);
-      opacity: 0.6;
+      background: linear-gradient(90deg, transparent, rgba(245, 185, 60, 0.75), transparent);
+      opacity: 0.7;
       transition: opacity 0.3s ease;
     }
 
     .tx-log-card:hover {
-      background: linear-gradient(155deg, rgba(20, 32, 54, 0.98) 0%, rgba(10, 18, 32, 0.99) 100%);
+      background: linear-gradient(160deg, rgba(42, 28, 17, 0.98) 0%, rgba(26, 17, 10, 0.99) 65%, rgba(15, 10, 6, 1) 100%);
       border-color: #ffd764;
       transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 30px rgba(212, 168, 83, 0.35);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.95), 0 0 35px rgba(245, 175, 40, 0.35), inset 0 0 24px rgba(245, 175, 40, 0.12);
     }
 
     .tx-log-card:hover::before {
       opacity: 1;
-      background: linear-gradient(90deg, transparent, #ffd764, transparent);
+      background: linear-gradient(90deg, transparent, #ffe08a, transparent);
     }
 
     .tx-log-card-top {
@@ -289,41 +306,42 @@
       font-size: 0.58rem;
       font-weight: 700;
       letter-spacing: 0.05em;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 3px;
       white-space: nowrap;
       flex-shrink: 0;
     }
 
     .tag-distress {
-      background: rgba(239, 68, 68, 0.2);
-      color: #ff8a80;
-      border: 1px solid rgba(239, 68, 68, 0.6);
-      box-shadow: 0 0 8px rgba(239, 68, 68, 0.25);
+      background: rgba(185, 40, 30, 0.24);
+      color: #ff9988;
+      border: 1px solid rgba(230, 70, 50, 0.6);
+      box-shadow: 0 0 10px rgba(230, 70, 50, 0.25);
     }
 
     .tag-survivor {
-      background: rgba(223, 178, 86, 0.2);
-      color: #ffd978;
-      border: 1px solid rgba(223, 178, 86, 0.6);
-      box-shadow: 0 0 8px rgba(223, 178, 86, 0.25);
+      background: rgba(220, 140, 20, 0.22);
+      color: #ffe08a;
+      border: 1px solid rgba(235, 165, 45, 0.6);
+      box-shadow: 0 0 10px rgba(235, 165, 45, 0.25);
     }
 
     .tag-decrypted {
-      background: rgba(0, 229, 255, 0.2);
-      color: #80deea;
-      border: 1px solid rgba(77, 208, 225, 0.6);
-      box-shadow: 0 0 8px rgba(77, 208, 225, 0.25);
+      background: rgba(50, 140, 80, 0.22);
+      color: #a4f0ba;
+      border: 1px solid rgba(75, 185, 115, 0.6);
+      box-shadow: 0 0 10px rgba(75, 185, 115, 0.25);
     }
 
     .dossier-card-freq {
       font-family: 'Space Mono', monospace;
       font-size: 0.62rem;
       font-weight: 700;
-      color: var(--brass-bright);
-      letter-spacing: 0.02em;
+      color: #ffd978;
+      letter-spacing: 0.04em;
       white-space: nowrap;
       flex-shrink: 0;
+      text-shadow: 0 0 8px rgba(245, 175, 40, 0.3);
     }
 
     .tx-log-card-body {
@@ -338,9 +356,9 @@
 
     .tx-log-card-title {
       font-family: 'Cinzel', serif;
-      font-size: 0.92rem;
+      font-size: 0.94rem;
       font-weight: 700;
-      color: #ffffff;
+      color: #fff6e2;
       letter-spacing: 0.03em;
       line-height: 1.25;
       margin-bottom: 0;
@@ -349,22 +367,23 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 12px rgba(245, 175, 40, 0.2);
     }
 
-    /* Oscilloscope visualizer box inside card body */
+    /* Oscilloscope visualizer box inside card body - Amber Phosphor Tube */
     .tx-card-oscilloscope {
       position: relative;
       width: 100%;
       height: 24px;
-      background: radial-gradient(circle at center, rgba(3, 24, 30, 0.98) 0%, rgba(1, 10, 14, 0.99) 100%);
-      border: 1px solid rgba(77, 208, 225, 0.45);
+      background: radial-gradient(circle at center, rgba(34, 20, 8, 0.98) 0%, rgba(13, 8, 3, 0.99) 100%);
+      border: 1px solid rgba(212, 168, 83, 0.45);
       border-radius: 4px;
       overflow: hidden;
       margin: 2px 0 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.25), 0 0 8px rgba(0, 229, 255, 0.1);
+      box-shadow: inset 0 0 14px rgba(245, 158, 11, 0.22), 0 0 10px rgba(0, 0, 0, 0.7);
       flex-shrink: 0;
     }
 
@@ -373,18 +392,29 @@
       height: 100%;
     }
 
+    .tx-card-oscilloscope svg line {
+      stroke: rgba(212, 168, 83, 0.25) !important;
+      stroke-dasharray: 4,4;
+    }
+
     .tx-card-oscilloscope .wave-line {
-      stroke: var(--cyan-beam);
-      stroke-width: 1.8;
+      stroke: #ffaa22;
+      stroke-width: 1.9;
       fill: none;
-      filter: drop-shadow(0 0 4px var(--cyan-beam));
+      filter: drop-shadow(0 0 4px #ff9e24) drop-shadow(0 0 8px rgba(255, 150, 0, 0.5));
+    }
+
+    /* Storm Gale Red/Amber Wave for Dispatch 09-A */
+    .tx-log-card-cipher .tx-card-oscilloscope .wave-line {
+      stroke: #ff6633 !important;
+      filter: drop-shadow(0 0 5px #ff5733) drop-shadow(0 0 10px rgba(255, 60, 20, 0.6)) !important;
     }
 
     .tx-log-card-summary {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 0.88rem;
-      line-height: 1.30;
-      color: #c4d4e6;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      color: #e5d6be;
       font-style: italic;
       margin-bottom: 0;
       display: -webkit-box;
@@ -399,7 +429,7 @@
       flex-direction: column;
       gap: 7px;
       padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(212, 168, 83, 0.18);
       flex-shrink: 0;
       width: 100%;
     }
@@ -407,7 +437,7 @@
     .tx-location-tag {
       font-family: 'Space Mono', monospace;
       font-size: 0.62rem;
-      color: #9ab0cf;
+      color: #bfa885;
       letter-spacing: 0.05em;
       white-space: nowrap;
       overflow: hidden;
@@ -416,7 +446,7 @@
       text-align: left;
     }
 
-    /* Golden Warm Decrypt Radio Button */
+    /* Tactile Bakelite & Brass Decrypt Button */
     .btn-launch-decoder {
       display: inline-flex;
       align-items: center;
@@ -424,10 +454,10 @@
       gap: 7px;
       width: 100%;
       padding: 7px 12px;
-      background: linear-gradient(135deg, #e5b95c 0%, #b88628 50%, #8c6014 100%);
-      border: 1px solid #ffe89e;
+      background: linear-gradient(135deg, #dfa94b 0%, #aa7822 50%, #7d5312 100%);
+      border: 1px solid #ffe699;
       border-radius: 4px;
-      color: #050912;
+      color: #120c04;
       font-family: 'Cinzel', serif;
       font-size: 0.70rem;
       font-weight: 800;
@@ -436,15 +466,15 @@
       text-decoration: none;
       cursor: pointer;
       white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.45);
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .tx-log-card:hover .btn-launch-decoder {
-      background: linear-gradient(135deg, #fff0b3 0%, #d4a853 50%, #a67c2e 100%);
+      background: linear-gradient(135deg, #fff0aa 0%, #e0aa4d 50%, #a06e1c 100%);
       color: #000000;
       border-color: #ffffff;
-      box-shadow: 0 0 18px rgba(255, 215, 100, 0.65), 0 4px 16px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 0 22px rgba(255, 200, 70, 0.75), 0 4px 16px rgba(0, 0, 0, 0.85);
       transform: translateY(-1px);
     }
 
@@ -460,12 +490,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, rgba(14, 22, 38, 0.95) 0%, rgba(6, 11, 20, 0.98) 100%);
-      border: 1.5px solid var(--border-brass);
+      background: linear-gradient(135deg, rgba(26, 18, 11, 0.96) 0%, rgba(14, 9, 5, 0.98) 100%);
+      border: 1.5px solid rgba(212, 168, 83, 0.45);
       border-radius: 8px;
       padding: 10px 18px;
       gap: 16px;
       flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 220, 140, 0.2);
     }
 
     .tx-toolbar-left-group {
@@ -480,10 +511,10 @@
       align-items: center;
       gap: 8px;
       padding: 7px 16px;
-      background: rgba(22, 32, 54, 0.9);
-      border: 1px solid var(--border-brass-bright);
+      background: rgba(35, 24, 15, 0.9);
+      border: 1px solid rgba(212, 168, 83, 0.45);
       border-radius: 6px;
-      color: var(--brass-bright);
+      color: #ffe099;
       font-family: 'Cinzel', serif;
       font-size: 0.78rem;
       font-weight: 700;
@@ -493,10 +524,10 @@
     }
 
     .btn-back-to-tx-logs:hover {
-      background: rgba(45, 68, 110, 0.98);
+      background: rgba(58, 40, 24, 0.98);
       color: #ffffff;
-      border-color: var(--cyan-beam);
-      box-shadow: 0 0 14px rgba(79, 227, 193, 0.35);
+      border-color: #ffd764;
+      box-shadow: 0 0 16px rgba(245, 175, 40, 0.4);
       transform: translateX(-2px);
     }
 
@@ -505,10 +536,10 @@
       align-items: center;
       gap: 8px;
       padding: 7px 16px;
-      background: linear-gradient(135deg, rgba(212, 168, 83, 0.22) 0%, rgba(180, 130, 45, 0.38) 100%);
-      border: 1.5px solid var(--border-brass-bright);
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.28) 0%, rgba(180, 130, 45, 0.45) 100%);
+      border: 1.5px solid rgba(255, 220, 140, 0.65);
       border-radius: 6px;
-      color: #ffe099;
+      color: #fff0aa;
       font-family: 'Cinzel', serif;
       font-size: 0.78rem;
       font-weight: 700;
@@ -520,10 +551,10 @@
     }
 
     .btn-tx-chronicle-quest:hover {
-      background: linear-gradient(135deg, rgba(212, 168, 83, 0.45) 0%, rgba(180, 130, 45, 0.65) 100%);
+      background: linear-gradient(135deg, rgba(212, 168, 83, 0.5) 0%, rgba(180, 130, 45, 0.7) 100%);
       color: #ffffff;
       border-color: #ffe8b3;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 168, 83, 0.5);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75), 0 0 22px rgba(245, 175, 40, 0.55);
       transform: translateY(-2px);
     }
 
@@ -543,14 +574,14 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(79, 227, 193, 0.12);
-      border: 1px solid rgba(79, 227, 193, 0.4);
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 175, 40, 0.45);
       border-radius: 14px;
       padding: 3px 10px;
       font-family: 'Space Mono', monospace;
       font-size: 0.7rem;
       font-weight: 700;
-      color: var(--cyan-beam);
+      color: #ffbe54;
       letter-spacing: 0.1em;
     }
 
@@ -558,7 +589,7 @@
       font-family: 'Cinzel', serif;
       font-size: 0.85rem;
       font-weight: 700;
-      color: #ffffff;
+      color: #fff6e0;
       letter-spacing: 0.06em;
     }
 
@@ -567,11 +598,11 @@
       width: 100%;
       height: calc(100vh - 210px);
       min-height: 740px;
-      border: 1.5px solid var(--border-brass);
+      border: 1.5px solid rgba(212, 168, 83, 0.45);
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 0, 0, 0.7);
-      background: #020409;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 40px rgba(0, 0, 0, 0.85);
+      background: #090603;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -593,7 +624,7 @@
     .tx-frame-skeleton {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at center, rgba(14, 22, 38, 0.98) 0%, rgba(2, 4, 9, 0.99) 100%);
+      background: radial-gradient(circle at center, rgba(32, 22, 13, 0.98) 0%, rgba(10, 6, 3, 0.99) 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -609,11 +640,11 @@
     }
 
     .skeleton-subtext {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Space Mono', monospace;
       font-size: 0.7rem;
-      color: var(--cyan-beam);
+      color: #ffcc66;
       letter-spacing: 0.08em;
-      opacity: 0.85;
+      opacity: 0.9;
       margin-top: 4px;
     }
 
