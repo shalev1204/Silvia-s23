@@ -166,6 +166,17 @@
     el('line', { x1: a.cx - 26, y1: top - 2, x2: a.cx + 26, y2: top - 2, stroke: '#3b2508', 'stroke-width': 2.5, 'stroke-linecap': 'round' }, g);
   }
 
+  // A quill about 80 units long, drawn along the x axis from the nib (0, 0)
+  function drawFeather(g) {
+    el('path', { d: 'M 14 0 C 30 -13 60 -16 84 -3 C 66 5 36 11 14 0 Z', fill: 'url(#sm-gold)', stroke: '#5a3d12', 'stroke-width': 1.2 }, g);
+    var barbs = el('g', { stroke: '#7a5419', 'stroke-width': 0.8, fill: 'none' }, g);
+    [24, 36, 48, 60, 70].forEach(function (x) {
+      el('path', { d: 'M ' + x + ' 0 L ' + (x + 7) + ' -8' }, barbs);
+      el('path', { d: 'M ' + x + ' 0 L ' + (x + 6) + ' 5' }, barbs);
+    });
+    el('path', { d: 'M 0 0 L 84 -3', stroke: '#3b2508', 'stroke-width': 1.6, 'stroke-linecap': 'round', fill: 'none' }, g);
+  }
+
   function render(flashNew) {
     if (!root) return;
     var have = owned();
@@ -209,6 +220,11 @@
     DATA.cracks.forEach(function (c) { el('path', { d: pathOf(c, false) }, cracks); });
 
     drawFrame(el('g', { 'aria-hidden': 'true' }, svg));
+    // Once the first fragment is set, a small gilded feather lies on the sill of the frame. Nobody mentions it.
+    if (have[0]) {
+      drawFeather(el('g', { class: 'sm-feather', 'aria-hidden': 'true', transform: 'translate(548 852) rotate(-34)' }, svg));
+      if (window.EclipseNotebook && window.EclipseNotebook.clue) window.EclipseNotebook.clue('feather');
+    }
 
     // the cartouche under the glass
     var a = DATA.arch;

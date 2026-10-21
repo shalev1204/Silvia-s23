@@ -706,7 +706,7 @@
           {
             id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
             complete() { set('order_masks_march_start', '1'); set('order_masks_gate_awake', 'true'); set('order_masks_carved', '3'); set('order_masks_gate_completed', 'true'); },
-            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41']); }
+            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41', 'order_ashes_clues']); }
           }
         ];
         // A reset game also forgets the hints its puzzles had climbed to (hub/js/hint-ladder.js)
@@ -6047,6 +6047,28 @@
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
         appendWireMessage('SYSTEM TELEMETRY', WIRE_FINAL_TELEMETRY[stepIdx](), true, false, null, null, { type: 'expedition', step: stepIdx });
+        if (stepIdx === 36) appendWireIntercept();
+      }
+
+      // After the night behind the gate, a broken line from someone else slips onto the wire, sealed with ash
+      // (docs/STAGE_PATH_BIBLE.md §9). Hermes never hears it and never mentions it.
+      const WIRE_INTERCEPT = "…kssh… tell the old man to hold the lamp lower… the treasure reads by it… kssh… the stair past the dressing rooms is rotten, she must keep to the wall… kssh… no harm comes to her in this tower. Not while I…";
+      function appendWireIntercept() {
+        if (!wireMessagesStream) return;
+        const el = document.createElement('div');
+        el.className = 'chat-bubble-wrap system-event wire-intercept';
+        el.innerHTML = `
+          <div class="chat-bubble-row">
+            <div class="chat-bubble">
+              <span class="wire-intercept-tag">✶ STATIC ON THE LINE · UNKNOWN SENDER ✶</span>
+              <span class="wire-intercept-text"></span>
+              <span class="wire-intercept-seal" aria-label="A seal of ash: a circle with a line across it">⊖</span>
+            </div>
+          </div>
+        `;
+        el.querySelector('.wire-intercept-text').textContent = WIRE_INTERCEPT;
+        wireMessagesStream.appendChild(el);
+        if (window.EclipseNotebook && window.EclipseNotebook.clue) window.EclipseNotebook.clue('intercept');
       }
 
       function appendStepIntro(stepIdx) {
@@ -6054,6 +6076,8 @@
         if (EXPEDITION_THREAD[stepIdx] && EXPEDITION_THREAD[stepIdx].hermesInitial) {
           appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[stepIdx].hermesInitial, false, false, null, null, { type: 'expedition', step: stepIdx });
         }
+        // Step 35 tells of the note sealed with ash on the last mask
+        if (stepIdx === 35 && window.EclipseNotebook && window.EclipseNotebook.clue) window.EclipseNotebook.clue('note1');
       }
 
       function isCarlesTester() {
@@ -7549,6 +7573,7 @@
                   if (sfx) sfx.playCelestialChime();
                   appendWireMessage('HERMES · CARTOGRAPHER', EXPEDITION_THREAD[finalStep].hermesFinal, false, true, () => {
                     appendWireMessage('SYSTEM TELEMETRY', WIRE_FINAL_TELEMETRY[finalStep](), true, false, null, null, { type: 'expedition', step: finalStep });
+                    if (finalStep === 36) setTimeout(() => { appendWireIntercept(); scrollChatToActivePrompt(true); }, 2600);
                     if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
                     renderWireChoices();
                     updateMessengerBadge();

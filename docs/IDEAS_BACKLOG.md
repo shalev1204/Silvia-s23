@@ -16,7 +16,7 @@
 | 7 | Variedad de mecánicas en 21–28 | M | alto | **Especificada (21-10-2026)**: ficha de variedad en `STAGE_PATH_BIBLE.md` §6.1; cada sala la cumple al construirse |
 | 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | **Especificada (21-10-2026)**: `STAGE_PATH_BIBLE.md` §6.2; se construye con las Hojas 23, 24 y los márgenes de 19–26 |
 | 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
-| 10 | Pistas sutiles de Pope-E en retrospectiva | M | alto | Parcial: nota 1 (Estación 20). Plan de pistas en `STAGE_PATH_BIBLE.md` §9 |
+| 10 | Pistas sutiles de Pope-E en retrospectiva | M | alto | **Implementada la parte construible (21-10-2026)**: pluma dorada y mensaje interceptado tras la Estación 20; notas 2 y 3 en las Estaciones 23 y 27; revelación en la Torre I. `STAGE_PATH_BIBLE.md` §9 |
 | 11 | Mirror Speaker que reacciona al estilo de juego | M | alto | No existe |
 | 12 | Cartas de Aurelia desbloqueables en el Hub | S | medio | No existe (los cuadernos I–III son caras 21A, 23B, 25B) |
 | 13 | Final distinto según el estilo de juego | L | medio | No existe |
@@ -172,8 +172,19 @@
 
 **Descartado**: panel en el Hub, página `/operator.html`, contraseña del Operador, avisos por email (el Operador no los marcó).
 
-### 10. Pistas sutiles de Pope-E (M)
-Pendiente de especificar.
+### 10. Pistas sutiles de Pope-E (M) · parte construible implementada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Notas 2 y 3**: en las **Estaciones 23 y 27** (la 1 ya está en la 20; el reflejo de espaldas, en la 26).
+- **Revelación en la Torre I**: **las dos cosas**, una escena del Field Wire en la que Hermes repasa cada pista (se guarda en Ask Hermes) y una página especial del cuaderno de Hermes con la fecha real en que Silvia vio cada una.
+- **Pistas extra ya**: **pluma dorada en el mapa** y **mensaje interceptado** en el Field Wire, ambas tras la Estación 20.
+
+**Implementación**
+- `web/assets/js/stage-mirror.js`: con el Fragmento I puesto, una pluma dorada pequeña descansa en el pie del marco del Espejo Vivo (`.sm-feather`, decorativa, sin texto).
+- `web/hub/js/hub-core.js`: tras el cierre del paso 36 se cuela una línea entrecortada (`.wire-intercept`) firmada con el sello de ceniza. Hermes no la comenta.
+- `web/hub/js/field-journal.js`: `EclipseNotebook.clue(id)` guarda en `order_ashes_clues` el primer momento en que cada pista estuvo en pantalla (`note1`, `feather`, `intercept`), para la página de la revelación. El reinicio de la Estación 20 en el probador lo borra.
+- Plan completo y reparto en `docs/STAGE_PATH_BIBLE.md` §9.
+
+**Verificación**: sección `ashes` del smoke (sin la Estación 20 no hay pluma ni interceptación; con ella aparecen ambas, se registran las tres fechas y nada nombra a Carles).
 
 ### 11. Mirror Speaker reactiva (M)
 Pendiente de especificar.

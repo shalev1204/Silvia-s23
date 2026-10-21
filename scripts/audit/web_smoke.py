@@ -28,6 +28,8 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  19. Hermes's Field Notebook: a dated page per solved game (misses, notes, time since arrival, rewards); resets tear it out.
  20. Stage Path pauses: after a fragment the next room says when it opens, on its card, at its door and on the Field Wire.
  21. Ambient sound: a synthesized bed per station game, silence on the map, a speaker that mutes it and remembers.
+ 22. The clues of the Ashes: after Station 20 a gilded feather on the Living Mirror, a line from an unknown sender on the
+     Field Wire, and the notebook keeps when each was first seen.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1549,6 +1551,48 @@ def test_ambience(browser):
     ctx.close()
 
 
+ASHES_JS = """(() => ({
+  feather: !!document.querySelector('.stage-mirror-svg .sm-feather'),
+  intercepts: [...document.querySelectorAll('#view-field-wire .wire-intercept')].map(e => e.textContent),
+  clues: JSON.parse(localStorage.getItem('order_ashes_clues') || '{}')
+}))()"""
+
+
+def test_ashes(browser):
+    print("\n22. The clues of the Ashes: after Station 20, a gilded feather on the mirror and a line slipping onto the wire")
+    ctx, page, errors = stage_page(browser, {"order_oracle_horizon_completed": "true"})
+    js = page.evaluate
+    js("switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    st = js(ASHES_JS)
+    check(not st["feather"] and not st["intercepts"] and not st["clues"], "before the gate: no feather, no stranger on the wire", str(st))
+    ctx.close()
+
+    # Live: Silvia answers the Station 20 debrief, Hermes closes the night, and the static slips in after him
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "35",
+            "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 31)}
+    ctx, page, errors = stage_page(browser, seed)
+    js = page.evaluate
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    check(not js(ASHES_JS)["intercepts"], "while the debrief waits for her answer, the line is quiet")
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(12500)
+    st = js(ASHES_JS)
+    text = " ".join(st["intercepts"])
+    check(len(st["intercepts"]) == 1 and "the treasure" in text, "after step 36 one broken line arrives, calling her the treasure", text[:90])
+    check(not any(w in text.lower() for w in ("carles", "pope", "seeker")), "it never names its sender nor calls her the seeker")
+    js("switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    st = js(ASHES_JS)
+    check(st["feather"], "a gilded feather lies on the sill of the Living Mirror")
+    check(all(k in st["clues"] for k in ("note1", "feather", "intercept")), "the notebook keeps when she first saw each clue", str(st["clues"]))
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    check(len(js(ASHES_JS)["intercepts"]) == 1, "after a reload the line is still there, once")
+    js("TesterDesert.replayFrom('s20')")
+    check(js("localStorage.getItem('order_ashes_clues')") is None, "replaying Station 20 forgets the clues")
+    check(not errors, "no JS errors with the clues", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1648,11 +1692,11 @@ SECTIONS = {
     "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
-    "notebook": test_notebook, "pause": test_stage_pause,
+    "notebook": test_notebook, "pause": test_stage_pause, "ashes": test_ashes,
     "ambience": test_ambience,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

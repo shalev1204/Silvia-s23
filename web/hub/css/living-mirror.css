@@ -94,3 +94,5 @@
       min-height: 100vh;
     }
 
+    /* The gilded feather on the sill (docs/STAGE_PATH_BIBLE.md §9) */
+    .stage-mirror-svg .sm-feather { pointer-events: none; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6)); }

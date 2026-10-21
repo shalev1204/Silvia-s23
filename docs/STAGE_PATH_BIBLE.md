@@ -177,6 +177,20 @@ Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pid
   5. Siempre llama a Silvia *the treasure*, nunca *the seeker*.
 - **Canales**: tres notas firmadas con el sello de ceniza; un reflejo de espaldas en la Sala de los Espejos (Estación 26); mensajes interceptando el Field Wire.
 
+**Reparto de las pistas (idea #10 del backlog, 21-10-2026)**
+
+| Momento | Pista | Estado |
+| :--- | :--- | :--- |
+| Estación 20 | Nota 1, clavada en la última máscara: *«Let her through. She is the treasure.»* (pistas 1 y 5) | ✅ Field Wire 35 y Ask Hermes |
+| Tras la Estación 20 | Una **pluma dorada** pequeña aparece apoyada en el marco del Espejo Vivo, sin explicación (pista 3) | ✅ `stage-mirror.js` |
+| Tras la Estación 20 | **Mensaje interceptado**: una línea entrecortada por estática se cuela en el Field Wire después del paso 36, firmada con el sello de ceniza; protege a Silvia y la llama *the treasure*. Hermes no la comenta | ✅ `hub-core.js` |
+| Estación 23 | Nota 2 (con la cita *«You were never only the seeker»*, pista 2) | ⏳ al construir la sala |
+| Estación 26 | Reflejo de espaldas en la Sala de los Espejos | ⏳ al construir la sala |
+| Estación 27 | Nota 3, justo antes del final | ⏳ al construir la sala |
+| Torre I | **Revelación en retrospectiva**: escena del Field Wire en la que Hermes enlaza cada pista con su momento (queda en Ask Hermes) **y** una página especial en el cuaderno de Hermes (Chronicles) con cada pista y la fecha real en que Silvia la vio | ⏳ con la Torre I |
+
+Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{pista: milisegundos}`): `EclipseNotebook.clue(id)` guarda el primer momento en que cada pista estuvo en pantalla (`note1`, `feather`, `intercept`; después `note2`, `reflection`, `note3`). Nada de esto se muestra antes de la Torre I.
+
 ---
 
 ## 10. Estado

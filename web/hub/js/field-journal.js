@@ -206,8 +206,21 @@
         box.querySelector('.notebook-empty').style.display = count ? 'none' : '';
       }
 
+      // The clues left by the leader of the Ashes on the Stage Path (docs/STAGE_PATH_BIBLE.md §9): the first
+      // moment each one was on screen (order_ashes_clues), for the notebook page of the reveal in Tower I.
+      // Nothing shows them before then.
+      var CLUES_KEY = 'order_ashes_clues';
+      function clue(id) {
+        var c = null;
+        try { c = JSON.parse(get(CLUES_KEY) || 'null'); } catch (e) { c = null; }
+        if (!c || typeof c !== 'object') c = {};
+        if (c[id]) return;
+        c[id] = Date.now();
+        try { localStorage.setItem(CLUES_KEY, JSON.stringify(c)); } catch (e) {}
+      }
+
       watch();
       setInterval(watch, POLL_MS);
 
-      return { render: render, pages: function () { return load(); } };
+      return { render: render, pages: function () { return load(); }, clue: clue };
     })();

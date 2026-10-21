@@ -953,3 +953,12 @@
       color: #ffd885;
     }
 
+    /* A line from an unknown sender slipping onto the Field Wire, sealed with ash (hub-core.js appendWireIntercept) */
+    .chat-bubble-wrap.wire-intercept .chat-bubble {
+      display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: min(520px, 92%);
+      background: rgba(30, 28, 32, 0.92); border: 1px dashed rgba(170, 165, 175, 0.55); color: #c9c4cf;
+      font-family: 'Courier New', monospace; font-size: 0.86rem; line-height: 1.5; text-align: center;
+    }
+    .wire-intercept-tag { font-size: 0.68rem; letter-spacing: 1.5px; color: #8e8994; }
+    .wire-intercept-text { font-style: italic; opacity: 0.9; }
+    .wire-intercept-seal { font-size: 1.5rem; line-height: 1; color: #6f6a73; }
