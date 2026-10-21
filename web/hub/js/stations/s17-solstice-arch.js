@@ -32,7 +32,6 @@
         signalHint: 'order_cairn5_signal_hint'
       };
       const SIGIL = 'DAYBREAK';
-      const HINT_AFTER_FAILS = 3;
 
       // ---- The courtyard: 9 × 9 flagstones, the arch above row 0 ----
       // Mirrors: 'f' is a forward slash (/), 'b' a backslash (\). Every mirror can be turned.
@@ -84,6 +83,36 @@
       const isDone = () => get(KEYS.done) === 'true';
       const dawnDone = () => isDone() || get(KEYS.dawnDone) === 'true';
       const roundsDone = () => (isDone() ? ROUNDS.length : Math.max(0, Math.min(ROUNDS.length - 1, parseInt(get(KEYS.round) || '0', 10) || 0)));
+
+      // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
+      const hints = window.EclipseHints;
+      const sigilHints = hints.define({
+        id: 's17-sigil', station: 'Station 17', title: 'the sigil of the midsummer ray', group: 'desert',
+        anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
+        texts: [
+          'Do not read every sun-stone of Sheet 16B, Silvia. Follow the ray from the arrow under the arch: only the stones it crosses count, in the order it crosses them.',
+          'I wrote down how the ray bounces off the mirrors. It is in Ask Hermes: "How do I follow the ray of Sheet 16B?"',
+          'Let us follow it together. From the arrow the ray goes straight down, and on the third flagstone it meets a mirror leaning like \\, which sends it to the right. Two flagstones further on it crosses the first sun-stone: D. Keep following it, mirror by mirror, until it reaches the altar.'
+        ]
+      });
+      const dawnHints = hints.define({
+        id: 's17-dawn', station: 'Station 17', title: 'the autumn dawn', group: 'desert',
+        anchor: el.dawnFeedback, solved: dawnDone, active: isAwake, legacyKey: KEYS.dawnHint,
+        texts: [
+          'Do not wait for the sun to turn the mirrors, Silvia. The first ray can be set in the dark: turn the mirrors before you call the dawn, and save your haste for the other three.',
+          'I have learnt to breathe slowly: now each ray waits longer. My note on working backwards from the altar is in Ask Hermes: "How do I aim the mirrors for an October dawn?"',
+          'Let us set the first ray together, in the dark. Light can only fall on the altar from straight above it, so follow its column up to the first mirror: it must catch the light from the west and drop it down, so it leans like \\. Now look west of that mirror: the one there must send the light toward it. Ask the same question there, and walk back until you reach the arch.'
+        ]
+      });
+      const signalHints = hints.define({
+        id: 's17-signal', station: 'Station 17', title: 'the night signal', group: 'desert',
+        anchor: el.signalFeedback, solved: isDone, active: dawnDone, legacyKey: KEYS.signalHint,
+        texts: [
+          'Watch the whole pattern before you touch the mirror. Some flashes are short and some are long, and the order matters as much as the count.',
+          'I wrote the last pattern in my log for you, under the night sky. My note is in Ask Hermes: "How do I answer the light on Tower II?"',
+          'Let us answer together. Touch the mirror and let go at once for a short flash; for a long one, hold it while you count one, two. Copy the flashes from my log one at a time, check the dots and dashes under the mirror, then send. A pause in the light is not a flash: leave it out.'
+        ]
+      });
 
       let mirrors = (() => {
         const saved = get(KEYS.mirrors);
@@ -249,7 +278,7 @@
         stopDawn();
         const fails = (parseInt(get(KEYS.dawnFails) || '0', 10) || 0) + 1;
         set(KEYS.dawnFails, String(fails));
-        if (fails >= HINT_AFTER_FAILS) set(KEYS.dawnHint, 'true');
+        dawnHints.fail();
         dawn.locks = 0; dawn.step = 0;
         feedback(el.dawnFeedback, 'The sun climbed past the arch. The dawn is spent; the ring only takes a dawn ray.', 'error');
         say("Too high, Silvia. The courtyard is in plain daylight and the ring has let go of its locks. Tomorrow the sun will rise again, and the mirrors will still be where you left them." + (get(KEYS.dawnHint) === 'true' ? " I have counted my breaths: tomorrow each ray will wait longer for us." : ''));
@@ -349,7 +378,7 @@
         if (pulses.join('') !== ROUNDS[r]) {
           const fails = (parseInt(get(KEYS.signalFails) || '0', 10) || 0) + 1;
           set(KEYS.signalFails, String(fails));
-          if (fails >= HINT_AFTER_FAILS) set(KEYS.signalHint, 'true');
+          signalHints.fail();
           feedback(el.signalFeedback, 'The light on Tower II waits, then asks again.', 'error');
           pulses = []; renderPulses();
           render();
@@ -419,12 +448,8 @@
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
-            set(KEYS.hint, 'true');
-            feedback(el.keyFeedback, 'The altar stays closed. Hermes left you a note in Ask Hermes about following the ray.', 'error');
-          } else {
-            feedback(el.keyFeedback, 'The altar stays closed. Follow the midsummer ray of Sheet 16B again.', 'error');
-          }
+          feedback(el.keyFeedback, 'The altar stays closed. Follow the midsummer ray of Sheet 16B again.', 'error');
+          sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
@@ -469,6 +494,7 @@
           el.hint.style.display = 'none';
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        sigilHints.refresh(); dawnHints.refresh(); signalHints.refresh();
       }
 
       // ---- Controls ----

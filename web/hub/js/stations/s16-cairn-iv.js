@@ -27,8 +27,6 @@
         sound: 'order_cairn4_sound'
       };
       const SIGIL = 'RESOUND';
-      const HINT_AFTER_FAILS = 3;
-      const COUNT_HINT_AFTER = 3;   // wrong verses before Hermes numbers the beats
       const PACES_PER_BEAT = 5;
 
       // The carved letters of Sheet 15A, by cliff and distance in paces
@@ -79,6 +77,28 @@
       const versesSung = () => (isDone() ? VERSES.length : Math.max(0, Math.min(VERSES.length, parseInt(get(KEYS.verses) || '0', 10) || 0)));
       const countHintOn = () => get(KEYS.countHint) === 'true';
       const soundOn = () => get(KEYS.sound) !== 'off';
+
+      // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
+      const hints = window.EclipseHints;
+      const sigilHints = hints.define({
+        id: 's16-sigil', station: 'Station 16', title: 'the sigil of the seven echoes', group: 'desert',
+        anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
+        texts: [
+          'Every echo in the log of Sheet 15A gives one letter. Its pillar tells you which cliff to look at, and its beats tell you how far.',
+          'I wrote down how an echo becomes a letter. It is in Ask Hermes: "How do I turn the echoes of Sheet 15A into letters?"',
+          'Let us take the first echo of the log together: the Right pillar, 8 beats. Right pillar, right cliff. Each beat is 5 paces, so 8 beats are 40 paces. On the right cliff, at the ring of 40 paces, the carved letter is R. Now the second echo, the same way.'
+        ]
+      });
+      const songHints = hints.define({
+        id: 's16-song', station: 'Station 16', title: 'the song of the pillars', group: 'desert',
+        anchor: el.songFeedback, solved: isDone, active: isAwake, legacyKey: KEYS.countHint,
+        texts: [
+          'Every call comes back from a fissure of its own cliff. Count the beats from the moment a pillar calls until its voice comes back, and every beat is 5 paces.',
+          'I have numbered the beats on the tape for you. My note on counting by ear is in Ask Hermes: "How do I count an echo by ear?"',
+          'Let us take the first call of the first verse together. The Left pillar calls on beat 0, and its echo comes back on beat 6: six beats are 30 paces, so the first fissure is Left, 30. Go on call by call. When echoes cross, remember that a long call comes back long.'
+        ],
+        onLevel: (n) => { if (n >= 2 && tape) drawTape(tape.raf ? 0 : Infinity); }
+      });
 
       let verseIdx = Math.min(versesSung(), VERSES.length - 1);
       let mode = 'mark';
@@ -374,10 +394,7 @@
         if (right !== v.answer.length) {
           const fails = (parseInt(get(KEYS.songFails) || '0', 10) || 0) + 1;
           set(KEYS.songFails, String(fails));
-          if (fails >= COUNT_HINT_AFTER && !countHintOn()) {
-            set(KEYS.countHint, 'true');
-            if (tape) drawTape(tape.raf ? 0 : Infinity);
-          }
+          songHints.fail();
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.songFeedback, 'The pillars fall silent. ' + right + ' of ' + v.answer.length + ' echoes rang true.', 'error');
           render();
@@ -427,12 +444,8 @@
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
-            set(KEYS.hint, 'true');
-            feedback(el.keyFeedback, 'The pillars stay mute. Hermes left you a note in Ask Hermes about counting echoes.', 'error');
-          } else {
-            feedback(el.keyFeedback, 'The pillars stay mute. Count the seven echoes of Sheet 15A again.', 'error');
-          }
+          feedback(el.keyFeedback, 'The pillars stay mute. Count the seven echoes of Sheet 15A again.', 'error');
+          sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
@@ -502,6 +515,7 @@
         if (el.play) el.play.textContent = '▶ Let the wind play verse ' + ['I', 'II', 'III'][verseIdx];
         if (el.hint) el.hint.style.display = countHintOn() && !done ? '' : 'none';
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        sigilHints.refresh(); songHints.refresh();
       }
 
       // ---- Controls ----
