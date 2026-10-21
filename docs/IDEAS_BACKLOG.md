@@ -13,7 +13,7 @@
 | 4 | Sonido ambiental por estación | M | alto | **Implementada (21-10-2026)**: `web/hub/js/ambience.js` |
 | 5 | Háptica en móvil | S | medio | **Descartada (21-10-2026)**: la vibración web no funciona en iPhone ni iPad |
 | 6 | Pistas progresivas en 3 niveles | L | alto | **Implementada en Cairn I y Estaciones 10–20 (21-10-2026)**; las 21–28 nacerán con ella |
-| 7 | Variedad de mecánicas en 21–28 | M | alto | Ya fijado en `STAGE_PATH_BIBLE.md` §6; falta cerrar cada diseño |
+| 7 | Variedad de mecánicas en 21–28 | M | alto | **Especificada (21-10-2026)**: ficha de variedad en `STAGE_PATH_BIBLE.md` §6.1; cada sala la cumple al construirse |
 | 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | No existe (varios juegos web ya se apoyan en la hoja, ninguno exige un dato exclusivo del papel) |
 | 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
 | 10 | Pistas sutiles de Pope-E en retrospectiva | M | alto | Parcial: nota 1 (Estación 20). Plan de pistas en `STAGE_PATH_BIBLE.md` §9 |
@@ -144,8 +144,12 @@
 
 **Verificación**: smoke `hints` (fallos → niveles 1, 2 y 3, la nota en el modal y en *Ask Hermes*; tiempo simulado; el reinicio del tester las borra) y las secciones de cada estación siguen verdes, comprobando la nota 1 a los 3 fallos y la ayuda antigua a los 6; smoke `early` (Cairn I y 10–13: fallos contados, nota 1 visible, el reinicio del tester las borra).
 
-### 7. Variedad de mecánicas en 21–28 (M)
-Pendiente de especificar.
+### 7. Variedad de mecánicas en 21–28 (M) · especificada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Enfoque**: una **ficha de variedad** en la Biblia del Escenario (`docs/STAGE_PATH_BIBLE.md` §6.1) que fija para cada sala la interacción principal, el sentido, la dificultad y cómo termina. El diseño detallado de cada sala se hace al construirla, cumpliendo la ficha.
+- **Reglas**: nunca dos salas seguidas con la misma interacción; como mucho la mitad acaba tecleando (hoy 3 de 9); una sala suave tras cada dura; al menos dos salas de sonido (22, 23) y una en tiempo real (24).
+
+**Verificación**: revisión de la ficha al empezar cada sala 21–28; el `code-review` de cada estación comprueba que la sala construida coincide con su fila.
 
 ### 8. Puzzle meta con las hojas físicas (M)
 Pendiente de especificar.

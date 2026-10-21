@@ -102,6 +102,30 @@ Cada cara de juego lleva además un **fragmento dibujado**: su silueta y el troz
 
 **Field Wire**: continúa desde el paso 33. Patrón por estación: escena de salida con respuestas (inicia el viaje), viaje, balance tras la estación y cierre. Las caras de historia se citan en el chat en su momento (*«Open Sheet 22B…»*).
 
+
+### 6.1 Ficha de variedad (idea #7 del backlog, 21-10-2026)
+
+Cada sala se diseña en detalle al construirla, **cumpliendo esta ficha**. Si un diseño necesita apartarse de ella, se reajusta la ficha entera con el Operador para que las reglas sigan cumpliéndose.
+
+| Est. | Sala | Interacción principal | Sentido | Dificultad (1–5) | Cómo termina |
+| :---: | :--- | :--- | :--- | :---: | :--- |
+| 20 | The Gate of a Thousand Masks | Comparar simetrías + **dibujar** a mano | Vista | 3 | Palabra tecleada (SILVER) y dibujo |
+| 21 | The Camera Obscura | **Girar** la proyección y **señalar** en la imagen | Vista | 2 | Señalar un lugar |
+| 22 | The Whispering Gallery | **Escuchar** en estéreo en los focos y **tocar** la melodía en espejo | **Oído** | 4 | Tocar notas (y la ecuación de J) |
+| 23 | The Automaton Orchestra | **Colocar** púas en la rejilla del cilindro según la partitura | **Oído** + vista | 2 | Los autómatas tocan la canción |
+| 24 | The Fly Tower | **Tiempo real**: arrastrar contrapesos contra el reloj | Tacto / reflejos | 4 | Escena equilibrada (y la ecuación de Q) |
+| 25 | The Shadow Theatre | **Secuencia de escenas**: mover figuras y lámparas siguiendo el guion | Vista | 3 | Palabra tecleada (lo que dicen las sombras) |
+| 26 | The Hall of Mirrors | **Laberinto**: moverse entre reflejos (flechas o toques) | Vista / espacio | 5 | Llegar a la salida (el reflejo de Pope-E) |
+| 27 | The Kaleidoscope Lantern | **Girar y alinear** cristales para que la luz deletree | Vista / color | 2 | Palabra tecleada (y la ecuación de X) |
+| 28 | The Stage of the Mirror Speaker | **Encajar** los nueve fragmentos en el marco | Vista | 3 | El espejo completo muestra el WHERE (sin teclear) |
+
+**Reglas de variedad (Operador, 21-10-2026)**
+- **Nunca dos seguidas iguales**: dos salas consecutivas no comparten interacción principal (dibujar → girar/señalar → escuchar/tocar → colocar → tiempo real → secuencia → laberinto → girar/alinear → encajar).
+- **No todo acaba en escribir**: como mucho la mitad termina tecleando. Hoy son 3 de 9 (20, 25 y 27); el resto acaba con una acción.
+- **Curva de dificultad**: una sala suave después de cada sala dura (2 tras 3, 4 o 5), con el pico en la 26 y un final ceremonial (28) que no es un examen.
+- **Sonido y tiempo real**: al menos dos salas de sonido (22 y 23) y una en tiempo real (24). Las de sonido necesitan un camino para jugar sin audio (subtítulos o partitura visible) y respetan el altavoz del sonido ambiental (#4).
+- Todas llevan la escalera de pistas (#6), su cama de sonido ambiental (#4) y sus horas de pausa tras el fragmento anterior (#3; el ritmo de §8 sugiere 3–8 h por sala).
+
 ---
 
 ## 7. Personajes del Stage Path
