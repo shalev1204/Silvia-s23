@@ -736,9 +736,15 @@ def test_polybius_stele(browser):
     check(modal_open() and js("document.querySelector('#stele-knock-game .monolith-game-inner').inert") is True
           and js("document.querySelector('#stele-fire-game .monolith-game-inner').inert") is True,
           "after 6 h it opens, the knocks and the atrium locked until the proverb")
-    for words in ["STARS GUIDE THOSE WHO SEEK", "STARS GUIDE THOSE WHO SEEK TRUTHS", "GUIDE STARS THOSE WHO SEEK TRUTH"]:
+    wrong = ["STARS GUIDE THOSE WHO SEEK", "STARS GUIDE THOSE WHO SEEK TRUTHS", "GUIDE STARS THOSE WHO SEEK TRUTH"]
+    for words in wrong:
         page.fill("#stele-key-input", words); page.click("#btn-stele-speak"); page.wait_for_timeout(120)
-    check(get("order_stele_hint") == "true" and get("order_stele_awake") is None, "3 wrong proverbs unlock the hint, the stele stays still")
+    check(get("order_hint_s18-proverb_level") == "1" and get("order_stele_hint") is None
+          and "note 1 of 3" in js("document.querySelector('#stele-key-feedback + .hint-ladder').textContent"),
+          "3 wrong proverbs: Hermes's first note under the stele")
+    for words in wrong:
+        page.fill("#stele-key-input", words); page.click("#btn-stele-speak"); page.wait_for_timeout(120)
+    check(get("order_stele_hint") == "true" and get("order_stele_awake") is None, "6 wrong proverbs unlock the older hint, the stele stays still")
     page.fill("#stele-key-input", "stars, guide those who seek truth!"); page.click("#btn-stele-speak"); page.wait_for_timeout(300)
     check(get("order_stele_awake") == "true" and "348" in js("document.getElementById('stele-telem-proverb').innerText"),
           "the proverb (any case and punctuation) turns the stele: 348° NNW")
@@ -777,7 +783,8 @@ def test_polybius_stele(browser):
     check(js("window.__stele.state().knocks") == 1 and "not in the order" in js("document.getElementById('stele-knock-feedback').innerText"),
           "SEEK knocked without the mirage is not understood")
     js(f"window.__stele.answer({json.dumps(knocks('HERMES', True))})")
-    check(js("window.__stele.state().knocks") == 1 and get("order_stele_knock_hint") == "true", "a third miss (his name) unlocks the hint")
+    check(js("window.__stele.state().knocks") == 1 and get("order_hint_s18-knocks_level") == "1" and get("order_stele_knock_hint") is None,
+          "a third miss (his name): Hermes's first note, not yet the law")
     # the real knock pad: Knock, Pause, Knock... then Send
     js("window.__stele.stop()")
     for i, count in enumerate(knocks("SEEK", True)):
@@ -803,6 +810,8 @@ def test_polybius_stele(browser):
     js("window.__stele.stop()")
     js("window.__stele.read('FSI')")
     check(js("window.__stele.state().knocks") == 3 and get("order_stele_knock_fails") == "4", "WELL read; ASH read without the mirage (FSI) is refused")
+    js("window.__stele.read('ASK')"); js("window.__stele.read('ASP')")
+    check(get("order_stele_knock_hint") == "true" and get("order_hint_s18-knocks_level") == "2", "6 misses copy the law beside the stone")
     js("window.__stele.read('ash')")
     st = js("window.__stele.state()")
     check(st["knocks"] == 4 and st["run"] == {"x": 4, "y": 8, "t": 0} and js("document.querySelector('#stele-fire-game .monolith-game-inner').inert") is False,
@@ -828,11 +837,17 @@ def test_polybius_stele(browser):
           "a burning flagstone cannot be entered")
     js("window.__stele.move(0, 0)")
     check(run()["t"] == 0 and get("order_stele_fire_fails") == "2", "standing on the mats as the fire arrives: caught")
-    js("window.__stele.move(0, -1)")
-    for _ in range(6):
-        js("window.__stele.move(0, 0)")
-    check(get("order_stele_fire_fails") == "3" and get("order_stele_fire_hint") == "true" and js("[...document.querySelectorAll('#stele-atrium text')].length") > 10,
-          "three failed crossings: every flagstone shows when it catches")
+    def caught():   # one step north, then wait on the mats until the fire takes Hermes
+        js("window.__stele.move(0, -1)")
+        for _ in range(6):
+            js("window.__stele.move(0, 0)")
+    caught()
+    check(get("order_stele_fire_fails") == "3" and get("order_hint_s18-fire_level") == "1" and get("order_stele_fire_hint") is None,
+          "three failed crossings: Hermes's first note, the flagstones not yet numbered")
+    for _ in range(3):
+        caught()
+    check(get("order_stele_fire_fails") == "6" and get("order_stele_fire_hint") == "true" and js("[...document.querySelectorAll('#stele-atrium text')].length") > 10,
+          "six failed crossings: every flagstone shows when it catches")
     for dx, dy in moves:
         js(f"window.__stele.move({dx}, {dy})")
     page.wait_for_timeout(500)

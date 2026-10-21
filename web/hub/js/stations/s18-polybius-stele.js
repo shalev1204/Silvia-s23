@@ -34,7 +34,6 @@
       };
       const PROVERB = 'STARS GUIDE THOSE WHO SEEK TRUTH';
       const PROVERB_LETTERS = PROVERB.replace(/ /g, '');
-      const HINT_AFTER_FAILS = 3;
 
       // ---- The founders' grid of Sheet 17A: PHOENIX first, then the rest of the alphabet (no J) ----
       const GRID = 'PHOENIXABCDFGKLMQRSTUVWYZ';
@@ -131,6 +130,36 @@
       const knocksDone = () => (isDone() ? STANZAS.length : Math.max(0, Math.min(STANZAS.length, parseInt(get(KEYS.knocks) || '0', 10) || 0)));
       const fireOpen = () => knocksDone() >= STANZAS.length;
       const soundOn = () => get(KEYS.sound) !== 'off';
+
+      // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
+      const hints = window.EclipseHints;
+      const proverbHints = hints.define({
+        id: 's18-proverb', station: 'Station 18', title: 'the proverb of the stele', group: 'desert',
+        anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
+        texts: [
+          'Every pair of numbers in the six stanzas of Sheet 17A points to one square of the grid above them. One square, one letter.',
+          'I wrote down how to read the stanzas, and how the mirage turns some of them round. It is in Ask Hermes: "How do I read the stanzas of Sheet 17A?"',
+          'Let us read the first letter together. Stanza I is a solar stanza, so its first pair, (IV, IV), means row IV, then column IV: that square holds S. Go on along stanza I, and when you reach stanza II, remember that its first number is the column.'
+        ]
+      });
+      const knockHints = hints.define({
+        id: 's18-knocks', station: 'Station 18', title: 'the knocks in the stone', group: 'desert',
+        anchor: el.knockFeedback, solved: fireOpen, active: isAwake, legacyKey: KEYS.knockHint,
+        texts: [
+          'Count every group of knocks; the chalk on the floor keeps the count for you. Two groups make one letter, in the same grid as the stanzas of Sheet 17A.',
+          'I copied the Law of Sheet 17A beside the stone, and my longer note is in Ask Hermes: "How do I read the Servant\'s knocks?"',
+          'Let us read his first letter together. In stanza I he knocked five, then three. Stanza I is solar: row V, column III, and that square holds W. Read the next two letters the same way. When the stanza is yours, it is stanza II, lunar: knock the column first.'
+        ]
+      });
+      const fireHints = hints.define({
+        id: 's18-fire', station: 'Station 18', title: 'the burning atrium', group: 'desert',
+        anchor: el.moveFeedback, solved: isDone, active: fireOpen, legacyKey: KEYS.fireHint,
+        texts: [
+          'Watch the fire, not only the hatch. Glowing flagstones catch on the next turn, bare stone never burns, and a flagstone that has burnt out is ash.',
+          'Now every flagstone shows in how many turns it will catch. My longer note is in Ask Hermes: "How do I cross the burning atrium?"',
+          'Let us take the first steps together. From the side door, without waiting, go up three flagstones, then one to the right: that one is bare stone, and the fire cannot reach you there. From it, look further north for the next bare stone, and remember that the last stretch to the hatch is walked on ash.'
+        ]
+      });
 
       let heard = [];        // the groups chalked on the floor, as they are knocked
       let reply = [];        // Silvia's answer: groups of knocks
@@ -304,7 +333,7 @@
       function knockFail() {
         const fails = (parseInt(get(KEYS.knockFails) || '0', 10) || 0) + 1;
         set(KEYS.knockFails, String(fails));
-        if (fails >= HINT_AFTER_FAILS) set(KEYS.knockHint, 'true');
+        knockHints.fail();
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
       }
       function readWord() {
@@ -493,8 +522,9 @@
       function lose(why) {
         const fails = (parseInt(get(KEYS.fireFails) || '0', 10) || 0) + 1;
         set(KEYS.fireFails, String(fails));
-        const hinted = fails >= HINT_AFTER_FAILS && get(KEYS.fireHint) !== 'true';
-        if (fails >= HINT_AFTER_FAILS) set(KEYS.fireHint, 'true');
+        const before = fireHints.level();
+        fireHints.fail();
+        const hinted = before < 2 && fireHints.level() >= 2;
         run = newRun();
         if (el.fireInner) { el.fireInner.classList.remove('laby-flash'); void el.fireInner.offsetWidth; el.fireInner.classList.add('laby-flash'); }
         feedback(el.moveFeedback, why === 'fire'
@@ -535,12 +565,8 @@
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
-            set(KEYS.hint, 'true');
-            feedback(el.keyFeedback, 'The stele does not move. Hermes left you a note in Ask Hermes about reading the stanzas.', 'error');
-          } else {
-            feedback(el.keyFeedback, 'The stele does not move. Read the six stanzas of Sheet 17A again, and mind the mirage.', 'error');
-          }
+          feedback(el.keyFeedback, 'The stele does not move. Read the six stanzas of Sheet 17A again, and mind the mirage.', 'error');
+          proverbHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
@@ -589,6 +615,7 @@
           el.hint.textContent = hint;
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        proverbHints.refresh(); knockHints.refresh(); fireHints.refresh();
       }
 
       // ---- Controls ----
