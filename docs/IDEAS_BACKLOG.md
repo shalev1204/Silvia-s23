@@ -11,7 +11,7 @@
 | 2 | Diario de campo automático (pestaña) | M | alto | **Implementada (21-10-2026)**: cuaderno de Hermes al pie de Chronicles (`web/hub/js/field-journal.js`) |
 | 3 | Momentos de pausa tras cada fragmento | S | medio | **Mecanismo implementado (21-10-2026)**: `web/hub/js/stage-pause.js`; las horas de cada sala se fijan al construirla |
 | 4 | Sonido ambiental por estación | M | alto | **Implementada (21-10-2026)**: `web/hub/js/ambience.js` |
-| 5 | Háptica en móvil | S | medio | No existe (`navigator.vibrate`: 0 usos) |
+| 5 | Háptica en móvil | S | medio | **Descartada (21-10-2026)**: la vibración web no funciona en iPhone ni iPad |
 | 6 | Pistas progresivas en 3 niveles | L | alto | **Implementada en Cairn I y Estaciones 10–20 (21-10-2026)**; las 21–28 nacerán con ella |
 | 7 | Variedad de mecánicas en 21–28 | M | alto | Ya fijado en `STAGE_PATH_BIBLE.md` §6; falta cerrar cada diseño |
 | 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | No existe (varios juegos web ya se apoyan en la hoja, ninguno exige un dato exclusivo del papel) |
@@ -121,8 +121,8 @@
 
 **Verificación**: `web_smoke.py --only ambience` (sección 21): sin cama en el mapa y altavoz visible; los Cuatro Pozos suenan con su cama; cerrar uno y abrir otro cambia de cama; el altavoz, por encima del juego, lo silencia y se recuerda al recargar; sin juego abierto, silencio. Revisado a 1280 y 390 px. (Que suene bien solo se puede comprobar escuchándolo: pendiente de oído del Operador.)
 
-### 5. Háptica en móvil (S)
-Pendiente de especificar.
+### 5. Háptica en móvil (S) · descartada (21-10-2026)
+**Decisión del Operador (21-10-2026)**: descartada. `navigator.vibrate` solo existe en Android; Safari de iPhone e iPad lo ignora, y Silvia juega en esos dispositivos. Se valoró sustituirla por un pulso visual y no se quiso.
 
 ### 6. Pistas progresivas en 3 niveles (L) · implementada en Cairn I y 10–20 (21-10-2026)
 **Decisiones del Operador (21-10-2026)**
