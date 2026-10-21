@@ -15,7 +15,7 @@
 | 6 | Pistas progresivas en 3 niveles | M | alto | Parcial: «pista tras 3 fallos» + *Ask Hermes* en cada estación |
 | 7 | Variedad de mecánicas en 21–28 | M | alto | Ya fijado en `STAGE_PATH_BIBLE.md` §6; falta cerrar cada diseño |
 | 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | No existe (varios juegos web ya se apoyan en la hoja, ninguno exige un dato exclusivo del papel) |
-| 9 | Modo «ojo de Operador» | S | medio | Parcial: panel *Tester controls* (saltar, completar, reiniciar); no hay vista de progreso ni atascos de Silvia |
+| 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
 | 10 | Pistas sutiles de Pope-E en retrospectiva | M | alto | Parcial: nota 1 (Estación 20). Plan de pistas en `STAGE_PATH_BIBLE.md` §9 |
 | 11 | Mirror Speaker que reacciona al estilo de juego | M | alto | No existe |
 | 12 | Cartas de Aurelia desbloqueables en el Hub | S | medio | No existe (los cuadernos I–III son caras 21A, 23B, 25B) |
@@ -82,8 +82,17 @@ Pendiente de especificar.
 ### 8. Puzzle meta con las hojas físicas (M)
 Pendiente de especificar.
 
-### 9. Modo «ojo de Operador» (S)
-Pendiente de especificar.
+### 9. Modo «ojo de Operador» (S) · especificada e implementada como informe de Claude (21-10-2026)
+**Decisión del Operador (21-10-2026)**: **no quiere panel**. Pregunta a Claude («¿dónde va Silvia?») y Claude lee Supabase con el conector y le resume dos cosas:
+- **Dónde está ahora**: estaciones completadas, paso del Field Wire y del amanecer, sellos, reliquias, último guardado y última sesión.
+- **Cómo juega**: respuestas elegidas en el Field Wire (`order_field_wire_choices`), pistas desbloqueadas (`*_hint`) e intentos fallidos (`*_fails`) que ya guardan las estaciones; con la #6 habrá más detalle.
+
+**Cómo hace Claude el informe** (proyecto `aoochekcbugawaurllco`, solo lectura):
+1. Último guardado: `select saved_at, progress from eclipse_saves where seeker='silvia' order by saved_at desc limit 1;` y de ahí las claves `order_*_completed` de cada estación (tabla de claves en `docs/WEB_ECOSYSTEM.md`), `order_field_wire_step`, `order_dawn_step`, `order_seal_cairn_1..5`, `order_inventory_relics`, `*_hint`, `*_fails`, `order_field_wire_choices`.
+2. Línea de tiempo: `select client_at, key, value from eclipse_events where seeker='silvia' and kind='key' and key ~ '(_completed|_march_start|_hint)$' order by client_at;` (cuándo abrió y terminó cada estación) y las sesiones: `kind='session'`.
+3. Resumir en español, sin volcar valores crudos; los datos son de Silvia y no se borran nunca sin orden del Operador.
+
+**Descartado**: panel en el Hub, página `/operator.html`, contraseña del Operador, avisos por email (el Operador no los marcó).
 
 ### 10. Pistas sutiles de Pope-E (M)
 Pendiente de especificar.
