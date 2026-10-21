@@ -709,6 +709,16 @@
             reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen']); }
           }
         ];
+        // A reset game also forgets the hints its puzzles had climbed to (hub/js/hint-ladder.js)
+        const HINT_PREFIX = { cairn1: 'cairn1-', chasm: 's10-', playa: 's11-', lexicon: 's12-', clepsydra: 's13-' };
+        GAMES.forEach((g) => {
+          const reset = g.reset;
+          if (!reset) return;
+          g.reset = function () {
+            reset.call(this);
+            if (window.EclipseHints) window.EclipseHints.reset(HINT_PREFIX[g.id] || g.id + '-');
+          };
+        });
 
         const isDone = (id) => { const g = GAMES.find((x) => x.id === id); return !!(g && g.flag && get(g.flag) === 'true'); };
 
@@ -5253,7 +5263,12 @@
         { id: 'astrolabe', label: 'The Astrolabe' },
         { id: 'workshop', label: 'The Workshop' }
       ];
+      // Hermes's notes from the hint ladder (hub/js/hint-ladder.js) join the list once the first is unlocked
+      function allInquiries() {
+        return FIELD_INQUIRIES.concat(window.EclipseHints ? window.EclipseHints.inquiries() : []);
+      }
       function isInquiryUnlocked(inq) {
+        if (typeof inq.unlocked === 'function') return inq.unlocked();
         if (!inq.requires) return true;
         const rule = INQUIRY_UNLOCKS[inq.requires];
         if (!rule) return true;
@@ -7559,7 +7574,7 @@
       function renderInquiryFilterBar() {
         const filterBar = document.getElementById('inquiry-filter-bar');
         if (!filterBar) return;
-        const visibleList = FIELD_INQUIRIES.filter(i => isInquiryUnlocked(i));
+        const visibleList = allInquiries().filter(i => isInquiryUnlocked(i));
         filterBar.innerHTML = INQUIRY_GROUPS.map((g) => {
           const count = g.id === 'all' ? visibleList.length : visibleList.filter(i => i.group === g.id).length;
           return `<button type="button" class="inquiry-filter-pill${g.id === currentInquiryFilter ? ' active' : ''}" data-filter="${g.id}">${g.label} (${count})</button>`;
@@ -7574,7 +7589,7 @@
 
         const query = currentInquirySearch.trim().toLowerCase();
         // Only visible, unlocked inquiries are displayed (no spoilers or locked placeholders)
-        const visibleList = FIELD_INQUIRIES.filter(inq => isInquiryUnlocked(inq));
+        const visibleList = allInquiries().filter(inq => isInquiryUnlocked(inq));
         const filtered = visibleList.filter((inq) => {
           if (filter !== 'all' && inq.group !== filter) return false;
           if (!query) return true;
@@ -7650,7 +7665,7 @@
         // Keep the "answered" counter in step with the read state
         const progressEl = document.getElementById('inquiry-progress');
         if (progressEl) {
-          const visibleList = FIELD_INQUIRIES.filter(i => isInquiryUnlocked(i));
+          const visibleList = allInquiries().filter(i => isInquiryUnlocked(i));
           const answered = visibleList.filter(i => readInquiriesSet.has(i.id)).length;
           progressEl.textContent = answered + ' / ' + visibleList.length + ' ANSWERED';
         }

@@ -22,6 +22,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  14. Station 20 (The Gate of a Thousand Masks): departure, 18-hour crossing, word, drawing by hand, Fragment I, debrief.
  15. Cloud save (against a fake Supabase): snapshot and events on every change, recovery in an empty browser,
      nothing sent while the cloud is unreachable or on a local copy, a profile switch is not reported as progress.
+ 16. Hint ladder: hints climb with time on screen (not off it), stay in Ask Hermes, and a tester reset clears them.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1170,19 +1171,33 @@ def test_masks_gate(browser):
     js("window.selectStageStation(40)"); page.wait_for_timeout(500)
     check(modal_open() and js("document.querySelector('#masks-draw-game .monolith-game-inner').inert") is True,
           "they arrive: the gate opens its modal, the drawing locked until the word")
-    for word in ["SILVIA", "MASKS", "SILVERS"]:
-        page.fill("#masks-key-input", word); page.click("#btn-masks-speak"); page.wait_for_timeout(120)
-    check(get("order_masks_hint") == "true" and get("order_masks_gate_awake") is None, "3 wrong words unlock the hint, the gate stays shut")
+    notes = lambda anchor: js(f"(() => {{ const b = document.getElementById('{anchor}').nextElementSibling; return b && b.classList.contains('hint-ladder') && b.offsetParent ? b.querySelectorAll('.hint-ladder-note').length : 0; }})()")
+
+    def wrong_words(n):
+        for k in range(n):
+            page.fill("#masks-key-input", ["SILVIA", "MASKS", "SILVERS"][k % 3]); page.click("#btn-masks-speak"); page.wait_for_timeout(100)
+    wrong_words(3)
+    check(notes("masks-key-feedback") == 1 and get("order_masks_hint") is None and get("order_masks_gate_awake") is None,
+          "3 wrong words: Hermes's first note appears under the word, the gate stays shut")
+    wrong_words(3)
+    check(notes("masks-key-feedback") == 2 and get("order_masks_hint") == "true", "6 wrong words: the second note opens the Ask Hermes answer")
+    wrong_words(3)
+    check(notes("masks-key-feedback") == 3 and "Top left" in js("document.getElementById('masks-key-feedback').nextElementSibling.innerText"),
+          "9 wrong words: the third note does the first two masks with her, never the word")
     page.fill("#masks-key-input", " sil-ver "); page.click("#btn-masks-speak"); page.wait_for_timeout(250)
-    check(get("order_masks_gate_awake") == "true", "the word SILVER, typed loosely, opens the gate")
+    check(get("order_masks_gate_awake") == "true" and notes("masks-key-feedback") == 0, "the word SILVER, typed loosely, opens the gate and the notes go")
 
     js("window.__masks.drawHalf()"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
     check("missing" in feedback("masks-draw-feedback") and js("window.__masks.carved()") == 0, "an outline without its eye is refused")
     js("window.__masks.drawWrong()"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
     check(js("window.__masks.carved()") == 0, "the carved half drawn again on its own side is refused")
     page.click("#btn-masks-clear"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
+    check(notes("masks-draw-feedback") == 1 and js("getComputedStyle(document.getElementById('masks-help-row')).display") == "none",
+          "after three tries Hermes's first note appears, the guide not yet")
+    for _ in range(3):
+        page.click("#btn-masks-hold"); page.wait_for_timeout(120)
     check(get("order_masks_draw_hint") == "true" and js("getComputedStyle(document.getElementById('masks-help-row')).display") != "none",
-          "after three tries the guide appears, and the Mirror Speaker offers to carve it")
+          "after six tries the guide appears, and the Mirror Speaker offers to carve it")
 
     # A shaking hand: the true half drawn by the real mouse, each point off by a few units
     box = page.locator("#masks-canvas").bounding_box()
@@ -1234,6 +1249,33 @@ def test_masks_gate(browser):
     check(modal_open() and js("getComputedStyle(document.getElementById('masks-victory')).display") != "none",
           "after a reload the gate stays open")
     check(not errors, "no JS errors at the gate", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+def test_hint_ladder(browser):
+    print("\n16. Hints climb by time too, wait off screen, live on in Ask Hermes and go with a tester reset")
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles", "order_hint_s20-word_secs": "596"})
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    get = lambda key: js("k => localStorage.getItem(k)", key)
+    notes = lambda: js("(() => { const b = document.getElementById('masks-key-feedback').nextElementSibling; return b && b.classList.contains('hint-ladder') && b.offsetParent ? b.querySelectorAll('.hint-ladder-note').length : 0; })()")
+    js("window.openMasksModal()")
+    page.wait_for_timeout(6500)
+    check(notes() == 1 and get("order_hint_s20-word_level") == "1", "ten minutes stuck on the word bring Hermes's first note")
+    js("window.closeMasksModal()")
+    # 20 min = 1200 s. At most one 5 s tick lands while the modal fades out; 20 s more on screen would cross it
+    js("localStorage.setItem('order_hint_s20-word_secs', '1185')")
+    page.wait_for_timeout(20000)
+    check(get("order_hint_s20-word_level") == "1", "time with the puzzle closed does not count")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
+    js("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(600)
+    grid = js("document.getElementById('inquiries-questions-grid').innerText")
+    check("notes · Station 20, the word of the gate" in grid and "the missing halves" not in grid,
+          "Ask Hermes keeps the notes she has unlocked, and only those")
+    js("TesterDesert.replayFrom('s20')")
+    check(get("order_hint_s20-word_level") is None and get("order_hint_s20-word_secs") is None, "a tester reset of Station 20 forgets its hints")
+    check(not errors, "no JS errors with the hint ladder", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
 
@@ -1335,9 +1377,10 @@ SECTIONS = {
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
     "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
+    "hints": test_hint_ladder,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

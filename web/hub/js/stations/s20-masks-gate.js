@@ -24,7 +24,6 @@
         drawHint: 'order_masks_draw_hint'
       };
       const WORD = 'SILVER';
-      const HINT_AFTER_FAILS = 3;
       const NODE = 40;
 
       // ---- The masks: right halves in mask units (x ≥ 0 from the axis, y down from the centre) ----
@@ -80,7 +79,27 @@
       const isDone = () => get(KEYS.done) === 'true';
       const carved = () => (isDone() ? MASKS.length : Math.max(0, Math.min(MASKS.length, parseInt(get(KEYS.carved) || '0', 10) || 0)));
       const drawFails = () => parseInt(get(KEYS.drawFails) || '0', 10) || 0;
-      const guideShown = () => drawFails() >= HINT_AFTER_FAILS;
+      // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
+      const hints = window.EclipseHints;
+      const wordHints = hints.define({
+        id: 's20-word', station: 'Station 20', title: 'the word of the gate', group: 'stage',
+        anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
+        texts: [
+          'The sheet already gives you the rule, Silvia: a true face is the same on both sides. Forget the letters for a moment and look only at the faces, one at a time.',
+          'I wrote down how to catch a mask that lies. It is in Ask Hermes: "How do I find the masks that lie on Sheet 19B?"',
+          'Let us do the first two together. Top left: diamonds on both cheeks, both brows, both eyes alike. It tells the truth, so its letter stays out. The one beside it has a tear on one cheek only: it lies, and its letter is the first of the word. Go on from the third mask, row by row.'
+        ]
+      });
+      const halfHints = hints.define({
+        id: 's20-halves', station: 'Station 20', title: 'the missing halves', group: 'stage',
+        anchor: el.drawFeedback, solved: isDone, active: isAwake, legacyKey: KEYS.drawHint,
+        texts: [
+          'Do not copy the gold half as it is: the mirror turns it round. A curve that bends left on the gold side bends right on yours.',
+          'The Mirror Speaker has breathed on the glass: a faint guide shows where the lines go. If your hand will not obey, she can carve the half for you.',
+          'Start with the outline alone. Put your finger where the gold edge meets the dotted line at the top and go down on your side, always as far from the line as the gold edge is on its own. Then the eye, at the same height as the gold one. Then the brow.'
+        ]
+      });
+      const guideShown = () => halfHints.level() >= 2;
       let strokes = [];       // Silvia's lines for the current mask, in mask units
       let current = null;     // the line being drawn
       let revealed = false;   // the current mask has just been carved true (shown for a moment)
@@ -232,19 +251,15 @@
         const mask = MASKS[maskIdx()];
         const res = judge(mask);
         if (res.ok) { carveTrue(); return; }
-        const fails = drawFails() + 1;
-        set(KEYS.drawFails, String(fails));
+        set(KEYS.drawFails, String(drawFails() + 1));
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         let msg;
         if (res.empty) msg = 'The mirror shows nothing yet. Draw the missing half on the glass, to the right of the dotted line.';
         else if (res.precise < NEED_PRECISE) msg = 'The mirror shows lines the carved half does not have. Rub them out and follow the gold more closely.';
         else if (res.worst < NEED_EACH) msg = 'Something is missing: every line of the carved half needs its twin in the glass.';
         else msg = 'Close, but the face does not close yet. Reach a little further along each line.';
-        if (fails === HINT_AFTER_FAILS) {
-          set(KEYS.drawHint, 'true');
-          msg += ' The Mirror Speaker has breathed on the glass: a faint guide shows where the lines go.';
-        }
         feedback(el.drawFeedback, msg, 'error');
+        halfHints.fail();
         render();
       }
       function carveTrue() {
@@ -275,7 +290,7 @@
           if (modal.style.display !== 'none' && el.hold && !el.hold.disabled) el.hold.focus();   // keyboard users keep their place
         }, 1300);
       }
-      // After three tries, anyone (a keyboard, a shaking hand) may let the Mirror Speaker carve the half
+      // From hint level 2, anyone (a keyboard, a shaking hand) may let the Mirror Speaker carve the half
       function letSpeakerCarve() {
         if (!canDraw() || !guideShown()) return;
         strokes = MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(1)));
@@ -334,15 +349,10 @@
         const typed = letters(el.keyInput && el.keyInput.value);
         if (!typed) { feedback(el.keyFeedback, 'Type the six letters from Sheet 19B.', 'error'); return; }
         if (typed !== WORD) {
-          const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
-          set(KEYS.fails, String(fails));
+          set(KEYS.fails, String((parseInt(get(KEYS.fails) || '0', 10) || 0) + 1));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
-            set(KEYS.hint, 'true');
-            feedback(el.keyFeedback, 'The masks stay still. Hermes left you a note in Ask Hermes about the masks that lie.', 'error');
-          } else {
-            feedback(el.keyFeedback, 'The masks stay still. Look again at the two halves of each mask on Sheet 19B.', 'error');
-          }
+          feedback(el.keyFeedback, 'The masks stay still. Look again at the two halves of each mask on Sheet 19B.', 'error');
+          wordHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
@@ -357,6 +367,7 @@
 
       function render() {
         const awake = isAwake(), done = isDone(), n = carved();
+        wordHints.refresh(); halfHints.refresh();
         if (el.count) el.count.textContent = done ? 'All three masks whole' : 'Mask ' + (shownIdx() + 1) + ' of ' + MASKS.length;
         [el.undo, el.clear].forEach((b) => { if (b) b.disabled = !awake || done || revealed || !strokes.length; });
         if (el.hold) el.hold.disabled = !awake || done || revealed;

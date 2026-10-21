@@ -12,7 +12,7 @@
 | 3 | Momentos de pausa tras cada fragmento | S | medio | No existe |
 | 4 | Sonido ambiental por estación | M | alto | Hay Web Audio en varias salas (tormenta, Cairn IV, Estela); no hay bucle ambiental por ruta |
 | 5 | Háptica en móvil | S | medio | No existe (`navigator.vibrate`: 0 usos) |
-| 6 | Pistas progresivas en 3 niveles | M | alto | Parcial: «pista tras 3 fallos» + *Ask Hermes* en cada estación |
+| 6 | Pistas progresivas en 3 niveles | L | alto | **Especificada (21-10-2026)**, en implementación: motor común + Estaciones 10–20 (luego 21–28) |
 | 7 | Variedad de mecánicas en 21–28 | M | alto | Ya fijado en `STAGE_PATH_BIBLE.md` §6; falta cerrar cada diseño |
 | 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | No existe (varios juegos web ya se apoyan en la hoja, ninguno exige un dato exclusivo del papel) |
 | 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
@@ -73,8 +73,23 @@ Pendiente de especificar.
 ### 5. Háptica en móvil (S)
 Pendiente de especificar.
 
-### 6. Pistas progresivas en 3 niveles (M)
-Pendiente de especificar.
+### 6. Pistas progresivas en 3 niveles (L) · especificada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Llegan solas, por fallos o por tiempo**: nivel 1 tras 3 fallos o 10 min atascada; nivel 2 tras 6 fallos o 20 min; nivel 3 tras 9 fallos o 35 min. Silvia no tiene que pedirlas.
+- **Método, nunca la respuesta**: 1 = hacia dónde mirar; 2 = qué regla usar; 3 = el primer paso hecho con ella. Silvia sigue resolviendo sola.
+- **Las da Hermes dentro del juego**: una nota suya en el propio modal de la estación; queda guardada en *Ask Hermes* para releerla.
+- **Alcance: todas las estaciones, 10–28** (también las del desierto y el Cairn I).
+
+**Diseño técnico**
+- Motor común `web/hub/js/hint-ladder.js` (`window.EclipseHints`), cargado antes de `hub-core.js`. Cada puzzle de cada estación se declara con un id (`s20-word`, `s20-halves`, …), sus tres textos y dónde se pinta la nota.
+- Estado por puzzle en `localStorage`: `order_hint_<id>_fails`, `order_hint_<id>_secs` (tiempo **activo**: solo con el puzzle abierto y la pestaña visible; se guarda cada minuto, no a cada segundo, para no llenar la nube) y `order_hint_<id>_level` (0–3). Viaja a Supabase con el guardado (#19), así el informe de la #9 sabe qué pistas usó.
+- **Nivel 2 = la ayuda que ya existía**: al llegar al nivel 2 se activa la clave antigua (`order_masks_hint`, `order_labyrinth_torch_hint`, …), con lo que aparece la pregunta de *Ask Hermes* o la guía visual que ya estaban escritas y revisadas. Los niveles 1 y 3 son textos nuevos.
+- Las Estaciones 10–13 y el Cairn I no tenían pistas: llevan los tres niveles nuevos y su detección de fallos.
+- *Ask Hermes*: una entrada por puzzle («Hermes's notes · …») con los niveles desbloqueados.
+- Tester: «Play this game» y los reinicios borran también las pistas de esa estación y las siguientes.
+- Reglas: inglés para Silvia, voz de Hermes, Regla 9 (nunca valores de letras), sin el DÓNDE ni Pope-E.
+
+**Verificación**: smoke `hints` (fallos → niveles 1, 2 y 3, la nota en el modal y en *Ask Hermes*; tiempo simulado; el reinicio del tester las borra) y las secciones de cada estación siguen verdes.
 
 ### 7. Variedad de mecánicas en 21–28 (M)
 Pendiente de especificar.
