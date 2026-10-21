@@ -81,6 +81,12 @@
         const st = window.StageMirror.stations.find((x) => x.node === node);
         if (!st) return;
         if (typeof window.selectMapNode === 'function') window.selectMapNode(node, true);
+        // A pause after the last fragment (hub/js/stage-pause.js): the card shows the hour, the room stays shut
+        const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(node) : '';
+        if (wait && !(typeof window.isAdminTester === 'function' && window.isAdminTester())) {
+          showDesertToast('Station ' + st.station + ' · ' + st.room + ': its door opens in ' + wait + '.');
+          return;
+        }
         const opener = window.STAGE_OPENERS[node];
         if (typeof opener === 'function') opener();
         else showDesertToast('Station ' + st.station + ' · ' + st.room + ': the Mirror Speaker has not opened this room yet.');

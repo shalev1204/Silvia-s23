@@ -1,0 +1,19 @@
+    /* The speaker button of the ambient sound (hub/js/ambience.js, docs/IDEAS_BACKLOG.md #4): above the station games */
+    .ambience-toggle {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 100010;
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(212, 168, 83, 0.55);
+      border-radius: 50%;
+      background: rgba(20, 14, 8, 0.85);
+      font-size: 1.05rem;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0.75;
+      transition: opacity 0.2s ease;
+    }
+    .ambience-toggle:hover, .ambience-toggle:focus-visible { opacity: 1; outline: 2px solid #d4a853; outline-offset: 2px; }
+    .ambience-toggle[aria-pressed="true"] { opacity: 0.55; }

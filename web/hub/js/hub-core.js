@@ -706,7 +706,7 @@
           {
             id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
             complete() { set('order_masks_march_start', '1'); set('order_masks_gate_awake', 'true'); set('order_masks_carved', '3'); set('order_masks_gate_completed', 'true'); },
-            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen']); }
+            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41']); }
           }
         ];
         // A reset game also forgets the hints its puzzles had climbed to (hub/js/hint-ladder.js)
@@ -1591,6 +1591,20 @@
           ];
           rooms.forEach(([node, station, room, sheet, teaser], i) => {
             cards[node] = () => {
+              const card = roomCard();
+              // A pause after the last fragment (hub/js/stage-pause.js): the door stays shut until its hour
+              const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(node) : '';
+              if (!wait) return card;
+              const tester = typeof window.isAdminTester === 'function' && window.isAdminTester();
+              return Object.assign({}, card, {
+                status: 'OPENS IN ' + wait.toUpperCase() + ' ✦',
+                lore: teaser + ' The door of this room opens in ' + wait + '.',
+                btnText: tester ? '⏩ Tester: open it now' : '🔒 Opens in ' + wait,
+                btnDisabled: !tester,
+                action: tester ? () => { window.EclipseStagePause.skip(node); return card.action ? card.action() : null; } : () => null
+              });
+            };
+            const roomCard = () => {
               const builtCard = window.STAGE_CARDS && window.STAGE_CARDS[node];
               if (typeof builtCard === 'function') return builtCard();
               const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][i];
@@ -7021,7 +7035,8 @@
         };
 
         if (wireCurrentStep >= WIRE_LAST_STEP) {
-          showWaypointBar('Fragment I Is Set · 1 of 9', 'Next: The Camera Obscura (Station 21). The Mirror Speaker has not opened that room yet.', WIRE_LAST_STEP);
+          const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(41) : '';
+          showWaypointBar('Fragment I Is Set · 1 of 9', 'Next: The Camera Obscura (Station 21). ' + (wait ? 'Its door opens in ' + wait + '.' : 'The Mirror Speaker has not opened that room yet.'), WIRE_LAST_STEP);
           return;
         }
         if (wireCurrentStep === 8) {

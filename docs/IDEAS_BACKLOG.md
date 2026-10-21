@@ -9,8 +9,8 @@
 |---|------|:---:|:---:|---|
 | 1 | Resumen «Previously on…» al volver | S | alto | **Implementada (21-10-2026)**: `web/hub/js/previously.js` |
 | 2 | Diario de campo automático (pestaña) | M | alto | **Implementada (21-10-2026)**: cuaderno de Hermes al pie de Chronicles (`web/hub/js/field-journal.js`) |
-| 3 | Momentos de pausa tras cada fragmento | S | medio | No existe |
-| 4 | Sonido ambiental por estación | M | alto | Hay Web Audio en varias salas (tormenta, Cairn IV, Estela); no hay bucle ambiental por ruta |
+| 3 | Momentos de pausa tras cada fragmento | S | medio | **Mecanismo implementado (21-10-2026)**: `web/hub/js/stage-pause.js`; las horas de cada sala se fijan al construirla |
+| 4 | Sonido ambiental por estación | M | alto | **Implementada (21-10-2026)**: `web/hub/js/ambience.js` |
 | 5 | Háptica en móvil | S | medio | No existe (`navigator.vibrate`: 0 usos) |
 | 6 | Pistas progresivas en 3 niveles | L | alto | **Implementada en Cairn I y Estaciones 10–20 (21-10-2026)**; las 21–28 nacerán con ella |
 | 7 | Variedad de mecánicas en 21–28 | M | alto | Ya fijado en `STAGE_PATH_BIBLE.md` §6; falta cerrar cada diseño |
@@ -91,11 +91,35 @@
 
 **Verificación**: `web_smoke.py --only notebook` (sección 19): páginas sin fecha para lo ya resuelto y en orden de historia; Estación 12 resuelta en directo con fecha, 2 fallos, el rumbo y su línea del Ledger; Estación 14 con su sello, «first try» y las 2 h desde la llegada; un reinicio del tester la quita; cabe en 390 px. Revisado a 1280 y 390 px.
 
-### 3. Momentos de pausa (S)
-Pendiente de especificar.
+### 3. Momentos de pausa (S) · mecanismo implementado (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Qué es**: una **pausa obligada en el tiempo**: tras ganar cada fragmento del espejo, la sala siguiente de la Torre III no abre hasta pasadas unas horas. **Sin escena de calma** ni texto contemplativo.
+- **Cuánto**: **depende de cada sala**; las horas se fijan con el Operador al diseñar cada sala (21–28), según su historia.
+- **Durante la espera**: candado con cuenta atrás («Opens in 14 h 20 min») en la ficha de la sala y en el aviso de ruta del Field Wire.
 
-### 4. Sonido ambiental por estación (M)
-Pendiente de especificar.
+**Diseño técnico**
+- `web/hub/js/stage-pause.js` (`window.EclipseStagePause`), cargado antes de `hub-core.js`. Tabla `HOURS` por nodo del Escenario (41–48, Estaciones 21–28), hoy toda a `null` (sin espera).
+- La espera cuenta desde que se resolvió la sala anterior, según la página del cuaderno de Hermes (`order_journal`, #2). Sin hora registrada (resuelta antes del cuaderno) no hay espera.
+- Ficha de la sala (`hub-core.js`, tarjetas 40–48): estado «OPENS IN …», botón «🔒 Opens in …» desactivado. `selectStageStation` avisa «its door opens in …» y no abre el juego. El aviso del Field Wire tras el Fragmento I dice «Its door opens in …».
+- Carles: el botón pasa a «⏩ Tester: open it now» y abre al momento (`order_stage_pause_skipped_<nodo>`, que el reinicio de la Estación 20 borra para la sala 41).
+- **Al construir cada sala 21–28**: poner sus horas en `HOURS`, extender el aviso del Field Wire a esa sala y borrar su `order_stage_pause_skipped_<nodo>` en su reinicio del tester.
+
+**Verificación**: `web_smoke.py --only pause` (sección 20): sin horas nada cambia; con 24 h y el Fragmento I hace 1 h, ficha, puerta y Field Wire dicen 23 h; sin Fragmento I no hay espera; Carles la abre al momento.
+
+### 4. Sonido ambiental por estación (M) · implementada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Dónde**: **en cada estación**, mientras su juego está abierto; se apaga al cerrarlo. En el mapa no suena nada.
+- **Origen**: **sintetizado** con Web Audio, sin archivos ni derechos de autor.
+- **Control**: **encendido por defecto a volumen bajo**, tras el primer toque o tecla (lo exigen los navegadores); botón de altavoz siempre visible para silenciarlo, que recuerda la elección.
+
+**Diseño técnico**
+- `web/hub/js/ambience.js` (`window.EclipseAmbience`), estilos en `web/hub/css/ambience.css`.
+- Cada 0,6 s mira qué modal de estación está en pantalla y le pone su «cama», con fundido de 1,5 s. Las camas se componen de piezas: viento (ruido filtrado con vaivén, con eco en cañones), dron, gotas, chasquidos y rumor grave. Ejemplos: Cairn I, viento del cauce seco al alba; 10, cañón con eco; 11, salar con chasquidos de sal; 13, gotas y agua de los Cuatro Pozos; 18, rumor y crepitar del fuego; 19, zumbido de la cámara del Oráculo; 20, dron de teatro con velas.
+- Se suspende con la pestaña oculta. `order_ambience_muted` guarda el silencio (viaja con la nube).
+- Los sonidos propios de cada estación (canto de los pilares, golpes de la Estela, tormenta) son aparte y conservan sus interruptores.
+- **Al construir las salas 21–28**: añadir su cama en `BEDS` con el id de su modal.
+
+**Verificación**: `web_smoke.py --only ambience` (sección 21): sin cama en el mapa y altavoz visible; los Cuatro Pozos suenan con su cama; cerrar uno y abrir otro cambia de cama; el altavoz, por encima del juego, lo silencia y se recuerda al recargar; sin juego abierto, silencio. Revisado a 1280 y 390 px. (Que suene bien solo se puede comprobar escuchándolo: pendiente de oído del Operador.)
 
 ### 5. Háptica en móvil (S)
 Pendiente de especificar.

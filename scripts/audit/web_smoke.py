@@ -26,6 +26,8 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  17. Early hints: Stations 10 to 13 and Cairn I count their misses and show Hermes's first note after three.
  18. «Previously on…»: after 12 hours away the recap tells the last thing, where things stand and what next; Ask Hermes keeps it.
  19. Hermes's Field Notebook: a dated page per solved game (misses, notes, time since arrival, rewards); resets tear it out.
+ 20. Stage Path pauses: after a fragment the next room says when it opens, on its card, at its door and on the Field Wire.
+ 21. Ambient sound: a synthesized bed per station game, silence on the map, a speaker that mutes it and remembers.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1484,6 +1486,69 @@ def test_notebook(browser):
     ctx.close()
 
 
+PAUSE_JS = """() => { const t = (s) => (s || '').replace(/\\u00a0/g, ' ').toLowerCase();
+    return { status: t(document.getElementById('insp-status').textContent), btn: t(document.getElementById('insp-btn-primary').textContent),
+             toast: t((document.getElementById('desert-toast-banner') || {}).textContent) }; }"""
+
+
+def test_stage_pause(browser):
+    print("\n20. Pauses on the Stage Path: after a fragment, the next room opens at its own hour")
+    journal = json.dumps({"s20": {"at": int(time.time() * 1000) - 3600 * 1000, "fails": 0, "notes": 0, "arrived": None}})
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "36",
+            "order_journal": journal}
+    ctx, page, errors = stage_page(browser, seed)
+    js = page.evaluate
+    room = lambda: (page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"), page.wait_for_timeout(400), js(PAUSE_JS))[2]
+    check("not yet" in room()["status"], "with no hours set for the room, nothing changes")
+    js("EclipseStagePause.HOURS[41] = 24")
+    st = room()
+    check("opens in 23 h" in st["status"] and "opens in 23 h" in st["btn"], "a 24-hour pause, one hour after Fragment I: the door opens in 23 h", str(st))
+    js("selectStageStation(41)"); page.wait_for_timeout(300)
+    check("opens in 23 h" in js(PAUSE_JS)["toast"], "knocking on the room tells her when it opens")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
+    wire = js("document.querySelector('#wire-completed-bar .messenger-waypoint-desc').textContent.replace(/\\u00a0/g, ' ')")
+    check("Its door opens in 23 h" in wire, "the Field Wire says the same", wire)
+    js("TesterDesert.replayFrom('s20')")
+    check(js("EclipseStagePause.remaining(41)") == 0, "with Fragment I gone there is nothing to wait for")
+    check(not errors, "no JS errors with the pause", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    ctx, page, errors = stage_page(browser, dict(seed, the_eclipse_active_seeker="Carles"))
+    js = page.evaluate
+    js("EclipseStagePause.HOURS[41] = 24; switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"); page.wait_for_timeout(400)
+    st = js(PAUSE_JS)
+    page.click("#insp-btn-primary"); page.wait_for_timeout(300)
+    check("tester: open it now" in st["btn"] and js("EclipseStagePause.remaining(41)") == 0,
+          "Carles can open the room at once", str(st))
+    ctx.close()
+
+
+def test_ambience(browser):
+    print("\n21. Ambient sound: each station game has its own bed, it stops on close, and the speaker mutes it")
+    ctx, page, errors = new_page(browser, dict(DESERT_BASE, **DESERT_DONE))
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    state = lambda: js("EclipseAmbience.state()")
+    check(state()["bed"] is None and js("document.getElementById('ambience-toggle').getClientRects().length > 0"), "on the map: no bed, the speaker is on screen")
+    page.mouse.click(5, 5)   # the first gesture lets the browser play sound
+    js("window.openOasisClepsydraModal()"); page.wait_for_timeout(1500)
+    st = state()
+    check(st["bed"] == "four wells" and st["running"] and not st["muted"], "the Four Wells play their own bed", str(st))
+    js("window.closeOasisClepsydraModal()"); page.wait_for_timeout(1500)
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(1500)
+    check(state()["bed"] == "salt flat", "closing one game and opening another changes the bed", str(state()))
+    page.click("#ambience-toggle"); page.wait_for_timeout(300)
+    check(state()["muted"] and js("localStorage.getItem('order_ambience_muted')") == "true", "the speaker, above the game, mutes it")
+    js("window.closeSaltPlayaModal()"); page.wait_for_timeout(1500)
+    check(state()["bed"] is None, "with no game open there is silence")
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    check(state()["muted"] and js("document.getElementById('ambience-toggle').getAttribute('aria-pressed')") == "true", "the choice is remembered")
+    check(not errors, "no JS errors with the ambient sound", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1583,10 +1648,11 @@ SECTIONS = {
     "s18": test_polybius_stele, "s19": test_oracle_horizon, "profiles": test_profiles, "tester": test_tester_play,
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
-    "notebook": test_notebook,
+    "notebook": test_notebook, "pause": test_stage_pause,
+    "ambience": test_ambience,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 
