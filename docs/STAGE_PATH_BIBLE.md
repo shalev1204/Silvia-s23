@@ -126,6 +126,23 @@ Cada sala se diseña en detalle al construirla, **cumpliendo esta ficha**. Si un
 - **Sonido y tiempo real**: al menos dos salas de sonido (22 y 23) y una en tiempo real (24). Las de sonido necesitan un camino para jugar sin audio (subtítulos o partitura visible) y respetan el altavoz del sonido ambiental (#4).
 - Todas llevan la escalera de pistas (#6), su cama de sonido ambiental (#4) y sus horas de pausa tras el fragmento anterior (#3; el ritmo de §8 sugiere 3–8 h por sala).
 
+
+### 6.2 Lo que solo el papel sabe (idea #8 del backlog, 21-10-2026)
+
+Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pide, pero no los muestra nunca (ni en las miniaturas de las hojas del Hub, ni en Ask Hermes, ni en las pistas). Se diseñan al dibujar sus hojas.
+
+| Truco | Hoja | Sala que lo pide | Idea |
+| :--- | :--- | :--- | :--- |
+| **Al trasluz** | 23 (23A + 23B) | 25 · The Shadow Theatre | Puesta contra una lámpara, la hoja junta sus dos caras: las figuras de 23A y las marcas de 23B (leídas en espejo) forman la escena o la palabra que la sala pide teclear. Es un teatro de sombras de verdad. |
+| **Doblar** | 24 (24A) | 26 · The Hall of Mirrors | Doblada por el eje marcado (un espejo), las dos mitades del plano se juntan y muestran el único camino o el reflejo que la sala necesita. Sin doblar, el plano engaña. |
+| **Marcas en los márgenes** | 19 a 26 | 28 · The Stage of the Mirror Speaker | Pequeñas marcas repartidas por los márgenes de las ocho hojas que, juntas en orden, dan lo que pide la ceremonia final (por ejemplo, el orden o las palabras del rito). Ninguna hoja sola lo dice. |
+
+**Reglas**
+- **Impresión**: papel de 80–90 g/m² para que el trasluz funcione; registro anverso/reverso con formas grandes y tolerancia de ±2 mm; la línea de doblez marcada y alejada del texto (cero colisiones, §2).
+- **La web nunca da el dato**: las miniaturas de las Hojas 23, 24 y de los márgenes se recortan o se generan sin esas marcas. La escalera de pistas (#6) puede explicar el gesto («hold Sheet 23 up to a lamp», «fold Sheet 24 along the mirror line»), nunca el resultado.
+- **Salida de emergencia**: si Silvia no tiene la hoja a mano, la pista de nivel 3 le pide que escriba a Hermes; Carles puede resolverlo desde el panel de tester. No hay versión digital del truco.
+- Cumple la ficha §6.1: 25 sigue terminando en palabra tecleada, 26 en llegar a la salida y 28 sin teclear (las marcas dan el orden o la elección del rito, que se hace con una acción).
+
 ---
 
 ## 7. Personajes del Stage Path

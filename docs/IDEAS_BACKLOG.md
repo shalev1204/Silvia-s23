@@ -14,7 +14,7 @@
 | 5 | Háptica en móvil | S | medio | **Descartada (21-10-2026)**: la vibración web no funciona en iPhone ni iPad |
 | 6 | Pistas progresivas en 3 niveles | L | alto | **Implementada en Cairn I y Estaciones 10–20 (21-10-2026)**; las 21–28 nacerán con ella |
 | 7 | Variedad de mecánicas en 21–28 | M | alto | **Especificada (21-10-2026)**: ficha de variedad en `STAGE_PATH_BIBLE.md` §6.1; cada sala la cumple al construirse |
-| 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | No existe (varios juegos web ya se apoyan en la hoja, ninguno exige un dato exclusivo del papel) |
+| 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | **Especificada (21-10-2026)**: `STAGE_PATH_BIBLE.md` §6.2; se construye con las Hojas 23, 24 y los márgenes de 19–26 |
 | 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
 | 10 | Pistas sutiles de Pope-E en retrospectiva | M | alto | Parcial: nota 1 (Estación 20). Plan de pistas en `STAGE_PATH_BIBLE.md` §9 |
 | 11 | Mirror Speaker que reacciona al estilo de juego | M | alto | No existe |
@@ -151,8 +151,14 @@
 
 **Verificación**: revisión de la ficha al empezar cada sala 21–28; el `code-review` de cada estación comprueba que la sala construida coincide con su fila.
 
-### 8. Puzzle meta con las hojas físicas (M)
-Pendiente de especificar.
+### 8. Puzzle «meta» con las hojas físicas (M) · especificada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Dónde**: **dentro del Stage Path**, con datos que solo están en las Hojas 19–26 impresas y que la web exige.
+- **Trucos**: **al trasluz**, **doblar** y **marcas en los márgenes** (medir con regla, no).
+
+**Diseño** (`docs/STAGE_PATH_BIBLE.md` §6.2): trasluz en la Hoja 23 para la sala 25 (The Shadow Theatre); doblez de la Hoja 24 para la 26 (The Hall of Mirrors); marcas en los márgenes de las Hojas 19–26 para la ceremonia de la 28. La web nunca muestra el dato (miniaturas recortadas, pistas que explican el gesto y no el resultado). Papel de 80–90 g/m² y registro anverso/reverso con tolerancia.
+
+**Verificación**: al imprimir las hojas, prueba física del trasluz y del doblez con la impresora real; al construir 25, 26 y 28, el smoke comprueba que ninguna vista del Hub contiene el dato.
 
 ### 9. Modo «ojo de Operador» (S) · especificada e implementada como informe de Claude (21-10-2026)
 **Decisión del Operador (21-10-2026)**: **no quiere panel**. Pregunta a Claude («¿dónde va Silvia?») y Claude lee Supabase con el conector y le resume dos cosas:
