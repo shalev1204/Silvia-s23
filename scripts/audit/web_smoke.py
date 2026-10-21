@@ -904,7 +904,10 @@ def test_oracle_horizon(browser):
           "the chamber opens, the disc and the vow locked until the sigil")
     for word in ["OVERTURN", "OVERTUREE", "ORACLE"]:
         page.fill("#oracle-key-input", word); page.click("#btn-oracle-speak"); page.wait_for_timeout(120)
-    check(get("order_oracle_hint") == "true" and get("order_oracle_awake") is None, "3 wrong sigils unlock the hint, the door stays shut")
+    check(get("order_hint_s19-sigil_level") == "1" and get("order_oracle_hint") is None, "3 wrong sigils bring Hermes's first note")
+    for word in ["OVERTURN", "OVERTUREE", "ORACLE"]:
+        page.fill("#oracle-key-input", word); page.click("#btn-oracle-speak"); page.wait_for_timeout(120)
+    check(get("order_oracle_hint") == "true" and get("order_oracle_awake") is None, "6 wrong sigils open the Ask Hermes hint, the door stays shut")
     page.fill("#oracle-key-input", " over-ture "); page.click("#btn-oracle-speak"); page.wait_for_timeout(250)
     check(get("order_oracle_awake") == "true", "forgiving sigil 'over-ture' opens the inner chamber")
 
@@ -938,9 +941,9 @@ def test_oracle_horizon(browser):
     say(["YOU", "WERE", "NEVER", "ONLY", "THE", "SEEKER"]); js("window.__oracle.vow()")
     check("first half" in feedback("oracle-vow-feedback") and get("order_oracle_horizon_completed") is None,
           "the prophecy's first half is not the vow")
-    for words in (["THE", "TREASURE", "YOU", "WERE", "ALWAYS"], ["YOU", "WERE", "ALWAYS", "THE"]):
+    for words in (["THE", "TREASURE", "YOU", "WERE", "ALWAYS"], ["YOU", "WERE", "ALWAYS", "THE"]) * 2 + (["YOU"],):
         say(words); js("window.__oracle.vow()")
-    check(get("order_oracle_vow_hint") == "true", "three wrong vows unlock the hint")
+    check(get("order_oracle_vow_hint") == "true", "six wrong vows open the hint")
     say(["YOU", "WERE", "ALWAYS", "THE", "TREASURE"]); js("window.__oracle.vow()")
     page.wait_for_timeout(400)
     check(get("order_oracle_horizon_completed") == "true" and "Aurelia" in feedback("oracle-dispatch-text"),

@@ -33,8 +33,7 @@
         passage: 'order_stage_passage_seen'
       };
       const SIGIL = 'OVERTURE';
-      const HINT_AFTER_FAILS = 3;
-      const DISC_HINT_AFTER_TURNS = 40;
+      const TURNS_PER_MISS = 15;   // turning the rings with no result counts as a miss every 15 turns
 
       // ---- The disc: spoke k (0 = north, clockwise) reads outer, middle, inner ----
       const WHEN_WORDS = 'DECEMBER EIGHTEEN TO TWENTY';
@@ -70,6 +69,35 @@
       const isAwake = () => get(KEYS.awake) === 'true';
       const isDone = () => get(KEYS.done) === 'true';
       const whenRead = () => isDone() || get(KEYS.when) === 'true';
+      // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
+      const hints = window.EclipseHints;
+      const sigilHints = hints.define({
+        id: 's19-sigil', station: 'Station 19', title: 'the sigil of the three mirrors', group: 'desert',
+        anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
+        texts: [
+          'Do not read the eight beacons where they stand, Silvia. Each one has to travel across the chart first, through the three mirrors, and only the square where it lands gives a letter.',
+          'I wrote down how a beacon crosses the mirrors. It is in Ask Hermes: "How do the three mirrors of Sheet 18A work?"',
+          'Let us send the first beacon together. It starts in column 2, Row A. Mirror I, on column 4, sends it to column 6, still on Row A. In column 6 Mirror II lies on Row D: Row A is three rows above it, so it lands three rows below, on Row G. Mirror III, on column 10, sends column 6 to column 14. Read the letter in column 14, Row G: that is the first letter of the sigil. Now beacon 2.'
+        ]
+      });
+      const discHints = hints.define({
+        id: 's19-disc', station: 'Station 19', title: 'the disc of 24 sightings', group: 'desert',
+        anchor: el.discFeedback, solved: whenRead, active: isAwake, legacyKey: KEYS.discHint,
+        texts: [
+          'Look for the little gold star on each ring, and then at the sky drawn beside the disc. The disc and the sky have to agree before the jewel answers.',
+          'Turn each ring until its star points the same way as that star in the sky. Then read from the north, rim to heart, and go clockwise. My longer note is in Ask Hermes: "How do I set the disc of 24 sightings?"',
+          'Start with the inner ring: its star is Polaris, the star that never leaves the north. Turn the inner ring until that star points straight up, to the north. Then find Capella and Aldebaran in the sky beside the disc and do the same with their rings.'
+        ]
+      });
+      const vowHints = hints.define({
+        id: 's19-vow', station: 'Station 19', title: 'the vow', group: 'desert',
+        anchor: el.vowFeedback, solved: isDone, active: whenRead, legacyKey: KEYS.vowHint,
+        texts: [
+          'These are not new words, Silvia. You have written them to me before.',
+          'They are the words you sent me from the cliffs, the night the storm began. Only the last five. My note is in Ask Hermes: "Which words does she remember?"',
+          'The vow has five words. It begins like the prophecy, YOU WERE, but it does not go on with NEVER. Think of the five words you sent me that night and say them in the same order.'
+        ]
+      });
       let rot = (() => {
         const saved = get(KEYS.disc);
         return saved && /^[0-7]{3}$/.test(saved) ? saved.split('').map(Number) : START.slice();
@@ -169,7 +197,7 @@
         set(KEYS.disc, rot.join(''));
         const turns = (parseInt(get(KEYS.turns) || '0', 10) || 0) + 1;
         set(KEYS.turns, String(turns));
-        if (turns >= DISC_HINT_AFTER_TURNS) set(KEYS.discHint, 'true');
+        if (turns % TURNS_PER_MISS === 0) discHints.fail();
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (rot.every((r) => r === 0)) {
           feedback(el.discFeedback, 'The three stars point true. The jewel of the disc wakes.', 'ok');
@@ -212,9 +240,8 @@
         const month = /\b(DEC|DECEMBER|DIC|DICIEMBRE)\b/.test(spelled.replace(/[^A-Z0-9]+/g, ' ')) || nums.filter((n) => n === '12').length > 0;
         const asDate = month && nums.includes('18') && nums.includes('20');
         if (!asWords && !asDate) {
-          const fails = (parseInt(get(KEYS.readFails) || '0', 10) || 0) + 1;
-          set(KEYS.readFails, String(fails));
-          if (fails >= HINT_AFTER_FAILS) set(KEYS.discHint, 'true');
+          set(KEYS.readFails, String((parseInt(get(KEYS.readFails) || '0', 10) || 0) + 1));
+          discHints.fail();
           feedback(el.discFeedback, 'Hermes frowns: that is not what the disc says. Start at the north spoke, read rim, middle, heart, then go clockwise.', 'error');
           render();
           return;
@@ -272,9 +299,8 @@
         if (!said.length) { feedback(el.vowFeedback, 'Choose the words first.', 'error'); return; }
         const words = said.map((i) => TILES[i]);
         if (words.join(' ') !== VOW.join(' ')) {
-          const fails = (parseInt(get(KEYS.vowFails) || '0', 10) || 0) + 1;
-          set(KEYS.vowFails, String(fails));
-          if (fails >= HINT_AFTER_FAILS) set(KEYS.vowHint, 'true');
+          set(KEYS.vowFails, String((parseInt(get(KEYS.vowFails) || '0', 10) || 0) + 1));
+          vowHints.fail();
           const full = words.join(' ') === 'YOU WERE NEVER ONLY THE SEEKER';
           feedback(el.vowFeedback, full
             ? 'She tilts her head: those words are true, but they are only the first half. They were never the words he said to her.'
@@ -313,15 +339,10 @@
         const typed = letters(el.keyInput && el.keyInput.value);
         if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from Sheet 18A.', 'error'); return; }
         if (typed !== SIGIL) {
-          const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
-          set(KEYS.fails, String(fails));
+          set(KEYS.fails, String((parseInt(get(KEYS.fails) || '0', 10) || 0) + 1));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          if (fails >= HINT_AFTER_FAILS && get(KEYS.hint) !== 'true') {
-            set(KEYS.hint, 'true');
-            feedback(el.keyFeedback, 'The door stays shut. Hermes left you a note in Ask Hermes about the three mirrors.', 'error');
-          } else {
-            feedback(el.keyFeedback, 'The door stays shut. Send the eight beacons across the mirrors of Sheet 18A again.', 'error');
-          }
+          feedback(el.keyFeedback, 'The door stays shut. Send the eight beacons across the mirrors of Sheet 18A again.', 'error');
+          sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
@@ -337,6 +358,7 @@
 
       function render() {
         const awake = isAwake(), done = isDone(), wRead = whenRead(), dTrue = discTrue();
+        sigilHints.refresh(); discHints.refresh(); vowHints.refresh();
         drawDisc();
         drawSky();
         drawTiles();
