@@ -707,6 +707,11 @@
             id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
             complete() { set('order_masks_march_start', '1'); set('order_masks_gate_awake', 'true'); set('order_masks_carved', '3'); set('order_masks_gate_completed', 'true'); },
             reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41', 'order_ashes_clues', 'order_speaker_line_41']); }
+          },
+          {
+            id: 's21', tag: 'Station 21', label: 'The Camera Obscura · Tower III', flag: 'order_camera_obscura_completed', built: true,
+            complete() { set('order_camera_obscura_found', JSON.stringify(['flag', 'cart', 'shutter', 'smoke'])); set('order_camera_obscura_completed', 'true'); },
+            reset() { dels(['order_camera_obscura_completed', 'order_camera_obscura_fails', 'order_camera_obscura_found', 'order_stage_pause_skipped_42', 'order_speaker_line_42']); }
           }
         ];
         // A reset game also forgets the hints its puzzles had climbed to (hub/js/hint-ladder.js)
@@ -724,9 +729,9 @@
 
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
-          const a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
-          const cap = a20 ? 36 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
+          const a21 = isDone('s21'), a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = a21 ? 39 : a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
+          const cap = a21 ? 40 : a20 ? 38 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -749,7 +754,8 @@
           s17: { wire: 22, node: 26, walk: 'order_cairn5_march_bypassed' },
           s18: { wire: 26, node: 13, walk: 'order_stele_march_bypassed' },
           s19: { wire: 30, node: 14, walk: 'order_oracle_stair_bypassed' },
-          s20: { wire: 34, node: 40, walk: 'order_masks_march_bypassed' }
+          s20: { wire: 34, node: 40, walk: 'order_masks_march_bypassed' },
+          s21: { wire: 38, node: 41 }
         };
         const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
 
@@ -4591,6 +4597,66 @@
           step: 36,
           completed: true,
           hermesFinal: "We sleep tonight behind the gate, in the old dressing rooms, on piles of costumes, with the lamp turned low. Aurelia found a crown of paper stars and put it on my head. I have not taken it off.\n\nThe note sealed with ash is in my coat. Whoever wrote it knew you were coming, Silvia. Let us find out what they want before they find out what we have.\n\nFragment I is set in the mirror. Look at Path III on your map: the glass has begun to remember."
+        },
+        {
+          // Station 21: the candles burn down and the Mirror Speaker opens a door onto a stair
+          step: 37,
+          hermesInitial: "Silvia, are you awake? Nobody sleeps in this theatre for long. The candles along the dressing rooms burned down all together, and in the glass at the end of the corridor the grey gown was standing beside a door that was not there before. She drew her line on it, and it opened on a stair going down.\n\nAurelia has already gone ahead; I can hear her counting the steps. Before I follow: Sheet 20A, Silvia. It is the city of the third tower, drawn upside down. Aurelia says it is not a map. It is a memory: the city as it stood yesterday. Have it ready.",
+          choices: [
+            {
+              id: "choice-37-go",
+              text: "I have Sheet 20A. Go down.",
+              silviaMsg: "I have Sheet 20A in front of me, Hermes, upside down. Go down the stair.",
+              hermesReply: "Then down we go. Thirty-one steps, by Aurelia's count, and the air is colder at every one of them."
+            },
+            {
+              id: "choice-37-upside",
+              text: "Why is the city upside down?",
+              silviaMsg: "Why is the city on Sheet 20A upside down, Hermes?",
+              hermesReply: "Aurelia says it is not a mistake. It is the whole point. She would not say more. She smiled at the sheet like someone who has done this before, a long time ago."
+            },
+            {
+              id: "choice-37-careful",
+              text: "Be careful on the stair.",
+              silviaMsg: "Be careful on the stair, Hermes. Hold the rail.",
+              hermesReply: "There is no rail. There is Aurelia's hand, and she has not let go of mine since the gate."
+            }
+          ]
+        },
+        {
+          step: 38,
+          completed: true,
+          hermesFinal: "We are at the bottom. A door with a hole in it, no bigger than a coin, and no light anywhere. Aurelia has put her hand over my lamp. In a moment my eyes will learn the dark.\n\nWhen they have, I will tell you what is on the wall. Open Path III on your Quest Map, Silvia, and look with me. You have the sheet. I have a hole in a wall."
+        },
+        {
+          // Station 21 debrief: the narrow house, the warm ashes and Fragment II
+          step: 39,
+          hermesInitial: "Fragment II is in my hands, Silvia, and my hands are black to the wrists. It was in the chimney of the narrow house, wrapped in a cloth that smelled of old smoke. The Ashes had been there. The hearth was still warm, and the walls were scratched with their sign, a circle with a line across it, over and over. They left in a hurry.\n\nAurelia stood in the street a long time, looking up at the chimney. She says a fire like that is not lit by people who want to hide. It was lit so that someone would look.",
+          choices: [
+            {
+              id: "choice-39-house",
+              text: "What was in the house?",
+              silviaMsg: "What else was in the house, Hermes?",
+              hermesReply: "Nothing but ash, a stool and a broom with no bristles. And a floorboard with a hollow under it, empty. Whatever the raiders carried out of that house, they carried it quickly."
+            },
+            {
+              id: "choice-39-safe",
+              text: "Is Fragment II safe?",
+              silviaMsg: "Is Fragment II safe, Hermes? Is it wrapped?",
+              hermesReply: "In my scarf, beside the first one. The two of them hum when they touch, Silvia, like two glasses on a table. Aurelia says it is only the cold. I do not think she believes it."
+            },
+            {
+              id: "choice-39-where",
+              text: "Where did the raiders go?",
+              silviaMsg: "Where did the raiders go, Hermes?",
+              hermesReply: "Deeper into the theatre. The cellar has a second stair, and from the bottom of it comes a sound like a great many people whispering at once. Aurelia says the next room is made of whispers."
+            }
+          ]
+        },
+        {
+          step: 40,
+          completed: true,
+          hermesFinal: "We rest in the cellar of the narrow house, with the hearth for company and the dust of the Ashes on everything. Aurelia has drawn the picture on the wall, upside down, in the margin of her sketchbook, so that she will not forget it.\n\nFragment II is set in the mirror. Look at Path III on your map: two pieces now, and in the second there is a window with a candle in it."
         }
       ];
 
@@ -5130,6 +5196,20 @@
           category: "Tower III",
           group: "stage",
           answer: "We do not know yet. The note was pinned on the last mask of the gate: 'Let her through. She is the treasure.' The seal is a circle of ash with a line across it, a little like the sign of the Order, but not quite. Aurelia says the Ashes are older than the Order, and that they obey one leader they never name. Whoever he is, he wanted you to pass. I do not know whether that should comfort me."
+        },
+        {
+          id: "inq-camera-upside",
+          title: "Why is the city upside down on Sheet 20A?",
+          category: "Tower III",
+          group: "stage",
+          answer: "A camera obscura is a dark room with a hole no bigger than a coin in one wall. Light from the street goes through the hole and paints the whole city on the opposite wall, but upside down, because light travels in straight lines and crosses at the hole. Aurelia drew Sheet 20A the way that wall shows it, so that the sheet and the wall can be held side by side. The city on the sheet is how it stood yesterday. On the wall, today, four things are different."
+        },
+        {
+          id: "inq-camera-house",
+          title: "What did we find in the narrow house?",
+          category: "Tower III",
+          group: "stage",
+          answer: "The narrow house behind the market had a cold chimney on Sheet 20A and a smoking one on the wall. The Ashes had lit a fire in its cellar so that someone would look, and they left Fragment II in the chimney, wrapped in a sooty cloth. The other three changes were only the city living its day: a new flag on the clock tower, a cart in the street and a shutter that someone had closed."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -5163,7 +5243,7 @@
       } else {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       }
-      const WIRE_LAST_STEP = 36;   // the last step of the expedition thread (end of Station 20, the Gate of a Thousand Masks)
+      const WIRE_LAST_STEP = 40;   // the last step of the expedition thread (end of Station 21, the Camera Obscura)
       if (wireCurrentStep > WIRE_LAST_STEP) wireCurrentStep = WIRE_LAST_STEP;
       while (wireHistory.length < wireCurrentStep) {
         wireHistory.push(0);
@@ -5238,7 +5318,8 @@
         oracle: { key: 'order_oracle_horizon_completed', label: 'Station 19' },
         masksHint: { key: 'order_masks_hint', label: 'the second hint at the word of the gate' },
         masksDraw: { key: 'order_masks_draw_hint', label: 'the second hint at the missing halves' },
-        masks: { key: 'order_masks_gate_completed', label: 'Station 20' }
+        masks: { key: 'order_masks_gate_completed', label: 'Station 20' },
+        camera: { key: 'order_camera_obscura_completed', label: 'Station 21' }
       };
       const INQUIRY_REQUIREMENTS = {
         'inq-desert-oracle': 'lexicon',
@@ -5279,7 +5360,9 @@
         'inq-unsent-letter': 'oracle',
         'inq-masks-lie': 'masksHint',
         'inq-masks-halves': 'masksDraw',
-        'inq-ash-note': 'masks'
+        'inq-ash-note': 'masks',
+        'inq-camera-upside': 'masks',
+        'inq-camera-house': 'camera'
       };
       FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
       const INQUIRY_GROUPS = [
@@ -6001,7 +6084,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -6055,7 +6138,9 @@
         30: () => '✦ SEALS 5 / 5 · DOWN THE INNER STAIR OF TOWER II · AUDIENCE WITH THE ORACLE ✦',
         32: () => '✦ THE FIRST TRUTH · WHEN: 18 – 20 DECEMBER · [Z] + [D] = 23 · [I] + [E] = 12 RECORDED · THE DESERT PATH IS COMPLETE ✦',
         34: () => '✦ SHEETS 19 – 26 RECEIVED · EAST ACROSS THE PLATEAU TO TOWER III (18 H) · KEEP SHEET 19B CLOSE ✦',
-        36: () => '✦ THE GATE OPENED · SILVER · FRAGMENT I SET · 1 / 9 · A NOTE SEALED IN ASH ✦'
+        36: () => '✦ THE GATE OPENED · SILVER · FRAGMENT I SET · 1 / 9 · A NOTE SEALED IN ASH ✦',
+        38: () => '✦ THE DARK ROOM · A HOLE IN THE WALL · SHEET 20A READY · FOUR CHANGES TO FIND ✦',
+        40: () => '✦ THE HIDEOUT FOUND · THE NARROW HOUSE · FRAGMENT II SET · 2 / 9 ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -7088,10 +7173,41 @@
           appendStepIntro(step);
         };
 
+        // The door of the next room of Tower III waits for its pause (hub/js/stage-pause.js), then for the seal on its
+        // sheet (hub/js/sheet-seals.js). The bar says which, and the chat looks again every half minute.
+        const roomDoor = (node) => ({
+          wait: window.EclipseStagePause ? window.EclipseStagePause.opensIn(node) : '',
+          face: window.EclipseSheetSeals ? window.EclipseSheetSeals.missing(node) : ''
+        });
+        const holdForDoor = (node, title, room, step) => {
+          const door = roomDoor(node);
+          if (!door.wait && !door.face) return false;
+          showWaypointBar(title, 'Next: ' + room + '. ' + (door.wait ? 'Its door opens in ' + door.wait + '.' : 'Its door opens with the seal on Sheet ' + door.face + '.'), step);
+          if (window.__wireDoorTimer) clearInterval(window.__wireDoorTimer);
+          window.__wireDoorTimer = setInterval(() => {
+            const d = roomDoor(node);
+            if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || (!d.wait && !d.face)) {
+              clearInterval(window.__wireDoorTimer); window.__wireDoorTimer = null;
+              if (!d.wait && !d.face) renderWireChoices();
+            }
+          }, 30000);
+          return true;
+        };
+        if (wireCurrentStep === 36) {
+          if (holdForDoor(41, 'Fragment I Is Set · 1 of 9', 'The Camera Obscura (Station 21)', 36)) return;
+          advanceTo(37);   // the candles have burned down: the stair to the dark room
+        }
+        if (wireCurrentStep === 38) {
+          if (localStorage.getItem('order_camera_obscura_completed') !== 'true') {
+            showWaypointBar('The Camera Obscura · Station 21 Awaits', 'Open Path III on the Quest Map and help Hermes read the city on the wall. Keep Sheet 20A close.', 38);
+            return;
+          }
+          advanceTo(39);   // Station 21 solved: the narrow house, the warm ashes and Fragment II
+        }
         if (wireCurrentStep >= WIRE_LAST_STEP) {
-          const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(41) : '';
-          const face = window.EclipseSheetSeals ? window.EclipseSheetSeals.missing(41) : '';
-          showWaypointBar('Fragment I Is Set · 1 of 9', 'Next: The Camera Obscura (Station 21). ' + (wait ? 'Its door opens in ' + wait + '.' : face ? 'Its door opens with the seal on Sheet ' + face + '.' : 'The Mirror Speaker has not opened that room yet.'), WIRE_LAST_STEP);
+          if (!holdForDoor(42, 'Fragment II Is Set · 2 of 9', 'The Whispering Gallery (Station 22)', WIRE_LAST_STEP)) {
+            showWaypointBar('Fragment II Is Set · 2 of 9', 'Next: The Whispering Gallery (Station 22). The Mirror Speaker has not opened that room yet.', WIRE_LAST_STEP);
+          }
           return;
         }
         if (wireCurrentStep === 8) {
@@ -7579,7 +7695,7 @@
                 renderWireChoices();
                 updateMessengerBadge();
               }
-            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35].includes(justAnsweredStep)) {
+            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39].includes(justAnsweredStep)) {
               // 9: Silvia answered at the gates of Tower II, and the 12-hour crossing to the Sun Monolith begins.
               // 11: Silvia answered the Station 14 debrief.
               // 13: Silvia answered at first light, and the 6-hour walk down to the Sandstone Labyrinth begins.
@@ -7594,6 +7710,8 @@
               // 31: Silvia answered the Station 19 debrief.
               // 33: Silvia answered at the morning of departure, and the 18-hour crossing to Tower III begins.
               // 35: Silvia answered the Station 20 debrief.
+              // 37: Silvia answered at the head of the stair to the Camera Obscura.
+              // 39: Silvia answered the Station 21 debrief.
               if (justAnsweredStep === 9) rememberGateSeal();
               if (MARCH_STARTED_BY_ANSWER[justAnsweredStep]) MARCH_STARTED_BY_ANSWER[justAnsweredStep].start();
               const finalStep = justAnsweredStep + 1;

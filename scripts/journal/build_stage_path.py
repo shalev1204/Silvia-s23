@@ -545,6 +545,99 @@ def render_game_19b_masks(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 
 
 # -------------------------------------------------------------------------
+# SHEET 20 · CARA A · THE CAMERA OBSCURA (STATION 21)
+# -------------------------------------------------------------------------
+# The city of the third tower as it stood the day before the raiders came ("before" of scripts/journal/camera_city.py,
+# the same source the Hub projects "now" from), printed upside down: the way the wall of the dark room shows it.
+
+def _draw_city_upside_down(canvas, x0, y0, width, gc, seed):
+    """The 'before' city as a pencil drawing, turned 180 degrees, with its top-left corner at (x0, y0)."""
+    from scripts.journal import camera_city
+    data = camera_city.build()
+    items, smoke = camera_city.view(data, "before")
+    k = width / data["width"]
+    # the ink spans only part of the 1200 x 640 field: turn the drawing about its own extent, so no empty sky is left
+    ys = [p[1] for it in items for p in it["pts"]] + [s["y"] - 82 for s in smoke]
+    ytop, ybot = min(ys) - 4, max(ys) + 4
+    T = lambda p: (x0 + (data["width"] - p[0]) * k, y0 + (ybot - p[1]) * k)   # turned 180 degrees: (x, y) -> (W - x, ybot - y)
+    for n, it in enumerate(items):
+        pts = [T(p) for p in it["pts"]]
+        area = 0.0
+        if it["c"]:
+            arr = np.array(pts, dtype=np.float32)
+            area = abs(cv2.contourArea(arr))
+            cv2.fillPoly(canvas, [np.round(arr).astype(np.int32)], (0, 0, 0, 0))   # what stands in front hides what is behind
+            if it["f"] == 2:
+                _hatch_polygon(canvas, pts, step=7, angle=-52.0, gc=gc, alpha=95, seed=seed + n)
+            elif it["f"] == 1:
+                _hatch_polygon(canvas, pts, step=11, angle=72.0, gc=gc, alpha=26, seed=seed + n)
+            elif area < 1100 * k * k:   # a window or a wheel: the glass is darker
+                _hatch_polygon(canvas, pts, step=5, angle=45.0, gc=gc, alpha=60, seed=seed + n)
+        big = it["c"] and it["f"] > 0 and area > 2500 * k * k
+        _pline(canvas, pts, gc, alpha=205 if big else 185, seed=seed + 1000 + n, closed=it["c"], thick=2 if big else 1, wob=0.7)
+    # the smoke of the chimneys that were burning: small curls that grow as they rise (before the turn: up is -y)
+    for n, s in enumerate(smoke):
+        for j in range(4):
+            cx, cy, r = s["x"] + 7 * math.sin(j * 1.4 + n), s["y"] - 14 - 17 * j, 4.5 + 2.4 * j
+            a0 = 40 + 55 * j
+            curl = [(cx + r * math.cos(math.radians(a0 + 300 * t / 14)), cy + r * math.sin(math.radians(a0 + 300 * t / 14))) for t in range(15)]
+            _pline(canvas, [T(p) for p in curl], gc, alpha=150, seed=seed + 3000 + 10 * n + j, passes=2, wob=0.5)
+    return (int(x0), int(y0), int(x0 + width), int(y0 + (ybot - ytop) * k))
+
+
+def render_game_20a_camera_obscura(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
+    """Sheet 20 · Cara A (front: X < 165 empty). Station 21. The first game face with a seal (idea #14)."""
+    from scripts.journal import sheet_seal
+    c = _canvas()
+    X0, W = FRONT_X0, TEXT_W
+    PT, LH = 38, 52
+    _text(c, "The Camera Obscura", X0, 80, 64, 20001, gc)
+    _divider(c, X0, 172, W, 20003, gc)
+    intro = ("A dark room with one small hole in its wall. Through the hole the whole city of the third tower falls on the wall, "
+             "upside down. This is the city as it stood the day before the raiders came, drawn the way the wall shows it: upside down.")
+    y = _paragraph(c, intro, X0, 224, W, size=PT, lh=LH, seed=20010, gc=gc)
+    rule = ("Keep this sheet beside you. In the dark room the city is turned the same way, and four things in it have changed "
+            "since this drawing was made. Find them. The raiders carry their fire wherever they go.")
+    y = _paragraph(c, rule, X0, y + 14, W, size=PT, lh=LH, seed=20030, gc=gc)
+
+    # the city is drawn apart so its height is known, and the free height of the face is shared around it
+    lower_h = 60 + 2 * 246 + 50 + 3 * 46           # divider, seal (r = 246), its three-line caption
+    layer = _canvas()
+    cbox = _draw_city_upside_down(layer, X0, 0, W, gc, 20100)
+    cut = layer[:cbox[3] + 8, :, :]
+    free = (CANVAS_HEIGHT_PX - FOOT - 25 - lower_h) - (y + cut.shape[0] + 90 + 80 + 80)   # what is left after the fixed gaps
+    air = max(0, free) // 3
+    top = y + 80 + air
+    blit_rgba(c, cut, 0, top)
+    y = top + cbox[3] + 80 + air
+    _text(c, "Look at the sky, the roofs, the shutters and the street.", X0 + W // 2, y, PT, 20060, gc, anchor="center")
+    y += 90 + air
+
+    # Fragment II, the plan of the mirror it belongs to, and the seal of the room: three columns with their captions
+    seal_r = 246                                   # 492 px across (42 mm): over the 30 mm a phone needs; modules of 5 whole pixels
+    plan_h, fscale, gap = 520, 1.3, 55
+    _divider(c, X0, y, W, 20070, gc)
+    y += 60
+    plan_w = _plan_width(plan_h)
+    bx0_, by0_, bx1_, by1_ = shard_bbox(1)
+    frag_w = int((bx1_ - bx0_) * fscale)
+    x_frag = X0 + (W - frag_w - plan_w - 2 * seal_r - 2 * gap) // 2
+    x_plan = x_frag + frag_w + gap
+    x_seal = x_plan + plan_w + gap + seal_r
+    box = draw_fragment(c, 1, x_frag, y + 40, fscale, gc, seed=20200)
+    _text(c, "Fragment II", x_frag, box[3] + 40, 42, 20210, gc)
+    cap = "The second piece of the mirror of Tower III. It is yours when the room opens."
+    _paragraph(c, cap, x_frag, box[3] + 104, frag_w + 10, size=31, lh=44, seed=20220, gc=gc)
+    plan = _draw_mirror_plan(c, 1, x_plan, y + 10, plan_h, gc, 20300)
+    _text(c, "Its place in the mirror", x_plan + plan_w // 2, plan[3] + 40, 33, 20240, gc, anchor="center")
+    sy = y + 10 + seal_r
+    sheet_seal.draw_seal(c, x_seal, sy, seal_r, "20A")
+    _paragraph(c, "The seal of this room. Scan it with your camera when the door asks for it.",
+               x_seal - seal_r, sy + seal_r + 50, 2 * seal_r, size=33, lh=46, seed=20400, gc=gc)
+    return _clear_foot(c)
+
+
+# -------------------------------------------------------------------------
 # stand-alone build of the Stage Path sheets
 # -------------------------------------------------------------------------
 
@@ -552,6 +645,8 @@ STAGE_SHEETS = [
     (19,
      ("Hoja 19 · Cara A (Lore: The Unsent Letter)", render_lore_19a_unsent_letter, "page19_front", False, False),
      ("Hoja 19 · Cara B (Game S1: The Gate of a Thousand Masks · Station 20)", render_game_19b_masks, "page19_back", True, False)),
+    (20,
+     ("Hoja 20 · Cara A (Game S2: The Camera Obscura · Station 21)", render_game_20a_camera_obscura, "page20_front", False, False)),
 ]
 # stem -> ((x0, y0), (x1, y1)): where a face folds (Sheet 24A, idea #8), marked in the print preview (stage_preview.py)
 FOLD_LINES = {}

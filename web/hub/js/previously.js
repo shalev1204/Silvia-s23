@@ -25,7 +25,8 @@
         s17: 'Under the Arch of the Solstice, Silvia woke Cairn V, and its seal was sewn into Hermes’s coat with the others. Over Tower II, the smoke was still rising.',
         s18: 'In the burning atrium of Tower II, Silvia read the stele and led Hermes through the fire to the well. The Servant was alive, and the Oracle’s charts were safe.',
         s19: 'Behind the door of the inner stair, the Oracle turned out to be Aurelia, alive since 1971. And her disc gave Silvia the first truth: the WHEN.',
-        s20: 'The Gate of a Thousand Masks opened for Hermes and Aurelia. Inside: Fragment I of the Mirror Speaker’s mirror, and a note sealed with ash.'
+        s20: 'The Gate of a Thousand Masks opened for Hermes and Aurelia. Inside: Fragment I of the Mirror Speaker’s mirror, and a note sealed with ash.',
+        s21: 'In the dark room under Tower III, Silvia held Sheet 20A against the city on the wall and found where the Ashes had lit their fire. The second piece of the mirror was in the chimney of the narrow house.'
       };
       var DO_WORDS = /^(Open|Keep|Read|Trace|Follow|Help|Guide|Speak|Wake|Answer)\b/;
 

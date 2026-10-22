@@ -76,6 +76,11 @@
           note: 'Tower III, the Gate of a Thousand Masks. The wall opened like a curtain, and the first piece of the Mirror Speaker’s mirror is in my hands.',
           quote: 'Cold, heavy, with a little moon in it that is not in the sky.',
           earned: ['Fragment I of the mirror'], sketch: T + 'masks_gate_preview.webp'
+        },
+        s21: {
+          note: 'Tower III, the Camera Obscura. A hole in a wall, and the whole city hanging upside down in the dark. Silvia knew which chimney was new.',
+          quote: 'A fire like that is not lit by people who want to hide.',
+          earned: ['Fragment II of the mirror'], sketch: T + 'camera_obscura_preview.webp'
         }
       };
 

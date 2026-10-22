@@ -64,7 +64,8 @@ web/
 | **18** | The Polybius Stele · Tower II in Flames (The Knocks in the Stone · The Burning Atrium) | 🏜️ Desert · Torre II | Modal dentro del Hub (con sonido) | ✅ Implementado |
 | **19** | The Oracle's Horizon (The Disc of 24 Sightings · The Vow) | 🏜️ Desert · Torre II | Modal dentro del Hub | ✅ Implementado (WHEN: 18–20 dic) |
 | **20** | The Gate of a Thousand Masks (The Word of the Gate · The Missing Halves) | 🎭 Stage · Torre III | Modal dentro del Hub | ✅ Implementado (Fragmento I) |
-| **21–28** | The Velvet Stage: Camera Obscura → Stage of the Mirror Speaker | 🎭 Stage · Torre III | Modales dentro del Hub | ⏳ Programado (`docs/STAGE_PATH_BIBLE.md`) |
+| **21** | The Camera Obscura (The City on the Wall) | 🎭 Stage · Torre III | Modal dentro del Hub | ✅ Implementado (Fragmento II) |
+| **22–28** | The Velvet Stage: Whispering Gallery → Stage of the Mirror Speaker | 🎭 Stage · Torre III | Modales dentro del Hub | ⏳ Programado (`docs/STAGE_PATH_BIBLE.md`) |
 | **--** | The Vault of the Grand Eclipse | 🗝️ Clímax | — | 🔒 Se abre al alinear las 3 torres |
 
 ---

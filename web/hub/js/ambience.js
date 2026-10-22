@@ -23,7 +23,8 @@
         'modal-solstice-arch': { name: 'courtyard of rays', wind: [0.3, 1200, 0.6, 0.05], drone: [0.07, 130.8, 196, 261.6] },
         'modal-polybius-stele': { name: 'tower in flames', rumble: [0.35, 300], crackle: [0.28, 3] },
         'modal-oracle-horizon': { name: 'inner chamber', wind: [0.12, 600, 0.8, 0.04], drone: [0.13, 98, 147, 196] },
-        'modal-masks-gate': { name: 'theatre gate', wind: [0.1, 500, 0.9, 0.03], drone: [0.11, 65.4, 98], crackle: [0.07, 0.5] }
+        'modal-masks-gate': { name: 'theatre gate', wind: [0.1, 500, 0.9, 0.03], drone: [0.11, 65.4, 98], crackle: [0.07, 0.5] },
+        'modal-camera-obscura': { name: 'dark room', wind: [0.05, 380, 1.1, 0.02], drone: [0.1, 55, 82.4], drips: [0.14, 0.35] }
       };
 
       var ctx = null, master = null, noise = null, current = null, bed = null;

@@ -36,6 +36,8 @@ SHEETS = [
 # The Stage Path (Tower III): sheets 19 to 26, delivered to Silvia all together in their own bundle.
 STAGE_SHEETS = [
     (19, 'Hoja_19_Carta_Nunca_Enviada_y_Juego_S1_Puerta_Mascaras.pdf', 'page19/pdf/page19_front_A5.pdf', 'page19/pdf/page19_back_A5.pdf'),
+    # back_rel None: the face is not built yet, so a blank A5 page keeps the duplex printing aligned (20B pending)
+    (20, 'Hoja_20_Camera_Obscura_y_cara_B_pendiente.pdf', 'page20/pdf/page20_front_A5.pdf', None),
 ]
 STAGE_TOTAL = 8
 
@@ -46,13 +48,21 @@ def build_stage_bundle() -> None:
     bundle = pypdf.PdfWriter()
     for num, name, front_rel, back_rel in STAGE_SHEETS:
         sheet_writer = pypdf.PdfWriter()
-        for rel in (front_rel, back_rel):
-            page = pypdf.PdfReader(os.path.join(PROJECT_ROOT, 'journal', rel)).pages[0]
-            sheet_writer.add_page(page)
-            bundle.add_page(page)
+        front = pypdf.PdfReader(os.path.join(PROJECT_ROOT, 'journal', front_rel)).pages[0]
+        for writer in (sheet_writer, bundle):
+            writer.add_page(front)
+        if back_rel is None:
+            w, h = float(front.mediabox.width), float(front.mediabox.height)
+            for writer in (sheet_writer, bundle):
+                writer.add_blank_page(w, h)
+            print(f"  [OK] Sheet {num:02d}: {name}  (NOTE: face {num}B is pending, its back is a BLANK A5 page for now)")
+        else:
+            back = pypdf.PdfReader(os.path.join(PROJECT_ROOT, 'journal', back_rel)).pages[0]
+            for writer in (sheet_writer, bundle):
+                writer.add_page(back)
+            print(f"  [OK] Sheet {num:02d}: {name}")
         with open(os.path.join(HOJAS_DIR, name), 'wb') as fh:
             sheet_writer.write(fh)
-        print(f"  [OK] Sheet {num:02d}: {name}")
     bundle_path = os.path.join(IMPRESION_DIR, '01_STAGE_PATH_HOJAS_19_A_26_A5.pdf')
     with open(bundle_path, 'wb') as fh:
         bundle.write(fh)

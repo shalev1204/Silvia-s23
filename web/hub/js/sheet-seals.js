@@ -7,7 +7,7 @@
     // Loaded before hub-core.js, which asks it when it draws a card.
     window.EclipseSheetSeals = (function () {
       'use strict';
-      var SEALS = { 41: null, 42: null, 43: null, 44: null, 45: null, 46: null, 47: null, 48: null };
+      var SEALS = { 41: '9682e2b4', 42: null, 43: null, 44: null, 45: null, 46: null, 47: null, 48: null };
       var FACE = { 41: '20A', 42: '20B', 43: '21B', 44: '22A', 45: '23A', 46: '24A', 47: '25A', 48: '26A' };
 
       function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

@@ -1145,12 +1145,12 @@ def test_tester_play(browser):
     print("\n12. Carles's tester: Play any game, forward and back")
     modals = {"cairn1": "modal-cairn-one", "s14": "modal-sun-monolith", "s15": "modal-sandstone-labyrinth",
               "s16": "modal-cairn-four", "s17": "modal-solstice-arch", "s18": "modal-polybius-stele", "s19": "modal-oracle-horizon",
-              "s20": "modal-masks-gate"}
-    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5, "s19": 5, "s20": 5}
+              "s20": "modal-masks-gate", "s21": "modal-camera-obscura"}
+    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5, "s19": 5, "s20": 5, "s21": 5}
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
-    for gid in ["s20", "s19", "s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
+    for gid in ["s21", "s20", "s19", "s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
         page.evaluate("document.getElementById('tester-panel').open = true")
         page.evaluate(PLAY_JS, gid)
         page.wait_for_timeout(600)
@@ -1158,7 +1158,7 @@ def test_tester_play(browser):
         page.wait_for_timeout(3200)
         st = page.evaluate(WORLD_JS)
         opened = modals[gid] in st["open"] if gid in modals else bool(st["open"])
-        clean = (gid == "s20" or "gilded_star" not in st["relics"]) and (gid in ("s19", "s20") or "servant_key" not in st["relics"]) and (gid in ("s17", "s18", "s19", "s20") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
+        clean = (gid in ("s20", "s21") or "gilded_star" not in st["relics"]) and (gid in ("s19", "s20", "s21") or "servant_key" not in st["relics"]) and (gid in ("s17", "s18", "s19", "s20", "s21") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
         check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
               f"seals {st['seals']}, open {st['open']}, relics {st['relics']}")
     check(not errors, "no JS errors while jumping between games", "; ".join(sorted(set(errors))[:3]))
@@ -1547,33 +1547,33 @@ PAUSE_JS = """() => { const t = (s) => (s || '').replace(/\\u00a0/g, ' ').toLowe
 
 def test_stage_pause(browser):
     print("\n20. Pauses on the Stage Path: after a fragment, the next room opens at its own hour")
-    journal = json.dumps({"s20": {"at": int(time.time() * 1000) - 3600 * 1000, "fails": 0, "notes": 0, "arrived": None}})
-    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "36",
+    journal = json.dumps({"s21": {"at": int(time.time() * 1000) - 3600 * 1000, "fails": 0, "notes": 0, "arrived": None}})
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_camera_obscura_completed": "true", "order_field_wire_step": "40",
             "order_journal": journal}
     ctx, page, errors = stage_page(browser, seed)
     js = page.evaluate
-    room = lambda: (page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"), page.wait_for_timeout(400), js(PAUSE_JS))[2]
+    room = lambda: (page.click(".stage-mirror-ribbon .sm-room:nth-child(3)"), page.wait_for_timeout(400), js(PAUSE_JS))[2]
     check("not yet" in room()["status"], "with no hours set for the room, nothing changes")
-    js("EclipseStagePause.HOURS[41] = 24")
+    js("EclipseStagePause.HOURS[42] = 24")
     st = room()
-    check("opens in 23 h" in st["status"] and "opens in 23 h" in st["btn"], "a 24-hour pause, one hour after Fragment I: the door opens in 23 h", str(st))
-    js("selectStageStation(41)"); page.wait_for_timeout(300)
+    check("opens in 23 h" in st["status"] and "opens in 23 h" in st["btn"], "a 24-hour pause, one hour after Fragment II: the door opens in 23 h", str(st))
+    js("selectStageStation(42)"); page.wait_for_timeout(300)
     check("opens in 23 h" in js(PAUSE_JS)["toast"], "knocking on the room tells her when it opens")
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
     wire = js("document.querySelector('#wire-completed-bar .messenger-waypoint-desc').textContent.replace(/\\u00a0/g, ' ')")
     check("Its door opens in 23 h" in wire, "the Field Wire says the same", wire)
-    js("TesterDesert.replayFrom('s20')")
-    check(js("EclipseStagePause.remaining(41)") == 0, "with Fragment I gone there is nothing to wait for")
+    js("TesterDesert.replayFrom('s21')")
+    check(js("EclipseStagePause.remaining(42)") == 0, "with Fragment II gone there is nothing to wait for")
     check(not errors, "no JS errors with the pause", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
     ctx, page, errors = stage_page(browser, dict(seed, the_eclipse_active_seeker="Carles"))
     js = page.evaluate
-    js("EclipseStagePause.HOURS[41] = 24; switchMapPath('stage', false)"); page.wait_for_timeout(600)
-    page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"); page.wait_for_timeout(400)
+    js("EclipseStagePause.HOURS[42] = 24; switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    page.click(".stage-mirror-ribbon .sm-room:nth-child(3)"); page.wait_for_timeout(400)
     st = js(PAUSE_JS)
     page.click("#insp-btn-primary"); page.wait_for_timeout(300)
-    check("tester: open it now" in st["btn"] and js("EclipseStagePause.remaining(41)") == 0,
+    check("tester: open it now" in st["btn"] and js("EclipseStagePause.remaining(42)") == 0,
           "Carles can open the room at once", str(st))
     ctx.close()
 
@@ -1787,22 +1787,22 @@ def test_journey(browser):
 
 def test_seals(browser):
     print("\n26. The seals of the Stage Path sheets: a QR on each game face is the key of its room")
-    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "36"}
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_camera_obscura_completed": "true", "order_field_wire_step": "40"}
     toast = "(document.getElementById('desert-toast-banner') || {}).textContent || ''"
     ctx, page, errors = stage_page(browser, seed)
     js = page.evaluate
-    room = lambda: (page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"), page.wait_for_timeout(400), js(PAUSE_JS))[2]
+    room = lambda: (page.click(".stage-mirror-ribbon .sm-room:nth-child(3)"), page.wait_for_timeout(400), js(PAUSE_JS))[2]
     check("seal" not in room()["status"], "with no seal set for the room, nothing changes")
-    js("EclipseSheetSeals.SEALS[41] = EclipseSheetSeals.hash('TESTSEAL')")
+    js("EclipseSheetSeals.SEALS[42] = EclipseSheetSeals.hash('TESTSEAL')")
     st = room()
-    check("seal of sheet 20a" in st["status"] and "scan the seal on sheet 20a" in st["btn"], "the room asks for the seal of Sheet 20A", str(st))
-    js("selectStageStation(41)"); page.wait_for_timeout(300)
-    check("seal on Sheet 20A" in js(toast), "knocking on the door asks for the seal", js(toast))
+    check("seal of sheet 20b" in st["status"] and "scan the seal on sheet 20b" in st["btn"], "the room asks for the seal of Sheet 20B", str(st))
+    js("selectStageStation(42)"); page.wait_for_timeout(300)
+    check("seal on Sheet 20B" in js(toast), "knocking on the door asks for the seal", js(toast))
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
     wire = js("document.querySelector('#wire-completed-bar .messenger-waypoint-desc').textContent.replace(/\\u00a0/g, ' ')")
-    check("seal on Sheet 20A" in wire, "the Field Wire says the same", wire)
-    check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept('testseal')") == 41
-          and js("localStorage.getItem('order_sheet_seal_41')") == "true", "only the right code turns the key")
+    check("seal on Sheet 20B" in wire, "the Field Wire says the same", wire)
+    check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept('testseal')") == 42
+          and js("localStorage.getItem('order_sheet_seal_42')") == "true", "only the right code turns the key")
     js("document.querySelector('[data-view=\"view-trail\"]').click()"); page.wait_for_timeout(800)
     js("switchMapPath('stage', false)"); page.wait_for_timeout(600)
     check("seal" not in room()["status"], "with its seal turned the room is back to its own state")
@@ -1811,23 +1811,23 @@ def test_seals(browser):
 
     # Scanning the QR: the Hub opens with ?seal=CODE (the hash is set before the page's load event, as a built room would have it)
     ctx, page, errors = new_page(browser, {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, **seed})
-    page.add_init_script("document.addEventListener('DOMContentLoaded', () => { EclipseSheetSeals.SEALS[41] = EclipseSheetSeals.hash('TESTSEAL'); })")
+    page.add_init_script("document.addEventListener('DOMContentLoaded', () => { EclipseSheetSeals.SEALS[42] = EclipseSheetSeals.hash('TESTSEAL'); })")
     page.goto(f"{BASE}/index.html?seal=TESTSEAL", wait_until="load"); page.wait_for_timeout(2500)
     js = page.evaluate
-    check(js("localStorage.getItem('order_sheet_seal_41')") == "true" and "seal" not in js("location.search"),
+    check(js("localStorage.getItem('order_sheet_seal_42')") == "true" and "seal" not in js("location.search"),
           "scanning the seal turns the key and leaves no code in the address", js("location.href"))
-    check("Sheet 20A turns" in js(toast), "the Hub says which seal turned", js(toast))
+    check("Sheet 20B turns" in js(toast), "the Hub says which seal turned", js(toast))
     page.goto(f"{BASE}/index.html?seal=WRONGONE", wait_until="load"); page.wait_for_timeout(2500)
     check("belongs to no door" in js(toast) and "seal" not in js("location.search"), "a wrong seal is refused", js(toast))
     ctx.close()
 
     ctx, page, errors = stage_page(browser, dict(seed, the_eclipse_active_seeker="Carles"))
     js = page.evaluate
-    js("EclipseSheetSeals.SEALS[41] = EclipseSheetSeals.hash('TESTSEAL'); switchMapPath('stage', false)"); page.wait_for_timeout(600)
-    page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"); page.wait_for_timeout(400)
+    js("EclipseSheetSeals.SEALS[42] = EclipseSheetSeals.hash('TESTSEAL'); switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    page.click(".stage-mirror-ribbon .sm-room:nth-child(3)"); page.wait_for_timeout(400)
     st = js(PAUSE_JS)
     page.click("#insp-btn-primary"); page.wait_for_timeout(300)
-    check("tester: open it now" in st["btn"] and js("localStorage.getItem('order_sheet_seal_41')") == "true", "Carles can open the room at once", str(st))
+    check("tester: open it now" in st["btn"] and js("localStorage.getItem('order_sheet_seal_42')") == "true", "Carles can open the room at once", str(st))
     ctx.close()
 
 
@@ -1837,12 +1837,13 @@ A11Y_MODALS = [("openWhisperingChasmModal", "modal-whispering-chasm"), ("openCai
                ("openOasisClepsydraModal", "modal-oasis-clepsydra"), ("openSunMonolithModal", "modal-sun-monolith"),
                ("openLabyrinthModal", "modal-sandstone-labyrinth"), ("openCairnFourModal", "modal-cairn-four"),
                ("openSolsticeModal", "modal-solstice-arch"), ("openSteleModal", "modal-polybius-stele"),
-               ("openOracleModal", "modal-oracle-horizon"), ("selectStageStation(40); void", "modal-masks-gate"),
+               ("openOracleModal", "modal-oracle-horizon"), ("selectStageStation(40); void", "modal-masks-gate"), ("openCameraObscuraModal", "modal-camera-obscura"),
                ("openSatchelInventoryModal", "modal-satchel-inventory"), ("openServantCairnCheckModal", "modal-servant-cairn-check")]
 # Every station played, the gate of Station 20 reached: all the windows can open
 A11Y_SEED = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true", "order_field_wire_step": "34",
              "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 30), "order_masks_march_start": "1",
-             "order_masks_march_bypassed": "true"}
+             "order_masks_march_bypassed": "true", "order_masks_gate_completed": "true", "order_stage_pause_skipped_41": "true",
+             "order_sheet_seal_41": "true"}
 A11Y_FOCUSABLE = ('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),'
                   'textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')
 # The controls in a part of the page: what the mouse can click but the keyboard cannot reach, and every control
@@ -2075,7 +2076,7 @@ def test_a11y(browser):
         page.keyboard.press("Escape"); page.wait_for_timeout(500)
         page.evaluate(f"document.getElementById('{mid}').style.display = 'none'")
     check(not small, "every control can be touched within 44 px of its centre", fmt(small))
-    wide = [mid + ": " + m for fn, mid in A11Y_MODALS[:12] for m in a11y_wide(page, fn, mid)]
+    wide = [mid + ": " + m for fn, mid in A11Y_MODALS[:13] for m in a11y_wide(page, fn, mid)]
     open_view(page, "view-trail")
     wide += page.evaluate(A11Y_CARDS_JS)
     check(not wide, "on the iPad no station window spills sideways and the path cards show all their words", fmt(wide))
@@ -2295,6 +2296,125 @@ def test_offline(browser):
     ctx.close()
 
 
+def test_camera_obscura(browser):
+    print("\n29. Station 21 · The Camera Obscura, from the pause and the seal to Fragment II")
+    now_ms = int(time.time() * 1000)
+    with open(os.path.join(ROOT, "journal", "stage_seals.json"), encoding="utf-8") as f:
+        printed_code = json.load(f)["20A"]["code"]   # the code of the seal printed on Sheet 20A
+    seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true",
+            "order_masks_gate_awake": "true", "order_masks_carved": "3", "order_masks_march_bypassed": "true",
+            "order_field_wire_step": "36", "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 32),
+            "order_journal": json.dumps({"s20": {"at": now_ms - 3600 * 1000, "fails": 0, "notes": 0}})}
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    modal_open = lambda: js("getComputedStyle(document.getElementById('modal-camera-obscura')).display") != "none"
+    wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
+    bar = lambda: js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+    bar_desc = lambda: js("document.querySelector('.messenger-waypoint-desc')?.innerText || ''")
+    card = lambda: js("document.getElementById('view-trail').innerText")
+    notes = lambda: js("(() => { const b = document.getElementById('camera-feedback').nextElementSibling; return b && b.classList.contains('hint-ladder') && b.offsetParent ? b.querySelectorAll('.hint-ladder-note').length : 0; })()")
+
+    def open_wire():
+        js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+        page.wait_for_timeout(2200)
+
+    # 1 hour into the 3-hour pause: the door is shut and the chat says when it opens
+    open_wire()
+    check("Fragment I Is Set" in bar() and "opens in" in bar_desc() and get("order_field_wire_step") == "36", "the pause after Fragment I keeps the chat at its bar, with the hours left", bar_desc())
+    js("window.selectStageStation(41)"); page.wait_for_timeout(500)
+    check(not modal_open() and "OPENS IN" in card(), "the card says when the door opens and the room stays shut")
+
+    # the pause is over: the seal of Sheet 20A is the key
+    js("localStorage.setItem('order_journal', JSON.stringify({s20: {at: %d, fails: 0, notes: 0}}))" % (now_ms - 4 * 3600 * 1000))
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    open_wire()
+    check("seal on Sheet 20A" in bar_desc() and get("order_field_wire_step") == "36", "after the pause the chat asks for the seal of Sheet 20A", bar_desc())
+    js("window.selectStageStation(41)"); page.wait_for_timeout(500)
+    check(not modal_open() and "SEAL OF SHEET 20A" in card(), "the card asks for the seal and the room stays shut")
+    check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept(%s)" % json.dumps(printed_code)) == 41,
+          "only the code printed on the sheet turns the key")
+
+    # the key is in: Hermes writes from the head of the stair
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    open_wire()
+    check(get("order_field_wire_step") == "37" and "Sheet 20A" in wire_text() and js("document.querySelectorAll('#wire-choices-grid button').length") == 3,
+          "with the seal turned the chat reaches step 37: the stair, Sheet 20A and 3 replies")
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(9000)
+    check(get("order_field_wire_step") == "38" and "Station 21 Awaits" in bar() and "DARK ROOM" in wire_text(),
+          "the answer takes him down to the dark room, and the bar waits for Station 21", bar())
+
+    # the room: the picture starts upside down and blurred, and only a sharp picture can be pointed at
+    js("window.selectStageStation(41)"); page.wait_for_timeout(500)
+    check(modal_open() and js("window.__camera.angle()") == 180 and not js("window.__camera.sharp()")
+          and js("document.getElementById('camera-city').style.filter").startswith("blur"), "the dark room opens with the city upside down and blurred")
+    check(js("document.querySelectorAll('#camera-city .camera-spot').length") == 11 and js("document.querySelectorAll('#camera-city .camera-smoke').length") == 9,
+          "eleven places can be pointed at and three chimneys smoke on the wall")
+    js("window.__camera.pick('house_d')"); page.wait_for_timeout(200)
+    check(get("order_camera_obscura_completed") is None and "blurred" in js("document.getElementById('camera-feedback').innerText") and js("window.__camera.fails()") == 0,
+          "pointing at a blurred picture does nothing and costs no miss")
+
+    # the lens ring: the keyboard, then a drag
+    page.focus("#camera-ring")
+    page.keyboard.press("Home")
+    check(js("window.__camera.angle()") == 0 and js("window.__camera.sharp()") and js("document.getElementById('camera-ring').getAttribute('aria-valuetext')") == "upright and sharp",
+          "Home stands the picture upright and sharp")
+    page.keyboard.press("End"); page.keyboard.press("PageDown"); page.keyboard.press("ArrowLeft")
+    check(js("window.__camera.angle()") == 130, "End, Page Down and the left arrow turn the ring by 45 and 5 degrees", str(js("window.__camera.angle()")))
+    box = page.locator("#camera-ring").bounding_box()
+    cx, cy = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+    page.mouse.move(cx + 40, cy); page.mouse.down(); page.mouse.move(cx + 30, cy - 30, steps=4); page.mouse.move(cx, cy - 46, steps=4); page.mouse.up()
+    check(js("window.__camera.sharp()") and js("document.getElementById('camera-city').classList.contains('is-sharp')"), "dragging the ring up to its mark brings the city upright and sharp", str(js("window.__camera.angle()")))
+
+    # wrong places, then the right one
+    js("window.__camera.pick('windmill')"); page.wait_for_timeout(100)
+    check("exactly as it was" in js("document.getElementById('camera-feedback').innerText") and js("window.__camera.fails()") == 1, "a place that did not change is refused")
+    js("window.__camera.pick('tower')"); page.wait_for_timeout(100)
+    check("new flag" in js("document.getElementById('camera-feedback').innerText") and js("window.__camera.found()") == ["flag"],
+          "a place that changed but hides nobody is named as one of the four changes")
+    js("window.__camera.pick('market')"); page.wait_for_timeout(300)
+    check(js("document.getElementById('camera-telem-found').innerText") == "[ 2 / 4 ]" and notes() == 1 and get("order_camera_obscura_completed") is None,
+          "three misses: two changes seen and Hermes's first note appears under the wall")
+    js("window.__camera.pick('house_c'); window.__camera.pick('gate'); window.__camera.pick('bridge')"); page.wait_for_timeout(300)
+    check(notes() == 2 and js("window.__camera.fails()") == 6, "six misses: the second note")
+    page.focus("#camera-city .camera-spot[data-place='house_d']")
+    page.keyboard.press("Enter"); page.wait_for_timeout(500)
+    check(get("order_camera_obscura_completed") == "true" and js("document.getElementById('camera-telem-found').innerText") == "4 / 4 ✓"
+          and js("document.getElementById('camera-victory').style.display") != "none" and js("window.__camera.angle()") == 0,
+          "the keyboard points at the narrow house: the hideout is found, four changes seen")
+    check(js("document.getElementById('camera-fragment-svg').childNodes.length") > 3 and "Fragment II" in js("document.getElementById('camera-victory').innerText"),
+          "Fragment II is drawn in the victory card")
+    page.click("#btn-camera-finish-station"); page.wait_for_timeout(1200)
+    st = js(MIRROR_JS)
+    check(not modal_open() and st["set"] == 2 and st["next"] == "42", "closing the room sets Fragment II and the mirror points at the Whispering Gallery", str(st)[:160])
+
+    # the debrief on the wire, and the next door
+    open_wire()
+    check(get("order_field_wire_step") == "39" and "Fragment II is in my hands" in wire_text(), "the chat reaches the Station 21 debrief")
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(9000)
+    check(get("order_field_wire_step") == "40" and "FRAGMENT II SET" in wire_text() and "Fragment II Is Set" in bar(), "the debrief ends at step 40 with Fragment II set", bar())
+    check("Whispering Gallery" in bar_desc(), "the bar names the next room", bar_desc())
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("window.selectStageStation(41)"); page.wait_for_timeout(500)
+    check(modal_open() and js("window.__camera.angle()") == 0 and js("document.getElementById('camera-victory').style.display") != "none",
+          "after a reload the room is still solved and upright")
+    ctx.close()
+
+    # the tester: Play this game lands where Hermes reaches the room
+    ctx, page, errors = new_page(browser, {**seed, "the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html?tester=1", wait_until="load")
+    page.wait_for_timeout(2500)
+    node = page.evaluate("window.TesterDesert.jumpTo('s21')")
+    check(node == 41 and page.evaluate("localStorage.getItem('order_field_wire_step')") == "38"
+          and page.evaluate("localStorage.getItem('order_masks_gate_completed')") == "true"
+          and page.evaluate("localStorage.getItem('order_camera_obscura_completed')") is None,
+          "the tester's Play this game: Station 20 done, Station 21 open, the chat at step 38")
+    check(not errors, "no JS errors in the dark room", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -2304,9 +2424,10 @@ SECTIONS = {
     "notebook": test_notebook, "pause": test_stage_pause, "ashes": test_ashes,
     "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
     "journey": test_journey, "seals": test_seals, "a11y": test_a11y, "offline": test_offline,
+    "camera": test_camera_obscura,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "camera"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

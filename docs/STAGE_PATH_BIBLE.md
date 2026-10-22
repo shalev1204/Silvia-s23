@@ -202,9 +202,21 @@ Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{
 | Pieza | Estado |
 | :--- | :--- |
 | Biblia del Stage Path | ✅ Este documento |
-| Base web (pestaña, mapa del espejo + caleidoscopio, chat, probador) | ✅ Espejo Vivo (`stage-mirror.js`), pestaña Path III, Field Wire 33–36, probador `s20` |
-| Hojas 19 a 26 (impresión) | ✅ Hoja 19 (19A, 19B) · ⏳ Hojas 20 a 26 · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
-| Estaciones 20 a 28 | ✅ Estación 20 · ⏳ Estaciones 21 a 28 |
+| Base web (pestaña, mapa del espejo + caleidoscopio, chat, probador) | ✅ Espejo Vivo (`stage-mirror.js`), pestaña Path III, Field Wire 33–40, probador `s20` y `s21` |
+| Hojas 19 a 26 (impresión) | ✅ Hoja 19 (19A, 19B) · 🟡 Hoja 20 (solo la cara A; la 20B llega con la Estación 22) · ⏳ Hojas 21 a 26 · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
+| Estaciones 20 a 28 | ✅ Estaciones 20 y 21 · ⏳ Estaciones 22 a 28 |
+
+### Estación 21 · The Camera Obscura (Hoja 20A · Fragmento II) · construida el 22-10-2026
+
+**Decisiones del Operador (22-10-2026)**: enigma «antes y después» (la hoja es la ciudad de ayer, la sala la de hoy); un anillo de lente que se arrastra (dedo, ratón o flechas); cuatro cambios, uno es el escondite; la sala abre **3 h** después del Fragmento I. Ficha §6.1: girar y señalar, vista, dificultad 2, acaba señalando un lugar.
+
+- **La ciudad** sale de una sola fuente, `scripts/journal/camera_city.py`: once lugares (molino, casa del molino, torre del reloj, fuente, sala con cúpula, mercado, casa estrecha tras el mercado, casa junto al mercado, casa de las contraventanas, puente, puerta de la ciudad). La hoja dibuja la versión *antes*, la web la versión *ahora* (`web/assets/js/camera-city-data.js`, generado; el mismo script escribe la miniatura de la ficha). **Los cuatro cambios**: una bandera nueva en la torre, un carro en la calle, la contraventana de la casa de las contraventanas (abierta → cerrada) y la chimenea fría de la casa estrecha que ahora humea (**el escondite**). Antes humeaban dos chimeneas (casa del molino y casa junto al mercado); ahora, tres.
+- **Hoja 20A**: la ciudad «antes» girada 180° (boca abajo, como la proyecta la pared; el texto no gira), pie «Look at the sky, the roofs, the shutters and the street.», Fragmento II con el plano del espejo y **el sello** (QR, 42 mm) cuyo código está en `journal/stage_seals.json` (hash en `SEALS[41]`). La cara B (20B, The Whispering Gallery, Estación 22) no existe aún: la hoja 20 se imprime con el dorso en blanco hasta entonces.
+- **Web** (`web/hub/js/stations/s21-camera-obscura.js`): la imagen empieza boca abajo y desenfocada; el **anillo** la gira (se encoge lo justo para caber) y solo **nítida y derecha (±7°)** se puede señalar (un clic con la imagen borrosa no cuesta fallo). Teclado: flechas ±5° (Shift ±1°), Re Pág/Av Pág ±45°, Inicio derecha, Fin boca abajo; cada lugar es un botón con nombre. Señalar un cambio falso lo apunta en las cuatro casillas («A flag», «A cart», «A shutter») y cuenta como fallo; un lugar sin cambios dice «exactly as it was». Premio: Fragmento II. Sin ecuación.
+- **Pistas** (#6): id `s21-city`, tres notas (los cuatro cambios y cuál es fuego; cuenta de chimeneas con humo, dos en la hoja y tres en la pared; empezar por el mercado y mirar la casa estrecha). Ask Hermes: «Why is the city upside down on Sheet 20A?» (desde la Estación 20) y «What did we find in the narrow house?» (al resolverla). Sonido ambiental «dark room» (#4). Pausa de 3 h (#3).
+- **Field Wire**: 37 (las velas se consumen, la Mirror Speaker abre una puerta y una escalera; hoja 20A a mano) → 38 (abajo, un agujero en la pared; la barra espera a la Estación 21) → 39 (balance: Fragmento II en la chimenea, el sello de la ceniza arañado en las paredes, Aurelia: «un fuego así no lo encienden quienes quieren esconderse») → 40 (cierre). Tras el 36 el chat espera pausa y sello y mira de nuevo cada medio minuto. `WIRE_LAST_STEP = 40`.
+- **Verificación**: sección `camera` del smoke (pausa → sello real → chat → anillo → fallos y pistas → teclado → Fragmento II → chat → tester); la sala está también en `a11y` (foco, contraste, táctil, sin desbordes).
+- **Pendiente del Operador**: imprimir la Hoja 20 (`journal/impresion/hojas_doble_cara/Hoja_20_Camera_Obscura_y_cara_B_pendiente.pdf`, dorso en blanco). Hasta que Silvia escanee el sello de la 20A la puerta sigue cerrada (Carles la abre desde el probador).
 
 ### Estación 20 · The Gate of a Thousand Masks (Hoja 19B · Fragmento I)
 

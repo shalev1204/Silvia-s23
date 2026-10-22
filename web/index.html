@@ -31,6 +31,7 @@
   <script src="./assets/maps/desert_relief_data.js"></script>
   <script src="./assets/js/desert-map-3d.js"></script>
   <script src="./assets/js/stage-mirror-data.js"></script>
+  <script src="./assets/js/camera-city-data.js"></script>
   <script src="./assets/js/stage-mirror.js"></script>
 
   <!-- Preload Critical Archival Plates (WebP Optimized for Instant Load) -->
@@ -66,6 +67,7 @@
   <link rel="stylesheet" href="./hub/css/stations/s18-polybius-stele.css">
   <link rel="stylesheet" href="./hub/css/stations/s19-oracle-horizon.css">
   <link rel="stylesheet" href="./hub/css/stations/s20-masks-gate.css">
+  <link rel="stylesheet" href="./hub/css/stations/s21-camera-obscura.css">
   <link rel="stylesheet" href="./hub/css/hint-ladder.css">
   <link rel="stylesheet" href="./hub/css/previously.css">
   <link rel="stylesheet" href="./hub/css/field-journal.css">
@@ -3675,6 +3677,89 @@
     </div>
   </div>
 
+  <!-- Station 21 · The Camera Obscura (Tower III, Stage Path) -->
+  <div class="monolith-modal-backdrop is-stage-room" id="modal-camera-obscura" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="camera-modal-title">
+    <div class="monolith-window">
+      <div class="monolith-header">
+        <div class="monolith-title-wrap">
+          <span class="monolith-title-icon" aria-hidden="true">🕳️</span>
+          <div>
+            <h2 class="monolith-title" id="camera-modal-title">THE CAMERA OBSCURA</h2>
+            <div class="monolith-subtitle">Station 21 · Tower III · The City on the Wall · Sheet 20A</div>
+          </div>
+        </div>
+        <button type="button" class="monolith-close-btn" id="btn-close-camera" aria-label="Close The Camera Obscura">✕</button>
+      </div>
+
+      <div class="monolith-telemetry">
+        <div>EXPEDITION:<strong>TOWER III // THE DARK ROOM</strong></div>
+        <div>CHANGES SEEN:<strong id="camera-telem-found">[ 0 / 4 ]</strong></div>
+        <div>HIDEOUT:<strong id="camera-telem-hideout">[ UNKNOWN ]</strong></div>
+        <div>FRAGMENT II:<strong id="camera-telem-fragment">[ MISSING ]</strong></div>
+      </div>
+
+      <div class="monolith-body">
+        <div class="monolith-panel">
+          <div class="monolith-card">
+            <div class="monolith-card-title">The City on the Wall</div>
+            <div class="camera-speaker" id="camera-speaker"></div>
+            <p class="camera-lead">Hold <strong>Sheet 20A</strong> against the wall. The city is upside down on both. Four things have changed since the sheet was drawn: turn the ring until the picture stands upright and sharp, then point at where the raiders hide.</p>
+            <div class="camera-wall">
+              <svg class="camera-city" id="camera-city" viewBox="-40 0 1280 640" role="group" aria-label="The city of the third tower, projected on the wall of the dark room. Eleven places can be pointed at."></svg>
+            </div>
+            <div class="camera-controls">
+              <div class="camera-ring" id="camera-ring" role="slider" tabindex="0" aria-label="Lens ring: turn the picture" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="359" aria-valuenow="180" aria-valuetext="upside down and blurred" aria-describedby="camera-ring-help">
+                <svg viewBox="0 0 112 112" aria-hidden="true">
+                  <circle cx="56" cy="56" r="46" class="camera-ring-track"></circle>
+                  <circle cx="56" cy="56" r="34" class="camera-ring-lens"></circle>
+                  <path d="M56 4 L52 14 L60 14 Z" class="camera-ring-mark"></path>
+                  <circle cx="56" cy="102" r="9" class="camera-ring-knob" id="camera-ring-knob"></circle>
+                </svg>
+              </div>
+              <div class="camera-ring-text">
+                <div id="camera-ring-help">Blurred. Turn the ring until the city stands upright.</div>
+                <div class="camera-ring-keys">Drag the ring, or use the arrow keys (Home: upright).</div>
+              </div>
+            </div>
+            <div class="monolith-feedback" id="camera-feedback" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="monolith-panel">
+          <div class="monolith-card">
+            <div class="monolith-card-title">The Dark Room</div>
+            <ul class="laby-rules">
+              <li>A camera obscura is a dark room with a small hole in its wall. The light of the outside draws the whole city on the opposite wall, upside down.</li>
+              <li>Sheet 20A shows the city as it stood the day before, drawn upside down the way this wall shows it. Compare them: four things are different.</li>
+              <li>The picture can be pointed at only when it is upright and sharp.</li>
+              <li>The raiders carry their fire wherever they go.</li>
+            </ul>
+            <ul class="camera-changes" id="camera-changes" aria-label="The four changes"></ul>
+            <div class="laby-hint" id="camera-hint" style="display: none;"></div>
+          </div>
+
+          <div class="monolith-card monolith-victory" id="camera-victory" style="display: none;">
+            <div class="monolith-card-title">✦ The Hideout Is Found</div>
+            <p id="camera-victory-text"></p>
+            <div class="masks-fragment-row">
+              <svg class="masks-fragment" id="camera-fragment-svg" viewBox="0 0 100 100" role="img" aria-label="Fragment II of the mirror of Tower III, with a window and a candle in it."></svg>
+              <div>
+                <strong class="masks-fragment-name">Fragment II</strong>
+                <span>Two ninths of the mirror of Tower III. Seven pieces are still hidden in the house.</span>
+              </div>
+            </div>
+            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-camera-finish-station">✦ Set Fragment II in the Mirror ➔</button>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE DARK ROOM</div>
+            <div class="monolith-dispatch" id="camera-dispatch-text" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- From the desert to the stage (shown once, after the audience with the Oracle) -->
   <div class="stage-passage-overlay" id="stage-passage-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="stage-passage-title">
     <div class="stage-passage-card">
@@ -4061,6 +4146,7 @@
   <script src="./hub/js/stations/s18-polybius-stele.js"></script>
   <script src="./hub/js/stations/s19-oracle-horizon.js"></script>
   <script src="./hub/js/stations/s20-masks-gate.js"></script>
+  <script src="./hub/js/stations/s21-camera-obscura.js"></script>
   <script src="./hub/js/sandstorm-lockdown.js"></script>
   <script src="./hub/js/previously.js"></script>
   <script src="./hub/js/field-journal.js"></script>

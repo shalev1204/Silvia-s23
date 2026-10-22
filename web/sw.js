@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '3ec6abf3dd8f';  // 140 files, 30.8 MB
+var VERSION = '11022423f38b';  // 144 files, 30.9 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -40,6 +40,7 @@ var PRECACHE = [
   "./assets/items/item_spyglass_lens.png",
   "./assets/items/item_surveyor_compass.jpg",
   "./assets/items/item_tuning_pebble.webp",
+  "./assets/js/camera-city-data.js",
   "./assets/js/desert-map-3d.js",
   "./assets/js/stage-mirror-data.js",
   "./assets/js/stage-mirror.js",
@@ -56,6 +57,7 @@ var PRECACHE = [
   "./assets/radio_station_bg.jpg",
   "./assets/silvia_navigator_avatar.jpg",
   "./assets/thumbnails/cairn_iv_preview.webp",
+  "./assets/thumbnails/camera_obscura_preview.webp",
   "./assets/thumbnails/celestial_flower_preview.webp",
   "./assets/thumbnails/chronicle_station8_locked.webp",
   "./assets/thumbnails/desert_frontier_preview.webp",
@@ -108,6 +110,7 @@ var PRECACHE = [
   "./hub/css/stations/s18-polybius-stele.css",
   "./hub/css/stations/s19-oracle-horizon.css",
   "./hub/css/stations/s20-masks-gate.css",
+  "./hub/css/stations/s21-camera-obscura.css",
   "./hub/css/trail-overlays.css",
   "./hub/css/view-archives.css",
   "./hub/css/view-chronicles.css",
@@ -146,6 +149,7 @@ var PRECACHE = [
   "./hub/js/stations/s18-polybius-stele.js",
   "./hub/js/stations/s19-oracle-horizon.js",
   "./hub/js/stations/s20-masks-gate.js",
+  "./hub/js/stations/s21-camera-obscura.js",
   "./hub/js/tester-panel.js",
   "./shared/navigator.css",
   "./shared/navigator.js"

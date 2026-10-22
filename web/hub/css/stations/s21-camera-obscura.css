@@ -1,0 +1,40 @@
+    /* ---- Station 21 · The Camera Obscura ---- */
+    .camera-lead { margin: 0 0 8px; font-size: 0.84rem; }
+    .camera-speaker:empty { display: none; }
+    .camera-wall {
+      border: 1px solid rgba(201, 154, 59, 0.45);
+      border-radius: 12px;
+      background: #070506;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+      line-height: 0;
+    }
+    .camera-city { display: block; width: 100%; height: auto; transition: filter 0.2s ease; user-select: none; -webkit-user-select: none; }
+    .camera-wall-bg { fill: #070506; }
+    .camera-sky { fill: rgba(246, 227, 176, 0.05); }
+    .camera-wall-edge { fill: none; stroke: rgba(201, 154, 59, 0.2); stroke-width: 2; }
+    .camera-line { fill: none; stroke: #f3e2b8; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; opacity: 0.92; }
+    .camera-line.is-wall { fill: rgba(246, 227, 176, 0.1); }
+    .camera-line.is-roof { fill: rgba(246, 227, 176, 0.26); }
+    .camera-smoke { fill: none; stroke: #f3e2b8; stroke-width: 1.6; opacity: 0.7; transform-box: fill-box; transform-origin: center; animation: camera-smoke-rise 4.2s ease-in-out infinite; }
+    @keyframes camera-smoke-rise { 0%, 100% { opacity: 0.35; transform: translateY(0) scale(0.92); } 50% { opacity: 0.8; transform: translateY(-5px) scale(1.06); } }
+    .camera-spot { fill: transparent; stroke: transparent; stroke-width: 2; cursor: default; }
+    .camera-city.is-sharp .camera-spot { cursor: pointer; }
+    .camera-city.is-sharp .camera-spot:hover { stroke: rgba(253, 230, 138, 0.7); fill: rgba(253, 230, 138, 0.06); }
+    .camera-spot:focus-visible { stroke: #fde68a; stroke-width: 4; fill: rgba(253, 230, 138, 0.08); }
+    /* on a touch screen each place gets a wide invisible margin, so a finger on a narrow house still lands on a place */
+    @media (pointer: coarse) { .camera-spot:not(:focus-visible) { stroke-width: 80px; } }
+    .camera-controls { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+    .camera-ring { flex: 0 0 auto; width: 112px; height: 112px; border-radius: 50%; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+    .camera-ring[aria-disabled="true"] { cursor: default; opacity: 0.6; }
+    .camera-ring svg { display: block; width: 100%; height: 100%; }
+    .camera-ring-track { fill: rgba(20, 8, 16, 0.85); stroke: rgba(201, 154, 59, 0.6); stroke-width: 6; }
+    .camera-ring-lens { fill: #0c0709; stroke: rgba(246, 227, 176, 0.35); stroke-width: 1.5; }
+    .camera-ring-mark { fill: #fde68a; }
+    .camera-ring-knob { fill: #f7dc8c; stroke: #3b2a17; stroke-width: 2; }
+    .camera-ring-text { font-size: 0.84rem; line-height: 1.4; }
+    .camera-ring-keys { margin-top: 4px; font-size: 0.74rem; color: #b8a07a; }
+    .camera-changes { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .camera-change { padding: 3px 10px; border-radius: 999px; border: 1px dashed rgba(201, 154, 59, 0.45); font-size: 0.76rem; color: #b8a07a; }
+    .camera-change.is-found { border-style: solid; border-color: #f7dc8c; color: #f7dc8c; background: rgba(247, 220, 140, 0.08); }
+    @media (prefers-reduced-motion: reduce) { .camera-smoke { animation: none; } .camera-city { transition: none; } }

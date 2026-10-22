@@ -7,7 +7,7 @@
     // (order_stage_pause_skipped_<node>). Loaded before hub-core.js, which asks it when it draws a card.
     window.EclipseStagePause = (function () {
       'use strict';
-      var HOURS = { 41: null, 42: null, 43: null, 44: null, 45: null, 46: null, 47: null, 48: null };
+      var HOURS = { 41: 3, 42: null, 43: null, 44: null, 45: null, 46: null, 47: null, 48: null };
 
       function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
       function rooms() { return window.StageMirror ? window.StageMirror.stations : []; }
