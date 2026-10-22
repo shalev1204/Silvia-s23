@@ -22,7 +22,7 @@
 | 13 | Final distinto según el estilo de juego | L | medio | **Especificada; perfil del viaje implementado (22-10-2026)**: `hub/js/journey-profile.js`, `scripts/audit/journey_report.py`; las escenas se construyen con la Torre I y la Bóveda |
 | 14 | QR o palabra clave por hoja | S | medio | **Implementada (22-10-2026)**: sellos con QR en las caras de juego de las Hojas 20–26 (`scripts/journal/sheet_seal.py`) y llave de cada sala en el Hub (`hub/js/sheet-seals.js`) |
 | 15 | Verificador de hojas unificado | M | alto | **Implementada (22-10-2026)**: `scripts/journal/verify_sheets.py` (colisiones texto–dibujo, tamaños, vocabulario y Reglas 9/10, sellos); bloquea las Hojas 19–26 y corre dentro de `build_stage_path.py` |
-| 16 | Vista previa de impresión con las 8 hojas | S | medio | Parcial: `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
+| 16 | Vista previa de impresión con las 8 hojas | S | medio | **Implementada (22-10-2026)**: `scripts/journal/stage_preview.py` escribe `journal/impresion/02_STAGE_PATH_VISTA_PREVIA_A4.pdf` (pliego de las 16 caras + anillas, pie y doblez por hoja) al construir las hojas |
 | 17 | Dividir `web/index.html` (~29.000 líneas) | L | alto (largo plazo) | **Implementada (20-10-2026)**: `web/hub/css` y `web/hub/js`, scripts clásicos sin build |
 | 18 | Smoke más rápido | M | alto | **Implementada (20-10-2026)**: `--jobs`, `--quick`, `--only` en `web_smoke.py` |
 | 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Hecho, probado y desplegado** (Supabase `aoochekcbugawaurllco`, 21-10-2026) |
@@ -278,8 +278,21 @@ La frase del Email 1 (*You were never only the seeker, you were always the treas
 
 **Verificación**: `python3 scripts/journal/verify_sheets.py` (todas, código de salida 1 si falla una cara 19–26) o `--sheets 19-26`; `python3 scripts/journal/build_stage_path.py` revisa y construye.
 
-### 16. Vista previa de impresión de las 8 hojas (S)
-Pendiente de especificar.
+### 16. Vista previa de impresión de las 8 hojas (S) · implementada (22-10-2026)
+**Decisiones del Operador (22-10-2026)**
+- **Qué enseña**: el **pliego de miniaturas** (las 16 caras de las Hojas 19–26 sobre el papel real; las que faltan, como hueco rotulado) y las **marcas de anillas y doblez** sobre cada hoja.
+- **Formato**: un **PDF de varias páginas** (A4 apaisado).
+- **Imposición**: **A5 sueltas, como ahora**; la vista previa es solo para revisar, no se imprime.
+- **Cuándo**: **al construir las hojas**.
+
+**Implementación**
+- `scripts/journal/stage_preview.py` escribe `journal/impresion/02_STAGE_PATH_VISTA_PREVIA_A4.pdf`: página 1, el pliego (dos filas de cuatro hojas, cara A y cara B lado a lado, con número y título; las caras sin construir muestran su tipo, su estación y su título provisional de `STAGE_PATH_BIBLE.md` §5). Después, una página por hoja construida con las dos caras grandes y, encima, las zonas del papel rayadas: anillas (cara A X < 165, cara B X > 1583), pie de 75 px y, si la cara se dobla, su línea de doblez con 40 px libres a cada lado. Bajo cada cara, la tinta hallada en anillas y pie (debe ser 0: «Limpia» o «REVISAR»).
+- El doblez se declara en `FOLD_LINES` de `build_stage_path.py` (cara → dos puntos); hoy vacío, lo usará la Hoja 24A (#8).
+- `build_stage_path.build()` termina regenerando el paquete de impresión 19–26 (`build_impresion_master.build_stage_bundle()`, que antes había que correr a mano) y la vista previa, con las caras ya dibujadas. Solo: `python3 scripts/journal/stage_preview.py`.
+- Es un archivo para Carles: no va a `web/` ni a Silvia.
+- **Al construir cada hoja 20–26**: añadirla a `STAGE_SHEETS` de `build_stage_path.py` **y** de `build_impresion_master.py` (las dos listas siguen separadas).
+
+**Verificación**: `python3 scripts/journal/build_stage_path.py` (verifica, construye, paquete y vista previa); revisión visual de las dos páginas y de un doblez de prueba (fuera del repositorio).
 
 ### 17. Dividir `index.html` (L) · implementada y verificada (20-10-2026)
 **Punto de partida**: CSS ~10.200 líneas en un `<style>` (196 comentarios de sección); HTML ~4.000; JS principal ~15.000 en un `<script>`: un núcleo de ~7.900 líneas (una sola clausura) seguido de 16 IIFE ya aisladas (`initGrandDesertMapAndChasm`, `initTesterPanel`, `initSunMonolith` … `initMasksGate`, `initSandstormLockdown`), que se comunican por `window.*`. El Operador abre el Hub por `file://`: no se pueden usar módulos ES.

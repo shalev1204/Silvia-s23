@@ -12,7 +12,7 @@ Sheet 19
 Margins: Cara A has no pixels at X < 165, Cara B none at X > 1583 (ring holes); 75 px clear at the foot.
 
 Run alone:  python3 scripts/journal/build_stage_path.py   (proof-reads every face with verify_sheets.py, then writes
-            journal/page19 PDFs and mockups)
+            journal/page19 PDFs and mockups, the 19-26 bundle and the print preview in journal/impresion)
 """
 
 import math
@@ -553,6 +553,8 @@ STAGE_SHEETS = [
      ("Hoja 19 · Cara A (Lore: The Unsent Letter)", render_lore_19a_unsent_letter, "page19_front", False, False),
      ("Hoja 19 · Cara B (Game S1: The Gate of a Thousand Masks · Station 20)", render_game_19b_masks, "page19_back", True, False)),
 ]
+# stem -> ((x0, y0), (x1, y1)): where a face folds (Sheet 24A, idea #8), marked in the print preview (stage_preview.py)
+FOLD_LINES = {}
 
 
 def build(sheets=STAGE_SHEETS):
@@ -563,6 +565,7 @@ def build(sheets=STAGE_SHEETS):
     paper = cv2.imread(os.path.join(journal, "page01", "real_paper_300dpi.png"))
     if paper is not None:
         paper = cv2.resize(paper, (CANVAS_WIDTH_PX, CANVAS_HEIGHT_PX), interpolation=cv2.INTER_LANCZOS4)
+    drawn = {}
     for num, *faces in sheets:
         base = os.path.join(journal, f"page{num:02d}")
         os.makedirs(os.path.join(base, "pdf"), exist_ok=True)
@@ -582,7 +585,12 @@ def build(sheets=STAGE_SHEETS):
                 a = (canvas[:, :, 3].astype(np.float32) / 255.0)[:, :, None]
                 out = (canvas[:, :, :3].astype(np.float32) * a + bg.astype(np.float32) * (1 - a)).astype(np.uint8)
                 cv2.imwrite(os.path.join(base, "mockups", f"{stem}_real_paper_mockup.jpg"), out, [cv2.IMWRITE_JPEG_QUALITY, 96])
+            drawn[stem] = canvas
             print(f"  ✓ {label}")
+    # the bundle Silvia receives and the preview Carles reads before printing (#16)
+    from scripts.journal import build_impresion_master, stage_preview
+    build_impresion_master.build_stage_bundle()
+    stage_preview.build_preview(drawn)
 
 
 if __name__ == "__main__":
