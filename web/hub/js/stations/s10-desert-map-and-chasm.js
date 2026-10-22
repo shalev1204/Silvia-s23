@@ -87,6 +87,12 @@
           showDesertToast('Station ' + st.station + ' · ' + st.room + ': its door opens in ' + wait + '.');
           return;
         }
+        // Then the seal on its sheet (hub/js/sheet-seals.js)
+        const face = window.EclipseSheetSeals ? window.EclipseSheetSeals.missing(node) : '';
+        if (face && !(typeof window.isAdminTester === 'function' && window.isAdminTester())) {
+          showDesertToast('Station ' + st.station + ' · ' + st.room + ': its door opens with the seal on Sheet ' + face + '. Scan it with your camera.');
+          return;
+        }
         const opener = window.STAGE_OPENERS[node];
         if (typeof opener === 'function') opener();
         else showDesertToast('Station ' + st.station + ' · ' + st.room + ': the Mirror Speaker has not opened this room yet.');

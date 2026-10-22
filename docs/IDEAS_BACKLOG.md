@@ -20,7 +20,7 @@
 | 11 | Mirror Speaker que reacciona al estilo de juego | M | alto | **Implementada (21-10-2026)**: una línea en escritura de espejo al abrirse cada sala; `hub/js/mirror-speaker.js` |
 | 12 | Cartas de Aurelia desbloqueables en el Hub | S | medio | **Implementada (22-10-2026)**: tres cartas de 1970–71 en Chronicles, con los cuadernos I–III; `hub/js/aurelia-letters.js` |
 | 13 | Final distinto según el estilo de juego | L | medio | **Especificada; perfil del viaje implementado (22-10-2026)**: `hub/js/journey-profile.js`, `scripts/audit/journey_report.py`; las escenas se construyen con la Torre I y la Bóveda |
-| 14 | QR o palabra clave por hoja | S | medio | No existe |
+| 14 | QR o palabra clave por hoja | S | medio | **Implementada (22-10-2026)**: sellos con QR en las caras de juego de las Hojas 20–26 (`scripts/journal/sheet_seal.py`) y llave de cada sala en el Hub (`hub/js/sheet-seals.js`) |
 | 15 | Verificador de hojas unificado | M | alto | Piezas sueltas: prueba de márgenes en cada `build_*.py`, `lint_lore_and_vocabulary.py`; no hay comprobación de colisiones texto-dibujo |
 | 16 | Vista previa de impresión con las 8 hojas | S | medio | Parcial: `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
 | 17 | Dividir `web/index.html` (~29.000 líneas) | L | alto (largo plazo) | **Implementada (20-10-2026)**: `web/hub/css` y `web/hub/js`, scripts clásicos sin build |
@@ -242,8 +242,20 @@ La frase del Email 1 (*You were never only the seeker, you were always the treas
 
 **Verificación**: sección `journey` del smoke (perfil vacío al empezar; con un viaje sembrado, cifras, franja, nombre y objeto correctos; el tono coincide con `hermesDominantTone()`) y una ejecución de `journey_report.py` con un progreso de prueba.
 
-### 14. QR o palabra clave por hoja (S)
-Pendiente de especificar.
+### 14. QR o palabra clave por hoja (S) · implementada (22-10-2026)
+**Decisiones del Operador (22-10-2026)**
+- **Para qué**: **llave de la estación**. La sala web no se abre hasta que Silvia escanea el sello de su hoja: prueba que tiene el papel delante y evita saltárselo.
+- **Forma**: **QR camuflado en un sello** renacentista: medallón de doble anillo con 24 marcas (como el disco de Aurelia) y el QR en el centro, con su margen limpio. Sin palabra impresa.
+- **Hojas**: **solo 19–26**. Llevan sello las caras de juego de las Hojas 20 a 26 (20A, 20B, 21B, 22A, 23A, 24A, 25A, 26A: Estaciones 21 a 28). La Estación 20 (19B) ya estaba abierta antes de los sellos y no lo necesita.
+
+**Implementación**
+- `scripts/journal/sheet_seal.py`: un código de 8 letras A–Z por cara (se crea una vez y se guarda en `journal/stage_seals.json`), el QR apunta a `https://the-eclipse-order.pages.dev/?seal=CÓDIGO`. `draw_seal(canvas, cx, cy, r, cara)` dibuja el medallón en la hoja; cada sello se relee con OpenCV antes de aceptarlo. Ejecutado solo, escribe vistas previas en `journal/seals/` e imprime el hash de cada código. Necesita `segno` (`pip install segno`), solo para las hojas.
+- `web/hub/js/sheet-seals.js` (`EclipseSheetSeals`): el Hub guarda **solo el hash** (FNV-1a) de cada código en `SEALS[nodo]`, que queda en `null` hasta que se construye la sala y se imprime su hoja (como las horas de las pausas, #3). Al abrir el Hub con `?seal=`, gira la llave (`order_sheet_seal_<nodo>`, viaja con la nube), quita el código de la dirección y lleva a la sala. Un sello escaneado antes de tiempo queda guardado.
+- Mientras falta el sello, la ficha de la sala, la puerta y el Field Wire dicen *«opens with the seal on Sheet 20A»*. Va después de la pausa (#3): primero la hora, luego el sello. Carles puede abrirla desde el probador.
+- **Salida de emergencia**: si la cámara falla o la hoja no está a mano, la pista de nivel 3 de la sala le pide que escriba a Hermes, y Carles la abre desde el probador.
+- **Al construir cada sala 21–28**: dibujar su sello en la cara con `draw_seal` (zona libre, cero colisiones, mínimo 30 mm de diámetro) y pegar su hash en `SEALS`.
+
+**Verificación**: `python3 scripts/journal/sheet_seal.py` (los ocho sellos se leen de vuelta) y sección `seals` del smoke (sin hash no se pide sello; con hash la ficha, la puerta y el Field Wire lo piden; un código bueno por la dirección abre la sala y se borra de la dirección; uno malo avisa; Carles la abre).
 
 ### 15. Verificador de hojas (M)
 Pendiente de especificar.

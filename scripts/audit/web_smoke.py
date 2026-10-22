@@ -36,6 +36,8 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
      Hermes's answer on the Field Wire at the step where she read it.
  25. The journey profile for the ending: tone, days on the road, rooms, notes, favourite hour, the name she gave Hermes
      and the object she chose (scripts/audit/journey_report.py prints it for Silvia's saved journey).
+ 26. The seals of the Stage Path sheets: the QR on each game face is the key of its room; the card, the door and the
+     Field Wire ask for it, a scanned code opens the room and leaves the address, a wrong one is refused.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1735,6 +1737,52 @@ def test_journey(browser):
     ctx.close()
 
 
+def test_seals(browser):
+    print("\n26. The seals of the Stage Path sheets: a QR on each game face is the key of its room")
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "36"}
+    toast = "(document.getElementById('desert-toast-banner') || {}).textContent || ''"
+    ctx, page, errors = stage_page(browser, seed)
+    js = page.evaluate
+    room = lambda: (page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"), page.wait_for_timeout(400), js(PAUSE_JS))[2]
+    check("seal" not in room()["status"], "with no seal set for the room, nothing changes")
+    js("EclipseSheetSeals.SEALS[41] = EclipseSheetSeals.hash('TESTSEAL')")
+    st = room()
+    check("seal of sheet 20a" in st["status"] and "scan the seal on sheet 20a" in st["btn"], "the room asks for the seal of Sheet 20A", str(st))
+    js("selectStageStation(41)"); page.wait_for_timeout(300)
+    check("seal on Sheet 20A" in js(toast), "knocking on the door asks for the seal", js(toast))
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
+    wire = js("document.querySelector('#wire-completed-bar .messenger-waypoint-desc').textContent.replace(/\\u00a0/g, ' ')")
+    check("seal on Sheet 20A" in wire, "the Field Wire says the same", wire)
+    check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept('testseal')") == 41
+          and js("localStorage.getItem('order_sheet_seal_41')") == "true", "only the right code turns the key")
+    js("document.querySelector('[data-view=\"view-trail\"]').click()"); page.wait_for_timeout(800)
+    js("switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    check("seal" not in room()["status"], "with its seal turned the room is back to its own state")
+    check(not errors, "no JS errors with the seals", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # Scanning the QR: the Hub opens with ?seal=CODE (the hash is set before the page's load event, as a built room would have it)
+    ctx, page, errors = new_page(browser, {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, **seed})
+    page.add_init_script("document.addEventListener('DOMContentLoaded', () => { EclipseSheetSeals.SEALS[41] = EclipseSheetSeals.hash('TESTSEAL'); })")
+    page.goto(f"{BASE}/index.html?seal=TESTSEAL", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    check(js("localStorage.getItem('order_sheet_seal_41')") == "true" and "seal" not in js("location.search"),
+          "scanning the seal turns the key and leaves no code in the address", js("location.href"))
+    check("Sheet 20A turns" in js(toast), "the Hub says which seal turned", js(toast))
+    page.goto(f"{BASE}/index.html?seal=WRONGONE", wait_until="load"); page.wait_for_timeout(2500)
+    check("belongs to no door" in js(toast) and "seal" not in js("location.search"), "a wrong seal is refused", js(toast))
+    ctx.close()
+
+    ctx, page, errors = stage_page(browser, dict(seed, the_eclipse_active_seeker="Carles"))
+    js = page.evaluate
+    js("EclipseSheetSeals.SEALS[41] = EclipseSheetSeals.hash('TESTSEAL'); switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    page.click(".stage-mirror-ribbon .sm-room:nth-child(2)"); page.wait_for_timeout(400)
+    st = js(PAUSE_JS)
+    page.click("#insp-btn-primary"); page.wait_for_timeout(300)
+    check("tester: open it now" in st["btn"] and js("localStorage.getItem('order_sheet_seal_41')") == "true", "Carles can open the room at once", str(st))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1836,10 +1884,10 @@ SECTIONS = {
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
     "notebook": test_notebook, "pause": test_stage_pause, "ashes": test_ashes,
     "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
-    "journey": test_journey,
+    "journey": test_journey, "seals": test_seals,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

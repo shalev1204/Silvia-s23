@@ -1594,8 +1594,19 @@
               const card = roomCard();
               // A pause after the last fragment (hub/js/stage-pause.js): the door stays shut until its hour
               const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(node) : '';
-              if (!wait) return card;
               const tester = typeof window.isAdminTester === 'function' && window.isAdminTester();
+              // Then the seal on its sheet (hub/js/sheet-seals.js): the QR on the game face is the key of the room
+              const face = !wait && window.EclipseSheetSeals ? window.EclipseSheetSeals.missing(node) : '';
+              if (face) {
+                return Object.assign({}, card, {
+                  status: 'SEAL OF SHEET ' + face + ' ✦',
+                  lore: teaser + ' The door of this room opens with the seal printed on Sheet ' + face + ' of the Journal: scan it with your camera.',
+                  btnText: tester ? '⏩ Tester: open it now' : '🔒 Scan the seal on Sheet ' + face,
+                  btnDisabled: !tester,
+                  action: tester ? () => { window.EclipseSheetSeals.skip(node); return card.action ? card.action() : null; } : () => null
+                });
+              }
+              if (!wait) return card;
               return Object.assign({}, card, {
                 status: 'OPENS IN ' + wait.toUpperCase() + ' ✦',
                 lore: teaser + ' The door of this room opens in ' + wait + '.',
@@ -7077,7 +7088,8 @@
 
         if (wireCurrentStep >= WIRE_LAST_STEP) {
           const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(41) : '';
-          showWaypointBar('Fragment I Is Set · 1 of 9', 'Next: The Camera Obscura (Station 21). ' + (wait ? 'Its door opens in ' + wait + '.' : 'The Mirror Speaker has not opened that room yet.'), WIRE_LAST_STEP);
+          const face = window.EclipseSheetSeals ? window.EclipseSheetSeals.missing(41) : '';
+          showWaypointBar('Fragment I Is Set · 1 of 9', 'Next: The Camera Obscura (Station 21). ' + (wait ? 'Its door opens in ' + wait + '.' : face ? 'Its door opens with the seal on Sheet ' + face + '.' : 'The Mirror Speaker has not opened that room yet.'), WIRE_LAST_STEP);
           return;
         }
         if (wireCurrentStep === 8) {

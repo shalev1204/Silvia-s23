@@ -143,6 +143,8 @@ Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pid
 - **Salida de emergencia**: si Silvia no tiene la hoja a mano, la pista de nivel 3 le pide que escriba a Hermes; Carles puede resolverlo desde el panel de tester. No hay versión digital del truco.
 - Cumple la ficha §6.1: 25 sigue terminando en palabra tecleada, 26 en llegar a la salida y 28 sin teclear (las marcas dan el orden o la elección del rito, que se hace con una acción).
 
+**Sellos de las hojas (idea #14).** Cada cara de juego de las Hojas 20 a 26 lleva un sello de la Orden con un QR en el centro (`scripts/journal/sheet_seal.py`). Es la llave de su sala: la puerta web no se abre hasta que Silvia lo escanea. Diámetro mínimo 30 mm, en zona libre de texto y dibujo; el hash de cada código se pega en `SEALS` de `web/hub/js/sheet-seals.js` al construir la sala.
+
 ---
 
 ## 7. Personajes del Stage Path
