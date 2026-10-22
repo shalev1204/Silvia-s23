@@ -506,7 +506,7 @@
           const isVisited = isTrue && cairn.step < chasmStepIndex;
 
           svgHtml += `
-            <g class="chasm-cairn-svg-node" data-letter="${cairn.letter}" style="cursor: pointer;" onclick="window.handleChasmCairnClick('${cairn.letter}')">
+            <g class="chasm-cairn-svg-node" data-letter="${cairn.letter}" style="cursor: pointer;" aria-hidden="true" onclick="window.handleChasmCairnClick('${cairn.letter}')">
               <circle cx="${cx}" cy="${cy}" r="16" fill="${isVisited ? '#14532d' : '#1e140d'}" stroke="${isVisited ? '#22c55e' : '#d4a853'}" stroke-width="${isVisited ? '2' : '1.5'}" />
               <circle cx="${cx}" cy="${cy}" r="12" fill="none" stroke="${isVisited ? '#86efac' : '#ffe099'}" stroke-width="0.8" stroke-dasharray="2, 3" />
               <text x="${cx}" y="${cy + 5}" text-anchor="middle" font-family="'Cinzel', serif" font-size="13" font-weight="700" fill="${isVisited ? '#86efac' : '#ffe099'}">${cairn.letter}</text>

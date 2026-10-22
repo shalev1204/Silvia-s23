@@ -1,0 +1,35 @@
+    /* Keyboard and touch access (docs/IDEAS_BACKLOG.md #20). Loaded last. */
+
+    /* Every control shows where the keyboard is; the ones with their own focus style keep it */
+    :focus-visible { outline: 3px solid var(--brass-bright, #ffd592); outline-offset: 2px; }
+
+    /* On the iPad (a finger, not a mouse) */
+    @media (pointer: coarse) {
+      /* a quick double tap does not zoom the page; two fingers still do */
+      html { touch-action: manipulation; }
+
+      /* small round controls keep their size and get a 44 px area to touch */
+      .satchel-slot, .sidebar-collapse-btn, .ambience-toggle, .btn-header-messenger, .d3-pin,
+      .chasm-close-btn, .monolith-close-btn, .lexicon-close-btn, .clepsydra-close-btn, .lightbox-close-btn, .jsp-close,
+      .monolith-step-btn, .seeker-pill, .journal-ref-pill, .clepsydra-cell-btn { overflow: visible; }
+      .satchel-slot, .chasm-close-btn, .lexicon-close-btn, .clepsydra-close-btn, .monolith-close-btn, .monolith-step-btn,
+      .seeker-pill, .journal-ref-pill, .clepsydra-cell-btn { position: relative; }
+      .satchel-slot::before, .sidebar-collapse-btn::before, .ambience-toggle::before, .btn-header-messenger::before, .d3-pin::before,
+      .chasm-close-btn::before, .monolith-close-btn::before, .lexicon-close-btn::before, .clepsydra-close-btn::before,
+      .lightbox-close-btn::before, .jsp-close::before, .monolith-step-btn::before, .seeker-pill::before, .journal-ref-pill::before,
+      .clepsydra-cell-btn::before {
+        content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px);
+        transform: translate(-50%, -50%); border-radius: 50%;
+      }
+
+      /* buttons and fields with words grow to a finger's height */
+      .btn-seeker-switch, .btn-satchel-inventory, .btn-launch-decoder, .btn-historical-web, .btn-inspector-back,
+      .eq-action-btn, .letter-val-input, .monolith-btn, .chasm-cairn-btn, .btn-chasm-reset, .btn-carve-word,
+      .lexicon-word-input, .clepsydra-select, .clepsydra-key-input, .clepsydra-cell-btn, #btn-clepsydra-reset-grid,
+      .btn-chasm-finish, .monolith-key-input, input[type="range"] {
+        min-height: 44px;
+      }
+
+      /* the squares of the Desert Lexicon grow to a fingertip */
+      .lexicon-cw-cell { width: 44px; height: 44px; }
+    }

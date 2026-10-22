@@ -54,7 +54,7 @@
       pointer-events: none;
     }
     .playa-num { font-size: 1.3rem; font-weight: 700; }
-    .playa-let { font-size: 0.72rem; font-weight: 700; color: #6b4f1d; letter-spacing: 0.04em; }
+    .playa-let { font-size: 0.72rem; font-weight: 700; color: #57400f; letter-spacing: 0.04em; }
     .playa-slab.reachable { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.9), 0 0 14px rgba(245, 158, 11, 0.5); }
     .playa-slab:hover:not(.sink):not(.chosen) { transform: translateY(-2px); }
     .playa-slab.chosen {

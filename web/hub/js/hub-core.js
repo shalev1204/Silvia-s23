@@ -1845,6 +1845,7 @@
             inspBtn.style.display = 'inline-flex';
             const span = inspBtn.querySelector('span');
             if (span) span.innerText = data.btnText;
+            inspBtn.setAttribute('aria-disabled', data.btnDisabled ? 'true' : 'false');
             if (data.btnDisabled) {
               inspBtn.style.opacity = '0.55';
               inspBtn.style.cursor = 'not-allowed';

@@ -26,7 +26,7 @@
 | 17 | Dividir `web/index.html` (~29.000 líneas) | L | alto (largo plazo) | **Implementada (20-10-2026)**: `web/hub/css` y `web/hub/js`, scripts clásicos sin build |
 | 18 | Smoke más rápido | M | alto | **Implementada (20-10-2026)**: `--jobs`, `--quick`, `--only` en `web_smoke.py` |
 | 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Hecho, probado y desplegado** (Supabase `aoochekcbugawaurllco`, 21-10-2026) |
-| 20 | Accesibilidad | M | alto | Parcial: `prefers-reduced-motion` en 7 puntos del Hub, ~97 `aria-label`; sin tamaño de letra ajustable ni auditoría de contraste/teclado |
+| 20 | Accesibilidad | M | alto | **Implementada (22-10-2026)**: teclado (diálogos que toman y devuelven el foco, Esc, tarjetas operables, anillo de foco), contraste WCAG AA y objetivos táctiles de 44 px en iPad (`hub/js/a11y.js`, `hub/css/a11y.css`); sección `a11y` del smoke |
 | 21 | PWA offline | M | medio | No existe (sin manifest ni service worker) |
 | 22 | Registro de juego (va con la #19) | S | medio | **Hecho con la #19**: cada cambio, sesión y vista viaja como evento a `eclipse_events` |
 
@@ -370,8 +370,27 @@ La frase del Email 1 (*You were never only the seeker, you were always the treas
 **Fuera de alcance**: login real de Supabase, exportar a archivo, avisos por email/Telegram.
 **Verificación**: smoke nuevo (guardado tras avanzar, recuperación en navegador vacío, sin red no se pierde nada, Carles no pisa a Silvia); prueba real contra Supabase con el conector; CSP sin bloqueos.
 
-### 20. Accesibilidad (M)
-Pendiente de especificar.
+### 20. Accesibilidad (M) · implementada (22-10-2026)
+**Decisiones del Operador (22-10-2026)**
+- **Alcance**: **teclado completo**, **contraste** (WCAG AA sin tocar la estética de pergamino) y **táctil de iPad** (objetivos de 44 px, sin zoom accidental).
+- **Sin controles nuevos**: ni botón en la cabecera, ni tamaño de letra ajustable, ni interruptores de alto contraste o menos movimiento. El Hub sigue los ajustes del sistema (`prefers-reduced-motion` ya se respeta en 11 sitios).
+- **Verificación**: **sección nueva en el smoke**.
+
+**Implementación**
+- `web/hub/js/a11y.js` (se carga el último, no pinta nada):
+  - **Ventanas** (`role="dialog"` + `aria-modal="true"`, las 14 de estación y las demás): al abrirse, el foco entra (las de 10–13, el zurrón y el Sirviente no lo hacían). Tab no sale de la ventana de arriba. Al cerrarse, el foco vuelve a donde estaba. Si una estación no cierra con Esc (el Sirviente del Mojón I), Esc pulsa su botón de cerrar.
+  - **Tarjetas y celdas que solo respondían al ratón** entran en el orden de Tab y responden a Enter o Espacio como a un clic: las de Transmisiones, Archivos y su lámina, el botón del inspector del mapa, las celdas y pistas del Léxico, los testimonios de la Clepsidra y las ranuras del zurrón.
+- `web/hub/css/a11y.css`:
+  - Anillo de foco de latón (`:focus-visible`) en todo control que no tenga el suyo.
+  - En pantallas táctiles (`pointer: coarse`): sin zoom por doble toque (`touch-action: manipulation`, el pellizco sigue). Los controles redondos pequeños conservan su tamaño y ganan un área táctil invisible de 44 px; los botones con texto y los campos crecen a 44 px de alto. Las casillas del Léxico pasan a 44 px (caben en el iPad en vertical y apaisado).
+- **Contraste corregido** (medido contra el fondo pintado de verdad): pie de la barra lateral, contador de mensajes, escala del dial de Transmisiones, estado de las letras del Ledger, números de las casillas del Abismo, letras de la Playa de Sal, leyenda de la Clepsidra y las líneas aún dormidas del Monolito.
+- **Semántica**: la lámina a pantalla completa es un diálogo con su «Close», el botón cerrado del inspector dice `aria-disabled`, y los nodos del dibujo del Abismo (que repiten los botones de los marcadores) quedan fuera del árbol accesible.
+
+**Fuera de alcance**
+- El dibujo a mano de la Estación 20 sigue siendo de dedo o ratón: dibujar es el juego.
+- La columna derecha de la Clepsidra se corta en el iPad apaisado; ya pasaba antes, es la deuda anotada de los modales s12/s13.
+
+**Verificación**: sección `a11y` del smoke (27): en las seis vistas (al principio del desierto y con todas las estaciones jugadas) y en las 14 ventanas de estación, todo lo clicable se alcanza con el teclado, cada control enseña su foco, el texto cumple AA (fondo leído de una captura con las letras transparentes), las ventanas toman, retienen y devuelven el foco y cierran con Esc. En un iPad emulado, cada control responde a un dedo a 21 px de su centro y el doble toque no hace zoom. Enter abre una tarjeta de Archivos.
 
 ### 21. PWA offline (M)
 Pendiente de especificar.

@@ -38,8 +38,11 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
      and the object she chose (scripts/audit/journey_report.py prints it for Silvia's saved journey).
  26. The seals of the Stage Path sheets: the QR on each game face is the key of its room; the card, the door and the
      Field Wire ask for it, a scanned code opens the room and leaves the address, a wrong one is refused.
+ 27. Accessibility: in every view and station window, the keyboard reaches all the mouse can click and shows where it
+     is, text contrast is WCAG AA (read against the painted parchment), the windows hold and return the focus and close
+     on Escape, and on a touch screen every control answers a finger within 44 px.
 
-Setup (once):  pip install playwright && python3 -m playwright install chromium
+Setup (once):  pip install playwright pillow numpy && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
 Options:       --chromium /path/to/chrome   use a specific browser binary
                --quick                      short pass before each commit (no long desert games)
@@ -1552,7 +1555,12 @@ def test_ambience(browser):
     check(state()["bed"] == "salt flat", "closing one game and opening another changes the bed", str(state()))
     page.click("#ambience-toggle"); page.wait_for_timeout(300)
     check(state()["muted"] and js("localStorage.getItem('order_ambience_muted')") == "true", "the speaker, above the game, mutes it")
-    js("window.closeSaltPlayaModal()"); page.wait_for_timeout(1500)
+    js("window.closeSaltPlayaModal()")
+    # the window fades for 220 ms and the bed follows on its next 600 ms look: slower when the machine is busy
+    for _ in range(30):
+        page.wait_for_timeout(200)
+        if state()["bed"] is None:
+            break
     check(state()["bed"] is None, "with no game open there is silence")
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     check(state()["muted"] and js("document.getElementById('ambience-toggle').getAttribute('aria-pressed')") == "true", "the choice is remembered")
@@ -1783,6 +1791,224 @@ def test_seals(browser):
     ctx.close()
 
 
+# ---- 27. Accessibility (#20) ----
+A11Y_MODALS = [("openWhisperingChasmModal", "modal-whispering-chasm"), ("openCairnOneModal", "modal-cairn-one"),
+               ("openSaltPlayaModal", "modal-salt-playa"), ("openDesertLexiconModal", "modal-desert-lexicon"),
+               ("openOasisClepsydraModal", "modal-oasis-clepsydra"), ("openSunMonolithModal", "modal-sun-monolith"),
+               ("openLabyrinthModal", "modal-sandstone-labyrinth"), ("openCairnFourModal", "modal-cairn-four"),
+               ("openSolsticeModal", "modal-solstice-arch"), ("openSteleModal", "modal-polybius-stele"),
+               ("openOracleModal", "modal-oracle-horizon"), ("selectStageStation(40); void", "modal-masks-gate"),
+               ("openSatchelInventoryModal", "modal-satchel-inventory"), ("openServantCairnCheckModal", "modal-servant-cairn-check")]
+# Every station played, the gate of Station 20 reached: all the windows can open
+A11Y_SEED = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true", "order_field_wire_step": "34",
+             "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 30), "order_masks_march_start": "1",
+             "order_masks_march_bypassed": "true"}
+A11Y_FOCUSABLE = ('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),'
+                  'textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')
+# The controls in a part of the page: what the mouse can click but the keyboard cannot reach, and every control
+A11Y_CONTROLS_JS = """([root, FOC]) => {
+  const base = document.querySelector(root || 'body');
+  const shown = el => { if (!el.getClientRects().length) return false; for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
+    const s = getComputedStyle(e); if (s.display === 'none' || s.visibility === 'hidden' || parseFloat(s.opacity) === 0) return false; } return true; };
+  const name = el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
+  const hidden = el => el.closest('[inert],[aria-hidden="true"]');
+  const mouseOnly = [];
+  base.querySelectorAll('*').forEach(el => {
+    if (hidden(el) || el.closest('[disabled]') || !shown(el)) return;   // a disabled button is shut for the mouse too
+    if (getComputedStyle(el).cursor !== 'pointer' && !el.hasAttribute('onclick')) return;
+    if (el.matches(FOC) || el.closest(FOC) || el.closest('label')) return;
+    const up = el.parentElement;
+    if (up && getComputedStyle(up).cursor === 'pointer' && !up.matches(FOC)) return;   // only the outermost
+    mouseOnly.push(name(el) + ' «' + (el.textContent || '').trim().slice(0, 24) + '»');
+  });
+  const controls = [...base.querySelectorAll(FOC)].filter(el => !hidden(el) && shown(el)).map(name);
+  return { mouseOnly, controls };
+}"""
+# Where the keyboard is: the look of each control with and without focus (outline, shadow, border, background, size)
+A11Y_RING_JS = """([root, FOC]) => {
+  const base = document.querySelector(root || 'body');
+  const shown = el => { if (!el.getClientRects().length) return false; const r = el.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight) return false; for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
+    const s = getComputedStyle(e); if (s.display === 'none' || s.visibility === 'hidden' || parseFloat(s.opacity) === 0) return false; } return true; };
+  const look = el => { const s = getComputedStyle(el); return [s.outlineStyle !== 'none' ? 'ring' : '',   // its width may still be growing (transitions)
+    s.boxShadow, s.borderColor, s.backgroundColor, s.transform, s.color, s.textDecorationLine].join('|'); };
+  const name = el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
+  const unseen = [];
+  [...base.querySelectorAll(FOC)].filter(el => !el.closest('[inert],[aria-hidden="true"]') && shown(el)).slice(0, 80).forEach(el => {
+    el.blur(); const off = look(el); el.focus({ preventScroll: true });
+    if (document.activeElement !== el) return;
+    // the SVG pieces show focus on their drawing; a child that changes counts
+    const kids = [...el.querySelectorAll('*')].slice(0, 6);
+    const changed = look(el) !== off || (el instanceof SVGElement && kids.length);
+    if (!changed) unseen.push(name(el));
+  });
+  document.activeElement && document.activeElement.blur && document.activeElement.blur();
+  return unseen;
+}"""
+# A finger's reach: four points 21 px around the centre of each control must land on it (or on another control)
+A11Y_TOUCH_JS = """([root, FOC]) => {
+  const base = document.querySelector(root || 'body');
+  const shown = el => { if (!el.getClientRects().length) return false; for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
+    const s = getComputedStyle(e); if (s.display === 'none' || s.visibility === 'hidden' || parseFloat(s.opacity) === 0) return false; } return true; };
+  const name = el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
+  const small = [];
+  [...base.querySelectorAll(FOC)].filter(el => !el.closest('[inert],[aria-hidden="true"]') && shown(el)).forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.width >= 44 && r.height >= 44) return;
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    if (cx < 22 || cy < 22 || cx > innerWidth - 22 || cy > innerHeight - 22) return;   // off screen: not checked
+    const miss = [[-21, 0], [21, 0], [0, -21], [0, 21]].some(([dx, dy]) => {
+      const hit = document.elementFromPoint(cx + dx, cy + dy);
+      return !hit || !(el.contains(hit) || hit.closest(FOC));
+    });
+    if (miss) small.push(name(el) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
+  });
+  return small;
+}"""
+A11Y_TEXTS_JS = """(root) => {
+  const base = document.querySelector(root || 'body');
+  const shown = el => { for (let e = el; e && e.nodeType === 1; e = e.parentElement) { const s = getComputedStyle(e);
+    if (s.display === 'none' || s.visibility === 'hidden' || parseFloat(s.opacity) === 0) return false; } return true; };
+  const parse = c => { const m = c.match(/rgba?\\(([^)]+)\\)/); if (!m) return null; const p = m[1].split(/[ ,\\/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+  const name = el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
+  const out = [], seen = new Set(), w = document.createTreeWalker(base, NodeFilter.SHOW_TEXT);
+  while (w.nextNode()) {
+    const t = w.currentNode, txt = t.textContent.trim();
+    if (!/[A-Za-z0-9]/.test(txt)) continue;                                  // words and numbers, not ornaments
+    const el = t.parentElement; if (!el || seen.has(el)) continue; seen.add(el);
+    if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'OPTION'].includes(el.tagName) || !shown(el) || el.closest('[disabled],[aria-disabled="true"],[aria-hidden="true"]')) continue;
+    const range = document.createRange(); range.selectNodeContents(t);
+    const r = range.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4 || r.bottom <= 0 || r.right <= 0 || r.top >= innerHeight || r.left >= innerWidth) continue;
+    const top = document.elementFromPoint(Math.min(innerWidth - 1, r.left + r.width / 2), Math.min(innerHeight - 1, r.top + r.height / 2));
+    if (top && !el.contains(top) && !top.contains(el)) continue;              // under something else
+    const s = getComputedStyle(el);
+    const fg = parse(s.webkitTextFillColor) && parse(s.webkitTextFillColor)[3] > 0 ? parse(s.webkitTextFillColor) : parse(s.color);
+    if (!fg || fg[3] === 0) continue;
+    let op = 1; for (let e = el; e && e.nodeType === 1; e = e.parentElement) op *= parseFloat(getComputedStyle(e).opacity);
+    out.push({ el: name(el), text: txt.slice(0, 30), fg: [fg[0], fg[1], fg[2], fg[3] * op], size: parseFloat(s.fontSize), bold: parseInt(s.fontWeight, 10) >= 700,
+               box: [Math.max(0, r.left), Math.max(0, r.top), Math.min(innerWidth, r.right), Math.min(innerHeight, r.bottom)] });
+  }
+  return out;
+}"""
+A11Y_HIDE_TEXT = "*,*::before,*::after{color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important;caret-color:transparent!important}"
+
+
+def low_contrast(page, root=None):
+    """Text under WCAG AA (4.5:1, 3:1 when large) against what is really painted behind it: the parchments are
+    pictures, so the background is read from a screenshot taken with every letter made transparent."""
+    import numpy as np
+    from PIL import Image
+    texts = page.evaluate(A11Y_TEXTS_JS, root)
+    if not texts:
+        return []
+    tag = page.add_style_tag(content=A11Y_HIDE_TEXT)
+    page.wait_for_timeout(60)
+    shot = np.asarray(Image.open(io.BytesIO(page.screenshot(animations="disabled"))).convert("RGB"), float)
+    tag.evaluate("el => el.remove()")
+    k = shot.shape[1] / page.viewport_size["width"]
+    lum = lambda c: float(np.dot([0.2126, 0.7152, 0.0722], np.where(c / 255 <= 0.03928, c / 255 / 12.92, ((c / 255 + 0.055) / 1.055) ** 2.4)))
+    bad = []
+    for t in texts:
+        x0, y0, x1, y1 = [int(round(v * k)) for v in t["box"]]
+        patch = shot[y0:y1, x0:x1].reshape(-1, 3)
+        if not len(patch):
+            continue
+        bg = np.median(patch, axis=0)
+        fg = np.asarray(t["fg"][:3], float) * t["fg"][3] + bg * (1 - t["fg"][3])
+        ratio = (max(lum(fg), lum(bg)) + 0.05) / (min(lum(fg), lum(bg)) + 0.05)
+        if ratio < (3 if t["size"] >= 24 or (t["bold"] and t["size"] >= 18.66) else 4.5):
+            bad.append("%s «%s» %.2f:1" % (t["el"], t["text"], ratio))
+    return bad
+
+
+def test_a11y(browser):
+    print("\n27. Accessibility: keyboard, contrast and touch in every view and station window")
+    fmt = lambda items: "; ".join(sorted(set(items))[:4]) + (" …" if len(set(items)) > 4 else "")
+    open_view = lambda page, v: (page.evaluate("v => document.querySelector(`[data-view='${v}']`).click()", v), page.wait_for_timeout(900))
+
+    # the views, at the start of the desert and with every station played
+    for label, seed in (("desert", DESERT_BASE), ("every station", A11Y_SEED)):
+        ctx, page, errors = new_page(browser, seed)
+        page.goto(f"{BASE}/index.html", wait_until="load")
+        page.wait_for_timeout(2500)
+        page.keyboard.press("Tab")   # from here on, focus is the keyboard's (:focus-visible)
+        mouse, ring, dim = [], [], []
+        for view in VIEWS:
+            open_view(page, view)
+            mouse += [view + ": " + m for m in page.evaluate(A11Y_CONTROLS_JS, [None, A11Y_FOCUSABLE])["mouseOnly"]]
+            ring += [view + ": " + m for m in page.evaluate(A11Y_RING_JS, ["#" + view, A11Y_FOCUSABLE])]
+            dim += [view + ": " + m for m in low_contrast(page)]
+        check(not mouse, f"{label}: everything the mouse can click, the keyboard can reach", fmt(mouse))
+        check(not ring, f"{label}: every control shows when it has the keyboard's focus", fmt(ring))
+        check(not dim, f"{label}: text contrast is at least WCAG AA", fmt(dim))
+        if label == "desert":
+            open_view(page, "view-archives")
+            page.focus(".archive-item-card:not(.active)"); page.keyboard.press("Enter"); page.wait_for_timeout(400)
+            check(page.evaluate("document.activeElement.classList.contains('active')"), "Enter opens an archive card, as a click does")
+        check(not errors, f"{label}: no JS errors", fmt(errors))
+        ctx.close()
+
+    # the station windows: focus goes in, stays in, Escape closes, focus comes back
+    ctx, page, errors = new_page(browser, A11Y_SEED)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    trapped, closing, back, mouse, dim, ring = [], [], [], [], [], []
+    for fn, mid in A11Y_MODALS:
+        open_view(page, "view-trail")
+        page.focus("[data-view=\"view-trail\"]")
+        page.keyboard.press("Shift+Tab"); page.keyboard.press("Tab")   # the keyboard is on the Trail tab
+        page.evaluate(f"window.{fn}()" if fn.startswith("open") else f"window.{fn} 0")
+        page.wait_for_timeout(1200)
+        inside = f"document.getElementById('{mid}').contains(document.activeElement)"
+        if not page.evaluate(inside):
+            trapped.append(mid + " (focus not inside)")
+        for _ in range(30):
+            page.keyboard.press("Tab")
+            if not page.evaluate(inside):
+                trapped.append(mid); break
+        mouse += [mid + ": " + m for m in page.evaluate(A11Y_CONTROLS_JS, ["#" + mid, A11Y_FOCUSABLE])["mouseOnly"]]
+        ring += [mid + ": " + m for m in page.evaluate(A11Y_RING_JS, ["#" + mid, A11Y_FOCUSABLE])]
+        dim += [mid + ": " + m for m in low_contrast(page, "#" + mid)]
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(700)
+        if page.evaluate(f"getComputedStyle(document.getElementById('{mid}')).display") != "none":
+            closing.append(mid)
+            page.evaluate(f"document.getElementById('{mid}').style.display = 'none'")
+        elif page.evaluate("document.activeElement && document.activeElement.getAttribute('data-view')") != "view-trail":
+            back.append(mid)
+    check(not trapped, f"the {len(A11Y_MODALS)} station windows take the focus and keep Tab inside", fmt(trapped))
+    check(not closing, "Escape closes every station window", fmt(closing))
+    check(not back, "closing one gives the focus back to where it was", fmt(back))
+    check(not mouse, "inside them, everything the mouse can click, the keyboard can reach", fmt(mouse))
+    check(not ring, "inside them, every control shows its focus", fmt(ring))
+    check(not dim, "inside them, text contrast is at least WCAG AA", fmt(dim))
+    check(not errors, "no JS errors in the station windows", fmt(errors))
+    ctx.close()
+
+    # the iPad: a finger, not a mouse
+    ctx = browser.new_context(viewport={"width": 1180, "height": 820}, has_touch=True)
+    page = ctx.new_page()
+    page.add_init_script(SEED_JS % json.dumps(A11Y_SEED))
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    check(page.evaluate("matchMedia('(pointer: coarse)').matches && getComputedStyle(document.documentElement).touchAction === 'manipulation'"),
+          "on a touch screen a double tap does not zoom the page")
+    small = []
+    for view in VIEWS:
+        open_view(page, view)
+        small += [view + ": " + m for m in page.evaluate(A11Y_TOUCH_JS, [None, A11Y_FOCUSABLE])]
+    for fn, mid in A11Y_MODALS:
+        open_view(page, "view-trail")
+        page.evaluate(f"window.{fn}()" if fn.startswith("open") else f"window.{fn} 0")
+        page.wait_for_timeout(1000)
+        small += [mid + ": " + m for m in page.evaluate(A11Y_TOUCH_JS, ["#" + mid, A11Y_FOCUSABLE])]
+        page.keyboard.press("Escape"); page.wait_for_timeout(500)
+        page.evaluate(f"document.getElementById('{mid}').style.display = 'none'")
+    check(not small, "every control can be touched within 44 px of its centre", fmt(small))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1884,10 +2110,10 @@ SECTIONS = {
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
     "notebook": test_notebook, "pause": test_stage_pause, "ashes": test_ashes,
     "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
-    "journey": test_journey, "seals": test_seals,
+    "journey": test_journey, "seals": test_seals, "a11y": test_a11y,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

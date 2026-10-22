@@ -208,7 +208,7 @@
       color: #fde68a;
       border-radius: 0 6px 6px 0;
     }
-    .monolith-fragment.is-sealed { border-left-color: rgba(212, 168, 83, 0.25); background: transparent; color: #7a6a52; font-style: normal; }
+    .monolith-fragment.is-sealed { border-left-color: rgba(212, 168, 83, 0.25); background: transparent; color: #a3906f; font-style: normal; }
     .monolith-dispatch { font-size: 0.82rem; line-height: 1.5; color: #e7d9bf; font-style: italic; }
     .monolith-dispatch-sender { font-size: 0.7rem; letter-spacing: 0.08em; color: #b8a07a; margin-bottom: 4px; font-style: normal; }
     .monolith-victory { border-color: #86efac; background: rgba(20, 40, 25, 0.55); }
