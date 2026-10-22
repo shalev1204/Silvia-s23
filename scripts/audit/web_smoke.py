@@ -30,6 +30,8 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  21. Ambient sound: a synthesized bed per station game, silence on the map, a speaker that mutes it and remembers.
  22. The clues of the Ashes: after Station 20 a gilded feather on the Living Mirror, a line from an unknown sender on the
      Field Wire, and the notebook keeps when each was first seen.
+ 23. The Mirror Speaker: once a room's door opens, a line in mirror writing answers how Silvia solved the room before
+     (hour, misses and notes, pace, tone on the wire); it is kept, turns round on a tap, and waits out a pause.
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -43,6 +45,7 @@ Each run writes scripts/audit/smoke_report.json (per section: result, seconds, f
 import argparse
 import concurrent.futures
 import contextlib
+import datetime
 import functools
 import glob
 import http.server
@@ -1593,6 +1596,55 @@ def test_ashes(browser):
     ctx.close()
 
 
+SPEAKER_JS = """(() => { const box = document.querySelector('.stage-mirror-speaker'), w = box && box.querySelector('.mirror-speaker-words');
+  return { shown: !!box && !box.hidden, text: w ? w.textContent : '', flip: w ? getComputedStyle(w).transform : '',
+           read: !!document.querySelector('.mirror-speaker-line.is-read') }; })()"""
+
+
+def test_speaker(browser):
+    print("\n23. The Mirror Speaker: a line in mirror writing at the next room, answering how Silvia played the one before")
+    ctx, page, errors = stage_page(browser, {"order_oracle_horizon_completed": "true"})
+    page.evaluate("switchMapPath('stage', false)"); page.wait_for_timeout(600)
+    check(not page.evaluate(SPEAKER_JS)["shown"], "while the first door is shut the glass is silent")
+    ctx.close()
+
+    # Fragment I won at 08:30 local, ten minutes after arriving, with seven misses and no notes
+    at = datetime.datetime.now().replace(hour=8, minute=30, second=0, microsecond=0)
+    at_ms = int(at.timestamp() * 1000)
+    page_s20 = {"at": at_ms, "fails": 7, "notes": 0, "arrived": at_ms - 10 * 60000}
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "36",
+            "order_journal": json.dumps({"s20": page_s20})}
+    ctx, page, errors = stage_page(browser, seed)
+    js = page.evaluate
+    js("switchMapPath('stage', false)"); page.wait_for_timeout(800)
+    st = js(SPEAKER_JS)
+    check(st["shown"] and st["text"].startswith("You came with the first light. The glass tested you hard. You did not break. And swiftly.")
+          and any(t in st["text"] for t in ("warmth", "guard", "plans bend", "reason opens")),
+          "at the Camera Obscura she reads her hour, her misses, her pace and her tone", st["text"])
+    check(st["flip"].startswith("matrix(-1"), "the line is written in mirror writing", st["flip"])
+    check(not any(w in st["text"].lower() for w in ("carles", "pope", "seeker", "silvia")), "the Speaker names no one")
+    js("localStorage.setItem('order_journal', JSON.stringify({s20: {at: Date.now(), fails: 0, notes: 0, arrived: null}}))")
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("switchMapPath('stage', false)"); page.wait_for_timeout(800)
+    check(js(SPEAKER_JS)["text"] == st["text"], "once written, the line never changes")
+    page.click(".mirror-speaker-line"); page.wait_for_timeout(900)
+    st = js(SPEAKER_JS)
+    check(st["read"] and st["flip"] in ("none", "matrix(1, 0, 0, 1, 0, 0)"), "a tap turns it round to be read", st["flip"])
+    js("TesterDesert.replayFrom('s20')")
+    check(js("localStorage.getItem('order_speaker_line_41')") is None, "replaying Station 20 wipes the glass")
+    check(not errors, "no JS errors with the Speaker", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # A pause: the door is not open yet, so nothing is written (the hours are set after load here, so forget the line the load wrote)
+    seed["order_journal"] = json.dumps({"s20": dict(page_s20, at=int(time.time() * 1000) - 3600 * 1000)})
+    ctx, page, errors = stage_page(browser, seed)
+    js = page.evaluate
+    js("EclipseStagePause.HOURS[41] = 24; localStorage.removeItem('order_speaker_line_41'); switchMapPath('stage', false); StageMirror.refresh()"); page.wait_for_timeout(800)
+    check(not js(SPEAKER_JS)["shown"] and js("localStorage.getItem('order_speaker_line_41')") is None,
+          "during a pause the glass waits with the door")
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1693,10 +1745,10 @@ SECTIONS = {
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
     "notebook": test_notebook, "pause": test_stage_pause, "ashes": test_ashes,
-    "ambience": test_ambience,
+    "ambience": test_ambience, "speaker": test_speaker,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

@@ -51,7 +51,7 @@
   function reflectedName() { return REFLECTED.split('').reverse().join(''); }
 
   var VIEW = { x: -40, y: -40, w: 680, h: 920 };   // the SVG viewBox (frame and cartouche around the glass)
-  var root = null, svg = null, canvas = null, ctx = null, ribbon = null, caption = null;
+  var root = null, svg = null, canvas = null, ctx = null, ribbon = null, caption = null, speaker = null;
   var angle = 0, spin = 0.0016, drag = null, raf = null, visible = true, lastT = 0;
 
   /* ------------------------------------------------------------------ the kaleidoscope */
@@ -236,6 +236,12 @@
     if (caption) caption.textContent = done
       ? 'The mirror is whole. It reflects ' + reflectedName().replace(' · ', ', ') + '.'
       : count + ' of 9 fragments set' + (next >= 0 ? ' · next: ' + STATIONS[next].room + ' (Station ' + STATIONS[next].station + ')' : '');
+    // the Mirror Speaker's line for the next room, written in the glass once its door is open (hub/js/mirror-speaker.js)
+    if (speaker) {
+      speaker.textContent = '';
+      speaker.hidden = true;
+      if (window.EclipseMirrorSpeaker && next >= 1 && !done) window.EclipseMirrorSpeaker.render(STATIONS[next].node, speaker);
+    }
     root.classList.toggle('is-complete', done);
     renderRibbon(have, next);
     sizeCanvas();
@@ -285,6 +291,10 @@
     caption.className = 'stage-mirror-caption';
     caption.setAttribute('aria-live', 'polite');
     root.appendChild(caption);
+    speaker = document.createElement('div');
+    speaker.className = 'stage-mirror-speaker';
+    speaker.hidden = true;
+    root.appendChild(speaker);
     ribbon = document.createElement('div');
     ribbon.className = 'stage-mirror-ribbon';
     ribbon.setAttribute('role', 'group');

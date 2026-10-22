@@ -706,7 +706,7 @@
           {
             id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
             complete() { set('order_masks_march_start', '1'); set('order_masks_gate_awake', 'true'); set('order_masks_carved', '3'); set('order_masks_gate_completed', 'true'); },
-            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41', 'order_ashes_clues']); }
+            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41', 'order_ashes_clues', 'order_speaker_line_41']); }
           }
         ];
         // A reset game also forgets the hints its puzzles had climbed to (hub/js/hint-ladder.js)
@@ -6437,6 +6437,7 @@
         order.forEach((t) => { if (counts[t] > bestCount) { best = t; bestCount = counts[t]; } });
         return best;
       }
+      window.hermesDominantTone = () => dominantTone(true);   // the Mirror Speaker answers it (hub/js/mirror-speaker.js)
 
       const CHASM_MARCH_HOURS = 26;
       const CHASM_MARCH_MS = CHASM_MARCH_HOURS * 3600 * 1000;

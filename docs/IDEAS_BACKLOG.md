@@ -17,7 +17,7 @@
 | 8 | Puzzle «meta» que solo se resuelve con las hojas físicas | M | alto | **Especificada (21-10-2026)**: `STAGE_PATH_BIBLE.md` §6.2; se construye con las Hojas 23, 24 y los márgenes de 19–26 |
 | 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
 | 10 | Pistas sutiles de Pope-E en retrospectiva | M | alto | **Implementada la parte construible (21-10-2026)**: pluma dorada y mensaje interceptado tras la Estación 20; notas 2 y 3 en las Estaciones 23 y 27; revelación en la Torre I. `STAGE_PATH_BIBLE.md` §9 |
-| 11 | Mirror Speaker que reacciona al estilo de juego | M | alto | No existe |
+| 11 | Mirror Speaker que reacciona al estilo de juego | M | alto | **Implementada (21-10-2026)**: una línea en escritura de espejo al abrirse cada sala; `hub/js/mirror-speaker.js` |
 | 12 | Cartas de Aurelia desbloqueables en el Hub | S | medio | No existe (los cuadernos I–III son caras 21A, 23B, 25B) |
 | 13 | Final distinto según el estilo de juego | L | medio | No existe |
 | 14 | QR o palabra clave por hoja | S | medio | No existe |
@@ -186,8 +186,19 @@
 
 **Verificación**: sección `ashes` del smoke (sin la Estación 20 no hay pluma ni interceptación; con ella aparecen ambas, se registran las tres fechas y nada nombra a Carles).
 
-### 11. Mirror Speaker reactiva (M)
-Pendiente de especificar.
+### 11. Mirror Speaker reactiva (M) · implementada (21-10-2026)
+**Decisiones del Operador (21-10-2026)**
+- **Señales**: **fallos y notas de Hermes** (escalera #6, guardados en el cuaderno #2), **rapidez** (desde la llegada hasta resolver), **tono en el Field Wire** (el tono dominante que ya se registra) y **hora del día**.
+- **Su voz**: **escritura de espejo en el cristal**, firmada con su línea horizontal. Sigue sin verse y sin hablar.
+- **Momento**: **al abrir cada sala**, comentando cómo resolvió la anterior.
+
+**Implementación**
+- `web/hub/js/mirror-speaker.js` (`EclipseMirrorSpeaker`): compone hasta cuatro frases breves y fijas (hora · esfuerzo · ritmo si es muy rápido o muy lento · tono) a partir de la página del cuaderno de la sala anterior. Sin página (sala resuelta antes del cuaderno): una frase neutra más la del tono. Se escribe una sola vez y se guarda (`order_speaker_line_<nodo>`), así no cambia después de leída.
+- Aparece cuando la puerta de la sala se abre (sala anterior resuelta y la pausa #3 cumplida): en el Espejo Vivo, bajo el título, y arriba del juego de cada sala nueva con `EclipseMirrorSpeaker.render(nodo, elemento)` (regla para construir las salas 21 a 28).
+- Escrita en espejo (`scaleX(-1)`); Silvia la lee con el espejo de mano de la Hoja 19A o tocándola (se da la vuelta 6 s). El lector de pantalla recibe el texto al derecho.
+- `hub-core.js` expone `window.hermesDominantTone()`. El reinicio de la Estación 20 en el probador borra la línea de la sala 21.
+
+**Verificación**: sección `speaker` del smoke (puerta cerrada sin línea; línea en espejo con las cuatro señales; la línea no cambia aunque cambien los datos; tocar la da la vuelta; la pausa la oculta).
 
 ### 12. Cartas de Aurelia en el Hub (S)
 Pendiente de especificar.

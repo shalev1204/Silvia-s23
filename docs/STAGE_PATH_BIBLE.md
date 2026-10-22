@@ -150,6 +150,7 @@ Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pid
 - **Hermes**: guía principal en el Field Wire; ahora viaja acompañado.
 - **Aurelia**: viaja con Hermes; su memoria vuelve por partes (cuaderno I a III). Pinta, comenta, a veces escribe ella en el chat.
 - **The Mirror Speaker**: guardiana de la Torre III. **Nunca se ve; solo se refleja.** Voz elegante, pausada y ceremonial; frases breves y perfectas. Firma: una línea horizontal. Habla de luz, umbral, reflejo y de lo que se ve cuando dejas de buscar (`docs/PATHS_AND_CHARACTERS.md`).
+  - **Reacciona al estilo de Silvia** (idea #11): al abrirse cada sala escribe en el cristal, en espejo, una línea breve sobre cómo resolvió la anterior (hora, fallos y notas, ritmo, tono con Hermes), firmada con su línea. Cada sala nueva la muestra arriba de su juego con `EclipseMirrorSpeaker.render(nodo, elemento)`.
 - **The BC Ashes**: secta antiquísima (*Before Christ*), guardianes del «primer fuego», con túnicas manchadas de ceniza.
 - **Pope-E**: jefe enmascarado de la secta (máscara de plata ennegrecida). Nunca hace daño. Deja tres notas firmadas con un sello de ceniza, aparece una vez como reflejo de espaldas (Estación 26) e intercepta el Field Wire para escribir a Silvia directamente. Siempre la llama *the treasure*.
 
