@@ -6048,6 +6048,15 @@
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
         appendWireMessage('SYSTEM TELEMETRY', WIRE_FINAL_TELEMETRY[stepIdx](), true, false, null, null, { type: 'expedition', step: stepIdx });
         if (stepIdx === 36) appendWireIntercept();
+        appendLetterNotes(stepIdx);
+      }
+
+      // Hermes answers each of Aurelia's letters at the step where Silvia read it (hub/js/aurelia-letters.js)
+      function appendLetterNotes(stepIdx) {
+        if (!window.EclipseAureliaLetters) return;
+        window.EclipseAureliaLetters.notesAt(stepIdx).forEach((text) => {
+          appendWireMessage(getCartographerTitle(), text, false, false, null, wireMessagesStream, { type: 'expedition', step: stepIdx });
+        });
       }
 
       // After the night behind the gate, a broken line from someone else slips onto the wire, sealed with ash
@@ -6438,6 +6447,11 @@
         return best;
       }
       window.hermesDominantTone = () => dominantTone(true);   // the Mirror Speaker answers it (hub/js/mirror-speaker.js)
+      // The answer Silvia chose at a step of the Field Wire (the journey profile reads steps 1 and 2: hub/js/journey-profile.js)
+      window.hermesWireChoice = (step) => {
+        const data = EXPEDITION_THREAD[step];
+        return data && data.choices && wireHistory[step] !== undefined ? data.choices[wireHistory[step]] || null : null;
+      };
 
       const CHASM_MARCH_HOURS = 26;
       const CHASM_MARCH_MS = CHASM_MARCH_HOURS * 3600 * 1000;
@@ -6934,6 +6948,7 @@
         for (let s = 0; s < wireCurrentStep; s++) {
           const stepData = EXPEDITION_THREAD[s];
           if (!stepData) continue;
+          if (!WIRE_FINAL_TELEMETRY[s]) appendLetterNotes(s);   // a final step answers them after its telemetry
           if (s === 4) {
             appendWireMessage(getCartographerTitle(), getHermesFinalForWatchtower(), false, false, null, null, { type: 'expedition', step: 4 });
             appendWireMessage('SYSTEM TELEMETRY', '✦ WAYPOINT SECURED · OUTER WATCHTOWER VI [112° E] · DESERT THRESHOLD REACHED ✦', true, false, null, null, { type: 'expedition', step: 4 });
@@ -6986,6 +7001,7 @@
         } else if (WIRE_FINAL_TELEMETRY[Math.min(wireCurrentStep, WIRE_LAST_STEP)]) {
           appendStepFinal(Math.min(wireCurrentStep, WIRE_LAST_STEP));
         }
+        if (!WIRE_FINAL_TELEMETRY[wireCurrentStep]) appendLetterNotes(wireCurrentStep);
 
         wireMessagesStream.classList.remove('is-restoring');
         if (!dawnFinalePlaying) {

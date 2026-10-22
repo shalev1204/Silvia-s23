@@ -1,0 +1,74 @@
+    /* Aurelia's Letters in Chronicles (hub/js/aurelia-letters.js, docs/IDEAS_BACKLOG.md #12): parchment, a lapis and gold initial, a wax seal */
+    .aurelia-letters { margin-top: 40px; }
+    .aurelia-letters[hidden] { display: none; }
+    .letters-head { text-align: center; margin-bottom: 20px; }
+    .letters-head-title { margin: 6px 0 4px; font-family: 'Cinzel', serif; font-size: 1.5rem; letter-spacing: 0.05em; color: #fde68a; }
+    .letters-head-desc, .letters-wait { margin: 0; font-family: 'EB Garamond', Georgia, serif; font-size: 1rem; color: #c9b48a; }
+    .letters-wait { text-align: center; font-style: italic; padding: 14px 0 0; }
+    .letters-wait[hidden] { display: none; }
+    .letters-list { display: flex; flex-direction: column; gap: 18px; }
+    .aurelia-letter {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 22px;
+      padding: 22px 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(138, 93, 29, 0.55);
+      background: radial-gradient(ellipse at 30% 20%, #f4e6c4 0%, #e8d3a6 60%, #d9bd86 100%);
+      box-shadow: inset 0 0 40px rgba(120, 80, 30, 0.25), 0 6px 18px rgba(0, 0, 0, 0.35);
+      color: #3a2410;
+      font-family: 'EB Garamond', Georgia, serif;
+      outline: none;
+    }
+    .aurelia-letter:focus-visible { box-shadow: 0 0 0 2px #d4a853, inset 0 0 40px rgba(120, 80, 30, 0.25); }
+    .letter-sketch svg { display: block; width: 100%; height: auto; }
+    .letter-sketch svg g[stroke="#e3b95c"], .letter-sketch svg path[fill="#e3b95c"] { filter: drop-shadow(0 0 0.5px #6b4515); }
+    .letter-date { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #8a5d1d; }
+    .letter-salutation { margin: 10px 0 6px; font-style: italic; font-size: 1.12rem; }
+    .letter-text { margin: 0 0 10px; font-size: 1.08rem; line-height: 1.55; font-style: italic; }
+    .letter-initial {
+      float: left;
+      margin: 4px 8px 0 0;
+      padding: 2px 9px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #1f3c8a, #142a66);
+      border: 2px solid #c99a3b;
+      font-family: 'Cinzel Decorative', 'Cinzel', serif;
+      font-style: normal;
+      font-size: 2.3rem;
+      line-height: 1.15;
+      color: #f7dc8c;
+      text-shadow: 0 0 3px rgba(247, 220, 140, 0.6);
+    }
+    .letter-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .letter-signature { margin: 4px 0 0; text-align: right; font-style: italic; font-size: 1.3rem; }
+
+    /* sealed: the folded letter with her wax seal (an A); breaking it splits the wax */
+    .aurelia-letter.is-sealed { display: block; padding: 0; }
+    .letter-envelope {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      width: 100%; padding: 26px 16px; border: 0; border-radius: 6px; background: transparent;
+      font-family: 'Cinzel', serif; color: #5a3d12; cursor: pointer;
+    }
+    .letter-envelope:focus-visible { outline: 2px solid #8a5d1d; outline-offset: -6px; }
+    .letter-envelope-num { font-size: 0.9rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    .letter-envelope-hint { font-family: 'EB Garamond', Georgia, serif; font-style: italic; font-size: 0.95rem; color: #6b4515; }
+    .letter-seal { position: relative; display: block; width: 64px; height: 64px; }
+    .letter-seal-half {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #c0392b, #7b1610 70%);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 0 6px rgba(0, 0, 0, 0.4);
+      font-family: 'Cinzel Decorative', 'Cinzel', serif; font-size: 1.8rem; line-height: 64px; text-align: center; color: rgba(255, 210, 190, 0.75);
+      transition: transform 0.7s ease, opacity 0.7s ease;
+    }
+    .letter-seal-half.is-left { clip-path: polygon(0 0, 54% 0, 44% 100%, 0 100%); }
+    .letter-seal-half.is-right { clip-path: polygon(54% 0, 100% 0, 100% 100%, 44% 100%); }
+    .aurelia-letter.is-breaking .letter-seal-half.is-left { transform: translate(-10px, 6px) rotate(-14deg); opacity: 0; }
+    .aurelia-letter.is-breaking .letter-seal-half.is-right { transform: translate(10px, 6px) rotate(14deg); opacity: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .letter-seal-half { transition: none; }
+    }
+    @media (max-width: 640px) {
+      .aurelia-letter { grid-template-columns: 1fr; gap: 10px; padding: 16px; }
+      .letter-sketch { width: 96px; margin: 0 auto; }
+    }

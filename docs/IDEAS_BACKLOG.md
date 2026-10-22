@@ -18,8 +18,8 @@
 | 9 | Modo «ojo de Operador» → informe de Claude | S | medio | **Hecho (21-10-2026)**: sin panel; Claude lee Supabase con el conector y resume dónde está Silvia y cómo juega |
 | 10 | Pistas sutiles de Pope-E en retrospectiva | M | alto | **Implementada la parte construible (21-10-2026)**: pluma dorada y mensaje interceptado tras la Estación 20; notas 2 y 3 en las Estaciones 23 y 27; revelación en la Torre I. `STAGE_PATH_BIBLE.md` §9 |
 | 11 | Mirror Speaker que reacciona al estilo de juego | M | alto | **Implementada (21-10-2026)**: una línea en escritura de espejo al abrirse cada sala; `hub/js/mirror-speaker.js` |
-| 12 | Cartas de Aurelia desbloqueables en el Hub | S | medio | No existe (los cuadernos I–III son caras 21A, 23B, 25B) |
-| 13 | Final distinto según el estilo de juego | L | medio | No existe |
+| 12 | Cartas de Aurelia desbloqueables en el Hub | S | medio | **Implementada (22-10-2026)**: tres cartas de 1970–71 en Chronicles, con los cuadernos I–III; `hub/js/aurelia-letters.js` |
+| 13 | Final distinto según el estilo de juego | L | medio | **Especificada; perfil del viaje implementado (22-10-2026)**: `hub/js/journey-profile.js`, `scripts/audit/journey_report.py`; las escenas se construyen con la Torre I y la Bóveda |
 | 14 | QR o palabra clave por hoja | S | medio | No existe |
 | 15 | Verificador de hojas unificado | M | alto | Piezas sueltas: prueba de márgenes en cada `build_*.py`, `lint_lore_and_vocabulary.py`; no hay comprobación de colisiones texto-dibujo |
 | 16 | Vista previa de impresión con las 8 hojas | S | medio | Parcial: `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
@@ -200,11 +200,47 @@
 
 **Verificación**: sección `speaker` del smoke (puerta cerrada sin línea; línea en espejo con las cuatro señales; la línea no cambia aunque cambien los datos; tocar la da la vuelta; la pausa la oculta).
 
-### 12. Cartas de Aurelia en el Hub (S)
-Pendiente de especificar.
+### 12. Cartas de Aurelia en el Hub (S) · implementada (22-10-2026)
+**Decisiones del Operador (22-10-2026)**
+- **Qué son**: cartas que Aurelia escribió a Hermes en el Alpine Observatory (1970–71) y **nunca le dio**. Reaparecen a medida que recupera la memoria: las encuentra cosidas en el forro de su viejo abrigo y se las da a Hermes. Ninguna habla del puente (se guarda para la Torre I).
+- **Cuántas y cuándo**: **tres, con los cuadernos**. Cada una acompaña a la cara del cuaderno que sigue a una sala en el orden de las hojas: carta I (el observatorio, marzo de 1970) al ganar la **Estación 22** (antes de la cara 21A); carta II (el disco y el voto, diciembre de 1970) al ganar la **Estación 25** (antes de la 23B); carta III (la terraza, agosto de 1971) al ganar la **Estación 27** (antes de la 25B).
+- **Dónde**: sección propia **«Aurelia's Letters»** en Chronicles, sobre el cuaderno de Hermes. Oculta hasta la Estación 19 (antes de esa audiencia, el nombre de Aurelia unido a la Oráculo sería un spoiler). Las cartas aún no recuperadas no se muestran: solo el número de las que faltan.
+- **Presentación**: pergamino con **inicial iluminada** (lapislázuli y pan de oro, como sus cartas celestes), **un pequeño dibujo suyo** en el margen de cada carta (la cúpula del observatorio, el disco de 24 avistamientos, la terraza con la estrella), **lacre que se rompe** la primera vez que se abre y, después, **Hermes comenta** en el Field Wire.
 
-### 13. Final según estilo de juego (L)
-Pendiente de especificar.
+**Implementación**
+- `web/hub/js/aurelia-letters.js` (`EclipseAureliaLetters`): textos, dibujos SVG en línea y estado `order_aurelia_letters` = `{ I: { at, step } }` (cuándo se abrió y en qué paso del Field Wire), que viaja con el guardado en la nube. Si la sala de una carta vuelve a quedar sin resolver (reinicio del probador), la carta se cierra y su registro se borra.
+- El comentario de Hermes se coloca en el Field Wire en el paso en que Silvia abrió la carta, también al reconstruir el chat (`hub-core.js`: `EclipseAureliaLetters.notesAt(paso)`), y enciende el contador de mensajes sin leer.
+- Las Estaciones 22, 25 y 27 aún no existen: hoy no se ve ninguna carta; la sección aparece tras la Estación 19 con su línea de espera.
+
+**Verificación**: sección `letters` del smoke (oculta antes de la Estación 19; sin cartas hasta la Estación 22; la carta I aparece lacrada, se abre rompiendo el lacre, Hermes comenta en el Field Wire una sola vez, también tras recargar; las tres cartas en orden; un reinicio la vuelve a cerrar; cabe en un móvil).
+
+### 13. Final según estilo de juego (L) · especificada; perfil implementado (22-10-2026)
+El regalo no cambia nunca: la Bóveda abre el cofre físico con las entradas. Lo que cambia es **cómo se lo cuentan**.
+
+**Decisiones del Operador (22-10-2026)**
+- **Qué varía**: las cuatro piezas. (1) **La despedida de Hermes**, última transmisión del Field Wire. (2) **Su constelación personal**: al abrir la Bóveda el cielo dibuja una constelación nueva con su nombre, cuya forma y leyenda nacen de su estilo. (3) **Una línea final de Aurelia y otra de la Mirror Speaker** (esta en espejo, firmada con su línea). (4) **El desenmascaramiento del líder de los Ashes** en la Torre I.
+- **Variantes**: **4, una por tono dominante** (cálida, protectora, táctica, analítica; el tono que ya registra el Field Wire, `dominantTone(true)`). Pocas, escritas a mano.
+- **Señales además del tono**: **el viaje en cifras** (días de viaje, salas resueltas, notas pedidas a Hermes, la franja horaria en la que más resolvió) y **elecciones clave del Field Wire** (el nombre que dio a Hermes en el paso 1 y el objeto que eligió en el paso 2). Entran como detalles dentro del texto.
+- **Parte física**: **carta a mano de Carles** para el cofre. Antes de la Bóveda, Claude lee el progreso de Silvia en Supabase (idea #9) y saca el mismo perfil que verá el Hub, para que Carles escriba la carta.
+
+**Implementación ya hecha (lo construible hoy)**
+- `web/hub/js/journey-profile.js` (`EclipseJourney.profile()`): una sola fuente de verdad para el final. Devuelve el tono dominante, los días de viaje (desde la primera página del cuaderno o la primera llegada), juegos resueltos del desierto y salas de la Torre III, notas y fallos totales, la franja horaria favorita, la sala más rápida, el nombre que dio a Hermes y el objeto elegido. No muestra nada en pantalla.
+- `scripts/audit/journey_report.py <progreso.json>`: abre el Hub sin ventana con ese progreso (la columna `progress` de `eclipse_saves`, que Claude lee con el conector) e imprime el perfil. Es el informe para la carta de Carles: mismas reglas que el final, sin duplicar lógica.
+- `hub-core.js` ya expone `window.hermesDominantTone()` (idea #11).
+
+**Pendiente (al construir la Torre I y la Bóveda)**: las escenas. Los textos de abajo son borradores para revisar; **el desenmascaramiento y la Bóveda no entran en `web/` hasta que se construya la Torre I** (el código del Hub es legible y no puede adelantar ni a Pope-E ni el WHAT). Marcadores: `{name}` nombre que dio a Hermes, `{item}` el objeto, `{days}`, `{rooms}`, `{notes}`, `{hour}` (*at first light*, *under the full sun*, *as the lamps were lit*, *by candlelight*).
+
+| Pieza | Cálida (*warm*) | Protectora (*protective*) | Táctica (*tactical*) | Analítica (*analytic*) |
+|---|---|---|---|---|
+| **Despedida de Hermes** | *Silvia. {days} days on this wire, and you never let it go quiet for long. You called me {name}, and I had not been anyone's anything for fifty-five years. I am keeping the {item}. Not for the road. For the morning you chose it.* | *Silvia. For {days} days you stood between me and every rotten stair. You called me {name}, and then you guarded the name. I owe you {rooms} rooms and one old man still standing. The {item} stays in my coat, beside the five seals.* | *Silvia. {rooms} rooms, {days} days, and not one plan of yours that did not bend the way you meant it to. You called me {name}, and I wore it like a rank. Last report: the road is finished. Keep the {item}; you will want it for the next one.* | *Silvia. You read the desert like a ledger: {rooms} rooms, {notes} of my notes, every figure checked twice. You called me {name}, and you were exact about it. The last line of my notebook is yours: the sum came out right.* |
+| **Constelación** | *The Hearth*: un anillo de estrellas con una brillante en el centro. *Drawn for a seeker who kept the fire lit for others.* | *The Shield*: un escudo de cometa con una estrella en el corazón. *Drawn for a seeker who stood in front.* | *The Arrow*: una flecha de cinco estrellas hacia el norte. *Drawn for a seeker who always knew the next step.* | *The Scale*: una balanza de siete estrellas. *Drawn for a seeker who weighed every light.* |
+| **Aurelia** | *You were kind to him when he could not be kind to himself. I know what that costs.* | *You held on to him. Someone once could not. Thank you for holding on.* | *You chose for him when he could not choose. He will never thank you properly. I will.* | *You did his sums in the cold, as I used to. Now you know why I loved the work.* |
+| **Mirror Speaker** | *You brought a lamp into a house of reflections. It is still lit.* | *You guarded what you love. The glass guards you now.* | *You moved like one who had read the end of the play. You had.* | *You saw what was not equal. That is the whole of seeing.* |
+| **Desenmascaramiento** (Torre I) | *You were kind to every stranger on this road, even the one in the mask. It was me, treasure. I only wanted to watch you be exactly who you are.* | *You protected an old man across a desert and a tower. Let someone protect you now. It was me behind the mask: I kept the stairs safe for you.* | *You were one step ahead the whole way, so maybe you guessed. I took the Astrolabe so that you would come and take it back.* | *You solved everything except the one unknown I hid in plain sight: me. You were never only the seeker. You were always the treasure.* |
+
+La frase del Email 1 (*You were never only the seeker, you were always the treasure*) cierra las cuatro variantes del desenmascaramiento; en la analítica ya está dentro.
+
+**Verificación**: sección `journey` del smoke (perfil vacío al empezar; con un viaje sembrado, cifras, franja, nombre y objeto correctos; el tono coincide con `hermesDominantTone()`) y una ejecución de `journey_report.py` con un progreso de prueba.
 
 ### 14. QR o palabra clave por hoja (S)
 Pendiente de especificar.

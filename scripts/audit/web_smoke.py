@@ -32,6 +32,10 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
      Field Wire, and the notebook keeps when each was first seen.
  23. The Mirror Speaker: once a room's door opens, a line in mirror writing answers how Silvia solved the room before
      (hour, misses and notes, pace, tone on the wire); it is kept, turns round on a tap, and waits out a pause.
+ 24. Aurelia's Letters: three letters of 1970 and 1971 in Chronicles, one with each sketchbook; a wax seal to break and
+     Hermes's answer on the Field Wire at the step where she read it.
+ 25. The journey profile for the ending: tone, days on the road, rooms, notes, favourite hour, the name she gave Hermes
+     and the object she chose (scripts/audit/journey_report.py prints it for Silvia's saved journey).
 
 Setup (once):  pip install playwright && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -1645,6 +1649,92 @@ def test_speaker(browser):
     ctx.close()
 
 
+LETTERS_JS = """(() => { const box = document.getElementById('aurelia-letters');
+  return { shown: !!box && !box.hidden, wait: (box && !box.querySelector('.letters-wait').hidden) ? box.querySelector('.letters-wait').textContent : '',
+           letters: [...document.querySelectorAll('.aurelia-letter')].map(a => ({ id: a.dataset.letter, sealed: a.classList.contains('is-sealed'), text: a.textContent })),
+           wire: [...document.querySelectorAll('#view-field-wire .chat-bubble')].map(b => b.textContent).filter(t => /her letter|second letter|Three short, a pause/.test(t)).length }; })()"""
+
+
+def test_letters(browser):
+    print("\n24. Aurelia's Letters: three letters of 1970 and 1971 in Chronicles, one with each sketchbook")
+    chron = lambda page: (page.evaluate("document.querySelector('[data-view=\"view-chronicles\"]').click()"), page.wait_for_timeout(500))
+    ctx, page, errors = stage_page(browser, {})
+    check(not page.evaluate(LETTERS_JS)["shown"], "before the audience with the Oracle the section stays hidden")
+    ctx.close()
+
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "36"}
+    ctx, page, errors = stage_page(browser, seed)
+    js = page.evaluate
+    chron(page)
+    st = js(LETTERS_JS)
+    check(st["shown"] and not st["letters"] and "one letter at a time" in st["wait"], "after Station 19 the section waits, empty", str(st)[:120])
+    js("['order_camera_obscura_completed', 'order_whispering_gallery_completed'].forEach(k => localStorage.setItem(k, 'true'))")
+    page.wait_for_timeout(1800)
+    st = js(LETTERS_JS)
+    check([l["id"] for l in st["letters"]] == ["I"] and st["letters"][0]["sealed"] and "March 1970" not in st["letters"][0]["text"]
+          and "2 more letters" in st["wait"], "Station 22 brings Letter I, sealed and unread", str(st)[:160])
+    page.click(".aurelia-letter[data-letter='I'] .letter-envelope"); page.wait_for_timeout(1300)
+    st = js(LETTERS_JS)
+    text = st["letters"][0]["text"]
+    check(not st["letters"][0]["sealed"] and "March 1970" in text and "Hermes," in text and "A." in text,
+          "breaking the seal opens it: date, Hermes, her initial", text[:80])
+    check(js("!!document.querySelector('.aurelia-letter .letter-initial') && !!document.querySelector('.aurelia-letter .letter-sketch svg')"),
+          "an illuminated initial and her sketch in the margin")
+    check(not any(w in text.lower() for w in ("bridge", "pope", "carles", "seeker")), "the letter never speaks of the bridge")
+    rec = json.loads(js("localStorage.getItem('order_aurelia_letters')") or "{}")
+    check(rec.get("I", {}).get("step") == 36 and js("localStorage.getItem('order_messenger_unread_count')") == "1",
+          "the Field Wire gets a new message, kept at the step where she read it", str(rec))
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    check(js(LETTERS_JS)["wire"] == 1, "Hermes answers the letter on the wire, once")
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    check(js(LETTERS_JS)["wire"] == 1, "after a reload his answer is still there, once")
+    chron(page)
+    check(not js(LETTERS_JS)["letters"][0]["sealed"], "an opened letter stays open")
+    js("['order_automaton_orchestra_completed', 'order_fly_tower_completed', 'order_shadow_theatre_completed', 'order_hall_of_mirrors_completed', 'order_kaleidoscope_lantern_completed'].forEach(k => localStorage.setItem(k, 'true'))")
+    page.wait_for_timeout(1800)
+    st = js(LETTERS_JS)
+    check([l["id"] for l in st["letters"]] == ["I", "II", "III"] and not st["wait"], "Stations 25 and 27 bring Letters II and III, in order", str([l["id"] for l in st["letters"]]))
+    page.set_viewport_size({"width": 390, "height": 800}); page.wait_for_timeout(400)
+    check(js("document.documentElement.scrollWidth") <= 390, "the letters fit a phone")
+    js("localStorage.removeItem('order_whispering_gallery_completed')"); page.wait_for_timeout(1800)
+    st = js(LETTERS_JS)
+    check("I" not in [l["id"] for l in st["letters"]] and "I" not in (js("localStorage.getItem('order_aurelia_letters')") or ""),
+          "unsolving Station 22 closes Letter I again", str([l["id"] for l in st["letters"]]))
+    check(not errors, "no JS errors with the letters", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+def test_journey(browser):
+    print("\n25. The journey profile for the ending: tone, days, rooms, notes, favourite hour, the name and the object she chose")
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Silvia"})
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    pr = page.evaluate("EclipseJourney.profile()")
+    check(pr["days"] == 0 and pr["rooms"] == 0 and pr["notes"] == 0 and pr["hour"] is None and pr["swiftest"] is None,
+          "at the start the journey is empty", str(pr))
+    ctx.close()
+
+    day = lambda d, h, m=0: int(datetime.datetime.now().replace(hour=h, minute=m, second=0, microsecond=0).timestamp() * 1000) - d * 86400000
+    journal = {"s14": {"at": day(2, 8), "fails": 2, "notes": 1, "arrived": day(2, 7, 50)},
+               "s19": {"at": day(0, 21), "fails": 0, "notes": 0, "arrived": None},
+               "s20": {"at": day(0, 20, 30), "fails": 0, "notes": 2, "arrived": day(0, 19)}}
+    seed = {"order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true", "order_field_wire_step": "36",
+            "order_journal": json.dumps(journal), "order_field_wire_choices": json.dumps([0, 1, 1, 0] + [0] * 31),
+            "order_satchel_expedition_item": json.dumps({"id": "surveyor_compass", "name": "1998 Brass Surveyor's Compass"})}
+    ctx, page, errors = stage_page(browser, seed)
+    pr = page.evaluate("EclipseJourney.profile()")
+    check(pr["days"] == 3 and pr["notes"] == 3 and pr["fails"] == 2, "three days on the road, three notes, two misses", str(pr))
+    check(pr["stageRooms"] == 1 and pr["rooms"] == pr["desertGames"] + 1
+          and pr["desertGames"] == page.evaluate("TesterDesert.games.filter(g => g.id !== 's20' && TesterDesert.isDone(g.id)).length"),
+          "the desert games and the rooms of Tower III add up, Station 20 counted once", str(pr))
+    check(pr["hour"] == "lamplight" and pr["swiftest"] and pr["swiftest"]["id"] == "s14" and pr["swiftest"]["minutes"] == 10,
+          "her favourite hour is lamplight, her swiftest room the Sun Monolith", str(pr))
+    check(pr["name"] == "The Cartographer" and pr["item"] == "1998 Brass Surveyor's Compass", "the name she gave Hermes and the object she chose", str(pr))
+    check(pr["tone"] == page.evaluate("hermesDominantTone()") and pr["tone"] in ("warm", "protective", "tactical", "analytic"), "the tone is the Field Wire's")
+    check(not errors, "no JS errors with the journey profile", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
@@ -1745,10 +1835,11 @@ SECTIONS = {
     "mirror": test_stage_mirror, "s20": test_masks_gate, "cloud": test_cloud_save,
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
     "notebook": test_notebook, "pause": test_stage_pause, "ashes": test_ashes,
-    "ambience": test_ambience, "speaker": test_speaker,
+    "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
+    "journey": test_journey,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

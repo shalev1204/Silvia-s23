@@ -149,6 +149,7 @@ Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pid
 
 - **Hermes**: guía principal en el Field Wire; ahora viaja acompañado.
 - **Aurelia**: viaja con Hermes; su memoria vuelve por partes (cuaderno I a III). Pinta, comenta, a veces escribe ella en el chat.
+  - **Sus cartas** (idea #12): tres cartas de 1970–71 a Hermes, nunca entregadas, que encuentra cosidas en el forro de su viejo abrigo. Se leen en Chronicles al ganar las Estaciones 22, 25 y 27 (junto a los cuadernos I, II y III). Ninguna habla del puente.
 - **The Mirror Speaker**: guardiana de la Torre III. **Nunca se ve; solo se refleja.** Voz elegante, pausada y ceremonial; frases breves y perfectas. Firma: una línea horizontal. Habla de luz, umbral, reflejo y de lo que se ve cuando dejas de buscar (`docs/PATHS_AND_CHARACTERS.md`).
   - **Reacciona al estilo de Silvia** (idea #11): al abrirse cada sala escribe en el cristal, en espejo, una línea breve sobre cómo resolvió la anterior (hora, fallos y notas, ritmo, tono con Hermes), firmada con su línea. Cada sala nueva la muestra arriba de su juego con `EclipseMirrorSpeaker.render(nodo, elemento)`.
 - **The BC Ashes**: secta antiquísima (*Before Christ*), guardianes del «primer fuego», con túnicas manchadas de ceniza.
