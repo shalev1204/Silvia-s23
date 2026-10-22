@@ -426,6 +426,103 @@ def render_sheet01_back() -> np.ndarray:
 # MASTER BUILD ORCHESTRATOR (12 SHEETS / 24 FACES)
 # -------------------------------------------------------------------------
 
+# Every sheet of the journal (also read by verify_sheets.py): (sheet_num, face_a_tuple, face_b_tuple)
+# Face tuple: (label, renderer_fn, stem, is_back, is_fullbleed)
+JOURNAL_SHEETS = [
+    # Sheet 1: Prologue
+    (1,
+     ("Hoja 1 · Cara A (Cover: The Eclipse Order)", render_sheet01_front, "page01_front", False, True),
+     ("Hoja 1 · Cara B (Letter: The Cartographer's Letter)", render_sheet01_back, "page01_back", True, False)),
+
+    # Sheet 2: The Celestial Alphabet (Part I)
+    (2,
+     ("Hoja 2 · Cara A (Alphabet Part I: Glyphs 1-7)", render_face_2a, "page02_front", False, False),
+     ("Hoja 2 · Cara B (Alphabet Part II: Glyphs 8-14)", render_face_2b, "page02_back", True, False)),
+
+    # Sheet 3: The Celestial Alphabet (Part II)
+    (3,
+     ("Hoja 3 · Cara A (Alphabet Part III: Glyphs 15-21)", render_face_3a, "page03_front", False, False),
+     ("Hoja 3 · Cara B (Alphabet Part IV: Glyphs 22-26 & Meridian Quadrant)", render_face_3b, "page03_back", True, False)),
+
+    # Sheet 4: Astrolabe Lore & Game C1 (The Planisphere)
+    (4,
+     ("Hoja 4 · Cara A (Lore: The Astrolabe & Constellation Frise)", render_face_4a, "page04_front", False, False),
+     ("Hoja 4 · Cara B (Game C1: The Planisphere)", render_sheet04_back_c1, "page04_back", True, False)),
+
+    # Sheet 5: Astrolabe Anatomy & Game C2 (The Zodiacal Engine)
+    (5,
+     ("Hoja 5 · Cara A (Lore: Exploded Astrolabe Anatomy)", render_sheet05_front_anatomy, "page05_front", False, False),
+     ("Hoja 5 · Cara B (Game C2: The Zodiacal Engine)", render_game_c2, "page05_back", True, False)),
+
+    # Sheet 6: Midnight Calibration & Game C3 (The Midnight Transit)
+    (6,
+     ("Hoja 6 · Cara A (Lore: Midnight Calibration & Planisphere)", render_face_5a, "page06_front", False, False),
+     ("Hoja 6 · Cara B (Game C3: The Midnight Transit)", render_sheet06_back_c3, "page06_back", True, False)),
+
+    # Sheet 7: Game C4 & Transition to Desert
+    (7,
+     ("Hoja 7 · Cara A (Game C4: The Celestial Cipher)", render_sheet07_front_c4, "page07_front", False, False),
+     ("Hoja 7 · Cara B (Lore: Field Log - The Desert Frontier & Dual Seals)", render_face_5b, "page07_back", True, False)),
+
+    # Sheet 8: Desert Lore & Grand Map Q1
+    (8,
+     ("Hoja 8 · Cara A (Lore: The Desert Frontier & The River Hunch)", render_face_6a, "page08_front", False, False),
+     ("Hoja 8 · Cara B (Map: Grand Desert Map - NW Top-Left / Spread 1)", render_face_6b, "page08_back", True, True)),
+
+    # Sheet 9: Grand Map Q2 & Game D1 (Chasm Maze)
+    (9,
+     ("Hoja 9 · Cara A (Map: Grand Desert Map - NE Top-Right / Spread 1)", render_face_7a, "page09_front", False, True),
+     ("Hoja 9 · Cara B (Game D1: The Whispering Chasm Maze)", render_game_d1, "page09_back", True, False)),
+
+    # Sheet 10: Game D2 (Salt Playa) & Salt Playa Study
+    (10,
+     ("Hoja 10 · Cara A (Game D2: The Salt Playa Navigation)", render_game_d2_salt_playa, "page10_front", False, False),
+     ("Hoja 10 · Cara B (Lore: Study on the Dry Salt Playa Formation)", render_lore_10b_salt_playa_study, "page10_back", True, False)),
+
+    # Sheet 11: Game D3 (Desert Lexicon - BC Ashes) & Grand Map Q3 (Map SW)
+    (11,
+     ("Hoja 11 · Cara A (Game D3: The Desert Lexicon & BC Ashes)", render_game_d2, "page11_front", False, False),
+     ("Hoja 11 · Cara B (Map: Grand Desert Map - SW Bottom-Left / Spread 2)", render_face_7b, "page11_back", True, True)),
+
+    # Sheet 12: Grand Map Q4 (Map SE) & Game D4 (Oasis Clepsydra - Mirage)
+    (12,
+     ("Hoja 12 · Cara A (Map: Grand Desert Map - SE Bottom-Right / Spread 2)", render_face_8a, "page12_front", False, True),
+     ("Hoja 12 · Cara B (Game D4: The Oasis Clepsydra - Feverish Mirage)", render_game_d3, "page12_back", True, False)),
+
+    # Sheet 13: Sanctuary Servant Lore & Game D5 (Sun Monolith - Cairn II)
+    (13,
+     ("Hoja 13 · Cara A (Lore: At the Gates of Tower II & Servant's Demand)", render_lore_13a_sanctuary_servant, "page13_front", False, False),
+     ("Hoja 13 · Cara B (Game D5: The Sun Monolith & Cairn II)", render_game_d5_sun_monolith, "page13_back", True, False)),
+
+    # Sheet 14: The 5 Cairns Survey Lore & Game D6 (Sandstone Labyrinth - Cairn III)
+    (14,
+     ("Hoja 14 · Cara A (Lore: The Five Geodetic Cairns Survey)", render_lore_14a_cairns_survey, "page14_front", False, False),
+     ("Hoja 14 · Cara B (Game D6: The Sandstone Labyrinth & Cairn III)", render_game_d6_sandstone_labyrinth, "page14_back", True, False)),
+
+    # Sheet 15: Game D7 (Cairn IV Sentry) & Zoom Bridge Left (Spread 3 Left)
+    (15,
+     ("Hoja 15 · Cara A (Game D7: Cairn IV Sentry of the Canyon)", render_game_d7_cairn_iv_sentry, "page15_front", False, False),
+     ("Hoja 15 · Cara B (Map Zoom: Natural Bridge & Sentinel Mesa - Left Panel)", render_zoom_bridge_left, "page15_back", True, True)),
+
+    # Sheet 16: Zoom Bridge Right (Spread 3 Right) & Game D8 (Solstice Arch / Altar - Cairn V)
+    (16,
+     ("Hoja 16 · Cara A (Map Zoom: Natural Bridge & Lower Wash - Right Panel)", render_zoom_bridge_right, "page16_front", False, True),
+     ("Hoja 16 · Cara B (Game D8: Arch of the Solstice & Cairn V Altar)", render_game_d8_arch_solstice_altar, "page16_back", True, False)),
+
+    # Sheet 17: Game D9 (Polybius Stele - Servant's Trial) & Audience with Oracle
+    (17,
+     ("Hoja 17 · Cara A (Game D9: The Polybius Stele - Servant's Trial)", render_game_d4, "page17_front", False, False),
+     ("Hoja 17 · Cara B (Lore: Audience with The Desert Oracle)", render_colophon, "page17_back", True, False)),
+
+    # Sheet 18: Game D10 (Oracle Climax) & Transition Art to Stage Path
+    (18,
+     ("Hoja 18 · Cara A (Game D10: The Oracle's Horizon & Triple Triangulation)", render_game_d10_oracle_horizon, "page18_front", False, True),
+     ("Hoja 18 · Cara B (Art: Transition to the Stage Path)", render_art_18b_stage_path_transition, "page18_back", True, True)),
+]
+# Sheets 19 to 26: the Stage Path (Tower III), built in build_stage_path.py
+JOURNAL_SHEETS += STAGE_SHEETS
+
+
 def build_entire_journal() -> None:
     print("==========================================================================")
     print("=== BUILDING COMPLETE 12-SHEET / 24-PAGE JOURNAL (ORGANIC LORE & GAMES) ===")
@@ -437,101 +534,7 @@ def build_entire_journal() -> None:
         if bg_raw is not None:
             bg_raw = cv2.resize(bg_raw, (CANVAS_WIDTH_PX, CANVAS_HEIGHT_PX), interpolation=cv2.INTER_LANCZOS4)
 
-    # 18 Sheets definition: (sheet_num, face_a_tuple, face_b_tuple)
-    # Face tuple: (label, renderer_fn, stem, is_back, is_fullbleed)
-    sheets = [
-        # Sheet 1: Prologue
-        (1,
-         ("Hoja 1 · Cara A (Cover: The Eclipse Order)", render_sheet01_front, "page01_front", False, True),
-         ("Hoja 1 · Cara B (Letter: The Cartographer's Letter)", render_sheet01_back, "page01_back", True, False)),
-
-        # Sheet 2: The Celestial Alphabet (Part I)
-        (2,
-         ("Hoja 2 · Cara A (Alphabet Part I: Glyphs 1-7)", render_face_2a, "page02_front", False, False),
-         ("Hoja 2 · Cara B (Alphabet Part II: Glyphs 8-14)", render_face_2b, "page02_back", True, False)),
-
-        # Sheet 3: The Celestial Alphabet (Part II)
-        (3,
-         ("Hoja 3 · Cara A (Alphabet Part III: Glyphs 15-21)", render_face_3a, "page03_front", False, False),
-         ("Hoja 3 · Cara B (Alphabet Part IV: Glyphs 22-26 & Meridian Quadrant)", render_face_3b, "page03_back", True, False)),
-
-        # Sheet 4: Astrolabe Lore & Game C1 (The Planisphere)
-        (4,
-         ("Hoja 4 · Cara A (Lore: The Astrolabe & Constellation Frise)", render_face_4a, "page04_front", False, False),
-         ("Hoja 4 · Cara B (Game C1: The Planisphere)", render_sheet04_back_c1, "page04_back", True, False)),
-
-        # Sheet 5: Astrolabe Anatomy & Game C2 (The Zodiacal Engine)
-        (5,
-         ("Hoja 5 · Cara A (Lore: Exploded Astrolabe Anatomy)", render_sheet05_front_anatomy, "page05_front", False, False),
-         ("Hoja 5 · Cara B (Game C2: The Zodiacal Engine)", render_game_c2, "page05_back", True, False)),
-
-        # Sheet 6: Midnight Calibration & Game C3 (The Midnight Transit)
-        (6,
-         ("Hoja 6 · Cara A (Lore: Midnight Calibration & Planisphere)", render_face_5a, "page06_front", False, False),
-         ("Hoja 6 · Cara B (Game C3: The Midnight Transit)", render_sheet06_back_c3, "page06_back", True, False)),
-
-        # Sheet 7: Game C4 & Transition to Desert
-        (7,
-         ("Hoja 7 · Cara A (Game C4: The Celestial Cipher)", render_sheet07_front_c4, "page07_front", False, False),
-         ("Hoja 7 · Cara B (Lore: Field Log - The Desert Frontier & Dual Seals)", render_face_5b, "page07_back", True, False)),
-
-        # Sheet 8: Desert Lore & Grand Map Q1
-        (8,
-         ("Hoja 8 · Cara A (Lore: The Desert Frontier & The River Hunch)", render_face_6a, "page08_front", False, False),
-         ("Hoja 8 · Cara B (Map: Grand Desert Map - NW Top-Left / Spread 1)", render_face_6b, "page08_back", True, True)),
-
-        # Sheet 9: Grand Map Q2 & Game D1 (Chasm Maze)
-        (9,
-         ("Hoja 9 · Cara A (Map: Grand Desert Map - NE Top-Right / Spread 1)", render_face_7a, "page09_front", False, True),
-         ("Hoja 9 · Cara B (Game D1: The Whispering Chasm Maze)", render_game_d1, "page09_back", True, False)),
-
-        # Sheet 10: Game D2 (Salt Playa) & Salt Playa Study
-        (10,
-         ("Hoja 10 · Cara A (Game D2: The Salt Playa Navigation)", render_game_d2_salt_playa, "page10_front", False, False),
-         ("Hoja 10 · Cara B (Lore: Study on the Dry Salt Playa Formation)", render_lore_10b_salt_playa_study, "page10_back", True, False)),
-
-        # Sheet 11: Game D3 (Desert Lexicon - BC Ashes) & Grand Map Q3 (Map SW)
-        (11,
-         ("Hoja 11 · Cara A (Game D3: The Desert Lexicon & BC Ashes)", render_game_d2, "page11_front", False, False),
-         ("Hoja 11 · Cara B (Map: Grand Desert Map - SW Bottom-Left / Spread 2)", render_face_7b, "page11_back", True, True)),
-
-        # Sheet 12: Grand Map Q4 (Map SE) & Game D4 (Oasis Clepsydra - Mirage)
-        (12,
-         ("Hoja 12 · Cara A (Map: Grand Desert Map - SE Bottom-Right / Spread 2)", render_face_8a, "page12_front", False, True),
-         ("Hoja 12 · Cara B (Game D4: The Oasis Clepsydra - Feverish Mirage)", render_game_d3, "page12_back", True, False)),
-
-        # Sheet 13: Sanctuary Servant Lore & Game D5 (Sun Monolith - Cairn II)
-        (13,
-         ("Hoja 13 · Cara A (Lore: At the Gates of Tower II & Servant's Demand)", render_lore_13a_sanctuary_servant, "page13_front", False, False),
-         ("Hoja 13 · Cara B (Game D5: The Sun Monolith & Cairn II)", render_game_d5_sun_monolith, "page13_back", True, False)),
-
-        # Sheet 14: The 5 Cairns Survey Lore & Game D6 (Sandstone Labyrinth - Cairn III)
-        (14,
-         ("Hoja 14 · Cara A (Lore: The Five Geodetic Cairns Survey)", render_lore_14a_cairns_survey, "page14_front", False, False),
-         ("Hoja 14 · Cara B (Game D6: The Sandstone Labyrinth & Cairn III)", render_game_d6_sandstone_labyrinth, "page14_back", True, False)),
-
-        # Sheet 15: Game D7 (Cairn IV Sentry) & Zoom Bridge Left (Spread 3 Left)
-        (15,
-         ("Hoja 15 · Cara A (Game D7: Cairn IV Sentry of the Canyon)", render_game_d7_cairn_iv_sentry, "page15_front", False, False),
-         ("Hoja 15 · Cara B (Map Zoom: Natural Bridge & Sentinel Mesa - Left Panel)", render_zoom_bridge_left, "page15_back", True, True)),
-
-        # Sheet 16: Zoom Bridge Right (Spread 3 Right) & Game D8 (Solstice Arch / Altar - Cairn V)
-        (16,
-         ("Hoja 16 · Cara A (Map Zoom: Natural Bridge & Lower Wash - Right Panel)", render_zoom_bridge_right, "page16_front", False, True),
-         ("Hoja 16 · Cara B (Game D8: Arch of the Solstice & Cairn V Altar)", render_game_d8_arch_solstice_altar, "page16_back", True, False)),
-
-        # Sheet 17: Game D9 (Polybius Stele - Servant's Trial) & Audience with Oracle
-        (17,
-         ("Hoja 17 · Cara A (Game D9: The Polybius Stele - Servant's Trial)", render_game_d4, "page17_front", False, False),
-         ("Hoja 17 · Cara B (Lore: Audience with The Desert Oracle)", render_colophon, "page17_back", True, False)),
-
-        # Sheet 18: Game D10 (Oracle Climax) & Transition Art to Stage Path
-        (18,
-         ("Hoja 18 · Cara A (Game D10: The Oracle's Horizon & Triple Triangulation)", render_game_d10_oracle_horizon, "page18_front", False, True),
-         ("Hoja 18 · Cara B (Art: Transition to the Stage Path)", render_art_18b_stage_path_transition, "page18_back", True, True)),
-    ]
-    # Sheets 19 to 26: the Stage Path (Tower III), built in build_stage_path.py
-    sheets += STAGE_SHEETS
+    sheets = list(JOURNAL_SHEETS)
 
     all_canvases = {}
 

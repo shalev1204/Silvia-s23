@@ -21,7 +21,7 @@
 | 12 | Cartas de Aurelia desbloqueables en el Hub | S | medio | **Implementada (22-10-2026)**: tres cartas de 1970–71 en Chronicles, con los cuadernos I–III; `hub/js/aurelia-letters.js` |
 | 13 | Final distinto según el estilo de juego | L | medio | **Especificada; perfil del viaje implementado (22-10-2026)**: `hub/js/journey-profile.js`, `scripts/audit/journey_report.py`; las escenas se construyen con la Torre I y la Bóveda |
 | 14 | QR o palabra clave por hoja | S | medio | **Implementada (22-10-2026)**: sellos con QR en las caras de juego de las Hojas 20–26 (`scripts/journal/sheet_seal.py`) y llave de cada sala en el Hub (`hub/js/sheet-seals.js`) |
-| 15 | Verificador de hojas unificado | M | alto | Piezas sueltas: prueba de márgenes en cada `build_*.py`, `lint_lore_and_vocabulary.py`; no hay comprobación de colisiones texto-dibujo |
+| 15 | Verificador de hojas unificado | M | alto | **Implementada (22-10-2026)**: `scripts/journal/verify_sheets.py` (colisiones texto–dibujo, tamaños, vocabulario y Reglas 9/10, sellos); bloquea las Hojas 19–26 y corre dentro de `build_stage_path.py` |
 | 16 | Vista previa de impresión con las 8 hojas | S | medio | Parcial: `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
 | 17 | Dividir `web/index.html` (~29.000 líneas) | L | alto (largo plazo) | **Implementada (20-10-2026)**: `web/hub/css` y `web/hub/js`, scripts clásicos sin build |
 | 18 | Smoke más rápido | M | alto | **Implementada (20-10-2026)**: `--jobs`, `--quick`, `--only` en `web_smoke.py` |
@@ -257,8 +257,26 @@ La frase del Email 1 (*You were never only the seeker, you were always the treas
 
 **Verificación**: `python3 scripts/journal/sheet_seal.py` (los ocho sellos se leen de vuelta) y sección `seals` del smoke (sin hash no se pide sello; con hash la ficha, la puerta y el Field Wire lo piden; un código bueno por la dirección abre la sala y se borra de la dirección; uno malo avisa; Carles la abre).
 
-### 15. Verificador de hojas (M)
-Pendiente de especificar.
+### 15. Verificador de hojas (M) · implementada (22-10-2026)
+**Decisiones del Operador (22-10-2026)**
+- **Qué comprueba**: **colisiones texto–dibujo** (40 px de papel limpio, `.agents/rules/user-preferences.md` §3), **tamaño de letra mínimo** (§4) y **vocabulario y Reglas 9/10**.
+- **Qué hojas**: **todas, pero solo bloquean las 19–26**. Las 1–18 ya están impresas: se informan, nunca bloquean.
+- **Margen**: **40 px**.
+- **Cuándo**: **al construir cada hoja**: `build_stage_path.py` revisa cada cara antes de escribir su PDF y se para si algo falla.
+
+**Implementación**
+- `scripts/journal/verify_sheets.py`: mientras se dibuja cada cara vigila `render_pencil_text`, `blit_rgba` y `draw_seal` de todos los constructores, así sabe de cada bloque de texto sus palabras, su tamaño y sus píxeles exactos; todo lo demás es dibujo. Mientras revisa no escribe nada (algunos constructores de las hojas impresas guardan su PDF al dibujar).
+- **Colisiones**: ningún trazo (alfa ≥ 60) a menos de 40 px de un bloque; se toleran 12 píxeles sueltos. No cuentan como dibujo los divisores finos bajo los títulos (con sus puntos finales). Una etiqueta **dentro** de un dibujo a propósito (la letra de una máscara, el numeral de un fragmento, un rótulo en su marco: trazos cerca por los cuatro lados) solo tiene que no tocarlos (3 px). En los mapas a sangre (18A) las etiquetas van sobre el dibujo: solo nota. Cada cara con choques deja `journal/verify/<cara>_check.png` con los trazos culpables en rojo (carpeta ignorada por git).
+- **Tamaños**: error por debajo de 22 px; nota si el cuerpo dominante de la cara baja de 35 px.
+- **Palabras**: las listas prohibidas y de jerga de `lint_lore_and_vocabulary.py`, letras con su valor (Regla 9, «[A] = 5»; las ecuaciones entre letras valen) y letras fuera de A–Z (Regla 10). En las caras de juego 20–26, además, que su sello exista y se lea de vuelta (#14).
+- `build_entire_journal.py`: la lista de hojas pasa a `JOURNAL_SHEETS` (nivel de módulo) para que el verificador la recorra.
+- El texto dibujado de otra forma (PIL directo) no se ve: el informe dice cuántos bloques vio en cada cara.
+
+**Primera pasada (22-10-2026)**
+- **Hoja 19B** tenía tres choques reales, ya corregidos: la flecha de «Its place in the mirror» a 12 px de su rótulo, los numerales del plano del espejo a 18 px (ahora 22) y la letra de las máscaras *moon* a 3 px del sombreado de la frente (bajada 4 px, centrada en su medallón). 19A y 19B pasan limpias.
+- **Hojas 1–18 (solo informe)**: 21 caras con texto a menos de 40 px de un trazo (casi todo rótulos de diagramas y grados), 11 con letra bajo 22 px (mínimo 12 px en 9B), 18 con el cuerpo bajo 35 px; ninguna con términos prohibidos ni Reglas 9/10; una palabra de jerga impresa («stereographic», 4A). 12 caras (portada, carta, mapas y algunos juegos de constelación) dibujan el texto de otra forma y no se revisan.
+
+**Verificación**: `python3 scripts/journal/verify_sheets.py` (todas, código de salida 1 si falla una cara 19–26) o `--sheets 19-26`; `python3 scripts/journal/build_stage_path.py` revisa y construye.
 
 ### 16. Vista previa de impresión de las 8 hojas (S)
 Pendiente de especificar.

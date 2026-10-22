@@ -11,7 +11,8 @@ Sheet 19
 
 Margins: Cara A has no pixels at X < 165, Cara B none at X > 1583 (ring holes); 75 px clear at the foot.
 
-Run alone:  python3 scripts/journal/build_stage_path.py   (writes journal/page19 PDFs and mockups)
+Run alone:  python3 scripts/journal/build_stage_path.py   (proof-reads every face with verify_sheets.py, then writes
+            journal/page19 PDFs and mockups)
 """
 
 import math
@@ -470,7 +471,7 @@ def _draw_mask(canvas, cx, cy, spec, gc, seed, s=1.0):
     for sgn in (+1, -1):
         leaf = [(cx + sgn * (r + 4), my), (cx + sgn * (r + 16), my - 7), (cx + sgn * (r + 30), my), (cx + sgn * (r + 16), my + 7), (cx + sgn * (r + 4), my)]
         _pline(canvas, leaf, gc, alpha=150, seed=seed + 92 + sgn)
-    _text(canvas, letter, cx, my - 22, 30, seed + 91, gc, anchor="center")
+    _text(canvas, letter, cx, my - 18, 30, seed + 91, gc, anchor="center")   # centred in the ring, clear of the forehead hatching
 
 
 def _plan_width(h):
@@ -491,7 +492,7 @@ def _draw_mirror_plan(canvas, idx, x, y, h, gc, seed):
         # the numeral sits a little toward the point of impact, clear of the frame
         cxs, cys = T((sh["center"][0] * 0.8 + stage_mirror.IMPACT[0] * 0.2, sh["center"][1] * 0.8 + stage_mirror.IMPACT[1] * 0.2))
         if j != idx:
-            _text(canvas, stage_mirror.ROMAN[j], cxs, cys - 14, 18, seed + 30 + j, gc, anchor="center")
+            _text(canvas, stage_mirror.ROMAN[j], cxs, cys - 16, 22, seed + 30 + j, gc, anchor="center")   # 22 px: the smallest reading size
     return (x, y, int(x + (stage_mirror.RIGHT - stage_mirror.LEFT) * k), y + h)
 
 
@@ -536,9 +537,9 @@ def render_game_19b_masks(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
     cap = ("When the gate opens, the first piece of the mirror of Tower III is yours. "
            "Keep it: nine pieces make one glass, and the whole glass shows the way.")
     ty = _paragraph(c, cap, tx, y + 74, tr - tx, size=33, lh=46, seed=20210, gc=gc)
-    _text(c, "Its place in the mirror", tr - 70, ty + 24, 30, 20240, gc, anchor="right")
-    ay = ty + 48   # a small pencil arrow toward the plan
-    _pline(c, [(tr - 58, ay), (tr - 8, ay)], gc, alpha=200, seed=20241, thick=2)
+    _text(c, "Its place in the mirror", tr - 110, ty + 24, 30, 20240, gc, anchor="right")
+    ay = ty + 48   # a small pencil arrow toward the plan, 40 px clear of its caption
+    _pline(c, [(tr - 66, ay), (tr - 8, ay)], gc, alpha=200, seed=20241, thick=2)
     _pline(c, [(tr - 22, ay - 10), (tr - 8, ay), (tr - 22, ay + 10)], gc, alpha=200, seed=20242, thick=2)
     return _clear_foot(c)
 
@@ -556,6 +557,8 @@ STAGE_SHEETS = [
 
 def build(sheets=STAGE_SHEETS):
     from scripts.journal.pdf_builder import PDFBuilder
+    from scripts.journal import verify_sheets   # every face is proof-read before its PDF is written (#15)
+    verify_sheets.install()
     journal = os.path.join(PROJECT_ROOT, "journal")
     paper = cv2.imread(os.path.join(journal, "page01", "real_paper_300dpi.png"))
     if paper is not None:
@@ -564,8 +567,12 @@ def build(sheets=STAGE_SHEETS):
         base = os.path.join(journal, f"page{num:02d}")
         os.makedirs(os.path.join(base, "pdf"), exist_ok=True)
         os.makedirs(os.path.join(base, "mockups"), exist_ok=True)
-        for label, renderer, stem, is_back, _bleed in faces:
-            canvas = renderer(gc=GRAPHITE_COLOR)
+        for label, renderer, stem, is_back, bleed in faces:
+            canvas, errors, warnings, _ = verify_sheets.check_face(num, label, renderer, stem, is_back, bleed)
+            for wmsg in warnings:
+                print(f"    note: {wmsg}")
+            if errors:
+                raise SystemExit(f"✗ {label}: " + "; ".join(errors) + " (python3 scripts/journal/verify_sheets.py --sheets 19-26)")
             zone = canvas[:, 1583:, 3] if is_back else canvas[:, :165, 3]
             assert not np.count_nonzero(zone), f"{label}: pixels in the ring holes"
             assert not np.count_nonzero(canvas[CANVAS_HEIGHT_PX - FOOT:, :, 3]), f"{label}: pixels in the foot band"
