@@ -41,6 +41,9 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  27. Accessibility: in every view and station window, the keyboard reaches all the mouse can click and shows where it
      is, text contrast is WCAG AA (read against the painted parchment), the windows hold and return the focus and close
      on Escape, and on a touch screen every control answers a finger within 44 px.
+ 28. Offline: the first visit keeps the whole Hub, a game is kept once opened, and with the server down and no signal
+     the Hub opens every view and the game plays; a new version waits and comes in the next time the Hub is opened;
+     the cloud save keeps a change on the device and sends it when the signal returns.
 
 Setup (once):  pip install playwright pillow numpy && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -102,10 +105,21 @@ def read_headers():
     return headers
 
 
-def start_server():
+def start_server(port=PORT, override=None):
+    """Serves web/; `override` maps a path to the bytes served instead (the offline section's next version)."""
     headers = read_headers()
 
     class Handler(http.server.SimpleHTTPRequestHandler):
+        def do_GET(self):
+            body = (override or {}).get(self.path.split("?")[0])
+            if body is None:
+                return super().do_GET()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/javascript")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
         def end_headers(self):
             for key, value in headers.items():
                 self.send_header(key, value)
@@ -123,7 +137,7 @@ def start_server():
     class Server(http.server.ThreadingHTTPServer):
         request_queue_size = 256  # the default backlog of 5 refuses connections when several browsers load at once
 
-    server = Server(("127.0.0.1", PORT), functools.partial(Handler, directory=WEB))
+    server = Server(("127.0.0.1", port), functools.partial(Handler, directory=WEB))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server
 
@@ -2012,13 +2026,15 @@ def test_a11y(browser):
 CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }};"  # same origin: CSP 'self'
 
 
-def cloud_page(browser, seed, query="?cloud=1", saved=None, fail_rpc=False):
-    """The Hub with cloud-config.js pointed at a fake Supabase that records every call."""
+def cloud_page(browser, seed, query="?cloud=1", saved=None, fail_rpc=False, down=None):
+    """The Hub with cloud-config.js pointed at a fake Supabase that records every call (none while down["v"])."""
     ctx, page, errors = new_page(browser, seed)
     calls = []
 
     def fake_cloud(route):
         req = route.request
+        if down and down["v"]:
+            return route.abort("internetdisconnected")
         path = req.url.split("/rest/v1/", 1)[-1]
         calls.append({"path": path, "body": json.loads(req.post_data or "null"), "key": req.headers.get("apikey")})
         if path == "rpc/eclipse_latest_save":
@@ -2102,6 +2118,124 @@ def test_cloud_save(browser):
     ctx.close()
 
 
+OFFLINE_PORT = PORT - 2   # its own origin and server: the worker is registered there only, and the server can go down
+OFFLINE_BASE = f"http://127.0.0.1:{OFFLINE_PORT}"
+OFFLINE_GAME = "constellation/celestial-flower/index.html"
+
+
+def until(page, expr, seconds):
+    """Polls a page expression (wait_for_function evaluates through eval, which the CSP blocks)."""
+    end = time.time() + seconds
+    while time.time() < end:
+        try:
+            if page.evaluate(expr):
+                return True
+        except Exception:
+            pass   # the page is reloading
+        page.wait_for_timeout(300)
+    return False
+
+
+def sw_cache(page):
+    return page.evaluate("""async () => {
+      const out = {};
+      for (const name of await caches.keys()) out[name] = (await (await caches.open(name)).keys()).map(r => r.url);
+      return out;
+    }""")
+
+
+def test_offline(browser):
+    print("\n28. Offline: the Hub plays without a signal and the journey waits for it")
+    import re
+    import subprocess
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "web", "offline_list.py"), "--check"],
+                       capture_output=True, text=True)
+    check(r.returncode == 0, "the offline list in web/sw.js is current", (r.stdout + r.stderr).strip())
+    with open(os.path.join(WEB, "sw.js"), encoding="utf-8") as f:
+        sw = f.read()
+    listed = json.loads(re.search(r"var PRECACHE = (\[.*?\]);", sw, re.S).group(1))
+
+    override = {}
+    server = start_server(OFFLINE_PORT, override)
+    ctx, page, errors = new_page(browser, DESERT_BASE)
+    failed = []
+    page.on("requestfailed", lambda q: failed.append(q.url) if q.url.startswith(OFFLINE_BASE) else None)
+    page.goto(f"{OFFLINE_BASE}/index.html?sw=1", wait_until="load")
+    until(page, "navigator.serviceWorker.controller !== null", 90)
+    kept = sw_cache(page)
+    hub = [n for n in kept if n.startswith("eclipse-hub-")]
+    check(len(hub) == 1 and len(kept[hub[0]]) == len(listed),
+          "the first visit keeps the whole Hub", f"{[(n, len(v)) for n, v in kept.items()]} of {len(listed)}")
+    page.goto(f"{OFFLINE_BASE}/{OFFLINE_GAME}", wait_until="load")
+    page.wait_for_timeout(2500)
+    check(any(OFFLINE_GAME.rsplit("/", 1)[0] in u for u in sw_cache(page).get("eclipse-visited", [])),
+          "a constellation game is kept the first time it is opened")
+
+    # No signal at all: the site's server is down and the browser is offline
+    server.shutdown(); server.server_close()
+    ctx.set_offline(True)
+    errors.clear(); failed.clear()
+    page.goto(f"{OFFLINE_BASE}/index.html?sw=1", wait_until="load")
+    page.wait_for_timeout(2500)
+    for view in VIEWS:
+        page.evaluate("v => { const b = document.querySelector(`[data-view='${v}']`); if (b) b.click(); }", view)
+        page.wait_for_timeout(900)
+    pics = page.evaluate("[...document.images].filter(i => i.complete && i.currentSrc.startsWith(location.origin) && !i.naturalWidth).map(i => i.currentSrc)")
+    js = [e for e in errors if "Failed to load resource" not in e]
+    check(page.evaluate("!!document.querySelector('[data-view]') && !!window.EclipseCloud") and not failed and not pics and not js,
+          "without a signal the Hub opens every view with all its pictures", "; ".join((failed + pics + js)[:3]))
+    check(page.evaluate("[...document.querySelectorAll('.offline-notice')].some(n => n.getClientRects().length && /journey is kept/.test(n.textContent))"),
+          "a notice says the journey is kept on the device")
+    failed.clear()
+    page.goto(f"{OFFLINE_BASE}/{OFFLINE_GAME}", wait_until="load")
+    page.wait_for_timeout(2000)
+    check(not failed and page.evaluate("document.body.innerText.trim().length > 0"),
+          "a game opened before plays again without a signal", "; ".join(failed[:3]))
+
+    # The signal returns with a new version: it waits, and comes in the next time the Hub is opened
+    server = start_server(OFFLINE_PORT, override)
+    ctx.set_offline(False)
+    override["/sw.js"] = re.sub(r"var VERSION = '\w+'", "var VERSION = 'smokenext'", sw).encode()
+    page.goto(f"{OFFLINE_BASE}/index.html?sw=1", wait_until="load")
+    page.wait_for_timeout(9000)   # past the opening: what is found now waits
+    page.evaluate("window.__stay = 1; navigator.serviceWorker.getRegistration().then(r => r.update())")
+    until(page, "navigator.serviceWorker.getRegistration().then(r => !!(r && r.waiting))", 90)
+    page.wait_for_timeout(1000)
+    check(page.evaluate("window.__stay === 1"),
+          "a new version never reloads an open Hub")
+    page.goto(f"{OFFLINE_BASE}/index.html?sw=1", wait_until="load")
+    until(page, "sessionStorage.getItem('eclipse_sw_reloaded') !== null", 30)
+    page.wait_for_load_state("load")
+    page.wait_for_timeout(1500)
+    kept = sw_cache(page)
+    check([n for n in kept if n.startswith("eclipse-hub-")] == ["eclipse-hub-smokenext"] and kept.get("eclipse-visited"),
+          "opening the Hub lets the new version in, drops the old one and keeps the visited games", str(list(kept)))
+    ctx.close()
+    server.shutdown(); server.server_close()
+
+    # The cloud save without a signal: the change waits on the device and goes up when the signal returns
+    down = {"v": False}
+    ctx, page, errors, calls = cloud_page(browser, DESERT_BASE, down=down)
+    page.wait_for_timeout(4500)
+    down["v"] = True
+    ctx.set_offline(True)
+    page.evaluate("localStorage.setItem('order_dawn_step', '2')")
+    page.wait_for_timeout(3500)
+    queued = page.evaluate("JSON.parse(localStorage.getItem('eclipse_cloud_queue') || '[]').some(e => e.key === 'order_dawn_step')")
+    sent = lambda: [c["body"] for c in calls if c["path"] == "eclipse_saves" and c["body"]["progress"].get("order_dawn_step") == "2"]
+    check(queued and not sent() and page.evaluate("!!document.querySelector('.offline-notice')"),
+          "without a signal the change waits on the device, with the notice")
+    down["v"] = False
+    ctx.set_offline(False)
+    page.wait_for_timeout(5000)
+    check(sent() and any(e.get("key") == "order_dawn_step" for c in calls if c["path"] == "eclipse_events" for e in c["body"])
+          and not page.evaluate("!!document.querySelector('.offline-notice')"),
+          "when the signal returns it reaches the cloud and the notice goes")
+    check(not [e for e in errors if "Failed to load resource" not in e and "internetdisconnected" not in e.lower()],
+          "no JS errors offline", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -2110,10 +2244,10 @@ SECTIONS = {
     "hints": test_hint_ladder, "early": test_early_hints, "previously": test_previously,
     "notebook": test_notebook, "pause": test_stage_pause, "ashes": test_ashes,
     "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
-    "journey": test_journey, "seals": test_seals, "a11y": test_a11y,
+    "journey": test_journey, "seals": test_seals, "a11y": test_a11y, "offline": test_offline,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "mirror", "s20"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "s20"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

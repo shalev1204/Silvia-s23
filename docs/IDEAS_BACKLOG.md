@@ -27,7 +27,7 @@
 | 18 | Smoke más rápido | M | alto | **Implementada (20-10-2026)**: `--jobs`, `--quick`, `--only` en `web_smoke.py` |
 | 19 | Guardado automático en la nube (antes «exportación e importación») | M | alto | **Hecho, probado y desplegado** (Supabase `aoochekcbugawaurllco`, 21-10-2026) |
 | 20 | Accesibilidad | M | alto | **Implementada (22-10-2026)**: teclado (diálogos que toman y devuelven el foco, Esc, tarjetas operables, anillo de foco), contraste WCAG AA y objetivos táctiles de 44 px en iPad (`hub/js/a11y.js`, `hub/css/a11y.css`); sección `a11y` del smoke |
-| 21 | PWA offline | M | medio | No existe (sin manifest ni service worker) |
+| 21 | PWA offline | M | medio | **Implementada (22-10-2026)**: el Hub (31 MB) se guarda en la primera visita y los juegos al abrirlos; aviso «No signal» y el guardado espera a la red; versiones nuevas al reabrir (`web/sw.js`, `hub/js/offline.js`); sección `offline` del smoke |
 | 22 | Registro de juego (va con la #19) | S | medio | **Hecho con la #19**: cada cambio, sesión y vista viaja como evento a `eclipse_events` |
 
 ## Restricciones transversales (valen para todas)
@@ -392,8 +392,33 @@ La frase del Email 1 (*You were never only the seeker, you were always the treas
 
 **Verificación**: sección `a11y` del smoke (27): en las seis vistas (al principio del desierto y con todas las estaciones jugadas) y en las 14 ventanas de estación, todo lo clicable se alcanza con el teclado, cada control enseña su foco, el texto cumple AA (fondo leído de una captura con las letras transparentes), las ventanas toman, retienen y devuelven el foco y cierran con Esc. En un iPad emulado, cada control responde a un dedo a 21 px de su centro y el doble toque no hace zoom. Enter abre una tarjeta de Archivos.
 
-### 21. PWA offline (M)
-Pendiente de especificar.
+### 21. PWA offline (M) · implementada (22-10-2026)
+**Decisiones del Operador (22-10-2026)**
+- **Alcance**: **el Hub y lo ya visitado**. El Hub entero (página, scripts, estilos e imágenes: 140 archivos, 31 MB) se guarda en la primera visita; cada juego de constelación, la primera vez que se abre. No se precargan los 120 MB del sitio (73 MB son de `midnight-calibration`).
+- **Sin instalación**: ni manifest ni icono en la pantalla de inicio; sigue siendo una web, que además funciona sin red.
+- **Guardado sin red**: el progreso queda en el dispositivo y se sube a Supabase al volver la señal, con un **aviso discreto**.
+- **Versiones**: la nueva se descarga en segundo plano y **entra al reabrir el Hub**; nunca recarga una página abierta.
+
+**Implementación**
+- `web/sw.js` (service worker, alcance todo el sitio):
+  - Al instalarse guarda el Hub en `eclipse-hub-<versión>`; al activarse borra las versiones anteriores.
+  - Responde primero desde lo guardado. Los juegos y las fuentes de Google se guardan en `eclipse-visited` al abrirse y se refrescan en segundo plano cuando hay red.
+  - El audio y el vídeo guardados responden por trozos (`Range`). Un vídeo que nunca se ha reproducido entero no se guarda: la cinemática de `midnight-calibration` necesita red.
+  - Nunca toca Supabase ni otros dominios.
+  - Las páginas se guardan sin su `?…` (lo lee el Hub, no el servidor), y `…/index.html` y `…/` son la misma, porque Cloudflare redirige una a la otra.
+- `scripts/web/offline_list.py` escribe la lista y su versión (hash del contenido) dentro de `sw.js`. Cualquier cambio en un archivo del Hub cambia `sw.js`, y el iPad descarga en segundo plano solo lo que cambió. **Hay que correrlo antes de cada despliegue**: el smoke falla si la lista está desfasada.
+- `web/hub/js/offline.js` (último script del Hub):
+  - Registra el worker solo en el sitio publicado (`https`), o con `?sw=1`.
+  - Si al abrir el Hub hay una versión esperando, la deja entrar y recarga una vez en los primeros 8 s. Lo que llega más tarde espera a la siguiente apertura.
+  - Muestra el aviso «No signal · your journey is kept on this device…» mientras no hay red o el guardado no la encuentra.
+- La cola de eventos y el reenvío al volver la red ya estaban en `cloud-save.js` (#19); no se ha tocado.
+- `_headers`: `connect-src` añade `fonts.googleapis.com` y `fonts.gstatic.com`, porque el worker pide las fuentes él mismo para guardarlas.
+
+**Verificación**: sección `offline` del smoke (28), en su propio origen y servidor.
+- La lista está al día, la primera visita guarda los 140 archivos y un juego queda guardado al abrirse.
+- Con el servidor apagado y el navegador sin red, el Hub abre las seis vistas con todas sus imágenes, sale el aviso y el juego vuelve a abrirse.
+- Una versión nueva encontrada con el Hub abierto no lo recarga; al reabrirlo entra, borra la anterior y conserva los juegos visitados.
+- Sin red, el cambio espera en la cola del dispositivo; al volver la red llega a la nube y el aviso desaparece.
 
 ### 22. Registro de juego (S) · implementada con la #19
 **Decisión del Operador (20-10-2026)**: el registro no se queda en el dispositivo: viaja a Supabase con el guardado (#19) y lo leen Claude (conector) y Carles (panel #9).
