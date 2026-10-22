@@ -5206,7 +5206,8 @@
       let currentInquiryFilter = 'all';
       let currentInquirySearch = '';
 
-      // Questions whose answers reveal puzzle results unlock when the matching station is complete
+      // Questions whose answers reveal puzzle results unlock when the matching station is complete; the "…Hint"
+      // keys are set by the hint ladder (hub/js/hint-ladder.js) at its second note: 6 misses or 20 minutes stuck
       const INQUIRY_UNLOCKS = {
         chasm: { key: 'order_whispering_chasm_completed', label: 'Station 10' },
         playa: { key: 'order_salt_playa_completed', label: 'Station 11' },
@@ -5214,29 +5215,29 @@
         clepsydra: { key: 'order_oasis_clepsydra_completed', label: 'Station 13' },
         cairn1found: { key: 'order_cairn1_found', label: 'finding Cairn I' },
         cairn1: { key: 'order_cairn1_completed', label: 'the Cairn I seal' },
-        monolithHint: { key: 'order_monolith_hint', label: 'three tries at the sigil of Cairn II' },
+        monolithHint: { key: 'order_monolith_hint', label: 'the second hint at the sigil of Cairn II' },
         monolithAwake: { key: 'order_sun_monolith_awake', label: 'waking the Sun Monolith' },
         monolith: { key: 'order_sun_monolith_completed', label: 'Station 14' },
-        labyrinthHint: { key: 'order_labyrinth_hint', label: 'three tries at the sigil of Cairn III' },
-        labyrinthTorches: { key: 'order_labyrinth_torch_hint', label: 'three close calls in the labyrinth' },
+        labyrinthHint: { key: 'order_labyrinth_hint', label: 'the second hint at the sigil of Cairn III' },
+        labyrinthTorches: { key: 'order_labyrinth_torch_hint', label: 'the second hint at the torches of the labyrinth' },
         labyrinth: { key: 'order_sandstone_labyrinth_completed', label: 'Station 15' },
-        cairn4Hint: { key: 'order_cairn4_hint', label: 'three tries at the sigil of Cairn IV' },
-        cairn4Count: { key: 'order_cairn4_count_hint', label: 'three verses that did not ring true' },
+        cairn4Hint: { key: 'order_cairn4_hint', label: 'the second hint at the sigil of Cairn IV' },
+        cairn4Count: { key: 'order_cairn4_count_hint', label: 'the second hint at the song of Cairn IV' },
         cairn4: { key: 'order_cairn_iv_completed', label: 'Station 16' },
-        cairn5Hint: { key: 'order_cairn5_hint', label: 'three tries at the sigil of Cairn V' },
-        cairn5Dawn: { key: 'order_cairn5_dawn_hint', label: 'three spent dawns' },
-        cairn5Signal: { key: 'order_cairn5_signal_hint', label: 'three signals the light did not accept' },
+        cairn5Hint: { key: 'order_cairn5_hint', label: 'the second hint at the sigil of Cairn V' },
+        cairn5Dawn: { key: 'order_cairn5_dawn_hint', label: 'the second hint at the autumn dawn' },
+        cairn5Signal: { key: 'order_cairn5_signal_hint', label: 'the second hint at the night signal' },
         cairn5: { key: 'order_arch_solstice_completed', label: 'Station 17' },
-        steleHint: { key: 'order_stele_hint', label: 'three tries at the proverb of the stele' },
-        steleKnocks: { key: 'order_stele_knock_hint', label: 'three answers the stone did not accept' },
-        steleFire: { key: 'order_stele_fire_hint', label: 'three tries at the burning atrium' },
+        steleHint: { key: 'order_stele_hint', label: 'the second hint at the proverb of the stele' },
+        steleKnocks: { key: 'order_stele_knock_hint', label: 'the second hint at the knocks of the Servant' },
+        steleFire: { key: 'order_stele_fire_hint', label: 'the second hint at the burning atrium' },
         stele: { key: 'order_polybius_stele_completed', label: 'Station 18' },
-        oracleHint: { key: 'order_oracle_hint', label: 'three tries at the sigil of the Oracle' },
-        oracleDisc: { key: 'order_oracle_disc_hint', label: 'a long time at the disc' },
-        oracleVow: { key: 'order_oracle_vow_hint', label: 'three tries at the vow' },
+        oracleHint: { key: 'order_oracle_hint', label: 'the second hint at the sigil of the Oracle' },
+        oracleDisc: { key: 'order_oracle_disc_hint', label: 'the second hint at the disc' },
+        oracleVow: { key: 'order_oracle_vow_hint', label: 'the second hint at the vow' },
         oracle: { key: 'order_oracle_horizon_completed', label: 'Station 19' },
-        masksHint: { key: 'order_masks_hint', label: 'three tries at the word of the gate' },
-        masksDraw: { key: 'order_masks_draw_hint', label: 'three tries at the missing halves' },
+        masksHint: { key: 'order_masks_hint', label: 'the second hint at the word of the gate' },
+        masksDraw: { key: 'order_masks_draw_hint', label: 'the second hint at the missing halves' },
         masks: { key: 'order_masks_gate_completed', label: 'Station 20' }
       };
       const INQUIRY_REQUIREMENTS = {

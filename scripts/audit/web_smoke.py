@@ -45,7 +45,7 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
      the Hub opens every view and the game plays; a new version waits and comes in the next time the Hub is opened;
      the cloud save keeps a change on the device and sends it when the signal returns.
 
-Setup (once):  pip install playwright pillow numpy && python3 -m playwright install chromium
+Setup (once):  pip install -r scripts/requirements.txt && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
 Options:       --chromium /path/to/chrome   use a specific browser binary
                --quick                      short pass before each commit (no long desert games)
@@ -653,6 +653,10 @@ def test_solstice_arch(browser):
     spend(2)
     check(get("order_hint_s17-dawn_level") == "1" and get("order_cairn5_dawn_hint") is None, "3 spent dawns: Hermes's first note, the rays not yet slower")
     spend(3)
+    for _ in range(20):   # the note is drawn on the next frame: slower when the machine is busy
+        if "45 seconds" in js("document.getElementById('solstice-hint').textContent"):
+            break
+        page.wait_for_timeout(150)
     check(get("order_cairn5_dawn_hint") == "true" and "45 seconds" in js("document.getElementById('solstice-hint').textContent"),
           "6 spent dawns: each ray waits 45 seconds")
     js("window.__cairn5.startDawn()")
@@ -1303,11 +1307,33 @@ def test_masks_gate(browser):
         page.mouse.up()
     page.click("#btn-masks-hold"); page.wait_for_timeout(1700)
     check(js("window.__masks.carved()") == 1 and get("order_masks_draw_fails") == "0", "a shaking hand, drawn with the mouse, makes the first mask whole")
+    # The second mask drawn with the keyboard alone: the arrows walk the pen along each line, Space puts it down and lifts it
+    page.focus("#masks-canvas")
+    page.keyboard.press("ArrowRight")   # the pen appears
+    pen = js("window.__masks.pen()")
+
+    def walk(x, y):
+        while abs(x - pen[0]) > 1 or abs(y - pen[1]) > 1:
+            horizontal = abs(x - pen[0]) >= abs(y - pen[1])
+            gap = x - pen[0] if horizontal else y - pen[1]
+            step = 4 if abs(gap) >= 4 else 1
+            page.keyboard.press(("Shift+" if step == 1 else "") + (("ArrowRight" if gap > 0 else "ArrowLeft") if horizontal else ("ArrowDown" if gap > 0 else "ArrowUp")))
+            if horizontal:
+                pen[0] += step if gap > 0 else -step
+            else:
+                pen[1] += step if gap > 0 else -step
+    for stroke in js("window.__masks.targets()"):
+        walk(*stroke[0]); page.keyboard.press("Space")
+        for x, y in stroke[1::2] + [stroke[-1]]:
+            walk(x, y)
+        page.keyboard.press("Space")
+    check(js("window.__masks.strokes()") == len(js("window.__masks.targets()")) and js("window.__masks.pen()") == pen,
+          "the arrow keys walk the pen and Space draws each line")
     # during the reveal the mask that was just closed is the one shown, not the next one
-    js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(250)
+    page.click("#btn-masks-hold"); page.wait_for_timeout(250)
     check(get("order_masks_carved") == "2" and "Mask 2 of 3" in js("document.getElementById('masks-draw-count').innerText")
           and "weeping mask" in js("document.getElementById('masks-canvas').getAttribute('aria-label')"),
-          "while the second mask closes, the screen still shows the second mask")
+          "drawn with the keyboard alone, the second mask is made whole; while it closes the screen still shows it")
     page.wait_for_timeout(1500)
     # the last mask is saved at once: a reload in the middle of its reveal cannot strand the station
     js("window.__masks.drawTrue()"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
@@ -1936,6 +1962,35 @@ def low_contrast(page, root=None):
     return bad
 
 
+# A station window pushed wider than the screen, or scrolling sideways (the content does not fit its columns)
+A11Y_WIDE_JS = """(id) => {
+  const m = document.getElementById(id), vw = document.documentElement.clientWidth, out = [];
+  [m, ...m.querySelectorAll('*')].forEach(e => {
+    if (!e.getClientRects().length) return;
+    const s = getComputedStyle(e), r = e.getBoundingClientRect();
+    if ((s.overflowX === 'auto' || s.overflowX === 'scroll') && e.scrollWidth > e.clientWidth + 2)
+      out.push('scrolls sideways: ' + (e.id || e.className) + ' ' + e.scrollWidth + '>' + e.clientWidth);
+    else if (r.width && r.right > vw + 1) out.push('past the screen: ' + (e.id || e.className));
+  });
+  return out.slice(0, 2); }"""
+# Words of the path cards cut off by the card's edge
+A11Y_CARDS_JS = """() => [...document.querySelectorAll('.map-path-tab-btn')].flatMap(b => { const r = b.getBoundingClientRect();
+  return [...b.querySelectorAll('.path-tab-body *, .path-tab-state')].filter(e => { const q = e.getBoundingClientRect();
+    return q.width && e.textContent.trim() && (q.right > r.right + 0.5 || q.bottom > r.bottom + 0.5 || e.scrollWidth > e.clientWidth + 1); })
+    .map(e => b.id + ' cuts "' + e.textContent.trim().slice(0, 30) + '"'); })"""
+
+
+def a11y_wide(page, fn, mid):
+    page.evaluate("v => { const b = document.querySelector(`[data-view='${v}']`); if (b) b.click(); }", "view-trail")
+    page.wait_for_timeout(600)
+    page.evaluate(f"window.{fn}()" if fn.startswith("open") else f"window.{fn} 0")
+    page.wait_for_timeout(900)
+    out = page.evaluate(A11Y_WIDE_JS, mid)
+    page.keyboard.press("Escape"); page.wait_for_timeout(400)
+    page.evaluate(f"document.getElementById('{mid}').style.display = 'none'")
+    return out
+
+
 def test_a11y(browser):
     print("\n27. Accessibility: keyboard, contrast and touch in every view and station window")
     fmt = lambda items: "; ".join(sorted(set(items))[:4]) + (" …" if len(set(items)) > 4 else "")
@@ -2020,6 +2075,10 @@ def test_a11y(browser):
         page.keyboard.press("Escape"); page.wait_for_timeout(500)
         page.evaluate(f"document.getElementById('{mid}').style.display = 'none'")
     check(not small, "every control can be touched within 44 px of its centre", fmt(small))
+    wide = [mid + ": " + m for fn, mid in A11Y_MODALS[:12] for m in a11y_wide(page, fn, mid)]
+    open_view(page, "view-trail")
+    wide += page.evaluate(A11Y_CARDS_JS)
+    check(not wide, "on the iPad no station window spills sideways and the path cards show all their words", fmt(wide))
     ctx.close()
 
 

@@ -105,7 +105,8 @@
       let revealed = false;   // the current mask has just been carved true (shown for a moment)
       let justSet = false;    // Fragment I has just been won and the mirror has not shown it yet
       let revealIdx = -1;     // the mask being shown whole during a reveal (the saved count has already moved on)
-      let activePointer = null;
+      let activePointer = null; // the finger or mouse drawing now, or 'keys' for the keyboard pen
+      let pen = null;           // where the keyboard pen stands, in mask units
       const maskIdx = () => Math.min(carved(), MASKS.length - 1);
       const shownIdx = () => (revealed && revealIdx >= 0 ? revealIdx : maskIdx());
 
@@ -212,6 +213,15 @@
             if (s.length === 1) { ctx.beginPath(); ctx.arc(s[0][0], s[0][1], 1.5, 0, 2 * Math.PI); ctx.fillStyle = '#e9e4f5'; ctx.fill(); return; }
             path(s); ctx.stroke();
           });
+          // the keyboard pen: a ring while it hovers, filled while it draws
+          if (pen && document.activeElement === el.canvas) {
+            ctx.beginPath();
+            ctx.arc(pen[0], pen[1], 5, 0, 2 * Math.PI);
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#e9d5ff';
+            ctx.stroke();
+            if (activePointer === 'keys') { ctx.fillStyle = '#e9d5ff'; ctx.fill(); }
+          }
         }
       }
       function pointAt(e) {
@@ -244,6 +254,37 @@
         };
         el.canvas.addEventListener('pointerup', end);
         el.canvas.addEventListener('pointercancel', end);
+
+        // The keyboard draws too: the arrows move a pen (two at once for a slant, Shift for small steps) and
+        // Space or Enter puts it down on the glass and lifts it. Its lines are judged like a finger's.
+        const MOVES = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+        const held = new Set();
+        el.canvas.addEventListener('keydown', (e) => {
+          if (MOVES[e.key]) {
+            e.preventDefault();
+            if (!canDraw() || (activePointer !== null && activePointer !== 'keys')) return;
+            held.add(e.key);
+            if (!pen) pen = [AX + 6, 30];
+            const step = e.shiftKey ? 1 : 4;
+            let dx = 0, dy = 0;
+            held.forEach((k) => { dx += MOVES[k][0]; dy += MOVES[k][1]; });
+            pen = [Math.max(0, Math.min(W, pen[0] + dx * step)), Math.max(0, Math.min(H, pen[1] + dy * step))];
+            if (activePointer === 'keys') current.push(pen);
+            draw();
+          } else if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) {
+            e.preventDefault();
+            if (!canDraw()) return;
+            if (activePointer === 'keys') { end(); return; }
+            if (activePointer !== null) return;
+            if (!pen) pen = [AX + 6, 30];
+            activePointer = 'keys';
+            current = [pen];
+            draw();
+          }
+        });
+        el.canvas.addEventListener('keyup', (e) => held.delete(e.key));
+        el.canvas.addEventListener('focus', draw);
+        el.canvas.addEventListener('blur', () => { held.clear(); if (activePointer === 'keys') end(); else draw(); });
       }
 
       function holdToMirror() {
@@ -377,7 +418,7 @@
           const mask = MASKS[shownIdx()];
           el.canvas.setAttribute('aria-label', done
             ? 'Three masks made whole in the mirror.'
-            : 'Mask ' + (shownIdx() + 1) + ' of 3, ' + mask.name + ': carved on its left half only, beside a mirror. Draw its right half as the mirror would show it. ' + strokes.length + (strokes.length === 1 ? ' line' : ' lines') + ' drawn.');
+            : 'Mask ' + (shownIdx() + 1) + ' of 3, ' + mask.name + ': carved on its left half only, beside a mirror. Draw its right half as the mirror would show it: with a finger, the mouse, or the arrow keys, with Space to put the pen down and lift it. ' + strokes.length + (strokes.length === 1 ? ' line' : ' lines') + ' drawn.');
         }
         if (el.tWord) el.tWord.textContent = awake ? WORD + ' ✓' : '[ 6 LETTERS ]';
         if (el.tMasks) el.tMasks.textContent = done ? '3 / 3 ✓' : '[ ' + n + ' / 3 ]';
@@ -516,6 +557,7 @@
         carved, strokes: () => strokes.length,
         targets: () => MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(1))),
         size: [W, H],
+        pen: () => pen,
         drawTrue: () => { strokes = MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(1))); render(); },
         setStrokes: (list) => { strokes = list; render(); },
         drawHalf: () => { strokes = [MASKS[maskIdx()].strokes[0].map(toCanvas(1))]; render(); },

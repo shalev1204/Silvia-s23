@@ -30,6 +30,9 @@
         min-height: 44px;
       }
 
+      /* the testimonies of the Clepsydra are whole-width cards: a finger's height at least */
+      .clepsydra-clue-card { min-height: 44px; box-sizing: border-box; }
+
       /* the squares of the Desert Lexicon grow to a fingertip */
       .lexicon-cw-cell { width: 44px; height: 44px; }
     }

@@ -386,9 +386,15 @@ La frase del Email 1 (*You were never only the seeker, you were always the treas
 - **Contraste corregido** (medido contra el fondo pintado de verdad): pie de la barra lateral, contador de mensajes, escala del dial de Transmisiones, estado de las letras del Ledger, números de las casillas del Abismo, letras de la Playa de Sal, leyenda de la Clepsidra y las líneas aún dormidas del Monolito.
 - **Semántica**: la lámina a pantalla completa es un diálogo con su «Close», el botón cerrado del inspector dice `aria-disabled`, y los nodos del dibujo del Abismo (que repiten los botones de los marcadores) quedan fuera del árbol accesible.
 
+**Deudas cerradas después (22-10-2026)**
+- **Dibujo de la Estación 20 con teclado**: el lienzo entra en el orden de Tab; las flechas mueven una pluma (dos a la vez para una diagonal, Shift para pasos de 1 unidad) y Espacio o Enter la baja al cristal y la levanta. Sus líneas se juzgan igual que las de un dedo; una prueba del smoke hace entera la segunda máscara solo con el teclado.
+- **Ventanas que se salían de lado** (Abismo, Playa, Léxico, Clepsidra, y la cinta del Cairn IV en móvil): las columnas de rejilla pasan a `minmax(0, …)`, la barra de la palabra del Léxico se parte en filas, la matriz de la Clepsidra ocupa todo el ancho por debajo de 1300 px (iPad incluido) y en móvil se desplaza dentro de su marco con los nombres de los buscadores fijos. La sección `a11y` mide en el iPad que ninguna ventana de estación se sale ni se desplaza de lado.
+- **Tarjetas de camino** que cortaban «9 of 9 trials cleared»: la barra de progreso y el contador se reparten la fila, y por debajo de 1240 px el estado baja bajo el texto. También lo mide la sección `a11y`.
+- **Etiquetas de las preguntas bloqueadas** (`INQUIRY_UNLOCKS`): decían «three tries…», pero desde la escalera de pistas (#6) se abren en la segunda nota (6 fallos o 20 minutos). Ahora dicen «the second hint at…».
+- **`segno`** y el resto de paquetes de `scripts/` están en `scripts/requirements.txt`.
+
 **Fuera de alcance**
-- El dibujo a mano de la Estación 20 sigue siendo de dedo o ratón: dibujar es el juego.
-- La columna derecha de la Clepsidra se corta en el iPad apaisado; ya pasaba antes, es la deuda anotada de los modales s12/s13.
+- La cinta de pilares del Cairn IV (390 px) sigue desplazándose dentro de su marco: es una cinta de 360 px a propósito.
 
 **Verificación**: sección `a11y` del smoke (27): en las seis vistas (al principio del desierto y con todas las estaciones jugadas) y en las 14 ventanas de estación, todo lo clicable se alcanza con el teclado, cada control enseña su foco, el texto cumple AA (fondo leído de una captura con las letras transparentes), las ventanas toman, retienen y devuelven el foco y cierran con Esc. En un iPad emulado, cada control responde a un dedo a 21 px de su centro y el doble toque no hace zoom. Enter abre una tarjeta de Archivos.
 

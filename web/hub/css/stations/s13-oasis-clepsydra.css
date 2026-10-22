@@ -114,16 +114,17 @@
 
     .clepsydra-body-grid {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
       gap: 18px;
       padding: 20px 24px;
       overflow-y: auto;
       flex: 1;
     }
 
-    @media (max-width: 1080px) {
+    /* the matrix needs the whole width below 1300 px (the iPad included): the wells go under it */
+    @media (max-width: 1300px) {
       .clepsydra-body-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
@@ -198,6 +199,9 @@
       white-space: nowrap;
       border-right: 2px solid rgba(96, 165, 250, 0.35);
     }
+
+    /* on a phone the matrix scrolls inside its frame: the seekers' names stay in view */
+    .clepsydra-logic-table td.row-hdr { position: sticky; left: 0; z-index: 1; background: #0f172a; }
 
     .clepsydra-cell-btn {
       width: 100%;
@@ -365,7 +369,7 @@
 
     .clepsydra-registry-row {
       display: grid;
-      grid-template-columns: 120px 1fr 1fr 1fr;
+      grid-template-columns: minmax(84px, 120px) repeat(3, minmax(0, 1fr));
       gap: 6px;
       align-items: center;
     }
@@ -386,6 +390,8 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.72rem;
       padding: 5px 4px;
+      width: 100%;
+      min-width: 0;
       outline: none;
       transition: border-color 0.2s ease;
     }

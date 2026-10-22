@@ -35,7 +35,7 @@ Antes de cada `npx wrangler pages deploy web`, ejecuta:
 
 ```bash
 python3 scripts/web/offline_list.py   # la lista del Hub sin red en web/sw.js (idea #21)
-pip install playwright && python3 -m playwright install chromium   # solo la primera vez
+pip install -r scripts/requirements.txt && python3 -m playwright install chromium   # solo la primera vez
 python3 scripts/audit/web_smoke.py
 ```
 
@@ -66,7 +66,7 @@ También conviene pasar `python3 scripts/audit/lint_lore_and_vocabulary.py` (voc
 
 **Perfil del viaje de Silvia** (para la carta a mano del cofre, idea #13): `python3 scripts/audit/journey_report.py progreso.json` abre el Hub sin ventana con su progreso (la columna `progress` de `eclipse_saves` en Supabase) e imprime el mismo perfil que usará el final: tono, días, salas, notas, franja horaria, cómo llamó a Hermes y el objeto que eligió. Usa el puerto del smoke: no lo corras a la vez que él.
 
-**Sellos de las hojas 20–26** (idea #14): `python3 scripts/journal/sheet_seal.py` crea (una vez) el código de cada cara de juego en `journal/stage_seals.json`, escribe vistas previas en `journal/seals/`, comprueba con OpenCV que cada QR se lee e imprime el hash que va en `SEALS` de `web/hub/js/sheet-seals.js`. Necesita `pip install segno`.
+**Sellos de las hojas 20–26** (idea #14): `python3 scripts/journal/sheet_seal.py` crea (una vez) el código de cada cara de juego en `journal/stage_seals.json`, escribe vistas previas en `journal/seals/`, comprueba con OpenCV que cada QR se lee e imprime el hash que va en `SEALS` de `web/hub/js/sheet-seals.js`. Usa `segno`, que está en `scripts/requirements.txt`.
 
 **Verificador de hojas** (idea #15): `python3 scripts/journal/verify_sheets.py [--sheets 19-26]` dibuja cada cara y comprueba colisiones texto–dibujo (40 px), tamaños de letra (mínimo 22 px), vocabulario y Reglas 9/10, y los sellos de las Hojas 20–26. Las Hojas 1–18 solo se informan; una cara 19–26 con errores devuelve código 1. `build_stage_path.py` lo corre antes de escribir cada PDF. Las caras con choques dejan una imagen en `journal/verify/`.
 

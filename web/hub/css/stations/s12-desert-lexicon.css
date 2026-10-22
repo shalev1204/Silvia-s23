@@ -128,7 +128,7 @@
 
     @media (max-width: 1024px) {
       .lexicon-workbench-body {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
@@ -163,7 +163,7 @@
       width: 100%;
       overflow-x: auto;
       display: flex;
-      justify-content: center;
+      justify-content: safe center;   /* a grid wider than the frame scrolls from its first column */
       padding: 4px 0;
     }
 
@@ -299,6 +299,7 @@
     /* Stele Input Bar */
     .lexicon-stele-input-bar {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       align-items: center;
       background: rgba(20, 14, 9, 0.8);
@@ -308,7 +309,8 @@
     }
 
     .lexicon-word-input {
-      flex: 1;
+      flex: 1 1 140px;
+      min-width: 0;
       background: #0d0905;
       border: 1px solid rgba(212, 168, 83, 0.4);
       color: #fff;

@@ -107,13 +107,15 @@
 
     .path-tab-progress {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 10px;
+      gap: 4px 10px;
       margin-top: 6px;
     }
 
     .path-tab-bar {
-      flex: 0 0 200px;
+      flex: 1 1 120px;
+      max-width: 200px;
       height: 6px;
       border-radius: 4px;
       background: rgba(255, 255, 255, 0.09);
@@ -156,6 +158,13 @@
       background: var(--brass-bright);
       border-color: var(--brass-bright);
       color: #1e1306;
+    }
+
+    /* narrower cards: the state goes under the words instead of beside them */
+    @media (max-width: 1240px) {
+      .map-path-tab-btn { grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; padding: 16px 18px; }
+      .path-tab-emblem { grid-row: span 2; align-self: center; }
+      .path-tab-state { grid-column: 2; justify-self: start; min-width: 0; }
     }
 
     @media (max-width: 860px) {

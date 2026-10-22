@@ -12,7 +12,7 @@ The QR is the key of that room: scanning it opens the Hub with ?seal=CODE, and t
 - Run alone: python3 scripts/journal/sheet_seal.py   writes journal/seals/seal_<face>.png previews and prints the
   hashes to paste into SEALS in sheet-seals.js when each room is built.
 
-Needs segno (pip install segno), only for the journal sheets.
+Needs segno (in scripts/requirements.txt).
 """
 
 import json

@@ -1,0 +1,8 @@
+# Python packages for scripts/ (install once: pip install -r scripts/requirements.txt)
+# Versions are the ones the Operator's Mac runs on (22-10-2026); newer ones should work.
+playwright>=1.58      # the web smoke (scripts/audit) and journey_report; then: python3 -m playwright install chromium
+pillow>=11.3          # the journal sheets, the print preview and the smoke's contrast check
+numpy>=2.0            # the journal sheets and the smoke's contrast check
+opencv-python>=4.13   # the journal sheets, the sheet verifier and reading back the QR seals
+pypdf>=6.10           # the print bundles (scripts/journal/build_impresion_master.py)
+segno>=1.6            # the QR seals of Sheets 20-26 (scripts/journal/sheet_seal.py)
