@@ -151,7 +151,7 @@
       setTimeout(() => cipherPasswordInput.classList.remove('input-error'), 450);
       if (cipherFeedbackMsg) {
         cipherFeedbackMsg.className = 'cipher-feedback-msg feedback-error';
-        cipherFeedbackMsg.innerHTML = '✕ The gears do not mesh. Align the 24 sightings from Sheet 7A in your journal.';
+        cipherFeedbackMsg.innerHTML = '✕ The gears do not mesh. Align the 24 sightings from the page “The Celestial Cipher” in your journal.';
       }
     }
   }

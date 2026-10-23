@@ -111,8 +111,8 @@
         id: 's15-sigil', station: 'Station 15', title: 'the sigil of the true road', group: 'desert',
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
-          'Start at the Southern Mouth of Sheet 14B, not at the cairn. Only the arches that stand on the one true road count, in the order you pass beneath them.',
-          'I wrote down how to find the true road. It is in Ask Hermes: "How do I find the true road of Sheet 14B?"',
+          'Start at the Southern Mouth on the page “The Sandstone Labyrinth & Cairn III”, not at the cairn. Only the arches that stand on the one true road count, in the order you pass beneath them.',
+          'I wrote down how to find the true road. It is in Ask Hermes, under the question about finding the true road.',
           'Let us start together. Put your pencil on the Southern Mouth and shade in every dead end you leave behind; the side fissures have arches too, to fool the hurried. The first arch on the true road carries a W: if your pencil reaches another letter first, you have strayed. Seven arches more, up to the cairn.'
         ]
       });
@@ -267,12 +267,12 @@
       function speakSigil() {
         if (isAwake()) return;
         const typed = (el.keyInput ? el.keyInput.value : '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
-        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from Sheet 14B.', 'error'); return; }
+        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from the page “The Sandstone Labyrinth & Cairn III”.', 'error'); return; }
         if (typed !== SIGIL) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The copper plate does not move. Walk the one true road of Sheet 14B again.', 'error');
+          feedback(el.keyFeedback, 'The copper plate does not move. Walk the one true road of the page “The Sandstone Labyrinth & Cairn III” again.', 'error');
           sigilHints.fail();
           return;
         }
@@ -433,7 +433,7 @@
         returnFocusTo = document.activeElement;
         if (!run) newRun();
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am inside the labyrinth, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road: Sheet 14B.");
+        else if (!isAwake()) say("Silvia, I am inside the labyrinth, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road, the one on the page “The Sandstone Labyrinth & Cairn III” of your journal.");
         else say("The torches are still out there. Watch their rounds, Silvia, and take me to the Western Cleft.");
         render();
         const focusTarget = isDone() ? el.finish : isAwake() ? el.pad.wait : el.keyInput;

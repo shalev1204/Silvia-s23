@@ -26,7 +26,7 @@
         s18: 'In the burning atrium of Tower II, Silvia read the stele and led Hermes through the fire to the well. The Servant was alive, and the Oracle’s charts were safe.',
         s19: 'Behind the door of the inner stair, the Oracle turned out to be Aurelia, alive since 1971. And her disc gave Silvia the first truth: the WHEN.',
         s20: 'The Gate of a Thousand Masks opened for Hermes and Aurelia. Inside: Fragment I of the Mirror Speaker’s mirror, and a note sealed with ash.',
-        s21: 'In the dark room under Tower III, Silvia held Sheet 20A against the city on the wall and found where the Ashes had lit their fire. The second piece of the mirror was in the chimney of the narrow house.',
+        s21: 'In the dark room under Tower III, Silvia held the page “The Camera Obscura” against the city on the wall and found where the Ashes had lit their fire. The second piece of the mirror was in the chimney of the narrow house.',
         s22: 'In the Whispering Gallery, Silvia found where the pins of the ellipse had stood and heard the Ashes say: she will come. She played the niche its tune backwards, the way a mirror would, and the third piece of the mirror was hers.'
       };
       var DO_WORDS = /^(Open|Keep|Read|Trace|Follow|Help|Guide|Speak|Wake|Answer)\b/;

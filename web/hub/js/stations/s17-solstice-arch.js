@@ -90,8 +90,8 @@
         id: 's17-sigil', station: 'Station 17', title: 'the sigil of the midsummer ray', group: 'desert',
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
-          'Do not read every sun-stone of Sheet 16B, Silvia. Follow the ray from the arrow under the arch: only the stones it crosses count, in the order it crosses them.',
-          'I wrote down how the ray bounces off the mirrors. It is in Ask Hermes: "How do I follow the ray of Sheet 16B?"',
+          'Do not read every sun-stone on the page “Arch of the Solstice & The Solar Altar”, Silvia. Follow the ray from the arrow under the arch: only the stones it crosses count, in the order it crosses them.',
+          'I wrote down how the ray bounces off the mirrors. It is in Ask Hermes: "How do I follow the ray of the page “Arch of the Solstice & The Solar Altar”?"',
           'Let us follow it together. From the arrow the ray goes straight down, and on the third flagstone it meets a mirror leaning like \\, which sends it to the right. Two flagstones further on it crosses the first sun-stone: D. Keep following it, mirror by mirror, until it reaches the altar.'
         ]
       });
@@ -443,12 +443,12 @@
       function speakSigil() {
         if (isAwake()) return;
         const typed = (el.keyInput ? el.keyInput.value : '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
-        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from Sheet 16B.', 'error'); return; }
+        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from the page “Arch of the Solstice & The Solar Altar”.', 'error'); return; }
         if (typed !== SIGIL) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The altar stays closed. Follow the midsummer ray of Sheet 16B again.', 'error');
+          feedback(el.keyFeedback, 'The altar stays closed. Follow the midsummer ray across the page “Arch of the Solstice & The Solar Altar” again.', 'error');
           sigilHints.fail();
           return;
         }
@@ -549,7 +549,7 @@
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. The courtyard behind it is paved with bronze mirrors and fallen pillars, and the Solar Altar waits on its terrace with a brass ring. From here I can see the dunes where Cairn V stands guard. Sheet 16B, please: the sigil first.");
+        else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. The courtyard behind it is paved with bronze mirrors and fallen pillars, and the Solar Altar waits on its terrace with a brass ring. From here I can see the dunes where Cairn V stands guard. Open the page “Arch of the Solstice & The Solar Altar”, please: the sigil first.");
         else if (!dawnDone()) say("The mirrors are where you left them. Set them as you think best, and call the dawn when you are ready.");
         else say("Night again. Watch the light on Tower II, and answer it with my mirror.");
         render();

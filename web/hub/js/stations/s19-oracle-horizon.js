@@ -76,7 +76,7 @@
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
           'Do not read the eight beacons where they stand, Silvia. Each one has to travel across the chart first, through the three mirrors, and only the square where it lands gives a letter.',
-          'I wrote down how a beacon crosses the mirrors. It is in Ask Hermes: "How do the three mirrors of Sheet 18A work?"',
+          'I wrote down how a beacon crosses the mirrors. It is in Ask Hermes: "How do the three mirrors of the page “The Oracle\'s Horizon” work?"',
           'Let us send the first beacon together. It starts in column 2, Row A. Mirror I, on column 4, sends it to column 6, still on Row A. In column 6 Mirror II lies on Row D: Row A is three rows above it, so it lands three rows below, on Row G. Mirror III, on column 10, sends column 6 to column 14. Read the letter in column 14, Row G: that is the first letter of the sigil. Now beacon 2.'
         ]
       });
@@ -337,11 +337,11 @@
       function speakSigil() {
         if (isAwake()) return;
         const typed = letters(el.keyInput && el.keyInput.value);
-        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from Sheet 18A.', 'error'); return; }
+        if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from the page “The Oracle\'s Horizon”.', 'error'); return; }
         if (typed !== SIGIL) {
           set(KEYS.fails, String((parseInt(get(KEYS.fails) || '0', 10) || 0) + 1));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The door stays shut. Send the eight beacons across the mirrors of Sheet 18A again.', 'error');
+          feedback(el.keyFeedback, 'The door stays shut. Send the eight beacons across the mirrors on the page “The Oracle\'s Horizon” again.', 'error');
           sigilHints.fail();
           return;
         }
@@ -427,7 +427,7 @@
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
         if (isDone()) { applyVictory(); say("She is grinding lapis by the altar, Silvia, and humming. Every now and then she looks up at me as if to check that I am still here. I am."); }
-        else if (!isAwake()) say("Silvia, I am at the bottom of the inner stair, with the Servant's key in my hand. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. The Servant says it opens only for the sigil of the Oracle. Sheet 18A, please. I can hear someone humming behind it.");
+        else if (!isAwake()) say("Silvia, I am at the bottom of the inner stair, with the Servant's key in my hand. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. The Servant says it opens only for the sigil of the Oracle. Open the page “The Oracle's Horizon”, please. I can hear someone humming behind it.");
         else if (!whenRead()) say("She is still holding the disc up for us, Silvia, patient as stone. Set the rings by the sky.");
         else say("She is waiting, Silvia, with her lips moving on words she cannot quite find. Give them back to her.");
         render();

@@ -1101,7 +1101,7 @@ def test_oracle_horizon(browser):
     answer_first()
     bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
     check(get("order_field_wire_step") == "33" and "THE DESERT PATH IS COMPLETE" in wire_text() and "[Z] + [D] = 23" in wire_text()
-          and "Sheet 19A" in wire_text() and choices() == 3,
+          and "The Unsent Letter" in wire_text() and choices() == 3,
           "step 32 closes the Desert Path, and the morning of departure for Tower III follows (step 33)", bar)
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
@@ -1296,7 +1296,7 @@ def test_masks_gate(browser):
         page.wait_for_timeout(9000)
 
     open_wire()
-    check(get("order_field_wire_step") == "33" and choices() == 3 and "Sheet 19A" in wire_text(),
+    check(get("order_field_wire_step") == "33" and choices() == 3 and "The Unsent Letter" in wire_text(),
           "the Stage Path begins on the wire: step 33, the letter and the new sheets, 3 replies")
     js("window.selectStageStation(40)"); page.wait_for_timeout(500)
     check(not modal_open(), "the gate stays out of reach before Silvia answers")
@@ -1532,7 +1532,7 @@ def test_previously(browser):
         return ctx, page, errors, page.evaluate(PREVIOUSLY_JS)
 
     ctx, page, errors, text = recap({"order_last_seen_at": hours_ago(13)})
-    check("Salt Playa" in text.split("|")[0] and "Salt Playa Crossed" in text and "Station 12 · Sheet 11A" in text.split("|")[-1],
+    check("Salt Playa" in text.split("|")[0] and "Salt Playa Crossed" in text and "The Desert Lexicon & Al-Qibla" in text.split("|")[-1],
           "13 hours away: the Salt Playa last time, the Nomad Ruins next", text[:240])
     page.click(".previously-continue"); page.wait_for_timeout(300)
     seen = int(page.evaluate("localStorage.getItem('order_last_seen_at')") or 0)
@@ -1556,7 +1556,7 @@ def test_previously(browser):
 
     ctx, page, errors, text = recap(dict(DESERT_DONE, order_field_wire_step="10", order_monolith_march_start=hours_ago(1),
                                          order_last_seen_at=hours_ago(20)))
-    check("Four Wells" in text.split("|")[0] and ("He arrives in 10 h 5" in text or "He arrives in 11 h 00" in text) and "Keep Sheet 13B close" in text.split("|")[-1],
+    check("Four Wells" in text.split("|")[0] and ("He arrives in 10 h 5" in text or "He arrives in 11 h 00" in text) and "Keep the page “The Sun Monolith & Cairn II” close" in text.split("|")[-1],
           "on the crossing to the Sun Monolith: the hours left and the sheet to keep close", text[:240])
     ctx.close()
 
@@ -1861,12 +1861,12 @@ def test_seals(browser):
     check("seal" not in room()["status"], "with no seal set for the room, nothing changes")
     js("EclipseSheetSeals.SEALS[43] = EclipseSheetSeals.hash('TESTSEAL')")
     st = room()
-    check("seal of sheet 21b" in st["status"] and "scan the seal on sheet 21b" in st["btn"], "the room asks for the seal of Sheet 21B", str(st))
+    check("seal of the page “the automaton orchestra”" in st["status"] and "scan the seal on the page “the automaton orchestra”" in st["btn"], "the room asks for the seal of the page “The Automaton Orchestra”", str(st))
     js("selectStageStation(43)"); page.wait_for_timeout(300)
-    check("seal on Sheet 21B" in js(toast), "knocking on the door asks for the seal", js(toast))
+    check("seal on the page “The Automaton Orchestra”" in js(toast), "knocking on the door asks for the seal", js(toast))
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
     wire = js("document.querySelector('#wire-completed-bar .messenger-waypoint-desc').textContent.replace(/\\u00a0/g, ' ')")
-    check("seal on Sheet 21B" in wire, "the Field Wire says the same", wire)
+    check("seal printed on the page “The Automaton Orchestra”" in wire, "the Field Wire says the same", wire)
     check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept('testseal')") == 43
           and js("localStorage.getItem('order_sheet_seal_43')") == "true", "only the right code turns the key")
     js("document.querySelector('[data-view=\"view-trail\"]').click()"); page.wait_for_timeout(800)
@@ -1882,7 +1882,7 @@ def test_seals(browser):
     js = page.evaluate
     check(js("localStorage.getItem('order_sheet_seal_43')") == "true" and "seal" not in js("location.search"),
           "scanning the seal turns the key and leaves no code in the address", js("location.href"))
-    check("Sheet 21B turns" in js(toast), "the Hub says which seal turned", js(toast))
+    check("The Automaton Orchestra” turns" in js(toast), "the Hub says which seal turned", js(toast))
     page.goto(f"{BASE}/index.html?seal=WRONGONE", wait_until="load"); page.wait_for_timeout(2500)
     check("belongs to no door" in js(toast) and "seal" not in js("location.search"), "a wrong seal is refused", js(toast))
     ctx.close()
@@ -2399,17 +2399,17 @@ def test_camera_obscura(browser):
     js("localStorage.setItem('order_journal', JSON.stringify({s20: {at: %d, fails: 0, notes: 0}}))" % (now_ms - 4 * 3600 * 1000))
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     open_wire()
-    check("seal on Sheet 20A" in bar_desc() and get("order_field_wire_step") == "36", "after the pause the chat asks for the seal of Sheet 20A", bar_desc())
+    check("seal printed on the page “The Camera Obscura”" in bar_desc() and get("order_field_wire_step") == "36", "after the pause the chat asks for the seal of the page “The Camera Obscura”", bar_desc())
     js("window.selectStageStation(41)"); page.wait_for_timeout(500)
-    check(not modal_open() and "SEAL OF SHEET 20A" in card(), "the card asks for the seal and the room stays shut")
+    check(not modal_open() and "SEAL OF THE PAGE “THE CAMERA OBSCURA”" in card(), "the card asks for the seal and the room stays shut")
     check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept(%s)" % json.dumps(printed_code)) == 41,
           "only the code printed on the sheet turns the key")
 
     # the key is in: Hermes writes from the head of the stair
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     open_wire()
-    check(get("order_field_wire_step") == "37" and "Sheet 20A" in wire_text() and js("document.querySelectorAll('#wire-choices-grid button').length") == 3,
-          "with the seal turned the chat reaches step 37: the stair, Sheet 20A and 3 replies")
+    check(get("order_field_wire_step") == "37" and "The Camera Obscura" in wire_text() and js("document.querySelectorAll('#wire-choices-grid button').length") == 3,
+          "with the seal turned the chat reaches step 37: the stair, the page “The Camera Obscura” and 3 replies")
     js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(9000)
     check(get("order_field_wire_step") == "38" and "Station 21 Awaits" in bar() and "DARK ROOM" in wire_text(),
           "the answer takes him down to the dark room, and the bar waits for Station 21", bar())
@@ -2526,17 +2526,17 @@ def test_whispering_gallery(browser):
     js("localStorage.setItem('order_journal', JSON.stringify({s21: {at: %d, fails: 0, notes: 0}}))" % (now_ms - 7 * 3600 * 1000))
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     open_wire()
-    check("seal on Sheet 20B" in bar_desc() and get("order_field_wire_step") == "40", "after the pause the chat asks for the seal of Sheet 20B", bar_desc())
+    check("seal printed on the page “The Whispering Gallery”" in bar_desc() and get("order_field_wire_step") == "40", "after the pause the chat asks for the seal of the page “The Whispering Gallery”", bar_desc())
     js("window.selectStageStation(42)"); page.wait_for_timeout(500)
-    check(not modal_open() and "SEAL OF SHEET 20B" in card(), "the card asks for the seal and the room stays shut")
+    check(not modal_open() and "SEAL OF THE PAGE “THE WHISPERING GALLERY”" in card(), "the card asks for the seal and the room stays shut")
     check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept(%s)" % json.dumps(printed_code)) == 42,
-          "only the code printed on Sheet 20B turns the key")
+          "only the code printed on the page “The Whispering Gallery” turns the key")
 
     # the key is in: Hermes writes from the head of the second stair
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     open_wire()
-    check(get("order_field_wire_step") == "41" and "Sheet 20B" in wire_text() and js("document.querySelectorAll('#wire-choices-grid button').length") == 3,
-          "with the seal turned the chat reaches step 41: the second stair, Sheet 20B and 3 replies")
+    check(get("order_field_wire_step") == "41" and "The Whispering Gallery" in wire_text() and js("document.querySelectorAll('#wire-choices-grid button').length") == 3,
+          "with the seal turned the chat reaches step 41: the second stair, the page “The Whispering Gallery” and 3 replies")
     js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(9000)
     check(get("order_field_wire_step") == "42" and "Station 22 Awaits" in bar() and "THE GALLERY" in wire_text(),
           "the answer takes him down to the gallery, and the bar waits for Station 22", bar())

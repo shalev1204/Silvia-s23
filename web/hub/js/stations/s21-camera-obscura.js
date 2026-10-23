@@ -66,8 +66,8 @@
         id: 's21-city', station: 'Station 21', title: 'the city on the wall', group: 'stage',
         anchor: el.feedback, solved: isDone,
         texts: [
-          'Four things changed since Sheet 20A, Silvia: something in the sky, something in the street, a shutter, and something on a roof. Which of the four is a fire?',
-          'On Sheet 20A two chimneys smoke. Turn the ring until the wall stands upright and count the smoking chimneys there: there are three. One of them is new.',
+          'Four things changed since the page “The Camera Obscura” was drawn, Silvia: something in the sky, something in the street, a shutter, and something on a roof. Which of the four is a fire?',
+          'On the page “The Camera Obscura” two chimneys smoke. Turn the ring until the wall stands upright and count the smoking chimneys there: there are three. One of them is new.',
           'Let us look together. Start at the market and look up, past the awnings, at the narrow house behind them. Now find that house on the sheet, upside down: is its chimney smoking there?'
         ]
       });
@@ -191,7 +191,7 @@
           remember(place.change);
           feedback(CHANGES[place.change].text, 'error');
         } else {
-          feedback('Look at ' + place.name + ' on Sheet 20A, upside down: it is exactly as it was. The raiders are not there.', 'error');
+          feedback('Look at ' + place.name + ' on the page “The Camera Obscura”, upside down: it is exactly as it was. The raiders are not there.', 'error');
         }
         set(KEYS.fails, String(fails() + 1));
         cityHints.fail();
@@ -236,7 +236,7 @@
       }
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = 'Silvia held Sheet 20A against the city on the wall, turned the lens until the picture stood upright, and saw what had changed: a flag, a cart, a shutter and, above the narrow house behind the market, a chimney that smokes. Where the raiders had lit a fire, the second piece of the mirror of Tower III was waiting in the ashes.';
+          el.victoryText.textContent = 'Silvia held the page “The Camera Obscura” against the city on the wall, turned the lens until the picture stood upright, and saw what had changed: a flag, a cart, a shutter and, above the narrow house behind the market, a chimney that smokes. Where the raiders had lit a fire, the second piece of the mirror of Tower III was waiting in the ashes.';
         }
         drawFragment();
       }
@@ -283,7 +283,7 @@
           const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(NODE) : '';
           if (get('order_masks_gate_completed') !== 'true') toast('✦ THE DOOR IS SHUT ✦ The Camera Obscura opens after the Gate of a Thousand Masks (Station 20).');
           else if (wait) toast('The candles of Tower III are still burning down. The Camera Obscura opens in ' + wait + '.');
-          else toast('The door of the Camera Obscura opens with the seal printed on Sheet ' + sealFace() + ': scan it with your camera.');
+          else toast('The door of the Camera Obscura opens with the seal printed on ' + (window.EclipseSheetSeals && window.EclipseSheetSeals.page ? window.EclipseSheetSeals.page(NODE) : 'the page “The Camera Obscura”') + ': scan it with your camera.');
           return;
         }
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
@@ -295,7 +295,7 @@
         if (isDone()) { applyVictory(); setAngle(0); say("We sleep tonight in the old dressing rooms again, Silvia, but nobody can say the dark room let us down. The picture on its wall is still turned the right way up, and a little smoke is still rising from the narrow house, as if the glass remembered."); }
         else {
           setAngle(START_DEG);
-          say("Silvia, the Mirror Speaker's reflection led us down a stair and into a room with no windows. It is as black as the inside of a cupboard, and in one wall there is a hole no bigger than a coin. On the opposite wall, hanging in the dark, is the whole city of the third tower, upside down: roofs where the ground should be, smoke falling toward the sky. Aurelia says this is a camera obscura. Sheet 20A, please. She says it shows the city as it was yesterday.");
+          say("Silvia, the Mirror Speaker's reflection led us down a stair and into a room with no windows. It is as black as the inside of a cupboard, and in one wall there is a hole no bigger than a coin. On the opposite wall, hanging in the dark, is the whole city of the third tower, upside down: roofs where the ground should be, smoke falling toward the sky. Aurelia says this is a camera obscura. Open the page “The Camera Obscura”, please. She says it shows the city as it was yesterday.");
         }
         render();
         const target = isDone() ? el.done : el.ring;
@@ -341,7 +341,7 @@
             statusClass: 'status-done-badge',
             title: 'The Camera Obscura · Tower III',
             thumb,
-            lore: 'Silvia held Sheet 20A against the city on the wall and found the four things that had changed. A chimney that was cold now smoked: the raiders had hidden in the narrow house behind the market, and the second piece of the mirror of Tower III lay in their ashes.',
+            lore: 'Silvia held the page “The Camera Obscura” against the city on the wall and found the four things that had changed. A chimney that was cold now smoked: the raiders had hidden in the narrow house behind the market, and the second piece of the mirror of Tower III lay in their ashes.',
             rewards: [
               { icon: '🪞', label: 'Fragment II', desc: 'Set in the mirror of Tower III' },
               { icon: '🏠', label: 'The Narrow House', desc: 'Where the raiders hid' }
@@ -357,9 +357,9 @@
           statusClass: 'status-live-badge',
           title: 'The Camera Obscura · Tower III',
           thumb,
-          lore: 'A hole in a wall, and the whole city of the third tower hanging in the dark, upside down. Hold Sheet 20A against the wall: four things have changed since it was drawn, and the raiders hide where one of them is.',
+          lore: 'A hole in a wall, and the whole city of the third tower hanging in the dark, upside down. Hold the journal page of the same name against the wall: four things have changed since it was drawn, and the raiders hide where one of them is.',
           rewards: [
-            { icon: '🕳️', label: 'The City on the Wall', desc: 'Sheet 20A · turn the lens, compare, point' },
+            { icon: '🕳️', label: 'The City on the Wall', desc: 'Your journal · turn the lens, compare, point' },
             { icon: '🪞', label: 'Fragment II', desc: 'One ninth of the mirror of Tower III' }
           ],
           btnText: '✦ ENTER THE DARK ROOM ➔',

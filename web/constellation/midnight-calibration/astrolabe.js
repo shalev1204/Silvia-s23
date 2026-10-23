@@ -638,7 +638,7 @@
         if (apertureBox) apertureBox.className = 'aperture-feedback-box error';
         if (apertureStatusTag) apertureStatusTag.textContent = `OPTICAL MISALIGNMENT // ${currentLimbo.toString().padStart(3, '0')}° LIMBO`;
         if (apertureStatusMsg) {
-          apertureStatusMsg.textContent = `The collimated ray strikes blind cliff rock at ${currentLimbo.toString().padStart(3, '0')}°. Consult your Field Observation Log (Sheet 6 · Side A) to calculate the true sanctuary meridian delta.`;
+          apertureStatusMsg.textContent = `The collimated ray strikes blind cliff rock at ${currentLimbo.toString().padStart(3, '0')}°. Consult the Field Observation Log on the page “The Midnight Calibration” to calculate the true sanctuary meridian delta.`;
         }
       }
     });
@@ -736,19 +736,19 @@
       const isAnchorsValid = combinedAnchors.includes('achernar') && (combinedAnchors.includes('polaris') || combinedAnchors.includes('polar'));
 
       if (!isDistValid) {
-        showTransitFeedback('⚠️ INVALID DISTANCE SUM: Calculate the sum of the six stellar chords in light-years (Sheet 6, Side B · 1).', 'error');
+        showTransitFeedback('⚠️ INVALID DISTANCE SUM: Calculate the sum of the six stellar chords in light-years (the page “The Midnight Transit”, box 1).', 'error');
         if (inputDistance) inputDistance.focus();
         return;
       }
 
       if (!isPolyValid) {
-        showTransitFeedback('⚠️ UNRECOGNIZED ASTERISM: Name the geometric polygon formed by tracing the light chords across the heavens (Sheet 6, Side B · 2).', 'error');
+        showTransitFeedback('⚠️ UNRECOGNIZED ASTERISM: Name the geometric polygon formed by tracing the light chords across the heavens (the page “The Midnight Transit”, box 2).', 'error');
         if (inputPolygon) inputPolygon.focus();
         return;
       }
 
       if (!isAnchorsValid) {
-        showTransitFeedback('⚠️ INCORRECT ANCHORS: Enter the two celestial guide stars bridging southern pivot and northern axle (Side B · 3).', 'error');
+        showTransitFeedback('⚠️ INCORRECT ANCHORS: Enter the two celestial guide stars bridging southern pivot and northern axle (box 3).', 'error');
         return;
       }
 

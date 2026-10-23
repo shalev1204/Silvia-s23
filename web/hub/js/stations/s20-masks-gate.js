@@ -86,7 +86,7 @@
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
           'The sheet already gives you the rule, Silvia: a true face is the same on both sides. Forget the letters for a moment and look only at the faces, one at a time.',
-          'I wrote down how to catch a mask that lies. It is in Ask Hermes: "How do I find the masks that lie on Sheet 19B?"',
+          'I wrote down how to catch a mask that lies. It is in Ask Hermes: "How do I find the masks that lie on the page “The Gate of a Thousand Masks”?"',
           'Let us do the first two together. Top left: diamonds on both cheeks, both brows, both eyes alike. It tells the truth, so its letter stays out. The one beside it has a tear on one cheek only: it lies, and its letter is the first of the word. Go on from the third mask, row by row.'
         ]
       });
@@ -377,7 +377,7 @@
       }
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = 'Silvia found the six masks that lie on Sheet 19B and spoke their word, SILVER, and the wall of masks opened like a curtain. Inside, she gave three half-carved masks their missing halves, the way a mirror would. Behind the last one waited the first piece of the mirror of Tower III. On the same mask, someone had pinned a note sealed with ash.';
+          el.victoryText.textContent = 'Silvia found the six masks that lie on the page “The Gate of a Thousand Masks” and spoke their word, SILVER, and the wall of masks opened like a curtain. Inside, she gave three half-carved masks their missing halves, the way a mirror would. Behind the last one waited the first piece of the mirror of Tower III. On the same mask, someone had pinned a note sealed with ash.';
         }
         if (el.keyInput) { el.keyInput.value = WORD; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
@@ -388,11 +388,11 @@
       function speakWord() {
         if (isAwake()) return;
         const typed = letters(el.keyInput && el.keyInput.value);
-        if (!typed) { feedback(el.keyFeedback, 'Type the six letters from Sheet 19B.', 'error'); return; }
+        if (!typed) { feedback(el.keyFeedback, 'Type the six letters from the page “The Gate of a Thousand Masks”.', 'error'); return; }
         if (typed !== WORD) {
           set(KEYS.fails, String((parseInt(get(KEYS.fails) || '0', 10) || 0) + 1));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The masks stay still. Look again at the two halves of each mask on Sheet 19B.', 'error');
+          feedback(el.keyFeedback, 'The masks stay still. Look again at the two halves of each mask on the page “The Gate of a Thousand Masks”.', 'error');
           wordHints.fail();
           return;
         }
@@ -459,7 +459,7 @@
           if (!toast) return;
           const eta = typeof window.getMasksMarchEta === 'function' ? window.getMasksMarchEta() : '';
           if (get('order_oracle_horizon_completed') !== 'true') toast('✦ THE CURTAIN IS DOWN ✦ The Stage Path opens after the audience with the Oracle (Station 19).');
-          else if (eta) toast('Hermes and Aurelia are crossing the plateau toward the third tower. Arrival in ' + eta + '. Keep Sheet 19B close.');
+          else if (eta) toast('Hermes and Aurelia are crossing the plateau toward the third tower. Arrival in ' + eta + '. Keep the page “The Gate of a Thousand Masks” close.');
           else toast('Hermes and Aurelia will leave Tower II once you answer him on the wire: eighteen hours east to the third tower.');
           return;
         }
@@ -468,7 +468,7 @@
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
         if (isDone()) { applyVictory(); say("We sleep tonight behind the gate, Silvia, in the dressing rooms, on piles of old costumes. The masks have all turned back to face the corridor. Every one of them is smiling now."); }
-        else if (!isAwake()) say("Silvia, we are at the gate of Tower III. It is not a door: it is a wall of masks, hundreds of them, from the ground to the top of the arch, all white, all staring. Aurelia says the old charts of the Sanctuary call it the Gate of a Thousand Masks. Six of these lie, she says, and the letter knew it. Sheet 19B, please.");
+        else if (!isAwake()) say("Silvia, we are at the gate of Tower III. It is not a door: it is a wall of masks, hundreds of them, from the ground to the top of the arch, all white, all staring. Aurelia says the old charts of the Sanctuary call it the Gate of a Thousand Masks. Six of these lie, she says, and the letter knew it. Find its page in your journal, please.");
         else say("The three masks are waiting, Silvia, each carved on one side only. Give each its other half. Aurelia is holding the lamp.");
         sizeCanvas();
         render();
@@ -536,12 +536,12 @@
           title: 'The Gate of a Thousand Masks · Tower III',
           thumb,
           lore: arrived
-            ? 'The gate of Tower III is a wall of masks, and six of them lie. Solve Sheet 19B of your journal and speak the word of the gate. Inside, three masks wait to be made whole.'
+            ? 'The gate of Tower III is a wall of masks, and six of them lie. Solve the page of the same name in your journal and speak the word of the gate. Inside, three masks wait to be made whole.'
             : (eta
-              ? 'Hermes and Aurelia are walking east across the plateau, after the raiders\' ruts. Arrival at the third tower in ' + eta + '. Keep Sheet 19B close.'
-              : 'Hermes and Aurelia will leave Tower II once you answer him on the wire: eighteen hours east to the third tower. Begin with Sheet 19A.'),
+              ? 'Hermes and Aurelia are walking east across the plateau, after the raiders\' ruts. Arrival at the third tower in ' + eta + '. Keep its page in your journal close.'
+              : 'Hermes and Aurelia will leave Tower II once you answer him on the wire: eighteen hours east to the third tower. Begin with the page “The Unsent Letter”.'),
           rewards: [
-            { icon: '🎭', label: 'The Word of the Gate', desc: 'Sheet 19B · twelve masks, six that lie' },
+            { icon: '🎭', label: 'The Word of the Gate', desc: 'Your journal · twelve masks, six that lie' },
             { icon: '✍️', label: 'The Missing Halves', desc: 'A second trial, at the mirror' },
             { icon: '🪞', label: 'Fragment I', desc: 'One ninth of the mirror of Tower III' }
           ],

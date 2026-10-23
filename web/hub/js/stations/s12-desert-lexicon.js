@@ -65,7 +65,7 @@
         anchor: () => document.querySelector('.lexicon-stele-input-bar'),
         solved: () => localStorage.getItem('order_desert_lexicon_completed') === 'true',
         texts: [
-          'You do not need all ten words, Silvia. Look at the circled squares of Sheet 11A: seven words pass through them, and their letters make the sigil. Start with the clues you are surest of.',
+          'You do not need all ten words, Silvia. Look at the circled squares on the page “The Desert Lexicon & Al-Qibla”: seven words pass through them, and their letters make the sigil. Start with the clues you are surest of.',
           'Each clue is one desert word, and the number in brackets is how many letters it has. Where two words cross they share a letter, so every word you carve gives you letters for the words that cross it. When the seven circled squares are full, the dial turns by itself.',
           'Let us carve one together. 3 Across, five letters: the eternal wanderer whose only roof is the stars. Someone with no house, who moves with the seasons and sleeps under the sky: a NOMAD. Its first square is circled, so it is a letter of the sigil. Now look at the words that cross it.'
         ]
@@ -320,7 +320,7 @@
           wordInput.classList.add('decoy-hit');
           setTimeout(() => wordInput.classList.remove('decoy-hit'), 800);
           if (dispatchEl) {
-            dispatchEl.textContent = `"Wait, Silvia! '${val || '???'}' does not fit the carved pattern of ${word.label}. Check Sheet 11A in your journal!"`;
+            dispatchEl.textContent = `"Wait, Silvia! '${val || '???'}' does not fit the carved pattern of ${word.label}. Check the page “The Desert Lexicon & Al-Qibla” in your journal!"`;
           }
           if (val) lexiconHints.fail();
         }

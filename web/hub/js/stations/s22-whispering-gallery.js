@@ -59,9 +59,9 @@
         id: 's22-focus', station: 'Station 22', title: 'where the pins stood', group: 'stage',
         anchor: el.focusFeedback, solved: atFocus,
         texts: [
-          'Sheet 20B, Silvia: Aurelia drew the gallery with two pins and a string, and a whisper at one pin is heard at the other. The pins are gone. Where did they stand?',
+          'Look at the page “The Whispering Gallery”, Silvia: Aurelia drew the gallery with two pins and a string, and a whisper at one pin is heard at the other. The pins are gone. Where did they stand?',
           'Look at the little drawing of the string: pulled tight to the top of the short axis, each half of the string runs to a pin. The string is ten varas, so each half is five. Measure five varas from the top of the short axis down to the long axis.',
-          'Let us measure together. Open your ruler to five varas on the scale of Sheet 20B, put one end on the top of the short axis, and swing the other down until it touches the long axis, on the west side. A pin stood where it touches. Then read on the plan how far that is from the middle.'
+          'Let us measure together. Open your ruler to five varas on the scale printed on the page “The Whispering Gallery”, put one end on the top of the short axis, and swing the other down until it touches the long axis, on the west side. A pin stood where it touches. Then read on the plan how far that is from the middle.'
         ]
       });
       const echoHints = window.EclipseHints.define({
@@ -387,7 +387,7 @@
       }
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = 'Silvia found on Sheet 20B where the pins of the gallery had stood, sent Hermes to the west one, and heard every word the raiders whispered at the east one. They had played the niche its own tune and it stayed shut; Silvia played it back the way a mirror would, from the last bell to the first, and the third piece of the mirror of Tower III was hers.';
+          el.victoryText.textContent = 'Silvia found on the page “The Whispering Gallery” where the pins of the gallery had stood, sent Hermes to the west one, and heard every word the raiders whispered at the east one. They had played the niche its own tune and it stayed shut; Silvia played it back the way a mirror would, from the last bell to the first, and the third piece of the mirror of Tower III was hers.';
         }
         drawFragment();
       }
@@ -449,7 +449,7 @@
           const wait = window.EclipseStagePause ? window.EclipseStagePause.opensIn(NODE) : '';
           if (get('order_camera_obscura_completed') !== 'true') toast('✦ THE DOOR IS SHUT ✦ The Whispering Gallery opens after the Camera Obscura (Station 21).');
           else if (wait) toast('The candles of Tower III are still burning down. The Whispering Gallery opens in ' + wait + '.');
-          else toast('The door of the Whispering Gallery opens with the seal printed on Sheet ' + sealFace() + ': scan it with your camera.');
+          else toast('The door of the Whispering Gallery opens with the seal printed on ' + (window.EclipseSheetSeals && window.EclipseSheetSeals.page ? window.EclipseSheetSeals.page(NODE) : 'the page “The Whispering Gallery”') + ': scan it with your camera.');
           return;
         }
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
@@ -465,7 +465,7 @@
         paintHermes();
         if (isDone()) { applyVictory(); say("We sleep tonight by the west pin, Silvia, wrapped in our coats on the cold floor. Every now and then Aurelia whispers something toward the east end, and it comes back to us, small and clear. She will not tell me what she says."); }
         else if (atFocus()) say("I am still standing on the west pin, Silvia, and the bells are still waiting. The raiders played the tune note for note and the niche stayed shut. Ring them for me.");
-        else say("Silvia, the second stair ended in a hall with no corners at all: a long oval of columns, cold as a church. Somewhere in the dark at the far end two of the Ashes are whispering, and I cannot hear a word. Aurelia says the Order laid this gallery out with two pins and a string, and that a whisper at one pin is heard at the other. Sheet 20B, please. Tell me where to stand.");
+        else say("Silvia, the second stair ended in a hall with no corners at all: a long oval of columns, cold as a church. Somewhere in the dark at the far end two of the Ashes are whispering, and I cannot hear a word. Aurelia says the Order laid this gallery out with two pins and a string, and that a whisper at one pin is heard at the other. Open the page “The Whispering Gallery”, please. Tell me where to stand.");
         render();
         const target = isDone() ? el.done : atFocus() ? (el.bells && el.bells.children[0]) : el.plan;
         if (target) setTimeout(() => target.focus(), 60);
@@ -527,9 +527,9 @@
           statusClass: 'status-live-badge',
           title: 'The Whispering Gallery · Tower III',
           thumb,
-          lore: 'A hall with no corners, laid out with two pins and a string. A whisper at one pin is heard at the other, and the raiders are whispering. Sheet 20B shows where the string ran: find where the pins stood, and listen.',
+          lore: 'A hall with no corners, laid out with two pins and a string. A whisper at one pin is heard at the other, and the raiders are whispering. The journal page of the same name shows where the string ran: find where the pins stood, and listen.',
           rewards: [
-            { icon: '👂', label: 'The Two Pins', desc: 'Sheet 20B · measure, move, listen' },
+            { icon: '👂', label: 'The Two Pins', desc: 'Your journal · measure, move, listen' },
             { icon: '🔔', label: 'The Tune of the Niche', desc: 'Answer it the way a mirror would' },
             { icon: '🪞', label: 'Fragment III', desc: 'One ninth of the mirror of Tower III' }
           ],

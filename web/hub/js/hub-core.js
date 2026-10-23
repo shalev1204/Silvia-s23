@@ -869,7 +869,7 @@
         // Authentic choices during the storm:
         //   - Step 0: [2] "Loud and clear. I solved your celestial cipher at the southern cliff..."
         //   - Step 1: [0] "Call you Hermes..."
-        //   - Step 2: [1] "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark..."
+        //   - Step 2: [1] "Check the page “Field Log: The Desert Frontier”, Section III: The Three Cairns & The Copper Benchmark..."
         //   - Step 3: [0] "According to your notes on Sheet 7B, the benchmark plate points 112° East toward Outer Watchtower VI."
         //   - Satchel Item: "1998 Brass Surveyor's Compass" (trail-head benchmark below Watchtower VI)
         // Waypoint secured at Outer Watchtower VI (wire step 4).
@@ -1090,7 +1090,7 @@
           rewards: [
             { icon: '📡', label: 'Survivor Beacon Locked', desc: '19.84 MHz shortwave carrier' },
             { icon: '📻', label: 'Transmission 2 Intercepted', desc: 'Proof of life from southern dunes' },
-            { icon: '🧭', label: 'Planisphere Alert', desc: 'Guidance to unlock Sheet 4' }
+            { icon: '🧭', label: 'Planisphere Alert', desc: 'Guidance to unlock the page “The Planisphere”' }
           ],
           btnText: 'Open Radio Transmission ➔',
           url: './constellation/radio-transmission/index.html#transmission-2'
@@ -1101,7 +1101,7 @@
           statusClass: 'status-done-badge',
           title: 'The Celestial Matrix',
           thumb: './assets/thumbnails/planisphere_preview.webp',
-          lore: 'At the Observatory, Silvia aligned the sixteen celestial guides and harmonic mechanics from Sheet 4. Transmission 3 (142.85 MHz) confirmed signal stabilization, locking Vector I coordinates and projecting the southern harmonic beam into the dunes.',
+          lore: 'At the Observatory, Silvia aligned the sixteen celestial guides and harmonic mechanics from the page “The Planisphere”. Transmission 3 (142.85 MHz) confirmed signal stabilization, locking Vector I coordinates and projecting the southern harmonic beam into the dunes.',
           rewards: [
             { icon: '🔤', label: 'Secret Letter P Decoded', desc: 'Primary Cardinal Guide key' },
             { icon: '📐', label: 'Ancient Vector I Locked', desc: 'Lat: [K]+[G]=48°, [A]+[O]=30\' · Lon: [B]+[P]=38°, [E]+[V]=14\', [F]+[T]=22″' },
@@ -1118,7 +1118,7 @@
           statusClass: 'status-done-badge',
           title: 'The Zodiacal Engine',
           thumb: './assets/thumbnails/zodiac_journal_preview.webp',
-          lore: 'Calibrating the seven dials of the Zodiacal Engine from Sheet 5, Silvia locked the emergency frequency and breached the desert outskirts outpost. Navigating the ancient subterranean chambers, she attuned the celestial obelisks and recovered the iron cipher chest discarded by the fleeing raiders.',
+          lore: 'Calibrating the seven dials on the page “The Zodiacal Engine”, Silvia locked the emergency frequency and breached the desert outskirts outpost. Navigating the ancient subterranean chambers, she attuned the celestial obelisks and recovered the iron cipher chest discarded by the fleeing raiders.',
           rewards: [
             { icon: '🔤', label: 'Secret Letter K Decoded', desc: 'Secondary Cardinal Guide key' },
             { icon: '📐', label: 'Zodiacal Differential', desc: 'Meridian resonance: [O] − [A] = 16' },
@@ -1300,7 +1300,7 @@
               statusClass: 'status-done-badge',
               title: 'The Desert Lexicon & Al-Qibla',
               thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-              lore: 'Translating the ten words carved on the stelae of the nomad ruins (Sheet 11A), Silvia formed the PHOENIX Sigil and set the Al-Qibla sun compass: its needle points 194° SSW, the way the raiders fled, and its tail 14° NNE, toward Tower II.',
+              lore: 'Translating the ten words carved on the stelae of the nomad ruins, on the page “The Desert Lexicon & Al-Qibla”, Silvia formed the PHOENIX Sigil and set the Al-Qibla sun compass: its needle points 194° SSW, the way the raiders fled, and its tail 14° NNE, toward Tower II.',
               rewards: [
                 { icon: '🦅', label: 'The Desert Sigil: PHOENIX', desc: 'Master key of 7 circled letters' },
                 { icon: '🧭', label: 'Al-Qibla: 194° SSW · 14° NNE', desc: 'The raiders\' heading, and its reverse to Tower II' },
@@ -1317,9 +1317,9 @@
             statusClass: 'status-live-badge',
             title: 'The Desert Lexicon & Al-Qibla',
             thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-            lore: 'In nomad ruins beside the Salt Playa (South-East Quadrant, Sheet 12A of the map), Hermes slipped past an ambush of raiders and found the desert stelae. Open Sheet 11A of your journal ("The Desert Lexicon & Al-Qibla"), solve the crossword and set the sun compass.',
+            lore: 'In nomad ruins beside the Salt Playa (South-East Quadrant, on the map page “Grand Desert Map · South-East”), Hermes slipped past an ambush of raiders and found the desert stelae. Open the page “The Desert Lexicon & Al-Qibla” in your journal, solve the crossword and set the sun compass.',
             rewards: [
-              { icon: '📜', label: 'Sheet 11A of the Journal', desc: '10 words of the nomad pilgrims' },
+              { icon: '📜', label: 'Journal page “The Desert Lexicon & Al-Qibla”', desc: '10 words of the nomad pilgrims' },
               { icon: '🦅', label: 'The Desert Sigil', desc: '7 circled letters' },
               { icon: '🧭', label: 'Al-Qibla Sun Compass', desc: 'Straight heading to Tower II' }
             ],
@@ -1337,7 +1337,7 @@
               statusClass: 'status-done-badge',
               title: 'The Oasis Clepsydra (4 Wells)',
               thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
-              lore: 'The four seekers have been matched with their arrival hours and relics on Sheet 12B (Key XXX, 30 Hours). The four wells were a fever mirage, but the logic kept Hermes lucid: he found a real spring beneath a carved falcon and filled the four water skins.',
+              lore: 'The four seekers have been matched with their arrival hours and relics on the page “The Oasis Clepsydra” (Key XXX, 30 Hours). The four wells were a fever mirage, but the logic kept Hermes lucid: he found a real spring beneath a carved falcon and filled the four water skins.',
               rewards: [
                 { icon: '⏳', label: 'The Mirage of the 4 Wells', desc: 'Falcon, Jackal, Scarab, Serpent' },
                 { icon: '💧', label: '4 Full Canteens', desc: 'Great Erg crossing secured' },
@@ -1354,9 +1354,9 @@
             statusClass: 'status-live-badge',
             title: 'The Oasis Clepsydra (4 Wells)',
             thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
-            lore: 'In the Desert Oasis basin (South-East Quadrant, Sheet 12A of the map), Hermes has reached the Four Wells. Open Sheet 12B of your journal ("The Oasis Clepsydra"), balance the hydraulic siphons and fill your canteens.',
+            lore: 'In the Desert Oasis basin (South-East Quadrant, on the map page “Grand Desert Map · South-East”), Hermes has reached the Four Wells. Open the page “The Oasis Clepsydra” in your journal, balance the hydraulic siphons and fill your canteens.',
             rewards: [
-              { icon: '⏳', label: 'Sheet 12B of the Journal', desc: 'Logic deduction of the 4 Seekers' },
+              { icon: '⏳', label: 'Journal page “The Oasis Clepsydra”', desc: 'Logic deduction of the 4 Seekers' },
               { icon: '💧', label: '4 Water Canteens', desc: 'Vital supplies for the desert' },
               { icon: '📐', label: 'The Clepsydra Key', desc: 'Written in Roman numerals' }
             ],
@@ -1375,7 +1375,7 @@
               statusClass: 'status-done-badge',
               title: 'The Sun Monolith & Cairn II',
               thumb,
-              lore: 'Silvia spoke the sigil of Sheet 13B and walked the sun across the sky until the Monolith\'s shadow touched the four marks of the founders. The niche of Cairn II opened: its seal was waiting inside, though iron bars had scarred the rim.',
+              lore: 'Silvia spoke the sigil from the page “The Sun Monolith & Cairn II” and walked the sun across the sky until the Monolith\'s shadow touched the four marks of the founders. The niche of Cairn II opened: its seal was waiting inside, though iron bars had scarred the rim.',
               rewards: [
                 { icon: '🪨', label: 'The Seal of Cairn II', desc: 'Second seal of the five' },
                 { icon: '📐', label: 'Ledger: [D] + [F] = 24 · [C] − [T] = 8', desc: 'Carved inside the lid of the niche' },
@@ -1394,12 +1394,12 @@
             title: 'The Sun Monolith & Cairn II',
             thumb,
             lore: arrived
-              ? 'On the high north-eastern ridge stands the Sun Monolith, and Cairn II sits at its feet like a sundial waiting for its hour. Solve Sheet 13B of your journal, speak its sigil and wake the Monolith.'
+              ? 'On the high north-eastern ridge stands the Sun Monolith, and Cairn II sits at its feet like a sundial waiting for its hour. Solve the page “The Sun Monolith & Cairn II” in your journal, speak its sigil and wake the Monolith.'
               : (eta
-                ? 'Hermes is walking north-north-east across the Great Erg, from the gates of Tower II to the Sun Monolith. Arrival in ' + eta + '. Keep Sheet 13B close.'
+                ? 'Hermes is walking north-north-east across the Great Erg, from the gates of Tower II to the Sun Monolith. Arrival in ' + eta + '. Keep the page “The Sun Monolith & Cairn II” close.'
                 : 'The road north-north-east from the gates of Tower II leads to the Sun Monolith. Hermes will set out once you answer him on the wire.'),
             rewards: [
-              { icon: '📖', label: 'Sheet 13B of the Journal', desc: 'The seven noons of the Monolith' },
+              { icon: '📖', label: 'Journal page “The Sun Monolith & Cairn II”', desc: 'The seven noons of the Monolith' },
               { icon: '☀️', label: 'The Walking Sun', desc: 'A second trial, only on the Ridge' },
               { icon: '🪨', label: 'The Seal of Cairn II', desc: 'Second seal of the five' }
             ],
@@ -1419,7 +1419,7 @@
               statusClass: 'status-done-badge',
               title: 'The Sandstone Labyrinth & Cairn III',
               thumb,
-              lore: 'Silvia read the eight arches of the true road on Sheet 14B and the copper plate of Cairn III turned. Then she guided Hermes through the dark, between the torches of the BC Ashes, and out through the Western Cleft.',
+              lore: 'Silvia read the eight arches of the true road on the page “The Sandstone Labyrinth & Cairn III” and the copper plate of Cairn III turned. Then she guided Hermes through the dark, between the torches of the BC Ashes, and out through the Western Cleft.',
               rewards: [
                 { icon: '🪨', label: 'The Seal of Cairn III', desc: 'Third seal of the five' },
                 { icon: '📐', label: 'Ledger: [W] + [A] = 26 · [N] − [E] = 9', desc: 'Carved under the copper plate' },
@@ -1440,14 +1440,14 @@
             title: 'The Sandstone Labyrinth & Cairn III',
             thumb,
             lore: arrived
-              ? 'Below the Arches of the West Wind, a maze of pillars and fissures hides Cairn III and its copper plate. Solve Sheet 14B of your journal, speak the sigil, and get Hermes out alive: the BC Ashes are inside.'
+              ? 'Below the Arches of the West Wind, a maze of pillars and fissures hides Cairn III and its copper plate. Solve the page “The Sandstone Labyrinth & Cairn III” in your journal, speak the sigil, and get Hermes out alive: the BC Ashes are inside.'
               : (eta
-                ? 'Hermes is walking down from the Sun Monolith to the Sandstone Labyrinth, on the bearing of 168°. Arrival in ' + eta + '. Keep Sheet 14B close.'
+                ? 'Hermes is walking down from the Sun Monolith to the Sandstone Labyrinth, on the bearing of 168°. Arrival in ' + eta + '. Keep the page “The Sandstone Labyrinth & Cairn III” close.'
                 : (heardAtDawn
                   ? 'The Sandstone Labyrinth lies south-south-east of the Sun Monolith, under the Arches of the West Wind. Hermes will set out once you answer him on the wire.'
                   : 'Somewhere beyond the Arches of the West Wind lies the Sandstone Labyrinth. Hermes is resting under the Sun Monolith and will wire you at first light.')),
             rewards: [
-              { icon: '📖', label: 'Sheet 14B of the Journal', desc: 'The eight arches of the true road' },
+              { icon: '📖', label: 'Journal page “The Sandstone Labyrinth & Cairn III”', desc: 'The eight arches of the true road' },
               { icon: '🔥', label: 'Escape from the BC Ashes', desc: 'A second trial, only in the labyrinth' },
               { icon: '🪨', label: 'The Seal of Cairn III', desc: 'Third seal of the five' }
             ],
@@ -1486,12 +1486,12 @@
             title: 'Cairn IV · Sentry of the Canyon',
             thumb,
             lore: arrived
-              ? 'Two hollow pillars guard the southern mouth of the gorge, under the Sentinel Mesa, and the wind sings inside them. Solve Sheet 15A of your journal, speak the sigil, and learn the song of the pillars.'
+              ? 'Two hollow pillars guard the southern mouth of the gorge, under the Sentinel Mesa, and the wind sings inside them. Solve the page “Cairn IV: Sentry of the Canyon” in your journal, speak the sigil, and learn the song of the pillars.'
               : (eta
-                ? 'Hermes is crossing the hardpan by night and the Natural Bridge of the Sentinel Mesa, toward the singing pillars. Arrival in ' + eta + '. Keep Sheet 15A close.'
+                ? 'Hermes is crossing the hardpan by night and the Natural Bridge of the Sentinel Mesa, toward the singing pillars. Arrival in ' + eta + '. Keep the page “Cairn IV: Sentry of the Canyon” close.'
                 : 'Far to the south-west, where the canyon narrows under the Sentinel Mesa, Cairn IV has stood since the founders\' time. Hermes will set out once you answer him on the wire.'),
             rewards: [
-              { icon: '📖', label: 'Sheet 15A of the Journal', desc: 'The seven echoes of the survey log' },
+              { icon: '📖', label: 'Journal page “Cairn IV: Sentry of the Canyon”', desc: 'The seven echoes of the survey log' },
               { icon: '🎶', label: 'The Song of the Pillars', desc: 'A second trial, by ear' },
               { icon: '🪨', label: 'The Seal of Cairn IV', desc: 'Fourth seal of the five' }
             ],
@@ -1530,12 +1530,12 @@
             title: 'The Arch of the Solstice & Cairn V',
             thumb,
             lore: arrived
-              ? 'Behind the Arch of the Solstice lies the Courtyard of Rays, its bronze mirrors and the Solar Altar, with Cairn V watching from the dunes. Solve Sheet 16B of your journal, speak the sigil, and bring the light to the altar.'
+              ? 'Behind the Arch of the Solstice lies the Courtyard of Rays, its bronze mirrors and the Solar Altar, with Cairn V watching from the dunes. Solve the page “Arch of the Solstice & The Solar Altar” in your journal, speak the sigil, and bring the light to the altar.'
               : (eta
-                ? 'Hermes is walking east without sleep, back over the Natural Bridge and across the dunes of Cairn V. Arrival in ' + eta + '. Keep Sheet 16B close.'
+                ? 'Hermes is walking east without sleep, back over the Natural Bridge and across the dunes of Cairn V. Arrival in ' + eta + '. Keep the page “Arch of the Solstice & The Solar Altar” close.'
                 : 'Near the Sanctuary of Tower II stands the Arch of the Solstice, and behind it the last cairn. Hermes will set out once you answer him on the wire.'),
             rewards: [
-              { icon: '📖', label: 'Sheet 16B of the Journal', desc: 'The midsummer ray and its sun-stones' },
+              { icon: '📖', label: 'Journal page “Arch of the Solstice & The Solar Altar”', desc: 'The midsummer ray and its sun-stones' },
               { icon: '☀', label: 'The Autumn Dawn', desc: 'A second trial, against the climbing sun' },
               { icon: '🪞', label: 'The Night Signal', desc: 'A third trial, in light' }
             ],
@@ -1554,7 +1554,7 @@
               statusClass: 'status-done-badge',
               title: 'The Polybius Stele · Tower II',
               thumb: './assets/thumbnails/polybius_stele_preview.webp',
-              lore: 'Silvia read the proverb of Sheet 17A and the stele turned. Under the floor the Servant answered in the founders\' grid, and she answered him back. Then she guided Hermes across the burning atrium, on the ash, to the hatch of the well.',
+              lore: 'Silvia read the proverb on the page “The Polybius Stele” and the stele turned. Under the floor the Servant answered in the founders\' grid, and she answered him back. Then she guided Hermes across the burning atrium, on the ash, to the hatch of the well.',
               rewards: [
                 { icon: '🗝️', label: "The Servant's Key", desc: 'The bronze key of the inner stair' },
                 { icon: '🧭', label: 'Bearing 348° NNW', desc: 'On the back of the stele, as on Cairn III' },
@@ -1573,12 +1573,12 @@
             title: 'The Polybius Stele · Tower II in Flames',
             thumb: './assets/thumbnails/polybius_stele_preview.webp',
             lore: arrived
-              ? 'The raiders have set fire to the library of Tower II and the Servant is missing. In the smoke of the atrium the stele stands untouched. Solve Sheet 17A of your journal and speak its proverb: someone under the floor is listening.'
+              ? 'The raiders have set fire to the library of Tower II and the Servant is missing. In the smoke of the atrium the stele stands untouched. Solve the page “The Polybius Stele” in your journal and speak its proverb: someone under the floor is listening.'
               : (eta
-                ? 'Hermes is following the dry bed under the dunes toward the smoke over the Sanctuary. Arrival in ' + eta + ', after dark. Keep Sheet 17A close.'
+                ? 'Hermes is following the dry bed under the dunes toward the smoke over the Sanctuary. Arrival in ' + eta + ', after dark. Keep the page “The Polybius Stele” close.'
                 : 'Smoke is rising over Tower II. Hermes will set out from the Arch once you answer him on the wire: six hours to the Sanctuary.'),
             rewards: [
-              { icon: '📜', label: 'The Proverb of the Stele', desc: 'Sheet 17A · six stanzas' },
+              { icon: '📜', label: 'The Proverb of the Stele', desc: 'The page “The Polybius Stele” · six stanzas' },
               { icon: '🪨', label: 'The Knocks in the Stone', desc: 'A second trial, in the grid of the stele' },
               { icon: '🔥', label: 'The Burning Atrium', desc: 'A third trial, against the fire' }
             ],
@@ -1610,10 +1610,11 @@
               // Then the seal on its sheet (hub/js/sheet-seals.js): the QR on the game face is the key of the room
               const face = !wait && window.EclipseSheetSeals ? window.EclipseSheetSeals.missing(node) : '';
               if (face) {
+                const sealPage = window.EclipseSheetSeals && window.EclipseSheetSeals.page ? window.EclipseSheetSeals.page(node) : 'its page in your journal';
                 return Object.assign({}, card, {
-                  status: 'SEAL OF SHEET ' + face + ' ✦',
-                  lore: teaser + ' The door of this room opens with the seal printed on Sheet ' + face + ' of the Journal: scan it with your camera.',
-                  btnText: tester ? '⏩ Tester: open it now' : '🔒 Scan the seal on Sheet ' + face,
+                  status: 'THE SEAL OF ' + sealPage.toUpperCase() + ' ✦',
+                  lore: teaser + ' The door of this room opens with the seal printed on ' + sealPage + '. Scan it with your camera.',
+                  btnText: tester ? '⏩ Tester: open it now' : '🔒 Scan the seal on ' + sealPage,
                   btnDisabled: !tester,
                   action: tester ? () => { window.EclipseSheetSeals.skip(node); return card.action ? card.action() : null; } : () => null
                 });
@@ -1639,7 +1640,7 @@
                 thumb: './assets/thumbnails/stage_mirror_preview.webp',
                 lore: teaser + ' The Mirror Speaker has not opened this room yet.',
                 rewards: [
-                  { icon: '📖', label: 'Sheet ' + sheet + ' of the Journal', desc: 'The game of this room' },
+                  { icon: '📖', label: 'Journal page “' + room + '”', desc: 'The game of this room' },
                   { icon: '🪞', label: 'Fragment ' + roman, desc: 'One ninth of the mirror of Tower III' }
                 ],
                 btnText: 'The door is still closed',
@@ -1660,7 +1661,7 @@
               statusClass: 'status-done-badge',
               title: "The Oracle's Horizon · Tower II",
               thumb: './assets/thumbnails/oracle_horizon_preview.webp',
-              lore: 'Silvia sealed the horizon of Sheet 18A, set the brass disc of 24 sightings to the sky and read the first truth on it: the WHEN. Then she gave the vow back to the Oracle, and the Oracle lifted her veil. She was Aurelia.',
+              lore: 'Silvia sealed the horizon on the page “The Oracle\'s Horizon”, set the brass disc of 24 sightings to the sky and read the first truth on it: the WHEN. Then she gave the vow back to the Oracle, and the Oracle lifted her veil. She was Aurelia.',
               rewards: [
                 { icon: '📅', label: 'The WHEN', desc: '18 – 20 December' },
                 { icon: '⭐', label: 'The Gilded Star', desc: 'Painted for the navigator' },
@@ -1683,14 +1684,14 @@
             title: "The Oracle's Horizon",
             thumb: './assets/thumbnails/oracle_horizon_preview.webp',
             lore: arrived
-              ? 'At the bottom of the inner stair of Tower II, a door carved with the horizon. Solve Sheet 18A of your journal, speak the sigil of the Oracle, and stand before her.'
+              ? 'At the bottom of the inner stair of Tower II, a door carved with the horizon. Solve the page “The Oracle\'s Horizon” in your journal, speak the sigil of the Oracle, and stand before her.'
               : (fourSeals
                 ? "'She receives no one until the five seals are home.' The first seal still sleeps by the dry wash, at Cairn I: the Servant will show you the way back."
                 : (steleDone
                   ? 'Hermes is waiting for dawn by the inner stair. Open the Cliffside Workshop: he will wire you before he goes down.'
                   : 'Deep in Tower II the Oracle keeps the first truth. Save the Servant of the atrium, and wait for Hermes on the wire.')),
             rewards: [
-              { icon: '📖', label: 'Sheet 18A of the Journal', desc: 'The three mirrors of the horizon' },
+              { icon: '📖', label: 'Journal page “The Oracle\'s Horizon”', desc: 'The three mirrors of the horizon' },
               { icon: '🪙', label: 'The Disc of 24 Sightings', desc: 'A second trial, set by the sky' },
               { icon: '💬', label: 'The Vow', desc: 'A third trial, in words' }
             ],
@@ -1975,7 +1976,7 @@
           fullImgSrc: './assets/emails/email-03-zodiac-outpost-full.webp',
           bodyHtml: `
             <p class="archive-record-note">
-              <strong>Dispatch III · The Subterranean Outpost:</strong> Transmission received from the Cartographer at the desert threshold. Informs Silvia of the dormant central command console and directs her to solve Sheet 5 (The Zodiacal Engine) to extract the emergency override sequence.
+              <strong>Dispatch III · The Subterranean Outpost:</strong> Transmission received from the Cartographer at the desert threshold. Informs Silvia of the dormant central command console and directs her to solve the page “The Zodiacal Engine” to extract the emergency override sequence.
             </p>
           `
         },
@@ -2264,7 +2265,7 @@
         chron7Title.style.color = 'var(--brass-bright)';
       }
       if (chron7Text) {
-        chron7Text.textContent = 'Calibrating the seven dials of the Zodiacal Engine from Sheet 5, Silvia locked the emergency beacon (142.85 MHz) and breached the subterranean outpost beneath the dunes. Attuning the celestial obelisks of Sol, Luna, and Stella, she recovered the iron cipher chest and unmasked Letter K.';
+        chron7Text.textContent = 'Calibrating the seven dials on the page “The Zodiacal Engine”, Silvia locked the emergency beacon (142.85 MHz) and breached the subterranean outpost beneath the dunes. Attuning the celestial obelisks of Sol, Luna, and Stella, she recovered the iron cipher chest and unmasked Letter K.';
       }
       if (chron7Btn) {
         chron7Btn.className = 'btn-historical-web';
@@ -4018,21 +4019,21 @@
               nameTitle: "Hermes",
               text: "Hermes — We are companions in this desert, not strangers. Call me Silvia, and I will call you Hermes.",
               silviaMsg: "Call you Hermes. We are companions in this desert, not strangers. Call me Silvia, and I will call you Hermes.",
-              hermesReply: "Hermes... It has been fifty-five years since anyone spoke that name with warmth. It feels good to put down the heavy mantle of the Order, if only between friends on a copper wire. Hermes it is, Silvia.\n\nNow, about our situation: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to Sheet 7B. What does it say about crossing this windy canyon?"
+              hermesReply: "Hermes... It has been fifty-five years since anyone spoke that name with warmth. It feels good to put down the heavy mantle of the Order, if only between friends on a copper wire. Hermes it is, Silvia.\n\nNow, about our situation: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to the page “Field Log: The Desert Frontier”. What does it say about crossing this windy canyon?"
             },
             {
               id: "choice-1-name-cartographer",
               nameTitle: "The Cartographer",
               text: "The Cartographer — You charted these stars and sands; that is the title of honor you earned with your compass.",
               silviaMsg: "I will call you The Cartographer. You mapped these stars and sands; that is the title of honor you earned with your compass.",
-              hermesReply: "The Cartographer. Direct, professional, and true to the craft. A surveyor's duty is never finished until every stone and meridian is accounted for. I will wear that title proudly on this wire, Navigator Silvia.\n\nNow, to business: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to Sheet 7B. What does it say about crossing this windy canyon?"
+              hermesReply: "The Cartographer. Direct, professional, and true to the craft. A surveyor's duty is never finished until every stone and meridian is accounted for. I will wear that title proudly on this wire, Navigator Silvia.\n\nNow, to business: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to the page “Field Log: The Desert Frontier”. What does it say about crossing this windy canyon?"
             },
             {
               id: "choice-1-name-order",
               nameTitle: "The Cartographer of Distant Light",
               text: "The Cartographer of Distant Light — The sacred title of the Order. We must honor the ancient rites.",
               silviaMsg: "The Cartographer of Distant Light. The sacred title of the Order must not be forgotten in the storm.",
-              hermesReply: "The full title... 'The Cartographer of Distant Light'. Hearing those words across the wire makes the old vows echo in these cliffs once more. The Order may be scattered, but its flame still burns in you. I accept the solemn mantle, Seeker Silvia.\n\nNow, heed this report: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to Sheet 7B. What does it say about crossing this windy canyon?"
+              hermesReply: "The full title... 'The Cartographer of Distant Light'. Hearing those words across the wire makes the old vows echo in these cliffs once more. The Order may be scattered, but its flame still burns in you. I accept the solemn mantle, Seeker Silvia.\n\nNow, heed this report: through my spyglass, I saw the raiders' heavy wagons break down in the sand dunes three leagues south. Their axles are buried to the hubs.\n\nStill, the storm is getting worse and walking blind into this wind is impossible. In the autumn of 1998, I spent three weeks surveying this exact gorge and recorded the only safe passages in my personal notes.\n\nPlease open your physical journal to the page “Field Log: The Desert Frontier”. What does it say about crossing this windy canyon?"
             }
           ]
         },
@@ -4042,38 +4043,38 @@
             {
               id: "choice-2-wash-flint",
               item: { id: "flint_tinder", name: "Ancient Flint & Juniper Tinder", icon: "🪵", desc: "Dry juniper wood and 1998 expedition flint found along the canyon wash bed." },
-              text: "Check Sheet 7B · Section I: Scramble down to the gravel canyon wash. The rock walls cut the gale, and there is dry juniper wood along the bank.",
-              silviaMsg: "I'm checking Sheet 7B · Section I: you noted that the high rock walls break the fury of the gale. Drop down into the dry gravel wash, keep away from the dunes, and gather whatever dry juniper wood washed down from the winter floods.",
+              text: "Check the page “Field Log: The Desert Frontier”, Section I: Scramble down to the gravel canyon wash. The rock walls cut the gale, and there is dry juniper wood along the bank.",
+              silviaMsg: "I'm checking the page “Field Log: The Desert Frontier”, Section I: you noted that the high rock walls break the fury of the gale. Drop down into the dry gravel wash, keep away from the dunes, and gather whatever dry juniper wood washed down from the winter floods.",
               beats: [
                 "Down to the gravel wash it is! I'm sliding down the shale embankment now... The slope is steep and loose rocks are tumbling into the dark, but the high canyon walls are finally cutting the gale overhead. The red dust stays low near the ground, and my boots can actually find firm footing on the dry gravel bed.",
                 "Wait, Silvia... look at what's caught against this flood boulder! The winter floods washed down a tangle of ancient, bone-dry juniper root, perfectly sheltered under the rock overhang. And half-buried in the silt right beside it: an old oilskin pouch from 1998 with my spare fire-striker and dark flint stone! We have fuel and fire for the night.",
-                "I packed the juniper wood and flint into my satchel and pushed fifty paces along the sheltered cliff trail. Ahead through the swirling dust, the entrance benchmark of the watchtower path emerged through the haze! Beneath the flat sandstone slab lies the copper benchmark plate I buried twenty-eight years ago.\n\nOpen your journal to Sheet 7B, Silvia: what compass direction was stamped on that plate to guide me to Watchtower VI?"
+                "I packed the juniper wood and flint into my satchel and pushed fifty paces along the sheltered cliff trail. Ahead through the swirling dust, the entrance benchmark of the watchtower path emerged through the haze! Beneath the flat sandstone slab lies the copper benchmark plate I buried twenty-eight years ago.\n\nOpen your journal to the page “Field Log: The Desert Frontier”, Silvia: what compass direction was stamped on that plate to guide me to Watchtower VI?"
               ],
-              hermesReply: "Down to the wash it is! I slid down the shale embankment onto the gravel bed. What a relief—overhead the gale is screaming, but down here the dust stays near the floor.\n\nAlong the dry bank, caught under a boulder, I found a tangle of dry juniper root and an old oilskin pouch half-buried in silt: my own spare flint from 1998! I stowed both in my satchel.\n\nAhead through the haze, I reached the entrance benchmark of the watchtower trail! Underneath the base slab is the copper reference plate pointing to Watchtower VI.\n\nLook at Sheet 7B in your journal: what compass direction was stamped on that plate?"
+              hermesReply: "Down to the wash it is! I slid down the shale embankment onto the gravel bed. What a relief—overhead the gale is screaming, but down here the dust stays near the floor.\n\nAlong the dry bank, caught under a boulder, I found a tangle of dry juniper root and an old oilskin pouch half-buried in silt: my own spare flint from 1998! I stowed both in my satchel.\n\nAhead through the haze, I reached the entrance benchmark of the watchtower trail! Underneath the base slab is the copper reference plate pointing to Watchtower VI.\n\nLook at the page “Field Log: The Desert Frontier” in your journal: what compass direction was stamped on that plate?"
             },
             {
               id: "choice-2-cairns-compass",
               item: { id: "surveyor_compass", name: "1998 Brass Surveyor's Compass", icon: "🧭", desc: "Precision surveyor compass left in 1998 beside the copper benchmark at the foot of the Watchtower VI trail." },
-              text: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. Keep to the wash bed you surveyed in 1998 and find your benchmark at the foot of the watchtower trail.",
-              silviaMsg: "Check Sheet 7B · Section III: The Three Cairns & The Copper Benchmark. Before climbing to Watchtower VI in 1998, you surveyed the dry wash bed below it. And you wrote that the plate under Cairn III was the FIRST copper benchmark, so there must be another one. Follow the wash bed to the foot of the watchtower trail!",
+              text: "Check the page “Field Log: The Desert Frontier”, Section III: The Three Cairns & The Copper Benchmark. Keep to the wash bed you surveyed in 1998 and find your benchmark at the foot of the watchtower trail.",
+              silviaMsg: "Check the page “Field Log: The Desert Frontier”, Section III: The Three Cairns & The Copper Benchmark. Before climbing to Watchtower VI in 1998, you surveyed the dry wash bed below it. And you wrote that the plate under Cairn III was the FIRST copper benchmark, so there must be another one. Follow the wash bed to the foot of the watchtower trail!",
               beats: [
                 "Section III! You read my notes from 1998 more closely than I wrote them, Silvia. 'The first copper benchmark'... I had forgotten that word. I'm sliding down into the sheltered wash bed, keeping my back to the gale. My three cairns run south-south-east from here, the last of them days down the wash; the nearest one was swallowed by flood silt long ago, and I cannot find it in this dust. But tonight I don't need them.",
                 "Here it is: the trail-head benchmark at the foot of the bluff, the second copper plate I set that autumn so whoever came after me could find the watchtower. And tucked into a dry stone niche beside it, wrapped tight in oiled canvas, was my precision brass surveyor's compass! I left it there the day I climbed out of this canyon in 1998. The blued-steel needle floated straight true the moment I lifted the latch. Not a speck of rust.",
-                "I secured the brass compass in my satchel and brushed the silt from the flat sandstone slab. The copper plate is right here, the twin of the first one I buried under Cairn III, stamped with the same bearing.\n\nLook closely at Sheet 7B in your journal: what compass heading was stamped on that plate to guide me up to Watchtower VI?"
+                "I secured the brass compass in my satchel and brushed the silt from the flat sandstone slab. The copper plate is right here, the twin of the first one I buried under Cairn III, stamped with the same bearing.\n\nLook closely at the page “Field Log: The Desert Frontier” in your journal: what compass heading was stamped on that plate to guide me up to Watchtower VI?"
               ],
-              hermesReply: "The first copper benchmark... so you noticed there was a second! My three cairns run on down the wash, the last of them days to the south and far beyond reach in this storm, but I followed the wash bed to the foot of the watchtower trail and found the second plate. In a dry stone niche beside it, wrapped in oiled canvas, was my 1998 brass surveyor's compass! The plate is the twin of the one under Cairn III, stamped with the same bearing.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on the copper plate to guide me to Watchtower VI?"
+              hermesReply: "The first copper benchmark... so you noticed there was a second! My three cairns run on down the wash, the last of them days to the south and far beyond reach in this storm, but I followed the wash bed to the foot of the watchtower trail and found the second plate. In a dry stone niche beside it, wrapped in oiled canvas, was my 1998 brass surveyor's compass! The plate is the twin of the one under Cairn III, stamped with the same bearing.\n\nCheck the page “Field Log: The Desert Frontier” in your journal: what compass heading did I stamp on the copper plate to guide me to Watchtower VI?"
             },
             {
               id: "choice-2-lookout-spyglass",
               item: { id: "spyglass_lens", name: "Scorched Spyglass Lens", icon: "🔍", desc: "A tempered optical lens bearing the raiders' charred ash sigil." },
-              text: "Check Sheet 7B · Upper Panorama: Scout from the northern bluff shelf before dropping down. Check the raiders' wagons and find the sheltered descent.",
-              silviaMsg: "Look at the upper panorama on Sheet 7B: before dropping into the canyon, use the northern bluff shelf as a natural lookout. Scout the raiders' wagons to the south and take the sheltered crack down.",
+              text: "Check the page “Field Log: The Desert Frontier”, Upper Panorama: Scout from the northern bluff shelf before dropping down. Check the raiders' wagons and find the sheltered descent.",
+              silviaMsg: "Look at the upper panorama on the page “Field Log: The Desert Frontier”: before dropping into the canyon, use the northern bluff shelf as a natural lookout. Scout the raiders' wagons to the south and take the sheltered crack down.",
               beats: [
                 "A brilliant scout's eye, Silvia. I'm creeping out onto the northern bluff shelf, staying low on my stomach beneath the crag. Through the red squall, I can see the entire southern basin... Silvia, you were right to have me look.",
                 "The raiders' six heavy baggage wagons are completely buried up to the hubs in the great dune drift three leagues south! Their canvas awnings are torn to shreds and their scouts abandoned their outpost in panic. Look what they dropped right by the descent fissure: a heavy optical spyglass lens in a scorched brass ring, finely etched with their burned ash sigil! I'm pocketing it in my satchel.",
-                "I slipped down the protected rock fissure, completely bypassing the storm on the ridge, and came out right at the entrance crag of the watchtower path! Beneath the foundation slab lies the copper surveyor's benchmark plate.\n\nCheck your journal at Sheet 7B: what compass heading did I stamp on that plate to reach Watchtower VI?"
+                "I slipped down the protected rock fissure, completely bypassing the storm on the ridge, and came out right at the entrance crag of the watchtower path! Beneath the foundation slab lies the copper surveyor's benchmark plate.\n\nCheck the page “Field Log: The Desert Frontier” in your journal: what compass heading did I stamp on that plate to reach Watchtower VI?"
               ],
-              hermesReply: "A brilliant tactician's eye, Silvia. I crept along the northern shelf, shielded by the crag, and looked through the storm.\n\nThe raiders' six heavy wagons are completely trapped in the sand dunes three leagues south—their canvas is torn to shreds and they are abandoning their carts! Right by the descent crack, where their scout must have surveyed the gorge, I found a brass optical lens dropped in the dust, etched with their scorched ash sigil. I pocketed it in my satchel—it may reveal how they read our skies.\n\nFrom there, I slipped down the hidden fissure straight to the entrance benchmark of the watchtower path. Under the flat sandstone foundation rests the copper plate.\n\nLook at Sheet 7B in your journal: what compass direction was stamped on that plate to guide me to Watchtower VI?"
+              hermesReply: "A brilliant tactician's eye, Silvia. I crept along the northern shelf, shielded by the crag, and looked through the storm.\n\nThe raiders' six heavy wagons are completely trapped in the sand dunes three leagues south—their canvas is torn to shreds and they are abandoning their carts! Right by the descent crack, where their scout must have surveyed the gorge, I found a brass optical lens dropped in the dust, etched with their scorched ash sigil. I pocketed it in my satchel—it may reveal how they read our skies.\n\nFrom there, I slipped down the hidden fissure straight to the entrance benchmark of the watchtower path. Under the flat sandstone foundation rests the copper plate.\n\nLook at the page “Field Log: The Desert Frontier” in your journal: what compass direction was stamped on that plate to guide me to Watchtower VI?"
             }
           ]
         },
@@ -4083,7 +4084,7 @@
           choices: [
             {
               id: "choice-3-bearing-direct",
-              silviaMsg: "According to your notes on Sheet 7B, the benchmark plate points 112° East toward Outer Watchtower VI.",
+              silviaMsg: "According to your notes on the page “Field Log: The Desert Frontier”, the benchmark plate points 112° East toward Outer Watchtower VI.",
               hermesReply: "112 degrees East... I cleared away the drifted sand with my knife, and the green metal showed the letters: '112° E // WATCHTOWER VI'.\n\nI aligned my field compass, fixed my eyes on the heading, and followed the base of the bluff. Through the swirling dust, a heavy wooden door appeared in the rock! The lock was stiff, but the old key turned with a loud click."
             }
           ]
@@ -4095,13 +4096,13 @@
         },
         {
           step: 5,
-          hermesInitial: "Silvia! Can you hear this across the line? I hooked my copper transmitter to the wire running all the way down to Camp VII, a ruined nomad camp at the edge of the Salt Playa!\n\nRaiders swept through here at dusk and I had to hide behind the broken walls until they passed. But look what stood right beside my hiding place: three massive sandstone steles carved with nomadic words and an astronomical sun compass called Al-Qibla.\n\nThe sandstorm shifted the dunes across the Great Erg, completely burying the raiders' wagon tracks. Our only hope of finding where they took the Master Astrolabe is locating Tower II—the Sanctuary of the Desert Oracle. But navigating the Erg without the true bearing would be suicide.\n\nLook at Sheet 11A in your physical journal. How do we unlock the Al-Qibla bearing on these steles?",
+          hermesInitial: "Silvia! Can you hear this across the line? I hooked my copper transmitter to the wire running all the way down to Camp VII, a ruined nomad camp at the edge of the Salt Playa!\n\nRaiders swept through here at dusk and I had to hide behind the broken walls until they passed. But look what stood right beside my hiding place: three massive sandstone steles carved with nomadic words and an astronomical sun compass called Al-Qibla.\n\nThe sandstorm shifted the dunes across the Great Erg, completely burying the raiders' wagon tracks. Our only hope of finding where they took the Master Astrolabe is locating Tower II—the Sanctuary of the Desert Oracle. But navigating the Erg without the true bearing would be suicide.\n\nLook at the page “The Desert Lexicon & Al-Qibla” in your physical journal. How do we unlock the Al-Qibla bearing on these steles?",
           choices: [
             {
               id: "choice-5-crossword",
-              text: "Check Sheet 11A: Solve the 10 crossword words to assemble the circled letters.",
-              silviaMsg: "I'm looking at Sheet 11A in my journal: The Desert Lexicon. We must carve the 10 desert terms on the sandstone stele to assemble the circled letters.",
-              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nWhen you solve the grid on Sheet 11A, what word do the circled letters 1 to 7 spell?"
+              text: "Check the page “The Desert Lexicon & Al-Qibla”: Solve the 10 crossword words to assemble the circled letters.",
+              silviaMsg: "I'm looking at the page “The Desert Lexicon & Al-Qibla” in my journal. We must carve the 10 desert terms on the sandstone stele to assemble the circled letters.",
+              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nWhen you solve the grid on the page “The Desert Lexicon & Al-Qibla”, what word do the circled letters 1 to 7 spell?"
             },
             {
               id: "choice-5-sigil",
@@ -4120,16 +4121,16 @@
         {
           step: 6,
           completed: true,
-          hermesFinal: "Silvia! Al-Qibla is locked: the raiders fled 194° South-Southwest, and Tower II lies the other way, 14° North-Northeast! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: the raiders left scorched banners hanging in these ruins, and the burned mark matches the one on their wagons. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check Sheet 12B in your journal to balance the water flow!"
+          hermesFinal: "Silvia! Al-Qibla is locked: the raiders fled 194° South-Southwest, and Tower II lies the other way, 14° North-Northeast! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: the raiders left scorched banners hanging in these ruins, and the burned mark matches the one on their wagons. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check the page “The Oasis Clepsydra” in your journal to balance the water flow!"
         },
         {
           step: 7,
-          hermesInitial: "Silvia, can you hear me? I hooked my copper wire into the rusted relay at Camp VIII beside the Four Wells!\n\nThe desert heat is merciless, and our canteens are running bone dry. Before us lie four sculpted stone basins: Falcon, Jackal, Scarab, and Serpent. But the surface water is dry! The underground siphons are sealed shut by heavy counterweights.\n\nAn engraved bronze plaque above the water gate reads: 'Only when the four seekers rest in their true shadow-hours will the living waters surge.' Four seekers came here before us: the Cartographer, the Alchemist, the Nomad, and the Astronomer. Each brought a sacred relic, arriving at a distinct shadow hour.\n\nLook at Sheet 12B in your physical journal. How do we deduce their arrival hours and balance the siphons?",
+          hermesInitial: "Silvia, can you hear me? I hooked my copper wire into the rusted relay at Camp VIII beside the Four Wells!\n\nThe desert heat is merciless, and our canteens are running bone dry. Before us lie four sculpted stone basins: Falcon, Jackal, Scarab, and Serpent. But the surface water is dry! The underground siphons are sealed shut by heavy counterweights.\n\nAn engraved bronze plaque above the water gate reads: 'Only when the four seekers rest in their true shadow-hours will the living waters surge.' Four seekers came here before us: the Cartographer, the Alchemist, the Nomad, and the Astronomer. Each brought a sacred relic, arriving at a distinct shadow hour.\n\nLook at the page “The Oasis Clepsydra” in your physical journal. How do we deduce their arrival hours and balance the siphons?",
           choices: [
             {
               id: "choice-7-matrix",
-              text: "Check Sheet 12B: The Cartographer carried the Astrolabe, arriving at the Scarab Well at Hr VI.",
-              silviaMsg: "I'm checking Sheet 12B in my journal: The Cartographer carried the Brass Astrolabe, arriving at the Scarab Well at Hr VI.",
+              text: "Check the page “The Oasis Clepsydra”: The Cartographer carried the Astrolabe, arriving at the Scarab Well at Hr VI.",
+              silviaMsg: "I'm checking the page “The Oasis Clepsydra” in my journal: The Cartographer carried the Brass Astrolabe, arriving at the Scarab Well at Hr VI.",
               hermesReply: "The Brass Astrolabe at the Scarab Well at Hour VI! Yes—the first counterweight groaned and water began trickling into the copper pipes! And what of the other three seekers?"
             },
             {
@@ -4175,8 +4176,8 @@
             },
             {
               id: "choice-9-course",
-              text: "Check Sheet 13A: set course NNE to the Sun Monolith.",
-              silviaMsg: "I'm reading Sheet 13A. The great circuit begins: our course is north-north-east, toward the shadow of the Sun Monolith.",
+              text: "Check the page “At the Gates of Tower II”: set course NNE to the Sun Monolith.",
+              silviaMsg: "I'm reading the page “At the Gates of Tower II”. The great circuit begins: our course is north-north-east, toward the shadow of the Sun Monolith.",
               hermesReply: "North-north-east. Exactly the line the Servant pointed to with his staff. The Sun Monolith, and Cairn II at its feet. The crossing of the Great Erg is long, but the night is cool and the stars are clear."
             }
           ]
@@ -4185,7 +4186,7 @@
           step: 10,
           completed: true,
           get hermesFinal() {
-            return "I am setting out now, Silvia: north-north-east across the Great Erg, by night, with the stars for a compass. Twelve hours on foot to the Ridge of the Sun. Keep Sheet 13B close; when I reach the Monolith, its seven noons will be your work.\n\nThe Servant watched me go from the top step until the dark took him. " + sealsPhrase(5 - sealsAtGates()) + " to find. One is waiting under the Sun.";
+            return "I am setting out now, Silvia: north-north-east across the Great Erg, by night, with the stars for a compass. Twelve hours on foot to the Ridge of the Sun. Keep the page “The Sun Monolith & Cairn II” close; when I reach the Monolith, its seven noons will be your work.\n\nThe Servant watched me go from the top step until the dark took him. " + sealsPhrase(5 - sealsAtGates()) + " to find. One is waiting under the Sun.";
           }
         },
         {
@@ -4224,12 +4225,12 @@
           // First light at the Monolith (Sheet 14A/14B). Covers the printed "North of the Sun Monolith" of Sheet 14B:
           // the line comes from the founders' survey, and the Order drew its charts with the south at the top.
           step: 13,
-          hermesInitial: "First light, Silvia. From the foot of the Monolith I can see the plateau of the Arches of the West Wind, and under it the Sandstone Labyrinth. It lies south-south-east of here, on the old line of 348° that the founders cut into Cairn III to point back at this very stone (Sheet 14A).\n\nYes, Sheet 14B says 'North of the Sun Monolith'. I copied that line from the founders' survey, and it puzzled me for years. Then, in the shadow of the Sanctuary, I remembered how they drew their charts: with the south at the top, as the great cartographers of the caravans did. Their north is our south. The ground does not lie; only the paper turns.\n\nOne more thing. There are fresh wheel ruts in the sand, going the same way. The BC Ashes fled into that labyrinth with their wagons once before.",
+          hermesInitial: "First light, Silvia. From the foot of the Monolith I can see the plateau of the Arches of the West Wind, and under it the Sandstone Labyrinth. It lies south-south-east of here, on the old line of 348° that the founders cut into Cairn III to point back at this very stone (the page “The Five Geodetic Cairns”).\n\nYes, the page “The Sandstone Labyrinth & Cairn III” says 'North of the Sun Monolith'. I copied that line from the founders' survey, and it puzzled me for years. Then, in the shadow of the Sanctuary, I remembered how they drew their charts: with the south at the top, as the great cartographers of the caravans did. Their north is our south. The ground does not lie; only the paper turns.\n\nOne more thing. There are fresh wheel ruts in the sand, going the same way. The BC Ashes fled into that labyrinth with their wagons once before.",
           choices: [
             {
               id: "choice-13-bearing",
               text: "Walk the reverse of the 348° groove.",
-              silviaMsg: "Take the bearing from Sheet 14A, Hermes. If Cairn III points to the Monolith at 348°, walk the reverse: 168°, south-south-east, and the cairn will be waiting at the end of it.",
+              silviaMsg: "Take the bearing from the page “The Five Geodetic Cairns”, Hermes. If Cairn III points to the Monolith at 348°, walk the reverse: 168°, south-south-east, and the cairn will be waiting at the end of it.",
               hermesReply: "One hundred and sixty-eight degrees. You turn the founders' compass faster than I do, Silvia. I will keep the Monolith exactly behind my back all the way down."
             },
             {
@@ -4241,7 +4242,7 @@
             {
               id: "choice-13-tablet",
               text: "Copy the Tablet at the Mouth before you go in.",
-              silviaMsg: "When you reach the Southern Mouth, copy the tablet before you go in. I'll trace the true road on Sheet 14B while you walk.",
+              silviaMsg: "When you reach the Southern Mouth, copy the tablet before you go in. I'll trace the true road on the page “The Sandstone Labyrinth & Cairn III” while you walk.",
               hermesReply: "It is already in my log: eight stone arches stand upon the one true road, each bearing a single letter. Find me those eight letters, Silvia, and I will speak them at the cairn."
             }
           ]
@@ -4250,7 +4251,7 @@
           step: 14,
           completed: true,
           get hermesFinal() {
-            return "I am going down now. Six hours to the Southern Mouth of the labyrinth, along the line of 168°, keeping to the rock. Trace Sheet 14B while I walk: only one road reaches Cairn III, and eight arches stand upon it.\n\n" + sealsPhrase(sealsAtGates() + 1) + " in my satchel, Silvia. " + sealsPhrase(4 - sealsAtGates()) + " still sleeping in the stone.";
+            return "I am going down now. Six hours to the Southern Mouth of the labyrinth, along the line of 168°, keeping to the rock. Trace the true road on the page “The Sandstone Labyrinth & Cairn III” while I walk: only one road reaches Cairn III, and eight arches stand upon it.\n\n" + sealsPhrase(sealsAtGates() + 1) + " in my satchel, Silvia. " + sealsPhrase(4 - sealsAtGates()) + " still sleeping in the stone.";
           }
         },
         {
@@ -4299,7 +4300,7 @@
             {
               id: "choice-17-bridge",
               text: "Ask him the way over the Natural Bridge.",
-              silviaMsg: "Ask him the safest way over the Natural Bridge. Sheets 15B and 16A show switchbacks on the eastern side.",
+              silviaMsg: "Ask him the safest way over the Natural Bridge. The pages “The Natural Bridge of the Sentinel Mesa” and “The Eastern Buttress & Lower Wash” show switchbacks on the eastern side.",
               hermesReply: "He laughed. 'The old cart track crosses the bridge on its back,' he said, 'but the switchbacks below are too tight for a loaded wagon. Men on foot, yes. Wagons, never.' If the raiders try it, they will have to choose between their wagons and their road."
             },
             {
@@ -4314,7 +4315,7 @@
           step: 18,
           completed: true,
           get hermesFinal() {
-            return "I am going now, Silvia. Eighteen hours: across the hardpan by night, over the Natural Bridge of the Sentinel Mesa, down to the southern mouth of the gorge where Cairn IV stands guard. I will sleep in the shade of the rocks when the sun is high.\n\nKeep Sheet 15A close: the survey log of the seven echoes. " + sealsPhrase(sealsAtGates() + 2) + " in my satchel; " + sealsPhrase(3 - sealsAtGates()).toLowerCase() + " still to find.";
+            return "I am going now, Silvia. Eighteen hours: across the hardpan by night, over the Natural Bridge of the Sentinel Mesa, down to the southern mouth of the gorge where Cairn IV stands guard. I will sleep in the shade of the rocks when the sun is high.\n\nKeep the page “Cairn IV: Sentry of the Canyon” close: the survey log of the seven echoes. " + sealsPhrase(sealsAtGates() + 2) + " in my satchel; " + sealsPhrase(3 - sealsAtGates()).toLowerCase() + " still to find.";
           }
         },
         {
@@ -4352,7 +4353,7 @@
         {
           // Leaving Cairn IV at dusk. Covers the printed "At midsummer dawn" of Sheet 16B: Hermes arrives in October.
           step: 21,
-          hermesInitial: "Dusk again, Silvia, and I am leaving the pillars behind. Before the light went I read Sheet 16B one more time, and one line will not let me go: 'At midsummer dawn, the sun's first ray slips beneath the arch.'\n\nMidsummer. The founders built the Courtyard of Rays for the longest day of the year. We are in October. The sun rises far to the south of where it rose for them, and its first ray will strike the arch at another place. If the courtyard is blind in autumn, the last seal is locked until June.\n\nAnd the footprints of the raiders who followed me are fresh on the road east. Eighteen hours to the Arch. I will not stop to sleep.",
+          hermesInitial: "Dusk again, Silvia, and I am leaving the pillars behind. Before the light went I read the page “Arch of the Solstice & The Solar Altar” one more time, and one line will not let me go: 'At midsummer dawn, the sun's first ray slips beneath the arch.'\n\nMidsummer. The founders built the Courtyard of Rays for the longest day of the year. We are in October. The sun rises far to the south of where it rose for them, and its first ray will strike the arch at another place. If the courtyard is blind in autumn, the last seal is locked until June.\n\nAnd the footprints of the raiders who followed me are fresh on the road east. Eighteen hours to the Arch. I will not stop to sleep.",
           choices: [
             {
               id: "choice-21-mirrors",
@@ -4378,7 +4379,7 @@
           step: 22,
           completed: true,
           get hermesFinal() {
-            return "Eighteen hours east, Silvia, without sleep: back across the Natural Bridge, along the Lower Wash and over the dunes where Cairn V stands guard at 163°. I will reach the Arch of the Solstice before the next dawn but one.\n\nKeep Sheet 16B close: the midsummer ray and its eight sun-stones. " + sealsPhrase(sealsAtGates() + 3) + " in my satchel. The fifth is waiting under the Arch.";
+            return "Eighteen hours east, Silvia, without sleep: back across the Natural Bridge, along the Lower Wash and over the dunes where Cairn V stands guard at 163°. I will reach the Arch of the Solstice before the next dawn but one.\n\nKeep the page “Arch of the Solstice & The Solar Altar” close: the midsummer ray and its eight sun-stones. " + sealsPhrase(sealsAtGates() + 3) + " in my satchel. The fifth is waiting under the Arch.";
           }
         },
         {
@@ -4413,13 +4414,13 @@
           step: 24,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtAltar()) + " of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. Write them in your Cipher Ledger; I wrote them on my sleeve.\n\nNow Tower II. If the Servant still stands, his last trial waits in the atrium: the Polybius Stele (Station 18, Sheet 17A). If he does not... then we will learn what the raiders came for. I will wire you from under the Arch before I set out.";
+            return sealsPhrase(sealsAtAltar()) + " of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. Write them in your Cipher Ledger; I wrote them on my sleeve.\n\nNow Tower II. If the Servant still stands, his last trial waits in the atrium: Station 18, the page “The Polybius Stele”. If he does not... then we will learn what the raiders came for. I will wire you from under the Arch before I set out.";
           }
         },
         {
           // Under the Arch at noon: the smoke over Tower II and the six-hour walk toward it
           step: 25,
-          hermesInitial: "Noon, Silvia. I meant to leave at dawn, and my legs said no. I slept two hours in the shade of the Arch with the seals sewn into my coat, and woke with the smoke still standing over Tower II like a black tree.\n\nThe Sanctuary is six hours from here, along the dry bed under the dunes. If I leave now, I will reach the foot of its steps after dark. The wagons are still there: I can see the glint of their harness from the terrace.\n\nAnd the stele in the atrium, Sheet 17A. The Servant called it his last trial. Whoever is inside that tower now, I think we will need it.",
+          hermesInitial: "Noon, Silvia. I meant to leave at dawn, and my legs said no. I slept two hours in the shade of the Arch with the seals sewn into my coat, and woke with the smoke still standing over Tower II like a black tree.\n\nThe Sanctuary is six hours from here, along the dry bed under the dunes. If I leave now, I will reach the foot of its steps after dark. The wagons are still there: I can see the glint of their harness from the terrace.\n\nAnd the stele in the atrium, the page “The Polybius Stele”. The Servant called it his last trial. Whoever is inside that tower now, I think we will need it.",
           choices: [
             {
               id: "choice-25-dark",
@@ -4429,8 +4430,8 @@
             },
             {
               id: "choice-25-stele",
-              text: "I'll have Sheet 17A open and ready.",
-              silviaMsg: "I have Sheet 17A open on my desk. Whatever the stele says, I'll read it with you.",
+              text: "I'll have the page “The Polybius Stele” open and ready.",
+              silviaMsg: "I have the page “The Polybius Stele” open on my desk. Whatever the stele says, I'll read it with you.",
               hermesReply: "Then I walk lighter. Keep the founders' grid under your hand, and the Law of the Inverted Mirage under the other. The Servant never chose a word by accident in his life."
             },
             {
@@ -4445,7 +4446,7 @@
           step: 26,
           completed: true,
           get hermesFinal() {
-            return "Six hours to Tower II, Silvia, along the dry bed under the dunes, toward the smoke. I will reach the foot of the Sanctuary steps after dark.\n\nKeep Sheet 17A close: the stele of the Servant and its Law of the Inverted Mirage. " + sealsPhrase(sealsAtAltar()) + " sewn into my coat.";
+            return "Six hours to Tower II, Silvia, along the dry bed under the dunes, toward the smoke. I will reach the foot of the Sanctuary steps after dark.\n\nKeep the page “The Polybius Stele” close: the stele of the Servant and its Law of the Inverted Mirage. " + sealsPhrase(sealsAtAltar()) + " sewn into my coat.";
           }
         },
         {
@@ -4479,19 +4480,19 @@
           get hermesFinal() {
             const seals = sealsAtWell();
             return "Two lines were cut under the hatch of the well, Silvia: [H] − [U] = 16 and [M] + [T] = 25. Into your Cipher Ledger with them. And the bearing on the back of the stele, 348° north-north-west, the same as Cairn III: I have written it on my sleeve with the others.\n\nThe Servant gave me his key, the bronze key of the inner stair. " + (seals >= 5
-              ? "'At dawn,' he said, 'with the five seals, she will receive you.' Station 19, Silvia: the Oracle's Horizon, Sheet 18A."
-              : "But he counted the seals in my coat, and there are " + sealsPhrase(seals).toLowerCase() + ". 'She receives no one until the five seals are home.' The first still sleeps by the dry wash. Station 19, the Oracle's Horizon (Sheet 18A), waits for it.");
+              ? "'At dawn,' he said, 'with the five seals, she will receive you.' Station 19, Silvia: the page “The Oracle's Horizon”."
+              : "But he counted the seals in my coat, and there are " + sealsPhrase(seals).toLowerCase() + ". 'She receives no one until the five seals are home.' The first still sleeps by the dry wash. Station 19, the page “The Oracle's Horizon”, waits for it.");
           }
         },
         {
           // Dawn at the inner stair of Tower II, with the Servant's key: the audience is about to begin
           step: 29,
-          hermesInitial: "Dawn, Silvia. The Servant woke me before first light with a cup of mint tea and the bronze key, and walked me to a door at the back of the atrium I had never noticed: the inner stair, cut down into the rock.\n\nThe raiders' fires at the foot of the steps are cold. Their wagons are gone, and the wheel ruts run east, toward the sunrise. The one under the oilcloth went with them.\n\nAt the bottom of the stair there is a second door: a slab of sandstone carved with a horizon, three mirrors and eight small sockets. Sheet 18A. And behind it, Silvia, someone is humming. The same tune the shepherd hummed for me on the hardpan.",
+          hermesInitial: "Dawn, Silvia. The Servant woke me before first light with a cup of mint tea and the bronze key, and walked me to a door at the back of the atrium I had never noticed: the inner stair, cut down into the rock.\n\nThe raiders' fires at the foot of the steps are cold. Their wagons are gone, and the wheel ruts run east, toward the sunrise. The one under the oilcloth went with them.\n\nAt the bottom of the stair there is a second door: a slab of sandstone carved with a horizon, three mirrors and eight small sockets. It is the page “The Oracle's Horizon”. And behind it, Silvia, someone is humming. The same tune the shepherd hummed for me on the hardpan.",
           choices: [
             {
               id: "choice-29-ready",
               text: "I'm ready. Let's seal the horizon.",
-              silviaMsg: "I'm ready, Hermes. Sheet 18A is open. Let's seal the horizon together.",
+              silviaMsg: "I'm ready, Hermes. The page “The Oracle's Horizon” is open. Let's seal the horizon together.",
               hermesReply: "Together, then. I have climbed down a thousand stairs in my life, Silvia, and never one as short as this. My knees are shaking like a schoolboy's."
             },
             {
@@ -4512,7 +4513,7 @@
           step: 30,
           completed: true,
           get hermesFinal() {
-            return "Down the inner stair, then. The Servant stays at the top with a lamp; he says this door is not his to open.\n\nSheet 18A, Silvia: eight beacons sent east across the three mirrors of the horizon, and the eight letters where they land. When the horizon is sealed, the door will open. " + sealsPhrase(countCairnSeals()) + " in my coat, and the Servant's key in my hand.";
+            return "Down the inner stair, then. The Servant stays at the top with a lamp; he says this door is not his to open.\n\nThe page “The Oracle's Horizon”, Silvia: eight beacons sent east across the three mirrors of the horizon, and the eight letters where they land. When the horizon is sealed, the door will open. " + sealsPhrase(countCairnSeals()) + " in my coat, and the Servant's key in my hand.";
           }
         },
         {
@@ -4549,12 +4550,12 @@
         {
           // The Stage Path begins: the morning of departure from Tower II, with the unsent letter and the new sheets
           step: 33,
-          hermesInitial: "Silvia. A whole day at the Sanctuary, the best one I have had since 1971. She showed me her charts, and I watched her hands.\n\nAt dawn we leave, Aurelia and I, east across the plateau, after the raiders' ruts. The Servant stays to guard the Sanctuary. He packed us bread, dates and a lamp, and would not hear a word of thanks.\n\nAurelia brought something from the cedar chest of the Sanctuary: a letter an Oracle of long ago wrote to the Mirror Speaker of Tower III, and never sent. It is written backwards. And this morning a pigeon of the Order landed on the stair with a packet for you: eight new sheets for your journal, 19 to 26. Open Sheet 19A, Silvia, and find a mirror.",
+          hermesInitial: "Silvia. A whole day at the Sanctuary, the best one I have had since 1971. She showed me her charts, and I watched her hands.\n\nAt dawn we leave, Aurelia and I, east across the plateau, after the raiders' ruts. The Servant stays to guard the Sanctuary. He packed us bread, dates and a lamp, and would not hear a word of thanks.\n\nAurelia brought something from the cedar chest of the Sanctuary: a letter an Oracle of long ago wrote to the Mirror Speaker of Tower III, and never sent. It is written backwards. And this morning a pigeon of the Order landed on the stair with a packet for you: eight new pages for your journal. Open the page “The Unsent Letter”, Silvia, and find a mirror.",
           choices: [
             {
               id: "choice-33-go",
               text: "I have the sheets. Let's go to the third tower.",
-              silviaMsg: "I have the new sheets, Hermes, and a mirror. Sheet 19A is in front of me. Let's go to the third tower.",
+              silviaMsg: "I have the new pages, Hermes, and a mirror. The page “The Unsent Letter” is in front of me. Let's go to the third tower.",
               hermesReply: "Then we walk. Eighteen hours to the gate of Tower III, if the plateau is kind. Aurelia walks faster than I do. She says I have grown slow. She is right."
             },
             {
@@ -4574,7 +4575,7 @@
         {
           step: 34,
           completed: true,
-          hermesFinal: "East, then. We set out at first light with the raiders' ruts in front of us and the sun in our eyes: eighteen hours across the plateau to the third tower, with a short sleep at noon in the shade of their last camp.\n\nKeep Sheet 19B close, Silvia. Aurelia says the old charts of the Sanctuary draw the gate of Tower III as a wall of masks, and that the last line of the letter is about it: 'Only the one who sees what is not equal will find it.'"
+          hermesFinal: "East, then. We set out at first light with the raiders' ruts in front of us and the sun in our eyes: eighteen hours across the plateau to the third tower, with a short sleep at noon in the shade of their last camp.\n\nKeep the page “The Gate of a Thousand Masks” close, Silvia. Aurelia says the old charts of the Sanctuary draw the gate of Tower III as a wall of masks, and that the last line of the letter is about it: 'Only the one who sees what is not equal will find it.'"
         },
         {
           // Station 20 debrief: inside the gate, the Mirror Speaker's reflection, Fragment I and a note sealed with ash
@@ -4609,18 +4610,18 @@
         {
           // Station 21: the candles burn down and the Mirror Speaker opens a door onto a stair
           step: 37,
-          hermesInitial: "Silvia, are you awake? Nobody sleeps in this theatre for long. The candles along the dressing rooms burned down all together, and in the glass at the end of the corridor the grey gown was standing beside a door that was not there before. She drew her line on it, and it opened on a stair going down.\n\nAurelia has already gone ahead; I can hear her counting the steps. Before I follow: Sheet 20A, Silvia. It is the city of the third tower, drawn upside down. Aurelia says it is not a map. It is a memory: the city as it stood yesterday. Have it ready.",
+          hermesInitial: "Silvia, are you awake? Nobody sleeps in this theatre for long. The candles along the dressing rooms burned down all together, and in the glass at the end of the corridor the grey gown was standing beside a door that was not there before. She drew her line on it, and it opened on a stair going down.\n\nAurelia has already gone ahead; I can hear her counting the steps. Before I follow: the page “The Camera Obscura”, Silvia. It is the city of the third tower, drawn upside down. Aurelia says it is not a map. It is a memory: the city as it stood yesterday. Have it ready.",
           choices: [
             {
               id: "choice-37-go",
-              text: "I have Sheet 20A. Go down.",
-              silviaMsg: "I have Sheet 20A in front of me, Hermes, upside down. Go down the stair.",
+              text: "I have the page “The Camera Obscura”. Go down.",
+              silviaMsg: "I have the page “The Camera Obscura” in front of me, Hermes, upside down. Go down the stair.",
               hermesReply: "Then down we go. Thirty-one steps, by Aurelia's count, and the air is colder at every one of them."
             },
             {
               id: "choice-37-upside",
               text: "Why is the city upside down?",
-              silviaMsg: "Why is the city on Sheet 20A upside down, Hermes?",
+              silviaMsg: "Why is the city on the page “The Camera Obscura” upside down, Hermes?",
               hermesReply: "Aurelia says it is not a mistake. It is the whole point. She would not say more. She smiled at the sheet like someone who has done this before, a long time ago."
             },
             {
@@ -4669,18 +4670,18 @@
         {
           // Station 22: the hearth goes out and the second stair leads down to the whispers
           step: 41,
-          hermesInitial: "Silvia, the hearth has gone out, and the whispering under the floor has not stopped all night. In the black window of the cellar the grey gown stood a moment by the second stair, and drew her line across it.\n\nAurelia is already lacing her boots. She says the room below was built by the Order to keep secrets, and that it keeps them very badly. Sheet 20B, Silvia. A hall shaped like an egg, a string, and two pins nobody drew. Have it ready, and have a ruler.",
+          hermesInitial: "Silvia, the hearth has gone out, and the whispering under the floor has not stopped all night. In the black window of the cellar the grey gown stood a moment by the second stair, and drew her line across it.\n\nAurelia is already lacing her boots. She says the room below was built by the Order to keep secrets, and that it keeps them very badly. The page “The Whispering Gallery”, Silvia. A hall shaped like an egg, a string, and two pins nobody drew. Have it ready, and have a ruler.",
           choices: [
             {
               id: "choice-41-ready",
-              text: "I have Sheet 20B and a ruler.",
-              silviaMsg: "I have Sheet 20B in front of me, Hermes, and a ruler. Go down.",
+              text: "I have the page “The Whispering Gallery” and a ruler.",
+              silviaMsg: "I have the page “The Whispering Gallery” in front of me, Hermes, and a ruler. Go down.",
               hermesReply: "Then down we go, as quietly as two old people can. Aurelia has taken off her boots after all. She says the floor below remembers footsteps."
             },
             {
               id: "choice-41-pins",
               text: "Why does the sheet have no pins?",
-              silviaMsg: "Why did Aurelia leave the pins off Sheet 20B, Hermes?",
+              silviaMsg: "Why did Aurelia leave the pins off the page “The Whispering Gallery”, Hermes?",
               hermesReply: "I asked her. She said that whoever needs the pins drawn for them should not be listening at them. Then she smiled, and said that you would not need them."
             },
             {
@@ -4760,35 +4761,35 @@
         {
           step: 0,
           divider: "Dawn · The Great Silence",
-          hermesInitial: "The wind has stopped. I woke up because of the quiet, not because of any noise.\n\nOut here they call it the Great Silence. After a big storm the desert holds its breath, and every sound carries for miles. I can hear my own heartbeat. I can hear sand sliding off the ledge, one grain at a time.\n\nI opened the door a crack. The sky is the color of a peach and the red dust still hangs low over the ground. Nothing moves: no raiders, no wagons, not even a bird.\n\nSheet 8A in your journal lists the Three Laws of the Waste. Which one should I trust first this morning?",
+          hermesInitial: "The wind has stopped. I woke up because of the quiet, not because of any noise.\n\nOut here they call it the Great Silence. After a big storm the desert holds its breath, and every sound carries for miles. I can hear my own heartbeat. I can hear sand sliding off the ledge, one grain at a time.\n\nI opened the door a crack. The sky is the color of a peach and the red dust still hangs low over the ground. Nothing moves: no raiders, no wagons, not even a bird.\n\nThe page “The Desert” in your journal lists the Three Laws of the Waste. Which one should I trust first this morning?",
           choices: [
             {
               id: "dawn-0-wash",
               tone: "tactical",
-              text: "Law 2 on Sheet 8A, the Dry Wash: the packed gravel of the riverbed is the only firm road.",
-              silviaMsg: "Law 2 on Sheet 8A, Hermes: the Dry Wash. The packed gravel of the dry riverbed is the only firm road through the canyons.",
+              text: "Law 2 on the page “The Desert”, the Dry Wash: the packed gravel of the riverbed is the only firm road.",
+              silviaMsg: "Law 2 on the page “The Desert”, Hermes: the Dry Wash. The packed gravel of the dry riverbed is the only firm road through the canyons.",
               hermesReply: "The Dry Wash. Yes. The sand will take a week to settle, but gravel packed by a thousand floods does not care about one storm.\n\nThere is a riverbed just below the watchtower. My map calls it Wadi al-Hajar, the river of stones. I will go down to it and keep my eyes open."
             },
             {
               id: "dawn-0-shadow",
               tone: "analytic",
-              text: "Law 1 on Sheet 8A, the Meridian Shadow: wait for noon and read true north from the shortest shadow.",
-              silviaMsg: "Law 1 on Sheet 8A, Hermes: the Meridian Shadow. At true noon the shortest shadow shows true north, and north points home to the observatory.",
+              text: "Law 1 on the page “The Desert”, the Meridian Shadow: wait for noon and read true north from the shortest shadow.",
+              silviaMsg: "Law 1 on the page “The Desert”, Hermes: the Meridian Shadow. At true noon the shortest shadow shows true north, and north points home to the observatory.",
               hermesReply: "A fine law, and I will keep it close. Something tells me shadows will matter again before this journey is over.\n\nBut noon is hours away, and the silence will not last. While I wait, I will go down to the riverbed under the watchtower. Wadi al-Hajar, the river of stones: dry now, but it is the other law on that sheet, and it is right under my feet."
             },
             {
               id: "dawn-0-rest",
               tone: "protective",
               text: "Don't rush out, Hermes. Eat something, drink some water, and test the ground before you trust it.",
-              silviaMsg: "Don't rush out, Hermes. Eat something, drink some water, and test the ground before you trust it. Sheet 8A can wait five minutes.",
-              hermesReply: "Dry figs and a mouthful of water, as ordered. I feel almost human again.\n\nAnd I tested the ground, I promise: three taps with my stick on every step. The only firm road out of here is the one Sheet 8A calls the Dry Wash, the old riverbed under the watchtower. Wadi al-Hajar, the river of stones. I am going down."
+              silviaMsg: "Don't rush out, Hermes. Eat something, drink some water, and test the ground before you trust it. The page “The Desert” can wait five minutes.",
+              hermesReply: "Dry figs and a mouthful of water, as ordered. I feel almost human again.\n\nAnd I tested the ground, I promise: three taps with my stick on every step. The only firm road out of here is the one your page “The Desert” calls the Dry Wash, the old riverbed under the watchtower. Wadi al-Hajar, the river of stones. I am going down."
             }
           ]
         },
         {
           step: 1,
           divider: "The Dry River · Wadi al-Hajar",
-          hermesInitial: "I am standing in Wadi al-Hajar now. It is wider than a street, with red walls on both sides and a floor of smooth gray stones, polished by water that left long ago. The silence is even deeper down here.\n\nThe map on Sheet 8B marks the safe road running west, straight to the canyon mouth. But my feet want to turn south, following this dry river into the unknown.\n\nI have no reason for it, Silvia. It is only a hunch, a pull like a quiet hand on my sleeve. Do I trust it, or do we stick strictly to the surveyor's line?",
+          hermesInitial: "I am standing in Wadi al-Hajar now. It is wider than a street, with red walls on both sides and a floor of smooth gray stones, polished by water that left long ago. The silence is even deeper down here.\n\nThe map on the page “Grand Desert Map · North-West” marks the safe road running west, straight to the canyon mouth. But my feet want to turn south, following this dry river into the unknown.\n\nI have no reason for it, Silvia. It is only a hunch, a pull like a quiet hand on my sleeve. Do I trust it, or do we stick strictly to the surveyor's line?",
           sketch: { src: "./assets/chat/sketch_dry_wash.webp", caption: "The dry riverbed, from the ledge below the watchtower." },
           choices: [
             {
@@ -5053,14 +5054,14 @@
           title: "Why is the desert so quiet after a storm?",
           category: "The Great Silence",
           group: "desert",
-          answer: "The old nomads call it the Great Silence. When the wind drops, the air is clean and still, and a voice or a footstep can carry for miles. Sheet 8A says the desert is the purest archive of the Order: it strips away everything and leaves only the stone. Listen well after a storm. You hear what stays."
+          answer: "The old nomads call it the Great Silence. When the wind drops, the air is clean and still, and a voice or a footstep can carry for miles. The page “The Desert” says the desert is the purest archive of the Order: it strips away everything and leaves only the stone. Listen well after a storm. You hear what stays."
         },
         {
           id: "inq-wadi",
           title: "What is Wadi al-Hajar?",
           category: "The Dry River",
           group: "desert",
-          answer: "The Dry Canyon Wash on your map, on Sheet 8B. A wadi is a riverbed that only runs after rain, and al-Hajar means of the stones. The winter floods pack its gravel hard, so it is the one safe road through the red canyons."
+          answer: "The Dry Canyon Wash on your map, on the page “Grand Desert Map · North-West”. A wadi is a riverbed that only runs after rain, and al-Hajar means of the stones. The winter floods pack its gravel hard, so it is the one safe road through the red canyons."
         },
         {
           id: "inq-satchel",
@@ -5092,7 +5093,7 @@
         },
         {
           id: "inq-monolith-shadows",
-          title: "How do I read the shadows of Sheet 13B?",
+          title: "How do I read the shadows on the page “The Sun Monolith & Cairn II”?",
           category: "Cairn II",
           group: "desert",
           answer: "Think of my staff and the Monolith as two people standing side by side in the sun. Whatever the hour, the taller one casts the longer shadow, always in the same proportion. My staff is two paces tall and the Monolith twenty-four: twelve times taller, so at any noon its shadow is twelve times the shadow of my staff. Work out each noon on paper, find that distance among the rings of the dial, and read the letter carved there. I will not do the arithmetic for you; the stone would know."
@@ -5113,7 +5114,7 @@
         },
         {
           id: "inq-labyrinth-arches",
-          title: "How do I find the true road of Sheet 14B?",
+          title: "How do I find the true road on the page “The Sandstone Labyrinth & Cairn III”?",
           category: "Cairn III",
           group: "desert",
           answer: "Start at the Southern Mouth, never at the cairn: the tablet was written for someone walking in. Trace with a pencil and keep one hand on the wall, the way a blind man walks a corridor; every dead end you leave behind, shade it in, and the true road will stand out on its own. Only the arches that stand on that one road count, and only in the order you pass beneath them. The arches in the side fissures are there to fool the hurried. Eight letters, Silvia, read from the mouth to the cairn."
@@ -5130,11 +5131,11 @@
           title: "What was under the copper plate of Cairn III?",
           category: "Cairn III",
           group: "desert",
-          answer: "Two plates, one on top of the other. On top, the copper benchmark I set myself in 1998, pointing 112° to Outer Watchtower VI, without knowing whose stones I was stacking (Sheet 14A). Beneath it, the founders' own copper plate, with eight letter slots and the old groove of 348° cut into the stone. When the eight letters of the true road were spoken it turned on its pin, and the founders' stone was waiting underneath with the Seal of Cairn III and two lines: [W] + [A] = 26 and [N] − [E] = 9."
+          answer: "Two plates, one on top of the other. On top, the copper benchmark I set myself in 1998, pointing 112° to Outer Watchtower VI, without knowing whose stones I was stacking (the page “The Five Geodetic Cairns”). Beneath it, the founders' own copper plate, with eight letter slots and the old groove of 348° cut into the stone. When the eight letters of the true road were spoken it turned on its pin, and the founders' stone was waiting underneath with the Seal of Cairn III and two lines: [W] + [A] = 26 and [N] − [E] = 9."
         },
         {
           id: "inq-seven-echoes",
-          title: "How do I turn the echoes of Sheet 15A into letters?",
+          title: "How do I turn the echoes on the page “Cairn IV: Sentry of the Canyon” into letters?",
           category: "Cairn IV",
           group: "desert",
           answer: "Take one echo at a time. The pillar tells you which cliff answered: Left pillar, left cliff; Right pillar, right cliff, never the other way. The beats tell you how far: each beat is 5 paces, so multiply the beats by five. Find that ring on the survey plan and read the letter carved on that cliff, at that ring. Seven echoes, seven letters, in the order of the log."
@@ -5155,7 +5156,7 @@
         },
         {
           id: "inq-midsummer-ray",
-          title: "How do I follow the ray of Sheet 16B?",
+          title: "How do I follow the ray on the page “Arch of the Solstice & The Solar Altar”?",
           category: "Cairn V",
           group: "desert",
           answer: "Put your finger under the arch, where the arrow is, and walk straight down. When you meet a bronze mirror, turn a quarter along its slant, the way a ball bounces off a wall at a corner: the slant tells you whether you go left or right. A fallen pillar ends a false path; go back and check your last turn. Every lettered sun-stone your finger crosses is a letter of the sigil, in that order, until the ray reaches the Solar Altar. Eight letters."
@@ -5183,7 +5184,7 @@
         },
         {
           id: "inq-stele-stanzas",
-          title: "How do I read the stanzas of Sheet 17A?",
+          title: "How do I read the stanzas on the page “The Polybius Stele”?",
           category: "Tower II",
           group: "desert",
           answer: "Each pair of numbers in a stanza points to one square of the grid at the top of the stele: the first number counts down the rows, the second across the columns. That is the plain reading, for stanzas I, III and V. In stanzas II, IV and VI the mirage swaps them: the first number is the column and the second the row. Write each letter in its box, and the six words make one proverb. The little numbers at the end of each line tell you how many letters to expect."
@@ -5193,7 +5194,7 @@
           title: "How do I read the Servant's knocks?",
           category: "Tower II",
           group: "desert",
-          answer: "Count the knocks in each group and write the numbers down in pairs: a short pause separates the two groups of a letter, a longer one separates the letters. Then look them up in the grid of Sheet 17A, as you did with the stanzas. And remember which stanza you are in, counting his and yours together: in the even ones the mirage swaps the pair. When it is your turn to answer, knock the first group, press Pause, knock the second, and so on, letter by letter."
+          answer: "Count the knocks in each group and write the numbers down in pairs: a short pause separates the two groups of a letter, a longer one separates the letters. Then look them up in the grid on the page “The Polybius Stele”, as you did with the stanzas. And remember which stanza you are in, counting his and yours together: in the even ones the mirage swaps the pair. When it is your turn to answer, knock the first group, press Pause, knock the second, and so on, letter by letter."
         },
         {
           id: "inq-burning-atrium",
@@ -5211,7 +5212,7 @@
         },
         {
           id: "inq-oracle-mirrors",
-          title: "How do the three mirrors of Sheet 18A work?",
+          title: "How do the three mirrors on the page “The Oracle's Horizon” work?",
           category: "Tower II",
           group: "desert",
           answer: "Take one beacon at a time and fold it across each mirror in turn, as if the chart were paper. Mirror I is the upright line on column 4: a beacon three columns to its left lands three columns to its right, on the same row. Mirror II is the horizon of the Sanctuary: in column 6 it lies on Row D, everywhere else on Row F, and a beacon two rows above it lands two rows below it, in the same column. Mirror III, on column 10, works like Mirror I. After the third fold, write down the letter the beacon lands on. Eight beacons, eight letters, in order."
@@ -5239,14 +5240,14 @@
         },
         {
           id: "inq-unsent-letter",
-          title: "Who wrote the unsent letter of Sheet 19A?",
+          title: "Who wrote “The Unsent Letter”?",
           category: "Tower III",
           group: "stage",
           answer: "An Oracle of Tower II, centuries ago, to the Mirror Speaker of her time. Aurelia found it in the cedar chest of the Sanctuary, under the oldest charts. It is written the way a mirror sees, from right to left: hold the page up to a mirror and it reads plainly. It asks forgiveness, it tells how the two of them broke the mirror of Tower III into nine pieces so that no one could turn the Astrolabe alone, and it warns about the Ashes. The last line is a riddle about the gate."
         },
         {
           id: "inq-masks-lie",
-          title: "How do I find the masks that lie on Sheet 19B?",
+          title: "How do I find the masks that lie on the page “The Gate of a Thousand Masks”?",
           category: "Tower III",
           group: "stage",
           answer: "Look at each mask as if a line ran down the middle of its face, through the letter on the forehead and the nose. A true mask is the same on both sides: what is on the left is on the right, at the same height. A mask that lies has something on one side only, or something missing on one side: a tear, a feather, a crack, an eyebrow, a ribbon, an eye of a different shape. Careful: a mask with two tears, or two feathers, is telling the truth. There are six liars. Read their letters left to right, row by row."
@@ -5267,24 +5268,24 @@
         },
         {
           id: "inq-camera-upside",
-          title: "Why is the city upside down on Sheet 20A?",
+          title: "Why is the city upside down on the page “The Camera Obscura”?",
           category: "Tower III",
           group: "stage",
-          answer: "A camera obscura is a dark room with a hole no bigger than a coin in one wall. Light from the street goes through the hole and paints the whole city on the opposite wall, but upside down, because light travels in straight lines and crosses at the hole. Aurelia drew Sheet 20A the way that wall shows it, so that the sheet and the wall can be held side by side. The city on the sheet is how it stood yesterday. On the wall, today, four things are different."
+          answer: "A camera obscura is a dark room with a hole no bigger than a coin in one wall. Light from the street goes through the hole and paints the whole city on the opposite wall, but upside down, because light travels in straight lines and crosses at the hole. Aurelia drew the page “The Camera Obscura” the way that wall shows it, so that the sheet and the wall can be held side by side. The city on the sheet is how it stood yesterday. On the wall, today, four things are different."
         },
         {
           id: "inq-camera-house",
           title: "What did we find in the narrow house?",
           category: "Tower III",
           group: "stage",
-          answer: "The narrow house behind the market had a cold chimney on Sheet 20A and a smoking one on the wall. The Ashes had lit a fire in its cellar so that someone would look, and they left Fragment II in the chimney, wrapped in a sooty cloth. The other three changes were only the city living its day: a new flag on the clock tower, a cart in the street and a shutter that someone had closed."
+          answer: "The narrow house behind the market had a cold chimney on the page “The Camera Obscura” and a smoking one on the wall. The Ashes had lit a fire in its cellar so that someone would look, and they left Fragment II in the chimney, wrapped in a sooty cloth. The other three changes were only the city living its day: a new flag on the clock tower, a cart in the street and a shutter that someone had closed."
         },
         {
           id: "inq-gallery-pins",
           title: "Why does a whisper cross the gallery?",
           category: "Tower III",
           group: "stage",
-          answer: "Because the gallery is an ellipse, the shape Kepler found in the paths of the planets. You draw one with two pins and a loop of string: keep the string tight with a pencil and go round. The two pins are its foci, and an ellipse has a secret: every sound that leaves one focus bounces off the wall and arrives at the other, all at the same moment. So a whisper at one pin is clear at the other, and lost everywhere else. Sheet 20B shows the string, but not where the pins stood."
+          answer: "Because the gallery is an ellipse, the shape Kepler found in the paths of the planets. You draw one with two pins and a loop of string: keep the string tight with a pencil and go round. The two pins are its foci, and an ellipse has a secret: every sound that leaves one focus bounces off the wall and arrives at the other, all at the same moment. So a whisper at one pin is clear at the other, and lost everywhere else. The page “The Whispering Gallery” shows the string, but not where the pins stood."
         },
         {
           id: "inq-gallery-niche",
@@ -5490,7 +5491,10 @@
         '4': { title: 'The Planisphere', note: 'The circle of star words. Find the sixteen celestial guides hidden in it.', thumb: './assets/thumbnails/planisphere_preview.webp', path: 'constellation', node: 6, nodeLabel: 'Station 06 · The Celestial Matrix' },
         '5': { title: 'The Zodiacal Engine', note: 'The crossword whose words open the console of the underground outpost.', thumb: './assets/thumbnails/zodiac_journal_preview.webp', path: 'constellation', node: 7, nodeLabel: 'Station 07 · The Zodiacal Engine' },
         '6': { title: 'Midnight Calibration & Transit', note: 'Calibrate the star heights, then trace the six chords of distant light.', thumb: './assets/thumbnails/midnight_calibration_preview.webp', path: 'constellation', node: 8, nodeLabel: 'Station 08 · Midnight Calibration' },
+        '6A': { title: 'The Midnight Calibration', note: 'Calibrate the heights of the guide stars against the astrolabe rig at true midnight.', thumb: './assets/thumbnails/midnight_calibration_preview.webp', path: 'constellation', node: 8, nodeLabel: 'Station 08 · Midnight Calibration' },
+        '6B': { title: 'The Midnight Transit', note: 'Trace the six chords of distant light across the shifted skies.', thumb: './assets/thumbnails/midnight_calibration_preview.webp', path: 'constellation', node: 8, nodeLabel: 'Station 08 · Midnight Calibration' },
         '7': { title: 'The Celestial Cipher', note: 'The coordinate dial that hides the old vow of the Order.', path: 'constellation', node: 9, nodeLabel: 'Station 09 · The Celestial Cipher' },
+        '7A': { title: 'The Celestial Cipher', note: 'The coordinate dial that hides the old vow of the Order.', path: 'constellation', node: 9, nodeLabel: 'Station 09 · The Celestial Cipher' },
         '7B': { title: 'Field Log: The Desert Frontier', note: "Hermes's survey notes from 1998: the Three Cairns along the canyon wash, the copper benchmark plate beneath Cairn III, and the 112° E bearing to Outer Watchtower VI." },
         '8A': { title: 'The Desert', note: 'Sun, silence and buried stone. The Three Laws of the Waste: the Meridian Shadow, the Dry Wash and the Benchmark Plate.' },
         '8B': { title: 'Grand Desert Map · North-West', note: 'The first quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_1_nw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
@@ -5507,11 +5511,17 @@
         '16A': { title: 'The Eastern Buttress & Lower Wash', note: 'The right half of the Natural Bridge zoom: the eastern pier, the switchbacks and the boulders of the 1971 quake.' },
         '16B': { title: 'Arch of the Solstice & The Solar Altar', note: 'The midsummer ray, the Courtyard of Rays and its eight sun-stones: the sigil of Cairn V.', thumb: './assets/thumbnails/solstice_arch_preview.webp', path: 'desert', node: 26, nodeLabel: 'Station 17 · The Arch of the Solstice' },
         '15A': { title: 'Cairn IV: Sentry of the Canyon', note: 'Two singing pillars, three laws of the echo and the survey log of seven echoes: the sigil of the Sentry.', thumb: './assets/thumbnails/cairn_iv_preview.webp', path: 'desert', node: 25, nodeLabel: 'Station 16 · Cairn IV' },
-        '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on Sheet 16A).' },
+        '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on the page “The Eastern Buttress & Lower Wash”).' },
         '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
         '18A': { title: "The Oracle's Horizon", note: 'Eight beacons sent east across the three mirrors of the horizon: the sigil of the Oracle, and the first truth.', thumb: './assets/thumbnails/oracle_horizon_preview.webp', path: 'desert', node: 14, nodeLabel: "Station 19 · The Oracle's Horizon" },
         '18B': { title: 'From the Desert to the Stage', note: 'Curtains, columns and the floor of a stage: the passage to the third tower.' },
-        '17A': { title: 'The Polybius Stele', note: "The Servant's trial: the founders' 5 × 5 grid, keyed with PHOENIX, and six stanzas carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' }
+        '17A': { title: 'The Polybius Stele', note: "The Servant's trial: the founders' 5 × 5 grid, keyed with PHOENIX, and six stanzas carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' },
+        '17B': { title: 'The Desert Oracle', note: 'An audience with the Oracle of Tower II, and the Servant Hermes once watched from a ridge in 1998.' },
+        '19A': { title: 'The Unsent Letter', note: 'A letter written backwards and never sent. Read it in a mirror.' },
+        '19B': { title: 'The Gate of a Thousand Masks', note: 'A thousand faces guard the theatre of the Order, and six of them lie.', path: 'stage', node: 40, nodeLabel: 'Station 20 · The Gate of a Thousand Masks' },
+        '20A': { title: 'The Camera Obscura', note: 'A dark room where the whole city appears upside down on the wall.', path: 'stage', node: 41, nodeLabel: 'Station 21 · The Camera Obscura' },
+        '20B': { title: 'The Whispering Gallery', note: 'A gallery where a whisper at one end is heard at the other.', path: 'stage', node: 42, nodeLabel: 'Station 22 · The Whispering Gallery' },
+        '21B': { title: 'The Automaton Orchestra', note: 'A brass orchestra that plays only what its cylinder remembers.', path: 'stage', node: 43, nodeLabel: 'Station 23 · The Automaton Orchestra' }
       };
       let sheetPopover = null;
       let sheetPopoverAnchor = null;
@@ -5529,13 +5539,13 @@
         const el = document.createElement('div');
         el.className = 'journal-sheet-popover';
         el.setAttribute('role', 'dialog');
-        el.setAttribute('aria-label', 'Sheet ' + key);
+        el.setAttribute('aria-label', info ? info.title : 'Your physical journal');
         el.innerHTML = `
           <button type="button" class="jsp-close" aria-label="Close">✕</button>
-          <div class="jsp-kicker">📖 Sheet ${key} · Physical journal</div>
+          <div class="jsp-kicker">📖 Your physical journal</div>
           <div class="jsp-title">${info ? info.title : 'Your physical journal'}</div>
-          ${info && info.thumb ? `<img class="jsp-thumb" src="${info.thumb}" alt="Preview of Sheet ${key}" loading="lazy">` : ''}
-          <div class="jsp-note">${info ? info.note : 'Open your physical journal to Sheet ' + key + '.'}</div>
+          ${info && info.thumb ? `<img class="jsp-thumb" src="${info.thumb}" alt="Preview of the page ${info.title}" loading="lazy">` : ''}
+          <div class="jsp-note">${info ? info.note : 'Open your physical journal.'}</div>
           ${info && info.nodeLabel ? `<button type="button" class="jsp-go">🗺️ ${info.nodeLabel} ➔</button>` : ''}
         `;
         document.body.appendChild(el);
@@ -6226,11 +6236,11 @@
         28: () => '✦ THE SERVANT IS SAFE · [H] − [U] = 16 · [M] + [T] = 25 RECORDED · BEARING 348° NNW · SEALS ' + sealsAtWell() + ' / 5 ✦',
         30: () => '✦ SEALS 5 / 5 · DOWN THE INNER STAIR OF TOWER II · AUDIENCE WITH THE ORACLE ✦',
         32: () => '✦ THE FIRST TRUTH · WHEN: 18 – 20 DECEMBER · [Z] + [D] = 23 · [I] + [E] = 12 RECORDED · THE DESERT PATH IS COMPLETE ✦',
-        34: () => '✦ SHEETS 19 – 26 RECEIVED · EAST ACROSS THE PLATEAU TO TOWER III (18 H) · KEEP SHEET 19B CLOSE ✦',
+        34: () => '✦ EIGHT NEW JOURNAL PAGES RECEIVED · EAST ACROSS THE PLATEAU TO TOWER III (18 H) · KEEP “THE GATE OF A THOUSAND MASKS” CLOSE ✦',
         36: () => '✦ THE GATE OPENED · SILVER · FRAGMENT I SET · 1 / 9 · A NOTE SEALED IN ASH ✦',
-        38: () => '✦ THE DARK ROOM · A HOLE IN THE WALL · SHEET 20A READY · FOUR CHANGES TO FIND ✦',
+        38: () => '✦ THE DARK ROOM · A HOLE IN THE WALL · “THE CAMERA OBSCURA” READY · FOUR CHANGES TO FIND ✦',
         40: () => '✦ THE HIDEOUT FOUND · THE NARROW HOUSE · FRAGMENT II SET · 2 / 9 ✦',
-        42: () => '✦ THE GALLERY · TWO PINS NOBODY DREW · SHEET 20B READY · LISTEN AT THE WEST ONE ✦',
+        42: () => '✦ THE GALLERY · TWO PINS NOBODY DREW · “THE WHISPERING GALLERY” READY · LISTEN AT THE WEST ONE ✦',
         44: () => '✦ THE NICHE OPENED · THE TUNE MIRRORED · FRAGMENT III SET · 3 / 9 · [J] × 2 = [T] RECORDED ✦'
       };
       function appendStepFinal(stepIdx) {
@@ -6769,42 +6779,42 @@
         10: {
           step: 10, march: monolithMarch, doneKey: 'order_sun_monolith_completed',
           walkingTitle: '✦ Crossing the Great Erg · Heading NNE to the Sun Monolith ✦',
-          walkingDesc: 'Hermes is walking by night across the Great Erg, with the stars for a compass. Keep Sheet 13B close.',
+          walkingDesc: 'Hermes is walking by night across the Great Erg, with the stars for a compass. Keep the page “The Sun Monolith & Cairn II” close.',
           etaLabel: 'ARRIVAL AT THE SUN MONOLITH',
           arrivedTitle: 'Sun Monolith Reached · Station 14 Awaits',
-          arrivedDesc: 'Hermes is standing on the Ridge of the Sun. Open the Grand Desert Map and wake Cairn II (Station 14 · Sheet 13B).'
+          arrivedDesc: 'Hermes is standing on the Ridge of the Sun. Open the Grand Desert Map and wake Cairn II (Station 14, the page “The Sun Monolith & Cairn II”).'
         },
         14: {
           step: 14, march: labyrinthMarch, doneKey: 'order_sandstone_labyrinth_completed',
           walkingTitle: '✦ Down to the Sandstone Labyrinth · Bearing 168° SSE ✦',
-          walkingDesc: 'Hermes is walking down from the Sun Monolith on the stone shelves, away from the raiders\' ruts. Trace Sheet 14B while he walks.',
+          walkingDesc: 'Hermes is walking down from the Sun Monolith on the stone shelves, away from the raiders\' ruts. Trace the true road on the page “The Sandstone Labyrinth & Cairn III” while he walks.',
           etaLabel: 'ARRIVAL AT THE SANDSTONE LABYRINTH',
           arrivedTitle: 'Sandstone Labyrinth Reached · Station 15 Awaits',
-          arrivedDesc: 'Hermes is at the foot of Cairn III, inside the labyrinth. Open the Grand Desert Map and speak the sigil of its copper plate (Station 15 · Sheet 14B).'
+          arrivedDesc: 'Hermes is at the foot of Cairn III, inside the labyrinth. Open the Grand Desert Map and speak the sigil of its copper plate (Station 15, the page “The Sandstone Labyrinth & Cairn III”).'
         },
         18: {
           step: 18, march: cairnFourMarch, doneKey: 'order_cairn_iv_completed',
           walkingTitle: '✦ Across the Hardpan · Over the Natural Bridge to Cairn IV ✦',
-          walkingDesc: 'Hermes walks the hardpan by night and sleeps in the rocks by day, toward the singing pillars. Keep Sheet 15A close.',
+          walkingDesc: 'Hermes walks the hardpan by night and sleeps in the rocks by day, toward the singing pillars. Keep the page “Cairn IV: Sentry of the Canyon” close.',
           etaLabel: 'ARRIVAL AT CAIRN IV',
           arrivedTitle: 'Cairn IV Reached · Station 16 Awaits',
-          arrivedDesc: 'Hermes is between the twin pillars at the southern mouth of the gorge. Open the Grand Desert Map and wake the Sentry of the Canyon (Station 16 · Sheet 15A).'
+          arrivedDesc: 'Hermes is between the twin pillars at the southern mouth of the gorge. Open the Grand Desert Map and wake the Sentry of the Canyon (Station 16, the page “Cairn IV: Sentry of the Canyon”).'
         },
         22: {
           step: 22, march: solsticeMarch, doneKey: 'order_arch_solstice_completed',
           walkingTitle: '✦ East to the Arch of the Solstice · No Sleep ✦',
-          walkingDesc: 'Hermes walks without rest, back over the Natural Bridge and across the dunes of Cairn V. Keep Sheet 16B close.',
+          walkingDesc: 'Hermes walks without rest, back over the Natural Bridge and across the dunes of Cairn V. Keep the page “Arch of the Solstice & The Solar Altar” close.',
           etaLabel: 'ARRIVAL AT THE ARCH',
           arrivedTitle: 'The Arch of the Solstice · Station 17 Awaits',
-          arrivedDesc: 'Hermes is under the Arch, by the Courtyard of Rays. Open the Grand Desert Map and speak the sigil of Cairn V (Station 17 · Sheet 16B).'
+          arrivedDesc: 'Hermes is under the Arch, by the Courtyard of Rays. Open the Grand Desert Map and speak the sigil of Cairn V (Station 17, the page “Arch of the Solstice & The Solar Altar”).'
         },
         26: {
           step: 26, march: steleMarch, doneKey: 'order_polybius_stele_completed',
           walkingTitle: '✦ To Tower II · Toward the Smoke ✦',
-          walkingDesc: 'Hermes follows the dry bed under the dunes toward the smoke over the Sanctuary, and will arrive after dark. Keep Sheet 17A close.',
+          walkingDesc: 'Hermes follows the dry bed under the dunes toward the smoke over the Sanctuary, and will arrive after dark. Keep the page “The Polybius Stele” close.',
           etaLabel: 'ARRIVAL AT TOWER II',
           arrivedTitle: 'Tower II in Flames · Station 18 Awaits',
-          arrivedDesc: 'Hermes is inside the burning atrium of the Sanctuary, by the stele. Open the Grand Desert Map and speak its proverb (Station 18 · Sheet 17A).'
+          arrivedDesc: 'Hermes is inside the burning atrium of the Sanctuary, by the stele. Open the Grand Desert Map and speak its proverb (Station 18, the page “The Polybius Stele”).'
         },
         30: {
           step: 30, march: oracleStair, doneKey: 'order_oracle_horizon_completed',
@@ -6812,15 +6822,15 @@
           walkingDesc: 'Hermes is going down the inner stair of Tower II.',
           etaLabel: 'AT THE DOOR',
           arrivedTitle: "The Inner Chamber · Station 19 Awaits",
-          arrivedDesc: "Hermes is at the door of the Oracle, at the bottom of the inner stair. Open the Grand Desert Map and speak the sigil of the Oracle (Station 19 · Sheet 18A)."
+          arrivedDesc: "Hermes is at the door of the Oracle, at the bottom of the inner stair. Open the Grand Desert Map and speak the sigil of the Oracle (Station 19, the page “The Oracle's Horizon”)."
         },
         34: {
           step: 34, march: masksMarch, doneKey: 'order_masks_gate_completed',
           walkingTitle: '✦ East Across the Plateau · To the Third Tower ✦',
-          walkingDesc: 'Hermes and Aurelia are walking east after the raiders\' ruts. Read Sheet 19A in a mirror, and keep Sheet 19B close.',
+          walkingDesc: 'Hermes and Aurelia are walking east after the raiders\' ruts. Read the page “The Unsent Letter” in a mirror, and keep the page “The Gate of a Thousand Masks” close.',
           etaLabel: 'ARRIVAL AT TOWER III',
           arrivedTitle: 'Tower III · The Gate of a Thousand Masks · Station 20 Awaits',
-          arrivedDesc: 'Hermes and Aurelia are at the gate of Tower III. Open Path III on the Quest Map and speak the word of the gate (Station 20 · Sheet 19B).'
+          arrivedDesc: 'Hermes and Aurelia are at the gate of Tower III. Open Path III on the Quest Map and speak the word of the gate (Station 20, the page “The Gate of a Thousand Masks”).'
         }
       };
       const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair, 33: masksMarch };
@@ -7462,7 +7472,7 @@
         const holdForDoor = (node, title, room, step) => {
           const door = roomDoor(node);
           if (!door.wait && !door.face) return false;
-          showWaypointBar(title, 'Next: ' + room + '. ' + (door.wait ? 'Its door opens in ' + door.wait + '.' : 'Its door opens with the seal on Sheet ' + door.face + '.'), step);
+          showWaypointBar(title, 'Next: ' + room + '. ' + (door.wait ? 'Its door opens in ' + door.wait + '.' : 'Its door opens with the seal printed on ' + (window.EclipseSheetSeals && window.EclipseSheetSeals.page ? window.EclipseSheetSeals.page(node) : 'its page in your journal') + '.'), step);
           if (window.__wireDoorTimer) clearInterval(window.__wireDoorTimer);
           window.__wireDoorTimer = setInterval(() => {
             const d = roomDoor(node);
@@ -7479,7 +7489,7 @@
         }
         if (wireCurrentStep === 38) {
           if (localStorage.getItem('order_camera_obscura_completed') !== 'true') {
-            showWaypointBar('The Camera Obscura · Station 21 Awaits', 'Open Path III on the Quest Map and help Hermes read the city on the wall. Keep Sheet 20A close.', 38);
+            showWaypointBar('The Camera Obscura · Station 21 Awaits', 'Open Path III on the Quest Map and help Hermes read the city on the wall. Keep the page “The Camera Obscura” close.', 38);
             return;
           }
           advanceTo(39);   // Station 21 solved: the narrow house, the warm ashes and Fragment II
@@ -7490,7 +7500,7 @@
         }
         if (wireCurrentStep === 42) {
           if (localStorage.getItem('order_whispering_gallery_completed') !== 'true') {
-            showWaypointBar('The Whispering Gallery · Station 22 Awaits', 'Open Path III on the Quest Map and stand with Hermes in the gallery. Keep Sheet 20B and a ruler close.', 42);
+            showWaypointBar('The Whispering Gallery · Station 22 Awaits', 'Open Path III on the Quest Map and stand with Hermes in the gallery. Keep the page “The Whispering Gallery” and a ruler close.', 42);
             return;
           }
           advanceTo(43);   // Station 22 solved: the words of the Ashes, the mirrored tune and Fragment III
@@ -7571,7 +7581,7 @@
             const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
             const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
             if (titleEl) titleEl.textContent = 'Al-Qibla Bearing Locked · The Four Wells Await';
-            if (descEl) descEl.textContent = 'Open the Grand Desert Map and help Hermes at the Four Wells of Camp VIII (Station 13 · Sheet 12B).';
+            if (descEl) descEl.textContent = 'Open the Grand Desert Map and help Hermes at the Four Wells of Camp VIII (Station 13, the page “The Oasis Clepsydra”).';
             try {
               localStorage.setItem('order_field_wire_completed', 'true');
               localStorage.setItem('order_field_wire_step', '6');
@@ -7699,7 +7709,7 @@
             const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
             const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
             if (titleEl) titleEl.textContent = 'Salt Playa Crossed · The Nomad Ruins Await';
-            if (descEl) descEl.textContent = 'Open the Grand Desert Map and help Hermes read the stelae of the Nomad Ruins (Station 12 · Sheet 11A).';
+            if (descEl) descEl.textContent = 'Open the Grand Desert Map and help Hermes read the stelae of the Nomad Ruins (Station 12, the page “The Desert Lexicon & Al-Qibla”).';
             try {
               localStorage.setItem('order_field_wire_completed', 'true');
               localStorage.setItem('order_field_wire_step', '4');
@@ -7739,7 +7749,7 @@
               <span class="tcc-ref">1998 SURVEY NOTES</span>
             </div>
             <p class="tcc-desc">
-              Consult <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="7B" title="Open details for Sheet 7B"><span class="pill-icon">📖</span> Sheet 7B</span> in your physical journal. Enter the stamped heading below to guide Hermes through the dust:
+              Consult <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="7B" title="Open details for the page Field Log: The Desert Frontier"><span class="pill-icon">📖</span> Field Log: The Desert Frontier</span> in your physical journal. Enter the stamped heading below to guide Hermes through the dust:
             </p>
             <div class="tcc-fields-row">
               <div class="tcc-field-group">
@@ -7783,7 +7793,7 @@
             const rawDir = (dirInput ? dirInput.value : '').trim();
 
             if (!rawDeg && !rawDir) {
-              showFeedback('Please enter the degrees and cardinal heading recorded on Sheet 7B.');
+              showFeedback('Please enter the degrees and cardinal heading recorded on the page “Field Log: The Desert Frontier”.');
               return;
             }
 
@@ -7801,7 +7811,7 @@
               handleWireChoiceSelection(currentData.choices[0], 0);
             } else {
               if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();
-              showFeedback('That heading does not align with the trail. Check the stamped copper plate for Watchtower VI on Sheet 7B.');
+              showFeedback('That heading does not align with the trail. Check the stamped copper plate for Watchtower VI on the page “Field Log: The Desert Frontier”.');
             }
           }
 

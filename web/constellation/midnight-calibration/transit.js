@@ -653,7 +653,7 @@
 
     } else {
       let errors = [];
-      if (!isDistValid) errors.push('Cumulative light-year traverse does not match Sheet 6 Side B');
+      if (!isDistValid) errors.push('Cumulative light-year traverse does not match the page “The Midnight Transit”');
       if (!isPolyValid) errors.push('Geometric asterism shape incorrect');
       if (!isAnchorsValid) errors.push('Bipolar stellar anchors misidentified');
 

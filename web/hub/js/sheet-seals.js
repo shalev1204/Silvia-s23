@@ -9,6 +9,9 @@
       'use strict';
       var SEALS = { 41: '9682e2b4', 42: 'a5cfd3a9', 43: null, 44: null, 45: null, 46: null, 47: null, 48: null };
       var FACE = { 41: '20A', 42: '20B', 43: '21B', 44: '22A', 45: '23A', 46: '24A', 47: '25A', 48: '26A' };
+      // The printed title of each face: the player never sees sheet numbers, only titles
+      var TITLE = { 41: 'The Camera Obscura', 42: 'The Whispering Gallery', 43: 'The Automaton Orchestra' };
+      function page(node) { return TITLE[node] ? 'the page “' + TITLE[node] + '”' : 'its page in your journal'; }
 
       function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
       function rooms() { return window.StageMirror ? window.StageMirror.stations : []; }
@@ -56,11 +59,11 @@
         var toast = function (msg) { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); };
         if (!node) { toast('✦ This seal belongs to no door of Tower III ✦'); return; }
         var st = rooms().filter(function (s) { return s.node === node; })[0];
-        toast('✦ The seal of Sheet ' + FACE[node] + ' turns in its lock: ' + (st ? st.room : 'a room of Tower III') + ' ✦');
+        toast('✦ The seal of ' + page(node) + ' turns in its lock: ' + (st ? st.room : 'a room of Tower III') + ' ✦');
         if (typeof window.switchMapPath === 'function' && get('order_oracle_horizon_completed') === 'true') window.switchMapPath('stage', false);
         if (typeof window.selectMapNode === 'function') window.selectMapNode(node, true);
       }
       window.addEventListener('load', fromAddress);
 
-      return { SEALS: SEALS, hash: hash, missing: missing, accept: accept, skip: turn, face: function (node) { return FACE[node] || ''; } };
+      return { SEALS: SEALS, hash: hash, missing: missing, accept: accept, skip: turn, page: page, face: function (node) { return FACE[node] || ''; } };
     })();

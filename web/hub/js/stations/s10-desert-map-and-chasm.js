@@ -90,7 +90,7 @@
         // Then the seal on its sheet (hub/js/sheet-seals.js)
         const face = window.EclipseSheetSeals ? window.EclipseSheetSeals.missing(node) : '';
         if (face && !(typeof window.isAdminTester === 'function' && window.isAdminTester())) {
-          showDesertToast('Station ' + st.station + ' · ' + st.room + ': its door opens with the seal on Sheet ' + face + '. Scan it with your camera.');
+          showDesertToast('Station ' + st.station + ' · ' + st.room + ': its door opens with the seal on ' + window.EclipseSheetSeals.page(node) + '. Scan it with your camera.');
           return;
         }
         const opener = window.STAGE_OPENERS[node];
@@ -265,39 +265,39 @@
           if (window.openDesertLexiconModal) {
             window.openDesertLexiconModal();
           } else {
-            showDesertToast('Station 12: The Desert Lexicon & Al-Qibla · See Sheet 11A of your physical journal.');
+            showDesertToast('Station 12: The Desert Lexicon & Al-Qibla · Open its page in your journal.');
           }
         } else if (targetId === 12) {
           window.selectMapNode(12, true);
           if (window.openOasisClepsydraModal) {
             window.openOasisClepsydraModal();
           } else {
-            showDesertToast('Station 13: The Oasis Clepsydra · See Sheet 12B of your physical journal.');
+            showDesertToast('Station 13: The Oasis Clepsydra · Open its page in your journal.');
           }
         } else if (targetId === 23) {
           window.selectMapNode(23, true);
           if (window.openSunMonolithModal) window.openSunMonolithModal();
-          else showDesertToast('Station 14: The Sun Monolith · See Sheet 13B of your physical journal.');
+          else showDesertToast('Station 14: The Sun Monolith · Open the page “The Sun Monolith & Cairn II” of your journal.');
         } else if (targetId === 24) {
           window.selectMapNode(24, true);
           if (window.openLabyrinthModal) window.openLabyrinthModal();
-          else showDesertToast('Station 15: The Sandstone Labyrinth · See Sheet 14B of your physical journal.');
+          else showDesertToast('Station 15: The Sandstone Labyrinth · Open the page “The Sandstone Labyrinth & Cairn III” of your journal.');
         } else if (targetId === 25) {
           window.selectMapNode(25, true);
           if (window.openCairnFourModal) window.openCairnFourModal();
-          else showDesertToast('Station 16: Cairn IV, Sentry of the Canyon · See Sheet 15A of your physical journal.');
+          else showDesertToast('Station 16: Cairn IV, Sentry of the Canyon · Open its page in your journal.');
         } else if (targetId === 26) {
           window.selectMapNode(26, true);
           if (window.openSolsticeModal) window.openSolsticeModal();
-          else showDesertToast('Station 17: The Arch of the Solstice · See Sheet 16B of your physical journal.');
+          else showDesertToast('Station 17: The Arch of the Solstice · Open the page “Arch of the Solstice & The Solar Altar” of your journal.');
         } else if (targetId === 13) {
           window.selectMapNode(13, true);
           if (window.openSteleModal) window.openSteleModal();
-          else showDesertToast('Station 18: The Polybius Stele (Tower II atrium) · See Sheet 17A of your physical journal.');
+          else showDesertToast('Station 18: The Polybius Stele (Tower II atrium) · Open its page in your journal.');
         } else if (targetId === 14) {
           window.selectMapNode(14, true);
           if (window.openOracleModal) window.openOracleModal();
-          else showDesertToast('Station 19: Tower II · The Sandstone Sanctuary of the Desert Oracle · Sheet 18A of your journal.');
+          else showDesertToast('Station 19: Tower II · The Sandstone Sanctuary of the Desert Oracle · Open the page “The Oracle\'s Horizon” of your journal.');
         }
       }
       window.selectDesertStation = selectDesertStation;

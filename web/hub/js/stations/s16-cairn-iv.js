@@ -84,8 +84,8 @@
         id: 's16-sigil', station: 'Station 16', title: 'the sigil of the seven echoes', group: 'desert',
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
-          'Every echo in the log of Sheet 15A gives one letter. Its pillar tells you which cliff to look at, and its beats tell you how far.',
-          'I wrote down how an echo becomes a letter. It is in Ask Hermes: "How do I turn the echoes of Sheet 15A into letters?"',
+          'Every echo in the log on the page “Cairn IV: Sentry of the Canyon” gives one letter. Its pillar tells you which cliff to look at, and its beats tell you how far.',
+          'I wrote down how an echo becomes a letter. It is in Ask Hermes, under the question about turning the echoes into letters.',
           'Let us take the first echo of the log together: the Right pillar, 8 beats. Right pillar, right cliff. Each beat is 5 paces, so 8 beats are 40 paces. On the right cliff, at the ring of 40 paces, the carved letter is R. Now the second echo, the same way.'
         ]
       });
@@ -439,12 +439,12 @@
       function speakSigil() {
         if (isAwake()) return;
         const typed = (el.keyInput ? el.keyInput.value : '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
-        if (!typed) { feedback(el.keyFeedback, 'Type the seven letters from Sheet 15A.', 'error'); return; }
+        if (!typed) { feedback(el.keyFeedback, 'Type the seven letters from the page “Cairn IV: Sentry of the Canyon”.', 'error'); return; }
         if (typed !== SIGIL) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The pillars stay mute. Count the seven echoes of Sheet 15A again.', 'error');
+          feedback(el.keyFeedback, 'The pillars stay mute. Count the seven echoes on the page “Cairn IV: Sentry of the Canyon” again.', 'error');
           sigilHints.fail();
           return;
         }
@@ -562,7 +562,7 @@
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am at the southern mouth of the gorge. Two hollow pillars, taller than three men, and the wind already hums inside them. The bronze plate between them asks for the sigil of the seven echoes: Sheet 15A.");
+        else if (!isAwake()) say("Silvia, I am at the southern mouth of the gorge. Two hollow pillars, taller than three men, and the wind already hums inside them. The bronze plate between them asks for the sigil of the seven echoes, the ones on the page “Cairn IV: Sentry of the Canyon” of your journal.");
         else say("The pillars are still singing. Let the wind play, count the echoes, and sing the verse back.");
         render();
         const focusTarget = isDone() ? el.finish : isAwake() ? el.play : el.keyInput;

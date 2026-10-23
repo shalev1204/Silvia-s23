@@ -239,7 +239,7 @@
         });
 
         if (gearStatus) {
-          gearStatus.innerText = 'MISALIGNED TEETH · CHECK SHEET 5 CIRCLES';
+          gearStatus.innerText = 'MISALIGNED TEETH · CHECK THE CIRCLES IN YOUR JOURNAL';
           gearStatus.style.color = '#fc8181';
         }
       }

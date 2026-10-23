@@ -99,8 +99,8 @@
         id: 's14-sigil', station: 'Station 14', title: 'the sigil of the seven noons', group: 'desert',
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
-          'Each of the seven noons of Sheet 13B gives one letter. You only know the shadow of my staff: the shadow of the Monolith is the one the dial needs.',
-          'I wrote down how my staff and the Monolith share the sun. It is in Ask Hermes: "How do I read the shadows of Sheet 13B?"',
+          'Each of the seven noons on the page “The Sun Monolith & Cairn II” gives one letter. You only know the shadow of my staff: the shadow of the Monolith is the one the dial needs.',
+          'I wrote down how my staff and the Monolith share the sun. It is in Ask Hermes, under the question about reading the shadows of the Monolith.',
           'Let us do the first noon together. My staff\'s shadow at Noon I is 1.5 paces. The Monolith is twelve times taller than my staff, so its shadow is 12 × 1.5 = 18 paces. On the dial, the ring of 18 paces carries S. Now Noon II, the same way.'
         ]
       });
@@ -249,12 +249,12 @@
       function speakSigil() {
         if (isAwake()) return;
         const typed = (el.keyInput ? el.keyInput.value : '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
-        if (!typed) { feedback(el.keyFeedback, 'Type the seven letters from Sheet 13B.', 'error'); return; }
+        if (!typed) { feedback(el.keyFeedback, 'Type the seven letters from the page “The Sun Monolith & Cairn II”.', 'error'); return; }
         if (typed !== SIGIL) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The Monolith stays silent. Check the seven noons on Sheet 13B.', 'error');
+          feedback(el.keyFeedback, 'The Monolith stays silent. Check the seven noons on the page “The Sun Monolith & Cairn II”.', 'error');
           sigilHints.fail();
           return;
         }
@@ -382,7 +382,7 @@
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I made it to the Ridge of the Sun. The Monolith is taller than I imagined, and Cairn II sits at its feet like a sundial waiting for its hour. The stone tablet asks for the sigil of Sheet 13B.");
+        else if (!isAwake()) say("Silvia, I made it to the Ridge of the Sun. The Monolith is taller than I imagined, and Cairn II sits at its feet like a sundial waiting for its hour. The stone tablet asks for the sigil of the page “The Sun Monolith & Cairn II” in your journal.");
         else say("The rings are still glowing. Move the sun, Silvia, and let the shadow touch the marks the inscription names, in order.");
         render();
         const focusTarget = isDone() ? el.finish : isAwake() ? el.slider : el.keyInput;

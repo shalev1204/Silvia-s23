@@ -280,7 +280,7 @@
         id: 's13-wells', station: 'Station 13', title: 'the four wells', group: 'desert',
         anchor: btnEngage, solved: () => localStorage.getItem('order_oasis_clepsydra_completed') === 'true',
         texts: [
-          'Do not start with the hours, Silvia. Two clues on Sheet 12B name a seeker and their relic outright: begin with those, and mark them in the matrix.',
+          'Do not start with the hours, Silvia. Two clues on the page “The Oasis Clepsydra” name a seeker and their relic outright: begin with those, and mark them in the matrix.',
           'Each seeker has exactly one well, one relic and one hour, and no two share any of them. A ✓ in the matrix means ✕ in every other box of its row and column, in that group. Earlier and later compare the hours: III, then VI, then IX, then XII. The key is the four arrival hours added together, in Roman numerals.',
           'Let us take clue IV together. The Astronomer carried the Gold Scarab and reached the Well of the Serpent: two ✓ in the Astronomer\'s row, and ✕ for everyone else under the Gold Scarab and the Serpent. They arrived at Hour IX or later, so cross out III and VI in their row. Now clue V, the same way.'
         ]
@@ -321,7 +321,7 @@
             setTimeout(() => keyInput.classList.remove('decoy-hit'), 800);
           }
           if (dispatchText) {
-            dispatchText.textContent = `"The hydraulic counterweights resist! The key is the sum of the four arrival hours from Sheet 12B, written in Roman numerals."`;
+            dispatchText.textContent = `"The hydraulic counterweights resist! The key is the sum of the four arrival hours on the page “The Oasis Clepsydra”, written in Roman numerals."`;
           }
           clepsydraHints.fail();
           return false;
@@ -349,7 +349,7 @@
             setTimeout(() => btnEngage.classList.remove('decoy-hit'), 800);
           }
           if (dispatchText) {
-            dispatchText.textContent = `"The subterranean siphons rattle! ${mismatchCount} seeker(s) are not aligned with their true well, relic, or shadow-hour according to Sheet 12B. Verify your deductions in the matrix!"`;
+            dispatchText.textContent = `"The subterranean siphons rattle! ${mismatchCount} seeker(s) are not aligned with their true well, relic, or shadow-hour according to the page “The Oasis Clepsydra”. Verify your deductions in the matrix!"`;
           }
           clepsydraHints.fail();
           return false;
@@ -479,7 +479,7 @@
           // Hermes walks on to the gates of Tower II (Sheet 13A); the scene plays on the wire, then the road to Station 14
           if (typeof window.selectMapNode === 'function') window.selectMapNode(23, true);
           if (typeof window.showDesertToast === 'function') {
-            window.showDesertToast('✦ TOWER II ✦ Hermes is walking to the gates of the Sandstone Sanctuary. Open the Cliffside Workshop to hear what he finds there (Sheet 13A).');
+            window.showDesertToast('✦ TOWER II ✦ Hermes is walking to the gates of the Sandstone Sanctuary. Open the Cliffside Workshop to hear what he finds there, then the page “At the Gates of Tower II” of your journal.');
           }
         });
       }

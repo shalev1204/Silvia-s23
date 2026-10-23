@@ -137,8 +137,8 @@
         id: 's18-proverb', station: 'Station 18', title: 'the proverb of the stele', group: 'desert',
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
-          'Every pair of numbers in the six stanzas of Sheet 17A points to one square of the grid above them. One square, one letter.',
-          'I wrote down how to read the stanzas, and how the mirage turns some of them round. It is in Ask Hermes: "How do I read the stanzas of Sheet 17A?"',
+          'Every pair of numbers in the six stanzas on the page “The Polybius Stele” points to one square of the grid above them. One square, one letter.',
+          'I wrote down how to read the stanzas, and how the mirage turns some of them round. It is in Ask Hermes: "How do I read the stanzas of the page “The Polybius Stele”?"',
           'Let us read the first letter together. Stanza I is a solar stanza, so its first pair, (IV, IV), means row IV, then column IV: that square holds S. Go on along stanza I, and when you reach stanza II, remember that its first number is the column.'
         ]
       });
@@ -146,8 +146,8 @@
         id: 's18-knocks', station: 'Station 18', title: 'the knocks in the stone', group: 'desert',
         anchor: el.knockFeedback, solved: fireOpen, active: isAwake, legacyKey: KEYS.knockHint,
         texts: [
-          'Count every group of knocks; the chalk on the floor keeps the count for you. Two groups make one letter, in the same grid as the stanzas of Sheet 17A.',
-          'I copied the Law of Sheet 17A beside the stone, and my longer note is in Ask Hermes: "How do I read the Servant\'s knocks?"',
+          'Count every group of knocks; the chalk on the floor keeps the count for you. Two groups make one letter, in the same grid as the stanzas on the page “The Polybius Stele”.',
+          'I copied the Law from the page “The Polybius Stele” beside the stone, and my longer note is in Ask Hermes: "How do I read the Servant\'s knocks?"',
           'Let us read his first letter together. In stanza I he knocked five, then three. Stanza I is solar: row V, column III, and that square holds W. Read the next two letters the same way. When the stanza is yours, it is stanza II, lunar: knock the column first.'
         ]
       });
@@ -550,7 +550,7 @@
       }
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = "The stele turned for the proverb of Sheet 17A and showed its back: 348° north-north-west, the bearing of Cairn III. Under the floor, the Servant answered in the founders' grid, and Silvia answered him back. Then Hermes crossed the burning atrium on the ash and lifted the hatch of the well: the Servant is alive, and so are the Oracle's charts.";
+          el.victoryText.textContent = "The stele turned for the proverb on the page “The Polybius Stele” and showed its back: 348° north-north-west, the bearing of Cairn III. Under the floor, the Servant answered in the founders' grid, and Silvia answered him back. Then Hermes crossed the burning atrium on the ash and lifted the hatch of the well: the Servant is alive, and so are the Oracle's charts.";
         }
         if (el.keyInput) { el.keyInput.value = PROVERB; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
@@ -560,12 +560,12 @@
       function speakProverb() {
         if (isAwake()) return;
         const typed = letters(el.keyInput && el.keyInput.value);
-        if (!typed) { feedback(el.keyFeedback, 'Type the six words of the proverb from Sheet 17A.', 'error'); return; }
+        if (!typed) { feedback(el.keyFeedback, 'Type the six words of the proverb from the page “The Polybius Stele”.', 'error'); return; }
         if (typed !== PROVERB_LETTERS) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
           if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The stele does not move. Read the six stanzas of Sheet 17A again, and mind the mirage.', 'error');
+          feedback(el.keyFeedback, 'The stele does not move. Read the six stanzas on the page “The Polybius Stele” again, and mind the mirage.', 'error');
           proverbHints.fail();
           return;
         }
@@ -574,7 +574,7 @@
         if (el.keyInput) { el.keyInput.value = PROVERB; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'STARS GUIDE THOSE WHO SEEK TRUTH. The stele turns on its base. On its back: 348° NNW.', 'ok');
-        say("I said it aloud, every word, and the stele turned on its base, Silvia, stone grinding on stone. On its back, cut deep: 348°, north-north-west. The bearing of Cairn III. And then, under my feet... knocking. Someone is knocking on the underside of the floor. Groups of knocks, and pauses. He heard the proverb, and he is answering in the grid of the stele. Listen, and read him on Sheet 17A.");
+        say("I said it aloud, every word, and the stele turned on its base, Silvia, stone grinding on stone. On its back, cut deep: 348°, north-north-west. The bearing of Cairn III. And then, under my feet... knocking. Someone is knocking on the underside of the floor. Groups of knocks, and pauses. He heard the proverb, and he is answering in the grid of the stele. Listen, and read him with the page “The Polybius Stele”.");
         render();
         setTimeout(() => { if (modal.style.display !== 'none' && knocksDone() === 0) listen(); }, 1800);
       }
@@ -610,7 +610,7 @@
         if (el.hint) {
           let hint = '';
           if (!done && open && get(KEYS.fireHint) === 'true') hint = '✦ Hermes reads the fire: every flagstone that has not caught yet shows in how many turns it will.';
-          else if (!done && awake && !open && get(KEYS.knockHint) === 'true') hint = '✦ Hermes copied the Law of Sheet 17A: stanzas I and III are knocked row first, then column; stanzas II and IV column first, then row. Each letter is two groups.';
+          else if (!done && awake && !open && get(KEYS.knockHint) === 'true') hint = '✦ Hermes copied the Law from the page “The Polybius Stele”: stanzas I and III are knocked row first, then column; stanzas II and IV column first, then row. Each letter is two groups.';
           el.hint.style.display = hint ? '' : 'none';
           el.hint.textContent = hint;
         }
@@ -686,8 +686,8 @@
         if (fireOpen() && !run) run = newRun();
         drawFloor();
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am inside. I came in by a side door the raiders never found: they are out by the wagons, waiting for the fire to do their work for them. The library of the atrium is burning, the roof is full of smoke, and in the middle of it all the stele stands untouched. The Servant is nowhere. Sheet 17A, please: what does the stele say?");
-        else if (!fireOpen()) say("He is still under the floor, Silvia, waiting for us. Listen to him again whenever you need to, and read him on Sheet 17A.");
+        else if (!isAwake()) say("Silvia, I am inside. I came in by a side door the raiders never found: they are out by the wagons, waiting for the fire to do their work for them. The library of the atrium is burning, the roof is full of smoke, and in the middle of it all the stele stands untouched. The Servant is nowhere. Open the page “The Polybius Stele”, please: what does the stele say?");
+        else if (!fireOpen()) say("He is still under the floor, Silvia, waiting for us. Listen to him again whenever you need to, and read him with the page “The Polybius Stele”.");
         else say("The fire is still spreading. The hatch of the well is in the far corner. Guide me, one flagstone at a time.");
         renderTape(el.tape, heard, false);
         renderTape(el.replyTape, reply, replyOpen);
