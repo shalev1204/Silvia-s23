@@ -82,6 +82,46 @@
     .chasm3d-laws ol { margin: 8px 0 6px 18px; padding: 0; line-height: 1.45; }
     .chasm3d-laws p { margin: 0; line-height: 1.45; }
 
+    /* How to play: the button by the clock, and three short pages over the window */
+    .chasm3d-help {
+      pointer-events: auto; width: 44px; height: 44px; margin: -8px -6px -8px 0; border-radius: 50%;
+      border: 1.5px solid #fde68a; background: rgba(60, 36, 16, 0.9); color: #fde68a;
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+    }
+    .chasm3d-help:hover { background: rgba(110, 66, 24, 0.95); }
+    .chasm3d-help:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+    .chasm3d-howto {
+      position: absolute; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center;
+      padding: 16px; background: rgba(10, 6, 3, 0.78); overflow-y: auto;
+    }
+    .chasm3d-howto[hidden] { display: none; }
+    .chasm3d-howto-card {
+      width: min(100%, 600px); margin: auto; padding: 20px 22px 16px; border-radius: 14px;
+      border: 1.5px solid rgba(212, 168, 83, 0.75); background: #1c140c; box-shadow: 0 18px 48px rgba(0, 0, 0, 0.8);
+      color: #f3e2b8; font-family: 'EB Garamond', Georgia, serif; font-size: 1.08rem; line-height: 1.5;
+    }
+    .chasm3d-howto-count { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.08em; color: #d4a853; }
+    .chasm3d-howto-card h3 { margin: 4px 0 10px; font-family: 'Cinzel', serif; font-size: 1.25rem; color: #fde68a; }
+    .chasm3d-howto-card p { margin: 0 0 10px; }
+    .chasm3d-howto-card strong { color: #fde68a; }
+    .chasm3d-howto-keys { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .chasm3d-howto-keys li { display: grid; grid-template-columns: 112px 1fr; gap: 12px; align-items: center; }
+    .chasm3d-howto-pic {
+      display: flex; gap: 5px; align-items: center; justify-content: center; min-height: 44px;
+      padding: 4px 6px; border-radius: 10px; background: rgba(16, 9, 5, 0.75);
+    }
+    .chasm3d-howto-pic .chasm3d-rune { width: 26px; height: 32px; }
+    .chasm3d-howto-rose { width: 44px; height: 44px; }
+    .chasm3d-howto-radio { font-size: 1.5rem; }
+    .chasm3d-howto-steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+    .chasm3d-howto-nav { display: flex; gap: 8px; margin-top: 16px; }
+    .chasm3d-howto-next { border-color: #fde68a; background: rgba(120, 72, 20, 0.9); }
+    .chasm3d-howto-skip {
+      display: block; margin: 10px auto 0; min-height: 44px; padding: 6px 12px; border: 0; background: none; cursor: pointer;
+      color: #e0c896; font-family: 'EB Garamond', Georgia, serif; font-size: 0.98rem; text-decoration: underline;
+    }
+    .chasm3d-howto-skip:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+
     @media (max-width: 980px) {
       .chasm3d-body { grid-template-columns: 1fr; }
       .chasm3d-stage { height: 52vh; min-height: 280px; }
@@ -91,6 +131,13 @@
       .chasm3d-rune { width: 26px; height: 32px; font-size: 0.95rem; }
       .chasm3d-rose { width: 60px; height: 60px; }
       .chasm3d-subtitle { bottom: 54px; font-size: 0.9rem; }
+      .chasm3d-howto { padding: 8px; align-items: flex-start; }
+      .chasm3d-howto-card { padding: 16px 14px 12px; font-size: 1rem; }
+      .chasm3d-howto-keys li { grid-template-columns: 80px 1fr; gap: 10px; }
+      .chasm3d-howto-pic { padding: 4px; gap: 3px; }
+      .chasm3d-howto-pic .chasm3d-rune { width: 20px; height: 26px; }
+      .chasm3d-howto .chasm3d-howto-rose { width: 40px; height: 40px; }
+      .chasm3d-howto-pic .chasm3d-clock { font-size: 0.78rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       .chasm3d-rose, .chasm3d-subtitle, .chasm3d-fade { transition: none; }

@@ -1885,7 +1885,7 @@ A11Y_SEED = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_ho
              "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 30), "order_masks_march_start": "1",
              "order_masks_march_bypassed": "true", "order_masks_gate_completed": "true", "order_stage_pause_skipped_41": "true",
              "order_sheet_seal_41": "true", "order_camera_obscura_completed": "true", "order_stage_pause_skipped_42": "true",
-             "order_sheet_seal_42": "true"}
+             "order_sheet_seal_42": "true", "order_chasm_howto": "seen"}   # How to play has its own checks in section 31
 A11Y_FOCUSABLE = ('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),'
                   'textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')
 # The controls in a part of the page: what the mouse can click but the keyboard cannot reach, and every control
@@ -2629,6 +2629,27 @@ def test_whispering_chasm(browser):
     check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none" and s["phase"] == "choose"
           and s["pos"] == [1, 0] and "North Portal" in voice() and "Sheet 9B" in voice(),
           "the canyon opens at the North Portal, Hermes asks her to keep Sheet 9B in front of her", f"{s['phase']} {s['pos']}")
+    howto_on = lambda: js("!document.getElementById('chasm3d-howto').hidden")
+    pages = []
+    if howto_on():
+        pages.append(js("document.getElementById('chasm3d-howto-count').innerText"))
+        for _ in range(2):
+            js("document.getElementById('btn-howto-next').click()")
+            pages.append(js("document.getElementById('chasm3d-howto-count').innerText"))
+    check(pages == ["1 of 3", "2 of 3", "3 of 3"] and js("document.activeElement.id") == "btn-howto-next"
+          and js("document.getElementById('btn-howto-next').innerText") == "Start walking",
+          "the first time, How to play opens on top: three short pages, ending in Start walking", str(pages))
+    dim = low_contrast(page, "#chasm3d-howto")
+    check(not dim, "How to play: text contrast is at least WCAG AA", "; ".join(dim[:4]))
+    page.keyboard.press("ArrowLeft")
+    page.keyboard.press("Escape"); page.wait_for_timeout(500)
+    check(not howto_on() and js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none"
+          and st()["pos"] == [1, 0] and get("order_chasm_howto") == "seen",
+          "Escape closes only How to play (the arrows did not walk Hermes), and it is remembered")
+    js("document.getElementById('btn-chasm-howto').click()")
+    check(howto_on() and js("document.getElementById('chasm3d-howto-count').innerText") == "1 of 3", "the ? by the clock opens How to play again")
+    js("document.getElementById('btn-howto-skip').click()")
+    check(not howto_on(), "Skip closes it")
     gl = s["gl"]
     if gl:
         js("window.__chasm.frames(4)")

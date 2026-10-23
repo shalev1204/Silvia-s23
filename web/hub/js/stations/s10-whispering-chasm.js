@@ -23,6 +23,7 @@
       const soundOn = () => !(window.EclipseAmbience && window.EclipseAmbience.state().muted);
       const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const WALK_KEY = 'order_chasm_walk';
+      const HOWTO_KEY = 'order_chasm_howto';   // 'seen' once she has read (or skipped) How to play
 
       // ---- The canyon of Sheet 9B (25 × 25; 1 = rock). Generated with the printed sheet by
       // scripts/journal/build_desert_games.py (render_game_d1): it must stay identical to the paper.
@@ -1587,17 +1588,60 @@
         // The first picture is drawn now (shaders, textures, shadows), so that slow first frame comes before the window fades in
         if (building && G) tick(performance.now(), 1 / 60);
         if (!raf) raf = requestAnimationFrame(frame);
-        // The first live control; at the way out (or while he rests) the victory card or the close button.
-        // Focused at once: the first 3D frame can hold the page long enough for a timer to come too late.
+        if (get(HOWTO_KEY) !== 'seen' && !isDone()) showHowto(0);
+        else focusFirst();
+      }
+      // The first live control; at the way out (or while he rests) the victory card or the close button.
+      // Focused at once: the first 3D frame can hold the page long enough for a timer to come too late.
+      function focusFirst() {
         const first = [...el.controls.querySelectorAll('button:not([disabled])'), ...(el.victory ? el.victory.querySelectorAll('button') : []), el.close]
           .find((x) => x && x.offsetParent);
         if (first) first.focus({ preventScroll: true });
+      }
+
+      // ---- How to play: three short pages, the first time she opens the canyon and whenever she presses ? ----
+      const howto = { box: $('chasm3d-howto'), page: 0, back: null };
+      const howtoPages = howto.box ? [...howto.box.querySelectorAll('.chasm3d-howto-page')] : [];
+      const howtoOpen = () => !!howto.box && !howto.box.hidden;
+      function showHowto(page) {
+        if (!howto.box) return;
+        if (!howtoOpen()) howto.back = document.activeElement;
+        howto.page = Math.max(0, Math.min(howtoPages.length - 1, page));
+        howtoPages.forEach((p, i) => { p.hidden = i !== howto.page; });
+        $('chasm3d-howto-count').textContent = `${howto.page + 1} of ${howtoPages.length}`;
+        $('btn-howto-back').disabled = howto.page === 0;
+        $('btn-howto-next').textContent = howto.page === howtoPages.length - 1 ? 'Start walking' : 'Next →';
+        howto.box.hidden = false;
+        $('btn-howto-next').focus({ preventScroll: true });
+      }
+      function hideHowto() {
+        if (!howtoOpen()) return;
+        howto.box.hidden = true;
+        put(HOWTO_KEY, 'seen');
+        const back = howto.back;
+        howto.back = null;
+        if (back && back.id !== 'btn-chasm-howto' && document.contains(back) && back.offsetParent) back.focus({ preventScroll: true });
+        else focusFirst();
+      }
+      if (howto.box) {
+        $('btn-howto-next').addEventListener('click', () => (howto.page === howtoPages.length - 1 ? hideHowto() : showHowto(howto.page + 1)));
+        $('btn-howto-back').addEventListener('click', () => showHowto(howto.page - 1));
+        $('btn-howto-skip').addEventListener('click', hideHowto);
+        $('btn-chasm-howto').addEventListener('click', () => showHowto(0));
+        // While it is open, keys belong to it: Escape closes only these pages, and the arrows do not walk Hermes.
+        // Caught before the page's own listeners (the Hub's Escape would otherwise close the whole canyon).
+        window.addEventListener('keydown', (e) => {
+          if (!howtoOpen() || modal.style.display === 'none' || e.key === 'Tab') return;
+          e.stopPropagation();
+          if (e.key === 'Escape') hideHowto();
+        }, true);
       }
       function closeChasm() {
         if (modal.style.display === 'none') return;
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (view.walk) finishWalk();
         clearTimeout(rest.t);
+        if (howto.box) howto.box.hidden = true;
         modal.classList.add('closing');
         setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
         if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();

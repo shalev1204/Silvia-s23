@@ -2200,6 +2200,7 @@
             <div class="chasm3d-status">
               <div class="chasm3d-skins" id="chasm3d-skins" role="img" aria-label="Water: 3 of 3 skins"></div>
               <div class="chasm3d-clock" id="chasm3d-clock">☀ 06:10</div>
+              <button type="button" class="chasm3d-help" id="btn-chasm-howto" aria-label="How to play: what everything on the screen means">?</button>
             </div>
           </div>
           <div class="chasm3d-subtitle" id="chasm3d-subtitle" role="status" aria-live="polite"></div>
@@ -2229,6 +2230,52 @@
             </ol>
             <p>Each wrong turn sends Hermes back to the last cairn and costs a skin of water. Each new cairn fills his skins again. At every fork you may listen once for the whisper of the pilgrims, until the next cairn.</p>
           </details>
+        </div>
+      </div>
+
+      <!-- How to play: three short pages, shown the first time and whenever she presses ? -->
+      <div class="chasm3d-howto" id="chasm3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="chasm3d-howto-count">1 of 3</div>
+
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes is inside the Whispering Chasm, a maze of red rock. He can only see the walls around him. <strong>You have the map</strong>: it is Sheet 9B of your journal.</p>
+            <p>Guide him through the canyon to the way out. On the way, find the <strong>six relic cairns, in order</strong>. Each relic has a letter carved into it, and the six letters spell the Nomad's Passphrase for Sheet 9B.</p>
+          </section>
+
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>What you see on the screen</h3>
+            <ul class="chasm3d-howto-keys">
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-rune"></span><span class="chasm3d-rune"></span><span class="chasm3d-rune"></span></span>
+                <span><strong>Runes.</strong> Six empty boxes. Each letter you find goes into its box.</span></li>
+              <li><span class="chasm3d-howto-pic"><svg viewBox="-50 -50 100 100" class="chasm3d-rose chasm3d-howto-rose" aria-hidden="true"><circle r="44" class="rose-ring"/><path d="M0,-40 L8,-6 L0,-12 L-8,-6 Z" class="rose-north"/><path d="M0,40 L8,6 L0,12 L-8,6 Z" class="rose-south"/><text y="-24" text-anchor="middle" class="rose-n">N</text></svg></span>
+                <span><strong>Compass.</strong> The red point always shows north, the top of Sheet 9B. Under it you read which way Hermes is facing.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-skin"></span><span class="chasm3d-skin"></span><span class="chasm3d-skin"></span></span>
+                <span><strong>Water.</strong> Hermes carries three skins of water. A wrong turn costs one, and he walks back to the last cairn. With none left, he has to rest in the shade for 40 seconds. Each new cairn fills them again.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-clock">☀ 06:10</span></span>
+                <span><strong>Clock.</strong> The time of day in the canyon. It moves on as Hermes walks, and the sun moves with it. There is no time limit.</span></li>
+              <li><span class="chasm3d-howto-pic chasm3d-howto-radio">📻</span>
+                <span><strong>Hermes, on the Field Wire.</strong> What he tells you over the radio. Read it: he describes what he sees.</span></li>
+            </ul>
+          </section>
+
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>How to play</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>When the canyon splits, Hermes stops. <strong>Choose a way</strong>: press a button on the right, tap an arrow on the sand, or use the arrow keys.</li>
+              <li><strong>Follow him on Sheet 9B</strong> with your pencil, so you always know where he is.</li>
+              <li>Not sure? Press <strong>Listen</strong>. A whisper comes from the right way. You can listen once, until the next cairn. Turn the sound on.</li>
+              <li>At a cairn, <strong>turn the relic</strong> until its letter faces you: drag it, or use the arrow buttons. When you can read the letter, it is yours.</li>
+              <li>Open <strong>The Law of the Canyon Walkers</strong>, under the buttons: it tells you which roads are traps.</li>
+            </ol>
+          </section>
+
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-howto-next">Next →</button>
+          </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
