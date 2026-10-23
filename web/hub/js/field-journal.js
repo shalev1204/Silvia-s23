@@ -81,6 +81,11 @@
           note: 'Tower III, the Camera Obscura. A hole in a wall, and the whole city hanging upside down in the dark. Silvia knew which chimney was new.',
           quote: 'A fire like that is not lit by people who want to hide.',
           earned: ['Fragment II of the mirror'], sketch: T + 'camera_obscura_preview.webp'
+        },
+        s22: {
+          note: 'Tower III, the Whispering Gallery. Two pins nobody drew, a string of ten varas, and the Ashes whispering at the far end. Silvia knew where to stand.',
+          quote: 'A mirror gives everything back, but the last thing first.',
+          earned: ['Fragment III of the mirror'], ledger: ['The Line of the Echo'], sketch: T + 'whispering_gallery_preview.webp'
         }
       };
 

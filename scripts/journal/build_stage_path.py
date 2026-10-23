@@ -638,6 +638,174 @@ def render_game_20a_camera_obscura(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
 
 
 # -------------------------------------------------------------------------
+# SHEET 20 · CARA B · THE WHISPERING GALLERY (STATION 22)
+# -------------------------------------------------------------------------
+# The plan of the elliptical hall (scripts/journal/whisper_gallery.py, the same source the Hub uses), drawn to scale
+# with its axes and a scale bar, but WITHOUT its two pins: Silvia finds them with a ruler (half the string, 5 varas,
+# from the top of the short axis down to the long axis: 3, 4, 5). The gardener's construction is shown apart, on a
+# different ellipse that is not to scale.
+
+GALLERY_K = 95   # px per vara on the plan (8.04 mm at 300 dpi); the scale bar is drawn with the same number
+
+INTRO_20B = ("Under the narrow house a second stair goes down to a long hall with no corners. The Order laid it out the way "
+             "Kepler drew the paths of the planets: two pins in the floor, a string of ten varas, and a pencil pulled tight "
+             "around them. A whisper at one pin is heard at the other, clear as a bell. Nowhere else.")
+RULE_20B = ("The pins are gone, but the string never stretched. Find where they stood. The raiders whisper at the east pin: "
+            "stand at the west one, and listen. What you hear must be answered the way a mirror answers.")
+
+
+def _dashed(canvas, p0, p1, gc, seed, dash=18, gap=12, alpha=150):
+    """A light dashed pencil line from p0 to p1."""
+    L = math.hypot(p1[0] - p0[0], p1[1] - p0[1])
+    ux, uy = (p1[0] - p0[0]) / L, (p1[1] - p0[1]) / L
+    s, k = 0.0, 0
+    while s < L:
+        e = min(L, s + dash)
+        _pline(canvas, [(p0[0] + ux * s, p0[1] + uy * s), (p0[0] + ux * e, p0[1] + uy * e)], gc, alpha=alpha, seed=seed + k, passes=1, wob=0.3)
+        s, k = e + gap, k + 1
+
+
+def _draw_gallery_plan(canvas, cx, cy, k, gc, seed):
+    """The plan of the gallery, centre (cx, cy), k px per vara: the double wall with its door, the colonnade and the two
+    axes. No pins. Returns the outer box of the wall (x0, y0, x1, y1)."""
+    from scripts.journal import whisper_gallery
+    g = whisper_gallery.build()
+    a, b = g["a"], g["b"]
+    P = lambda x, y: (cx + x * k, cy - y * k)                     # plan (x east, y north) -> page
+    t_door = math.degrees(math.acos(0.45 / a))                    # the door: 0.9 vara wide in the south wall
+    wall = 0.12                                                   # thickness of the wall, in varas
+    arc = lambda ra, rb: [P(ra * math.cos(math.radians(t)), rb * math.sin(math.radians(t)))
+                          for t in np.linspace(-90 + (90 - t_door), 270 - (90 - t_door), 240)]
+    inner, outer = arc(a, b), arc(a + wall, b + wall)
+    _hatch_polygon(canvas, inner + outer[::-1], step=4, angle=45, gc=gc, alpha=70, seed=seed)
+    _pline(canvas, inner, gc, alpha=225, seed=seed + 1, thick=2)
+    _pline(canvas, outer, gc, alpha=205, seed=seed + 2, thick=2)
+    for end in (0, -1):                                           # the jambs of the door
+        _pline(canvas, [inner[end], outer[end]], gc, alpha=220, seed=seed + 3 + end, thick=2)
+    # the colonnade
+    r = g["column_r"] * k
+    for n, (x, y) in enumerate(g["columns"]):
+        px, py = P(x, y)
+        ring = [(px + r * math.cos(2 * math.pi * i / 28), py + r * math.sin(2 * math.pi * i / 28)) for i in range(29)]
+        _hatch_polygon(canvas, ring, step=4, angle=-45, gc=gc, alpha=80, seed=seed + 10 + n)
+        _pline(canvas, ring, gc, alpha=215, seed=seed + 40 + n, closed=True)
+    # the two axes, wall to wall: light dashes (they carry no mark where the pins stood)
+    _dashed(canvas, P(-a, 0), P(a, 0), gc, seed + 100)
+    _dashed(canvas, P(0, -b), P(0, b), gc, seed + 200)
+    x0, y0 = P(-a - wall, b + wall)
+    x1, y1 = P(a + wall, -b - wall)
+    return (int(x0), int(y0), int(math.ceil(x1)), int(math.ceil(y1)))
+
+
+def _draw_scale_bar(canvas, x0, y, k, varas, gc, seed):
+    """A scale bar of `varas` whole varas at k px per vara, its left end at (x0, y): two rules, every other vara filled."""
+    x1 = x0 + varas * k
+    _pline(canvas, [(x0, y), (x1, y)], gc, alpha=225, seed=seed, wob=0.3)
+    _pline(canvas, [(x0, y + 8), (x1, y + 8)], gc, alpha=225, seed=seed + 1, wob=0.3)
+    for i in range(varas + 1):
+        xi = x0 + i * k
+        _pline(canvas, [(xi, y - 5), (xi, y + 13)], gc, alpha=225, seed=seed + 2 + i, passes=1, wob=0.2)
+        if i < varas and i % 2 == 0:
+            cv2.rectangle(canvas, (int(xi), int(y)), (int(xi + k), int(y + 8)), (*gc, 200), -1)
+    return x1
+
+
+def _draw_gardener_vignette(canvas, cx, cy, a, b, gc, seed):
+    """The gardener's way (not to scale): two pins, a string tied to both, and a pencil pulled tight at the top of the
+    short axis. (cx, cy) is the middle of this little ellipse."""
+    c = math.sqrt(a * a - b * b)
+    _pline(canvas, [(cx + a * math.cos(t), cy + b * math.sin(t)) for t in np.linspace(0, 2 * math.pi, 120)],
+           gc, alpha=185, seed=seed, thick=2)
+    top = (cx, cy - b)
+    for sgn in (-1, +1):
+        fx = cx + sgn * c
+        _pline(canvas, [(fx, cy), top], gc, alpha=200, seed=seed + 2 + sgn)                     # the string, pulled tight
+        loop = [(fx + 9 * math.cos(t), cy + 5 * math.sin(t)) for t in np.linspace(0, 2 * math.pi, 24)]
+        _pline(canvas, loop, gc, alpha=160, seed=seed + 5 + sgn, passes=1)                     # tied round the pin
+        cv2.circle(canvas, (int(fx), int(cy)), 6, (*gc, 235), -1, cv2.LINE_AA)                 # the pin's head
+        _pline(canvas, [(fx, cy), (fx + 4, cy + 16)], gc, alpha=150, seed=seed + 8 + sgn)       # its shadow on the floor
+    # the pencil: tip at the top of the short axis, leaning back toward the hand that pulls it
+    ang = math.radians(-58)                                       # from the vertical, toward the upper right
+    d = (math.sin(-ang), -math.cos(ang))
+    n = (-d[1], d[0])
+    tip, L, w = top, 104, 7
+    cone = (tip[0] + d[0] * 22, tip[1] + d[1] * 22)
+    end = (tip[0] + d[0] * L, tip[1] + d[1] * L)
+    body = [(cone[0] + n[0] * w, cone[1] + n[1] * w), (end[0] + n[0] * w, end[1] + n[1] * w),
+            (end[0] - n[0] * w, end[1] - n[1] * w), (cone[0] - n[0] * w, cone[1] - n[1] * w)]
+    _hatch_polygon(canvas, body, step=4, angle=math.degrees(math.atan2(d[1], d[0])) + 90, gc=gc, alpha=60, seed=seed + 20)
+    _pline(canvas, body, gc, alpha=215, seed=seed + 21, closed=True)
+    _pline(canvas, [body[0], tip, body[3]], gc, alpha=215, seed=seed + 22)
+    _pline(canvas, [(cone[0] + d[0] * 8 + n[0] * w, cone[1] + d[1] * 8 + n[1] * w),
+                    (cone[0] + d[0] * 8 - n[0] * w, cone[1] + d[1] * 8 - n[1] * w)], gc, alpha=150, seed=seed + 23, passes=1)
+    return (int(cx - a - 10), int(min(cy - b, end[1] - w) - 2), int(cx + a + 10), int(cy + b + 16))
+
+
+def render_game_20b_whispering_gallery(gc: tuple = GRAPHITE_COLOR) -> np.ndarray:
+    """Sheet 20 · Cara B (back: X > 1583 empty). Station 22."""
+    from scripts.journal import sheet_seal
+    c = _canvas()
+    X0, W = BACK_X0, TEXT_W
+    PT, LH, K = 36, 50, GALLERY_K
+    _text(c, "The Whispering Gallery", X0, 72, 64, 22001, gc)
+    _divider(c, X0, 162, W, 22003, gc)
+    y = _paragraph(c, INTRO_20B, X0, 210, W, size=PT, lh=LH, seed=22010, gc=gc)
+
+    # the rule, with the gardener's construction beside it (a little ellipse, not the gallery)
+    vig_x = X0 + W - 440
+    rule_top = y + 12
+    rule_end = _paragraph(c, RULE_20B, X0, rule_top, vig_x - 45 - X0, size=PT, lh=LH, seed=22030, gc=gc)
+    vig = _draw_gardener_vignette(c, vig_x + 220, rule_top + 120, 175, 75, gc, 22100)
+    _text(c, "Two pins, one string, one pencil.", vig_x + 220, vig[3] + 34, 30, 22130, gc, anchor="center")
+
+    # the plan, to scale: N above, W and E at the ends of the long axis, the door in the south wall.
+    # It stands a little left of the middle, so its north-east shoulder keeps clear of the construction above it
+    cx = X0 + 600
+    n_top = rule_end + 26
+    cy = n_top + 36 + 42 + int(round((4.0 + 0.12) * K))           # the N, its clear band, then the wall
+    plan = _draw_gallery_plan(c, cx, cy, K, gc, 22200)
+    _text(c, "N", cx, n_top, 36, 22300, gc, anchor="center")
+    _text(c, "W", plan[0] - 44, cy - 24, 36, 22301, gc, anchor="right")
+    _text(c, "E", plan[2] + 44, cy - 24, 36, 22302, gc, anchor="left")
+    _text(c, "10 varas", cx - int(1.3 * K), cy - 46, 30, 22303, gc, anchor="center")
+    _text(c, "8 varas", cx + 46, cy - int(2.0 * K) - 18, 30, 22304, gc, anchor="left")
+    _text(c, "door", cx, plan[3] + 40, 32, 22305, gc, anchor="center")
+    # the scale bar, at the very scale of the plan, under its south-east side
+    bar_x0, bar_y = cx + int(0.9 * K), plan[3] + 42
+    bar_x1 = _draw_scale_bar(c, bar_x0, bar_y, K, 5, gc, 22310)
+    for i in range(6):
+        _text(c, str(i), bar_x0 + i * K, bar_y + 24, 28, 22320 + i, gc, anchor="center")
+    _text(c, "varas", bar_x1 + 20, bar_y + 24, 28, 22330, gc, anchor="left")
+    plan_end = bar_y + 24 + 40
+
+    # Fragment III, the plan of the mirror it belongs to, and the seal of the room (as on Sheet 20A)
+    seal_r = 246
+    plan_h, fscale, gap = 520, 1.3, 55
+    lower_h = 48 + 10 + 2 * seal_r + 42 + 3 * 46 + 12
+    y = CANVAS_HEIGHT_PX - FOOT - 15 - lower_h
+    assert y >= plan_end + 30, "Sheet 20B: the plan runs into the fragment row (%d < %d)" % (y, plan_end + 30)
+    _divider(c, X0, y, W, 22400, gc)
+    y += 48
+    plan_w = _plan_width(plan_h)
+    bx0_, by0_, bx1_, by1_ = shard_bbox(2)
+    frag_w = int((bx1_ - bx0_) * fscale)
+    x_frag = X0 + (W - frag_w - plan_w - 2 * seal_r - 2 * gap) // 2
+    x_plan = x_frag + frag_w + gap
+    x_seal = x_plan + plan_w + gap + seal_r
+    box = draw_fragment(c, 2, x_frag, y + 40, fscale, gc, seed=22500)
+    _text(c, "Fragment III", x_frag, box[3] + 40, 42, 22510, gc)
+    cap = "The third piece of the mirror of Tower III. It is yours when the room opens."
+    _paragraph(c, cap, x_frag, box[3] + 104, frag_w + 10, size=31, lh=44, seed=22520, gc=gc)
+    mplan = _draw_mirror_plan(c, 2, x_plan, y + 10, plan_h, gc, 22600)
+    _text(c, "Its place in the mirror", x_plan + plan_w // 2, mplan[3] + 40, 33, 22640, gc, anchor="center")
+    sy = y + 10 + seal_r
+    sheet_seal.draw_seal(c, x_seal, sy, seal_r, "20B")
+    _paragraph(c, "The seal of this room. Scan it with your camera when the door asks for it.",
+               x_seal - seal_r, sy + seal_r + 42, 2 * seal_r, size=33, lh=46, seed=22700, gc=gc)
+    return _clear_foot(c)
+
+
+# -------------------------------------------------------------------------
 # stand-alone build of the Stage Path sheets
 # -------------------------------------------------------------------------
 
@@ -646,7 +814,8 @@ STAGE_SHEETS = [
      ("Hoja 19 · Cara A (Lore: The Unsent Letter)", render_lore_19a_unsent_letter, "page19_front", False, False),
      ("Hoja 19 · Cara B (Game S1: The Gate of a Thousand Masks · Station 20)", render_game_19b_masks, "page19_back", True, False)),
     (20,
-     ("Hoja 20 · Cara A (Game S2: The Camera Obscura · Station 21)", render_game_20a_camera_obscura, "page20_front", False, False)),
+     ("Hoja 20 · Cara A (Game S2: The Camera Obscura · Station 21)", render_game_20a_camera_obscura, "page20_front", False, False),
+     ("Hoja 20 · Cara B (Game S3: The Whispering Gallery · Station 22)", render_game_20b_whispering_gallery, "page20_back", True, False)),
 ]
 # stem -> ((x0, y0), (x1, y1)): where a face folds (Sheet 24A, idea #8), marked in the print preview (stage_preview.py)
 FOLD_LINES = {}

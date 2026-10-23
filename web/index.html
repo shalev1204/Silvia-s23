@@ -32,6 +32,7 @@
   <script src="./assets/js/desert-map-3d.js"></script>
   <script src="./assets/js/stage-mirror-data.js"></script>
   <script src="./assets/js/camera-city-data.js"></script>
+  <script src="./assets/js/whisper-gallery-data.js"></script>
   <script src="./assets/js/stage-mirror.js"></script>
 
   <!-- Preload Critical Archival Plates (WebP Optimized for Instant Load) -->
@@ -68,6 +69,7 @@
   <link rel="stylesheet" href="./hub/css/stations/s19-oracle-horizon.css">
   <link rel="stylesheet" href="./hub/css/stations/s20-masks-gate.css">
   <link rel="stylesheet" href="./hub/css/stations/s21-camera-obscura.css">
+  <link rel="stylesheet" href="./hub/css/stations/s22-whispering-gallery.css">
   <link rel="stylesheet" href="./hub/css/hint-ladder.css">
   <link rel="stylesheet" href="./hub/css/previously.css">
   <link rel="stylesheet" href="./hub/css/field-journal.css">
@@ -3760,6 +3762,92 @@
     </div>
   </div>
 
+  <!-- Station 22 · The Whispering Gallery (Tower III, Stage Path) -->
+  <div class="monolith-modal-backdrop is-stage-room" id="modal-whispering-gallery" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="gallery-modal-title">
+    <div class="monolith-window">
+      <div class="monolith-header">
+        <div class="monolith-title-wrap">
+          <span class="monolith-title-icon" aria-hidden="true">👂</span>
+          <div>
+            <h2 class="monolith-title" id="gallery-modal-title">THE WHISPERING GALLERY</h2>
+            <div class="monolith-subtitle">Station 22 · Tower III · The Two Pins and the Mirrored Tune · Sheet 20B</div>
+          </div>
+        </div>
+        <button type="button" class="monolith-close-btn" id="btn-close-gallery" aria-label="Close The Whispering Gallery">✕</button>
+      </div>
+
+      <div class="monolith-telemetry">
+        <div>EXPEDITION:<strong>TOWER III // THE GALLERY</strong></div>
+        <div>LISTENING POST:<strong id="gallery-telem-focus">[ SEARCHING ]</strong></div>
+        <div>THE NICHE:<strong id="gallery-telem-niche">[ UNHEARD ]</strong></div>
+        <div>FRAGMENT III:<strong id="gallery-telem-fragment">[ MISSING ]</strong></div>
+      </div>
+
+      <div class="monolith-body">
+        <div class="monolith-panel">
+          <div class="monolith-card">
+            <div class="monolith-card-title">The Plan of the Gallery</div>
+            <div class="gallery-speaker" id="gallery-speaker"></div>
+            <p class="gallery-lead">The raiders whisper at the <strong>east pin</strong>. Find on <strong>Sheet 20B</strong> where the pins stood, move Hermes to the <strong>west</strong> one, and listen there.</p>
+            <p class="gallery-sound" id="gallery-sound"></p>
+            <div class="gallery-hall">
+              <svg class="gallery-plan" id="gallery-plan" viewBox="-560 -430 1120 860" tabindex="0" role="application" aria-roledescription="plan" aria-label="The plan of the gallery. Move Hermes with the arrow keys, half a vara at a time; Enter listens where he stands." aria-describedby="gallery-where"></svg>
+            </div>
+            <div class="gallery-where" id="gallery-where" aria-live="polite"></div>
+            <p class="gallery-heard" id="gallery-heard" aria-live="polite"></p>
+            <div class="gallery-actions">
+              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-gallery-listen">👂 Stand still and listen here</button>
+            </div>
+            <div class="monolith-feedback" id="gallery-focus-feedback" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="monolith-panel">
+          <div class="monolith-card" id="gallery-bells-card" style="display: none;">
+            <div class="monolith-card-title">The Bells of the Niche</div>
+            <p class="gallery-lead">Six bells rang from the east. The raiders played them back note for note, and the niche stayed shut.</p>
+            <div class="gallery-bells" id="gallery-bells" role="group" aria-label="The five bells, from the biggest to the smallest"></div>
+            <div class="gallery-played" id="gallery-played" role="img" aria-label="No bell played yet"></div>
+            <div class="gallery-actions">
+              <button type="button" class="monolith-btn" id="btn-gallery-again">🔔 Hear the tune again</button>
+              <button type="button" class="monolith-btn" id="btn-gallery-restart">↺ Start my answer again</button>
+            </div>
+            <div class="monolith-feedback" id="gallery-echo-feedback" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-card-title">The Gallery</div>
+            <ul class="laby-rules">
+              <li>The Order laid this hall out with two pins in the floor and a string of ten varas. A whisper at one pin is heard at the other, and nowhere else.</li>
+              <li>Sheet 20B shows the gallery, its axes and its scale, but not the pins.</li>
+              <li>Near the right place the whisper starts to come through, from the side where it is clearer.</li>
+              <li>What the gallery says must be answered the way a mirror answers.</li>
+            </ul>
+            <div class="laby-hint" id="gallery-hint" style="display: none;"></div>
+          </div>
+
+          <div class="monolith-card monolith-victory" id="gallery-victory" style="display: none;">
+            <div class="monolith-card-title">✦ The Niche Is Open</div>
+            <p id="gallery-victory-text"></p>
+            <div class="masks-fragment-row">
+              <svg class="masks-fragment" id="gallery-fragment-svg" viewBox="0 0 100 100" role="img" aria-label="Fragment III of the mirror of Tower III, with an arch and the edge of a balcony in it."></svg>
+              <div>
+                <strong class="masks-fragment-name">Fragment III</strong>
+                <span>Three ninths of the mirror of Tower III. Inside the niche's door: [J] × 2 = [T], now in the Cipher Ledger.</span>
+              </div>
+            </div>
+            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-gallery-finish-station">✦ Set Fragment III in the Mirror ➔</button>
+          </div>
+
+          <div class="monolith-card">
+            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE GALLERY</div>
+            <div class="monolith-dispatch" id="gallery-dispatch-text" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- From the desert to the stage (shown once, after the audience with the Oracle) -->
   <div class="stage-passage-overlay" id="stage-passage-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="stage-passage-title">
     <div class="stage-passage-card">
@@ -4147,6 +4235,7 @@
   <script src="./hub/js/stations/s19-oracle-horizon.js"></script>
   <script src="./hub/js/stations/s20-masks-gate.js"></script>
   <script src="./hub/js/stations/s21-camera-obscura.js"></script>
+  <script src="./hub/js/stations/s22-whispering-gallery.js"></script>
   <script src="./hub/js/sandstorm-lockdown.js"></script>
   <script src="./hub/js/previously.js"></script>
   <script src="./hub/js/field-journal.js"></script>

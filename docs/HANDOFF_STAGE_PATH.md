@@ -19,7 +19,7 @@
 
 ## Pendiente inmediato
 
-**Hecho el 22-10-2026**: Estación 21 (The Camera Obscura, Hoja 20A, Fragmento II); detalle en `docs/STAGE_PATH_BIBLE.md` §10. Lo siguiente es la **Estación 22** (The Whispering Gallery, Hoja 20B, Fragmento III + ecuación J = 8; sala de **sonido**: tras ella se cierra la Hoja 20, hoy con el dorso en blanco). Antes de construir, preguntarle al Operador las decisiones de diseño en formato test. Sigue pendiente que el Operador imprima la Hoja 20 para que Silvia escanee el sello de la 20A (Carles abre la sala desde el probador). Generador de la ciudad: `scripts/journal/camera_city.py` (única fuente de la hoja y de la web).
+**Hecho el 23-10-2026**: Estación 22 (The Whispering Gallery, Hoja 20B, Fragmento III, $[J] \times 2 = [T]$; pausa de 6 h); detalle en `docs/STAGE_PATH_BIBLE.md` §10. La Hoja 20 ya está completa (20A + 20B). Lo siguiente es la **Estación 23** (The Automaton Orchestra, Hoja 21B, Fragmento IV; segunda sala de **sonido**: colocar púas en el cilindro; la Hoja 21 lleva además el cuaderno de Aurelia I en la 21A). Antes de construir, preguntarle al Operador las decisiones de diseño en formato test. Sigue pendiente que el Operador imprima la Hoja 20 a doble cara (`Hoja_20_Camera_Obscura_y_Whispering_Gallery.pdf`) para que Silvia escanee los sellos de la 20A y la 20B (Carles abre las salas desde el probador). Generadores: `scripts/journal/camera_city.py` y `scripts/journal/whisper_gallery.py`.
 
 ## Siguiente trabajo (Estaciones 21–28, Hojas 20–26)
 
@@ -28,7 +28,7 @@ Mapa acordado con el Operador (estación → cara de hoja → fragmento):
 | Est. | Nodo | Juego | Cara | Extra |
 |---|---|---|---|---|
 | 21 | 41 | The Camera Obscura | 20A | Fragmento II (hecha) |
-| 22 | 42 | The Whispering Gallery | 20B | III + Ledger J = 8 |
+| 22 | 42 | The Whispering Gallery | 20B | III + Ledger J = 8 (hecha) |
 | 23 | 43 | The Automaton Orchestra | 21B | IV |
 | 24 | 44 | The Fly Tower | 22A | V + Ledger Q = 14 |
 | 25 | 45 | The Shadow Theatre | 23A | VI + reliquia |

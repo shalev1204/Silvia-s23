@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '11022423f38b';  // 144 files, 30.9 MB
+var VERSION = 'c35a0697ea7c';  // 148 files, 30.9 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -44,6 +44,7 @@ var PRECACHE = [
   "./assets/js/desert-map-3d.js",
   "./assets/js/stage-mirror-data.js",
   "./assets/js/stage-mirror.js",
+  "./assets/js/whisper-gallery-data.js",
   "./assets/maps/desert_quadrant_1_nw.webp",
   "./assets/maps/desert_quadrant_2_ne.webp",
   "./assets/maps/desert_quadrant_3_sw.webp",
@@ -78,6 +79,7 @@ var PRECACHE = [
   "./assets/thumbnails/sun_monolith_preview.webp",
   "./assets/thumbnails/transceiver_offline_preview.webp",
   "./assets/thumbnails/whispering_chasm_preview.webp",
+  "./assets/thumbnails/whispering_gallery_preview.webp",
   "./assets/thumbnails/zodiac_journal_preview.webp",
   "./assets/vendor/three.min.js",
   "./constellation/celestial-cipher/assets/distant-light-precipice.jpg",
@@ -111,6 +113,7 @@ var PRECACHE = [
   "./hub/css/stations/s19-oracle-horizon.css",
   "./hub/css/stations/s20-masks-gate.css",
   "./hub/css/stations/s21-camera-obscura.css",
+  "./hub/css/stations/s22-whispering-gallery.css",
   "./hub/css/trail-overlays.css",
   "./hub/css/view-archives.css",
   "./hub/css/view-chronicles.css",
@@ -150,6 +153,7 @@ var PRECACHE = [
   "./hub/js/stations/s19-oracle-horizon.js",
   "./hub/js/stations/s20-masks-gate.js",
   "./hub/js/stations/s21-camera-obscura.js",
+  "./hub/js/stations/s22-whispering-gallery.js",
   "./hub/js/tester-panel.js",
   "./shared/navigator.css",
   "./shared/navigator.js"

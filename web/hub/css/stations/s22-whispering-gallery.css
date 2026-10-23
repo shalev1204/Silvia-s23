@@ -1,0 +1,48 @@
+    /* ---- Station 22 · The Whispering Gallery ---- */
+    .gallery-lead { margin: 0 0 8px; font-size: 0.84rem; }
+    .gallery-speaker:empty { display: none; }
+    .gallery-sound { margin: 0 0 8px; font-size: 0.76rem; color: #b8a07a; }
+    .gallery-hall {
+      border: 1px solid rgba(201, 154, 59, 0.45);
+      border-radius: 12px;
+      background: #0a0709;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+      line-height: 0;
+    }
+    .gallery-plan { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; user-select: none; -webkit-user-select: none; }
+    .gallery-plan[aria-disabled="true"] { cursor: default; }
+    .gallery-plan:focus-visible { outline: 3px solid #fde68a; outline-offset: -3px; }
+    .gallery-wall-out { fill: none; stroke: rgba(201, 154, 59, 0.35); stroke-width: 4; }
+    .gallery-floor { fill: rgba(246, 227, 176, 0.04); stroke: #f3e2b8; stroke-width: 3; }
+    .gallery-axis { stroke: rgba(246, 227, 176, 0.28); stroke-width: 2; stroke-dasharray: 10 10; }
+    .gallery-column { fill: rgba(246, 227, 176, 0.12); stroke: #f3e2b8; stroke-width: 2.4; }
+    .gallery-door { fill: #0a0709; }
+    .gallery-label { fill: #d8c08a; font-size: 26px; font-family: inherit; }
+    .gallery-scale { fill: #f3e2b8; }
+    .gallery-scale.is-odd { fill: rgba(246, 227, 176, 0.25); }
+    .gallery-wave { fill: none; stroke: #9cc8e6; stroke-width: 3; }
+    .gallery-hermes-ring { fill: rgba(253, 230, 138, 0.15); stroke: #fde68a; stroke-width: 3; }
+    .gallery-hermes-dot { fill: #fde68a; }
+    .gallery-where { margin-top: 8px; font-size: 0.82rem; }
+    .gallery-heard { margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid rgba(156, 200, 230, 0.6); font-style: italic; font-size: 0.86rem; line-height: 1.45; color: #e8dcc0; background: rgba(156, 200, 230, 0.06); border-radius: 0 8px 8px 0; word-break: break-word; }
+    .gallery-heard.is-faint { color: #a99c84; }
+    .gallery-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .gallery-bells { display: flex; justify-content: center; align-items: flex-end; gap: 6px; margin: 6px 0 10px; flex-wrap: wrap; }
+    .gallery-bell {
+      --size: 1;
+      width: calc(36px + 24px * var(--size)); min-height: 72px;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px;
+      padding: 6px 4px; border-radius: 10px; border: 1px solid rgba(201, 154, 59, 0.5);
+      background: rgba(20, 8, 16, 0.75); color: #f7dc8c; cursor: pointer; font: inherit; font-size: 0.78rem;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .gallery-bell svg { width: calc(22px + 24px * var(--size)); height: auto; fill: rgba(247, 220, 140, 0.18); stroke: #f7dc8c; stroke-width: 3; }
+    .gallery-bell:disabled { cursor: default; opacity: 0.75; }
+    .gallery-bell:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+    .gallery-bell.is-ringing { background: rgba(247, 220, 140, 0.35); transform: translateY(-3px); }
+    .gallery-bell.is-ringing svg { fill: #f7dc8c; }
+    .gallery-played { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
+    .gallery-played-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px dashed rgba(201, 154, 59, 0.6); }
+    .gallery-played-dot.is-on { border-style: solid; border-color: #f7dc8c; background: #f7dc8c; }
+    @media (prefers-reduced-motion: reduce) { .gallery-bell { transition: none; } .gallery-bell.is-ringing { transform: none; } }

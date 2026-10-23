@@ -712,6 +712,11 @@
             id: 's21', tag: 'Station 21', label: 'The Camera Obscura · Tower III', flag: 'order_camera_obscura_completed', built: true,
             complete() { set('order_camera_obscura_found', JSON.stringify(['flag', 'cart', 'shutter', 'smoke'])); set('order_camera_obscura_completed', 'true'); },
             reset() { dels(['order_camera_obscura_completed', 'order_camera_obscura_fails', 'order_camera_obscura_found', 'order_stage_pause_skipped_42', 'order_speaker_line_42']); }
+          },
+          {
+            id: 's22', tag: 'Station 22', label: 'The Whispering Gallery · Tower III', flag: 'order_whispering_gallery_completed', built: true,
+            complete() { set('order_whispering_gallery_focus', 'true'); set('order_whispering_gallery_completed', 'true'); },
+            reset() { dels(['order_whispering_gallery_completed', 'order_whispering_gallery_focus', 'order_stage_pause_skipped_43', 'order_speaker_line_43']); }
           }
         ];
         // A reset game also forgets the hints its puzzles had climbed to (hub/js/hint-ladder.js)
@@ -729,9 +734,9 @@
 
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
-          const a21 = isDone('s21'), a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = a21 ? 39 : a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
-          const cap = a21 ? 40 : a20 ? 38 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
+          const a22 = isDone('s22'), a21 = isDone('s21'), a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = a22 ? 43 : a21 ? 39 : a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
+          const cap = a22 ? 44 : a21 ? 42 : a20 ? 38 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -755,7 +760,8 @@
           s18: { wire: 26, node: 13, walk: 'order_stele_march_bypassed' },
           s19: { wire: 30, node: 14, walk: 'order_oracle_stair_bypassed' },
           s20: { wire: 34, node: 40, walk: 'order_masks_march_bypassed' },
-          s21: { wire: 38, node: 41 }
+          s21: { wire: 38, node: 41 },
+          s22: { wire: 42, node: 42 }
         };
         const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
 
@@ -2822,7 +2828,8 @@
         { id: 'stele-hu', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Well', expr: 'H − U', l1: 'H', op: '-', l2: 'U', target: 16, unit: '', requires: 'order_polybius_stele_completed' },
         { id: 'stele-mt', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Hatch', expr: 'M + T', l1: 'M', op: '+', l2: 'T', target: 25, unit: '', requires: 'order_polybius_stele_completed' },
         { id: 'oracle-zd', station: 'Station 19 · The back of the disc', name: 'The Line of the Rim', expr: 'Z + D', l1: 'Z', op: '+', l2: 'D', target: 23, unit: '', requires: 'order_oracle_horizon_completed' },
-        { id: 'oracle-ie', station: 'Station 19 · The back of the disc', name: 'The Line of the Heart', expr: 'I + E', l1: 'I', op: '+', l2: 'E', target: 12, unit: '', requires: 'order_oracle_horizon_completed' }
+        { id: 'oracle-ie', station: 'Station 19 · The back of the disc', name: 'The Line of the Heart', expr: 'I + E', l1: 'I', op: '+', l2: 'E', target: 12, unit: '', requires: 'order_oracle_horizon_completed' },
+        { id: 'gallery-jt', station: 'Station 22 · Inside the door of the niche', name: 'The Line of the Echo', expr: 'J × 2', l1: 'J', op: 'x2', l2: 'T', target: null, unit: '', requires: 'order_whispering_gallery_completed' }
       ];
 
       // Desert equations only appear once their station is solved, so the Ledger never spoils them
@@ -4657,6 +4664,66 @@
           step: 40,
           completed: true,
           hermesFinal: "We rest in the cellar of the narrow house, with the hearth for company and the dust of the Ashes on everything. Aurelia has drawn the picture on the wall, upside down, in the margin of her sketchbook, so that she will not forget it.\n\nFragment II is set in the mirror. Look at Path III on your map: two pieces now, and in the second there is a window with a candle in it."
+        },
+        {
+          // Station 22: the hearth goes out and the second stair leads down to the whispers
+          step: 41,
+          hermesInitial: "Silvia, the hearth has gone out, and the whispering under the floor has not stopped all night. In the black window of the cellar the grey gown stood a moment by the second stair, and drew her line across it.\n\nAurelia is already lacing her boots. She says the room below was built by the Order to keep secrets, and that it keeps them very badly. Sheet 20B, Silvia. A hall shaped like an egg, a string, and two pins nobody drew. Have it ready, and have a ruler.",
+          choices: [
+            {
+              id: "choice-41-ready",
+              text: "I have Sheet 20B and a ruler.",
+              silviaMsg: "I have Sheet 20B in front of me, Hermes, and a ruler. Go down.",
+              hermesReply: "Then down we go, as quietly as two old people can. Aurelia has taken off her boots after all. She says the floor below remembers footsteps."
+            },
+            {
+              id: "choice-41-pins",
+              text: "Why does the sheet have no pins?",
+              silviaMsg: "Why did Aurelia leave the pins off Sheet 20B, Hermes?",
+              hermesReply: "I asked her. She said that whoever needs the pins drawn for them should not be listening at them. Then she smiled, and said that you would not need them."
+            },
+            {
+              id: "choice-41-quiet",
+              text: "Be very quiet down there.",
+              silviaMsg: "Be very quiet down there, Hermes. If you can hear them, they can hear you.",
+              hermesReply: "Only at the right place, Aurelia says. Everywhere else the gallery swallows every sound. I will whisper to you from the stair, and nowhere else."
+            }
+          ]
+        },
+        {
+          step: 42,
+          completed: true,
+          hermesFinal: "We are at the foot of the stair, at the door of a long hall with no corners. Columns all round it, and the dark in the middle. At the far end two voices are whispering, and I cannot make out one word.\n\nOpen Path III on your Quest Map, Silvia, and stand with me in the gallery. You have the sheet and the ruler. I have two ears, and they are not as young as yours."
+        },
+        {
+          // Station 22 debrief: the words of the Ashes, the mirrored tune, Fragment III and the Line of the Echo
+          step: 43,
+          hermesInitial: "Fragment III is in my scarf with the other two, Silvia. They do not hum any more when they touch: they sing, very softly, the six bells of the niche, backwards.\n\nAnd we heard the Ashes. 'Leave it. She will come.' I have been turning those four words over all night. They are not hunting us. They are waiting for you. Aurelia says the line in the niche is for your Ledger: [J] × 2 = [T].",
+          choices: [
+            {
+              id: "choice-43-she",
+              text: "Who is 'she'?",
+              silviaMsg: "Who did they mean, Hermes? 'She will come.'",
+              hermesReply: "Aurelia looked at me, and I looked at the sheet in my hand, the one you sent me. I think we both know, Silvia. What I do not know is why they would wait for you instead of stopping you."
+            },
+            {
+              id: "choice-43-line",
+              text: "I will solve the line.",
+              silviaMsg: "I will put [J] × 2 = [T] in my Ledger and solve it, Hermes.",
+              hermesReply: "Twice J is T. You found T long ago, in the desert. Aurelia says the Order liked its echoes exact: a sound that comes back twice as strong is not an echo, it is an answer."
+            },
+            {
+              id: "choice-43-aurelia",
+              text: "What did Aurelia whisper?",
+              silviaMsg: "What does Aurelia whisper toward the east end, Hermes?",
+              hermesReply: "She will not tell me. Something short, always the same, and it comes back to us small and clear. Once I thought it was my name. Then I thought it was a date. I am too old to ask twice."
+            }
+          ]
+        },
+        {
+          step: 44,
+          completed: true,
+          hermesFinal: "We sleep by the west pin, wrapped in our coats on the cold floor. Every sound in the gallery comes to us here, and none of it is the Ashes any more: only drops of water, and the columns settling.\n\nFragment III is set in the mirror. Look at Path III on your map: three pieces now, and in the third there is an arch, and the edge of a balcony."
         }
       ];
 
@@ -5210,6 +5277,20 @@
           category: "Tower III",
           group: "stage",
           answer: "The narrow house behind the market had a cold chimney on Sheet 20A and a smoking one on the wall. The Ashes had lit a fire in its cellar so that someone would look, and they left Fragment II in the chimney, wrapped in a sooty cloth. The other three changes were only the city living its day: a new flag on the clock tower, a cart in the street and a shutter that someone had closed."
+        },
+        {
+          id: "inq-gallery-pins",
+          title: "Why does a whisper cross the gallery?",
+          category: "Tower III",
+          group: "stage",
+          answer: "Because the gallery is an ellipse, the shape Kepler found in the paths of the planets. You draw one with two pins and a loop of string: keep the string tight with a pencil and go round. The two pins are its foci, and an ellipse has a secret: every sound that leaves one focus bounces off the wall and arrives at the other, all at the same moment. So a whisper at one pin is clear at the other, and lost everywhere else. Sheet 20B shows the string, but not where the pins stood."
+        },
+        {
+          id: "inq-gallery-niche",
+          title: "What was in the niche of the gallery?",
+          category: "Tower III",
+          group: "stage",
+          answer: "The niche at the west pin opens to a tune of six bells, played from its last note to its first: the gallery is a mirror for sound, and a mirror gives everything back in reverse. The Ashes played it note for note, the right way round, and it stayed shut for them. Inside, on grey velvet, lay Fragment III, with an arch and the edge of a balcony in it, and inside its little door Aurelia had scratched a line for your Ledger: [J] × 2 = [T]."
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -5243,7 +5324,7 @@
       } else {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       }
-      const WIRE_LAST_STEP = 40;   // the last step of the expedition thread (end of Station 21, the Camera Obscura)
+      const WIRE_LAST_STEP = 44;   // the last step of the expedition thread (end of Station 22, the Whispering Gallery)
       if (wireCurrentStep > WIRE_LAST_STEP) wireCurrentStep = WIRE_LAST_STEP;
       while (wireHistory.length < wireCurrentStep) {
         wireHistory.push(0);
@@ -5319,7 +5400,8 @@
         masksHint: { key: 'order_masks_hint', label: 'the second hint at the word of the gate' },
         masksDraw: { key: 'order_masks_draw_hint', label: 'the second hint at the missing halves' },
         masks: { key: 'order_masks_gate_completed', label: 'Station 20' },
-        camera: { key: 'order_camera_obscura_completed', label: 'Station 21' }
+        camera: { key: 'order_camera_obscura_completed', label: 'Station 21' },
+        gallery: { key: 'order_whispering_gallery_completed', label: 'Station 22' }
       };
       const INQUIRY_REQUIREMENTS = {
         'inq-desert-oracle': 'lexicon',
@@ -5362,7 +5444,9 @@
         'inq-masks-halves': 'masksDraw',
         'inq-ash-note': 'masks',
         'inq-camera-upside': 'masks',
-        'inq-camera-house': 'camera'
+        'inq-camera-house': 'camera',
+        'inq-gallery-pins': 'camera',
+        'inq-gallery-niche': 'gallery'
       };
       FIELD_INQUIRIES.forEach((inq) => { if (INQUIRY_REQUIREMENTS[inq.id]) inq.requires = INQUIRY_REQUIREMENTS[inq.id]; });
       const INQUIRY_GROUPS = [
@@ -6084,7 +6168,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 41: 'Tower III · The Whispering Gallery' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -6140,7 +6224,9 @@
         34: () => '✦ SHEETS 19 – 26 RECEIVED · EAST ACROSS THE PLATEAU TO TOWER III (18 H) · KEEP SHEET 19B CLOSE ✦',
         36: () => '✦ THE GATE OPENED · SILVER · FRAGMENT I SET · 1 / 9 · A NOTE SEALED IN ASH ✦',
         38: () => '✦ THE DARK ROOM · A HOLE IN THE WALL · SHEET 20A READY · FOUR CHANGES TO FIND ✦',
-        40: () => '✦ THE HIDEOUT FOUND · THE NARROW HOUSE · FRAGMENT II SET · 2 / 9 ✦'
+        40: () => '✦ THE HIDEOUT FOUND · THE NARROW HOUSE · FRAGMENT II SET · 2 / 9 ✦',
+        42: () => '✦ THE GALLERY · TWO PINS NOBODY DREW · SHEET 20B READY · LISTEN AT THE WEST ONE ✦',
+        44: () => '✦ THE NICHE OPENED · THE TUNE MIRRORED · FRAGMENT III SET · 3 / 9 · [J] × 2 = [T] RECORDED ✦'
       };
       function appendStepFinal(stepIdx) {
         appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -7204,9 +7290,20 @@
           }
           advanceTo(39);   // Station 21 solved: the narrow house, the warm ashes and Fragment II
         }
+        if (wireCurrentStep === 40) {
+          if (holdForDoor(42, 'Fragment II Is Set · 2 of 9', 'The Whispering Gallery (Station 22)', 40)) return;
+          advanceTo(41);   // the hearth has gone out: the second stair, down to the whispers
+        }
+        if (wireCurrentStep === 42) {
+          if (localStorage.getItem('order_whispering_gallery_completed') !== 'true') {
+            showWaypointBar('The Whispering Gallery · Station 22 Awaits', 'Open Path III on the Quest Map and stand with Hermes in the gallery. Keep Sheet 20B and a ruler close.', 42);
+            return;
+          }
+          advanceTo(43);   // Station 22 solved: the words of the Ashes, the mirrored tune and Fragment III
+        }
         if (wireCurrentStep >= WIRE_LAST_STEP) {
-          if (!holdForDoor(42, 'Fragment II Is Set · 2 of 9', 'The Whispering Gallery (Station 22)', WIRE_LAST_STEP)) {
-            showWaypointBar('Fragment II Is Set · 2 of 9', 'Next: The Whispering Gallery (Station 22). The Mirror Speaker has not opened that room yet.', WIRE_LAST_STEP);
+          if (!holdForDoor(43, 'Fragment III Is Set · 3 of 9', 'The Automaton Orchestra (Station 23)', WIRE_LAST_STEP)) {
+            showWaypointBar('Fragment III Is Set · 3 of 9', 'Next: The Automaton Orchestra (Station 23). The Mirror Speaker has not opened that room yet.', WIRE_LAST_STEP);
           }
           return;
         }
@@ -7695,7 +7792,7 @@
                 renderWireChoices();
                 updateMessengerBadge();
               }
-            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39].includes(justAnsweredStep)) {
+            } else if ([9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43].includes(justAnsweredStep)) {
               // 9: Silvia answered at the gates of Tower II, and the 12-hour crossing to the Sun Monolith begins.
               // 11: Silvia answered the Station 14 debrief.
               // 13: Silvia answered at first light, and the 6-hour walk down to the Sandstone Labyrinth begins.
@@ -7712,6 +7809,8 @@
               // 35: Silvia answered the Station 20 debrief.
               // 37: Silvia answered at the head of the stair to the Camera Obscura.
               // 39: Silvia answered the Station 21 debrief.
+              // 41: Silvia answered at the head of the second stair, down to the Whispering Gallery.
+              // 43: Silvia answered the Station 22 debrief.
               if (justAnsweredStep === 9) rememberGateSeal();
               if (MARCH_STARTED_BY_ANSWER[justAnsweredStep]) MARCH_STARTED_BY_ANSWER[justAnsweredStep].start();
               const finalStep = justAnsweredStep + 1;

@@ -36,8 +36,8 @@ SHEETS = [
 # The Stage Path (Tower III): sheets 19 to 26, delivered to Silvia all together in their own bundle.
 STAGE_SHEETS = [
     (19, 'Hoja_19_Carta_Nunca_Enviada_y_Juego_S1_Puerta_Mascaras.pdf', 'page19/pdf/page19_front_A5.pdf', 'page19/pdf/page19_back_A5.pdf'),
-    # back_rel None: the face is not built yet, so a blank A5 page keeps the duplex printing aligned (20B pending)
-    (20, 'Hoja_20_Camera_Obscura_y_cara_B_pendiente.pdf', 'page20/pdf/page20_front_A5.pdf', None),
+    # back_rel None (a face not built yet) puts a blank A5 page in its place, so the duplex printing stays aligned
+    (20, 'Hoja_20_Camera_Obscura_y_Whispering_Gallery.pdf', 'page20/pdf/page20_front_A5.pdf', 'page20/pdf/page20_back_A5.pdf'),
 ]
 STAGE_TOTAL = 8
 

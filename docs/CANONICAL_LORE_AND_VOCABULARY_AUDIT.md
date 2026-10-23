@@ -704,6 +704,15 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Asignación en el Ledger**: $\mathbf{Z = 5, \quad I = 10}$. Valores libres; ninguna letra repite valor.
 - **Letras aún sin ecuación (solo Operador)**: $J, Q, X$, con los valores libres $8, 14, 15$ (para el Stage Path).
 
+#### 13. DEDUCCIÓN DE $J$ (Estación 22 · La puertecilla del nicho de la Whispering Gallery, solo en la web)
+- **Origen**: al tocar en espejo la melodía de seis campanas (Estación 22), el nicho del foco oeste se abre; en el interior de su puertecilla Aurelia arañó una línea, que aparece en el Ledger con `requires: 'order_whispering_gallery_completed'` (decisión del Operador, 23-10-2026).
+- **Ecuación (The Line of the Echo)**:
+  $$[J] \times 2 = [T]$$
+- **Resolución** (con $T = 16$ de §7.B.5):
+  $$[J] = 16 / 2 \implies \mathbf{J = 8}$$
+- **Asignación en el Ledger**: $\mathbf{J = 8}$. Valor libre; ninguna letra repite valor.
+- **Letras aún sin ecuación (solo Operador)**: $Q, X$, con los valores libres $14, 15$ (Estaciones 24 y 27).
+
 ---
 
 ## 8. DIRECTORIO GEOGRÁFICO Y ONOMÁSTICO CANÓNICO

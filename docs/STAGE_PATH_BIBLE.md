@@ -98,7 +98,7 @@ Cada cara de juego lleva además un **fragmento dibujado**: su silueta y el troz
 | **27** | 25A | The Kaleidoscope Lantern | Los cristales del gran farol | Alinear los cristales para que la luz deletree una palabra | Fragmento VIII · X |
 | **28** | 26A | The Stage of the Mirror Speaker | La ceremonia del espejo | Encajar los 9 fragmentos: el WHERE | Fragmento IX · **WHERE** |
 
-**Cipher Ledger**: quedan $J, Q, X$ con los valores libres $8, 14, 15$ (Biblia Maestra §7.B.12). Se fijarán al construir las estaciones 22, 24 y 27, con una ecuación de una sola incógnita cada una (estilo de las estaciones 17 a 19).
+**Cipher Ledger**: $J = 8$ quedó fijada en la Estación 22 con $[J] \times 2 = [T]$ (Biblia Maestra §7.B.13); quedan $Q, X$ con los valores libres $14, 15$. Se fijarán al construir las estaciones 24 y 27, con una ecuación de una sola incógnita cada una (estilo de las estaciones 17 a 19).
 
 **Field Wire**: continúa desde el paso 33. Patrón por estación: escena de salida con respuestas (inicia el viaje), viaje, balance tras la estación y cierre. Las caras de historia se citan en el chat en su momento (*«Open Sheet 22B…»*).
 
@@ -202,21 +202,36 @@ Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{
 | Pieza | Estado |
 | :--- | :--- |
 | Biblia del Stage Path | ✅ Este documento |
-| Base web (pestaña, mapa del espejo + caleidoscopio, chat, probador) | ✅ Espejo Vivo (`stage-mirror.js`), pestaña Path III, Field Wire 33–40, probador `s20` y `s21` |
-| Hojas 19 a 26 (impresión) | ✅ Hoja 19 (19A, 19B) · 🟡 Hoja 20 (solo la cara A; la 20B llega con la Estación 22) · ⏳ Hojas 21 a 26 · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
-| Estaciones 20 a 28 | ✅ Estaciones 20 y 21 · ⏳ Estaciones 22 a 28 |
+| Base web (pestaña, mapa del espejo + caleidoscopio, chat, probador) | ✅ Espejo Vivo (`stage-mirror.js`), pestaña Path III, Field Wire 33–44, probador `s20`, `s21` y `s22` |
+| Hojas 19 a 26 (impresión) | ✅ Hoja 19 (19A, 19B) · ✅ Hoja 20 (20A, 20B) · ⏳ Hojas 21 a 26 · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
+| Estaciones 20 a 28 | ✅ Estaciones 20, 21 y 22 · ⏳ Estaciones 23 a 28 |
+
+### Estación 22 · The Whispering Gallery (Hoja 20B · Fragmento III · J) · construida el 23-10-2026
+
+**Decisiones del Operador (23-10-2026)**: dos tiempos, **focos y eco en espejo**; la hoja es **la elipse del jardinero** sin los alfileres; la ecuación es $[J] \times 2 = [T]$; la sala abre **6 h** después del Fragmento II. Ficha §6.1: escuchar y tocar, oído, dificultad 4, acaba tocando notas.
+
+- **La galería** sale de una sola fuente, `scripts/journal/whisper_gallery.py`: elipse de semiejes 5 y 4 varas (10 × 8), cuerda de 10 varas, **focos a 3 varas del centro** sobre el eje largo (triángulo 3-4-5), 17 columnas y la puerta en el centro del lado sur. Los asaltantes susurran en el **foco este**; Silvia escucha en el **oeste**. La web carga `web/assets/js/whisper-gallery-data.js` (generado; el mismo script escribe la miniatura, que no marca los focos).
+- **Hoja 20B**: el plano a escala (95 px por vara, barra «0 1 2 3 4 5 varas»), los ejes con sus medidas, la viñeta genérica del jardinero (dos alfileres, una cuerda, un lápiz tensado en lo alto del eje corto) y el texto: los alfileres ya no están, pero la cuerda nunca se estiró. **El plano no marca los focos**: se hallan midiendo 5 varas desde lo alto del eje corto hasta el eje largo. Fragmento III con su plano y **el sello** (hash en `SEALS[42]`).
+- **Web** (`web/hub/js/stations/s22-whispering-gallery.js`):
+  1. **Los alfileres.** Hermes empieza en la puerta y se mueve por una rejilla de media vara (arrastrar, tocar, o flechas; Enter escucha). La sala dice dónde está en varas («2 varas west, 0.5 varas north»), como se mide en la hoja. A menos de 1,5 varas del foco oeste el susurro (ruido filtrado en estéreo, panoramizado hacia el foco) y su subtítulo (letras que faltan) se aclaran; a media vara, *clear as a bell*. «Stand still and listen here» fuera del foco es un fallo. Hermes no se acerca a menos de 1 vara del foco este (los asaltantes; no cuenta como fallo).
+  2. **El eco en espejo.** En el foco: las palabras de los Ashes (*«…Then it is not a tune. It is a reflection. Leave it. She will come.»*) y la melodía de **6 campanas** (de 5) que el nicho les tocó. Ellos la devolvieron nota a nota y no abrió; Silvia la toca **al revés**. Tocarla al derecho da un mensaje propio; cualquier otra, «stays shut». «Hear the tune again» sin límite.
+  - **Sin sonido** (altavoz del sonido ambiental apagado): la sala lo dice, cada susurro está escrito y cada campana brilla al sonar. Premio: Fragmento III y $[J] \times 2 = [T]$ en el Ledger (*The Line of the Echo*).
+- **Pistas** (#6): `s22-focus` (dónde estaban los alfileres → media cuerda desde lo alto del eje corto → medir juntos con la regla) y `s22-echo` (un reflejo → del último al primero → apuntar las campanas y leer la lista al revés). Ask Hermes: «Why does a whisper cross the gallery?» (desde la Estación 21) y «What was in the niche of the gallery?» (al resolverla). Sonido ambiental «stone gallery» (#4). Pausa de 6 h (#3). Al ganarla llega la **carta I** de Aurelia (#12).
+- **Field Wire**: 41 (el hogar se apaga, la Mirror Speaker cruza la segunda escalera; hoja 20B y una regla) → 42 (la puerta de la galería; la barra espera a la Estación 22) → 43 (balance: los fragmentos cantan la melodía al revés, «She will come», la línea de J) → 44 (cierre). Tras el 40 el chat espera pausa y sello. `WIRE_LAST_STEP = 44`.
+- **Verificación**: sección `gallery` del smoke (pausa → sello real → chat → teclado → fallos → focos → melodía al derecho, errónea y en espejo → Fragmento III → Ledger → chat → sin sonido → tester). Las secciones `pause` y `seals` usan ahora la sala 43 como sala de prueba.
+- **Pendiente del Operador**: imprimir la Hoja 20 a doble cara. Hasta que Silvia escanee el sello de la 20B la galería sigue cerrada.
 
 ### Estación 21 · The Camera Obscura (Hoja 20A · Fragmento II) · construida el 22-10-2026
 
 **Decisiones del Operador (22-10-2026)**: enigma «antes y después» (la hoja es la ciudad de ayer, la sala la de hoy); un anillo de lente que se arrastra (dedo, ratón o flechas); cuatro cambios, uno es el escondite; la sala abre **3 h** después del Fragmento I. Ficha §6.1: girar y señalar, vista, dificultad 2, acaba señalando un lugar.
 
 - **La ciudad** sale de una sola fuente, `scripts/journal/camera_city.py`: once lugares (molino, casa del molino, torre del reloj, fuente, sala con cúpula, mercado, casa estrecha tras el mercado, casa junto al mercado, casa de las contraventanas, puente, puerta de la ciudad). La hoja dibuja la versión *antes*, la web la versión *ahora* (`web/assets/js/camera-city-data.js`, generado; el mismo script escribe la miniatura de la ficha). **Los cuatro cambios**: una bandera nueva en la torre, un carro en la calle, la contraventana de la casa de las contraventanas (abierta → cerrada) y la chimenea fría de la casa estrecha que ahora humea (**el escondite**). Antes humeaban dos chimeneas (casa del molino y casa junto al mercado); ahora, tres.
-- **Hoja 20A**: la ciudad «antes» girada 180° (boca abajo, como la proyecta la pared; el texto no gira), pie «Look at the sky, the roofs, the shutters and the street.», Fragmento II con el plano del espejo y **el sello** (QR, 42 mm) cuyo código está en `journal/stage_seals.json` (hash en `SEALS[41]`). La cara B (20B, The Whispering Gallery, Estación 22) no existe aún: la hoja 20 se imprime con el dorso en blanco hasta entonces.
+- **Hoja 20A**: la ciudad «antes» girada 180° (boca abajo, como la proyecta la pared; el texto no gira), pie «Look at the sky, the roofs, the shutters and the street.», Fragmento II con el plano del espejo y **el sello** (QR, 42 mm) cuyo código está en `journal/stage_seals.json` (hash en `SEALS[41]`). La cara B es la 20B (Estación 22).
 - **Web** (`web/hub/js/stations/s21-camera-obscura.js`): la imagen empieza boca abajo y desenfocada; el **anillo** la gira (se encoge lo justo para caber) y solo **nítida y derecha (±7°)** se puede señalar (un clic con la imagen borrosa no cuesta fallo). Teclado: flechas ±5° (Shift ±1°), Re Pág/Av Pág ±45°, Inicio derecha, Fin boca abajo; cada lugar es un botón con nombre. Señalar un cambio falso lo apunta en las cuatro casillas («A flag», «A cart», «A shutter») y cuenta como fallo; un lugar sin cambios dice «exactly as it was». Premio: Fragmento II. Sin ecuación.
 - **Pistas** (#6): id `s21-city`, tres notas (los cuatro cambios y cuál es fuego; cuenta de chimeneas con humo, dos en la hoja y tres en la pared; empezar por el mercado y mirar la casa estrecha). Ask Hermes: «Why is the city upside down on Sheet 20A?» (desde la Estación 20) y «What did we find in the narrow house?» (al resolverla). Sonido ambiental «dark room» (#4). Pausa de 3 h (#3).
 - **Field Wire**: 37 (las velas se consumen, la Mirror Speaker abre una puerta y una escalera; hoja 20A a mano) → 38 (abajo, un agujero en la pared; la barra espera a la Estación 21) → 39 (balance: Fragmento II en la chimenea, el sello de la ceniza arañado en las paredes, Aurelia: «un fuego así no lo encienden quienes quieren esconderse») → 40 (cierre). Tras el 36 el chat espera pausa y sello y mira de nuevo cada medio minuto. `WIRE_LAST_STEP = 40`.
 - **Verificación**: sección `camera` del smoke (pausa → sello real → chat → anillo → fallos y pistas → teclado → Fragmento II → chat → tester); la sala está también en `a11y` (foco, contraste, táctil, sin desbordes).
-- **Pendiente del Operador**: imprimir la Hoja 20 (`journal/impresion/hojas_doble_cara/Hoja_20_Camera_Obscura_y_cara_B_pendiente.pdf`, dorso en blanco). Hasta que Silvia escanee el sello de la 20A la puerta sigue cerrada (Carles la abre desde el probador).
+- **Pendiente del Operador**: imprimir la Hoja 20 a doble cara (`journal/impresion/hojas_doble_cara/Hoja_20_Camera_Obscura_y_Whispering_Gallery.pdf`). Hasta que Silvia escanee el sello de la 20A la puerta sigue cerrada (Carles la abre desde el probador).
 
 ### Estación 20 · The Gate of a Thousand Masks (Hoja 19B · Fragmento I)
 
