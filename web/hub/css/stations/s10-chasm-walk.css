@@ -122,6 +122,98 @@
     }
     .chasm3d-howto-skip:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
 
+    /* ---- Feel: everything answers, arrives and celebrates (all of it off with reduced motion) ---- */
+    .chasm3d-word { display: inline-block; animation: chasm-word 0.42s cubic-bezier(.2, .7, .3, 1) both; }
+    @keyframes chasm-word { from { opacity: 0; transform: translateY(6px); filter: blur(2px); } to { opacity: 1; transform: none; filter: none; } }
+    .chasm3d-where.is-new { animation: chasm-rise 0.45s ease both; }
+    @keyframes chasm-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .chasm3d-controls .chasm3d-btn { animation: chasm-pop 0.38s cubic-bezier(.2, .9, .3, 1.25) both; }
+    @keyframes chasm-pop { from { opacity: 0; transform: translateY(10px) scale(0.94); } to { opacity: 1; transform: none; } }
+    .chasm3d-btn { transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+    .chasm3d-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(253, 230, 138, 0.18), inset 0 0 0 1px rgba(253, 230, 138, 0.35); }
+    .chasm3d-btn:active:not(:disabled) { transform: translateY(1px) scale(0.97); box-shadow: none; transition-duration: 0.05s; }
+    .chasm3d-btn.is-listen:not(:disabled) { background-image: linear-gradient(100deg, transparent 30%, rgba(207, 230, 245, 0.18) 50%, transparent 70%); background-size: 250% 100%; animation: chasm-pop 0.38s cubic-bezier(.2, .9, .3, 1.25) both, chasm-shimmer 2.6s ease-in-out 0.6s infinite; }
+    @keyframes chasm-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+    .chasm3d-btn.is-rest { --p: 0; background: linear-gradient(90deg, rgba(95, 168, 216, 0.35) calc(var(--p) * 100%), rgba(60, 36, 16, 0.85) calc(var(--p) * 100%)); opacity: 1; }
+
+    .chasm3d-skin::after { transition: height 0.7s cubic-bezier(.3, .8, .3, 1); }
+    .chasm3d-skins.is-hurt { animation: chasm-shake 0.5s ease; }
+    @keyframes chasm-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+    .chasm3d-skins.is-fill .chasm3d-skin { animation: chasm-bubble 0.6s cubic-bezier(.2, .9, .3, 1.4) both; }
+    .chasm3d-skins.is-fill .chasm3d-skin:nth-child(2) { animation-delay: 0.08s; }
+    .chasm3d-skins.is-fill .chasm3d-skin:nth-child(3) { animation-delay: 0.16s; }
+    @keyframes chasm-bubble { 0% { transform: scale(1); } 45% { transform: scale(1.25); box-shadow: 0 0 14px rgba(95, 168, 216, 0.9); } 100% { transform: scale(1); } }
+
+    .chasm3d-rune { transition: background 0.3s ease, border-color 0.3s ease; }
+    .chasm3d-rune.is-incoming { color: transparent; }
+    .chasm3d-rune.is-new { animation: chasm-catch 0.7s cubic-bezier(.2, .9, .3, 1.5); }
+    @keyframes chasm-catch { 0% { transform: scale(1); } 35% { transform: scale(1.45); box-shadow: 0 0 0 8px rgba(253, 230, 138, 0.25), 0 0 26px rgba(253, 230, 138, 0.9); } 100% { transform: scale(1); } }
+    .chasm3d-rune.is-wave { animation: chasm-wave 0.9s ease both; }
+    @keyframes chasm-wave { 0%, 100% { transform: none; } 40% { transform: translateY(-10px) scale(1.2); box-shadow: 0 0 24px rgba(253, 230, 138, 0.95); background: rgba(200, 130, 40, 0.9); } }
+    .chasm3d-flyrune {
+      position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; font: 700 2rem 'Cinzel', serif; color: #fff3c4;
+      text-shadow: 0 0 10px #fde68a, 0 0 26px #f59e0b, 0 0 48px rgba(245, 158, 11, 0.7);
+    }
+    .chasm3d-flash { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 48%, rgba(255, 240, 190, 0.85), rgba(255, 200, 110, 0.25) 40%, transparent 70%); }
+    .chasm3d-flash.is-on { animation: chasm-flash 0.9s ease-out; }
+    @keyframes chasm-flash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+    .chasm3d-hurt { position: absolute; inset: 0; pointer-events: none; opacity: 0; box-shadow: inset 0 0 90px 30px rgba(190, 30, 20, 0.75); }
+    .chasm3d-hurt.is-on { animation: chasm-flash 0.8s ease-out; }
+
+    .chasm3d-gauge {
+      --w: 0; position: absolute; left: 50%; bottom: 14px; transform: translate(-50%, 12px); opacity: 0; pointer-events: none;
+      display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 40px; background: rgba(16, 9, 5, 0.72);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .chasm3d-gauge.is-on { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 600px) { .chasm3d-gauge { bottom: 70px; } }   /* above the water and the clock */
+    .chasm3d-gauge svg { width: 38px; height: 38px; transform: rotate(-90deg); filter: drop-shadow(0 0 calc(var(--w) * 8px) rgba(253, 230, 138, 0.9)); }
+    .chasm3d-gauge .g-track { fill: none; stroke: rgba(253, 230, 138, 0.18); stroke-width: 7; }
+    .chasm3d-gauge .g-fill { fill: none; stroke: #fde68a; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--w) * 100); }
+    .chasm3d-gauge span { font-family: 'Cinzel', serif; font-size: 0.82rem; letter-spacing: 0.05em; color: #fde68a; white-space: nowrap; }
+
+    .chasm3d-confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 4; }
+    .chasm3d-confetti i {
+      position: absolute; top: -12px; left: var(--x); width: 8px; height: 13px; border-radius: 2px; opacity: 0;
+      animation: chasm-confetti var(--d) cubic-bezier(.25, .6, .4, 1) var(--delay) forwards;
+    }
+    @keyframes chasm-confetti { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), 110%) rotate(var(--r)); } }
+    .chasm3d-panel .chasm-victory-card { animation: chasm-victory 0.7s cubic-bezier(.2, .9, .3, 1.3) both; }
+    @keyframes chasm-victory { from { opacity: 0; transform: translateY(16px) scale(0.92); } to { opacity: 1; transform: none; } }
+    .chasm3d-help { transition: transform 0.15s ease; }
+    .chasm3d-help:hover { transform: scale(1.08) rotate(-8deg); }
+
+    /* the guide: it rises in, its pages slide, its little pictures move */
+    .chasm3d-howto:not([hidden]) { animation: chasm-fadein 0.3s ease both; }
+    .chasm3d-howto:not([hidden]) .chasm3d-howto-card { animation: chasm-card 0.5s cubic-bezier(.2, .9, .3, 1.2) both; }
+    @keyframes chasm-fadein { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes chasm-card { from { opacity: 0; transform: translateY(24px) scale(0.94); } to { opacity: 1; transform: none; } }
+    .chasm3d-howto-page.is-fwd { animation: chasm-slide-l 0.38s cubic-bezier(.2, .8, .3, 1) both; }
+    .chasm3d-howto-page.is-back { animation: chasm-slide-r 0.38s cubic-bezier(.2, .8, .3, 1) both; }
+    @keyframes chasm-slide-l { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+    @keyframes chasm-slide-r { from { opacity: 0; transform: translateX(-36px); } to { opacity: 1; transform: none; } }
+    .chasm3d-howto-keys li, .chasm3d-howto-steps li { animation: chasm-rise 0.4s ease both; }
+    .chasm3d-howto-keys li:nth-child(2), .chasm3d-howto-steps li:nth-child(2) { animation-delay: 0.07s; }
+    .chasm3d-howto-keys li:nth-child(3), .chasm3d-howto-steps li:nth-child(3) { animation-delay: 0.14s; }
+    .chasm3d-howto-keys li:nth-child(4), .chasm3d-howto-steps li:nth-child(4) { animation-delay: 0.21s; }
+    .chasm3d-howto-keys li:nth-child(5), .chasm3d-howto-steps li:nth-child(5) { animation-delay: 0.28s; }
+    .chasm3d-howto-dots { display: flex; gap: 6px; margin: 6px 0 2px; }
+    .chasm3d-howto-dots i { width: 8px; height: 8px; border-radius: 8px; background: rgba(212, 168, 83, 0.35); transition: width 0.35s cubic-bezier(.2, .9, .3, 1.2), background 0.35s ease; }
+    .chasm3d-howto-dots i.is-on { width: 26px; background: #fde68a; }
+    .chasm3d-howto-rose .rose-north, .chasm3d-howto-rose .rose-south { transform-origin: 0 0; animation: chasm-needle 3s ease-in-out infinite; }
+    @keyframes chasm-needle { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg); } }
+    .chasm3d-howto-pic .chasm3d-skin { --fill: 1; }
+    .chasm3d-howto-pic .chasm3d-skin::after { animation: chasm-level 3.2s ease-in-out infinite; }
+    .chasm3d-howto-pic .chasm3d-skin:nth-child(3)::after { animation-delay: 0.4s; }
+    @keyframes chasm-level { 0%, 100% { height: 100%; } 45%, 60% { height: 30%; } }
+    .chasm3d-howto-pic .chasm3d-rune { animation: chasm-blink 2.4s ease-in-out infinite; }
+    .chasm3d-howto-pic .chasm3d-rune:nth-child(2) { animation-delay: 0.3s; }
+    .chasm3d-howto-pic .chasm3d-rune:nth-child(3) { animation-delay: 0.6s; }
+    @keyframes chasm-blink { 0%, 70%, 100% { border-color: rgba(253, 230, 138, 0.55); box-shadow: none; } 35% { border-color: #fde68a; box-shadow: 0 0 10px rgba(253, 230, 138, 0.6); } }
+    .chasm3d-howto-radio { animation: chasm-radio 2.2s ease-in-out infinite; }
+    @keyframes chasm-radio { 0%, 100% { transform: none; } 10% { transform: rotate(-8deg); } 20% { transform: rotate(8deg); } 30% { transform: none; } }
+
     @media (max-width: 980px) {
       .chasm3d-body { grid-template-columns: 1fr; }
       .chasm3d-stage { height: 52vh; min-height: 280px; }
@@ -141,4 +233,5 @@
     }
     @media (prefers-reduced-motion: reduce) {
       .chasm3d-rose, .chasm3d-subtitle, .chasm3d-fade { transition: none; }
+      .chasm3d-window *, .chasm3d-window *::after, .chasm3d-howto, .chasm3d-howto-card { animation: none !important; transition: none !important; }
     }

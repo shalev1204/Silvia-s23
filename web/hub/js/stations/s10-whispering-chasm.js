@@ -616,12 +616,24 @@
         motes.frustumCulled = false;
         scene.add(motes);
 
-        // The relic in Silvia's hands, with its own light
+        // The relic in Silvia's hands, with its own light, a halo that warms as the letter turns to her,
+        // and the golden sparks it throws out when the rune is read
         const relicLight = new T.PointLight(0xfff0d0, 0, 6, 2);
         scene.add(relicLight);
+        const relicGlow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffd98a, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+        relicGlow.visible = false;
+        relicGlow.renderOrder = -1;
+        scene.add(relicGlow);
+        const sparksN = 70;
+        const sparksGeo = new T.BufferGeometry();
+        sparksGeo.setAttribute('position', new T.BufferAttribute(new Float32Array(sparksN * 3), 3));
+        const sparks = new T.Points(sparksGeo, new T.PointsMaterial({ map: glowTex, color: 0xffd27a, size: 0.09, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+        sparks.frustumCulled = false;
+        sparks.visible = false;
+        scene.add(sparks);
 
         return { T, renderer, scene, camera, sky, sunDisc, hemi, sun, lantern, prints, hermes: H.hermes, legL: H.legL, legR: H.legR, flame: H.flame,
-                 staff: H.staff, lamp: H.lamp, cloak: H.cloak, arrows, arrowGeo, dust, dustN, motes, motesBase, motesN, relicLight, relic: null, lowPower, stoneAt, shafts };
+                 staff: H.staff, lamp: H.lamp, cloak: H.cloak, arrows, arrowGeo, dust, dustN, motes, motesBase, motesN, relicLight, relicGlow, sparks, sparksN, relic: null, lowPower, stoneAt, shafts };
       }
 
       // ---- Hermes as the Cartographer of Distant Light: silver hair and white beard, the deep blue robe embroidered
@@ -946,7 +958,7 @@
       }
 
       // ---- Hermes on screen ----
-      const view = { x: 0, z: 0, yaw: 0, look: 0, walk: null, phase: 'idle', relicHold: 0, shake: 0 };
+      const view = { x: 0, z: 0, yaw: 0, look: 0, walk: null, phase: 'idle', relicHold: 0, shake: 0, hot: -1, spin: null, turnQ: [], burst: null, glow: 0, warm: 0 };
       function placeHermes(k, d) {
         const [r, c] = at(k);
         view.x = wx(c); view.z = wz(r); view.yaw = yawOf(d);
@@ -979,7 +991,7 @@
           a.position.set(view.x + dc * 1.8, 0.03, view.z + dr * 1.8);
           a.scale.setScalar(1.35);
           a.rotation.y = yawOf(o.d);
-          a.userData = o;
+          a.userData = Object.assign({ born: performance.now(), n: G.arrows.children.length }, o);
           G.arrows.add(a);
         });
       }
@@ -1047,10 +1059,106 @@
         src.start(t, Math.random()); src.stop(t + 0.14);
       }
 
+      // Small rewards for the ear, made on the spot (no files): bell notes, a soft thud, bubbles
+      function tone(freq, at, dur, opts) {
+        const a = ensureAudio();
+        if (!a) return;
+        const { ctx } = a, t = ctx.currentTime + (at || 0), o = opts || {};
+        const osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.type = o.type || 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+        if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t + dur);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(o.gain || 0.12, t + (o.attack || 0.01));
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        osc.connect(g); g.connect(a.master);
+        osc.start(t); osc.stop(t + dur + 0.05);
+      }
+      const NOTE = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5, E6: 1318.5, G6: 1567.98 };
+      const sounds = {
+        rune: () => ['C5', 'E5', 'G5', 'C6', 'E6'].forEach((n, i) => { tone(NOTE[n], i * 0.085, 1.1, { gain: 0.1 }); tone(NOTE[n] * 2, i * 0.085, 0.5, { gain: 0.025, type: 'triangle' }); }),
+        warm: (level) => tone([NOTE.C5, NOTE.E5, NOTE.G5][level - 1] || NOTE.G5, 0, 0.35, { gain: 0.05, type: 'triangle' }),
+        thud: () => { tone(140, 0, 0.35, { to: 55, gain: 0.22 }); tone(90, 0.02, 0.25, { type: 'triangle', to: 50, gain: 0.08 }); },
+        fill: () => [0, 1, 2].forEach((i) => tone(520 + i * 160, i * 0.07, 0.12, { to: 900 + i * 160, gain: 0.06 })),
+        win: () => {
+          ['C5', 'E5', 'G5', 'C6', 'E6', 'G6'].forEach((n, i) => tone(NOTE[n], i * 0.11, 1.4, { gain: 0.09 }));
+          ['C5', 'E5', 'G5', 'C6'].forEach((n) => tone(NOTE[n], 0.8, 2.2, { gain: 0.06, type: 'triangle', attack: 0.08 }));
+        }
+      };
+
+      // ---- Little moments on the screen: a flash of light, a red pulse, a shower of confetti ----
+      const fxEl = {};
+      if (el.stage) {
+        const mk = (cls, html) => { const d = document.createElement('div'); d.className = cls; d.setAttribute('aria-hidden', 'true'); if (html) d.innerHTML = html; el.stage.appendChild(d); return d; };
+        fxEl.flash = mk('chasm3d-flash');
+        fxEl.hurt = mk('chasm3d-hurt');
+        fxEl.gauge = mk('chasm3d-gauge', '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" class="g-track"/><circle cx="32" cy="32" r="27" class="g-fill" pathLength="100"/></svg><span>Turn it to the light</span>');
+      }
+      function paintWarmth() {
+        if (!fxEl.gauge) return;
+        const on = view.phase === 'relic';
+        fxEl.gauge.classList.toggle('is-on', on);
+        if (!on) return;
+        fxEl.gauge.style.setProperty('--w', view.warm.toFixed(3));
+        const level = view.warm > 0.92 ? 3 : view.warm > 0.66 ? 2 : view.warm > 0.33 ? 1 : 0;
+        const label = ['Turn it to the light', 'Warmer…', 'Warmer still…', 'Almost! Hold it there'][level];
+        const span = fxEl.gauge.querySelector('span');
+        if (span.textContent !== label) span.textContent = label;
+        if (level > (view.warmLevel || 0)) sounds.warm(level);
+        view.warmLevel = level;
+      }
+      function turnSmooth(ax, ang) {
+        if (view.phase !== 'relic') return;
+        view.spin = null;
+        view.turnQ.push({ ax, left: ang });
+      }
+      // The rune leaves the relic and flies up into its box, which catches it with a little bounce
+      function runeFly(i, letter) {
+        const box = el.runes && el.runes.children[i];
+        if (!box || !el.stage || reducedMotion() || !box.animate) { if (box) replay(box, 'is-new'); return; }
+        const st = el.stage.getBoundingClientRect(), b = box.getBoundingClientRect();
+        const fly = document.createElement('div');
+        fly.className = 'chasm3d-flyrune';
+        fly.setAttribute('aria-hidden', 'true');
+        fly.textContent = letter;
+        el.stage.appendChild(fly);
+        box.classList.add('is-incoming');
+        const x0 = st.width / 2, y0 = st.height * 0.48, x1 = b.left - st.left + b.width / 2, y1 = b.top - st.top + b.height / 2;
+        const anim = fly.animate([
+          { transform: `translate(${x0}px, ${y0}px) translate(-50%, -50%) scale(0.4)`, opacity: 0 },
+          { transform: `translate(${x0}px, ${y0 - 30}px) translate(-50%, -50%) scale(2.6)`, opacity: 1, offset: 0.35 },
+          { transform: `translate(${x1}px, ${y1}px) translate(-50%, -50%) scale(0.9)`, opacity: 1 }
+        ], { duration: 1150, easing: 'cubic-bezier(.5,0,.3,1)', delay: 250 });
+        anim.onfinish = () => { fly.remove(); box.classList.remove('is-incoming'); replay(box, 'is-new'); };
+      }
+      function confetti() {
+        if (!el.stage || reducedMotion()) return;
+        const box = document.createElement('div');
+        box.className = 'chasm3d-confetti';
+        box.setAttribute('aria-hidden', 'true');
+        const cols = ['#fde68a', '#f59e0b', '#ef6b4a', '#5fa8d8', '#a7f3d0', '#fff3e4'];
+        for (let i = 0; i < 70; i++) {
+          const c = document.createElement('i');
+          c.style.cssText = `--x:${(Math.random() * 100).toFixed(1)}%;--dx:${((Math.random() - 0.5) * 160).toFixed(0)}px;--r:${(Math.random() * 720 - 360).toFixed(0)}deg;`
+            + `--d:${(1.8 + Math.random() * 1.6).toFixed(2)}s;--delay:${(Math.random() * 0.6).toFixed(2)}s;background:${cols[i % cols.length]}`;
+          box.appendChild(c);
+        }
+        el.stage.appendChild(box);
+        setTimeout(() => box.remove(), 4200);
+      }
+
       // =====================================================================
       // The panel: Hermes's voice, where he stands, the controls
       // =====================================================================
-      function say(text) { if (el.voice) el.voice.textContent = text; }
+      // Hermes's words arrive in a soft cascade, word after word (the whole line in under a second)
+      function say(text) {
+        if (!el.voice) return;
+        if (reducedMotion()) { el.voice.textContent = text; return; }
+        const parts = String(text).split(/(\s+)/), words = parts.filter((w) => w.trim()).length;
+        const step = Math.min(28, 800 / Math.max(1, words));
+        let n = 0;
+        el.voice.innerHTML = parts.map((w) => (w.trim() ? `<span class="chasm3d-word" style="animation-delay:${Math.round(n++ * step)}ms">${w.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span>` : w)).join('');
+      }
       function subtitle(text, secs) {
         if (!el.subtitle) return;
         el.subtitle.textContent = text;
@@ -1068,8 +1176,16 @@
           el.runes.setAttribute('aria-label', S.runes ? `Runes found: ${CAIRNS.slice(0, S.runes).map((c) => c.letter).join(' ')}` : 'No runes found yet');
         }
         if (el.skins) {
-          el.skins.innerHTML = [0, 1, 2].map((i) => `<span class="chasm3d-skin" style="--fill:${Math.max(0, Math.min(1, S.water - i))}"></span>`).join('');
+          // The skins are kept (not redrawn), so the water level slides; a lost skin drains with a shake, a refill bubbles
+          if (el.skins.children.length !== 3) el.skins.innerHTML = '<span class="chasm3d-skin"></span>'.repeat(3);
+          [...el.skins.children].forEach((sk, i) => sk.style.setProperty('--fill', Math.max(0, Math.min(1, S.water - i))));
           el.skins.setAttribute('aria-label', `Water: ${Math.max(0, Math.round(S.water * 10) / 10)} of 3 skins`);
+          const before = view.water0;
+          view.water0 = S.water;
+          if (before !== undefined && G && modal.style.display !== 'none') {
+            if (S.water <= before - 0.5) { el.skins.classList.remove('is-fill'); replay(el.skins, 'is-hurt'); replay(fxEl.hurt, 'is-on'); sounds.thud(); }
+            else if (S.water >= before + 0.5) { el.skins.classList.remove('is-hurt'); replay(el.skins, 'is-fill'); setTimeout(sounds.fill, 500); }
+          }
         }
         if (el.clock) el.clock.textContent = '☀ ' + clock(S.min);
         paintFacing();
@@ -1082,7 +1198,18 @@
           el.facing.textContent = 'Facing ' + DIRS[d][2];
         }
       }
-      function where(text) { if (el.where) el.where.textContent = text; }
+      function where(text) {
+        if (!el.where || el.where.textContent === text) return;
+        el.where.textContent = text;
+        replay(el.where, 'is-new');
+      }
+      // Restart a one-shot CSS animation on an element
+      function replay(node, cls) {
+        if (!node) return;
+        node.classList.remove(cls);
+        void node.offsetWidth;
+        node.classList.add(cls);
+      }
       function headingLabel() { return DIRS[S.h][2]; }
 
       function btn(label, onClick, opts) {
@@ -1094,10 +1221,16 @@
         if (opts && opts.disabled) b.disabled = true;
         if (opts && opts.dir !== undefined) b.dataset.dir = DIRS[opts.dir][2];
         b.addEventListener('click', onClick);
+        b.style.animationDelay = `${el.controls.children.length * 55}ms`;   // the buttons arrive one after another
+        if (opts && opts.dir !== undefined) {   // pointing at a way lights its arrow on the sand
+          const hot = (on) => () => { view.hot = on ? opts.dir : -1; };
+          b.addEventListener('mouseenter', hot(true)); b.addEventListener('mouseleave', hot(false));
+          b.addEventListener('focus', hot(true)); b.addEventListener('blur', hot(false));
+        }
         el.controls.appendChild(b);
         return b;
       }
-      function clearControls() { if (el.controls) el.controls.innerHTML = ''; }
+      function clearControls() { if (el.controls) el.controls.innerHTML = ''; view.hot = -1; }
 
       // ---- At a stop where he can choose ----
       function showChoice(line) {
@@ -1200,6 +1333,7 @@
         else if (stop === 'stuck') text = "Every way out of this place crosses my own footprints. The first law closes all of them.";
         else text = PLACES[k] ? PLACES[k].text : "The gorge ends here, in a wall of red rock. Not even a lizard lives here. The fourth law warns us about blind gorges like this one.";
         S.water = Math.max(0, S.water - 1);
+        view.shake = 1;
         const restNeeded = S.water <= 0.001;
         const cost = restNeeded ? "And that was my last drop of water." : `It cost us a skin of water: ${skinsWord(S.water)} left.`;
         say(`${text} ${cost}`);
@@ -1251,6 +1385,7 @@
           if (view.phase !== 'rest') return;
           const left = Math.max(0, Math.ceil((S.rest - Date.now()) / 1000));
           b.textContent = `Hermes is resting · ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+          b.style.setProperty('--p', (1 - left / REST_S).toFixed(3));   // the button fills like a bar while he rests
           where(`Resting in the shade. The sun is moving across the sky.`);
           if (left <= 0) { endRest(); return; }
           rest.t = setTimeout(tick, 500);
@@ -1281,9 +1416,9 @@
           // The rune starts turned away from her: half a turn past the way Hermes faces, and tipped over
           G.relic.quaternion.setFromEuler(new G.T.Euler(0.9, yawOf(S.h) + Math.PI * 0.85, 0.3, 'YXZ'));
           G.scene.add(G.relic);
-          view.relicHold = 0;
+          view.relicHold = 0; view.warm = 0; view.warmLevel = 0; view.spin = null; view.turnQ.length = 0;
         }
-        const turn = (ax, ang) => () => rotateRelic(ax, ang);
+        const turn = (ax, ang) => () => turnSmooth(ax, ang);
         btn('⟲', turn('y', -0.35), { aria: 'Turn the relic left', cls: 'is-turn' });
         btn('⟳', turn('y', 0.35), { aria: 'Turn the relic right', cls: 'is-turn' });
         btn('⤒', turn('x', -0.35), { aria: 'Tip the relic away from you', cls: 'is-turn' });
@@ -1309,7 +1444,17 @@
         if (view.phase !== 'relic') return;
         const i = S.runes, ca = CAIRNS[i];
         view.phase = 'found';
-        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        view.spin = null; view.turnQ.length = 0;
+        if (soundOn()) sounds.rune(); else if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        replay(fxEl.flash, 'is-on');
+        if (G && G.relic && !reducedMotion()) {   // a burst of golden sparks out of the relic
+          const v = new Float32Array(G.sparksN * 3);
+          for (let n = 0; n < G.sparksN; n++) {
+            const a = Math.random() * Math.PI * 2, e = Math.random() * 1.2 - 0.2, sp = 0.8 + Math.random() * 1.4;
+            v[n * 3] = Math.cos(a) * Math.cos(e) * sp; v[n * 3 + 1] = Math.sin(e) * sp + 0.9; v[n * 3 + 2] = Math.sin(a) * Math.cos(e) * sp;
+          }
+          view.burst = { t: 0, o: G.relic.position.clone(), v };
+        }
         S.runes = i + 1;
         S.water = 3;
         S.wh = 1;
@@ -1317,6 +1462,7 @@
         S.cp = S.pos.slice();
         S.ch = S.h;
         paintHud();
+        runeFly(i, ca.letter);
         subtitle(`The ${ordinal(i)} rune: ${ca.letter}`, 4);
         say(ca.found);
         clearControls();
@@ -1337,7 +1483,8 @@
         say("We are out, Silvia! The cliffs fall away on both sides and the light is so bright that I have to close my eyes. Ahead lies a white plain of salt, flat as a table, all the way to the horizon: the Salt Playa. Far away I can see the ruins of an old nomad camp. But the walkers' track does not cross the salt in a straight line, and I can already see why: there are dark holes of brine under the crust. Open Sheet 10A of your journal.");
         where('Out of the canyon, at the edge of the Salt Playa.');
         if (el.victory) el.victory.style.display = 'block';
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        confetti();
         const first = !isDone();
         put('order_whispering_chasm_completed', 'true');
         put('order_desert_station_active', '11');
@@ -1346,6 +1493,7 @@
         if (first && typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (first && typeof window.selectMapNode === 'function') window.selectMapNode(11, false);
         paintHud();
+        if (el.runes) [...el.runes.children].forEach((r, n) => { r.style.animationDelay = `${n * 120}ms`; replay(r, 'is-wave'); });
       }
 
       // =====================================================================
@@ -1421,6 +1569,10 @@
         camPos.x += (tx - camPos.x) * k; camPos.y += (ty - camPos.y) * k; camPos.z += (tz - camPos.z) * k; camPos.ok = true;
         G.camera.position.set(camPos.x, camPos.y, camPos.z);
         G.camera.lookAt(lx, ly, lz);
+        if (view.shake > 0) {   // a wrong turn jolts the picture for a moment
+          if (!rm) { const a = view.shake * view.shake * 0.12; G.camera.position.x += (Math.random() - 0.5) * a; G.camera.position.y += (Math.random() - 0.5) * a; }
+          view.shake = Math.max(0, view.shake - dt * 2.2);
+        }
 
         // The relic floats in front of the camera; the letter must face it for a moment
         if (G.relic) {
@@ -1428,8 +1580,30 @@
           G.relic.position.copy(G.camera.position).addScaledVector(f, 1.3);
           G.relic.position.y += 0.08;
           G.relicLight.position.copy(G.camera.position).add(new T.Vector3(0.5, 0.6, 0.2));
-          G.relicLight.intensity = 1.1;
-          if (view.phase === 'relic' && !dragging) {
+          if (view.phase === 'relic') {
+            // The arrow buttons and keys turn it smoothly; a flick of the finger keeps it spinning a little
+            const tq = view.turnQ[0];
+            if (tq) {
+              const step = rm ? tq.left : tq.left * Math.min(1, dt * 14);
+              rotateRelic(tq.ax, step); tq.left -= step;
+              if (Math.abs(tq.left) < 0.002) view.turnQ.shift();
+            }
+            if (view.spin && !dragging) {
+              rotateRelic('y', view.spin.y * dt); rotateRelic('x', view.spin.x * dt);
+              const k2 = Math.pow(0.03, dt); view.spin.x *= k2; view.spin.y *= k2;
+              if (Math.abs(view.spin.x) + Math.abs(view.spin.y) < 0.05) view.spin = null;
+            }
+          }
+          // Warmer as the letter turns towards her: the gauge fills, the relic glows, a soft note at each quarter
+          const warm = view.phase === 'found' ? 1 : Math.max(0, Math.min(1, (relicFacing() - 0.15) / 0.75));
+          view.warm += (warm - view.warm) * Math.min(1, dt * 8);
+          paintWarmth();
+          G.relicLight.intensity = 0.9 + view.warm * 1.6;
+          G.relicGlow.visible = true;
+          G.relicGlow.position.copy(G.relic.position).addScaledVector(f, 0.35);
+          G.relicGlow.material.opacity = 0.12 + view.warm * 0.55 + (view.phase === 'found' ? Math.sin(now / 240) * 0.08 : 0);
+          G.relicGlow.scale.setScalar(1.1 + view.warm * 0.9);
+          if (view.phase === 'relic' && !dragging && !view.spin && !view.turnQ.length) {
             if (relicFacing() > 0.9) { view.relicHold += dt; if (view.relicHold > 0.5) relicFound(); }
             else view.relicHold = 0;
           }
@@ -1438,10 +1612,31 @@
             const upright = G.camera.quaternion.clone().multiply(G.relic.userData.plate.quaternion.clone().invert());
             G.relic.quaternion.slerp(upright, Math.min(1, dt * 4));
           }
-        } else G.relicLight.intensity = 0;
+        } else { G.relicLight.intensity = 0; G.relicGlow.visible = false; }
+
+        // Golden sparks thrown out by a rune when it is read
+        if (view.burst) {
+          const b = view.burst, sp = G.sparks.geometry.attributes.position;
+          b.t += dt;
+          for (let i = 0; i < G.sparksN; i++) {
+            sp.setXYZ(i, b.o.x + b.v[i * 3] * b.t, b.o.y + b.v[i * 3 + 1] * b.t - 1.6 * b.t * b.t, b.o.z + b.v[i * 3 + 2] * b.t);
+          }
+          sp.needsUpdate = true;
+          G.sparks.material.opacity = Math.max(0, 1 - b.t / 1.3);
+          G.sparks.visible = true;
+          if (b.t > 1.3) { view.burst = null; G.sparks.visible = false; }
+        }
 
         // Arrows breathe; whisper dust drifts in
-        G.arrows.children.forEach((a) => { if (!a.userData.blocked) a.material.opacity = 0.6 + Math.sin(now / 300) * 0.3; });
+        G.arrows.children.forEach((a) => {
+          // they spring out of the sand when he stops, and the one she points at grows and brightens
+          const age = rm ? 1 : Math.min(1, Math.max(0, (performance.now() - a.userData.born) / 1000 - a.userData.n * 0.07) * 3.2);
+          const pop = 1 + 2.7 * Math.pow(age - 1, 3) + 1.7 * Math.pow(age - 1, 2);   // ease out, with a little overshoot
+          const hot = !a.userData.blocked && view.hot === a.userData.d;
+          a.userData.h = (a.userData.h || 0) + ((hot ? 1 : 0) - (a.userData.h || 0)) * Math.min(1, dt * 10);
+          a.scale.setScalar(1.35 * pop * (1 + a.userData.h * 0.3));
+          if (!a.userData.blocked) a.material.opacity = Math.min(1, 0.6 + Math.sin(now / 300) * 0.3 + a.userData.h * 0.5);
+        });
         if (view.dust) {
           const dd = view.dust, pos = G.dust.geometry.attributes.position;
           dd.t += dt;
@@ -1487,6 +1682,7 @@
         if (!G) return;
         downAt = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false };
         dragging = true;
+        view.spin = null; view.turnQ.length = 0;
         try { el.canvas.setPointerCapture(e.pointerId); } catch (err) {}
       }
       function onMove(e) {
@@ -1494,7 +1690,11 @@
         const dx = e.clientX - downAt.lx, dy = e.clientY - downAt.ly;
         downAt.lx = e.clientX; downAt.ly = e.clientY;
         if (Math.abs(e.clientX - downAt.x) + Math.abs(e.clientY - downAt.y) > 6) downAt.moved = true;
-        if (view.phase === 'relic') { rotateRelic('y', dx * 0.012); rotateRelic('x', dy * 0.012); }
+        if (view.phase === 'relic') {
+          rotateRelic('y', dx * 0.012); rotateRelic('x', dy * 0.012);
+          const vx = Math.max(-8, Math.min(8, dy * 0.72)), vy = Math.max(-8, Math.min(8, dx * 0.72));   // radians a second, at ~60 moves a second
+          view.spin = view.spin ? { x: view.spin.x * 0.5 + vx * 0.5, y: view.spin.y * 0.5 + vy * 0.5 } : { x: vx, y: vy };
+        }
         else view.look = Math.max(-1.8, Math.min(1.8, view.look - dx * 0.006));
       }
       function onUp(e) {
@@ -1526,7 +1726,7 @@
         const rel = { ArrowUp: 0, ArrowRight: 1, ArrowDown: 2, ArrowLeft: 3 }[e.key];
         if (view.phase === 'relic' && rel !== undefined) {
           e.preventDefault();
-          rotateRelic(rel % 2 ? 'y' : 'x', [-0.35, 0.35, 0.35, -0.35][rel]);
+          turnSmooth(rel % 2 ? 'y' : 'x', [-0.35, 0.35, 0.35, -0.35][rel]);
           return;
         }
         if (view.phase === 'choose') {
@@ -1573,7 +1773,7 @@
         S = load();
         if (el.victory) el.victory.style.display = 'none';
         dropRelic();
-        view.walk = null; view.look = 0; view.dust = null; camPos.ok = false;
+        view.walk = null; view.look = 0; view.dust = null; view.water0 = undefined; camPos.ok = false;
         placeHermes(S.trail[S.trail.length - 1], S.h);
         paintPrints();
         paintHud();
@@ -1605,10 +1805,14 @@
       const howtoOpen = () => !!howto.box && !howto.box.hidden;
       function showHowto(page) {
         if (!howto.box) return;
+        const was = howtoOpen() ? howto.page : -1;
         if (!howtoOpen()) howto.back = document.activeElement;
         howto.page = Math.max(0, Math.min(howtoPages.length - 1, page));
         howtoPages.forEach((p, i) => { p.hidden = i !== howto.page; });
+        howtoPages.forEach(p => p.classList.remove('is-fwd', 'is-back'));
+        if (was >= 0 && was !== howto.page) replay(howtoPages[howto.page], howto.page > was ? 'is-fwd' : 'is-back');
         $('chasm3d-howto-count').textContent = `${howto.page + 1} of ${howtoPages.length}`;
+        [...($('chasm3d-howto-dots')?.children || [])].forEach((d, i) => d.classList.toggle('is-on', i === howto.page));
         $('btn-howto-back').disabled = howto.page === 0;
         $('btn-howto-next').textContent = howto.page === howtoPages.length - 1 ? 'Start walking' : 'Next →';
         howto.box.hidden = false;
