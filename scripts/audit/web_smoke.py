@@ -44,6 +44,9 @@ Serves web/ locally with the security headers of web/_headers and drives a real 
  28. Offline: the first visit keeps the whole Hub, a game is kept once opened, and with the server down and no signal
      the Hub opens every view and the game plays; a new version waits and comes in the next time the Hub is opened;
      the cloud save keeps a change on the device and sends it when the signal returns.
+ 29. Station 21 (The Camera Obscura) and 30. Station 22 (The Whispering Gallery).
+ 31. Station 10 (The Whispering Chasm in 3D): the portal, the forks and their whisper, wrong turns that cost water and
+     send Hermes back, the rest in the shade, relics turned until the rune shows, reloads mid-walk, the way out.
 
 Setup (once):  pip install -r scripts/requirements.txt && python3 -m playwright install chromium
 Run:           python3 scripts/audit/web_smoke.py            (exit code 0 = all green)
@@ -211,21 +214,18 @@ def test_wire_gating(browser):
                                         "order_oasis_clepsydra_completed": "true"})
     check(len(info["choices"]) == 3 and not errors, "Clepsydra done: Camp VIII debrief opens", "; ".join(errors[:2]))
 
-    camp = dict(DESERT_BASE, order_whispering_chasm_completed="false", order_salt_playa_completed="false", order_silvia_waypoint_v2="done")
-    ctx, page, errors = new_page(browser, camp)
+    portal = dict(DESERT_BASE, order_whispering_chasm_completed="false", order_salt_playa_completed="false", order_silvia_waypoint_v2="done")
+    ctx, page, errors = new_page(browser, portal)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
     js = page.evaluate
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
     wire = js("document.getElementById('view-field-wire').innerText")
-    check("Camp at the North Portal" in wire, "Chasm march over while the canyon is rebuilt: Hermes makes camp at the North Portal",
+    check("North Portal Reached" in wire and "Sheet 9B" in wire, "Chasm march over: the wire says Hermes is at the North Portal and points to Sheet 9B",
           wire[-300:].replace("\n", " "))
     js("window.openWhisperingChasmModal()"); page.wait_for_timeout(400)
-    js("window.selectDesertStation(10)"); page.wait_for_timeout(400)
-    check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") == "none"
-          and "CAMP AT THE NORTH PORTAL" in js("(document.getElementById('desert-toast-banner') || {}).textContent || ''"), "the camp keeps the Chasm closed and says why",
-          js("(document.getElementById('desert-toast-banner') || {}).textContent || ''") + " | " + js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display"))
-    check(not errors, "no JS errors at the camp", "; ".join(errors[:2]))
+    check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none", "the Chasm opens for Silvia at the North Portal")
+    check(not errors, "no JS errors at the North Portal", "; ".join(errors[:2]))
     ctx.close()
 
 
@@ -1414,6 +1414,26 @@ def test_hint_ladder(browser):
     ctx.close()
 
 
+# One step of the Whispering Chasm walk: at a fork take the way the whisper points to (or any other, for the wrong one),
+# after a wrong turn go back, after a rest get up, at a relic find the rune.
+CHASM_STEP = """(() => { const c = window.__chasm, s = c.state();
+  if (s.phase === 'choose') return c.choose(c.guide());
+  if (s.phase === 'setback') { c.back(); return 'back'; }
+  if (s.phase === 'rest') { c.endRest(); return 'rest'; }
+  if (s.phase === 'relic') { c.solveRelic(); c.walkOn(); return 'relic'; }
+  if (s.phase === 'found') { c.walkOn(); return 'found'; }
+  return s.phase; })()"""
+CHASM_STEP_WRONG = """(() => { const c = window.__chasm, s = c.state();
+  if (s.phase === 'choose') { const g = c.guide(), names = ['north', 'east', 'south', 'west'];
+    const o = s.options.find((x) => !x.blocked && names[x.d] !== g) || s.options.find((x) => !x.blocked);
+    return o ? c.choose(names[o.d]) : 'none'; }
+  if (s.phase === 'setback') { c.back(); return 'back'; }
+  if (s.phase === 'rest') { c.endRest(); return 'rest'; }
+  if (s.phase === 'relic') { c.solveRelic(); c.walkOn(); return 'relic'; }
+  if (s.phase === 'found') { c.walkOn(); return 'found'; }
+  return s.phase; })()"""
+
+
 def test_early_hints(browser):
     print("\n17. Early hints: Stations 10 to 13 and Cairn I count their misses into Hermes's notes")
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
@@ -1434,10 +1454,12 @@ def test_early_hints(browser):
     js("window.closeCairnOneModal()"); page.wait_for_timeout(300)
 
     js("window.openWhisperingChasmModal()"); page.wait_for_timeout(400)
-    for letter in "TKI":     # two trap markers, one out of order
-        js(f"window.handleChasmCairnClick('{letter}')")
-    check(get("order_hint_s10-chasm_level") == "1" and "note 1 of 3" in note("modal-whispering-chasm", ".chasm-cairns-keypad-box"),
-          "Station 10: trap and skipped markers bring the first note")
+    for _ in range(30):      # wrong turns until three of them have sent Hermes back
+        if get("order_hint_s10-chasm_level") == "1":
+            break
+        js(CHASM_STEP_WRONG)
+    check(get("order_hint_s10-chasm_level") == "1" and "note 1 of 3" in note("modal-whispering-chasm", "#chasm3d-controls"),
+          "Station 10: three wrong turns in the canyon bring the first note")
     js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(300)
 
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
@@ -2056,7 +2078,7 @@ def test_a11y(browser):
         for _ in range(30):
             page.keyboard.press("Tab")
             if not page.evaluate(inside):
-                trapped.append(mid); break
+                trapped.append(mid + " (Tab went to " + page.evaluate("(() => { const a = document.activeElement; return a.tagName + '#' + a.id + '.' + a.className; })()") + ")"); break
         mouse += [mid + ": " + m for m in page.evaluate(A11Y_CONTROLS_JS, ["#" + mid, A11Y_FOCUSABLE])["mouseOnly"]]
         ring += [mid + ": " + m for m in page.evaluate(A11Y_RING_JS, ["#" + mid, A11Y_FOCUSABLE])]
         dim += [mid + ": " + m for m in low_contrast(page, "#" + mid)]
@@ -2589,6 +2611,128 @@ def test_whispering_gallery(browser):
     ctx.close()
 
 
+def test_whispering_chasm(browser):
+    print("\n31. Station 10 · The Whispering Chasm in 3D: forks, whispers, wrong turns, water, relics and the way out")
+    seed = dict(DESERT_BASE, order_whispering_chasm_completed="false", order_salt_playa_completed="false",
+                order_silvia_waypoint_v2="done", order_desert_station_active="10")
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    get = lambda key: js("k => localStorage.getItem(k)", key)
+    st = lambda: js("window.__chasm.state()")
+    voice = lambda: js("document.getElementById('chasm3d-voice').innerText")
+    reopen = lambda: (page.reload(wait_until="load"), page.wait_for_timeout(2500), js("window.openWhisperingChasmModal()"), page.wait_for_timeout(400))
+
+    js("window.openWhisperingChasmModal()"); page.wait_for_timeout(600)
+    s = st()
+    check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none" and s["phase"] == "choose"
+          and s["pos"] == [1, 0] and "North Portal" in voice() and "Sheet 9B" in voice(),
+          "the canyon opens at the North Portal, Hermes asks her to keep Sheet 9B in front of her", f"{s['phase']} {s['pos']}")
+    gl = s["gl"]
+    if gl:
+        js("window.__chasm.frames(4)")
+        check(st()["drawn"] > 0, "the canyon is drawn in 3D")
+    else:
+        check(js("document.getElementById('chasm3d-stage').classList.contains('is-flat')"), "without WebGL the canyon falls back to words")
+    check([o["d"] for o in s["options"]] == [1], "at the portal the only way is east, into the gorge")
+    js("window.__chasm.choose('east')")
+    s = st()
+    names = ["north", "east", "south", "west"]
+    ways = sorted(names[o["d"]] for o in s["options"])
+    check(s["phase"] == "choose" and ways == ["east", "south"] and "Which way" in voice()
+          and js("document.querySelectorAll('#chasm3d-controls .chasm3d-btn.is-way').length") == 2,
+          "the first fork: east or south, one button for each and the question in Hermes's words", f"{s['phase']} {ways}")
+
+    js("document.querySelector('#chasm3d-controls .chasm3d-btn.is-listen').click()")
+    sub = js("document.getElementById('chasm3d-subtitle').innerText")
+    check("A whisper comes from" in sub and "(east)" in sub and st()["wh"] == 0
+          and js("document.querySelector('#chasm3d-controls .chasm3d-btn.is-listen').disabled"),
+          "Listen: one whisper per stretch, from the east, and then the ear is spent", sub)
+
+    js("window.__chasm.choose('south')")   # the quick road the second law warns about
+    for _ in range(8):
+        if st()["phase"] != "choose":
+            break
+        js(CHASM_STEP_WRONG)
+    s = st()
+    check(s["phase"] == "setback" and "skin of water" in voice() and s["water"] < 3 and s["pos"] == [1, 0]
+          and js("document.querySelector('#chasm3d-controls .chasm3d-btn.is-back') !== null"),
+          "a wrong turn: Hermes says why, it costs a skin of water and he goes back to the portal", f"{s['phase']} {s['water']}")
+    js("window.__chasm.back()")
+    check(st()["phase"] == "choose" and st()["trail"] == [1 * 25 + 0], "back at the portal, the wrong footprints are gone")
+
+    for _ in range(40):
+        if st()["phase"] == "rest":
+            break
+        js(CHASM_STEP_WRONG)
+    check(st()["phase"] == "rest" and "Hermes is resting" in js("document.getElementById('chasm3d-controls').innerText"),
+          "the last skin empty: Hermes rests in the shade, with a countdown")
+    reopen()
+    check(st()["phase"] == "rest", "a reload during the rest keeps him resting")
+    js("window.__chasm.endRest()")
+    s = st()
+    check(s["phase"] == "choose" and abs(s["water"] - 1) < 0.01 and "drop by drop" in voice(), "after the rest one skin is full again")
+
+    for _ in range(80):      # the right way to the first relic
+        if st()["phase"] == "relic":
+            break
+        js(CHASM_STEP)
+    s = st()
+    check(s["phase"] == "relic" and s["runes"] == 0 and "bell" in voice().lower(), "the first cairn: the bell, turned away from her", s["phase"])
+    if gl:
+        js("window.__chasm.frames(20)")   # the camera settles in front of the relic
+        start = js("window.__chasm.facing()")
+        for _ in range(4):        # turn it as she would, each time the way that shows the rune best, and hold it there
+            for _ in range(40):
+                if js("window.__chasm.facing()") > 0.96:
+                    break
+                js("""(() => { const c = window.__chasm; let best = null, val = -2;
+                    for (const [ax, a] of [['y', 0.2], ['y', -0.2], ['x', 0.2], ['x', -0.2]]) {
+                      c.turn(ax, a); const f = c.facing(); c.turn(ax, -a); if (f > val) { val = f; best = [ax, a]; } }
+                    c.turn(best[0], best[1]); })()""")
+            js("window.__chasm.frames(30)")
+            if st()["phase"] != "relic":
+                break
+        check(start < 0.5 and st()["phase"] == "found", "turning the bell until the M faces her finds the rune",
+              f"start {start:.2f} now {js('window.__chasm.facing()'):.2f} {st()['phase']}")
+    else:
+        js("window.__chasm.solveRelic()")
+    s = st()
+    check(s["runes"] == 1 and s["water"] == 3 and "first rune" in js("document.getElementById('chasm3d-subtitle').innerText")
+          and js("document.querySelectorAll('#chasm3d-runes .chasm3d-rune.is-found').length") == 1,
+          "the M is the first rune, the skins are full and the rune is in the bar")
+    js("window.__chasm.walkOn()")
+    js(CHASM_STEP); js(CHASM_STEP)
+    before = st()
+    reopen()
+    after = st()
+    check(after["pos"] == before["pos"] and after["runes"] == 1 and after["trail"] == before["trail"],
+          "a reload in the middle of the walk puts Hermes back where he was", f"{before['pos']} {after['pos']}")
+
+    for _ in range(400):
+        if st()["phase"] == "done":
+            break
+        js(CHASM_STEP)
+    s = st()
+    check(s["phase"] == "done" and s["runes"] == 6 and s["pos"] == [23, 24], "the whispers lead him past all six cairns and out", f"{s['phase']} {s['runes']}")
+    check(get("order_whispering_chasm_completed") == "true" and get("order_desert_station_active") == "11"
+          and js("getComputedStyle(document.getElementById('chasm-victory-card')).display") != "none"
+          and "Salt Playa" in voice() and "Sheet 10A" in voice(),
+          "out of the canyon: the station is done, the Salt Playa is next and Sheet 10A is named")
+    check(" ".join(js("[...document.querySelectorAll('#chasm3d-runes .chasm3d-rune')].map(x => x.innerText)")) == "M I R A G E", "the bar spells MIRAGE")
+    js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(400)
+    reopen()
+    check(st()["phase"] == "done", "opened again, the canyon shows the way out")
+    js("document.getElementById('btn-chasm-again').click()")
+    s = st()
+    check(s["phase"] == "choose" and s["pos"] == [1, 0] and s["runes"] == 0 and get("order_whispering_chasm_completed") == "true",
+          "walk it again: back at the portal, the station stays done")
+    js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(400)
+    check(not errors, "no JS errors in the canyon", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -2599,9 +2743,10 @@ SECTIONS = {
     "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
     "journey": test_journey, "seals": test_seals, "a11y": test_a11y, "offline": test_offline,
     "camera": test_camera_obscura, "gallery": test_whispering_gallery,
+    "chasm": test_whispering_chasm,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

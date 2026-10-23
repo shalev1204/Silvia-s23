@@ -58,6 +58,7 @@
   <link rel="stylesheet" href="./hub/css/view-trail.css">
   <link rel="stylesheet" href="./hub/css/desert-map.css">
   <link rel="stylesheet" href="./hub/css/stations/s10-whispering-chasm.css">
+  <link rel="stylesheet" href="./hub/css/stations/s10-chasm-walk.css">
   <link rel="stylesheet" href="./hub/css/stations/s11-salt-playa.css">
   <link rel="stylesheet" href="./hub/css/stations/s12-desert-lexicon.css">
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-clepsydra.css">
@@ -2158,128 +2159,76 @@
   </div>
 
   <!-- =====================================================================
-       TACTICAL EXPEDITION MODAL: THE WHISPERING CHASM (STATION 10)
+       THE WHISPERING CHASM (STATION 10): a walk behind Hermes, in 3D (hub/js/stations/s10-whispering-chasm.js)
        ===================================================================== -->
   <div class="chasm-modal-backdrop" id="modal-whispering-chasm" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="chasm-modal-title">
-    <div class="chasm-workbench-window">
-      <!-- Tactical Corner Brackets -->
+    <div class="chasm-workbench-window chasm3d-window">
       <div class="map-frame-corner corner-tl"></div>
       <div class="map-frame-corner corner-tr"></div>
       <div class="map-frame-corner corner-bl"></div>
       <div class="map-frame-corner corner-br"></div>
 
-      <!-- Header -->
       <div class="chasm-header-bar">
         <div class="chasm-header-title-wrap">
           <span class="chasm-header-icon">🧭</span>
           <div>
             <div class="chasm-header-title" id="chasm-modal-title">The Whispering Chasm · Station 10</div>
-            <div class="chasm-header-subtitle">Tactical Canyon Descent · Reference Sheet 9B in Physical Journal</div>
+            <div class="chasm-header-subtitle">Walk the canyon with Hermes · Sheet 9B of your journal</div>
           </div>
         </div>
-        <button type="button" class="chasm-close-btn" id="btn-close-chasm" title="Close Tactical View">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-chasm" title="Close" aria-label="Close the Whispering Chasm">✕</button>
       </div>
 
-      <!-- Telemetry Strip -->
-      <div class="chasm-telemetry-strip">
-        <div class="chasm-telemetry-pill">
-          <span>🚶 Explorer:</span>
-          <strong id="chasm-telem-explorer">Hermes</strong>
-        </div>
-        <div class="chasm-telemetry-pill">
-          <span>🧭 Bearing:</span>
-          <strong>112° ESE</strong>
-        </div>
-        <div class="chasm-telemetry-pill">
-          <span>⏱️ March Time:</span>
-          <strong id="chasm-telem-time">4h 30m</strong>
-        </div>
-        <div class="chasm-telemetry-pill">
-          <span>💧 Canteen:</span>
-          <strong id="chasm-telem-canteen">3 / 3 Skins</strong>
-        </div>
-        <div class="chasm-telemetry-pill">
-          <span>📍 Waypoint:</span>
-          <strong id="chasm-telem-waypoint">North Portal</strong>
-        </div>
-      </div>
-
-      <!-- Workbench Body -->
-      <div class="chasm-workbench-body">
-        <!-- Left: 25x25 Canyon Labyrinth Interactive Canvas / SVG -->
-        <div class="chasm-maze-frame">
-          <div class="chasm-maze-canvas-wrap">
-            <svg class="chasm-svg-maze" viewBox="0 0 1060 1060" id="chasm-svg-maze">
-              <!-- Grid will be rendered dynamically with walls, cairns, footsteps and Hermes token -->
-            </svg>
-          </div>
-        </div>
-
-        <!-- Right: Navigator's Field Desk & Controls -->
-        <div class="chasm-desk-panel">
-          <div class="chasm-desk-header">
-            <div class="chasm-desk-title">The Law of the Canyon Walkers</div>
-            <div class="chasm-desk-rule">
-              1. Never retrace your steps once committed.<br>
-              2. Avoid side gorges that skip the sacred relics.<br>
-              3. Collect all 6 relic stone markers in strict order to uncover the secret word.
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="chasm3d-stage">
+          <canvas id="chasm3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/whispering_chasm_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="chasm3d-runes" id="chasm3d-runes" role="img" aria-label="No runes found yet"></div>
+            <div class="chasm3d-compass" aria-hidden="true">
+              <svg viewBox="-50 -50 100 100" id="chasm3d-rose" class="chasm3d-rose">
+                <circle r="44" class="rose-ring"/>
+                <path d="M0,-40 L8,-6 L0,-12 L-8,-6 Z" class="rose-north"/>
+                <path d="M0,40 L8,6 L0,12 L-8,6 Z" class="rose-south"/>
+                <text y="-24" text-anchor="middle" class="rose-n">N</text>
+                <text x="30" y="5" text-anchor="middle" class="rose-l">E</text>
+                <text y="34" text-anchor="middle" class="rose-l">S</text>
+                <text x="-30" y="5" text-anchor="middle" class="rose-l">W</text>
+              </svg>
+              <div class="chasm3d-facing" id="chasm3d-facing">Facing east</div>
+            </div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-skins" id="chasm3d-skins" role="img" aria-label="Water: 3 of 3 skins"></div>
+              <div class="chasm3d-clock" id="chasm3d-clock">☀ 06:10</div>
             </div>
           </div>
+          <div class="chasm3d-subtitle" id="chasm3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="chasm3d-fade"></div>
+        </div>
 
-          <!-- Nomad's Passphrase 6 Answer Slots -->
-          <div class="chasm-passphrase-slots-box">
-            <div class="chasm-slots-label">
-              <span>NOMAD'S PASSPHRASE (SHEET 9B)</span>
-              <span id="chasm-progress-count">0 / 6 MARKERS</span>
-            </div>
-            <div class="chasm-slots-row">
-              <div class="chasm-slot-box" id="chasm-slot-0"><span class="slot-letter"></span><span class="chasm-slot-idx">1</span></div>
-              <div class="chasm-slot-box" id="chasm-slot-1"><span class="slot-letter"></span><span class="chasm-slot-idx">2</span></div>
-              <div class="chasm-slot-box" id="chasm-slot-2"><span class="slot-letter"></span><span class="chasm-slot-idx">3</span></div>
-              <div class="chasm-slot-box" id="chasm-slot-3"><span class="slot-letter"></span><span class="chasm-slot-idx">4</span></div>
-              <div class="chasm-slot-box" id="chasm-slot-4"><span class="slot-letter"></span><span class="chasm-slot-idx">5</span></div>
-              <div class="chasm-slot-box" id="chasm-slot-5"><span class="slot-letter"></span><span class="chasm-slot-idx">6</span></div>
-            </div>
-          </div>
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="chasm3d-voice" role="status" aria-live="polite"></div>
+          <div class="chasm3d-where" id="chasm3d-where"></div>
+          <div class="chasm3d-controls" id="chasm3d-controls" role="group" aria-label="Guide Hermes"></div>
 
-          <!-- Discovered Cairns Quick-Select Keypad -->
-          <div class="chasm-cairns-keypad-box">
-            <div class="chasm-keypad-label">Guide Hermes to the Next Waypoint:</div>
-            <div class="chasm-cairns-grid" id="chasm-keypad-buttons">
-              <!-- Injected dynamically: M, I, R, A, G, E, and decoys T, K, S -->
-            </div>
-          </div>
-
-          <!-- Live Telegram Ticker from Hermes -->
-          <div class="chasm-dispatch-box" id="chasm-dispatch-box">
-            <div class="chasm-dispatch-sender">
-              <span>📻 FIELD WIRE DISPATCH // HERMES</span>
-            </div>
-            <div id="chasm-dispatch-text">
-              "Silvia, I'm standing at the North Portal of the Whispering Chasm. The canyon splits ahead. Which stone marker do your notes indicate first?"
-            </div>
-          </div>
-
-          <!-- Victory Card (Shown when MIRAGE completed) -->
           <div class="chasm-victory-card" id="chasm-victory-card" style="display: none;">
-            <div class="chasm-victory-title">
-              <span>🌴</span>
-              <span>Out of the Gorge!</span>
-            </div>
-            <div class="chasm-victory-text">
-              "Silvia, we made it out of the gorge! The cliffs fall away and a blinding white salt basin, the Salt Playa, stretches ahead. Far beyond it I can see the ruins of an old nomad camp, but the crust is riddled with brine sinkholes... Open Sheet 10A of your journal: The Salt Playa!"
-            </div>
-            <button type="button" class="btn-chasm-finish" id="btn-chasm-finish">
-              <span>🗺️ Return to Grand Desert Map & Unlock the Salt Playa ➔</span>
-            </button>
+            <div class="chasm-victory-title"><span>🌴</span><span>Out of the Gorge!</span></div>
+            <div class="chasm-victory-text">The six runes spell the Nomad's Passphrase. Write them in the six boxes of Sheet 9B, then open Sheet 10A: the Salt Playa is next.</div>
+            <button type="button" class="btn-chasm-finish" id="btn-chasm-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-chasm-again">↺ Walk the canyon again</button>
           </div>
 
-          <!-- Actions Row -->
-          <div class="chasm-actions-row">
-            <button type="button" class="btn-chasm-reset" id="btn-chasm-reset">
-              <span>↺ Retrace to North Portal</span>
-            </button>
-          </div>
+          <details class="chasm3d-laws">
+            <summary>The Law of the Canyon Walkers</summary>
+            <ol>
+              <li>Never walk the same ground twice. Your own footprints close the way.</li>
+              <li>The quick road to the Oasis skips the cairns. Do not take it.</li>
+              <li>Find all six relic cairns, in order, before you leave the canyon.</li>
+              <li>A gorge that ends in a wall, a drop or a false cairn is a trap.</li>
+            </ol>
+            <p>Each wrong turn sends Hermes back to the last cairn and costs a skin of water. Each new cairn fills his skins again. At every fork you may listen once for the whisper of the pilgrims, until the next cairn.</p>
+          </details>
         </div>
       </div>
     </div>
@@ -4220,6 +4169,7 @@
   <script src="./hub/js/sheet-seals.js"></script>
   <script src="./hub/js/hub-core.js"></script>
   <script src="./hub/js/stations/s10-desert-map-and-chasm.js"></script>
+  <script src="./hub/js/stations/s10-whispering-chasm.js"></script>
   <script src="./hub/js/satchel-and-cairn-one.js"></script>
   <script src="./hub/js/tester-panel.js"></script>
   <script src="./hub/js/dawn-map-layer.js"></script>

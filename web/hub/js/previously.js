@@ -15,7 +15,7 @@
       var LAST = {
         start: 'A storm of red sand buried the raiders’ tracks, and Hermes rode it out under a rock shelf by Watchtower VI, with a copper wire to Silvia his only light.',
         cairn1: 'At dawn, by the dry wash, Silvia guided Hermes stone by stone through Cairn I, and the Wash River seal went into his satchel.',
-        chasm: 'Silvia led Hermes through the Whispering Chasm, marker by marker, and out of the gorge alive.',
+        chasm: 'Silvia walked Hermes through the Whispering Chasm, fork by fork, and he found the six relics: M, I, R, A, G, E.',
         playa: 'Silvia found Hermes a safe road across the Salt Playa, slab by slab, around the sinkholes.',
         lexicon: 'At Camp VII, Silvia read the nomad steles and locked the Al-Qibla bearing: the true road to Tower II.',
         clepsydra: 'At the Four Wells of Camp VIII, Silvia set the four seekers in their shadow-hours, and the water came back.',

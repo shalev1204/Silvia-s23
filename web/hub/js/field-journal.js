@@ -27,7 +27,7 @@
           earned: ['Seal of Cairn I'], sketch: './assets/chat/sketch_cairn_one.webp'
         },
         chasm: {
-          note: 'The Whispering Chasm. A maze of red walls, and a voice on the wire telling me which markers to trust. I came out the far side with all my water.',
+          note: 'The Whispering Chasm. A maze of red walls that whispered at every fork. Silvia had the whole map on her sheet; I had only the next turn. Six relics, six runes, and I came out at the Oasis Gate with water in my skins.',
           earned: ['The way through the gorge'], sketch: './assets/chat/sketch_chasm_mouth.webp'
         },
         playa: {

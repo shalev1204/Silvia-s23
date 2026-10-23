@@ -656,7 +656,7 @@
           {
             id: 'chasm', tag: 'Station 10', label: 'The Whispering Chasm', flag: 'order_whispering_chasm_completed', built: true,
             complete() { set('order_whispering_chasm_completed', 'true'); set('order_desert_station_active', '11'); },
-            reset() { del('order_whispering_chasm_completed'); }
+            reset() { del('order_whispering_chasm_completed'); del('order_chasm_walk'); }
           },
           {
             id: 'playa', tag: 'Station 11', label: 'The Salt Playa', flag: 'order_salt_playa_completed', built: true,
@@ -1237,14 +1237,14 @@
               statusClass: 'status-done-badge',
               title: 'The Whispering Chasm',
               thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-              lore: 'Guiding Hermes with the Law of the Canyon Walkers and Sheet 9B of your physical journal, Silvia led him through the 25×25 sandstone labyrinth, found the six stone markers (M-I-R-A-G-E) and unlocked a clue about the letter R for the Cipher Ledger.',
+              lore: 'Fork by fork, with Sheet 9B open in front of her, Silvia walked Hermes through the red maze of the Whispering Chasm. He turned the six relics in his hands until each one showed its rune, M, I, R, A, G and E, and came out at the Oasis Gate with water in his skins. The third rune, R, belongs in the Cipher Ledger.',
               rewards: [
-                { icon: '🏜️', label: 'Canyon Labyrinth Cleared', desc: '6 stone markers in strict order' },
-                { icon: '🗝️', label: 'Passphrase Verified: MIRAGE', desc: 'The password of the desert nomads' },
-                { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'The 3rd marker reveals the letter R' },
-                { icon: '🏜️', label: 'Out of the Gorge', desc: 'The Salt Playa opens at the end of the canyon' }
+                { icon: '🏜️', label: 'The Canyon Walked', desc: 'Six relic cairns, found in order' },
+                { icon: '🗝️', label: 'Passphrase: MIRAGE', desc: 'The word the old walkers left in the stones' },
+                { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'R is the rune of the third cairn' },
+                { icon: '🏜️', label: 'Out of the Gorge', desc: 'Beyond the Oasis Gate lies the Salt Playa' }
               ],
-              btnText: 'Review the Canyon Route ➔',
+              btnText: 'Walk the Canyon Again ➔',
               action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
             };
           }
@@ -1259,34 +1259,14 @@
               title: isBypassed ? 'Western Shelf Trek · Heading to North Portal' : 'Dry Wash Trek · Heading to North Portal',
               thumb: './assets/thumbnails/whispering_chasm_preview.webp',
               lore: isBypassed
-                ? 'Hermes left the river stones undisturbed and is traversing the hard rock shelf directly toward the canyon. Track his beacon across the western ridge on the Grand Desert Map or consult the Field Wire for live ETA.'
-                : 'The Wash River seal is secured in Hermes\'s satchel. He is trekking across the dry wash and scree slopes toward the Whispering Chasm. Follow his progress on the Field Wire.',
+                ? 'Hermes left the river stones as they were and is crossing the hard rock shelf straight toward the canyon. You can follow his light along the western ridge on the Grand Desert Map, or open the Field Wire to see how long he still has to walk.'
+                : 'The Wash River seal is safe in Hermes\'s satchel. Now he is walking up the dry riverbed and over the loose stone slopes toward the Whispering Chasm. Open the Field Wire to see how far he has come.',
               rewards: [
-                { icon: '🎒', label: isBypassed ? 'River Stones Undisturbed' : 'Wash River Seal in Satchel', desc: 'Heading toward the gorge' },
-                { icon: '⏱️', label: '26-Hour Traversal', desc: 'Hermes will radio when the portal is reached' },
-                { icon: '📻', label: 'Field Wire Standby', desc: 'Low-power telemetry beacon active' }
+                { icon: '🎒', label: isBypassed ? 'River Stones Left Alone' : 'Wash River Seal in the Satchel', desc: 'On the road to the canyon' },
+                { icon: '⏱️', label: 'A 26-Hour Walk', desc: 'Hermes will call you when he reaches the gate' },
+                { icon: '📻', label: 'Field Wire on Standby', desc: 'His beacon is still sending' }
               ],
               btnText: '✦ OPEN FIELD WIRE & CHECK TREK ETA ➔',
-              action: () => {
-                if (typeof activateHubView === 'function') activateHubView('view-field-wire');
-              }
-            };
-          }
-
-          if (typeof window.isChasmCamped === 'function' && window.isChasmCamped()) {
-            return {
-              badge: 'STATION 10 // CAMP AT THE NORTH PORTAL',
-              status: 'HERMES IS RESTING · THE CANYON OPENS SOON ⏳',
-              statusClass: 'status-live-badge',
-              title: 'Camp at the Mouth of the Chasm',
-              thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-              lore: 'Hermes has reached the North Portal and made camp behind a fallen rock. Tonight the wind howls through the gorge so hard that no one could hear the whispers inside it. He is waiting for the air to settle. When the canyon is quiet, he will call you on the Field Wire, and you will walk it with him, turn by turn.',
-              rewards: [
-                { icon: '🏕️', label: 'Camp at the North Portal', desc: 'Sheltered from the wind' },
-                { icon: '💧', label: 'Water Skins Filled', desc: 'Three skins, ready for the walk' },
-                { icon: '📜', label: 'Sheet 9B on a Flat Stone', desc: 'Keep yours close too' }
-              ],
-              btnText: '✦ READ HERMES\'S LAST MESSAGE ➔',
               action: () => {
                 if (typeof activateHubView === 'function') activateHubView('view-field-wire');
               }
@@ -1299,14 +1279,14 @@
             statusClass: 'status-live-badge',
             title: 'The Whispering Chasm',
             thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-            lore: 'First mission in the Great Desert: Hermes has reached the entrance of the Whispering Chasm. To guide him through the 25×25 acoustic gorge, open Sheet 9B of your journal ("The Whispering Chasm"), follow the walkers\' rules and find the six stone markers in order.',
+            lore: 'Hermes is standing at the North Portal, the narrow gate where the Whispering Chasm begins. Inside, the red walls twist into a maze, and somewhere in it the old walkers hid six relics, each marked with a rune. You will walk it with him, fork by fork. Keep Sheet 9B of your journal open: it shows the whole maze from above, and he will only ever see the next turn.',
             rewards: [
-              { icon: '🧭', label: 'Sheet 9B of the Journal', desc: '25×25 sandstone labyrinth puzzle' },
+              { icon: '🧭', label: 'Sheet 9B of the Journal', desc: 'The canyon maze, seen from above' },
               { icon: '🗺️', label: 'South-West Quadrant (Sheet 11B)', desc: 'Location on the Grand Desert Map' },
-              { icon: '🗝️', label: 'A 6-Letter Passphrase', desc: '6 relic markers' },
-              { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'The 3rd marker on the path reveals the letter R' }
+              { icon: '🗝️', label: 'A Six-Letter Passphrase', desc: 'One rune on each relic' },
+              { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'Hidden at the third cairn' }
             ],
-            btnText: '✦ DESCEND INTO THE CANYON & GUIDE HERMES ➔',
+            btnText: '✦ ENTER THE CANYON WITH HERMES ➔',
             action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
           };
         },
@@ -5044,7 +5024,7 @@
           title: "What is the Whispering Chasm?",
           category: "The Whispering Chasm",
           group: "desert",
-          answer: "A narrow, twisting gorge where the wind carries every sound. The old nomads left stone markers inside it, and a few rules for walkers: never retrace your steps, and never take a side passage that skips a marker."
+          answer: "A deep, narrow canyon that twists back on itself like a knot, and the wind inside it carries every sound, even a whisper. Long ago the desert walkers hid six relics in it, one on each of six cairns, and left four laws for anyone who follows them. Never walk the same ground twice. Never take the quick road that skips the cairns. Find all six, in order, before you leave. And treat every dead end as a trap. Sheet 9B of your journal shows the whole maze from above, so you can see what I cannot."
         },
         {
           id: "inq-cairns",
@@ -6674,15 +6654,6 @@
       }
       window.isChasmMarchOver = isChasmMarchOver;
 
-      // The Whispering Chasm is being rebuilt as a walk behind Hermes. Until it ships, Hermes makes camp at the
-      // North Portal when he arrives, and the canyon stays closed for Silvia (never for the tester or a finished run).
-      const CHASM_CANYON_OPEN = false;
-      function isChasmCamped() {
-        if (CHASM_CANYON_OPEN || !isChasmMarchOver()) return false;
-        if (localStorage.getItem('order_whispering_chasm_completed') === 'true') return false;
-        return !(typeof window.isAdminTester === 'function' && window.isAdminTester());
-      }
-      window.isChasmCamped = isChasmCamped;
       window.skipChasmMarch = function () {
         localStorage.setItem('order_chasm_march_bypassed', 'true');
         if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
@@ -7501,21 +7472,12 @@
                 clearInterval(window.__chasmMarchTimer);
                 window.__chasmMarchTimer = null;
               }
-              if (isChasmCamped()) {
-                if (titleEl) titleEl.textContent = 'Camp at the North Portal · Hermes Is Waiting';
-                if (descEl) {
-                  descEl.textContent = 'Hermes has reached the mouth of the canyon and made camp behind a fallen rock. '
-                    + 'Tonight the wind runs through the gorge so hard that it howls between the walls, and nobody could walk in there and still hear the whispers. '
-                    + 'He has filled his water skins and spread Sheet 9B on a flat stone, ready for the morning. '
-                    + 'As soon as the canyon is quiet, he will call you here, and you will walk through it with him, one turn at a time.';
-                }
-              } else {
-                if (titleEl) titleEl.textContent = 'North Portal Reached · The Whispering Chasm Awaits';
-                if (descEl) {
-                  descEl.textContent = isBypassed
-                    ? 'Hermes arrived at the canyon mouth via the western shelf. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).'
-                    : 'The Seal of Cairn I is in the satchel. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).';
-                }
+              if (titleEl) titleEl.textContent = 'North Portal Reached · The Whispering Chasm Awaits';
+              if (descEl) {
+                descEl.textContent = (isBypassed
+                  ? 'Hermes crossed the western rock shelf and is standing at the mouth of the canyon. '
+                  : 'The Seal of Cairn I is safe in his satchel, and Hermes is standing at the mouth of the canyon. ')
+                  + 'His three water skins are full and his lantern is lit. Open the Grand Desert Map, choose the Whispering Chasm (Station 10), and walk it with him. Keep Sheet 9B in front of you.';
               }
             }
             try {

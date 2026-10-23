@@ -20,8 +20,14 @@
         }
         return true;
       }
+      // A window still fading in (its first frame can be slow, as in the 3D Chasm) is open although it is transparent
+      function fadingIn(d) {
+        if (!d.isConnected || !d.getClientRects().length || getComputedStyle(d).display === 'none' || !d.getAnimations) return false;
+        return d.getAnimations().some(function (a) { return a.playState === 'running' || a.pending; });
+      }
       function openDialogs() {
-        return Array.prototype.filter.call(document.querySelectorAll('[role="dialog"][aria-modal="true"],[role="alertdialog"][aria-modal="true"]'), shown);
+        return Array.prototype.filter.call(document.querySelectorAll('[role="dialog"][aria-modal="true"],[role="alertdialog"][aria-modal="true"]'),
+          function (d) { return shown(d) || fadingIn(d); });
       }
       function topDialog() {
         var list = openDialogs(), best = null, bestZ = -Infinity;

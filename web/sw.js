@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '5219e8ae805d';  // 148 files, 30.9 MB
+var VERSION = 'ad26325e540e';  // 150 files, 31.0 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -101,6 +101,7 @@ var PRECACHE = [
   "./hub/css/path-themes.css",
   "./hub/css/previously.css",
   "./hub/css/sandstorm.css",
+  "./hub/css/stations/s10-chasm-walk.css",
   "./hub/css/stations/s10-whispering-chasm.css",
   "./hub/css/stations/s11-salt-playa.css",
   "./hub/css/stations/s12-desert-lexicon.css",
@@ -142,6 +143,7 @@ var PRECACHE = [
   "./hub/js/sheet-seals.js",
   "./hub/js/stage-pause.js",
   "./hub/js/stations/s10-desert-map-and-chasm.js",
+  "./hub/js/stations/s10-whispering-chasm.js",
   "./hub/js/stations/s11-salt-playa.js",
   "./hub/js/stations/s12-desert-lexicon.js",
   "./hub/js/stations/s13-oasis-clepsydra.js",
