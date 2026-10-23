@@ -211,6 +211,23 @@ def test_wire_gating(browser):
                                         "order_oasis_clepsydra_completed": "true"})
     check(len(info["choices"]) == 3 and not errors, "Clepsydra done: Camp VIII debrief opens", "; ".join(errors[:2]))
 
+    camp = dict(DESERT_BASE, order_whispering_chasm_completed="false", order_salt_playa_completed="false", order_silvia_waypoint_v2="done")
+    ctx, page, errors = new_page(browser, camp)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+    wire = js("document.getElementById('view-field-wire').innerText")
+    check("Camp at the North Portal" in wire, "Chasm march over while the canyon is rebuilt: Hermes makes camp at the North Portal",
+          wire[-300:].replace("\n", " "))
+    js("window.openWhisperingChasmModal()"); page.wait_for_timeout(400)
+    js("window.selectDesertStation(10)"); page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") == "none"
+          and "CAMP AT THE NORTH PORTAL" in js("(document.getElementById('desert-toast-banner') || {}).textContent || ''"), "the camp keeps the Chasm closed and says why",
+          js("(document.getElementById('desert-toast-banner') || {}).textContent || ''") + " | " + js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display"))
+    check(not errors, "no JS errors at the camp", "; ".join(errors[:2]))
+    ctx.close()
+
 
 def test_ledger_gating(browser):
     print("\n4. Cipher Ledger reveals desert equations only after their station")

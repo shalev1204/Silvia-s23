@@ -227,7 +227,11 @@
           const isTester = (typeof window.isAdminTester === 'function' && window.isAdminTester()) || (typeof isCarlesTester === 'function' && isCarlesTester());
           const marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
 
-          if ((isChasmUnlocked && marchOver) || isChasmAlreadyDone || isTester) {
+          const camped = typeof window.isChasmCamped === 'function' && window.isChasmCamped();
+
+          if (camped && isChasmUnlocked) {
+            showDesertToast('✦ CAMP AT THE NORTH PORTAL ✦ Hermes is resting at the mouth of the canyon. The wind inside is too strong tonight. He will call you on the Field Wire as soon as he can go in.');
+          } else if ((isChasmUnlocked && marchOver) || isChasmAlreadyDone || isTester) {
             if (window.openWhisperingChasmModal) {
               window.openWhisperingChasmModal();
             } else {
@@ -723,6 +727,11 @@
           if (typeof window.showDesertToast === 'function') {
             window.showDesertToast('✦ 26-HOUR TREK IN PROGRESS ✦ Hermes is trekking across the scree slopes to the North Portal. Check the Field Wire for live ETA.');
           }
+          return;
+        }
+
+        if (typeof window.isChasmCamped === 'function' && window.isChasmCamped()) {
+          if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ CAMP AT THE NORTH PORTAL ✦ Hermes is resting at the mouth of the canyon. The wind inside is too strong tonight. He will call you on the Field Wire as soon as he can go in.');
           return;
         }
 

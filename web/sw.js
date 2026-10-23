@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = 'c35a0697ea7c';  // 148 files, 30.9 MB
+var VERSION = '5219e8ae805d';  // 148 files, 30.9 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",

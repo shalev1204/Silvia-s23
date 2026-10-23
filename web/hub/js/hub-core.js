@@ -1273,6 +1273,26 @@
             };
           }
 
+          if (typeof window.isChasmCamped === 'function' && window.isChasmCamped()) {
+            return {
+              badge: 'STATION 10 // CAMP AT THE NORTH PORTAL',
+              status: 'HERMES IS RESTING · THE CANYON OPENS SOON ⏳',
+              statusClass: 'status-live-badge',
+              title: 'Camp at the Mouth of the Chasm',
+              thumb: './assets/thumbnails/whispering_chasm_preview.webp',
+              lore: 'Hermes has reached the North Portal and made camp behind a fallen rock. Tonight the wind howls through the gorge so hard that no one could hear the whispers inside it. He is waiting for the air to settle. When the canyon is quiet, he will call you on the Field Wire, and you will walk it with him, turn by turn.',
+              rewards: [
+                { icon: '🏕️', label: 'Camp at the North Portal', desc: 'Sheltered from the wind' },
+                { icon: '💧', label: 'Water Skins Filled', desc: 'Three skins, ready for the walk' },
+                { icon: '📜', label: 'Sheet 9B on a Flat Stone', desc: 'Keep yours close too' }
+              ],
+              btnText: '✦ READ HERMES\'S LAST MESSAGE ➔',
+              action: () => {
+                if (typeof activateHubView === 'function') activateHubView('view-field-wire');
+              }
+            };
+          }
+
           return {
             badge: 'STATION 10 // DESERT PATH',
             status: 'NORTH PORTAL REACHED · CANYON DESCENT READY ✦',
@@ -6653,6 +6673,16 @@
         return getChasmMarchProgress() >= 1.0;
       }
       window.isChasmMarchOver = isChasmMarchOver;
+
+      // The Whispering Chasm is being rebuilt as a walk behind Hermes. Until it ships, Hermes makes camp at the
+      // North Portal when he arrives, and the canyon stays closed for Silvia (never for the tester or a finished run).
+      const CHASM_CANYON_OPEN = false;
+      function isChasmCamped() {
+        if (CHASM_CANYON_OPEN || !isChasmMarchOver()) return false;
+        if (localStorage.getItem('order_whispering_chasm_completed') === 'true') return false;
+        return !(typeof window.isAdminTester === 'function' && window.isAdminTester());
+      }
+      window.isChasmCamped = isChasmCamped;
       window.skipChasmMarch = function () {
         localStorage.setItem('order_chasm_march_bypassed', 'true');
         if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
@@ -7471,11 +7501,21 @@
                 clearInterval(window.__chasmMarchTimer);
                 window.__chasmMarchTimer = null;
               }
-              if (titleEl) titleEl.textContent = 'North Portal Reached · The Whispering Chasm Awaits';
-              if (descEl) {
-                descEl.textContent = isBypassed
-                  ? 'Hermes arrived at the canyon mouth via the western shelf. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).'
-                  : 'The Seal of Cairn I is in the satchel. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).';
+              if (isChasmCamped()) {
+                if (titleEl) titleEl.textContent = 'Camp at the North Portal · Hermes Is Waiting';
+                if (descEl) {
+                  descEl.textContent = 'Hermes has reached the mouth of the canyon and made camp behind a fallen rock. '
+                    + 'Tonight the wind runs through the gorge so hard that it howls between the walls, and nobody could walk in there and still hear the whispers. '
+                    + 'He has filled his water skins and spread Sheet 9B on a flat stone, ready for the morning. '
+                    + 'As soon as the canyon is quiet, he will call you here, and you will walk through it with him, one turn at a time.';
+                }
+              } else {
+                if (titleEl) titleEl.textContent = 'North Portal Reached · The Whispering Chasm Awaits';
+                if (descEl) {
+                  descEl.textContent = isBypassed
+                    ? 'Hermes arrived at the canyon mouth via the western shelf. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).'
+                    : 'The Seal of Cairn I is in the satchel. Open the Grand Desert Map and guide Hermes through the Whispering Chasm (Station 10 · Sheet 9B).';
+                }
               }
             }
             try {
