@@ -83,7 +83,8 @@ VIEWS = ["view-trail", "view-transmissions", "view-archives", "view-chronicles",
 
 # Seeds a profile once per tab (sessionStorage guard), so reloads keep whatever the page writes
 SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
-SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done", "order_silvia_live_v3": "done"}
+SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done", "order_silvia_live_v3": "done",
+          "order_silvia_north_portal_v1": "done"}
 DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true"}
 DESERT_BASE = dict(SILVIA, order_dawn_step="3", order_cairn1_completed="true", order_seal_cairn_1="true",
                    order_chasm_march_start="1", order_whispering_chasm_completed="true",
@@ -1179,15 +1180,17 @@ def test_profiles(browser):
     page.wait_for_timeout(2500)
     check(seals() == 4, "Carles reaches Cairn IV with the tester")
     login(page, "Silvia")
-    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 0 and get("order_field_wire_step") == "4"
-          and "tuning_pebble" not in page.evaluate("window.getOwnedRelicIds()"),
+    # Her own canonical point (23 Oct): only the Wash River Seal of Cairn I, at the North Portal
+    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 1 and get("order_seal_cairn_1") == "true" and get("order_field_wire_step") == "4"
+          and get("order_cairn_iv_completed") is None and "tuning_pebble" not in page.evaluate("window.getOwnedRelicIds()"),
           "Silvia does not inherit Carles's seals, inventory or chat")
-    page.evaluate("localStorage.setItem('order_dawn_step', '1')")
+    page.evaluate("localStorage.setItem('seeker_silvia_cipher_ledger', JSON.stringify({O: 23, A: 7, R: 3}))")
     login(page, "Carles")
     check(seals() == 4 and get("order_cairn_iv_completed") == "true" and get("order_dawn_step") == "3",
           "Carles's adventure comes back untouched")
     login(page, "Silvia")
-    check(get("order_dawn_step") == "1" and seals() == 0, "Silvia's own progress comes back")
+    check('"R":3' in (get("seeker_silvia_cipher_ledger") or "") and seals() == 1 and get("order_dawn_choices") == "[1,1]",
+          "Silvia's own progress comes back")
     check(not errors, "no JS errors while switching seekers", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
@@ -1842,7 +1845,7 @@ def test_letters(browser):
 
 def test_journey(browser):
     print("\n25. The journey profile for the ending: tone, days, rooms, notes, favourite hour, the name and the object she chose")
-    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Silvia"})
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Silvia", "order_silvia_north_portal_v1": "done"})
     page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
     pr = page.evaluate("EclipseJourney.profile()")
     check(pr["days"] == 0 and pr["rooms"] == 0 and pr["notes"] == 0 and pr["hour"] is None and pr["swiftest"] is None,
@@ -2884,6 +2887,53 @@ def test_veiled_stations(browser):
     ctx.close()
 
 
+def test_silvia_north_portal(browser):
+    print("\n33. Silvia's story point (23 Oct): from her last cloud save, the dawn is done and Hermes calls from the North Portal")
+    compass = json.dumps({"id": "surveyor_compass", "name": "1998 Brass Surveyor's Compass", "icon": "🧭",
+                          "desc": "Precision surveyor compass left in 1998 beside the copper benchmark at the foot of the Watchtower VI trail."})
+    relics = json.dumps(["gilded_feather", "order_wax_seal", "surveyor_compass"])
+    # Her last cloud save (22 Oct 17:54 UTC), plus the profile key her device holds
+    oct22 = {"the_eclipse_active_seeker": "Silvia", "order_dawn_step": "0", "order_dawn_choices": "[]", "order_hub_unlocked": "true",
+             "order_hub_unlocked_v4": "true", "order_silvia_live_v3": "done", "order_silvia_live_v4": "done", "order_active_map_path": "desert",
+             "order_field_wire_step": "4", "order_field_wire_choices": "[2,0,1,0]", "order_field_wire_completed": "true",
+             "order_cipher_completed": "true", "order_midnight_completed": "true", "order_zodiac_completed": "true", "order_station8_unlocked": "true",
+             "order_inventory_relics": relics, "seeker_silvia_inventory_relics": relics, "order_cartographer_title": "Hermes",
+             "order_silvia_waypoint_v2": "done", "order_carles_waypoint_v2": "done", "order_silvia_oa_ledger_v1": "done",
+             "order_sandstorm_triggered": "true", "order_sandstorm_start_time": "1792152000000", "order_sandstorm_target_time": "1792324800000",
+             "order_storm_tester_bypassed": "true", "order_desert_path_unlocked": "true", "order_sandstorm_wire_unlocked": "true",
+             "seeker_silvia_cipher_ledger": json.dumps({"O": 23, "A": 7}), "seeker_silvia_equations_resolved": json.dumps({"lat-min": True, "zod-diff": True}),
+             "order_messenger_unread_count": "1", "order_satchel_expedition_item": compass, "seeker_silvia_satchel_expedition_item": compass,
+             "seeker_silvia_cipher_completed": "true", "seeker_silvia_midnight_completed": "true", "order_silvia_inquiries_reset_v1": "done"}
+    ctx, page, errors = new_page(browser, oct22)
+    js = page.evaluate
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    get = lambda k: js(f"localStorage.getItem('{k}')")
+    check(get("order_dawn_step") == "3" and get("order_dawn_choices") == "[1,1]" and get("order_cairn1_completed") == "true"
+          and get("order_cairn1_optimal") is None and "seal_cairn_1" in get("order_inventory_relics") and get("order_chasm_wire") is None
+          and js("window.getChasmMarchProgress()") == 1 and js("window.isChasmMarchOver()") and not js("window.isChasmBriefHeard()"),
+          "her answers are kept: Meridian Shadow, chalk marks, Cairn I in 16 lifts, the seal in the satchel, the 26 hours walked")
+    js("window.selectMapNode(10, false)"); page.wait_for_timeout(400)
+    check("HERMES IS CALLING" in js("document.getElementById('insp-btn-primary').innerText").upper(),
+          "the Station 10 card: Hermes is calling from the North Portal")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(3000)
+    wire = js("document.getElementById('view-field-wire').innerText")
+    pills = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].map(b => b.innerText)")
+    check("Meridian Shadow" in wire and "chalk mark" in wire and "Wash River seal" in wire and "fifteen" not in wire.lower()
+          and "narrower than I imagined" in wire and len(pills()) == 3,
+          "the Field Wire tells her dawn as she lived it, then Hermes at the North Portal waits for her answer (3 replies)", wire[-240:].replace("\n", " "))
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+    wire = js("document.getElementById('view-field-wire').innerText")
+    check(get("order_dawn_choices") == "[1,1]" and wire.count("narrower than I imagined") == 1 and len(pills()) == 3,
+          "reloaded: the story point is applied once, the question still waits")
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(4000)
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(800)
+    check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none",
+          "once she answers, the Whispering Chasm opens")
+    check(not errors, "no JS errors on Silvia's story point", "; ".join(errors[:2]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -2894,10 +2944,10 @@ SECTIONS = {
     "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
     "journey": test_journey, "seals": test_seals, "a11y": test_a11y, "offline": test_offline,
     "camera": test_camera_obscura, "gallery": test_whispering_gallery,
-    "chasm": test_whispering_chasm, "veil": test_veiled_stations,
+    "chasm": test_whispering_chasm, "veil": test_veiled_stations, "portal": test_silvia_north_portal,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

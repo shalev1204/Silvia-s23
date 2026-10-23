@@ -957,6 +957,36 @@
         window.syncWaypointBaseline = syncWaypointBaseline;
         syncWaypointBaseline();
 
+        // Canonical Story Point (23 Oct 2026), Silvia only, once: the dawn is over and Hermes stands at the North Portal.
+        //   - Dawn 0: [1] Law 1, the Meridian Shadow · Dawn 1: [1] the chalk mark every hundred paces
+        //   - Cairn I solved in 16 lifts (not the optimal 15): the Wash River Seal is in the satchel
+        //   - The 26-hour trek began 22 Oct 18:00 CEST and is over
+        // Her North Portal brief stays unanswered: Hermes calls her on the Field Wire and she answers him there.
+        (function syncSilviaNorthPortal() {
+          const seekerNow = (localStorage.getItem('the_eclipse_active_seeker') || (window.currentSeeker || 'Silvia')).toLowerCase();
+          if (seekerNow !== 'silvia' || localStorage.getItem('order_silvia_north_portal_v1') === 'done') return;
+          if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') {
+            localStorage.setItem('order_dawn_step', '3');
+            localStorage.setItem('order_dawn_choices', JSON.stringify([1, 1]));
+            localStorage.setItem('order_cairn1_found', 'true');
+            localStorage.setItem('order_cairn1_completed', 'true');
+            localStorage.setItem('order_seal_cairn_1', 'true');
+            ['order_cairn1_optimal', 'order_cairn1_bypassed', 'order_cairn1_locked_until_3_cairns', 'order_chasm_march_bypassed']
+              .forEach((k) => localStorage.removeItem(k));
+            const TREK_START = Date.UTC(2026, 9, 22, 16, 0);   // 22 Oct 2026 18:00 CEST
+            const start = parseInt(localStorage.getItem('order_chasm_march_start') || '0', 10);
+            if (!start || start > TREK_START) localStorage.setItem('order_chasm_march_start', String(TREK_START));
+            try {
+              let relics = JSON.parse(localStorage.getItem('order_inventory_relics') || '[]');
+              if (!Array.isArray(relics)) relics = [];
+              if (!relics.includes('seal_cairn_1')) relics.push('seal_cairn_1');
+              localStorage.setItem('order_inventory_relics', JSON.stringify(relics));
+              localStorage.setItem('seeker_silvia_inventory_relics', JSON.stringify(relics));
+            } catch (e) {}
+          }
+          localStorage.setItem('order_silvia_north_portal_v1', 'done');
+        })();
+
         // Ask Hermes: wipe leftover "Answered" badges from tester runs (shared localStorage key)
         if (localStorage.getItem('order_silvia_inquiries_reset_v1') !== 'done') {
           localStorage.removeItem('order_field_inquiries_read');
@@ -6807,10 +6837,10 @@
         return Math.max(0, Math.min(1.0, (Date.now() - start) / CHASM_MARCH_MS));
       }
 
-      // The Operator's hold (23-10-2026): until his OK the canyon stays shut for Silvia, even once the 26 hours have
-      // passed. Hermes makes camp in sight of the North Portal and calls her later. Testers, and a skipped walk, go on.
-      // To open the Whispering Chasm for Silvia: set CHASM_HOLD to false and deploy.
-      const CHASM_HOLD = true;
+      // The Operator's hold (23-10-2026): while true, the canyon stays shut for Silvia even once the 26 hours have
+      // passed, and Hermes makes camp in sight of the North Portal. Testers, and a skipped walk, go on.
+      // Released on the Operator's OK (23-10-2026): Silvia has reached the North Portal.
+      const CHASM_HOLD = false;
       function isChasmHeld() {
         if (!CHASM_HOLD || localStorage.getItem('order_whispering_chasm_completed') === 'true') return false;
         if (localStorage.getItem('order_chasm_march_bypassed') === 'true') return false;
