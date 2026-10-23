@@ -33,7 +33,7 @@ Mapa acordado con el Operador (estación → cara de hoja → fragmento):
 | 24 | 44 | The Fly Tower | 22A | V + Ledger Q = 14 |
 | 25 | 45 | The Shadow Theatre | 23A | VI + reliquia |
 | 26 | 46 | The Hall of Mirrors | 24A | VII; reflejo de Pope-E visto de espaldas |
-| 27 | 47 | The Kaleidoscope Lantern | 25A | VIII + Ledger X = 15 |
+| 27 | 47 | The Kaleidoscope Lantern | 25A | VIII (la X = 15 ya la da la Estación 10) |
 | 28 | 48 | Stage of the Mirror Speaker | 26A | IX + revelación del WHERE |
 
 Caras de historia: 21A Cuaderno de Aurelia I (observatorio, 1970) · 22B The Ashes Before Christ (secta BC, sello de Pope-E) · 23B Cuaderno II (disco y voto) · 24B Doctrina de la Mirror Speaker · 25B Cuaderno III (terraza bajo las estrellas) · 26B Back to the Peaks. Pope-E: notas 2 y 3 (Estaciones 22/26 aprox.), reflejo en la 26. Más allá: Torre I y Bóveda.
@@ -42,7 +42,7 @@ Patrón por estación (plantilla: la Estación 20, `web/hub/js/stations/s20-mask
 1. Preguntar al Operador las decisiones de diseño en formato test (una estación cada vez), como en las anteriores.
 2. Cara(s) de la hoja en `scripts/journal/build_stage_path.py` (registrar en `STAGE_SHEETS`; margen izquierdo X<165 vacío en Cara A, X>1583 vacío en Cara B; `draw_fragment(canvas, idx, ...)` dibuja el fragmento de su estación).
 3. Modal `.monolith-*` con clase `is-stage-room`, controlador, `window.STAGE_OPENERS[node]`, `window.STAGE_CARDS[node]` (nodos 40–48), `makeMarch`, `MARCH_LEGS`, `MARCH_STARTED_BY_ANSWER`, pasos del Field Wire (empezar en 37), `WIRE_LAST_STEP`, telemetría, divisores, lista de respuestas que auto-avanzan, tester (`GAMES`, `ARRIVAL`, `WALKS`, `syncWire`), preguntas de Ask Hermes (grupo `stage`), claves en `StageMirror.STATIONS` (ya definidas).
-4. Ledger: J, Q, X con valores 8, 14, 15 en las estaciones 22, 24 y 27 (una ecuación de una incógnita cada una; Regla 9: nunca mostrar valores de letras en las hojas).
+4. Ledger: J = 8 (Estación 22, hecha) y Q = 14 (Estación 24), una ecuación de una incógnita cada una; X = 15 ya la da la Estación 10 (§7.B.14). Regla 9: nunca mostrar valores de letras en las hojas.
 5. Smoke, revisión independiente, docs, commit y push a la rama.
 
 ## Invariantes (no romper)

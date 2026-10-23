@@ -98,7 +98,7 @@ Cada cara de juego lleva además un **fragmento dibujado**: su silueta y el troz
 | **27** | 25A | The Kaleidoscope Lantern | Los cristales del gran farol | Alinear los cristales para que la luz deletree una palabra | Fragmento VIII · X |
 | **28** | 26A | The Stage of the Mirror Speaker | La ceremonia del espejo | Encajar los 9 fragmentos: el WHERE | Fragmento IX · **WHERE** |
 
-**Cipher Ledger**: $J = 8$ quedó fijada en la Estación 22 con $[J] \times 2 = [T]$ (Biblia Maestra §7.B.13); quedan $Q, X$ con los valores libres $14, 15$. Se fijarán al construir las estaciones 24 y 27, con una ecuación de una sola incógnita cada una (estilo de las estaciones 17 a 19).
+**Cipher Ledger**: $J = 8$ quedó fijada en la Estación 22 con $[J] \times 2 = [T]$ (Biblia Maestra §7.B.13); $X = 15$ se adelantó a la Estación 10 (The Line of the Gate, $[X] + [E] = 17$, §7.B.14, decisión del Operador 23-10-2026); queda $Q$ con el valor libre $14$, que se fijará al construir la Estación 24 con una ecuación de una sola incógnita (estilo de las estaciones 17 a 19). La Estación 27 ya no da letra del Ledger.
 
 **Field Wire**: continúa desde el paso 33. Patrón por estación: escena de salida con respuestas (inicia el viaje), viaje, balance tras la estación y cierre. Las caras de historia se citan en el chat en su momento (*«Open Sheet 22B…»*).
 

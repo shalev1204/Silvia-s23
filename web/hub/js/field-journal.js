@@ -28,7 +28,7 @@
         },
         chasm: {
           note: 'The Whispering Chasm. A maze of red walls that whispered at every fork. Silvia had the whole map on her sheet; I had only the next turn. Six relics, six runes, and I came out at the Oasis Gate with water in my skins.',
-          earned: ['The way through the gorge'], sketch: './assets/chat/sketch_chasm_mouth.webp'
+          earned: ['The way through the gorge', 'The Nomad\'s Passphrase'], ledger: ['The Line of the Gate'], sketch: './assets/chat/sketch_chasm_mouth.webp'
         },
         playa: {
           note: 'The Salt Playa. Every slab looked solid, and half of them were not. Silvia read the facets, I walked where she said, and the crust held.',

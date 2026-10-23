@@ -656,7 +656,7 @@
           {
             id: 'chasm', tag: 'Station 10', label: 'The Whispering Chasm', flag: 'order_whispering_chasm_completed', built: true,
             complete() { set('order_whispering_chasm_completed', 'true'); set('order_desert_station_active', '11'); },
-            reset() { del('order_whispering_chasm_completed'); del('order_chasm_walk'); }
+            reset() { del('order_whispering_chasm_completed'); del('order_chasm_walk'); del('order_chasm_howto'); del('order_chasm_wire'); }
           },
           {
             id: 'playa', tag: 'Station 11', label: 'The Salt Playa', flag: 'order_salt_playa_completed', built: true,
@@ -1237,11 +1237,11 @@
               statusClass: 'status-done-badge',
               title: 'The Whispering Chasm',
               thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-              lore: 'Fork by fork, with Sheet 9B open in front of her, Silvia walked Hermes through the red maze of the Whispering Chasm. He turned the six relics in his hands until each one showed its rune, M, I, R, A, G and E, and came out at the Oasis Gate with water in his skins. The third rune, R, belongs in the Cipher Ledger.',
+              lore: 'Fork by fork, with the page “The Whispering Chasm” of her journal open in front of her, Silvia walked Hermes through the red maze of the Whispering Chasm. He turned the six relics in his hands until each one showed its rune, M, I, R, A, G and E, and came out at the Oasis Gate with water in his skins. Above the gate waited a line for the Cipher Ledger, with a letter she had never had: [X] + [E] = 17.',
               rewards: [
                 { icon: '🏜️', label: 'The Canyon Walked', desc: 'Six relic cairns, found in order' },
                 { icon: '🗝️', label: 'Passphrase: MIRAGE', desc: 'The word the old walkers left in the stones' },
-                { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'R is the rune of the third cairn' },
+                { icon: '📐', label: 'The Line of the Gate: [X] + [E] = 17', desc: 'A new letter for the Cipher Ledger' },
                 { icon: '🏜️', label: 'Out of the Gorge', desc: 'Beyond the Oasis Gate lies the Salt Playa' }
               ],
               btnText: 'Walk the Canyon Again ➔',
@@ -1279,12 +1279,12 @@
             statusClass: 'status-live-badge',
             title: 'The Whispering Chasm',
             thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-            lore: 'Hermes is standing at the North Portal, the narrow gate where the Whispering Chasm begins. Inside, the red walls twist into a maze, and somewhere in it the old walkers hid six relics, each marked with a rune. You will walk it with him, fork by fork. Keep Sheet 9B of your journal open: it shows the whole maze from above, and he will only ever see the next turn.',
+            lore: 'Hermes is standing at the North Portal, the narrow gate where the Whispering Chasm begins. Inside, the red walls twist into a maze, and somewhere in it the old walkers hid six relics, each marked with a rune. You will walk it with him, fork by fork. Keep the page “The Whispering Chasm” of your journal open: it shows the whole maze from above, and he will only ever see the next turn.',
             rewards: [
-              { icon: '🧭', label: 'Sheet 9B of the Journal', desc: 'The canyon maze, seen from above' },
-              { icon: '🗺️', label: 'South-West Quadrant (Sheet 11B)', desc: 'Location on the Grand Desert Map' },
+              { icon: '🧭', label: 'Journal page “The Whispering Chasm”', desc: 'The canyon maze, seen from above' },
+              { icon: '🗺️', label: 'Grand Desert Map · South-West', desc: 'Where the canyon lies on the map' },
               { icon: '🗝️', label: 'A Six-Letter Passphrase', desc: 'One rune on each relic' },
-              { icon: '📐', label: 'Ledger Clue: the letter R', desc: 'Hidden at the third cairn' }
+              { icon: '📐', label: 'A New Letter for the Ledger', desc: 'Waiting at the way out of the canyon' }
             ],
             btnText: '✦ ENTER THE CANYON WITH HERMES ➔',
             action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
@@ -1708,7 +1708,7 @@
               statusClass: 'status-done-badge',
               title: 'The Salt Playa (Dry Basin)',
               thumb: './assets/thumbnails/salt_playa_preview.webp',
-              lore: 'Guiding Hermes with the Law of the Basin and Sheet 10A of your physical journal, Silvia found the one safe crossing of seven slabs, dodging the brine sinkholes. The letters along the path spelled CRYSTAL and opened the south shore.',
+              lore: 'Guiding Hermes with the Law of the Basin and the page “The Salt Playa (Dry Basin)” of her journal, Silvia found the one safe crossing of seven slabs, dodging the brine sinkholes. The letters along the path spelled CRYSTAL and opened the south shore.',
               rewards: [
                 { icon: '🧂', label: 'Basin Crossed', desc: '7 safe slabs, north to south' },
                 { icon: '🗝️', label: 'Passage Keyword Verified: CRYSTAL', desc: 'The key to the south shore' },
@@ -1725,9 +1725,9 @@
             statusClass: 'status-live-badge',
             title: 'The Salt Playa (Dry Basin)',
             thumb: './assets/thumbnails/salt_playa_preview.webp',
-            lore: 'Out of the Whispering Chasm, the ground opens into a blinding white salt basin. Pockets of brine hide under the crust. Open Sheet 10A of your journal ("The Salt Playa"), follow the Law of the Basin from Row I to Row VII and read the letters along your path to find the passage keyword that guides Hermes across.',
+            lore: 'Out of the Whispering Chasm, the ground opens into a blinding white salt basin. Pockets of brine hide under the crust. Open the page “The Salt Playa (Dry Basin)” of your journal, follow the Law of the Basin from Row I to Row VII and read the letters along your path to find the passage keyword that guides Hermes across.',
             rewards: [
-              { icon: '🧂', label: 'Sheet 10A of the Journal', desc: '7×7 slab grid with brine sinkholes' },
+              { icon: '🧂', label: 'Journal page “The Salt Playa (Dry Basin)”', desc: '7×7 slab grid with brine sinkholes' },
               { icon: '📜', label: 'Law of the Basin', desc: 'Each step changes the facet count by exactly 1' },
               { icon: '🗝️', label: 'Passage Keyword', desc: 'Seven letters that open the south shore' }
             ],
@@ -2815,6 +2815,7 @@
         { id: 'diff-pb', station: 'Station 09 · Folio Limen', name: 'Frontier Shift', expr: 'P − B', l1: 'P', op: '-', l2: 'B', target: 4, unit: ' E' },
         { id: 'diff-ve', station: 'Station 09 · Folio Limen', name: 'Solar Amplitude', expr: 'V − E', l1: 'V', op: '-', l2: 'E', target: 10, unit: ' S' },
         { id: 'diff-tf', station: 'Station 09 · Folio Limen', name: 'Polar Resonance', expr: 'T − F', l1: 'T', op: '-', l2: 'F', target: 10, unit: ' W' },
+        { id: 'chasm-xe', station: 'Station 10 · Above the Oasis Gate', name: 'The Line of the Gate', expr: 'X + E', l1: 'X', op: '+', l2: 'E', target: 17, unit: '', requires: 'order_whispering_chasm_completed' },
         { id: 'stele-rf', station: 'Station 12 · Nomad Ruins Stele', name: 'Stargazer Proportion', expr: 'R × 2', l1: 'R', op: 'x2', l2: 'F', target: null, unit: '', requires: 'order_desert_lexicon_completed' },
         { id: 'falcon-pa', station: 'Station 13 · Falcon Stone', name: 'Falcon Inscription', expr: 'P − A', l1: 'P', op: '-', l2: 'A', target: 14, unit: '', requires: 'order_oasis_clepsydra_completed' },
         { id: 'cairn2-df', station: 'Station 14 · Lid of Cairn II', name: 'The Deneb Line', expr: 'D + F', l1: 'D', op: '+', l2: 'F', target: 24, unit: '', requires: 'order_sun_monolith_completed' },
@@ -4824,7 +4825,7 @@
         {
           step: 3,
           divider: "The North Portal",
-          hermesFinal: "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Wash River seal.\n\nI have no idea what it opens. But the Order does not hide things without a reason, so it goes into the front pocket of my satchel, and I will carry it carefully.\n\n{TONE}\n\nI followed the river to its end, and the red walls closed in around me. At the end of the wash the rock splits open into a narrow gate: the North Portal of the Whispering Chasm. The wind is already murmuring inside, so softly that I can almost make out words.\n\nOpen the Grand Desert Map, Silvia, and check Sheet 9B. This is where the canyon begins.",
+          hermesFinal: "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Wash River seal.\n\nI have no idea what it opens. But the Order does not hide things without a reason, so it goes into the front pocket of my satchel, and I will carry it carefully.\n\n{TONE}\n\nI followed the river to its end, and the red walls closed in around me. At the end of the wash the rock splits open into a narrow gate: the North Portal of the Whispering Chasm. The wind is already murmuring inside, so softly that I can almost make out words.\n\nOpen the Grand Desert Map, Silvia, and find the page “The Whispering Chasm” in your journal. This is where the canyon begins.",
           sketch: { src: "./assets/chat/sketch_chasm_mouth.webp", caption: "The North Portal of the Whispering Chasm." }
         }
       ];
@@ -5024,7 +5025,7 @@
           title: "What is the Whispering Chasm?",
           category: "The Whispering Chasm",
           group: "desert",
-          answer: "A deep, narrow canyon that twists back on itself like a knot, and the wind inside it carries every sound, even a whisper. Long ago the desert walkers hid six relics in it, one on each of six cairns, and left four laws for anyone who follows them. Never walk the same ground twice. Never take the quick road that skips the cairns. Find all six, in order, before you leave. And treat every dead end as a trap. Sheet 9B of your journal shows the whole maze from above, so you can see what I cannot."
+          answer: "A deep, narrow canyon that twists back on itself like a knot, and the wind inside it carries every sound, even a whisper. Long ago the desert walkers hid six relics in it, one on each of six cairns, and left four laws for anyone who follows them. Never walk the same ground twice. Never take the quick road that skips the cairns. Find all six, in order, before you leave. And treat every dead end as a trap. The page “The Whispering Chasm” of your journal shows the whole maze from above, so you can see what I cannot."
         },
         {
           id: "inq-cairns",
@@ -5477,6 +5478,10 @@
         return text.replace(/\bSheet\s+([0-9]+[A-Za-z]?)\b/gi, (match, sheet) => {
           const key = sheet.toUpperCase();
           return `<span class="journal-ref-pill" role="button" tabindex="0" data-sheet="${key}" aria-haspopup="dialog" title="Open details for Sheet ${key}"><span class="pill-icon">📖</span> Sheet ${key}</span>`;
+        }).replace(/“([^”<]+)”/g, (match, title) => {
+          // A page named by its printed title, “The Whispering Chasm”, opens the same card
+          const key = Object.keys(JOURNAL_SHEETS).find((k) => JOURNAL_SHEETS[k].title === title);
+          return key ? `<span class="journal-ref-pill" role="button" tabindex="0" data-sheet="${key}" aria-haspopup="dialog" title="Open details for the page ${title}"><span class="pill-icon">📖</span> ${title}</span>` : match;
         });
       }
 
@@ -5491,7 +5496,7 @@
         '8B': { title: 'Grand Desert Map · North-West', note: 'The first quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_1_nw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '9A': { title: 'Grand Desert Map · North-East', note: 'The second quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_2_ne.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '9B': { title: 'The Whispering Chasm', note: 'The 25×25 canyon labyrinth and the Law of the Canyon Walkers.', thumb: './assets/thumbnails/whispering_chasm_preview.webp', path: 'desert', node: 10, nodeLabel: 'Station 10 · The Whispering Chasm' },
-        '10A': { title: 'The Salt Playa', note: 'A 7×7 field of salt slabs. Read the facets and the letters along a safe path.', thumb: './assets/thumbnails/salt_playa_preview.webp', path: 'desert', node: 21, nodeLabel: 'Station 11 · The Salt Playa' },
+        '10A': { title: 'The Salt Playa (Dry Basin)', note: 'A 7×7 field of salt slabs. Read the facets and the letters along a safe path.', thumb: './assets/thumbnails/salt_playa_preview.webp', path: 'desert', node: 21, nodeLabel: 'Station 11 · The Salt Playa' },
         '11A': { title: 'The Desert Lexicon & Al-Qibla', note: 'The nomad crossword and the sun compass.', thumb: './assets/thumbnails/desert_lexicon_preview.webp', path: 'desert', node: 11, nodeLabel: 'Station 12 · The Desert Lexicon' },
         '11B': { title: 'Grand Desert Map · South-West', note: 'The third quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_3_sw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '12A': { title: 'Grand Desert Map · South-East', note: 'The fourth quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_4_se.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
@@ -6327,6 +6332,7 @@
             localStorage.removeItem('order_cairn1_locked_until_3_cairns');
             localStorage.removeItem('order_chasm_march_start');
             localStorage.removeItem('order_chasm_march_bypassed');
+            localStorage.removeItem(CHASM_WIRE_KEY);
             removeShelterStormWaitBox();
           } catch(e) {}
           dawnStep = 0;
@@ -6358,6 +6364,7 @@
           localStorage.setItem('order_field_wire_completed', 'true');
           localStorage.removeItem('order_chasm_march_start');
           localStorage.removeItem('order_chasm_march_bypassed');
+          localStorage.removeItem(CHASM_WIRE_KEY);
         } catch(e) {}
 
         dawnStep = targetDawnStep;
@@ -6395,7 +6402,9 @@
             rewindToExpeditionStep(0);
             return;
           }
-          if (meta.type === 'dawn') {
+          if (meta.type === 'chasm') {
+            rewindToChasmWire(meta.step);
+          } else if (meta.type === 'dawn') {
             if (meta.step >= DAWN_DONE) {
               rewindToDawnStep(2);
             } else {
@@ -6823,12 +6832,12 @@
           const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
           const isOptimal = localStorage.getItem('order_cairn1_optimal') === 'true';
           if (isBypassed) {
-            return "You are right, Silvia. A surveyor who follows whims in the waste is a surveyor who does not come back. The sun is climbing, and our water is too precious for ghost hunts.\n\nI am leaving the river stones untouched in the wash and turning west, following the hard rock shelf directly toward the gorge. It will be a grueling 26-hour trek across the scree slopes to reach the North Portal, but the rock is solid underfoot.\n\nTrack my beacon across the western ridge on the Grand Desert Map. I will keep the wire on low-power standby and radio in the moment I reach the canyon mouth.";
+            return "You are right, Silvia. A surveyor who follows whims in the waste is a surveyor who does not come back. The sun is climbing, and our water is too precious for ghost hunts.\n\nI am leaving the river stones untouched in the wash and turning west, following the hard rock shelf directly toward the gorge. It will be a grueling 26-hour trek across the scree slopes to reach the North Portal, but the rock is solid underfoot.\n\nTrack my beacon across the western ridge on the Grand Desert Map. And while I walk, open the page “The Whispering Chasm” in your journal: it is the whole canyon seen from above, the view I will never have down there. Study it well. I will keep the wire on low-power standby and radio in the moment I reach the canyon mouth.";
           }
           const optimalPraise = isOptimal
             ? "Fifteen lifts—exactly fifteen! You moved the four river stones with the pure mathematical economy of the ancient surveyors, Silvia. Not a single stone was lifted in vain.\n\n"
             : "";
-          return (optimalPraise + "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Wash River seal.\n\nI have no idea what it opens, but into my satchel it goes.\n\n{TONE}\n\nNow look ahead, Silvia. The riverbed ends against a colossal wall of red sandstone, where the Whispering Chasm splits the mountain. It is a long, grueling trek across the broken wash and scree slopes to reach that fissure—at least 26 hours of hard walking through the heat and dust.\n\nI am tightening my boots, filling my canteen from the cool silt reservoir, and setting out right now. Follow my beacon on the Grand Desert Map. I will keep the wire on low-power standby and radio in the moment I sight the canyon mouth.").replace('{TONE}', HERMES_TONE_FINALE[dominantTone(true)]);
+          return (optimalPraise + "It is done. The last stone settled and the whole base gave a soft click, as if the river itself had exhaled. A hollow opened under the third foundation, and in it lay a flat disc of sandstone, as big as my palm: a sun above a wavy line. The Wash River seal.\n\nI have no idea what it opens, but into my satchel it goes.\n\n{TONE}\n\nNow look ahead, Silvia. The riverbed ends against a colossal wall of red sandstone, where the Whispering Chasm splits the mountain. It is a long, grueling trek across the broken wash and scree slopes to reach that fissure—at least 26 hours of hard walking through the heat and dust.\n\nI am tightening my boots, filling my canteen from the cool silt reservoir, and setting out right now. Follow my beacon on the Grand Desert Map. And while I walk, open the page “The Whispering Chasm” in your journal: it is the whole canyon seen from above, the view I will never have down there. Study it well. I will keep the wire on low-power standby and radio in the moment I sight the canyon mouth.").replace('{TONE}', HERMES_TONE_FINALE[dominantTone(true)]);
         }
         return d.hermesInitial;
       }
@@ -6871,6 +6880,7 @@
             }
             appendDawnIntro(s, false);
             appendWireMessage('SYSTEM TELEMETRY', telemetryText, true, false, null, null, { type: 'dawn', step: 2 });
+            appendChasmWireHistory();
           } else {
             appendDawnIntro(s, false);
             if (s < dawnStep) {
@@ -7034,6 +7044,189 @@
         } catch (e) {}
         if (live) window.__dawnFinaleLive = true;
       });
+
+      // =======================================================================
+      // THE WHISPERING CHASM ON THE WIRE · at the North Portal Hermes asks her to draw the canyon on
+      // her journal before he goes in; at the Oasis Gate, after it, he tells what the canyon gave them.
+      // Only for a journey standing there: a save already past the Salt Playa never hears them.
+      // =======================================================================
+      const CHASM_WIRE_KEY = 'order_chasm_wire';   // { seen0, reply0, seen1, reply1 }: 0 the North Portal, 1 the Oasis Gate
+      const CHASM_WIRE_TELEMETRY = "✦ NOMAD'S PASSPHRASE RECORDED [MIRAGE] · NEW LEDGER LINE [X] + [E] = 17 · THE SALT PLAYA AWAITS ✦";
+      const CHASM_WIRE = [
+        {
+          divider: 'The North Portal · Before the Descent',
+          hermesInitial: "I am here, Silvia. The North Portal.\n\nIt is narrower than I imagined: two red walls so tall that the sky is only a blue thread above my head, and so close that I can touch both of them with my arms open. The wind goes in ahead of me and comes back changed, full of soft voices, like people talking in the next room. Now I understand the name.\n\nSomebody stood here before us. The canyon walkers, the nomads who crossed these sands long ago, used this gorge as their road to the wells. On a flat stone by the entrance they carved their law, the same four laws that are printed on the page “The Whispering Chasm” in your journal. Never walk the same ground twice. Do not take the quick road. Find all six relic cairns, in order. Beware of the gorges that end in a wall.\n\nDown there I will only ever see the next turn. You can see the whole canyon from above. So before I take a single step, take your pencil: on the page “The Whispering Chasm”, draw the way from the North Portal to the exit marked Desert Oasis, keeping the four laws. Every time your line passes a true cairn, write its rune in the next box of the Nomad's Passphrase.\n\nThen I go in, and you guide me turn by turn, with your line in front of you.",
+          choices: [
+            {
+              tag: '✏️',
+              text: 'My line is drawn in my journal, Hermes. Light your lantern: I will guide you turn by turn.',
+              silviaMsg: 'My line is drawn in my journal, Hermes, from the North Portal all the way to the oasis. Light your lantern: I will guide you turn by turn.',
+              hermesReply: "Then the canyon is already ours, and it simply does not know it yet.\n\nLantern lit. Three skins of water, full. Boots tied twice. I am stepping through the portal now, Silvia. Open the Whispering Chasm and stay close: every time the gorge splits, I will stop and wait for your word."
+            },
+            {
+              tag: '⏳',
+              text: 'Give me a few minutes with my pencil first. Sit in the shade and drink something.',
+              silviaMsg: 'Give me a few minutes with my pencil first, Hermes. Sit in the shade of the portal and drink something.',
+              hermesReply: "Gladly. I am sitting in the shade with my back against the cool rock, listening to the voices. Take all the time you need: a line drawn calmly on paper is worth more than a hundred hurried steps down there.\n\nWhen your pencil reaches the oasis, open the Whispering Chasm and I will get up."
+            },
+            {
+              tag: '👂',
+              text: 'What are the voices saying, Hermes? Are they warning us?',
+              silviaMsg: 'What are the voices saying, Hermes? Are they warning us?',
+              hermesReply: "I pressed my ear to the rock. It is the wind in the cracks, I am almost sure... But the walkers say the voices belong to the pilgrims the gorge kept, and that they still point the way to the next cairn. Down there I can listen once on every stretch, and I will tell you where the whisper comes from.\n\nA whisper is only a hint, though. Your line in the journal is the real map. Draw it first, then open the Whispering Chasm and we go in together."
+            }
+          ]
+        },
+        {
+          divider: 'The Oasis Gate · Dusk',
+          hermesInitial: "Silvia, I am sitting on a warm stone just outside the canyon, and I cannot stop smiling.\n\nI came out a little before noon, and the salt was so bright and so hot that nobody could walk on it, so I waited out the hottest hours in the shade of the rocks. Now the sun is going down. Behind me the gorge is turning purple, and the whispers sound different now: softer, almost like people saying goodbye. I left every relic exactly where we found it: the bell, the lamp, the comb, the horn, the key and the shell. They belong to the pilgrims, not to us. We only took their letters, and the letters are already in your journal.\n\nM, I, R, A, G, E. MIRAGE. A strange password for people who live in the desert, don't you think? I have been turning it over all the way out. Out here a mirage is water that is not really there. Maybe the walkers chose it as a warning: trust the cairns, the laws and the map, never your thirst. Or maybe it is a word that opens something further on. I have learned not to throw any word away.\n\nAnd look up, Silvia. Across the top of the Oasis Gate somebody cut a great X into the rock, and under it, small and neat, in the same careful hand as the other lines of the Order: X + E = 17. The X, a letter of the secret alphabet we have never had! It goes straight into your Cipher Ledger. And keep the R of the bone comb in mind too, the third rune: the Ledger will ask for it soon.\n\nThe walkers call this end of the canyon the Oasis Gate. From here an old track runs south across the Salt Playa, a white plain as flat as a table, all the way to the wells. But something worries me. The sand by the gate is full of fresh tracks: camels, many of them, and boots, all heading south across the salt. Somebody passed through here not long ago, and they were in a hurry.",
+          choices: [
+            {
+              tag: '🏆',
+              text: 'MIRAGE is in my six boxes and the Line of the Gate is in my Cipher Ledger. Rest now, Hermes: you earned it.',
+              silviaMsg: 'MIRAGE is written in the six boxes of the Nomad\'s Passphrase, and X + E = 17 is in my Cipher Ledger. Rest now, Hermes: you earned it.',
+              hermesReply: "Written and recorded. Then tonight I sleep like one of those cairn stones.\n\nBut not before I have looked at the salt once more. The crust is thin in places, and under it there are holes full of brine, dark as ink. Tomorrow at first light I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Open it when you are ready, and find me a path through the Salt Playa."
+            },
+            {
+              tag: '🐫',
+              text: 'Those tracks worry me too. No fire tonight, and keep the Seal of Cairn I well hidden.',
+              silviaMsg: 'Those tracks worry me too, Hermes. No fire tonight, and keep the Seal of Cairn I well hidden in your satchel.',
+              hermesReply: "No fire, then. Cold figs for dinner and the stars for a lamp. The seal is at the very bottom of my satchel, wrapped in my spare shirt, and the satchel is under my head.\n\nWhoever made those tracks is ahead of us, on the same road. We will cross the salt carefully and keep our eyes open. Tomorrow at first light I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Open it when you are ready."
+            },
+            {
+              tag: '🗝️',
+              text: 'Maybe MIRAGE opens something further on. Keep it like a key, Hermes.',
+              silviaMsg: 'Maybe MIRAGE opens something further on, Hermes. Keep it like a key.',
+              hermesReply: "Like a key. I have written it on the inside of my hat band, where the sun cannot fade it, next to the bearing of the watchtower.\n\nTomorrow the Salt Playa. The crust is thin in places, and under it there are holes full of brine, dark as ink. I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Open it when you are ready, and find me a path."
+            }
+          ]
+        }
+      ];
+      function chasmWire() {
+        try { const w = JSON.parse(localStorage.getItem(CHASM_WIRE_KEY) || '{}'); return w && typeof w === 'object' ? w : {}; } catch (e) { return {}; }
+      }
+      function saveChasmWire(w) { try { localStorage.setItem(CHASM_WIRE_KEY, JSON.stringify(w)); } catch (e) {} }
+      let chasmWirePlaying = false;
+
+      // What was already said, drawn again when the chat opens (after the dawn)
+      function appendChasmWireHistory() {
+        const w = chasmWire();
+        CHASM_WIRE.forEach((d, i) => {
+          if (!w['seen' + i] || (chasmWirePlaying && w['reply' + i] === undefined)) return;
+          appendWireDivider(d.divider);
+          appendWireMessage(getCartographerTitle(), d.hermesInitial, false, false, null, null, { type: 'chasm', step: i });
+          const c = d.choices[w['reply' + i]];
+          if (!c) return;
+          appendWireMessage('SILVIA · NAVIGATOR', c.silviaMsg, false, false, null, null, { type: 'chasm', step: i });
+          appendWireMessage(getCartographerTitle(), c.hermesReply, false, false, null, null, { type: 'chasm', step: i });
+          if (i === 1) appendWireMessage('SYSTEM TELEMETRY', CHASM_WIRE_TELEMETRY, true, false, null, null, { type: 'chasm', step: 1 });
+        });
+      }
+
+      // Hermes speaks live, then her replies appear
+      function beginChasmWire(i) {
+        chasmWirePlaying = true;
+        const w = chasmWire();
+        w['seen' + i] = true;
+        saveChasmWire(w);
+        wirePromptBox.style.display = 'none';
+        wireCompletedBar.style.display = 'none';
+        showTyping(true);
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playCelestialChime();
+          appendWireDivider(CHASM_WIRE[i].divider);
+          appendWireMessage(getCartographerTitle(), CHASM_WIRE[i].hermesInitial, false, true, () => {
+            chasmWirePlaying = false;
+            renderWireChoices();
+            updateMessengerBadge();
+            scrollChatToActivePrompt(true);
+          }, null, { type: 'chasm', step: i });
+        }, 900);
+      }
+
+      function handleChasmWireChoice(i, idx) {
+        const choice = CHASM_WIRE[i].choices[idx];
+        if (sfx) sfx.playMechanicalClick();
+        wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg, false, false, null, null, { type: 'chasm', step: i });
+        const w = chasmWire();
+        w['reply' + i] = idx;
+        saveChasmWire(w);
+        chasmWirePlaying = true;
+        wirePromptBox.style.display = 'none';
+        showTyping(true);
+        setTimeout(() => {
+          showTyping(false);
+          if (sfx) sfx.playChimeHover();
+          appendWireMessage(getCartographerTitle(), choice.hermesReply, false, true, () => {
+            if (i === 1) {
+              if (sfx) sfx.playCelestialChime();
+              appendWireMessage('SYSTEM TELEMETRY', CHASM_WIRE_TELEMETRY, true, false, null, null, { type: 'chasm', step: 1 });
+            }
+            chasmWirePlaying = false;
+            renderWireChoices();
+            scrollChatToActivePrompt(true);
+          }, null, { type: 'chasm', step: i });
+        }, 700);
+      }
+
+      // Its turn in renderWireChoices: true when it drew the prompt (or Hermes is speaking), false to let the bar show
+      function chasmWireTurn(i) {
+        if (chasmWirePlaying) {
+          wirePromptBox.style.display = 'none';
+          wireCompletedBar.style.display = 'none';
+          return true;
+        }
+        const w = chasmWire();
+        const header = document.getElementById('wire-prompt-header-text');
+        if (!w['seen' + i]) {
+          const chasmModal = document.getElementById('modal-whispering-chasm');
+          if (document.body.getAttribute('data-active-view') !== 'view-field-wire' || (chasmModal && chasmModal.style.display !== 'none' && chasmModal.style.display !== '')) {
+            if (getMessengerUnreadCount() < 1) setMessengerUnreadCount(1);   // Hermes has something to say
+            return false;
+          }
+          beginChasmWire(i);
+          return true;
+        }
+        if (w['reply' + i] === undefined) {
+          wirePromptBox.style.display = 'block';
+          wireCompletedBar.style.display = 'none';
+          wireChoicesGrid.innerHTML = '';
+          if (header) header.textContent = 'Choose your reply';
+          CHASM_WIRE[i].choices.forEach((c, idx) => {
+            wireChoicesGrid.appendChild(makeChoicePill(c.tag, formatJournalCallouts(c.text), () => handleChasmWireChoice(i, idx)));
+          });
+          return true;
+        }
+        if (i === 0) {
+          wirePromptBox.style.display = 'block';
+          wireCompletedBar.style.display = 'none';
+          wireChoicesGrid.innerHTML = '';
+          if (header) header.textContent = 'Hermes is waiting at the North Portal:';
+          wireChoicesGrid.appendChild(makeChoicePill('🧭', 'Walk into the Whispering Chasm with Hermes (Station 10)', () => {
+            if (typeof window.openWhisperingChasmModal === 'function') window.openWhisperingChasmModal();
+          }));
+          return true;
+        }
+        return false;
+      }
+
+      // Out of the canyon: the Oasis Gate waits on the wire (a badge while the chat is closed)
+      // and back from the canyon with the chat already open, Hermes speaks there and then
+      ['chasm:cleared', 'chasm:closed'].forEach((ev) => document.addEventListener(ev, () => { if (wireCurrentStep === 4 && !chasmWirePlaying) renderWireChoices(); }));
+
+      function rewindToChasmWire(step) {
+        if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();
+        window.__wireTypewriterToken = (window.__wireTypewriterToken || 0) + 1;
+        showTyping(false);
+        chasmWirePlaying = false;
+        const w = chasmWire();
+        for (let i = step; i < CHASM_WIRE.length; i++) { delete w['seen' + i]; delete w['reply' + i]; }
+        saveChasmWire(w);
+        renderWireExpedition();
+        markMessengerAsRead();
+      }
 
       function scrollChatToActivePrompt(smooth = false) {
         const doScroll = () => {
@@ -7410,6 +7603,8 @@
         }
 
         if (wireCurrentStep === 4) {
+          if (!isChasmDone && isChasmMarchOver() && chasmWireTurn(0)) return;
+          if (isChasmDone && !isPlayaDone && !isLexiconDone && chasmWireTurn(1)) return;
           if (!isChasmDone) {
             wirePromptBox.style.display = 'none';
             wireCompletedBar.style.display = 'flex';
@@ -7453,6 +7648,7 @@
                     <div style="margin-top:6px; color:#fde68a; font-family:'Cinzel',serif; font-size:0.84rem; letter-spacing:0.05em;">
                       ⏱️ TREK ETA: ${timeStr} remaining until arrival at North Portal
                     </div>
+                    <div style="margin-top:6px;">Meanwhile, study the canyon from above on the page “The Whispering Chasm” of your journal.</div>
                     ${testerBtn}
                   `;
                   const skipBtn = descEl.querySelector('#btn-admin-skip-march');
@@ -7477,7 +7673,7 @@
                 descEl.textContent = (isBypassed
                   ? 'Hermes crossed the western rock shelf and is standing at the mouth of the canyon. '
                   : 'The Seal of Cairn I is safe in his satchel, and Hermes is standing at the mouth of the canyon. ')
-                  + 'His three water skins are full and his lantern is lit. Open the Grand Desert Map, choose the Whispering Chasm (Station 10), and walk it with him. Keep Sheet 9B in front of you.';
+                  + 'His three water skins are full and his lantern is lit. Open the Grand Desert Map, choose the Whispering Chasm (Station 10), and walk it with him. Keep the page “The Whispering Chasm” of your journal in front of you.';
               }
             }
             try {
@@ -7491,7 +7687,7 @@
             const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
             const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
             if (titleEl) titleEl.textContent = 'Gorge Cleared · The Salt Playa Awaits';
-            if (descEl) descEl.textContent = 'Open the Grand Desert Map and guide Hermes across the Salt Playa (Station 11 · Sheet 10A).';
+            if (descEl) descEl.textContent = 'Open the Grand Desert Map and guide Hermes across the Salt Playa (Station 11 · journal page “The Salt Playa (Dry Basin)”).';
             try {
               localStorage.setItem('order_field_wire_completed', 'true');
               localStorage.setItem('order_field_wire_step', '4');
@@ -7999,6 +8195,7 @@
           try {
             localStorage.removeItem('order_dawn_choices');
             localStorage.removeItem('order_dawn_step');
+            localStorage.removeItem('order_chasm_wire');
             // With the Chasm already cleared the Cairn I seal stays earned; otherwise the dawn can be played again
             if (localStorage.getItem('order_whispering_chasm_completed') !== 'true') {
               localStorage.removeItem('order_cairn1_found');

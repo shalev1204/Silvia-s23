@@ -112,7 +112,7 @@
         anchor: () => el.controls,
         solved: isDone,
         texts: [
-          "Keep your pencil on Sheet 9B and move it every time I move, so you always know where I am. The top of the page is north, like the N on the compass in the corner of your screen.",
+          "Keep your pencil on the canyon in your journal and move it every time I move, so you always know where I am. The top of the page is north, like the N on the compass in the corner of your screen.",
           "The walkers' laws, in plain words: never walk the same ground twice; the quick road to the Oasis skips the cairns, so do not take it; the six cairns must come in order; and a gorge that ends in a wall, a drop or a false cairn is a trap.",
           "Let us take the first turn together. Just inside the North Portal the gorge splits: one way drops south straight away. That is the quick road the second law warns about. Keep going east, along the top of the sheet, and the first cairn your pencil meets is M."
         ]
@@ -122,7 +122,7 @@
       let S = null;
       function fresh() {
         return { pos: START.slice(), h: 1, trail: [key(START[0], START[1])], ss: 0, runes: 0, water: 3, min: START_MIN, wh: 1,
-                 cp: START.slice(), ch: 1, walked: 0, forks: 0 };
+                 cp: START.slice(), ch: 1, walked: 0, forks: 0, fails: 0, heard: 0 };
       }
       function load() {
         try {
@@ -952,6 +952,7 @@
         G.hemi.intensity = 0.55 + 0.2 * k;
         G.scene.fog.color.copy(horizon).lerp(new G.T.Color(0x9a6aa8), 0.3);   // a violet haze down the long corridors
         G.shafts.material.opacity = 0.05 + 0.13 * k;
+        if (win && Math.abs((paintSky.k ?? -1) - k) > 0.02) { paintSky.k = k; win.style.setProperty('--sun', k.toFixed(2)); }
         G.sunDir = dir;
         G.sky.position.copy(G.camera.position);
         G.sunDisc.position.copy(G.camera.position).addScaledVector(dir, 100);
@@ -1093,6 +1094,53 @@
         fxEl.flash = mk('chasm3d-flash');
         fxEl.hurt = mk('chasm3d-hurt');
         fxEl.gauge = mk('chasm3d-gauge', '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" class="g-track"/><circle cx="32" cy="32" r="27" class="g-fill" pathLength="100"/></svg><span>Turn it to the light</span>');
+        // A wrong turn is told in the middle of the picture, where she cannot miss it
+        fxEl.alert = document.createElement('div');
+        fxEl.alert.className = 'chasm3d-alert';
+        fxEl.alert.hidden = true;
+        fxEl.alert.setAttribute('role', 'alert');
+        el.stage.appendChild(fxEl.alert);
+      }
+      function showAlert(stop, restNeeded) {
+        if (!fxEl.alert) return null;
+        const [title, why] = {
+          decoy: ['A false cairn', 'It stands at a dead end, and a true cairn never does.'],
+          early: ['Out of order', 'You skipped a cairn. The cairns must be found in order.'],
+          'exit-early': ['Not yet!', `Only ${S.runes} of the six runes. All six come before the way out.`],
+          tracks: ['Your own footprints', 'Never walk the same ground twice.'],
+          stuck: ['No way left', 'Every way from here crosses your own footprints.']
+        }[stop] || ['A dead end', 'The gorge ends in a wall of rock.'];
+        const back = S.runes ? `the cairn of the ${CAIRNS[S.runes - 1].relic}` : 'the North Portal';
+        fxEl.alert.innerHTML = `<div class="chasm3d-alert-card">
+          <div class="chasm3d-alert-seal" aria-hidden="true">✕</div>
+          <div class="chasm3d-alert-kicker">Wrong turn</div>
+          <div class="chasm3d-alert-title">${title}</div>
+          <p class="chasm3d-alert-why">${why}</p>
+          <p class="chasm3d-alert-cost">${restNeeded ? '💧 No water left: Hermes must rest in the shade.' : '💧 −1 skin of water'}</p>
+          <p class="chasm3d-alert-next">Hermes walks back to ${back}. Try again from there.</p>
+          <button type="button" class="chasm3d-alert-btn">${restNeeded ? 'Rest in the shade' : '↺ Back to the last cairn'}</button>
+        </div>`;
+        fxEl.alert.hidden = false;
+        replay(fxEl.alert, 'is-on');
+        const b = fxEl.alert.querySelector('button');
+        b.addEventListener('click', () => goBack());
+        return b;
+      }
+      function hideAlert() { if (fxEl.alert) fxEl.alert.hidden = true; }
+      const win = modal && modal.querySelector('.chasm3d-window');
+      if (win) {
+        // Life around the game: a warm haze that drifts, an astrolabe turning slowly, sand motes rising in the light
+        const amb = document.createElement('div');
+        amb.className = 'chasm3d-ambient';
+        amb.setAttribute('aria-hidden', 'true');
+        const ticks = Array.from({ length: 72 }, (_, i) => { const a = i * 5 * Math.PI / 180, r0 = i % 6 ? 92 : 86; return `<line x1="${(Math.cos(a) * r0).toFixed(1)}" y1="${(Math.sin(a) * r0).toFixed(1)}" x2="${(Math.cos(a) * 97).toFixed(1)}" y2="${(Math.sin(a) * 97).toFixed(1)}"/>`; }).join('');
+        const star = Array.from({ length: 16 }, (_, i) => { const a = i * Math.PI / 8, r = i % 2 ? 34 : (i % 4 ? 52 : 70), b1 = a - 0.12, b2 = a + 0.12; return `<path d="M0,0 L${(Math.cos(b1) * 14).toFixed(1)},${(Math.sin(b1) * 14).toFixed(1)} L${(Math.cos(a) * r).toFixed(1)},${(Math.sin(a) * r).toFixed(1)} L${(Math.cos(b2) * 14).toFixed(1)},${(Math.sin(b2) * 14).toFixed(1)} Z"/>`; }).join('');
+        let motes = '';
+        for (let i = 0; i < 26; i++) motes += `<i style="--x:${(6 + Math.random() * 84).toFixed(1)}%;--s:${(2 + Math.random() * 3).toFixed(1)}px;--d:${(14 + Math.random() * 16).toFixed(1)}s;--delay:${(-Math.random() * 30).toFixed(1)}s;--dx:${(Math.random() * 60 - 30).toFixed(0)}px"></i>`;
+        amb.innerHTML = `<div class="amb-haze"></div><div class="amb-haze amb-haze-2"></div>
+          <svg class="amb-rose" viewBox="-100 -100 200 200"><circle r="97"/><circle r="86"/><circle r="60" stroke-dasharray="2 4"/><circle r="22"/><g class="amb-ticks">${ticks}</g><g class="amb-star">${star}</g></svg>
+          <div class="amb-motes">${motes}</div>`;
+        win.insertBefore(amb, win.firstChild);
       }
       function paintWarmth() {
         if (!fxEl.gauge) return;
@@ -1153,11 +1201,13 @@
       // Hermes's words arrive in a soft cascade, word after word (the whole line in under a second)
       function say(text) {
         if (!el.voice) return;
-        if (reducedMotion()) { el.voice.textContent = text; return; }
+        if (reducedMotion() || view.quiet) { el.voice.textContent = text; return; }
         const parts = String(text).split(/(\s+)/), words = parts.filter((w) => w.trim()).length;
-        const step = Math.min(28, 800 / Math.max(1, words));
+        const step = Math.min(28, 520 / Math.max(1, words));
         let n = 0;
         el.voice.innerHTML = parts.map((w) => (w.trim() ? `<span class="chasm3d-word" style="animation-delay:${Math.round(n++ * step)}ms">${w.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span>` : w)).join('');
+        const label = el.voice.previousElementSibling;
+        if (label) { label.classList.add('is-talking'); clearTimeout(say.t); say.t = setTimeout(() => label.classList.remove('is-talking'), words * step + 900); }
       }
       function subtitle(text, secs) {
         if (!el.subtitle) return;
@@ -1201,7 +1251,7 @@
       function where(text) {
         if (!el.where || el.where.textContent === text) return;
         el.where.textContent = text;
-        replay(el.where, 'is-new');
+        if (!view.quiet) replay(el.where, 'is-new');
       }
       // Restart a one-shot CSS animation on an element
       function replay(node, cls) {
@@ -1221,7 +1271,8 @@
         if (opts && opts.disabled) b.disabled = true;
         if (opts && opts.dir !== undefined) b.dataset.dir = DIRS[opts.dir][2];
         b.addEventListener('click', onClick);
-        b.style.animationDelay = `${el.controls.children.length * 55}ms`;   // the buttons arrive one after another
+        if (view.quiet) b.style.animation = 'none';   // the window itself is fading in
+        else b.style.animationDelay = `${el.controls.children.length * 55}ms`;   // the buttons arrive one after another
         if (opts && opts.dir !== undefined) {   // pointing at a way lights its arrow on the sand
           const hot = (on) => () => { view.hot = on ? opts.dir : -1; };
           b.addEventListener('mouseenter', hot(true)); b.addEventListener('mouseleave', hot(false));
@@ -1291,7 +1342,7 @@
         const k = key(S.pos[0], S.pos[1]);
         if (stop === 'fork') { showChoice(FORK_LINES[S.forks++ % FORK_LINES.length]); return; }
         if (stop === 'rune') { startRelic(cairnAt[k]); return; }
-        if (stop === 'out') { victory(); return; }
+        if (stop === 'out') { victory(true); return; }
         setback(stop);
       }
 
@@ -1299,6 +1350,7 @@
       function listen() {
         if (view.phase !== 'choose' || S.wh <= 0) return;
         S.wh--;
+        S.heard++;
         const d = whisperDir();
         const words = WHISPERS[(S.runes + S.forks) % WHISPERS.length];
         if (d < 0) {
@@ -1333,6 +1385,7 @@
         else if (stop === 'stuck') text = "Every way out of this place crosses my own footprints. The first law closes all of them.";
         else text = PLACES[k] ? PLACES[k].text : "The gorge ends here, in a wall of red rock. Not even a lizard lives here. The fourth law warns us about blind gorges like this one.";
         S.water = Math.max(0, S.water - 1);
+        S.fails++;
         view.shake = 1;
         const restNeeded = S.water <= 0.001;
         const cost = restNeeded ? "And that was my last drop of water." : `It cost us a skin of water: ${skinsWord(S.water)} left.`;
@@ -1348,8 +1401,8 @@
         save();
         paintHud();
         btn(restNeeded ? 'Rest in the shade' : '↺ Back to the last cairn', () => goBack(), { cls: 'is-back' });
-        const first = el.controls.querySelector('button');
-        if (first) setTimeout(() => first.focus(), 30);
+        const first = showAlert(stop, restNeeded) || el.controls.querySelector('button');
+        if (first) setTimeout(() => first.focus({ preventScroll: true }), 30);
       }
       function skinsWord(w) {
         const n = Math.round(w * 10) / 10;
@@ -1362,6 +1415,7 @@
         if (view.phase !== 'setback') return;
         view.phase = 'fading';
         clearControls();
+        hideAlert();
         if (el.fade) el.fade.classList.add('is-on');
         const done = () => {
           placeHermes(S.trail[S.trail.length - 1], S.h);
@@ -1476,11 +1530,11 @@
       }
 
       // ---- Out of the gorge ----
-      function victory() {
+      function victory(live) {
         view.phase = 'done';
         paintArrows([]);
         clearControls();
-        say("We are out, Silvia! The cliffs fall away on both sides and the light is so bright that I have to close my eyes. Ahead lies a white plain of salt, flat as a table, all the way to the horizon: the Salt Playa. Far away I can see the ruins of an old nomad camp. But the walkers' track does not cross the salt in a straight line, and I can already see why: there are dark holes of brine under the crust. Open Sheet 10A of your journal.");
+        say("We are out, Silvia! The cliffs fall away on both sides and the light is so bright that I have to close my eyes. Ahead lies a white plain of salt, flat as a table, all the way to the horizon: the Salt Playa. Far away I can see the ruins of an old nomad camp. And above the gate, cut into the rock, there is something for your Cipher Ledger! Nobody crosses that salt at midday, so I will rest in the shade of the Oasis Gate and tell you everything on the Field Wire.");
         where('Out of the canyon, at the edge of the Salt Playa.');
         if (el.victory) el.victory.style.display = 'block';
         if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
@@ -1492,7 +1546,10 @@
         hints.refresh();
         if (first && typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (first && typeof window.selectMapNode === 'function') window.selectMapNode(11, false);
+        if (first) document.dispatchEvent(new Event('chasm:cleared'));   // Hermes has news on the Field Wire
         paintHud();
+        // Live, the reward rises over the canyon once the confetti has had its moment
+        if (live) setTimeout(() => { if (view.phase === 'done' && modal.style.display !== 'none') showReward(); }, reducedMotion() ? 300 : 2600);
         if (el.runes) [...el.runes.children].forEach((r, n) => { r.style.animationDelay = `${n * 120}ms`; replay(r, 'is-wave'); });
       }
 
@@ -1688,7 +1745,7 @@
       function onMove(e) {
         if (!dragging || !downAt) return;
         const dx = e.clientX - downAt.lx, dy = e.clientY - downAt.ly;
-        downAt.lx = e.clientX; downAt.ly = e.clientY;
+        downAt.lx = e.clientX; downAt.ly = e.clientY; downAt.t = performance.now();
         if (Math.abs(e.clientX - downAt.x) + Math.abs(e.clientY - downAt.y) > 6) downAt.moved = true;
         if (view.phase === 'relic') {
           rotateRelic('y', dx * 0.012); rotateRelic('x', dy * 0.012);
@@ -1700,6 +1757,8 @@
       function onUp(e) {
         if (!dragging) return;
         dragging = false;
+        // a fling only when she lets go while still moving: held still first, the relic stays where she aimed it
+        if (view.spin && (!downAt || !downAt.t || performance.now() - downAt.t > 90)) view.spin = null;
         if (downAt && !downAt.moved && view.phase === 'choose' && G.arrows.children.length) {
           const rect = el.canvas.getBoundingClientRect();
           const p = new G.T.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
@@ -1770,23 +1829,27 @@
         if (el.stage) el.stage.classList.toggle('is-flat', !G);
         fit();
         const firstTime = !get(WALK_KEY);
+        view.quiet = true;
         S = load();
         if (el.victory) el.victory.style.display = 'none';
         dropRelic();
         view.walk = null; view.look = 0; view.dust = null; view.water0 = undefined; camPos.ok = false;
+        hideAlert();
+        hideReward(true);
         placeHermes(S.trail[S.trail.length - 1], S.h);
         paintPrints();
         paintHud();
         const k = key(S.pos[0], S.pos[1]);
         if (isDone() && S.runes === 6 && S.pos[0] === EXIT[0] && S.pos[1] === EXIT[1]) {
           victory();
-          say("We camp tonight at the mouth of the canyon, Silvia, with the white salt in front of us. When the wind blows down the gorge behind me, I still think I can hear the whispers. Sheet 10A is waiting for you.");
+          say("We camp tonight at the mouth of the canyon, Silvia, with the white salt in front of us. When the wind blows down the gorge behind me, I still think I can hear the whispers. Tomorrow, the page “The Salt Playa (Dry Basin)” of your journal.");
         } else if (S.rest) rest();
         else if (k in cairnAt && cairnAt[k] === S.runes) startRelic(S.runes);
-        else if (firstTime && !isDone()) showChoice("Silvia, I am standing at the North Portal. The canyon is only a crack in the red rock, so deep that the morning sun has not reached the bottom yet. The wind inside sounds like people talking quietly in the next room. Here is how we will do it: I walk, and you steer. Every time the gorge splits, I will stop and wait for your choice. Keep Sheet 9B in front of you, with the top of the page pointing north, and follow me with your pencil.");
-        else showChoice(S.trail.length === 1 ? "I am back at the North Portal, Silvia, ready to go in again. Keep Sheet 9B in front of you, with the top of the page pointing north." : "I am still here, Silvia, exactly where you left me. Find my place on Sheet 9B and tell me which way to go.");
+        else if (firstTime && !isDone()) showChoice("Silvia, I am standing at the North Portal. The canyon is only a crack in the red rock, so deep that the morning sun has not reached the bottom yet. The wind inside sounds like people talking quietly in the next room. Here is how we will do it: I walk, and you steer. Every time the gorge splits, I will stop and wait for your choice. Keep the page “The Whispering Chasm” of your journal in front of you, with the top of the page pointing north, and follow me with your pencil.");
+        else showChoice(S.trail.length === 1 ? "I am back at the North Portal, Silvia, ready to go in again. Keep the page “The Whispering Chasm” of your journal in front of you, with the top of the page pointing north." : "I am still here, Silvia, exactly where you left me. Find my place in your journal and tell me which way to go.");
         // The first picture is drawn now (shaders, textures, shadows), so that slow first frame comes before the window fades in
         if (building && G) tick(performance.now(), 1 / 60);
+        view.quiet = false;
         if (!raf) raf = requestAnimationFrame(frame);
         if (get(HOWTO_KEY) !== 'seen' && !isDone()) showHowto(0);
         else focusFirst();
@@ -1797,6 +1860,155 @@
         const first = [...el.controls.querySelectorAll('button:not([disabled])'), ...(el.victory ? el.victory.querySelectorAll('button') : []), el.close]
           .find((x) => x && x.offsetParent);
         if (first) first.focus({ preventScroll: true });
+      }
+
+      // ---- The reward: what the canyon gave her, shown once she walks out (and again from the victory card) ----
+      const RELIC_ICON = {
+        bell: '<path d="M-10 6 Q-11 -12 0 -12 Q11 -12 10 6 Z"/><path d="M-14 6 H14"/><circle cy="10" r="2.5"/><path d="M0 -12 V-16"/>',
+        lamp: '<path d="M-13 2 Q0 13 13 2 Q3 -3 -13 2 Z"/><path d="M13 2 L17 -2"/><path d="M-3 -4 Q-1 -13 3 -7 Q2 -4 -3 -4 Z"/>',
+        comb: '<path d="M-13 -7 H13 V-1 H-13 Z"/><path d="M-10 -1 V9 M-6 -1 V9 M-2 -1 V6 M2 -1 V9 M6 -1 V4 M10 -1 V9"/>',
+        horn: '<path d="M-13 9 Q-9 -9 12 -11 L13 -4 Q-3 -3 -7 11 Z"/><path d="M-11 4 L-6 6"/>',
+        key: '<circle cx="-8" r="5.5"/><path d="M-2.5 0 H14 M10 0 V5 M14 0 V6"/>',
+        shell: '<path d="M0 11 L-13 -3 Q0 -15 13 -3 Z"/><path d="M0 11 L-6 -9 M0 11 L0 -11 M0 11 L6 -9"/>'
+      };
+      const reward = { box: null, back: null };
+      const rewardOpen = () => !!reward.box && !reward.box.hidden;
+      // Her road from the North Portal to the Oasis Gate: the trail she walked, or (a save without one) the walkers' road
+      function rewardRoute() {
+        const t = S.trail || [];
+        if (t.length > 20 && t[0] === key(START[0], START[1]) && t[t.length - 1] === key(EXIT[0], EXIT[1])) return t.map(at);
+        // the same rules as the whispers: never over the road already walked, past no other cairn, out only at the end
+        const stops = [START, ...CAIRNS.map((c) => [c.r, c.c]), EXIT], out = [START], walked = new Set([key(START[0], START[1])]);
+        for (let i = 1; i < stops.length; i++) {
+          const from = key(stops[i - 1][0], stops[i - 1][1]), goal = key(stops[i][0], stops[i][1]), prev = { [from]: -1 }, q = [from];
+          while (q.length && !(goal in prev)) {
+            const k = q.shift(), [r, c] = at(k);
+            DIRS.forEach(([dr, dc]) => {
+              const nk = key(r + dr, c + dc);
+              if (!open(r + dr, c + dc) || nk in prev || walked.has(nk)) return;
+              if (nk !== goal && ((nk in cairnAt) || (nk in decoyAt) || nk === key(EXIT[0], EXIT[1]))) return;
+              prev[nk] = k; q.push(nk);
+            });
+          }
+          const leg = [];
+          for (let k = goal; k !== from && k !== undefined && k !== -1; k = prev[k]) leg.unshift(at(k));
+          leg.forEach(([r, c]) => walked.add(key(r, c)));
+          out.push(...leg);
+        }
+        return out;
+      }
+      function showReward() {
+        const body = modal && modal.querySelector('.chasm3d-body');
+        if (!body) return;
+        if (!reward.box) {
+          reward.box = document.createElement('div');
+          reward.box.className = 'chasm3d-reward';
+          reward.box.setAttribute('role', 'dialog');
+          reward.box.setAttribute('aria-label', 'Your reward for the Whispering Chasm');
+          body.appendChild(reward.box);
+          // a click before it has all played shows everything at once
+          reward.box.addEventListener('pointerdown', (e) => { if (!(e.target.closest && e.target.closest('button'))) reward.box.classList.add('is-fast'); });
+        }
+        const quiet = reducedMotion();
+        const mins = Math.max(0, Math.round(S.min - START_MIN));
+        const time = `${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, '0')} min`;
+        // The map: walls of the canyon, her road drawn in gold, each cairn lighting up as the line reaches it
+        const route = rewardRoute(), DRAW0 = 0.7, DRAW = 2.8;
+        const pts = route.map(([r, c]) => `${c + 0.5},${r + 0.5}`).join(' ');
+        const reach = CAIRNS.map((c) => { const i = route.findIndex(([r, cc]) => r === c.r && cc === c.c); return DRAW0 + DRAW * Math.max(0, i) / Math.max(1, route.length - 1); });
+        let walls = '';
+        MAZE.forEach((row, r) => { for (let c = 0; c < N; c++) if (row[c] === '1') walls += `M${c} ${r}h1v1h-1z`; });
+        const flawless = (S.fails || 0) === 0 && mins > 0;
+        reward.box.innerHTML = `<div class="rw-rays" aria-hidden="true"></div>
+          <div class="rw-sparks" aria-hidden="true">${Array.from({ length: 22 }, (_, i) => `<i style="--a:${(i * 360 / 22).toFixed(0)}deg;--d:${(140 + (i % 5) * 40)}px;--t:${(0.9 + (i % 4) * 0.2).toFixed(1)}s"></i>`).join('')}</div>
+          <div class="chasm3d-reward-card">
+          <div class="chasm3d-reward-kicker">Station 10 · The Whispering Chasm</div>
+          <h3 class="chasm3d-reward-title">Out of the Gorge!</h3>
+          <p class="rw-sub">Six relics, six runes, and the way out. This is what the canyon gives you.</p>
+          <div class="rw-grid">
+            <section class="rw-map" aria-label="Your road through the canyon">
+              <div class="rw-label">Your road through the canyon</div>
+              <svg viewBox="-0.5 -0.5 26 26" aria-hidden="true">
+                <path class="rw-walls" d="${walls}"/>
+                <polyline class="rw-road-glow" points="${pts}" pathLength="1" style="--d0:${DRAW0}s;--dd:${DRAW}s"/>
+                <polyline class="rw-road" points="${pts}" pathLength="1" style="--d0:${DRAW0}s;--dd:${DRAW}s"/>
+                <circle class="rw-end" cx="${START[1] + 0.5}" cy="${START[0] + 0.5}" r="0.55"/>
+                ${CAIRNS.map((c, i) => `<g class="rw-cairn" style="--t:${reach[i].toFixed(2)}s"><circle cx="${c.c + 0.5}" cy="${c.r + 0.5}" r="0.95"/><text x="${c.c + 0.5}" y="${c.r + 0.86}">${c.letter}</text></g>`).join('')}
+                <circle class="rw-end rw-exit" cx="${EXIT[1] + 0.5}" cy="${EXIT[0] + 0.5}" r="0.7" style="--t:${(DRAW0 + DRAW).toFixed(2)}s"/>
+              </svg>
+              <div class="rw-ends"><span>▲ North Portal</span><span>Oasis Gate ▼</span></div>
+              ${mins > 0 ? `<div class="chasm3d-reward-stats">
+                <div><b data-count="${mins}" data-time="1">${time}</b><span>in the canyon</span></div>
+                <div><b data-count="${S.fails || 0}">${S.fails || 0}</b><span>wrong turns</span></div>
+                <div><b data-count="${S.heard || 0}">${S.heard || 0}</b><span>whispers heard</span></div>
+              </div>` : ''}
+              ${flawless ? '<div class="rw-flawless">✦ A flawless walk ✦</div>' : ''}
+            </section>
+            <section class="rw-loot">
+              <div class="chasm3d-reward-relics">${CAIRNS.map((c, i) => `<div class="chasm3d-medal" style="--t:${reach[i].toFixed(2)}s">
+                <svg viewBox="-20 -20 40 40" aria-hidden="true">${RELIC_ICON[c.relic]}</svg>
+                <b>${c.letter}</b><small>${c.relic}</small></div>`).join('')}</div>
+              <div class="chasm3d-reward-word"><span>The Nomad's Passphrase</span>
+                <strong aria-label="MIRAGE">${'MIRAGE'.split('').map((l, i) => `<em style="--i:${i}">${l}</em>`).join('')}</strong>
+                <small>Write it in the six boxes of the Nomad's Passphrase, on the page “The Whispering Chasm” of your journal.</small></div>
+              <div class="rw-ledger">
+                <div class="rw-seal" aria-hidden="true"><span>X</span></div>
+                <div class="rw-ledger-text">
+                  <div class="rw-ledger-kicker">The Cipher Ledger · a new letter</div>
+                  <div class="rw-ledger-title">The Line of the Gate</div>
+                  <div class="rw-eq" aria-label="X plus E equals 17"><i>X</i><u>+</u><i>E</i><u>=</u><b>17</b></div>
+                  <p>Carved above the Oasis Gate. A letter of the secret alphabet you have never had before: work it out in your Cipher Ledger.</p>
+                </div>
+              </div>
+              <div class="rw-next">Next · Station 11 · The Salt Playa</div>
+            </section>
+          </div>
+          <div class="chasm3d-reward-actions">
+            <button type="button" class="chasm3d-reward-wire">📻 Hermes is calling on the Field Wire</button>
+            <button type="button" class="chasm3d-btn chasm3d-reward-stay">Stay in the canyon</button>
+          </div>
+        </div>`;
+        if (!rewardOpen()) reward.back = document.activeElement;
+        reward.box.hidden = false;
+        reward.box.classList.remove('is-fast');
+        replay(reward.box, 'is-on');
+        // a chime as the line reaches each cairn, a deep stamp for the seal of the new letter
+        if (soundOn() && !quiet) {
+          CAIRNS.forEach((c, i) => tone(NOTE[['C5', 'D5', 'E5', 'G5', 'A5', 'C6'][i]], reach[i], 0.9, { gain: 0.07, type: 'triangle' }));
+          ['E6', 'G6'].forEach((n, i) => tone(NOTE[n], DRAW0 + DRAW + 0.5 + i * 0.12, 1.1, { gain: 0.05 }));
+          tone(110, 4.35, 0.5, { gain: 0.16, to: 55 });
+          tone(NOTE.C6, 4.4, 1.4, { gain: 0.06, type: 'triangle' });
+        }
+        // the numbers count up once the road is drawn
+        const counters = [...reward.box.querySelectorAll('[data-count]')];
+        const fmt = (b, v) => (b.dataset.time ? `${Math.floor(v / 60)} h ${String(v % 60).padStart(2, '0')} min` : String(v));
+        if (!quiet) counters.forEach((b) => {
+          const end = +b.dataset.count, t0 = performance.now() + 3600;
+          b.textContent = fmt(b, 0);
+          const step = (now) => {
+            const k = reward.box.classList.contains('is-fast') ? 1 : Math.max(0, Math.min(1, (now - t0) / 900));
+            b.textContent = fmt(b, Math.round(end * (1 - Math.pow(1 - k, 3))));
+            if (k < 1 && rewardOpen()) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        });
+        reward.box.querySelector('.chasm3d-reward-wire').addEventListener('click', () => {
+          hideReward(true);
+          closeChasm();
+          if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire');
+          else { const tab = document.querySelector('[data-view="view-field-wire"]'); if (tab) tab.click(); }
+        });
+        reward.box.querySelector('.chasm3d-reward-stay').addEventListener('click', () => hideReward());
+        reward.box.querySelector('.chasm3d-reward-wire').focus({ preventScroll: true });
+      }
+      function hideReward(quiet) {
+        if (!rewardOpen()) return;
+        reward.box.hidden = true;
+        const back = reward.back;
+        reward.back = null;
+        if (quiet) return;
+        if (back && document.contains(back) && back.offsetParent) back.focus({ preventScroll: true });
+        else focusFirst();
       }
 
       // ---- How to play: three short pages, the first time she opens the canyon and whenever she presses ? ----
@@ -1835,6 +2047,7 @@
         // While it is open, keys belong to it: Escape closes only these pages, and the arrows do not walk Hermes.
         // Caught before the page's own listeners (the Hub's Escape would otherwise close the whole canyon).
         window.addEventListener('keydown', (e) => {
+          if (rewardOpen() && modal.style.display !== 'none' && e.key !== 'Tab') { e.stopPropagation(); if (e.key === 'Escape') hideReward(); return; }
           if (!howtoOpen() || modal.style.display === 'none' || e.key === 'Tab') return;
           e.stopPropagation();
           if (e.key === 'Escape') hideHowto();
@@ -1846,12 +2059,14 @@
         if (view.walk) finishWalk();
         clearTimeout(rest.t);
         if (howto.box) howto.box.hidden = true;
+        hideReward(true);
         modal.classList.add('closing');
-        setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); }, 220);
+        setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); document.dispatchEvent(new Event('chasm:closed')); }, 220);
         if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
         returnFocusTo = null;
       }
       function walkAgain() {
+        hideReward(true);
         S = fresh();
         save();
         if (el.victory) el.victory.style.display = 'none';
@@ -1865,6 +2080,7 @@
       window.closeWhisperingChasmModal = closeChasm;
       if (el.close) el.close.addEventListener('click', closeChasm);
       if (el.again) el.again.addEventListener('click', walkAgain);
+      if ($('btn-chasm-reward')) $('btn-chasm-reward').addEventListener('click', () => showReward());
       if (el.finish) el.finish.addEventListener('click', () => {
         closeChasm();
         if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);

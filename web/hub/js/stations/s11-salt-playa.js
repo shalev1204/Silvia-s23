@@ -53,7 +53,7 @@
         id: 's11-playa', station: 'Station 11', title: 'the salt crossing', group: 'desert',
         anchor: board, solved: isDone,
         texts: [
-          'The numbers of facets decide the road across Sheet 10A, not the letters. The letters only tell you, at the end, that you walked it right.',
+          'The numbers of facets decide the road across the salt, not the letters. The letters only tell you, at the end, that you walked it right.',
           'Each stride goes one row south, straight down or diagonally, onto a slab with exactly one facet more or one less than the slab you stand on. When a slab leaves you no such stride, step back and try its neighbour: only one road reaches the south shore.',
           'Let us take the first stride together. You start on 3 facets, [C], in Row I. In Row II the slabs within reach are a sinkhole, a 6 and a 4: only the 4, [R], is one facet away. From 4 facets, go on the same way, and when two slabs both fit, try one and be ready to step back.'
         ]

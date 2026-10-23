@@ -231,7 +231,7 @@
             if (window.openWhisperingChasmModal) {
               window.openWhisperingChasmModal();
             } else {
-              showDesertToast('Station 10: The Whispering Chasm · Open Sheet 9B of your physical journal.');
+              showDesertToast('Station 10: The Whispering Chasm · Open the page “The Whispering Chasm” of your journal.');
             }
           } else if (!isChasmUnlocked) {
             showDesertToast('✦ BASECAMP · WATCHTOWER VI ✦ Hermes is at Watchtower VI. Open the Field Wire to review his dawn dispatch.');
@@ -258,7 +258,7 @@
           if (window.openSaltPlayaModal) {
             window.openSaltPlayaModal();
           } else {
-            showDesertToast('Station 11: The Salt Playa · See Sheet 10A of your physical journal.');
+            showDesertToast('Station 11: The Salt Playa · Open the page “The Salt Playa (Dry Basin)” of your journal.');
           }
         } else if (targetId === 11) {
           window.selectMapNode(11, true);

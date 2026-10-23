@@ -1,15 +1,21 @@
     /* ---- Station 10 · The Whispering Chasm: the walk behind Hermes (3D) ---- */
-    .chasm3d-window { max-width: 1280px; }
+    /* The canyon fills the whole screen: a thin living border, the picture as large as it can be */
+    #modal-whispering-chasm { padding: 8px; }
+    .chasm3d-window { --sun: 0.6; max-width: none; height: 100%; max-height: none; isolation: isolate; }
+    .chasm3d-window > :not(.chasm3d-ambient) { position: relative; z-index: 1; }
+    .chasm3d-window > .chasm3d-howto, .chasm3d-window > .map-frame-corner { position: absolute; }
+    #modal-whispering-chasm .chasm-header-bar { padding: 8px 20px; background: rgba(22, 16, 10, 0.55); }
     .chasm3d-body {
+      flex: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 360px;
+      grid-template-columns: minmax(0, 1fr) clamp(330px, 27vw, 430px);
       min-height: 0;
       overflow: auto;
     }
     .chasm3d-stage {
       position: relative;
       min-height: 360px;
-      height: min(72vh, 640px);
+      height: 100%;
       background: #1a0e08;
       overflow: hidden;
       touch-action: none;
@@ -55,7 +61,7 @@
     .chasm3d-fade { position: absolute; inset: 0; background: #e8c9a0; opacity: 0; pointer-events: none; transition: opacity 0.6s ease; }
     .chasm3d-fade.is-on { opacity: 0.92; }
 
-    .chasm3d-panel { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-left: 1.5px solid rgba(212, 168, 83, 0.3); background: rgba(22, 16, 10, 0.96); overflow-y: auto; max-height: min(72vh, 640px); }
+    .chasm3d-panel { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-left: 1.5px solid rgba(212, 168, 83, 0.3); background: rgba(22, 16, 10, 0.62); overflow-y: auto; max-height: 100%; }
     .chasm3d-panel > * { flex-shrink: 0; }
     .chasm3d-voice-label { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.08em; color: #d4a853; }
     .chasm3d-voice { font-family: 'EB Garamond', Georgia, serif; font-size: 1.08rem; line-height: 1.5; color: #f3e2b8; min-height: 4.5em; }
@@ -214,9 +220,211 @@
     .chasm3d-howto-radio { animation: chasm-radio 2.2s ease-in-out infinite; }
     @keyframes chasm-radio { 0%, 100% { transform: none; } 10% { transform: rotate(-8deg); } 20% { transform: rotate(8deg); } 30% { transform: none; } }
 
+
+    /* ---- Around the game: a slow warm haze, an astrolabe turning, sand motes rising (the haze follows the canyon's sun) ---- */
+    .chasm3d-ambient { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #120c08; }
+    .amb-haze {
+      position: absolute; width: 70%; height: 80%; right: 0; top: -20%; border-radius: 50%; filter: blur(60px); transform-origin: 100% 0;
+      background: radial-gradient(circle, hsla(calc(18 + var(--sun) * 14), 85%, 50%, calc(0.22 + var(--sun) * 0.16)), transparent 70%);
+      animation: amb-drift 38s ease-in-out infinite alternate; transition: background 2s ease;
+    }
+    .amb-haze-2 { right: 0; top: 45%; width: 55%; height: 70%; transform-origin: 100% 100%; background: radial-gradient(circle, rgba(122, 74, 168, 0.22), transparent 70%); animation-duration: 47s; animation-direction: alternate-reverse; }
+    @keyframes amb-drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(-14%, 10%) scale(1.1); } }
+    .amb-rose { position: absolute; right: 0; bottom: -110px; width: 420px; height: 420px; fill: none; stroke: rgba(212, 168, 83, 0.16); stroke-width: 0.8; }
+    .amb-rose .amb-ticks { stroke: rgba(212, 168, 83, 0.22); animation: amb-turn 240s linear infinite; }
+    .amb-rose .amb-star { fill: rgba(212, 168, 83, 0.07); stroke: rgba(212, 168, 83, 0.2); animation: amb-turn 180s linear infinite reverse; }
+    @keyframes amb-turn { to { transform: rotate(360deg); } }
+    .amb-motes i {
+      position: absolute; left: var(--x); bottom: -10px; width: var(--s); height: var(--s); border-radius: 50%;
+      background: #fde68a; box-shadow: 0 0 6px #f59e0b; opacity: 0;
+      animation: amb-rise var(--d) linear var(--delay) infinite;
+    }
+    @keyframes amb-rise { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 0.55; } 80% { opacity: 0.35; } 100% { opacity: 0; transform: translate(var(--dx), -105vh); } }
+    #modal-whispering-chasm .chasm-header-bar::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -1.5px; height: 1.5px; pointer-events: none;
+      background: linear-gradient(90deg, transparent, #fde68a 50%, transparent) no-repeat; background-size: 30% 100%;
+      animation: amb-sweep 7s ease-in-out infinite;
+    }
+    @keyframes amb-sweep { from { background-position: -40% 0; } to { background-position: 140% 0; } }
+    #modal-whispering-chasm .chasm-header-icon { display: inline-block; animation: amb-needle 6s ease-in-out infinite; }
+    @keyframes amb-needle { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(14deg); } }
+    #modal-whispering-chasm .map-frame-corner { animation: amb-corner 4s ease-in-out infinite; }
+    @keyframes amb-corner { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 6px rgba(253, 230, 138, 0.8)); } }
+    /* the radio crackles while Hermes speaks */
+    .chasm3d-voice-label::after { content: ''; display: inline-block; width: 14px; height: 10px; margin-left: 8px; vertical-align: -1px; opacity: 0;
+      background: linear-gradient(#d4a853, #d4a853) 0 100% / 3px 40% no-repeat, linear-gradient(#d4a853, #d4a853) 5px 100% / 3px 80% no-repeat, linear-gradient(#d4a853, #d4a853) 10px 100% / 3px 55% no-repeat; transition: opacity 0.3s ease; }
+    .chasm3d-voice-label.is-talking::after { opacity: 1; animation: amb-bars 0.5s steps(3) infinite; }
+    @keyframes amb-bars { 0% { background-size: 3px 40%, 3px 80%, 3px 55%; } 33% { background-size: 3px 90%, 3px 30%, 3px 70%; } 66% { background-size: 3px 60%, 3px 65%, 3px 25%; } 100% { background-size: 3px 40%, 3px 80%, 3px 55%; } }
+
+    /* ---- A wrong turn, told in the middle of the picture ---- */
+    .chasm3d-alert {
+      position: absolute; inset: 0; z-index: 4; display: flex; align-items: center; justify-content: center; padding: 16px;
+      background: radial-gradient(circle at 50% 50%, rgba(40, 6, 4, 0.55), rgba(20, 3, 2, 0.82));
+    }
+    .chasm3d-alert[hidden] { display: none; }
+    .chasm3d-alert.is-on { animation: chasm-fadein 0.3s ease both; }
+    .chasm3d-alert-card {
+      width: min(100%, 440px); padding: 22px 24px 20px; border-radius: 16px; text-align: center; position: relative;
+      border: 2px solid #e2725b; background: linear-gradient(#2a120c, #1a0c08);
+      box-shadow: 0 0 0 4px rgba(226, 114, 91, 0.18), 0 22px 60px rgba(0, 0, 0, 0.85), 0 0 50px rgba(226, 114, 91, 0.3);
+      color: #f3e2b8; font-family: 'EB Garamond', Georgia, serif; font-size: 1.08rem; line-height: 1.45;
+    }
+    .chasm3d-alert.is-on .chasm3d-alert-card { animation: chasm-thump 0.6s cubic-bezier(.2, .9, .3, 1.3) both; }
+    @keyframes chasm-thump { 0% { opacity: 0; transform: scale(0.6); } 55% { opacity: 1; transform: scale(1.06); } 70% { transform: scale(1) rotate(-1.5deg); } 85% { transform: rotate(1deg); } 100% { transform: none; } }
+    .chasm3d-alert-seal {
+      width: 58px; height: 58px; margin: -52px auto 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 35% 30%, #f08a6e, #a8321e); border: 2px solid #fde68a; color: #fff3e0;
+      font: 700 1.6rem 'Cinzel', serif; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 22px rgba(240, 120, 90, 0.6);
+    }
+    .chasm3d-alert.is-on .chasm3d-alert-seal { animation: chasm-stamp 0.5s 0.15s cubic-bezier(.2, .9, .3, 1.6) both; }
+    @keyframes chasm-stamp { from { transform: scale(2.2) rotate(-25deg); opacity: 0; } to { transform: none; opacity: 1; } }
+    .chasm3d-alert-kicker { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; color: #f4a08a; }
+    .chasm3d-alert-title { margin: 2px 0 6px; font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.75rem; color: #fde68a; text-shadow: 0 0 18px rgba(253, 230, 138, 0.35); }
+    .chasm3d-alert-card p { margin: 0 0 8px; }
+    .chasm3d-alert-cost { display: inline-block; padding: 3px 12px; border-radius: 20px; background: rgba(95, 168, 216, 0.16); color: #cfe6f5; font-size: 1rem; }
+    .chasm3d-alert-next { color: #e8dcc0; }
+    .chasm3d-alert-btn {
+      margin-top: 6px; min-height: 50px; width: 100%; padding: 10px 16px; border-radius: 12px; cursor: pointer;
+      border: 1.5px solid #fde68a; background: linear-gradient(#8a5420, #5c3412); color: #fff3c4;
+      font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.05em; box-shadow: 0 0 0 0 rgba(253, 230, 138, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.2s ease; animation: chasm-call 2s ease-in-out 0.8s infinite;
+    }
+    .chasm3d-alert-btn:hover { transform: translateY(-2px); }
+    .chasm3d-alert-btn:active { transform: translateY(1px) scale(0.98); }
+    .chasm3d-alert-btn:focus-visible { outline: 3px solid #fde68a; outline-offset: 3px; }
+    @keyframes chasm-call { 0%, 100% { box-shadow: 0 0 0 0 rgba(253, 230, 138, 0.45); } 50% { box-shadow: 0 0 0 8px rgba(253, 230, 138, 0); } }
+
+
+    /* ---- The reward: her road drawn in gold, the six relics, the passphrase, a new letter for the Ledger ---- */
+    .chasm3d-reward {
+      position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center; padding: 14px; overflow-y: auto; overflow-x: hidden;
+      background: radial-gradient(circle at 50% 30%, rgba(150, 92, 26, 0.6), rgba(10, 6, 3, 0.94) 72%);
+    }
+    .chasm3d-reward[hidden] { display: none; }
+    .chasm3d-reward.is-on { animation: chasm-fadein 0.45s ease both; }
+    .rw-rays {   /* a slow sunburst behind the card */
+      position: absolute; left: 50%; top: 40%; width: 1400px; height: 1400px; margin: -700px 0 0 -700px; pointer-events: none; opacity: 0.55;
+      background: repeating-conic-gradient(from 0deg, rgba(253, 230, 138, 0.16) 0deg 6deg, transparent 6deg 18deg);
+      -webkit-mask: radial-gradient(circle, #000 8%, transparent 62%); mask: radial-gradient(circle, #000 8%, transparent 62%);
+      animation: amb-turn 90s linear infinite;
+    }
+    .rw-sparks { position: absolute; left: 50%; top: 22%; width: 0; height: 0; pointer-events: none; }
+    .rw-sparks i {
+      position: absolute; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: #fde68a; box-shadow: 0 0 10px #f59e0b; opacity: 0;
+      transform: rotate(var(--a)) translateY(0);
+    }
+    .chasm3d-reward.is-on .rw-sparks i { animation: rw-spark var(--t) cubic-bezier(.1, .7, .3, 1) 0.3s both; }
+    @keyframes rw-spark { 0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(1.4); } 100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) scale(0.3); } }
+    .chasm3d-reward-card {
+      width: min(100%, 1060px); margin: auto; padding: 18px 26px 18px; border-radius: 18px; text-align: center; position: relative; overflow: hidden;
+      border: 2px solid #d4a853; background: linear-gradient(170deg, #2a1c0e, #160e07 60%);
+      box-shadow: 0 0 0 5px rgba(212, 168, 83, 0.14), 0 26px 70px rgba(0, 0, 0, 0.85), 0 0 80px rgba(253, 230, 138, 0.22);
+      color: #f3e2b8; font-family: 'EB Garamond', Georgia, serif; font-size: 1.05rem; line-height: 1.45;
+    }
+    .chasm3d-reward-card::before {   /* a slow sweep of light across the card */
+      content: ''; position: absolute; inset: -40% -60%; pointer-events: none;
+      background: linear-gradient(105deg, transparent 42%, rgba(253, 230, 138, 0.1) 50%, transparent 58%);
+      animation: chasm-sheen 5s ease-in-out 1.2s infinite;
+    }
+    @keyframes chasm-sheen { from { transform: translateX(-40%); } to { transform: translateX(40%); } }
+    .chasm3d-reward.is-on .chasm3d-reward-card { animation: chasm-card 0.7s cubic-bezier(.2, .9, .3, 1.2) both; }
+    .chasm3d-reward-kicker { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: #d4a853; }
+    .chasm3d-reward-title { margin: 0; font-family: 'Cinzel', serif; font-size: 2.3rem; color: #fde68a; text-shadow: 0 0 26px rgba(253, 230, 138, 0.55); }
+    .chasm3d-reward.is-on .chasm3d-reward-title { animation: chasm-thump 0.8s 0.2s cubic-bezier(.2, .9, .3, 1.3) both; }
+    .rw-sub { margin: 0 0 12px; color: #e8dcc0; font-style: italic; }
+    .chasm3d-reward.is-on .rw-sub { animation: chasm-rise 0.5s ease 0.45s both; }
+    .rw-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 20px; align-items: center; margin-bottom: 14px; text-align: left; }
+    .rw-label, .rw-ledger-kicker { font-family: 'Cinzel', serif; font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: #d4a853; text-align: center; }
+    /* the map of the canyon */
+    .rw-map { padding: 10px 12px 12px; border-radius: 14px; background: radial-gradient(circle at 50% 40%, #f1dcae, #d9bd85 75%); color: #4a2c12; box-shadow: inset 0 0 26px rgba(120, 72, 20, 0.45), 0 10px 30px rgba(0, 0, 0, 0.5); }
+    .rw-map .rw-label { color: #7a4a18; }
+    .rw-map svg { display: block; width: 100%; max-width: 360px; margin: 4px auto 0; aspect-ratio: 1; overflow: visible; }
+    .rw-walls { fill: rgba(92, 52, 18, 0.72); }
+    .rw-road, .rw-road-glow { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+    .rw-road { stroke: #b45309; stroke-width: 0.42; }
+    .rw-road-glow { stroke: rgba(245, 158, 11, 0.45); stroke-width: 1.1; filter: blur(0.25px); }
+    .chasm3d-reward.is-on .rw-road, .chasm3d-reward.is-on .rw-road-glow { animation: rw-draw var(--dd) cubic-bezier(.45, .05, .55, .95) var(--d0) both; }
+    @keyframes rw-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+    .rw-end { fill: #7a4a18; }
+    .rw-exit { fill: #15803d; }
+    .rw-cairn circle { fill: #fde68a; stroke: #92400e; stroke-width: 0.18; }
+    .rw-cairn text { font: 700 1.15px 'Cinzel', serif; fill: #7c2d12; text-anchor: middle; }
+    .rw-cairn, .rw-exit { transform-box: fill-box; transform-origin: center; }
+    .chasm3d-reward.is-on .rw-cairn, .chasm3d-reward.is-on .rw-exit { animation: rw-pop 0.55s cubic-bezier(.2, .9, .3, 1.6) var(--t) both; }
+    @keyframes rw-pop { 0% { opacity: 0; transform: scale(0.2); } 60% { opacity: 1; transform: scale(1.6); } 100% { transform: none; } }
+    .rw-ends { display: flex; justify-content: space-between; font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.06em; color: #7a4a18; margin: 2px 4px 6px; }
+    .rw-map .chasm3d-reward-stats { display: flex; justify-content: space-around; gap: 8px; padding-top: 8px; border-top: 1px dashed rgba(122, 74, 24, 0.45); text-align: center; }
+    .rw-map .chasm3d-reward-stats div { display: flex; flex-direction: column; align-items: center; }
+    .rw-map .chasm3d-reward-stats b { font: 700 1.2rem 'Cinzel', serif; color: #7c2d12; font-variant-numeric: tabular-nums; }
+    .rw-map .chasm3d-reward-stats span { font-size: 0.82rem; color: #6b4520; }
+    .chasm3d-reward.is-on .chasm3d-reward-stats { animation: chasm-rise 0.5s ease 3.5s both; }
+    .rw-flawless { margin-top: 8px; text-align: center; font: 700 0.9rem 'Cinzel', serif; letter-spacing: 0.12em; color: #92400e; }
+    .chasm3d-reward.is-on .rw-flawless { animation: chasm-stamp 0.6s cubic-bezier(.2, .9, .3, 1.5) 4.4s both; }
+    /* the relics, lighting up as the road reaches each cairn */
+    .chasm3d-reward-relics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 10px; }
+    .chasm3d-medal {
+      display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 2px 7px; border-radius: 50% 50% 14px 14px; text-align: center;
+      background: radial-gradient(circle at 50% 30%, rgba(200, 130, 40, 0.5), rgba(60, 36, 16, 0.85) 70%); border: 1.5px solid rgba(253, 230, 138, 0.7);
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5), 0 0 14px rgba(253, 230, 138, 0.2);
+    }
+    .chasm3d-reward.is-on .chasm3d-medal { animation: chasm-medal 0.7s cubic-bezier(.2, .9, .3, 1.4) var(--t) both; }
+    @keyframes chasm-medal { 0% { opacity: 0; transform: perspective(400px) rotateY(-120deg) translateY(-30px) scale(0.6); } 60% { opacity: 1; transform: perspective(400px) rotateY(18deg) scale(1.12); } 100% { transform: none; } }
+    .chasm3d-medal svg { width: 30px; height: 30px; fill: none; stroke: #fde68a; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .chasm3d-medal b { font: 700 1.4rem 'Cinzel', serif; color: #fff3c4; text-shadow: 0 0 10px #f59e0b; line-height: 1; }
+    .chasm3d-medal small { font-family: 'Cinzel', serif; font-size: 0.66rem; letter-spacing: 0.08em; color: #e8dcc0; }
+    /* MIRAGE, one letter at a time */
+    .chasm3d-reward-word { display: flex; flex-direction: column; align-items: center; margin-bottom: 12px; text-align: center; }
+    .chasm3d-reward-word > span { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: #d4a853; }
+    .chasm3d-reward-word strong { display: flex; gap: 0.18em; font: 700 2.6rem 'Cinzel', serif; color: #fde68a; text-shadow: 0 0 20px rgba(245, 158, 11, 0.85); line-height: 1.1; }
+    .chasm3d-reward-word em { font-style: normal; display: inline-block; }
+    .chasm3d-reward.is-on .chasm3d-reward-word em { animation: chasm-stamp 0.5s cubic-bezier(.2, .9, .3, 1.6) calc(3.55s + var(--i) * 0.09s) both; }
+    .chasm3d-reward-word small { font-size: 0.9rem; color: #c9b48a; max-width: 34em; }
+    .chasm3d-reward.is-on .chasm3d-reward-word small { animation: chasm-rise 0.5s ease 4.1s both; }
+    /* the new letter of the secret alphabet, sealed in wax */
+    .rw-ledger {
+      display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; margin-bottom: 10px;
+      background: linear-gradient(160deg, #efdcb0, #d8b97f); color: #3d2410; box-shadow: inset 0 0 22px rgba(120, 72, 20, 0.4), 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+    .chasm3d-reward.is-on .rw-ledger { animation: rw-unroll 0.6s cubic-bezier(.2, .9, .3, 1.2) 4.0s both; }
+    @keyframes rw-unroll { from { opacity: 0; transform: scaleY(0.2) translateY(-20px); } to { opacity: 1; transform: none; } }
+    .rw-seal {
+      flex: 0 0 auto; width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center; position: relative;
+      background: radial-gradient(circle at 38% 32%, #e05252, #9b1c1c 55%, #6b1010); box-shadow: 0 0 0 4px rgba(155, 28, 28, 0.35), 0 6px 14px rgba(0, 0, 0, 0.45), inset 0 -4px 10px rgba(0, 0, 0, 0.35);
+    }
+    .rw-seal::before { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 1.5px dashed rgba(255, 220, 200, 0.45); }
+    .rw-seal span { font: 700 2.4rem 'Cinzel', serif; color: #ffe4c4; text-shadow: 0 2px 0 #6b1010, 0 0 12px rgba(255, 200, 150, 0.6); }
+    .chasm3d-reward.is-on .rw-seal { animation: rw-seal 0.7s cubic-bezier(.2, .9, .3, 1.4) 4.3s both; }
+    @keyframes rw-seal { 0% { opacity: 0; transform: scale(2.6) rotate(-40deg); } 55% { opacity: 1; transform: scale(0.88) rotate(6deg); } 100% { transform: none; } }
+    .rw-ledger-text { flex: 1; min-width: 0; }
+    .rw-ledger .rw-ledger-kicker { text-align: left; color: #8a4b12; }
+    .rw-ledger-title { font: 700 1.05rem 'Cinzel', serif; color: #5c2a0c; }
+    .rw-eq { display: flex; align-items: center; gap: 6px; margin: 4px 0 2px; font: 700 1.5rem 'Cinzel', serif; color: #3d2410; }
+    .rw-eq i { font-style: normal; display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 8px; border: 2px solid #8a4b12; background: rgba(255, 248, 225, 0.6); }
+    .rw-eq i:first-child { border-color: #9b1c1c; color: #9b1c1c; box-shadow: 0 0 12px rgba(155, 28, 28, 0.35); }
+    .rw-eq u { text-decoration: none; color: #8a4b12; }
+    .chasm3d-reward.is-on .rw-eq > * { animation: chasm-rise 0.35s ease 4.6s both; }
+    .chasm3d-reward.is-on .rw-eq > :nth-child(2) { animation-delay: 4.7s; } .chasm3d-reward.is-on .rw-eq > :nth-child(3) { animation-delay: 4.8s; }
+    .chasm3d-reward.is-on .rw-eq > :nth-child(4) { animation-delay: 4.9s; } .chasm3d-reward.is-on .rw-eq > :nth-child(5) { animation-delay: 5s; }
+    .rw-ledger p { margin: 2px 0 0; font-size: 0.92rem; line-height: 1.35; color: #4a2c12; }
+    .rw-next { text-align: center; font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.1em; color: #d4a853; }
+    .chasm3d-reward.is-on .rw-next { animation: chasm-rise 0.5s ease 5.1s both; }
+    .chasm3d-reward-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .chasm3d-reward-actions .chasm3d-btn { flex: 0 1 auto; }
+    .chasm3d-reward-wire {
+      min-height: 50px; padding: 10px 22px; border-radius: 12px; cursor: pointer; border: 1.5px solid #fde68a;
+      background: linear-gradient(#8a5420, #5c3412); color: #fff3c4; font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.04em;
+      animation: chasm-call 2s ease-in-out 5.6s infinite; transition: transform 0.15s ease;
+    }
+    .chasm3d-reward-wire:hover { transform: translateY(-2px); }
+    .chasm3d-reward-wire:active { transform: translateY(1px) scale(0.98); }
+    .chasm3d-reward-wire:focus-visible, .chasm3d-reward-stay:focus-visible { outline: 3px solid #fde68a; outline-offset: 3px; }
+    .chasm3d-reward.is-on .chasm3d-reward-actions { animation: chasm-rise 0.5s ease 4.4s both; }
+    /* a click before it has all played: everything at once */
+    .chasm3d-reward.is-fast .chasm3d-reward-card *, .chasm3d-reward.is-fast .rw-sparks i { animation-delay: 0s !important; animation-duration: 0.25s !important; }
+
     @media (max-width: 980px) {
       .chasm3d-body { grid-template-columns: 1fr; }
-      .chasm3d-stage { height: 52vh; min-height: 280px; }
+      .chasm3d-stage { height: 62vh; min-height: 280px; }
       .chasm3d-panel { border-left: 0; border-top: 1.5px solid rgba(212, 168, 83, 0.3); max-height: none; }
     }
     @media (max-width: 520px) {
@@ -230,8 +438,21 @@
       .chasm3d-howto-pic .chasm3d-rune { width: 20px; height: 26px; }
       .chasm3d-howto .chasm3d-howto-rose { width: 40px; height: 40px; }
       .chasm3d-howto-pic .chasm3d-clock { font-size: 0.78rem; }
+      .chasm3d-alert-card { padding: 18px 16px 14px; font-size: 1rem; }
+      .chasm3d-alert-title { font-size: 1.4rem; }
+      .amb-rose { width: 260px; height: 260px; }
+      .chasm3d-reward { padding: 8px; align-items: flex-start; }
+      .chasm3d-reward-card { padding: 16px 12px 14px; }
+      .chasm3d-reward-title { font-size: 1.6rem; }
+      .rw-grid { grid-template-columns: 1fr; gap: 14px; }
+      .rw-map svg { max-width: 300px; }
+      .chasm3d-reward-relics { grid-template-columns: repeat(3, 1fr); }
+      .chasm3d-reward-word strong { font-size: 2.1rem; }
+      .rw-seal { width: 60px; height: 60px; }
+      .rw-seal span { font-size: 2rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       .chasm3d-rose, .chasm3d-subtitle, .chasm3d-fade { transition: none; }
       .chasm3d-window *, .chasm3d-window *::after, .chasm3d-howto, .chasm3d-howto-card { animation: none !important; transition: none !important; }
+      .amb-motes { display: none; }
     }

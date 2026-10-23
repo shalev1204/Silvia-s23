@@ -221,17 +221,43 @@ def test_wire_gating(browser):
     js = page.evaluate
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
     wire = js("document.getElementById('view-field-wire').innerText")
-    check("North Portal Reached" in wire and "Sheet 9B" in wire, "Chasm march over: the wire says Hermes is at the North Portal and points to Sheet 9B",
-          wire[-300:].replace("\n", " "))
-    js("window.openWhisperingChasmModal()"); page.wait_for_timeout(400)
+    pills = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].map(b => b.innerText)")
+    check("narrower than I imagined" in wire and "The Whispering Chasm" in wire and "Desert Oasis" in wire and "Sheet" not in wire[wire.lower().rfind("before the descent"):] and len(pills()) == 3
+          and js("!!document.querySelector('#view-field-wire .journal-ref-pill[data-sheet=\"9B\"]')"),
+          "Chasm march over: at the North Portal Hermes asks her to draw the way on the page The Whispering Chasm first (a page pill, no sheet numbers), with 3 replies", wire[-300:].replace("\n", " "))
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(4000)
+    check(len(pills()) == 1 and "Walk into the Whispering Chasm" in pills()[0], "after her reply, one way on: walk into the Chasm with Hermes", str(pills()))
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(600)
     check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none", "the Chasm opens for Silvia at the North Portal")
-    check(not errors, "no JS errors at the North Portal", "; ".join(errors[:2]))
+    js("localStorage.setItem('order_whispering_chasm_completed', 'true'); localStorage.setItem('order_desert_station_active', '11')")
+    js("document.dispatchEvent(new Event('chasm:cleared'))"); page.wait_for_timeout(600)
+    check("seen1" not in (js("localStorage.getItem('order_chasm_wire')") or ""), "won in the canyon: Hermes waits until she is back on the wire")
+    js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(3500)
+    wire = js("document.getElementById('view-field-wire').innerText")
+    check("Oasis Gate" in wire and "M, I, R, A, G, E" in wire and "X + E = 17" in wire and "fresh tracks" in wire and len(pills()) == 3,
+          "back from the canyon: at the Oasis Gate Hermes tells the lore of MIRAGE, the third rune and the tracks, with 3 replies", wire[-300:].replace("\n", " "))
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(4500)
+    wire = js("document.getElementById('view-field-wire').innerText")
+    check("PASSPHRASE RECORDED" in wire and "The Salt Playa (Dry Basin)" in wire and "Sheet 10A" not in wire and "Gorge Cleared" in js("document.getElementById('wire-completed-bar').innerText"),
+          "her reply: the page The Salt Playa (Dry Basin), the telemetry, then the way to the Salt Playa")
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
+    wire = js("document.getElementById('view-field-wire').innerText")
+    check(wire.count("narrower than I imagined") == 1 and wire.count("fresh tracks") == 1 and wire.count("PASSPHRASE RECORDED") == 1,
+          "reloaded, the North Portal and the Oasis Gate stay in the chat, once each")
+    check(not errors, "no JS errors at the North Portal and the Oasis Gate", "; ".join(errors[:2]))
+    ctx.close()
+    gate = dict(DESERT_BASE, order_whispering_chasm_completed="true", order_salt_playa_completed="false", order_silvia_waypoint_v2="done")
+    ctx, page, errors = new_page(browser, gate)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    check(page.evaluate("document.getElementById('messenger-counter-badge').textContent.trim()") == "1", "chat closed at the Oasis Gate: a badge says Hermes is calling")
     ctx.close()
 
 
 def test_ledger_gating(browser):
     print("\n4. Cipher Ledger reveals desert equations only after their station")
-    cases = [({}, []), ({"order_desert_lexicon_completed": "true"}, ["stele-rf"]),
+    cases = [({}, []), ({"order_whispering_chasm_completed": "true"}, ["chasm-xe"]),
+             ({"order_desert_lexicon_completed": "true"}, ["stele-rf"]),
              (DESERT_DONE, ["stele-rf", "falcon-pa"]),
              (dict(DESERT_DONE, order_sun_monolith_completed="true"), ["stele-rf", "falcon-pa", "cairn2-df", "cairn2-ct"])]
     for extra, expected in cases:
@@ -240,7 +266,7 @@ def test_ledger_gating(browser):
         page.wait_for_timeout(2500)
         page.evaluate("document.querySelector('[data-view=\"view-cipher\"]').click()")
         page.wait_for_timeout(600)
-        ids = page.evaluate("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id.replace('eq-item-', '')).filter(i => /stele|falcon|cairn2/.test(i))")
+        ids = page.evaluate("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id.replace('eq-item-', '')).filter(i => /stele|falcon|cairn2|chasm/.test(i))")
         check(ids == expected and not errors, f"desert equations shown: {expected or 'none'}", f"got {ids}; " + "; ".join(errors[:2]))
         ctx.close()
 
@@ -2627,8 +2653,8 @@ def test_whispering_chasm(browser):
     js("window.openWhisperingChasmModal()"); page.wait_for_timeout(600)
     s = st()
     check(js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none" and s["phase"] == "choose"
-          and s["pos"] == [1, 0] and "North Portal" in voice() and "Sheet 9B" in voice(),
-          "the canyon opens at the North Portal, Hermes asks her to keep Sheet 9B in front of her", f"{s['phase']} {s['pos']}")
+          and s["pos"] == [1, 0] and "North Portal" in voice() and "The Whispering Chasm" in voice() and "Sheet" not in voice(),
+          "the canyon opens at the North Portal, Hermes asks her to keep the page The Whispering Chasm in front of her", f"{s['phase']} {s['pos']}")
     howto_on = lambda: js("!document.getElementById('chasm3d-howto').hidden")
     pages = []
     if howto_on():
@@ -2680,8 +2706,15 @@ def test_whispering_chasm(browser):
     check(s["phase"] == "setback" and "skin of water" in voice() and s["water"] < 3 and s["pos"] == [1, 0]
           and js("document.querySelector('#chasm3d-controls .chasm3d-btn.is-back') !== null"),
           "a wrong turn: Hermes says why, it costs a skin of water and he goes back to the portal", f"{s['phase']} {s['water']}")
+    page.wait_for_timeout(150)   # the way back takes the focus a moment after the card appears
+    alert = js("(() => { const a = document.querySelector('#chasm3d-stage .chasm3d-alert'); return a && !a.hidden ? a.innerText : ''; })()")
+    check("WRONG TURN" in alert.upper() and "skin of water" in alert and "North Portal" in alert
+          and js("document.activeElement.classList.contains('chasm3d-alert-btn')"),
+          "the wrong turn is told in the middle of the picture, with the way back focused",
+          alert.replace("\n", " ")[:120] + " · focus: " + js("document.activeElement.className"))
     js("window.__chasm.back()")
-    check(st()["phase"] == "choose" and st()["trail"] == [1 * 25 + 0], "back at the portal, the wrong footprints are gone")
+    check(st()["phase"] == "choose" and st()["trail"] == [1 * 25 + 0] and js("document.querySelector('.chasm3d-alert').hidden"),
+          "back at the portal, the wrong footprints are gone")
 
     for _ in range(40):
         if st()["phase"] == "rest":
@@ -2739,9 +2772,23 @@ def test_whispering_chasm(browser):
     check(s["phase"] == "done" and s["runes"] == 6 and s["pos"] == [23, 24], "the whispers lead him past all six cairns and out", f"{s['phase']} {s['runes']}")
     check(get("order_whispering_chasm_completed") == "true" and get("order_desert_station_active") == "11"
           and js("getComputedStyle(document.getElementById('chasm-victory-card')).display") != "none"
-          and "Salt Playa" in voice() and "Sheet 10A" in voice(),
-          "out of the canyon: the station is done, the Salt Playa is next and Sheet 10A is named")
+          and "Salt Playa" in voice() and "Field Wire" in voice(),
+          "out of the canyon: the station is done, the Salt Playa is next and Hermes will tell the rest on the Field Wire")
     check(" ".join(js("[...document.querySelectorAll('#chasm3d-runes .chasm3d-rune')].map(x => x.innerText)")) == "M I R A G E", "the bar spells MIRAGE")
+    page.wait_for_timeout(3200)
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('.chasm3d-reward'))")
+    check("The Line of the Gate" in reward() and "Sheet" not in reward() and js("document.querySelectorAll('.chasm3d-reward .chasm3d-medal').length") == 6
+          and js("document.querySelector('.chasm3d-reward-word strong').getAttribute('aria-label')") == "MIRAGE"
+          and js("document.querySelector('.rw-eq').getAttribute('aria-label')") == "X plus E equals 17"
+          and js("document.querySelectorAll('.rw-map .rw-cairn').length") == 6 and js("document.querySelector('.rw-road').points.length") > 40
+          and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')"),
+          "the reward rises over the canyon: her road on the map, six relics, MIRAGE and the new Ledger line [X] + [E] = 17", reward()[:200].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and js("document.getElementById('modal-whispering-chasm').style.display") != "none", "Escape puts the reward away, the canyon stays open")
+    js("document.getElementById('btn-chasm-reward').click()"); page.wait_for_timeout(300)
+    shown_again = bool(reward())
+    js("document.querySelector('.chasm3d-reward-stay').click()"); page.wait_for_timeout(300)
+    check(shown_again and not reward(), "See your reward shows it again, Stay in the canyon puts it away")
     js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(400)
     reopen()
     check(st()["phase"] == "done", "opened again, the canyon shows the way out")

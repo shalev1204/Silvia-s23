@@ -711,7 +711,15 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Resolución** (con $T = 16$ de §7.B.5):
   $$[J] = 16 / 2 \implies \mathbf{J = 8}$$
 - **Asignación en el Ledger**: $\mathbf{J = 8}$. Valor libre; ninguna letra repite valor.
-- **Letras aún sin ecuación (solo Operador)**: $Q, X$, con los valores libres $14, 15$ (Estaciones 24 y 27).
+- **Letras aún sin ecuación (solo Operador)**: $Q$, con el valor libre $14$ (Estación 24).
+
+#### 7.B.14 · Estación 10 · The Line of the Gate (Whispering Chasm, X = 15)
+- **Origen** (decisión del Operador, 23-10-2026: el premio del Chasm es una operación y una letra que no esté en la frase y que Silvia no tuviera): sobre el arco de la Oasis Gate hay una gran X tallada y, debajo, una línea del Order; aparece en el Ledger con `requires: 'order_whispering_chasm_completed'` (id `chasm-xe`).
+- **Ecuación (The Line of the Gate)**:
+  $$[X] + [E] = 17$$
+- **Resolución** (con $E = 2$ de las ecuaciones de la Estación 06 y 09):
+  $$[X] = 17 - 2 \implies \mathbf{X = 15}$$
+- **Asignación en el Ledger**: $\mathbf{X = 15}$, el valor libre que se había reservado para la Estación 27. La X no aparece en la frase final. La pista de la R (tercera runa) se mantiene en la historia del cañón porque la Estación 12 la usa ($[R] \times 2 = [F]$).
 
 ---
 

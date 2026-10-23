@@ -59,7 +59,16 @@
           setTimeout(() => window.location.reload(), 450);
         });
 
+        const btnRestart = document.createElement('button');
+        btnRestart.type = 'button';
+        btnRestart.className = 'tester-btn';
+        btnRestart.textContent = '↺ Start over';
+        btnRestart.title = 'Only this game goes back to its very beginning (its How to play too); every other game stays as it is';
+        btnRestart.disabled = !g.built || !g.reset;
+        btnRestart.addEventListener('click', () => apply(() => g.reset(), '✦ ' + g.tag + ' starts over ✦'));
+
         row.appendChild(btnPlay);
+        row.appendChild(btnRestart);
         row.appendChild(btnComplete);
         rowsEl.appendChild(row);
       });
