@@ -195,7 +195,11 @@
       // =====================================================================
       // The 3D canyon
       // =====================================================================
-      const CELL = 2;
+      // The sheet draws corridors and walls the same width. Here the walls (even rows and columns of the sheet) are thin
+      // fins of rock and the corridors (odd ones) are wide, so the canyon has room to breathe. The centres of the cells
+      // stay evenly spaced, so walking, footprints and the map logic are the same as on paper.
+      const CELL = 2.2, WIDE = 3.3, THIN = 1.1;
+      const span = (i) => ((((i % 2) + 2) % 2) ? WIDE : THIN);
       const wx = (c) => c * CELL, wz = (r) => r * CELL;
       const yawOf = (d) => Math.atan2(-DIRS[d][1], -DIRS[d][0]);   // yaw 0 faces -Z, which is north (the top of the sheet)
       let G = null;   // everything three.js, built on the first opening
@@ -209,12 +213,64 @@
         cv.width = w; cv.height = h;
         paint(cv.getContext('2d'), w, h);
         const t = new THREE.CanvasTexture(cv);
+        t.encoding = THREE.sRGBEncoding;
         if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
         return t;
       }
+      // Soft painted washes over a base colour: the skin of bronze, clay, bone… (broad brush, no grain)
+      function speckle(g, w, h, seed, base, spots, count) {
+        g.fillStyle = base; g.fillRect(0, 0, w, h);
+        const r2 = rng(seed);
+        for (let i = 0; i < count / 4; i++) {
+          const [col, size] = spots[Math.floor(r2() * spots.length)];
+          const x = r2() * w, y = r2() * h, rad = size * (2 + r2() * 3);
+          const gr = g.createRadialGradient(x, y, 0, x, y, rad);
+          gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)');
+          g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+        }
+      }
+
+      // ---- The painted look: shade falls in a few soft steps, and a rim of light outlines what matters ----
+      let toonRamp = null;
+      function toon(opts) {
+        if (!toonRamp) {
+          const steps = [80, 80, 80, 165, 165, 235, 255, 255], px = new Uint8Array(steps.length * 4);
+          steps.forEach((v, i) => px.set([v, v, v, 255], i * 4));
+          toonRamp = new THREE.DataTexture(px, steps.length, 1);
+          toonRamp.magFilter = toonRamp.minFilter = THREE.LinearFilter;
+          toonRamp.needsUpdate = true;
+        }
+        return new THREE.MeshToonMaterial(Object.assign({ gradientMap: toonRamp }, opts));
+      }
+      // A warm glow on the edges that turn away from the eye (one shader for all, the colour is per material)
+      function rimShader(sh) {
+        sh.uniforms.uRim = this.userData.rim;
+        sh.fragmentShader = 'uniform vec3 uRim;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>',
+          '#include <emissivemap_fragment>\n  totalEmissiveRadiance += uRim * pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 2.6);');
+      }
+      function rim(mat, color, strength) {
+        mat.userData.rim = { value: new THREE.Color(color).multiplyScalar(strength) };
+        mat.onBeforeCompile = rimShader;
+        return mat;
+      }
+      // Surfaces coloured by where they stand in the world, painted per pixel so they never blur or pixelate
+      const WORLD_VERT = ['varying vec3 vWp;\n', '#include <project_vertex>\n#ifdef USE_INSTANCING\n  vWp = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;\n#else\n  vWp = (modelMatrix * vec4(transformed, 1.0)).xyz;\n#endif'];
+      function worldPainted(mat, uniforms, decl, body) {
+        mat.userData.paint = uniforms;
+        mat.extensions = { derivatives: true };
+        mat.onBeforeCompile = function (sh) {
+          Object.assign(sh.uniforms, this.userData.paint);
+          sh.vertexShader = WORLD_VERT[0] + sh.vertexShader.replace('#include <project_vertex>', WORLD_VERT[1]);
+          sh.fragmentShader = 'varying vec3 vWp;\n' + decl + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n  {\n' + body + '\n  }');
+        };
+        mat.customProgramCacheKey = () => decl;
+        return mat;
+      }
+      const ucol = (hex) => ({ value: new THREE.Color(hex) });
 
       function buildWorld() {
         const T = window.THREE;
+        if (T.ColorManagement) T.ColorManagement.legacyMode = false;   // colours are written as on screen (sRGB); only this game uses three.js in the Hub
         let renderer;
         try {
           renderer = new T.WebGLRenderer({ canvas: el.canvas, antialias: true, powerPreference: 'high-performance' });
@@ -223,66 +279,130 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = T.PCFSoftShadowMap;
+        // Painted colour: what is written is what shows, saturated, with no film curve dulling it
+        renderer.outputEncoding = T.sRGBEncoding;
+        renderer.toneMapping = T.NoToneMapping;
         const scene = new T.Scene();
-        scene.fog = new T.Fog(0x3a2418, 10, 46);
-        const camera = new T.PerspectiveCamera(62, 16 / 10, 0.1, 160);
+        scene.fog = new T.Fog(0xe0a080, 18, 70);
+        const camera = new T.PerspectiveCamera(60, 16 / 10, 0.1, 180);
         const rand = rng(909);
 
-        // Sky dome with a sun
-        const skyGeo = new T.SphereGeometry(120, 24, 12);
+        // Sky dome with a sun and a few painted clouds (they ride with the dome, so they stay on the horizon)
+        const skyGeo = new T.SphereGeometry(140, 24, 12);
         const skyCol = new Float32Array(skyGeo.attributes.position.count * 3);
         skyGeo.setAttribute('color', new T.BufferAttribute(skyCol, 3));
-        const sky = new T.Mesh(skyGeo, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide, fog: false, depthWrite: false }));
+        const sky = new T.Mesh(skyGeo, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide, fog: false, depthWrite: false, toneMapped: false }));
         scene.add(sky);
-        const sunDisc = new T.Sprite(new T.SpriteMaterial({
-          map: canvasTex(64, 64, (g, w) => {
-            const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
-            gr.addColorStop(0, 'rgba(255,250,225,1)'); gr.addColorStop(0.25, 'rgba(255,230,160,0.9)'); gr.addColorStop(1, 'rgba(255,200,120,0)');
-            g.fillStyle = gr; g.fillRect(0, 0, w, w);
-          }), fog: false, depthWrite: false, transparent: true }));
-        sunDisc.scale.set(16, 16, 1);
+        const glowTex = canvasTex(64, 64, (g, w) => {
+          const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+          gr.addColorStop(0, 'rgba(255,250,230,1)'); gr.addColorStop(0.25, 'rgba(255,225,160,0.85)'); gr.addColorStop(1, 'rgba(255,190,110,0)');
+          g.fillStyle = gr; g.fillRect(0, 0, w, w);
+        });
+        const sunDisc = new T.Sprite(new T.SpriteMaterial({ map: glowTex, fog: false, depthWrite: false, transparent: true, toneMapped: false }));
+        sunDisc.scale.set(18, 18, 1);
         scene.add(sunDisc);
+        const cloudTex = canvasTex(256, 128, (g, w, h) => {
+          const r2 = rng(61), puffs = [];
+          for (let i = 0; i < 9; i++) { const x = 40 + i * 22 + (r2() - 0.5) * 10, rr = 18 + Math.sin(i / 8 * Math.PI) * 26 + r2() * 8; puffs.push([x, h - 34 - rr * 0.55, rr]); }
+          g.fillStyle = '#c99ab8'; puffs.forEach(([x, y, rr]) => { g.beginPath(); g.arc(x, y + 6, rr, 0, Math.PI * 2); g.fill(); });     // lilac shade underneath
+          g.fillStyle = '#fff3e4'; puffs.forEach(([x, y, rr]) => { g.beginPath(); g.arc(x - 3, y - 3, rr * 0.9, 0, Math.PI * 2); g.fill(); });   // lit tops
+          g.globalCompositeOperation = 'destination-in';   // a flat underside, as clouds have
+          const fade = g.createLinearGradient(0, 0, 0, h); fade.addColorStop(0.78, 'rgba(0,0,0,1)'); fade.addColorStop(0.86, 'rgba(0,0,0,0)');
+          g.fillStyle = fade; g.fillRect(0, 0, w, h);
+        });
+        for (let i = 0; i < 7; i++) {
+          const cl = new T.Sprite(new T.SpriteMaterial({ map: cloudTex, fog: false, depthWrite: false, transparent: true, toneMapped: false, opacity: 0.92 }));
+          const az = i / 7 * Math.PI * 2 + rand() * 0.6, el = 0.22 + rand() * 0.35, s = 34 + rand() * 22;
+          cl.position.set(Math.sin(az) * Math.cos(el) * 110, Math.sin(el) * 110, Math.cos(az) * Math.cos(el) * 110);
+          cl.scale.set(s, s / 2, 1);
+          sky.add(cl);
+        }
 
-        // Light: the sky, the sun (shadows follow Hermes), his lantern
-        const hemi = new T.HemisphereLight(0xffd6a8, 0x5a2a18, 0.55);
+        // Light: a warm sky above, violet bounce from below (so the shade is coloured, not grey), the sun, his lantern
+        const hemi = new T.HemisphereLight(0xfff0dc, 0x7a4aa8, 0.8);
         scene.add(hemi);
-        const sun = new T.DirectionalLight(0xffe2b0, 1.2);
+        const sun = new T.DirectionalLight(0xfff0d0, 1.3);
         sun.castShadow = true;
         sun.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
-        Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 90 });
+        Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 100 });
         sun.shadow.bias = -0.0015;
+        sun.shadow.normalBias = 0.03;
         sun.shadow.camera.updateProjectionMatrix();
         scene.add(sun); scene.add(sun.target);
-        const lantern = new T.PointLight(0xffb15a, 1.4, 10, 2);
+        const lantern = new T.PointLight(0xffb15a, 1.4, 11, 2);
         scene.add(lantern);
 
-        // Sand floor
-        const sandTex = canvasTex(256, 256, (g, w, h) => {
-          g.fillStyle = '#c4834f'; g.fillRect(0, 0, w, h);
-          const r2 = rng(5);
-          for (let i = 0; i < 5000; i++) {
-            const v = r2();
-            g.fillStyle = v < 0.5 ? 'rgba(120,60,30,0.18)' : 'rgba(255,220,170,0.16)';
-            g.fillRect(r2() * w, r2() * h, 1 + r2() * 2, 1 + r2() * 2);
+        // Which ground lies at the foot of a wall: a soft mask, so the sand darkens to violet where the cliffs rise
+        const maskO = -4 * CELL, maskS = (N + 8) * CELL;
+        const wallMask = canvasTex(256, 256, (g, w) => {
+          g.fillStyle = '#000'; g.fillRect(0, 0, w, w);
+          const k = w / maskS;
+          for (let r = -4; r < N + 4; r++) for (let c = -4; c < N + 4; c++) {
+            if (r >= 0 && r < N && c >= 0 && c < N && MAZE[r][c] === '0') continue;
+            for (let f = 5; f >= 0; f--) {   // feathered by hand (canvas blur filters are not everywhere)
+              const pad = f * 0.2, x = wx(c) - span(c) / 2 - pad - maskO, z = wz(r) - span(r) / 2 - pad - maskO;
+              g.fillStyle = 'rgba(255,255,255,0.22)';
+              g.fillRect(x * k, z * k, (span(c) + pad * 2) * k, (span(r) + pad * 2) * k);
+            }
           }
-          g.strokeStyle = 'rgba(140,80,40,0.12)'; g.lineWidth = 2;
-          for (let y = 8; y < h; y += 18) { g.beginPath(); for (let x = 0; x <= w; x += 8) g.lineTo(x, y + Math.sin(x / 20 + y) * 3); g.stroke(); }
-        }, [30, 30]);
-        const floor = new T.Mesh(new T.PlaneGeometry(140, 140), new T.MeshLambertMaterial({ map: sandTex }));
+        });
+        wallMask.encoding = T.LinearEncoding;
+        wallMask.flipY = false;
+
+        // Sand: a warm gold, with broad shaded drifts and soft wind ripples painted across it
+        const floorMat = worldPainted(toon(), {
+          uSand: ucol(0xe8a060), uSandLo: ucol(0xc06a48), uSandHi: ucol(0xffd498), uFootShade: ucol(0x7a447c),
+          uMask: { value: wallMask }, uMaskO: { value: maskO }, uMaskS: { value: maskS }
+        }, 'uniform vec3 uSand, uSandLo, uSandHi, uFootShade;\nuniform sampler2D uMask;\nuniform float uMaskO, uMaskS;\n', `
+    float drift = sin(vWp.x * 0.21 + sin(vWp.z * 0.17) * 2.0) * sin(vWp.z * 0.19 + sin(vWp.x * 0.13) * 2.0);
+    vec3 c = mix(uSand, uSandLo, smoothstep(0.1, 0.75, drift) * 0.55);
+    float rip = sin(vWp.z * 2.4 + sin(vWp.x * 0.55) * 2.2 + vWp.x * 0.4);
+    c = mix(c, uSandHi, smoothstep(0.6, 0.95, rip) * 0.6);
+    c = mix(c, uSandLo, smoothstep(0.6, 0.95, -rip) * 0.35);
+    float foot = texture2D(uMask, (vWp.xz - uMaskO) / uMaskS).r;
+    c = mix(c, uFootShade, smoothstep(0.05, 0.85, foot) * 0.7);
+    diffuseColor.rgb *= c;`);
+        const floor = new T.Mesh(new T.PlaneGeometry(160, 160), floorMat);
         floor.rotation.x = -Math.PI / 2;
         floor.position.set(wx(12), 0, wz(12));
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Canyon walls: one block per rock cell of the sheet, plus a broken ledge on top, plus a ring outside
-        const rockTex = canvasTex(64, 256, (g, w, h) => {
-          const bands = ['#8f3f24', '#a8512e', '#7c341e', '#b9683c', '#94452a', '#6e2d1a', '#a35a33'];
-          let y = 0;
-          const r2 = rng(17);
-          while (y < h) { const bh = 6 + r2() * 26; g.fillStyle = bands[Math.floor(r2() * bands.length)]; g.fillRect(0, y, w, bh); y += bh; }
-          for (let i = 0; i < 900; i++) { g.fillStyle = r2() < 0.5 ? 'rgba(40,15,8,0.22)' : 'rgba(255,190,140,0.12)'; g.fillRect(r2() * w, r2() * h, 1 + r2() * 3, 1); }
-        }, [1, 2]);
-        const rockMat = new T.MeshLambertMaterial({ map: rockTex });
+        // Canyon walls: chunky faceted sandstone, painted by height (plum at the foot, glowing orange, a cream crust
+        // where the sun lands on top) with broad strata that run on from one cliff to the next
+        function rockGeometry() {
+          const geo = new T.BoxGeometry(1, 1, 1, 2, 6, 2);
+          geo.translate(0, 0.5, 0);
+          const p = geo.attributes.position;
+          const hash = (x, y, z) => { const s = Math.sin(x * 127.1 + y * 311.7 + z * 74.7) * 43758.5453; return s - Math.floor(s); };
+          for (let i = 0; i < p.count; i++) {
+            const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+            // The same corner of two faces gets the same push, so the rock stays closed
+            const qx = Math.round(x * 4) / 4, qy = Math.round(y * 12) / 12, qz = Math.round(z * 4) / 4;
+            const wear = 1 + Math.sin(qy * Math.PI * 5 + hash(qx, 0, qz) * 6) * 0.07;   // ledges eroded in steps
+            if (y > 0.001) {
+              p.setX(i, x * wear + (hash(qx, qy, qz) - 0.5) * 0.16);
+              p.setZ(i, z * wear + (hash(qz, qx, qy) - 0.5) * 0.16);
+              if (y < 0.999) p.setY(i, y + (hash(qy, qz, qx) - 0.5) * 0.05);
+            }
+          }
+          geo.computeVertexNormals();
+          return geo;
+        }
+        const ROCK = 'uniform vec3 uFoot, uMid, uHigh, uCrust, uLip;\n';
+        const rockPaint = (foot, mid, high, crust, lip) => worldPainted(toon({ flatShading: true }),
+          { uFoot: ucol(foot), uMid: ucol(mid), uHigh: ucol(high), uCrust: ucol(crust), uLip: ucol(lip) }, ROCK, `
+    float wob = sin(vWp.x * 0.31 + vWp.z * 0.23) * 0.45 + sin((vWp.x - vWp.z) * 0.9) * 0.12;
+    float hgt = vWp.y + wob;
+    vec3 c = mix(uFoot, uMid, smoothstep(0.0, 3.0, hgt));
+    c = mix(c, uHigh, smoothstep(3.0, 7.5, hgt));
+    float band = hgt * 1.15, f = fract(band);
+    c *= 0.9 + 0.16 * fract(sin(floor(band) * 12.9898 + 4.1) * 43758.5453);
+    c = mix(c, uLip, smoothstep(0.84, 0.96, f) * 0.4);
+    vec3 fn = normalize(cross(dFdx(vWp), dFdy(vWp)));
+    c = mix(c, uCrust, smoothstep(0.45, 0.8, fn.y));
+    diffuseColor.rgb *= c;`);
+        const rockMat = rockPaint(0x6a2c4a, 0xd65a36, 0xf59a50, 0xffd9a0, 0xffc28a);
         const cells = [];
         for (let r = -3; r < N + 3; r++) {
           for (let c = -3; c < N + 3; c++) {
@@ -293,52 +413,111 @@
             cells.push([r, c, inside]);
           }
         }
-        const box = new T.BoxGeometry(1, 1, 1);
-        box.translate(0, 0.5, 0);
-        const walls = new T.InstancedMesh(box, rockMat, cells.length * 2);
+        const walls = new T.InstancedMesh(rockGeometry(), rockMat, cells.length * 2);
         walls.castShadow = true; walls.receiveShadow = true;
-        const m4 = new T.Matrix4(), q = new T.Quaternion(), v = new T.Vector3(), sc = new T.Vector3();
+        const m4 = new T.Matrix4(), q = new T.Quaternion(), v = new T.Vector3(), sc = new T.Vector3(), up = new T.Vector3(0, 1, 0);
         let n = 0;
         cells.forEach(([r, c, inside]) => {
-          const h = inside ? 6 + rand() * 3.5 : 9 + rand() * 4;
-          m4.compose(v.set(wx(c), 0, wz(r)), q.identity(), sc.set(CELL * 1.02, h, CELL * 1.02));
+          const h = inside ? 4.6 + rand() * 2.6 : 8 + rand() * 4;
+          const sx = span(c), sz = span(r);
+          q.setFromAxisAngle(up, rand() < 0.5 ? 0 : Math.PI);
+          m4.compose(v.set(wx(c), 0, wz(r)), q, sc.set(sx * 1.04, h, sz * 1.04));
           walls.setMatrixAt(n++, m4);
-          const lh = 0.8 + rand() * 2.4, s = CELL * (0.55 + rand() * 0.4);
-          q.setFromAxisAngle(v.set(0, 1, 0), rand() * Math.PI);
-          m4.compose(v.set(wx(c) + (rand() - 0.5) * 0.7, h - 0.3, wz(r) + (rand() - 0.5) * 0.7), q, sc.set(s, lh, s));
-          walls.setMatrixAt(n++, m4);
+          if (rand() < 0.7) {   // a cap of harder rock, a little wider than the fin below it
+            const lh = 0.5 + rand() * 1.6;
+            q.setFromAxisAngle(up, (rand() - 0.5) * 0.25);
+            m4.compose(v.set(wx(c) + (rand() - 0.5) * 0.3, h - 0.25, wz(r) + (rand() - 0.5) * 0.3), q,
+              sc.set(sx * (0.85 + rand() * 0.35), lh, sz * (0.85 + rand() * 0.35)));
+            walls.setMatrixAt(n++, m4);
+          }
         });
         walls.count = n;
         scene.add(walls);
 
         // Fallen rocks along the foot of the walls
-        const rubbleGeo = new T.IcosahedronGeometry(0.5, 0);
-        const rubble = new T.InstancedMesh(rubbleGeo, new T.MeshLambertMaterial({ color: 0x8a4a2c, flatShading: true }), 420);
+        const rubbleGeo = new T.DodecahedronGeometry(0.5, 0);
+        const rubble = new T.InstancedMesh(rubbleGeo, rockMat, 520);
         rubble.castShadow = true; rubble.receiveShadow = true;
         let rn = 0;
-        for (let r = 0; r < N && rn < 420; r++) for (let c = 0; c < N && rn < 420; c++) {
+        for (let r = 0; r < N && rn < 520; r++) for (let c = 0; c < N && rn < 520; c++) {
           if (MAZE[r][c] !== '0') continue;
           DIRS.forEach(([dr, dc]) => {
-            if (rn >= 420 || open(r + dr, c + dc) || rand() > 0.32) return;
-            const s = 0.15 + rand() * 0.35;
-            const along = (rand() - 0.5) * CELL * 0.8;
+            if (rn >= 520 || open(r + dr, c + dc) || rand() > 0.38) return;
+            const s = 0.12 + rand() * 0.4;
+            const toWall = (dc ? span(c) : span(r)) / 2 - 0.15, along = (rand() - 0.5) * (dc ? span(r) : span(c)) * 0.85;
             q.setFromEuler(new T.Euler(rand() * 3, rand() * 3, rand() * 3));
-            m4.compose(v.set(wx(c) + dc * 0.8 + (dr ? along : 0), s * 0.35, wz(r) + dr * 0.8 + (dc ? along : 0)), q, sc.set(s, s * 0.7, s));
+            m4.compose(v.set(wx(c) + dc * toWall + (dr ? along : 0), s * 0.3, wz(r) + dr * toWall + (dc ? along : 0)), q, sc.set(s, s * 0.7, s));
             rubble.setMatrixAt(rn++, m4);
           });
         }
         rubble.count = rn;
         scene.add(rubble);
 
+        // Desert agaves in the shade of the walls: a rosette of thick leaves, deep teal at the heart, sage at the tips
+        const leafPos = [], leafCol = [], dark = new T.Color(0x1f6f6a), pale = new T.Color(0xa8d68a), lc = new T.Color();
+        for (let l = 0; l < 11; l++) {
+          const cone = new T.ConeGeometry(0.07, l < 4 ? 0.5 : 0.7, 4).toNonIndexed();
+          cone.translate(0, (l < 4 ? 0.5 : 0.7) / 2, 0);
+          cone.rotateX(l < 4 ? 0.25 : 0.75 + (l % 3) * 0.12);
+          cone.rotateY(l * 2.4);
+          const cp = cone.attributes.position;
+          for (let i = 0; i < cp.count; i++) {
+            leafPos.push(cp.getX(i), cp.getY(i), cp.getZ(i));
+            lc.copy(dark).lerp(pale, Math.min(1, cp.getY(i) / 0.55));
+            leafCol.push(lc.r, lc.g, lc.b);
+          }
+        }
+        const agaveGeo = new T.BufferGeometry();
+        agaveGeo.setAttribute('position', new T.Float32BufferAttribute(leafPos, 3));
+        agaveGeo.setAttribute('color', new T.Float32BufferAttribute(leafCol, 3));
+        agaveGeo.computeVertexNormals();
+        const shrubs = new T.InstancedMesh(agaveGeo, toon({ vertexColors: true, flatShading: true }), 160);
+        let sn = 0;
+        for (let r = 1; r < N && sn < 160; r += 2) for (let c = 1; c < N && sn < 160; c += 2) {
+          if (MAZE[r][c] !== '0' || rand() > 0.45) continue;
+          const side = rand() < 0.5 ? -1 : 1, s = 0.6 + rand() * 0.7;
+          q.setFromAxisAngle(up, rand() * Math.PI);
+          m4.compose(v.set(wx(c) + side * (WIDE / 2 - 0.45), 0, wz(r) + (rand() - 0.5) * 1.6), q, sc.set(s, s * (0.8 + rand() * 0.4), s));
+          shrubs.setMatrixAt(sn++, m4);
+        }
+        shrubs.count = sn;
+        shrubs.castShadow = true;
+        scene.add(shrubs);
+
+        // Shafts of sunlight that fall slanting into the gorge
+        const shaftTex = canvasTex(32, 128, (g, w, h) => {
+          const v2 = g.createLinearGradient(0, 0, 0, h);
+          v2.addColorStop(0, 'rgba(255,255,255,0.9)'); v2.addColorStop(1, 'rgba(255,255,255,0)');
+          g.fillStyle = v2; g.fillRect(0, 0, w, h);
+          g.globalCompositeOperation = 'destination-in';
+          const h2 = g.createLinearGradient(0, 0, w, 0);
+          h2.addColorStop(0, 'rgba(0,0,0,0)'); h2.addColorStop(0.5, 'rgba(0,0,0,1)'); h2.addColorStop(1, 'rgba(0,0,0,0)');
+          g.fillStyle = h2; g.fillRect(0, 0, w, h);
+        });
+        const shaftGeo = new T.PlaneGeometry(1.4, 9);
+        shaftGeo.translate(0, 4.5, 0);
+        const shafts = new T.InstancedMesh(shaftGeo, new T.MeshBasicMaterial({ map: shaftTex, color: 0xffd9a0, transparent: true, opacity: 0.16,
+          depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide, toneMapped: false }), 40);
+        let hn = 0;
+        for (let r = 1; r < N && hn < 40; r += 2) for (let c = 1; c < N && hn < 40; c += 2) {
+          if (MAZE[r][c] !== '0' || rand() > 0.22) continue;
+          q.setFromEuler(new T.Euler(0, rand() * Math.PI, 0.35, 'YXZ'));
+          m4.compose(v.set(wx(c) + (rand() - 0.5), 0, wz(r) + (rand() - 0.5)), q, sc.set(0.7 + rand() * 0.8, 1, 1));
+          shafts.setMatrixAt(hn++, m4);
+        }
+        shafts.count = hn;
+        shafts.renderOrder = 3;
+        scene.add(shafts);
+
         // Cairns, false cairns, the named dead ends, the two portals
-        const stoneMat = new T.MeshLambertMaterial({ color: 0xa0603a, flatShading: true });
+        const stoneMat = rim(toon({ color: 0xf0a868, flatShading: true }), 0xffd8a0, 0.35);   // paler than the cliffs, so a cairn stands out
         const stoneAt = {};
         // A cairn stands against the wall of its corridor (or at the back of its dead end), so Hermes stops beside it
         function cairnMesh(r, c, seed) {
           let ox = 0, oz = 0;
           DIRS.forEach(([dr, dc]) => { if (open(r + dr, c + dc)) { ox -= dc; oz -= dr; } });
           if (!ox && !oz) { if (open(r - 1, c)) ox = 1; else oz = 1; }
-          const len = Math.hypot(ox, oz), x = wx(c) + ox / len * 0.62, z = wz(r) + oz / len * 0.62;
+          const len = Math.hypot(ox, oz), x = wx(c) + ox / len * (WIDE / 2 - 0.5), z = wz(r) + oz / len * (WIDE / 2 - 0.5);
           const g = new T.Group(), r2 = rng(seed);
           for (let i = 0; i < 6; i++) {
             const s = 0.42 - i * 0.055;
@@ -346,7 +525,7 @@
             st.scale.set(1, 0.42, 1);
             st.position.set((r2() - 0.5) * 0.06, 0.12 + i * 0.19, (r2() - 0.5) * 0.06);
             st.rotation.y = r2() * 3;
-            st.castShadow = true;
+            st.castShadow = true; st.receiveShadow = true;
             g.add(st);
           }
           g.position.set(x, 0, z);
@@ -354,7 +533,7 @@
           stoneAt[key(r, c)] = g.position;
           return g;
         }
-        const jarMat = new T.MeshLambertMaterial({ color: 0x9c5b34 });
+        const jarMat = rim(toon({ color: 0xc8703e }), 0xffc890, 0.3);
         CAIRNS.forEach((ca, i) => {
           const g = cairnMesh(ca.r, ca.c, 100 + i);
           const jar = new T.Mesh(new T.LatheGeometry([[0, 0], [0.16, 0.02], [0.2, 0.16], [0.14, 0.34], [0.08, 0.38], [0.09, 0.44]].map((p) => new T.Vector2(p[0], p[1])), 12), jarMat);
@@ -366,36 +545,36 @@
         Object.keys(PLACES).forEach((k) => {
           const [r, c] = at(+k), x = wx(c), z = wz(r), kind = PLACES[k].kind;
           if (kind === 'well') {
-            const ring = new T.Mesh(new T.TorusGeometry(0.62, 0.17, 6, 16), stoneMat);
-            ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.14, z); ring.castShadow = true;
-            const hole = new T.Mesh(new T.CircleGeometry(0.5, 16), new T.MeshBasicMaterial({ color: 0x120804 }));
+            const ring = new T.Mesh(new T.TorusGeometry(0.75, 0.2, 6, 16), stoneMat);
+            ring.rotation.x = -Math.PI / 2; ring.position.set(x, 0.16, z); ring.castShadow = true;
+            const hole = new T.Mesh(new T.CircleGeometry(0.6, 16), new T.MeshBasicMaterial({ color: 0x120804 }));
             hole.rotation.x = -Math.PI / 2; hole.position.set(x, 0.03, z);
             scene.add(ring); scene.add(hole);
           } else if (kind === 'pit') {
-            const pit = new T.Mesh(new T.CircleGeometry(0.95, 9), new T.MeshBasicMaterial({ color: 0x050302 }));
-            pit.rotation.x = -Math.PI / 2; pit.scale.set(1, 0.7, 1); pit.position.set(x, 0.02, z + 0.2);
+            const pit = new T.Mesh(new T.CircleGeometry(1.4, 9), new T.MeshBasicMaterial({ color: 0x050302 }));
+            pit.rotation.x = -Math.PI / 2; pit.scale.set(1, 0.7, 1); pit.position.set(x, 0.02, z + 0.3);
             scene.add(pit);
           } else if (kind === 'salt') {
-            const salt = new T.Mesh(new T.CircleGeometry(1.15, 12), new T.MeshLambertMaterial({ color: 0xf2eee4 }));
+            const salt = new T.Mesh(new T.CircleGeometry(1.6, 12), toon({ color: 0xf6f2ea }));
             salt.rotation.x = -Math.PI / 2; salt.position.set(x, 0.02, z); salt.receiveShadow = true;
             scene.add(salt);
           } else if (kind === 'dune') {
-            const dune = new T.Mesh(new T.SphereGeometry(1.3, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), new T.MeshLambertMaterial({ map: sandTex }));
-            dune.scale.set(0.95, 1.1, 1.3); dune.position.set(x + 0.4, 0, z); dune.receiveShadow = true;
+            const dune = new T.Mesh(new T.SphereGeometry(1.3, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), floorMat);
+            dune.scale.set(1.1, 1.2, 1.6); dune.position.set(x + 0.5, 0, z); dune.receiveShadow = true;
             scene.add(dune);
           }
         });
-        const glowMat = (col) => new T.MeshBasicMaterial({ color: col, fog: false });
-        const exitGlow = new T.Mesh(new T.PlaneGeometry(CELL * 1.2, 14), glowMat(0xfff4dc));
-        exitGlow.position.set(wx(N + 3), 5, wz(EXIT[0])); exitGlow.rotation.y = -Math.PI / 2;
+        const glowMat = (col) => new T.MeshBasicMaterial({ color: col, fog: false, toneMapped: false });
+        const exitGlow = new T.Mesh(new T.PlaneGeometry(WIDE * 1.1, 16), glowMat(0xfff4dc));
+        exitGlow.position.set(wx(N + 3), 6, wz(EXIT[0])); exitGlow.rotation.y = -Math.PI / 2;
         scene.add(exitGlow);
-        const portalGlow = new T.Mesh(new T.PlaneGeometry(CELL * 1.2, 14), glowMat(0xffe0b0));
-        portalGlow.position.set(wx(-3), 5, wz(START[0])); portalGlow.rotation.y = Math.PI / 2;
+        const portalGlow = new T.Mesh(new T.PlaneGeometry(WIDE * 1.1, 16), glowMat(0xffe0b0));
+        portalGlow.position.set(wx(-3), 6, wz(START[0])); portalGlow.rotation.y = Math.PI / 2;
         scene.add(portalGlow);
 
         // Footprints
         const printTex = canvasTex(32, 64, (g) => {
-          g.fillStyle = 'rgba(70,32,14,0.75)';
+          g.fillStyle = 'rgba(110,52,78,0.7)';
           g.beginPath(); g.ellipse(16, 22, 9, 15, 0, 0, Math.PI * 2); g.fill();
           g.beginPath(); g.ellipse(16, 50, 7, 9, 0, 0, Math.PI * 2); g.fill();
         });
@@ -406,30 +585,8 @@
         prints.renderOrder = 2;
         scene.add(prints);
 
-        // Hermes: coat, hat, satchel and lantern
-        const hermes = new T.Group();
-        const coat = new T.MeshLambertMaterial({ color: 0x5b3b24 });
-        const cloth = new T.MeshLambertMaterial({ color: 0xd8c39a });
-        const skin = new T.MeshLambertMaterial({ color: 0xc58c62 });
-        const body = new T.Mesh(new T.CylinderGeometry(0.2, 0.3, 0.75, 10), coat); body.position.y = 0.95;
-        const head = new T.Mesh(new T.SphereGeometry(0.15, 12, 10), skin); head.position.y = 1.45;
-        const brim = new T.Mesh(new T.CylinderGeometry(0.34, 0.34, 0.03, 16), cloth); brim.position.y = 1.55;
-        const crown = new T.Mesh(new T.CylinderGeometry(0.15, 0.18, 0.18, 12), cloth); crown.position.y = 1.65;
-        const scarf = new T.Mesh(new T.TorusGeometry(0.15, 0.05, 6, 12), new T.MeshLambertMaterial({ color: 0x9a2f22 })); scarf.rotation.x = Math.PI / 2; scarf.position.y = 1.32;
-        const bag = new T.Mesh(new T.BoxGeometry(0.12, 0.28, 0.3), new T.MeshLambertMaterial({ color: 0x3b2614 })); bag.position.set(-0.27, 0.85, 0.05);
-        const legGeo = new T.CylinderGeometry(0.07, 0.06, 0.6, 8); legGeo.translate(0, -0.3, 0);
-        const legL = new T.Mesh(legGeo, coat), legR = new T.Mesh(legGeo, coat);
-        legL.position.set(-0.1, 0.6, 0); legR.position.set(0.1, 0.6, 0);
-        const armGeo = new T.CylinderGeometry(0.05, 0.05, 0.55, 8); armGeo.translate(0, -0.27, 0);
-        const armR = new T.Mesh(armGeo, coat); armR.position.set(0.27, 1.22, 0); armR.rotation.x = -0.9;
-        const lamp = new T.Group();
-        const lampCage = new T.Mesh(new T.CylinderGeometry(0.07, 0.08, 0.16, 8, 1, true), new T.MeshLambertMaterial({ color: 0x2b1a0c, wireframe: true }));
-        const flame = new T.Mesh(new T.SphereGeometry(0.05, 8, 8), new T.MeshBasicMaterial({ color: 0xffd38a }));
-        lamp.add(lampCage); lamp.add(flame);
-        lamp.position.set(0.3, 0.86, -0.42);
-        [body, head, brim, crown, scarf, bag, legL, legR, armR].forEach((m) => { m.castShadow = true; hermes.add(m); });
-        hermes.add(lamp);
-        scene.add(hermes);
+        const H = buildHermes(T, glowTex);
+        scene.add(H.hermes);
 
         // Arrows on the sand at a fork
         const arrowShape = new T.Shape();
@@ -449,75 +606,314 @@
         dust.frustumCulled = false;
         scene.add(dust);
 
+        // Motes of sand that hang in the light around him
+        const motesN = lowPower ? 120 : 260;
+        const motesGeo = new T.BufferGeometry(), motesBase = new Float32Array(motesN * 3), mr = rng(77);
+        for (let i = 0; i < motesN; i++) { motesBase[i * 3] = mr() * 14; motesBase[i * 3 + 1] = 0.2 + mr() * 4.5; motesBase[i * 3 + 2] = mr() * 14; }
+        motesGeo.setAttribute('position', new T.BufferAttribute(new Float32Array(motesN * 3), 3));
+        const motes = new T.Points(motesGeo, new T.PointsMaterial({ map: glowTex, color: 0xffe2b8, size: 0.06, transparent: true, opacity: 0.55, depthWrite: false, blending: T.AdditiveBlending }));
+        motes.frustumCulled = false;
+        scene.add(motes);
+
         // The relic in Silvia's hands, with its own light
         const relicLight = new T.PointLight(0xfff0d0, 0, 6, 2);
         scene.add(relicLight);
 
-        return { T, renderer, scene, camera, sky, sunDisc, hemi, sun, lantern, prints, hermes, legL, legR, flame, arrows, arrowGeo,
-                 dust, dustN, relicLight, relic: null, lowPower, stoneAt };
+        return { T, renderer, scene, camera, sky, sunDisc, hemi, sun, lantern, prints, hermes: H.hermes, legL: H.legL, legR: H.legR, flame: H.flame,
+                 staff: H.staff, lamp: H.lamp, cloak: H.cloak, arrows, arrowGeo, dust, dustN, motes, motesBase, motesN, relicLight, relic: null, lowPower, stoneAt, shafts };
       }
 
-      // ---- Relics: each one carries its rune on a single face ----
-      function letterTex(letter) {
-        return canvasTex(128, 128, (g, w) => {
-          g.clearRect(0, 0, w, w);
-          g.font = 'bold 92px Cinzel, Georgia, serif';
-          g.textAlign = 'center'; g.textBaseline = 'middle';
-          g.fillStyle = 'rgba(255,236,190,0.55)'; g.fillText(letter, w / 2 + 3, w / 2 + 6);
-          g.fillStyle = 'rgba(30,14,6,0.95)'; g.fillText(letter, w / 2, w / 2 + 3);
+      // ---- Hermes as the Cartographer of Distant Light: silver hair and white beard, the deep blue robe embroidered
+      // with gold constellations, brown boots, a walking staff, his satchel, the brass spyglass and the lantern ----
+      // Adds a part to its parent at height y (Object3D.add returns the parent, so its position cannot be chained)
+      function pin(parent, mesh, y) { mesh.position.y = y; parent.add(mesh); return mesh; }
+      function buildHermes(T, glowTex) {
+        const hermes = new T.Group();
+        // The robe is painted in broad strokes: royal blue that deepens towards the hem, gold constellations whose
+        // stars glow faintly of their own light, the gold border along the hem and down the front opening
+        const stars = [];
+        const r2 = rng(43);
+        for (let k = 0; k < 16; k++) {
+          const cx = r2() * 512, cy = 40 + r2() * 166, pts = [];
+          for (let s = 0; s < 4 + Math.floor(r2() * 3); s++) pts.push([cx + (r2() - 0.5) * 70, cy + (r2() - 0.5) * 50, 2.4 + r2() * 1.8]);
+          stars.push(pts);
+        }
+        const drawStars = (g, thread) => stars.forEach((pts) => {
+          if (thread) { g.strokeStyle = thread; g.lineWidth = 1.6; g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke(); }
+          pts.forEach(([x, y, rr]) => { g.fillStyle = '#ffe9a8'; g.beginPath(); g.arc(x, y, rr, 0, Math.PI * 2); g.fill(); });
         });
+        const robeTex = canvasTex(512, 256, (g, w, h) => {
+          const grad = g.createLinearGradient(0, 0, 0, h);
+          grad.addColorStop(0, '#3a6fd0'); grad.addColorStop(0.55, '#24479c'); grad.addColorStop(1, '#152a66');
+          g.fillStyle = grad; g.fillRect(0, 0, w, h);
+          speckle(g, w, h, 41, 'rgba(0,0,0,0)', [['rgba(120,170,255,0.18)', 14], ['rgba(10,20,60,0.22)', 16]], 120);
+          drawStars(g, 'rgba(240,200,110,0.85)');
+          g.fillStyle = '#d9a440'; g.fillRect(0, h - 28, w, 16);
+          g.fillStyle = '#ffe08a'; g.fillRect(0, h - 25, w, 3); g.fillRect(0, h - 17, w, 2);
+          g.fillStyle = '#d9a440'; g.fillRect(w / 2 - 6, 0, 12, h);
+          g.fillStyle = '#ffe08a'; g.fillRect(w / 2 - 1.5, 0, 3, h);
+        });
+        const starGlow = canvasTex(512, 256, (g, w, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, w, h); drawStars(g, null); });
+        const warm = 0xffdcae;
+        const robe = rim(toon({ map: robeTex, emissive: 0xffd27a, emissiveMap: starGlow, emissiveIntensity: 0.7 }), 0x9cc4ff, 0.45);
+        const blue = rim(toon({ color: 0x2c58b8 }), 0x9cc4ff, 0.45);
+        const skin = rim(toon({ color: 0xf0b48c }), warm, 0.3);
+        const silver = rim(toon({ color: 0xf4f2ee }), 0xffffff, 0.35);
+        const leather = rim(toon({ color: 0x7a4a26 }), warm, 0.3);
+        const boot = rim(toon({ color: 0x5e3418 }), warm, 0.25);
+        const wood = rim(toon({ color: 0x8a5a2e }), warm, 0.3);
+        const brass = rim(toon({ color: 0xf0c060 }), 0xfff0b0, 0.6);
+        const gold = rim(toon({ color: 0xf2c25a, emissive: 0x3a2404 }), 0xfff0b0, 0.5);
+        const V = (a) => a.map((p) => new T.Vector2(p[0], p[1]));
+        const add = (mesh, x, y, z, parent) => { mesh.position.set(x, y, z); mesh.castShadow = true; (parent || hermes).add(mesh); return mesh; };
+
+        // The robe falls from the shoulders to just above the boots; a short cape covers the shoulders
+        const cloak = new T.Group();
+        hermes.add(cloak);
+        const robeGeo = new T.LatheGeometry(V([[0.4, 0.1], [0.37, 0.3], [0.33, 0.55], [0.29, 0.8], [0.26, 1.0], [0.25, 1.15], [0.27, 1.28], [0.22, 1.38], [0.09, 1.44]]), 24);
+        robeGeo.rotateY(Math.PI);    // the gold opening (the middle of the texture) comes to the front, which is -Z
+        add(new T.Mesh(robeGeo, robe), 0, 0, 0, cloak);
+        add(new T.Mesh(new T.LatheGeometry(V([[0.36, 1.06], [0.34, 1.2], [0.29, 1.34], [0.18, 1.43], [0.1, 1.46]]), 24), blue), 0, 0, 0, cloak);
+        add(new T.Mesh(new T.CylinderGeometry(0.27, 0.27, 0.05, 20, 1, true), gold), 0, 0.97, 0, cloak);   // the sash
+        // The hood lies down around his neck, as in the portraits
+        const cowl = add(new T.Mesh(new T.TorusGeometry(0.13, 0.065, 8, 18), blue), 0, 1.45, 0.01);
+        cowl.rotation.x = Math.PI / 2;
+        const hood = add(new T.Mesh(new T.SphereGeometry(0.16, 14, 10), blue), 0, 1.45, 0.11);
+        hood.scale.set(1.05, 0.65, 0.75);
+        // Head: the face, silver hair swept back, the white beard
+        add(new T.Mesh(new T.SphereGeometry(0.14, 16, 12), skin), 0, 1.61, 0);
+        add(new T.Mesh(new T.SphereGeometry(0.148, 16, 12), silver), 0, 1.638, 0.03);
+        const mane = add(new T.Mesh(new T.SphereGeometry(0.11, 12, 10), silver), 0, 1.54, 0.08);
+        mane.scale.set(1.15, 1, 0.7);
+        const beard = add(new T.Mesh(new T.ConeGeometry(0.095, 0.24, 12), silver), 0, 1.47, -0.09);
+        beard.rotation.x = Math.PI + 0.35;
+        add(new T.Mesh(new T.SphereGeometry(0.024, 8, 6), skin), 0, 1.61, -0.14);   // the nose
+        // Arms in wide sleeves; fingerless leather gloves
+        function arm(side, ax, az) {
+          const a = new T.Group();
+          a.position.set(side * 0.27, 1.33, 0);
+          a.rotation.set(ax, 0, az);
+          const sleeve = new T.Mesh(new T.CylinderGeometry(0.06, 0.1, 0.48, 10), blue);
+          sleeve.position.y = -0.24; sleeve.castShadow = true; a.add(sleeve);
+          const glove = new T.Mesh(new T.SphereGeometry(0.068, 10, 8), leather);
+          glove.position.y = -0.52; a.add(glove);
+          hermes.add(a);
+          return a;
+        }
+        const armR = arm(1, 0.55, 0.12), armL = arm(-1, 0.35, -0.15);
+        // The lantern hangs from his right hand, upright whatever the arm does
+        const lamp = new T.Group();
+        lamp.position.set(0, -0.6, 0);
+        lamp.rotation.x = -0.55;
+        armR.add(lamp);
+        const lampBody = new T.Group();
+        lampBody.position.y = -0.08;
+        lamp.add(lampBody);
+        pin(lampBody, new T.Mesh(new T.CylinderGeometry(0.075, 0.085, 0.03, 10), brass), -0.09);
+        pin(lampBody, new T.Mesh(new T.ConeGeometry(0.08, 0.07, 10), brass), 0.1);
+        const glass = new T.Mesh(new T.CylinderGeometry(0.065, 0.065, 0.16, 10), new T.MeshBasicMaterial({ color: 0xffc46a, transparent: true, opacity: 0.55 }));
+        lampBody.add(glass);
+        const flame = new T.Mesh(new T.SphereGeometry(0.035, 8, 8), new T.MeshBasicMaterial({ color: 0xfff0b8, toneMapped: false }));
+        lampBody.add(flame);
+        const halo = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffb860, transparent: true, opacity: 0.55, depthWrite: false, blending: T.AdditiveBlending }));
+        halo.scale.set(0.7, 0.7, 1);
+        flame.add(halo);
+        // The staff in his left hand, as he walks out of the sketch of the North Portal
+        const staff = new T.Group();
+        staff.position.set(-0.34, 0.84, -0.18);
+        hermes.add(staff);
+        const pole = new T.Mesh(new T.CylinderGeometry(0.022, 0.028, 1.8, 8), wood);
+        pole.position.y = 0.06; pole.castShadow = true; staff.add(pole);
+        pin(staff, new T.Mesh(new T.TorusGeometry(0.045, 0.014, 6, 12), brass), 0.98);
+        // A small star of brass set in the ring, that keeps a glint of light even in the shade
+        const finial = pin(staff, new T.Mesh(new T.OctahedronGeometry(0.035, 0), new T.MeshBasicMaterial({ color: 0xfff0b0, toneMapped: false })), 0.98);
+        const glint = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffd890, transparent: true, opacity: 0.6, depthWrite: false, blending: T.AdditiveBlending }));
+        glint.scale.set(0.32, 0.32, 1);
+        finial.add(glint);
+        // The satchel on his right hip, the brass spyglass tucked behind the sash
+        add(new T.Mesh(new T.BoxGeometry(0.1, 0.22, 0.26), leather), 0.31, 0.86, 0.05);
+        const glassTube = add(new T.Mesh(new T.CylinderGeometry(0.03, 0.038, 0.36, 10), brass), -0.1, 1.02, 0.27);
+        glassTube.rotation.z = 0.9;
+        // Boots that show under the hem as he walks
+        const legL = new T.Group(), legR = new T.Group();
+        [[legL, -0.1], [legR, 0.1]].forEach(([g, x]) => {
+          const b = new T.Mesh(new T.BoxGeometry(0.12, 0.1, 0.24), boot);
+          b.position.set(0, 0.05, -0.04); b.castShadow = true;
+          g.add(b); g.position.x = x; hermes.add(g);
+        });
+        return { hermes, legL, legR, flame, staff, lamp, cloak };
+      }
+
+      // ---- Relics: each one carries its rune cut into its own surface ----
+      // The surface that holds the rune is mapped flat from the front (or from above), and gets the rune carved
+      // into its colour and its relief; the rest of the object keeps the plain material.
+      function engrave(geo, face, cx, cy, size) {
+        if (!geo.attributes.normal) geo.computeVertexNormals();
+        const p = geo.attributes.position, nr = geo.attributes.normal, uv = new Float32Array(p.count * 2);
+        for (let i = 0; i < p.count; i++) {
+          const n = face === 'top' ? nr.getY(i) : nr.getZ(i);
+          if (n > 0.3) {
+            const a = p.getX(i), b = face === 'top' ? -p.getZ(i) : p.getY(i);
+            uv[i * 2] = (a - cx) / size + 0.5; uv[i * 2 + 1] = (b - cy) / size + 0.5;
+          } else { uv[i * 2] = 0.03; uv[i * 2 + 1] = 0.03; }
+        }
+        geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+        return geo;
+      }
+      const SKINS = {
+        bronze: ['#a8722e', [['rgba(70,170,150,0.4)', 7], ['rgba(90,50,16,0.25)', 6], ['rgba(255,220,140,0.35)', 4]], '#3a2208', 'rgba(255,230,160,0.85)'],
+        clay: ['#9a5a34', [['rgba(40,20,10,0.25)', 7], ['rgba(190,120,80,0.2)', 4]], '#4a2412', 'rgba(236,180,130,0.9)'],
+        bone: ['#ddcfac', [['rgba(150,120,80,0.18)', 5], ['rgba(255,250,235,0.3)', 3]], '#5a4228', 'rgba(255,248,226,0.8)'],
+        brass: ['#b8903e', [['rgba(90,60,20,0.22)', 5], ['rgba(240,210,130,0.25)', 3]], '#3e2a0a', 'rgba(255,236,170,0.8)'],
+        iron: ['#5e3420', [['rgba(170,82,40,0.4)', 7], ['rgba(30,16,10,0.3)', 5]], '#140804', 'rgba(240,184,128,0.95)'],
+        shell: ['#e2bf9c', [['rgba(214,150,130,0.3)', 6], ['rgba(255,244,230,0.35)', 4]], '#6a3a26', 'rgba(255,246,232,0.85)']
+      };
+      // The colour and the relief of one relic's surface, with the rune carved (or scratched) in the middle
+      function runeSurface(skin, letter, letterPx, style) {
+        const [base, spots, groove, rim] = SKINS[skin];
+        const W = 256, font = `700 ${letterPx}px Cinzel, Georgia, serif`;
+        const draw = (g, x, y, mode) => {
+          g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle';
+          if (mode === 'outline') { g.lineWidth = Math.max(2, letterPx * 0.03); g.strokeText(letter, x, y); }
+          else if (style === 'scratch') { g.fillText(letter, x, y); g.lineWidth = Math.max(3, letterPx * 0.05); g.lineJoin = 'round'; g.strokeText(letter, x, y); }
+          else g.fillText(letter, x, y);
+        };
+        const map = canvasTex(W, W, (g) => {
+          speckle(g, W, W, letter.charCodeAt(0) * 7, base, spots, 220);
+          g.fillStyle = g.strokeStyle = rim; draw(g, W / 2 + 3, W / 2 + 3 + letterPx * 0.04);     // the lit lower edge of the cut
+          g.fillStyle = g.strokeStyle = groove; draw(g, W / 2, W / 2 + letterPx * 0.04);         // the bottom of the cut
+          if (style !== 'scratch') { g.strokeStyle = 'rgba(0,0,0,0.35)'; draw(g, W / 2 - 1, W / 2 - 1 + letterPx * 0.04, 'outline'); }
+        });
+        const bump = canvasTex(W, W, (g) => {
+          g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, W);
+          g.filter = 'blur(2px)';
+          g.fillStyle = g.strokeStyle = '#000000';
+          draw(g, W / 2, W / 2 + letterPx * 0.04);
+          g.filter = 'none';
+        });
+        bump.encoding = THREE.LinearEncoding;
+        return { map, bump };
       }
       function makeRelic(kind, letter) {
         const T = G.T, g = new T.Group();
-        const mat = (color, metal, rough) => new T.MeshStandardMaterial({ color, metalness: metal, roughness: rough, side: T.DoubleSide });
-        const bronze = mat(0x6f7a4a, 0.35, 0.55), clay = mat(0x8e4f2c, 0, 0.9), bone = mat(0xd9caa6, 0, 0.75);
-        const iron = mat(0x7a3d1e, 0.3, 0.85), shellM = mat(0xe9c9a8, 0, 0.6);
         const V = (a) => a.map((p) => new T.Vector2(p[0], p[1]));
-        let face = 0.32, size = 0.3;
+        const skins = {};
+        // Painted shading with a rim of light; metal gets a brighter, golden rim in place of a mirror shine
+        const shine = (m, metal) => rim(m, metal > 0.2 ? 0xffe6a0 : 0xfff0dc, metal > 0.2 ? 0.75 : 0.4);
+        const plain = (skin, metal, rough) => (skins[skin + metal + rough] = skins[skin + metal + rough] || shine(toon({
+          map: canvasTex(128, 128, (c, w, h) => speckle(c, w, h, skin.length * 13, SKINS[skin][0], SKINS[skin][1], 90)) }), metal));
+        const carved = (skin, metal, rough, letterPx, style) => {
+          const s = runeSurface(skin, letter, letterPx, style);
+          return shine(toon({ map: s.map, bumpMap: s.bump, bumpScale: 2.5 }), metal);
+        };
+        // Where the rune sits, and which way it faces (the camera must look at it to read it)
+        const anchor = new T.Object3D();
+        let face = 'front';
         if (kind === 'bell') {
-          g.add(new T.Mesh(new T.LatheGeometry(V([[0, 0.42], [0.12, 0.4], [0.18, 0.3], [0.21, 0.08], [0.3, -0.12], [0.36, -0.2], [0.34, -0.22], [0, -0.18]]), 24), bronze));
-          const loop = new T.Mesh(new T.TorusGeometry(0.07, 0.025, 8, 16), bronze); loop.position.y = 0.47; g.add(loop);
-          face = 0.245; size = 0.22;
+          // The profile runs from the lip up to the crown, so the lathe faces outwards; the inside runs back down
+          const outer = [[0.36, -0.25], [0.35, -0.22], [0.29, -0.16], [0.24, -0.05], [0.215, 0.1], [0.2, 0.25], [0.17, 0.36], [0.12, 0.42], [0.06, 0.44]];
+          g.add(new T.Mesh(engrave(new T.LatheGeometry(V(outer), 40), 'front', 0, 0.06, 0.5), carved('bronze', 0.35, 0.5, 120)));
+          g.add(new T.Mesh(new T.LatheGeometry(V(outer.map(([r, y]) => [r * 0.9, y - 0.015]).reverse()), 40), plain('bronze', 0.3, 0.6)));
+          pin(g, new T.Mesh(new T.CylinderGeometry(0.06, 0.06, 0.02, 20), plain('bronze', 0.3, 0.6)), 0.445);
+          pin(g, new T.Mesh(new T.TorusGeometry(0.06, 0.022, 8, 18), plain('bronze', 0.35, 0.5)), 0.5);
+          pin(g, new T.Mesh(new T.SphereGeometry(0.055, 12, 10), plain('iron', 0.2, 0.8)), -0.2);
+          anchor.position.set(0, 0.06, 0.22);
         } else if (kind === 'lamp') {
-          const b = new T.Mesh(new T.SphereGeometry(0.3, 20, 14), clay); b.scale.set(1, 0.5, 1); g.add(b);
-          const spout = new T.Mesh(new T.CylinderGeometry(0.05, 0.08, 0.3, 10), clay); spout.rotation.z = Math.PI / 2; spout.position.set(0.36, 0.02, 0); g.add(spout);
-          const handle = new T.Mesh(new T.TorusGeometry(0.08, 0.025, 8, 14), clay); handle.position.set(-0.33, 0.06, 0); g.add(handle);
-          face = 0.29; size = 0.24;
+          // A palm-sized oil lamp: round body, a flat top with the filling hole, the nozzle and a ring handle
+          const body = [[0, -0.1], [0.2, -0.09], [0.29, -0.04], [0.3, 0.02], [0.27, 0.07], [0.24, 0.085], [0.002, 0.085], [0, 0.085]];   // the point by the axis keeps the lid's normal straight up
+          g.add(new T.Mesh(engrave(new T.LatheGeometry(V(body), 36), 'top', 0, -0.02, 0.5), carved('clay', 0, 0.9, 130, 'scratch')));
+          const hole = new T.Mesh(new T.CircleGeometry(0.035, 14), new T.MeshBasicMaterial({ color: 0x1a0c06 }));
+          hole.rotation.x = -Math.PI / 2; hole.position.set(0, 0.087, 0.18); g.add(hole);
+          const nozzle = new T.Mesh(new T.CylinderGeometry(0.05, 0.075, 0.24, 14), plain('clay', 0, 0.9));
+          nozzle.rotation.x = Math.PI / 2; nozzle.position.set(0, 0.0, -0.36); g.add(nozzle);
+          const soot = new T.Mesh(new T.CircleGeometry(0.045, 12), new T.MeshBasicMaterial({ color: 0x0c0604 }));
+          soot.position.set(0, 0.0, -0.481); soot.rotation.y = Math.PI; g.add(soot);
+          const handle = new T.Mesh(new T.TorusGeometry(0.07, 0.025, 8, 16), plain('clay', 0, 0.9));
+          handle.position.set(0, 0.03, 0.33); handle.rotation.y = Math.PI / 2; g.add(handle);
+          anchor.position.set(0, 0.086, 0.02); anchor.rotation.x = -Math.PI / 2;
+          face = 'top';
         } else if (kind === 'comb') {
-          const spine = new T.Mesh(new T.BoxGeometry(0.8, 0.2, 0.06), bone); spine.position.y = 0.12; g.add(spine);
-          for (let i = 0; i < 14; i++) if (i % 3 !== 1 || i < 5) {
-            const t = new T.Mesh(new T.BoxGeometry(0.03, 0.3, 0.035), bone); t.position.set(-0.36 + i * 0.055, -0.13, 0); g.add(t);
+          // Carved bone: an arched back with the rune along it, and the teeth (half of them broken)
+          const back = new T.Shape();
+          back.moveTo(-0.42, -0.02); back.lineTo(0.42, -0.02); back.lineTo(0.42, 0.1);
+          back.quadraticCurveTo(0, 0.3, -0.42, 0.1); back.closePath();
+          const bg = new T.ExtrudeGeometry(back, { depth: 0.07, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 2, curveSegments: 16 });
+          bg.translate(0, 0, -0.035);
+          g.add(new T.Mesh(engrave(bg, 'front', 0, 0.1, 0.42), carved('bone', 0, 0.7, 150)));
+          const toothMat = plain('bone', 0, 0.7);
+          for (let i = 0; i < 15; i++) {
+            const broken = i % 3 === 1 && i > 4, len = broken ? 0.09 + (i % 2) * 0.04 : 0.3;
+            const t = new T.Mesh(new T.CylinderGeometry(0.012, 0.018, len, 6), toothMat);
+            t.position.set(-0.385 + i * 0.055, -0.02 - len / 2, 0); g.add(t);
           }
-          face = 0.035; size = 0.18;
+          anchor.position.set(0, 0.1, 0.05);
         } else if (kind === 'horn') {
+          // A ram's horn with the little brass plate the walkers fixed to it
           const pts = [];
-          for (let i = 0; i <= 30; i++) { const a = i / 30 * Math.PI * 1.5; const rr = 0.32 - i * 0.006; pts.push(new T.Vector3(Math.cos(a) * rr, Math.sin(a) * rr, -i * 0.012)); }
-          g.add(new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts), 48, 0.08, 10), bone));
-          const plate = new T.Mesh(new T.CylinderGeometry(0.14, 0.14, 0.02, 20), bronze); plate.rotation.x = Math.PI / 2; plate.position.set(0, 0, 0.09); g.add(plate);
-          face = 0.102; size = 0.22;
-        } else if (kind === 'key') {
-          const bow = new T.Mesh(new T.TorusGeometry(0.17, 0.045, 10, 22), iron); bow.position.y = 0.26; g.add(bow);
-          const disc = new T.Mesh(new T.CylinderGeometry(0.13, 0.13, 0.04, 20), iron); disc.rotation.x = Math.PI / 2; disc.position.y = 0.26; g.add(disc);
-          const shaft = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, 0.6, 10), iron); shaft.position.y = -0.17; g.add(shaft);
-          [[0.06, -0.4], [0.06, -0.3]].forEach(([x, y]) => { const bit = new T.Mesh(new T.BoxGeometry(0.12, 0.05, 0.03), iron); bit.position.set(x + 0.03, y, 0); g.add(bit); });
-          face = 0.022; size = 0.2;
-          g.userData.faceY = 0.26;
-        } else {
-          const dome = new T.Mesh(new T.SphereGeometry(0.38, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), shellM);
-          dome.scale.set(1, 0.32, 1); dome.rotation.x = Math.PI / 2; g.add(dome);
-          for (let i = 0; i < 9; i++) {
-            const a = -1.2 + i * 0.3, rib = new T.Mesh(new T.BoxGeometry(0.025, 0.36, 0.02), shellM);
-            rib.position.set(Math.sin(a) * 0.17, Math.cos(a) * 0.17 - 0.04, 0.1); rib.rotation.z = -a; g.add(rib);
+          for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 1.55; const rr = 0.32 - i * 0.0045; pts.push(new T.Vector3(Math.cos(a) * rr, Math.sin(a) * rr, -i * 0.01)); }
+          const hornGeo = new T.TubeGeometry(new T.CatmullRomCurve3(pts), 64, 0.08, 12);
+          const ridges = hornGeo.attributes.position;
+          for (let i = 0; i < ridges.count; i++) {   // the growth rings of the horn, and the tip that narrows
+            const seg = Math.floor(i / 13) / 64, k = (1 - seg * 0.75) * (1 + Math.sin(seg * 120) * 0.06);
+            const c = new T.Vector3(); const along = Math.min(40, Math.round(seg * 40)); c.copy(pts[along]);
+            ridges.setXYZ(i, c.x + (ridges.getX(i) - c.x) * k, c.y + (ridges.getY(i) - c.y) * k, c.z + (ridges.getZ(i) - c.z) * k);
           }
-          face = 0.125; size = 0.2;
+          hornGeo.computeVertexNormals();
+          g.add(new T.Mesh(hornGeo, plain('bone', 0, 0.65)));
+          const plateGeo = new T.CylinderGeometry(0.13, 0.13, 0.025, 28);
+          plateGeo.rotateX(Math.PI / 2);
+          const plate = new T.Mesh(engrave(plateGeo, 'front', 0, 0, 0.27), carved('brass', 0.45, 0.4, 150));
+          plate.position.set(0, 0, 0.09); g.add(plate);
+          [[-0.1, 0], [0.1, 0]].forEach(([x]) => { const rivet = new T.Mesh(new T.SphereGeometry(0.012, 6, 6), plain('brass', 0.5, 0.4)); rivet.position.set(x, 0, 0.104); g.add(rivet); });
+          anchor.position.set(0, 0, 0.105);
+        } else if (kind === 'key') {
+          // A heavy iron key: a round head with the rune, a ring to hang it, the shaft and its bit
+          const headGeo = new T.CylinderGeometry(0.16, 0.16, 0.05, 32);
+          headGeo.rotateX(Math.PI / 2);
+          const head = new T.Mesh(engrave(headGeo, 'front', 0, 0, 0.33), carved('iron', 0.3, 0.85, 150));
+          head.position.y = 0.24; g.add(head);
+          const rim = new T.Mesh(new T.TorusGeometry(0.16, 0.025, 8, 32), plain('iron', 0.3, 0.85)); rim.position.y = 0.24; g.add(rim);
+          const ring = new T.Mesh(new T.TorusGeometry(0.05, 0.016, 8, 16), plain('iron', 0.3, 0.85)); ring.position.y = 0.44; g.add(ring);
+          const shaft = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, 0.62, 12), plain('iron', 0.3, 0.85)); shaft.position.y = -0.2; g.add(shaft);
+          [[-0.38, 0.13], [-0.46, 0.09]].forEach(([y, w]) => { const bit = new T.Mesh(new T.BoxGeometry(w, 0.05, 0.035), plain('iron', 0.3, 0.85)); bit.position.set(w / 2, y, 0); g.add(bit); });
+          anchor.position.set(0, 0.24, 0.026);
+        } else {
+          // A scallop: ribs fanning out from the hinge, the rune cut across them
+          const rows = 14, cols = 28, pos = [], idx = [];
+          for (let i = 0; i <= rows; i++) for (let j = 0; j <= cols; j++) {
+            const t = i / rows, a = (j / cols - 0.5) * 2.1, R = 0.4 * t;
+            const rib = Math.pow(Math.abs(Math.cos(a * 7.5)), 0.6) * 0.034 * t;
+            pos.push(Math.sin(a) * R, -0.2 + Math.cos(a) * R, 0.13 * (1 - t * t * 0.7) * Math.cos(a * 0.9) + rib);
+          }
+          for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
+            const a = i * (cols + 1) + j, b = a + 1, c = a + cols + 1, d = c + 1;
+            idx.push(a, b, c, b, d, c);   // wound so the ribbed face looks forwards (+z)
+          }
+          const front = new T.BufferGeometry();
+          front.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); front.setIndex(idx); front.computeVertexNormals();
+          g.add(new T.Mesh(engrave(front, 'front', 0, 0.02, 0.5), carved('shell', 0, 0.55, 120)));
+          const backGeo = front.clone(); backGeo.scale(1, 1, -0.35); backGeo.index.array.reverse(); backGeo.computeVertexNormals();
+          g.add(new T.Mesh(backGeo, plain('shell', 0, 0.6)));
+          [-1, 1].forEach((s) => { const ear = new T.Mesh(new T.BoxGeometry(0.1, 0.07, 0.03), plain('shell', 0, 0.6)); ear.position.set(s * 0.07, -0.21, 0.02); ear.rotation.z = s * 0.3; g.add(ear); });
+          anchor.position.set(0, 0.02, 0.14);
         }
-        const plateMesh = new T.Mesh(new T.PlaneGeometry(size, size), new T.MeshBasicMaterial({ map: letterTex(letter), transparent: true, depthWrite: false }));
-        plateMesh.position.set(0, g.userData.faceY || 0, face + 0.004);
-        g.add(plateMesh);
-        g.userData.plate = plateMesh;
-        g.traverse((m) => { if (m.isMesh) m.castShadow = false; });
-        g.scale.setScalar(0.62);
+        g.add(anchor);
+        g.userData.plate = anchor;
+        g.userData.face = face;
+        g.scale.setScalar(0.66);
         return g;
+      }
+
+      // The relic leaves her hands: its meshes, materials and carved textures are freed
+      function dropRelic() {
+        if (!G || !G.relic) return;
+        G.scene.remove(G.relic);
+        G.relic.traverse((m) => {
+          if (!m.isMesh) return;
+          m.geometry.dispose();
+          [m.material].flat().forEach((mt) => { if (mt.map) mt.map.dispose(); if (mt.bumpMap) mt.bumpMap.dispose(); mt.dispose(); });
+        });
+        G.relic = null;
       }
 
       // ---- Time of day: sun, sky and light follow the clock ----
@@ -529,7 +925,8 @@
       function paintSky() {
         const { el: e, dir } = sunAt(S.min);
         const k = Math.min(1, e / 1.0);
-        const horizon = new G.T.Color().setHSL(0.07, 0.75, 0.55 + 0.15 * k), zenith = new G.T.Color().setHSL(0.58, 0.55 - 0.2 * (1 - k), 0.35 + 0.25 * k);
+        // A painted sky: peach at the horizon, a deep clear blue overhead; dawn and dusk turn both warmer
+        const horizon = new G.T.Color().setHSL(0.06 + 0.02 * k, 0.9, 0.6 + 0.12 * k, 'srgb'), zenith = new G.T.Color().setHSL(0.6 - 0.04 * (1 - k), 0.7, 0.36 + 0.2 * k, 'srgb');
         const pos = G.sky.geometry.attributes.position, col = G.sky.geometry.attributes.color, c = new G.T.Color();
         for (let i = 0; i < pos.count; i++) {
           const y = Math.max(0, pos.getY(i) / 120);
@@ -537,10 +934,11 @@
           col.setXYZ(i, c.r, c.g, c.b);
         }
         col.needsUpdate = true;
-        G.sun.intensity = 0.5 + 1.1 * Math.sin(Math.min(e, 1.2));
-        G.sun.color.setHSL(0.09, 0.8, 0.6 + 0.3 * k);
-        G.hemi.intensity = 0.6 + 0.3 * k;
-        G.scene.fog.color.setHSL(0.05, 0.4, 0.13 + 0.12 * k);
+        G.sun.intensity = 0.35 + 0.7 * Math.sin(Math.min(e, 1.2));
+        G.sun.color.setHSL(0.09, 0.85, 0.7 + 0.22 * k, 'srgb');
+        G.hemi.intensity = 0.55 + 0.2 * k;
+        G.scene.fog.color.copy(horizon).lerp(new G.T.Color(0x9a6aa8), 0.3);   // a violet haze down the long corridors
+        G.shafts.material.opacity = 0.05 + 0.13 * k;
         G.sunDir = dir;
         G.sky.position.copy(G.camera.position);
         G.sunDisc.position.copy(G.camera.position).addScaledVector(dir, 100);
@@ -577,7 +975,7 @@
           const mat = new G.T.MeshBasicMaterial({ color: o.blocked ? 0x6b625a : 0xffc65a, transparent: true, opacity: o.blocked ? 0.35 : 0.9, depthWrite: false });
           const a = new G.T.Mesh(G.arrowGeo, mat);
           const [dr, dc] = DIRS[o.d];
-          a.position.set(view.x + dc * CELL * 1.05, 0.03, view.z + dr * CELL * 1.05);
+          a.position.set(view.x + dc * 1.8, 0.03, view.z + dr * 1.8);
           a.scale.setScalar(1.35);
           a.rotation.y = yawOf(o.d);
           a.userData = o;
@@ -877,6 +1275,7 @@
         say(ca.arrive);
         where(`At the ${ordinal(i)} cairn. Turn the ${ca.relic} until its carved letter faces you: drag it, or use the arrow buttons or the arrow keys.`);
         if (G) {
+          dropRelic();
           G.relic = makeRelic(ca.relic, ca.letter);
           // The rune starts turned away from her: half a turn past the way Hermes faces, and tipped over
           G.relic.quaternion.setFromEuler(new G.T.Euler(0.9, yawOf(S.h) + Math.PI * 0.85, 0.3, 'YXZ'));
@@ -921,7 +1320,7 @@
         say(ca.found);
         clearControls();
         btn('Walk on', () => {
-          if (G && G.relic) { G.scene.remove(G.relic); G.relic = null; }
+          dropRelic();
           showChoice();
         }, { cls: 'is-way' });
         save();
@@ -955,7 +1354,7 @@
       const camPos = { x: 0, y: 0, z: 0, ok: false };
       function frame(now) {
         raf = requestAnimationFrame(frame);
-        if (!G || modal.style.display === 'none' || document.hidden) return;
+        if (!G || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;   // no frames while it fades out
         tick(now, Math.min(0.1, (now - (last || now)) / 1000));
         last = now;
       }
@@ -991,12 +1390,17 @@
         const H = G.hermes;
         H.position.set(view.x, 0, view.z);
         H.rotation.y = view.yaw;
-        const swing = moving && !rm ? Math.sin(now / 130) * 0.55 : 0;
-        G.legL.rotation.x = swing; G.legR.rotation.x = -swing;
-        H.position.y = moving && !rm ? Math.abs(Math.sin(now / 130)) * 0.04 : 0;
+        const swing = moving && !rm ? Math.sin(now / 130) : 0;
+        G.legL.position.z = swing * 0.17; G.legR.position.z = -swing * 0.17;
+        G.legL.position.y = Math.max(0, swing) * 0.05; G.legR.position.y = Math.max(0, -swing) * 0.05;
+        G.staff.rotation.x = swing * 0.22;
+        G.cloak.rotation.z = swing * 0.025;
+        G.lamp.rotation.z = rm ? 0 : Math.sin(now / 260) * 0.07 + swing * 0.08;
+        H.position.y = moving && !rm ? Math.abs(Math.sin(now / 130)) * 0.035 : 0;
         const flick = 1.25 + Math.sin(now / 90) * 0.08 + Math.sin(now / 37) * 0.05;
         G.lantern.intensity = flick;
         G.lantern.position.copy(G.flame.getWorldPosition(new T.Vector3()));
+        G.shafts.visible = G.camera.position.y < 5;   // seen from above at a fork, the shafts of light would read as ribbons
 
         // Camera: behind and above him; closer and lower in front of a relic
         const yaw = view.yaw + view.look;
@@ -1006,8 +1410,8 @@
         H.visible = !stone;
         // At a fork the camera rises, so the mouths of the side passages and the arrows on the sand are in view
         const fork = view.phase === 'choose' || view.phase === 'setback';
-        let tx = view.x - fx * (fork ? 1.3 : 3.4), ty = fork ? 7.2 : 2.35, tz = view.z - fz * (fork ? 1.3 : 3.4);
-        let lx = view.x + fx * (fork ? 0.5 : 2.6), ly = fork ? 0 : 1.15, lz = view.z + fz * (fork ? 0.5 : 2.6);
+        let tx = view.x - fx * (fork ? 1.6 : 3.8), ty = fork ? 8.4 : 2.6, tz = view.z - fz * (fork ? 1.6 : 3.8);
+        let lx = view.x + fx * (fork ? 0.6 : 3), ly = fork ? 0 : 1.2, lz = view.z + fz * (fork ? 0.6 : 3);
         if (stone) {
           tx = view.x - fx * 1.5; ty = 1.6; tz = view.z - fz * 1.5;
           lx = stone.x; ly = 0.95; lz = stone.z;
@@ -1028,7 +1432,11 @@
             if (relicFacing() > 0.9) { view.relicHold += dt; if (view.relicHold > 0.5) relicFound(); }
             else view.relicHold = 0;
           }
-          if (view.phase === 'found') G.relic.rotation.y += dt * 0.25;
+          if (view.phase === 'found') {
+            // Once read, the relic settles with its rune upright and square to her, so an M never shows as a W
+            const upright = G.camera.quaternion.clone().multiply(G.relic.userData.plate.quaternion.clone().invert());
+            G.relic.quaternion.slerp(upright, Math.min(1, dt * 4));
+          }
         } else G.relicLight.intensity = 0;
 
         // Arrows breathe; whisper dust drifts in
@@ -1043,6 +1451,15 @@
           pos.needsUpdate = true;
           G.dust.material.opacity = Math.max(0, Math.min(0.8, dd.t * 2, (3.5 - dd.t)));
           if (dd.t > 3.5) { view.dust = null; G.dust.material.opacity = 0; }
+        }
+
+        if (G.motes) {
+          const mp = G.motes.geometry.attributes.position, b0 = G.motesBase, t = now / 1000, wrap = (x) => ((x % 14) + 14) % 14;
+          for (let i = 0; i < G.motesN; i++) {
+            mp.setXYZ(i, view.x - 7 + wrap(b0[i * 3] + t * 0.22 + Math.sin(t * 0.4 + i) * 0.3),
+              b0[i * 3 + 1] + Math.sin(t * 0.5 + i * 1.7) * 0.18, view.z - 7 + wrap(b0[i * 3 + 2] + t * 0.1));
+          }
+          mp.needsUpdate = true;
         }
 
         // Sun and shadows follow Hermes
@@ -1154,7 +1571,7 @@
         const firstTime = !get(WALK_KEY);
         S = load();
         if (el.victory) el.victory.style.display = 'none';
-        if (G && G.relic) { G.scene.remove(G.relic); G.relic = null; }
+        dropRelic();
         view.walk = null; view.look = 0; view.dust = null; camPos.ok = false;
         placeHermes(S.trail[S.trail.length - 1], S.h);
         paintPrints();
