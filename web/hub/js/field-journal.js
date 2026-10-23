@@ -12,6 +12,7 @@
       // Walks that end at a game: start key and hours (a skipped walk has no arrival time)
       var WALKS = {
         chasm: ['order_chasm_march_start', 'order_chasm_march_bypassed', 26],
+        playa: ['order_playa_march_start', 'order_playa_march_bypassed', 10],
         s14: ['order_monolith_march_start', 'order_monolith_march_bypassed', 12],
         s15: ['order_labyrinth_march_start', 'order_labyrinth_march_bypassed', 6],
         s16: ['order_cairn4_march_start', 'order_cairn4_march_bypassed', 18],

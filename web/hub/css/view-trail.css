@@ -300,3 +300,16 @@
       font-style: italic;
     }
 
+
+    /* The tester's way past a walk, under its countdown */
+    .insp-march-skip {
+      align-self: flex-start;
+      padding: 4px 12px;
+      background: rgba(251, 191, 36, 0.18);
+      border: 1px solid #fbbf24;
+      border-radius: 4px;
+      color: #fde68a;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }

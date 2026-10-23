@@ -656,12 +656,12 @@
           {
             id: 'chasm', tag: 'Station 10', label: 'The Whispering Chasm', flag: 'order_whispering_chasm_completed', built: true,
             complete() { set('order_whispering_chasm_completed', 'true'); set('order_desert_station_active', '11'); },
-            reset() { del('order_whispering_chasm_completed'); del('order_chasm_walk'); del('order_chasm_howto'); del('order_chasm_wire'); }
+            reset() { dels(['order_whispering_chasm_completed', 'order_chasm_walk', 'order_chasm_howto', 'order_chasm_wire', 'order_playa_march_start', 'order_playa_march_bypassed']); }
           },
           {
             id: 'playa', tag: 'Station 11', label: 'The Salt Playa', flag: 'order_salt_playa_completed', built: true,
             complete() { set('order_salt_playa_completed', 'true'); set('order_salt_playa_path', JSON.stringify([3, 4, 3, 2, 2, 3, 3])); },
-            reset() { dels(['order_salt_playa_completed', 'order_salt_playa_path']); }
+            reset() { dels(['order_salt_playa_completed', 'order_salt_playa_path']); }   // its night at the Oasis Gate goes with the Chasm
           },
           {
             id: 'lexicon', tag: 'Station 12', label: 'The Desert Lexicon', flag: 'order_desert_lexicon_completed', built: true,
@@ -750,7 +750,7 @@
         const ARRIVAL = {
           cairn1: { wire: 4, node: 22, dawn: 2 },
           chasm: { wire: 4, node: 10, walk: 'order_chasm_march_bypassed' },
-          playa: { wire: 4, node: 21 },
+          playa: { wire: 4, node: 21, walk: 'order_playa_march_bypassed' },
           lexicon: { wire: 5, node: 11 },
           clepsydra: { wire: 6, node: 12 },
           s14: { wire: 10, node: 23, walk: 'order_monolith_march_bypassed' },
@@ -763,7 +763,7 @@
           s21: { wire: 38, node: 41 },
           s22: { wire: 42, node: 42 }
         };
-        const WALKS = ['order_chasm_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
+        const WALKS = ['order_chasm_march_bypassed', 'order_playa_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
 
         // Puts the Hermes chat exactly at `step`: the replies before it are kept (first reply if none was saved)
         function setWire(step) {
@@ -931,6 +931,8 @@
               localStorage.removeItem('order_cairn1_locked_until_3_cairns');
               localStorage.removeItem('order_chasm_march_start');
               localStorage.removeItem('order_chasm_march_bypassed');
+              localStorage.removeItem('order_playa_march_start');
+              localStorage.removeItem('order_playa_march_bypassed');
               localStorage.setItem(waypointDoneKey, 'done');
               localStorage.setItem('order_silvia_waypoint_v2', 'done');
               localStorage.setItem('order_carles_waypoint_v2', 'done');
@@ -1002,6 +1004,36 @@
       // so that all views, wire stream elements, and map controllers are fully initialized.
 
       // 3. Star Map Node Definitions & Click Inspection
+      // A station Hermes has not reached yet (Station 11 and Stations 14–18): no name, no rewards, a veiled picture and
+      // a live countdown to his arrival. At zero the card is drawn again, whole (selectMapNode).
+      function veiledStation(o) {
+        const march = window.EclipseMarches && window.EclipseMarches[o.march];
+        const started = !!march && march.started();
+        const at = started ? march.arrivesAt() : 0;
+        const tester = typeof window.isAdminTester === 'function' && window.isAdminTester();
+        return {
+          badge: 'STATION ' + o.station + ' // DESERT PATH',
+          status: started ? 'HERMES ON HIS WAY ⏳' : 'HERMES IS CALLING 📻',
+          statusClass: 'status-live-badge',
+          title: 'Station ' + o.station + ' · [ Sealed ]',
+          thumb: o.thumb,
+          veiled: true,
+          lore: started ? o.walking : (o.waiting || 'Hermes is waiting for your answer on the Field Wire before he sets out on the next stretch of the road.'),
+          rewards: [{ icon: '🔒', label: 'Sealed until Hermes arrives', desc: 'The name of the place, its page and what it keeps' }],
+          countdown: at ? {
+            title: o.etaLabel || 'HERMES ARRIVES IN',
+            ref: 'STATION ' + o.station + ' · [ SEALED ]',
+            arrivesAt: at,
+            footer: '✦ The name of the place, its page in your journal and what it keeps open the moment Hermes arrives. ✦',
+            skip: tester ? march.skip : null
+          } : null,
+          btnText: started ? '⏳ Hermes is on his way' : '📻 OPEN THE FIELD WIRE ➔',
+          btnDisabled: started,
+          action: started ? null : () => { if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire'); }
+        };
+      }
+      const marchOver = (name) => !!(window.EclipseMarches && window.EclipseMarches[name] && window.EclipseMarches[name].over());
+
       const nodesData = {
         1: {
           badge: 'STATION 01 // ORIGIN DISPATCH',
@@ -1250,6 +1282,23 @@
           }
 
           const isMarchOver = (typeof window.isChasmMarchOver === 'function') ? window.isChasmMarchOver() : true;
+          if (!isMarchOver && window.isChasmCamped()) {
+            return {
+              badge: 'STATION 10 // DESERT PATH',
+              status: 'CAMP BY THE NORTH PORTAL ⛺',
+              statusClass: 'status-live-badge',
+              title: 'Camp Below the North Portal',
+              thumb: './assets/thumbnails/whispering_chasm_preview.webp',
+              lore: 'Hermes has reached the great red wall and made camp in sight of the North Portal. He is resting his legs and filling his skins before the descent, and he will call you on the Field Wire when he is ready to go in. Meanwhile, study the page “The Whispering Chasm” of your journal.',
+              rewards: [
+                { icon: '⛺', label: 'Camp at the Canyon Mouth', desc: 'Hermes rests before the descent' },
+                { icon: '🧭', label: 'Journal page “The Whispering Chasm”', desc: 'The canyon maze, seen from above' },
+                { icon: '📻', label: 'Field Wire on Standby', desc: 'He will call you when he is ready' }
+              ],
+              btnText: '⛺ HERMES IS RESTING AT HIS CAMP',
+              btnDisabled: true
+            };
+          }
           if (!isMarchOver) {
             const isBypassed = localStorage.getItem('order_cairn1_bypassed') === 'true';
             return {
@@ -1266,6 +1315,13 @@
                 { icon: '⏱️', label: 'A 26-Hour Walk', desc: 'Hermes will call you when he reaches the gate' },
                 { icon: '📻', label: 'Field Wire on Standby', desc: 'His beacon is still sending' }
               ],
+              countdown: window.getChasmMarchArrivesAt() ? {
+                title: 'ARRIVAL AT THE NORTH PORTAL IN',
+                ref: 'STATION 10 · ON THE ROAD',
+                arrivesAt: window.getChasmMarchArrivesAt(),
+                footer: '✦ Hermes will call you on the Field Wire the moment he reaches the canyon mouth. ✦',
+                skip: typeof window.isAdminTester === 'function' && window.isAdminTester() ? window.skipChasmMarch : null
+              } : null,
               btnText: '✦ OPEN FIELD WIRE & CHECK TREK ETA ➔',
               action: () => {
                 if (typeof activateHubView === 'function') activateHubView('view-field-wire');
@@ -1273,21 +1329,26 @@
             };
           }
 
+          // Hermes speaks first at the North Portal: until Silvia has answered him, the button takes her to the wire
+          const briefHeard = typeof window.isChasmBriefHeard === 'function' ? window.isChasmBriefHeard() : true;
           return {
             badge: 'STATION 10 // DESERT PATH',
-            status: 'NORTH PORTAL REACHED · CANYON DESCENT READY ✦',
+            status: briefHeard ? 'NORTH PORTAL REACHED · CANYON DESCENT READY ✦' : 'NORTH PORTAL REACHED · HERMES IS CALLING 📻',
             statusClass: 'status-live-badge',
             title: 'The Whispering Chasm',
             thumb: './assets/thumbnails/whispering_chasm_preview.webp',
-            lore: 'Hermes is standing at the North Portal, the narrow gate where the Whispering Chasm begins. Inside, the red walls twist into a maze, and somewhere in it the old walkers hid six relics, each marked with a rune. You will walk it with him, fork by fork. Keep the page “The Whispering Chasm” of your journal open: it shows the whole maze from above, and he will only ever see the next turn.',
+            lore: briefHeard
+              ? 'Hermes is standing at the North Portal, the narrow gate where the Whispering Chasm begins. Inside, the red walls twist into a maze. You will walk it with him, fork by fork. Keep the page “The Whispering Chasm” of your journal open: it shows the whole maze from above, and he will only ever see the next turn.'
+              : 'Hermes is standing at the North Portal, the narrow gate where the Whispering Chasm begins, and he wants a word with you before he takes a single step inside. Open the Field Wire and answer him.',
             rewards: [
               { icon: '🧭', label: 'Journal page “The Whispering Chasm”', desc: 'The canyon maze, seen from above' },
               { icon: '🗺️', label: 'Grand Desert Map · South-West', desc: 'Where the canyon lies on the map' },
-              { icon: '🗝️', label: 'A Six-Letter Passphrase', desc: 'One rune on each relic' },
-              { icon: '📐', label: 'A New Letter for the Ledger', desc: 'Waiting at the way out of the canyon' }
+              { icon: '🔒', label: 'What the Canyon Keeps', desc: 'Revealed when Hermes walks out' }
             ],
-            btnText: '✦ ENTER THE CANYON WITH HERMES ➔',
-            action: () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
+            btnText: briefHeard ? '✦ ENTER THE CANYON WITH HERMES ➔' : '📻 HERMES IS CALLING · OPEN THE FIELD WIRE ➔',
+            action: briefHeard
+              ? () => (window.openWhisperingChasmModal ? window.openWhisperingChasmModal() : null)
+              : () => { if (typeof activateHubView === 'function') activateHubView('view-field-wire'); }
           };
         },
         11: () => {
@@ -1385,6 +1446,10 @@
               action: open
             };
           }
+          if (!marchOver('monolith')) {
+            return veiledStation({ station: 14, march: 'monolith', thumb,
+              walking: 'Hermes is walking by night across open sand, with the stars for a compass. Where he is going stays sealed until he gets there.' });
+          }
           const eta = typeof window.getMonolithMarchEta === 'function' ? window.getMonolithMarchEta() : '';
           const arrived = (typeof window.isMonolithMarchOver === 'function' && window.isMonolithMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
           return {
@@ -1428,6 +1493,10 @@
               btnText: 'Review the Sandstone Labyrinth ➔',
               action: open
             };
+          }
+          if (!marchOver('labyrinth')) {
+            return veiledStation({ station: 15, march: 'labyrinth', thumb,
+              walking: 'Hermes is walking down from the ridge on the stone shelves, away from the raiders\' ruts. Where he is going stays sealed until he gets there.' });
           }
           const eta = typeof window.getLabyrinthMarchEta === 'function' ? window.getLabyrinthMarchEta() : '';
           const arrived = (typeof window.isLabyrinthMarchOver === 'function' && window.isLabyrinthMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
@@ -1477,6 +1546,10 @@
               action: open
             };
           }
+          if (!marchOver('cairnFour')) {
+            return veiledStation({ station: 16, march: 'cairnFour', thumb,
+              walking: 'Hermes walks the hardpan by night and sleeps in the rocks by day. Where he is going stays sealed until he gets there.' });
+          }
           const eta = typeof window.getCairnFourMarchEta === 'function' ? window.getCairnFourMarchEta() : '';
           const arrived = (typeof window.isCairnFourMarchOver === 'function' && window.isCairnFourMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
           return {
@@ -1521,6 +1594,10 @@
               action: open
             };
           }
+          if (!marchOver('solstice')) {
+            return veiledStation({ station: 17, march: 'solstice', thumb,
+              walking: 'Hermes is walking east without sleep, back over the Natural Bridge. Where he is going stays sealed until he gets there.' });
+          }
           const eta = typeof window.getSolsticeMarchEta === 'function' ? window.getSolsticeMarchEta() : '';
           const arrived = (typeof window.isSolsticeMarchOver === 'function' && window.isSolsticeMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
           return {
@@ -1563,6 +1640,10 @@
               btnText: 'Revisit the Atrium ➔',
               action: open
             };
+          }
+          if (!marchOver('stele')) {
+            return veiledStation({ station: 18, march: 'stele', thumb: './assets/thumbnails/polybius_stele_preview.webp',
+              walking: 'Hermes is following a dry bed under the dunes toward a column of smoke, and will arrive after dark. Where he is going stays sealed until he gets there.' });
           }
           const eta = typeof window.getSteleMarchEta === 'function' ? window.getSteleMarchEta() : '';
           const arrived = (typeof window.isSteleMarchOver === 'function' && window.isSteleMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
@@ -1720,9 +1801,18 @@
             };
           }
 
+          if (!marchOver('playa')) {
+            return veiledStation({
+              station: 11, march: 'playa', thumb: './assets/thumbnails/salt_playa_preview.webp', etaLabel: 'FIRST LIGHT IN',
+              walking: 'Hermes is asleep by the rocks of the Oasis Gate, outside the canyon, his satchel under his head. At first light he sets out on the next stretch of the road, and only then does this station open. Keep the page he gave you tonight close.',
+              waiting: localStorage.getItem('order_whispering_chasm_completed') === 'true'
+                ? 'Hermes is out of the canyon and calling you from the Oasis Gate. Open the Field Wire to hear him.'
+                : 'The road beyond the Whispering Chasm is still unknown. Guide Hermes through the canyon first.'
+            });
+          }
           return {
             badge: 'STATION 11 // DESERT PATH',
-            status: 'SALT BASIN AHEAD OF HERMES ✦',
+            status: 'FIRST LIGHT ON THE SALT ✦',
             statusClass: 'status-live-badge',
             title: 'The Salt Playa (Dry Basin)',
             thumb: './assets/thumbnails/salt_playa_preview.webp',
@@ -1837,6 +1927,7 @@
         if (inspTitle) inspTitle.innerText = data.title;
         if (inspLore) inspLore.innerText = data.lore;
         if (data.thumb && inspThumb) inspThumb.src = data.thumb;
+        if (inspThumb && inspThumb.parentElement) inspThumb.parentElement.classList.toggle('is-veiled', !!data.veiled);
 
         // Render Unlocked Relics & Canonical Rewards
         if (inspRelicsChips && data.rewards && data.rewards.length > 0) {
@@ -1901,17 +1992,55 @@
           inspCountdownBar.style.display = (id == 8 && !isStation8Unlocked()) ? 'flex' : 'none';
         }
 
+        // The walk to a sealed station: a live countdown, and at zero the card opens by itself (on the Quest Map)
+        if (window.__inspMarchTimer) { clearInterval(window.__inspMarchTimer); window.__inspMarchTimer = null; }
+        const inspMarchBar = document.getElementById('insp-march-bar');
+        if (inspMarchBar) {
+          const cd = data.countdown;
+          inspMarchBar.style.display = cd ? 'flex' : 'none';
+          if (cd) {
+            inspMarchBar.querySelector('.countdown-title-text').textContent = cd.title;
+            inspMarchBar.querySelector('.countdown-station-ref').textContent = cd.ref;
+            inspMarchBar.querySelector('.countdown-footer-msg').textContent = cd.footer;
+            const skipBtn = inspMarchBar.querySelector('.insp-march-skip');
+            skipBtn.hidden = !cd.skip;
+            skipBtn.onclick = cd.skip ? () => { cd.skip(); selectMapNode(id, false); } : null;
+            const digits = inspMarchBar.querySelectorAll('.countdown-unit-box strong');
+            const tick = (live) => {
+              const rem = Math.max(0, cd.arrivesAt - Date.now());
+              [Math.floor(rem / 3600000), Math.floor((rem % 3600000) / 60000), Math.floor((rem % 60000) / 1000)]
+                .forEach((v, i) => { digits[i].textContent = String(v).padStart(2, '0'); });
+              if (rem > 0 || !live) return;
+              clearInterval(window.__inspMarchTimer); window.__inspMarchTimer = null;
+              if (sfx && typeof sfx.playCelestialChime === 'function') sfx.playCelestialChime();
+              if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
+              if (document.body.getAttribute('data-active-view') === 'view-trail') selectMapNode(id, false);
+            };
+            tick(false);
+            if (cd.arrivesAt > Date.now()) window.__inspMarchTimer = setInterval(() => tick(true), 1000);
+          }
+        }
+
         if (inspBtnReset) {
           const isMidnightDone = getSeekerMidnightCompleted();
-          const targetStation = isMidnightDone ? 9 : 8;
+          // On the Desert Path the active quest is Hermes's next station; before it, Station 08 or 09
+          const desertNo = { 10: '10', 21: '11', 11: '12', 12: '13', 23: '14', 24: '15', 25: '16', 26: '17', 13: '18', 14: '19', 22: 'Cairn I' };
+          const desertTarget = desertNo[id] && typeof window.getNextDesertNodeId === 'function' ? window.getNextDesertNodeId() : null;
+          const targetStation = desertTarget || (isMidnightDone ? 9 : 8);
           if (id == targetStation || data.hideReturnBtn || (+id >= 40 && +id <= 48)) {   // the Stage rooms keep their own ribbon
-            inspBtnReset.style.display = 'none';
+            // On the Desert Path the button keeps its box (display:none shrinks the inspector and the 3D map under it repaints every frame)
+            inspBtnReset.style.display = desertNo[id] ? 'inline-flex' : 'none';
+            inspBtnReset.style.visibility = desertNo[id] ? 'hidden' : '';
+            inspBtnReset.tabIndex = -1;
           } else {
             inspBtnReset.style.display = 'inline-flex';
+            inspBtnReset.style.visibility = '';
+            inspBtnReset.tabIndex = 0;
             const isCarles = (currentSeeker || 'Silvia').toLowerCase() === 'carles';
-            const label = (!isMidnightDone || isCarles)
-              ? `➔ Return to Active Quest (Station 0${targetStation})`
-              : `➔ Return to Horizon (Station 0${targetStation})`;
+            const targetName = desertTarget ? (desertNo[desertTarget] === 'Cairn I' ? 'Cairn I' : 'Station ' + desertNo[desertTarget]) : `Station 0${targetStation}`;
+            const label = (desertTarget || !isMidnightDone || isCarles)
+              ? `➔ Return to Active Quest (${targetName})`
+              : `➔ Return to Horizon (${targetName})`;
             const span = inspBtnReset.querySelector('span');
             if (span) {
               span.innerText = label;
@@ -6342,6 +6471,8 @@
             localStorage.removeItem('order_cairn1_locked_until_3_cairns');
             localStorage.removeItem('order_chasm_march_start');
             localStorage.removeItem('order_chasm_march_bypassed');
+            localStorage.removeItem('order_playa_march_start');
+            localStorage.removeItem('order_playa_march_bypassed');
             localStorage.removeItem(CHASM_WIRE_KEY);
             removeShelterStormWaitBox();
           } catch(e) {}
@@ -6374,6 +6505,8 @@
           localStorage.setItem('order_field_wire_completed', 'true');
           localStorage.removeItem('order_chasm_march_start');
           localStorage.removeItem('order_chasm_march_bypassed');
+          localStorage.removeItem('order_playa_march_start');
+          localStorage.removeItem('order_playa_march_bypassed');
           localStorage.removeItem(CHASM_WIRE_KEY);
         } catch(e) {}
 
@@ -6663,15 +6796,42 @@
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('skip_march') === '1' || urlParams.get('chasm_ready') === '1') return 1.0;
         if (localStorage.getItem('order_chasm_march_bypassed') === 'true') return 1.0;
-        const start = parseInt(localStorage.getItem('order_chasm_march_start') || '0', 10);
+        let start = parseInt(localStorage.getItem('order_chasm_march_start') || '0', 10);
+        // A save past the dawn with no start time (older saves, a partial restore): Hermes sets out now
+        if (!start && (localStorage.getItem('order_cairn1_completed') === 'true' || localStorage.getItem('order_cairn1_bypassed') === 'true'
+            || parseInt(localStorage.getItem('order_dawn_step') || '0', 10) >= 3)) {
+          start = Date.now();
+          try { localStorage.setItem('order_chasm_march_start', String(start)); } catch (e) {}
+        }
         if (!start) return 0.0;
         return Math.max(0, Math.min(1.0, (Date.now() - start) / CHASM_MARCH_MS));
       }
 
+      // The Operator's hold (23-10-2026): until his OK the canyon stays shut for Silvia, even once the 26 hours have
+      // passed. Hermes makes camp in sight of the North Portal and calls her later. Testers, and a skipped walk, go on.
+      // To open the Whispering Chasm for Silvia: set CHASM_HOLD to false and deploy.
+      const CHASM_HOLD = true;
+      function isChasmHeld() {
+        if (!CHASM_HOLD || localStorage.getItem('order_whispering_chasm_completed') === 'true') return false;
+        if (localStorage.getItem('order_chasm_march_bypassed') === 'true') return false;
+        return !isCarlesTester();
+      }
+      // The 26 hours are over but the hold keeps Hermes at his camp
+      window.isChasmCamped = () => isChasmHeld() && getChasmMarchProgress() >= 1.0;
+
       function isChasmMarchOver() {
-        return getChasmMarchProgress() >= 1.0;
+        return getChasmMarchProgress() >= 1.0 && !isChasmHeld();
       }
       window.isChasmMarchOver = isChasmMarchOver;
+      window.getChasmMarchProgress = getChasmMarchProgress;
+      window.getChasmMarchArrivesAt = () => {
+        const start = parseInt(localStorage.getItem('order_chasm_march_start') || '0', 10);
+        return start > 1 ? start + CHASM_MARCH_MS : 0;
+      };
+      // Hermes's brief at the North Portal: until Silvia answers it, the canyon stays shut
+      window.isChasmBriefHeard = () => {
+        try { const w = JSON.parse(localStorage.getItem('order_chasm_wire') || '{}'); return !!w && w.reply0 !== undefined; } catch (e) { return false; }
+      };
 
       window.skipChasmMarch = function () {
         localStorage.setItem('order_chasm_march_bypassed', 'true');
@@ -6704,8 +6864,18 @@
           if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
           renderWireExpedition();
         };
-        return { progress, started, over, eta, start, skip };
+        // When Hermes arrives (ms since epoch), 0 before he sets out
+        const arrivesAt = () => { const t = parseInt(localStorage.getItem(keys.start) || '0', 10); return t > 1 ? t + ms : 0; };
+        return { progress, started, over, eta, start, skip, arrivesAt };
       }
+
+      // Station 11: the night at the Oasis Gate. Hermes sleeps outside the canyon and sets out on the salt at
+      // first light, 10 hours after Silvia answers him there (the Oasis Gate reply starts it).
+      const playaMarch = makeMarch(10, { start: 'order_playa_march_start', bypassed: 'order_playa_march_bypassed', done: 'order_salt_playa_completed' });
+      window.isPlayaMarchOver = playaMarch.over;
+      window.getPlayaMarchEta = playaMarch.eta;
+      window.getPlayaMarchProgress = playaMarch.progress;
+      window.skipPlayaMarch = playaMarch.skip;
 
       // Station 14: the 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (wire step 9 starts it)
       const monolithMarch = makeMarch(12, { start: 'order_monolith_march_start', bypassed: 'order_monolith_march_bypassed', done: 'order_sun_monolith_completed' });
@@ -6832,6 +7002,26 @@
           arrivedTitle: 'Tower III · The Gate of a Thousand Masks · Station 20 Awaits',
           arrivedDesc: 'Hermes and Aurelia are at the gate of Tower III. Open Path III on the Quest Map and speak the word of the gate (Station 20, the page “The Gate of a Thousand Masks”).'
         }
+      };
+      // First light at the Oasis Gate: Hermes calls from the edge of the salt, as he promised (a badge while the chat is closed)
+      setInterval(() => {
+        if (!playaMarch.started() || !playaMarch.over() || localStorage.getItem('order_salt_playa_completed') === 'true') return;
+        if (localStorage.getItem('order_playa_first_light_called') === 'true') return;
+        try { localStorage.setItem('order_playa_first_light_called', 'true'); } catch (e) {}
+        if (document.body.getAttribute('data-active-view') === 'view-field-wire') renderWireChoices();
+        else if (getMessengerUnreadCount() < 1) setMessengerUnreadCount(1);
+        if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
+      }, 15000);
+
+      // Every walk by its station, for the sealed cards of the Quest Map (the countdown reads arrivesAt)
+      window.EclipseMarches = { playa: playaMarch, monolith: monolithMarch, labyrinth: labyrinthMarch, cairnFour: cairnFourMarch, solstice: solsticeMarch, stele: steleMarch };
+      const PLAYA_LEG = {
+        step: 4, march: playaMarch, doneKey: 'order_salt_playa_completed',
+        walkingTitle: '✦ Night at the Oasis Gate · The Salt Waits for First Light ✦',
+        walkingDesc: 'Hermes is asleep by the rocks of the Oasis Gate, his satchel under his head. Study the page “The Salt Playa (Dry Basin)” of your journal tonight: at first light he will call you from the edge of the salt.',
+        etaLabel: 'FIRST LIGHT ON THE SALT',
+        arrivedTitle: 'First Light · Station 11 Awaits',
+        arrivedDesc: 'Hermes is standing at the edge of the white salt, his boots tied twice. Open the Grand Desert Map and guide him across the Salt Playa (Station 11, the page “The Salt Playa (Dry Basin)”).'
       };
       const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair, 33: masksMarch };
 
@@ -7095,19 +7285,19 @@
               tag: '🏆',
               text: 'MIRAGE is in my six boxes and the Line of the Gate is in my Cipher Ledger. Rest now, Hermes: you earned it.',
               silviaMsg: 'MIRAGE is written in the six boxes of the Nomad\'s Passphrase, and X + E = 17 is in my Cipher Ledger. Rest now, Hermes: you earned it.',
-              hermesReply: "Written and recorded. Then tonight I sleep like one of those cairn stones.\n\nBut not before I have looked at the salt once more. The crust is thin in places, and under it there are holes full of brine, dark as ink. Tomorrow at first light I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Open it when you are ready, and find me a path through the Salt Playa."
+              hermesReply: "Written and recorded. Then tonight I sleep like one of those cairn stones.\n\nBut not before I have looked at the salt once more. The crust is thin in places, and under it there are holes full of brine, dark as ink. Tomorrow at first light I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Study it tonight and find me a path. I will call you from the edge of the salt the moment the sun is up."
             },
             {
-              tag: '🐫',
+              tag: '🐫', needsSeal: true,   // only when Hermes carries the Seal of Cairn I (not after the river stones were left alone)
               text: 'Those tracks worry me too. No fire tonight, and keep the Seal of Cairn I well hidden.',
               silviaMsg: 'Those tracks worry me too, Hermes. No fire tonight, and keep the Seal of Cairn I well hidden in your satchel.',
-              hermesReply: "No fire, then. Cold figs for dinner and the stars for a lamp. The seal is at the very bottom of my satchel, wrapped in my spare shirt, and the satchel is under my head.\n\nWhoever made those tracks is ahead of us, on the same road. We will cross the salt carefully and keep our eyes open. Tomorrow at first light I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Open it when you are ready."
+              hermesReply: "No fire, then. Cold figs for dinner and the stars for a lamp. The seal is at the very bottom of my satchel, wrapped in my spare shirt, and the satchel is under my head.\n\nWhoever made those tracks is ahead of us, on the same road. We will cross the salt carefully and keep our eyes open. Tomorrow at first light I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Study it tonight. I will call you from the edge of the salt the moment the sun is up."
             },
             {
               tag: '🗝️',
               text: 'Maybe MIRAGE opens something further on. Keep it like a key, Hermes.',
               silviaMsg: 'Maybe MIRAGE opens something further on, Hermes. Keep it like a key.',
-              hermesReply: "Like a key. I have written it on the inside of my hat band, where the sun cannot fade it, next to the bearing of the watchtower.\n\nTomorrow the Salt Playa. The crust is thin in places, and under it there are holes full of brine, dark as ink. I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Open it when you are ready, and find me a path."
+              hermesReply: "Like a key. I have written it on the inside of my hat band, where the sun cannot fade it, next to the bearing of the watchtower.\n\nTomorrow the Salt Playa. The crust is thin in places, and under it there are holes full of brine, dark as ink. I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Study it tonight and find me a path. I sleep here, by the gate, and at first light I will call you from the edge of the salt."
             }
           ]
         }
@@ -7142,7 +7332,9 @@
         wirePromptBox.style.display = 'none';
         wireCompletedBar.style.display = 'none';
         showTyping(true);
+        const token = window.__wireTypewriterToken || 0;
         setTimeout(() => {
+          if (token !== (window.__wireTypewriterToken || 0)) return;   // the chat was drawn again: it is in the history
           showTyping(false);
           if (sfx) sfx.playCelestialChime();
           appendWireDivider(CHASM_WIRE[i].divider);
@@ -7163,10 +7355,13 @@
         const w = chasmWire();
         w['reply' + i] = idx;
         saveChasmWire(w);
+        if (i === 1) playaMarch.start();   // he sleeps at the Oasis Gate and walks onto the salt at first light
         chasmWirePlaying = true;
         wirePromptBox.style.display = 'none';
         showTyping(true);
+        const token = window.__wireTypewriterToken || 0;
         setTimeout(() => {
+          if (token !== (window.__wireTypewriterToken || 0)) return;   // the chat was drawn again: it is in the history
           showTyping(false);
           if (sfx) sfx.playChimeHover();
           appendWireMessage(getCartographerTitle(), choice.hermesReply, false, true, () => {
@@ -7204,7 +7399,9 @@
           wireCompletedBar.style.display = 'none';
           wireChoicesGrid.innerHTML = '';
           if (header) header.textContent = 'Choose your reply';
+          const hasSeal = localStorage.getItem('order_seal_cairn_1') === 'true' || localStorage.getItem('order_cairn1_completed') === 'true';
           CHASM_WIRE[i].choices.forEach((c, idx) => {
+            if (c.needsSeal && !hasSeal) return;
             wireChoicesGrid.appendChild(makeChoicePill(c.tag, formatJournalCallouts(c.text), () => handleChasmWireChoice(i, idx)));
           });
           return true;
@@ -7234,6 +7431,7 @@
         const w = chasmWire();
         for (let i = step; i < CHASM_WIRE.length; i++) { delete w['seen' + i]; delete w['reply' + i]; }
         saveChasmWire(w);
+        if (step <= 1) ['order_playa_march_start', 'order_playa_march_bypassed'].forEach((k) => localStorage.removeItem(k));
         renderWireExpedition();
         markMessengerAsRead();
       }
@@ -7267,6 +7465,9 @@
       window.scrollChatToActivePrompt = scrollChatToActivePrompt;
 
       function renderWireExpedition() {
+        // Drawn again while Hermes was still speaking at the North Portal or the Oasis Gate: his words are saved, so they
+        // come back whole with the history and her replies follow (the interrupted typing stops with the new token)
+        if (chasmWirePlaying) { chasmWirePlaying = false; window.__wireTypewriterToken = (window.__wireTypewriterToken || 0) + 1; }
         if (typeof syncSilviaWaypointBaseline === 'function') syncSilviaWaypointBaseline();
         try {
           const savedStep = localStorage.getItem('order_field_wire_step');
@@ -7638,6 +7839,11 @@
                   if (isChasmMarchOver()) renderWireChoices();
                   return;
                 }
+                if (window.isChasmCamped()) {
+                  if (titleEl) titleEl.textContent = '✦ Camp in Sight of the North Portal ✦';
+                  if (descEl) descEl.textContent = 'Hermes has reached the great red wall and made camp in sight of the North Portal. He is resting before the descent and will call you on the Field Wire when he is ready to go in. Meanwhile, study the page “The Whispering Chasm” of your journal.';
+                  return;
+                }
                 const start = parseInt(localStorage.getItem('order_chasm_march_start') || '0', 10);
                 const elapsed = start ? Date.now() - start : 0;
                 const remMs = Math.max(0, CHASM_MARCH_MS - elapsed);
@@ -7692,16 +7898,12 @@
             } catch(e) {}
             return;
           } else if (!isPlayaDone && !isLexiconDone) {
-            wirePromptBox.style.display = 'none';
-            wireCompletedBar.style.display = 'flex';
-            const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
-            const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
-            if (titleEl) titleEl.textContent = 'Gorge Cleared · The Salt Playa Awaits';
-            if (descEl) descEl.textContent = 'Open the Grand Desert Map and guide Hermes across the Salt Playa (Station 11 · journal page “The Salt Playa (Dry Basin)”).';
-            try {
-              localStorage.setItem('order_field_wire_completed', 'true');
-              localStorage.setItem('order_field_wire_step', '4');
-            } catch(e) {}
+            // Until Silvia answers him at the Oasis Gate, Hermes has not lain down yet: the night starts with her reply
+            if (chasmWire().reply1 === undefined) {
+              showWaypointBar('Out of the Gorge · Hermes Is Calling', 'Hermes is calling you from the Oasis Gate. Keep the Field Wire open to hear him.', 4);
+              return;
+            }
+            showMarchLeg(PLAYA_LEG);
             return;
           } else if (!isLexiconDone) {
             wirePromptBox.style.display = 'none';

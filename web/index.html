@@ -472,6 +472,25 @@
                 ✦ The celestial meridian aligns at astronomical midnight. Only then can the celestial dials and instruments be calibrated. ✦
               </div>
             </div>
+            <!-- The walk to a sealed station: Hermes's arrival, live (hub-core.js selectMapNode) -->
+            <div class="inspector-countdown-bar" id="insp-march-bar" style="display:none;" aria-live="off">
+              <div class="countdown-top-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="countdown-pulse-dot"></span>
+                  <span class="countdown-title-text">HERMES ARRIVES IN</span>
+                </div>
+                <span class="countdown-station-ref">[ SEALED ]</span>
+              </div>
+              <div class="countdown-digits-wrap">
+                <span class="countdown-unit-box"><strong>00</strong><small>h</small></span>
+                <span>:</span>
+                <span class="countdown-unit-box"><strong>00</strong><small>m</small></span>
+                <span>:</span>
+                <span class="countdown-unit-box"><strong>00</strong><small>s</small></span>
+              </div>
+              <div class="countdown-footer-msg"></div>
+              <button type="button" class="insp-march-skip" hidden>⏩ Tester: skip the walk</button>
+            </div>
             <div class="inspector-relics-card" id="insp-relics-box" style="display:none;">
               <div class="relics-header">
                 <span class="relics-icon">✦</span>
@@ -2200,7 +2219,6 @@
             <div class="chasm3d-status">
               <div class="chasm3d-skins" id="chasm3d-skins" role="img" aria-label="Water: 3 of 3 skins"></div>
               <div class="chasm3d-clock" id="chasm3d-clock">☀ 06:10</div>
-              <button type="button" class="chasm3d-help" id="btn-chasm-howto" aria-label="How to play: what everything on the screen means">?</button>
             </div>
           </div>
           <div class="chasm3d-subtitle" id="chasm3d-subtitle" role="status" aria-live="polite"></div>
@@ -2212,6 +2230,7 @@
           <div class="chasm3d-voice" id="chasm3d-voice" role="status" aria-live="polite"></div>
           <div class="chasm3d-where" id="chasm3d-where"></div>
           <div class="chasm3d-controls" id="chasm3d-controls" role="group" aria-label="Guide Hermes"></div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-chasm-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
           <div class="chasm-victory-card" id="chasm-victory-card" style="display: none;">
             <div class="chasm-victory-title"><span>🌴</span><span>Out of the Gorge!</span></div>
@@ -2229,7 +2248,7 @@
               <li>Find all six relic cairns, in order, before you leave the canyon.</li>
               <li>A gorge that ends in a wall, a drop or a false cairn is a trap.</li>
             </ol>
-            <p>Each wrong turn sends Hermes back to the last cairn and costs a skin of water. Each new cairn fills his skins again. At every fork you may listen once for the whisper of the pilgrims, until the next cairn.</p>
+            <p>Each wrong turn sends Hermes back to the last cairn and costs a skin of water. Each new cairn fills his skins again. On every stretch between two cairns you may listen once for the whisper of the pilgrims.</p>
           </details>
         </div>
       </div>

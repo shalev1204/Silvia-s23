@@ -111,6 +111,7 @@
         if (localStorage.getItem('order_desert_lexicon_completed') === 'true') return 12;
         return localStorage.getItem('order_salt_playa_completed') === 'true' ? 11 : 21;
       }
+      window.getNextDesertNodeId = getNextDesertNodeId;
 
       // The Desert Path has one view: the 3D unlit map (Three.js), mounted on stage.
       function ensureDesert3D() {
@@ -236,7 +237,9 @@
           } else if (!isChasmUnlocked) {
             showDesertToast('✦ BASECAMP · WATCHTOWER VI ✦ Hermes is at Watchtower VI. Open the Field Wire to review his dawn dispatch.');
           } else if (!marchOver) {
-            showDesertToast('✦ 26-HOUR TREK IN PROGRESS ✦ Hermes is trekking toward the North Portal. Follow his beacon on the map.');
+            showDesertToast(typeof window.isChasmCamped === 'function' && window.isChasmCamped()
+              ? '✦ CAMP BY THE NORTH PORTAL ✦ Hermes is resting before the descent. He will call you on the Field Wire when he is ready.'
+              : '✦ 26-HOUR TREK IN PROGRESS ✦ Hermes is trekking toward the North Portal. Follow his beacon on the map.');
           }
         } else if (targetId === 22) {
           window.selectMapNode(22, true);

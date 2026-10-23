@@ -350,6 +350,24 @@
       transform: scale(1.06);
     }
 
+    /* A station Hermes has not reached: its picture stays in the fog */
+    .inspector-thumb-frame.is-veiled img,
+    .star-inspector-panel:hover .inspector-thumb-frame.is-veiled img {
+      filter: blur(14px) brightness(0.35) saturate(0.4);
+      transform: scale(1.15);
+    }
+    .inspector-thumb-frame.is-veiled::after {
+      content: '?';
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: 'Cinzel', serif;
+      font-size: 3rem;
+      color: rgba(226, 176, 105, 0.7);
+      text-shadow: 0 0 18px rgba(226, 176, 105, 0.45);
+    }
+
     .inspector-content-box {
       display: flex;
       flex-direction: column;

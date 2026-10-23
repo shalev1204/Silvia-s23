@@ -231,6 +231,15 @@
           toast('✦ TERRA INCOGNITA ✦ Guide Hermes through the Whispering Chasm (Station 10) before crossing the Salt Playa.');
           return;
         }
+        // Out of the canyon, Hermes spends the night at the Oasis Gate and walks onto the salt at first light
+        if (!isDone() && !(window.isAdminTester && window.isAdminTester()) && typeof window.isPlayaMarchOver === 'function' && !window.isPlayaMarchOver()) {
+          const eta = typeof window.getPlayaMarchEta === 'function' ? window.getPlayaMarchEta() : '';
+          toast(eta
+            ? '✦ NIGHT AT THE OASIS GATE ✦ Hermes is asleep by the gate. First light in ' + eta + ': then he calls you from the edge of the salt.'
+            : '✦ THE OASIS GATE ✦ Hermes is calling you from the Oasis Gate on the Field Wire.');
+          if (!eta && typeof window.activateHubView === 'function') window.activateHubView('view-field-wire');
+          return;
+        }
         if (sfx) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');

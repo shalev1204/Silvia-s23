@@ -12,7 +12,7 @@
         ['lamplight', 18, 22],
         ['candlelight', 22, 29]   // 22:00 to 05:00
       ];
-      var WALK_STARTS = ['order_chasm_march_start', 'order_monolith_march_start', 'order_labyrinth_march_start', 'order_cairn4_march_start',
+      var WALK_STARTS = ['order_chasm_march_start', 'order_playa_march_start', 'order_monolith_march_start', 'order_labyrinth_march_start', 'order_cairn4_march_start',
         'order_cairn5_march_start', 'order_stele_march_start', 'order_masks_march_start'];
 
       function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

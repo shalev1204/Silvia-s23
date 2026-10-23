@@ -67,7 +67,7 @@
       const CAIRNS = [
         { letter: 'M', r: 7, c: 9, relic: 'bell',
           arrive: "A cairn, Silvia! A little tower of flat red stones, as high as my knee. The walkers call these the Six Relic Cairns: each one keeps something that belonged to a pilgrim the gorge never gave back. They are not the Order's great Cairns, but the walkers treat them with the same respect. On top of this one sits a bronze bell, green with age. Somewhere on it there is a letter. Turn it in your hands until you find it.",
-          found: "M, cut into the rim of the bell. That is the first rune. At the foot of the cairn the walkers have left a clay jar sealed with wax, full of cool water, and I have filled all three skins. Write the M in the first box on your sheet." },
+          found: "M, cut into the rim of the bell. That is the first rune. At the foot of the cairn the walkers have left a clay jar sealed with wax, full of cool water, and I have filled all three skins. Write the M in the first box on your page." },
         { letter: 'I', r: 9, c: 23, relic: 'lamp',
           arrive: "The second cairn, half hidden in the shadow of the wall. Someone left a small clay oil lamp on it, the kind you carry in the palm of your hand, still black with old smoke. Find the letter for me.",
           found: "I, scratched into the lamp. Two runes. There is another water jar here, and my skins are full again. The canyon is getting deeper; I can barely see the sky." },
@@ -88,10 +88,10 @@
       const DECOYS = [{ letter: 'T', r: 13, c: 5 }, { letter: 'K', r: 19, c: 19 }, { letter: 'S', r: 3, c: 17 }];
       // Dead ends named on Sheet 9B: Hermes says the name, so Silvia can find him on the paper
       const PLACES = {
-        [key(11, 1)]: { kind: 'well', text: "This must be the place your sheet calls The Dry Well: a ring of old stones around a hole full of dust. No water in it, and no way on." },
-        [key(23, 1)]: { kind: 'pit', text: "Stop! The floor ends one step in front of my boots. There is a crack in the ground here, so deep that my lantern cannot find the bottom. This must be the Blind Chasm on your sheet." },
-        [key(23, 11)]: { kind: 'salt', text: "The ground turns white and crusty here, like old snow. It is a pit of salt, and the crust cracks when I touch it with my boot. Your sheet calls this the Salt Basin. There is no way through." },
-        [key(13, 23)]: { kind: 'dune', text: "A slope of loose red sand fills the gorge from wall to wall. I tried to climb it and slid back down twice. This must be the Sands of Thirst on your sheet. No way through." }
+        [key(11, 1)]: { kind: 'well', text: "This must be the place your page calls The Dry Well: a ring of old stones around a hole full of dust. No water in it, and no way on." },
+        [key(23, 1)]: { kind: 'pit', text: "Stop! The floor ends one step in front of my boots. There is a crack in the ground here, so deep that my lantern cannot find the bottom. This must be the Blind Chasm on your page." },
+        [key(23, 11)]: { kind: 'salt', text: "The ground turns white and crusty here, like old snow. It is a pit of salt, and the crust cracks when I touch it with my boot. Your page calls this the Salt Basin. There is no way through." },
+        [key(13, 23)]: { kind: 'dune', text: "A slope of loose red sand fills the gorge from wall to wall. I tried to climb it and slid back down twice. This must be the Sands of Thirst on your page. No way through." }
       };
       const cairnAt = {}, decoyAt = {};
       CAIRNS.forEach((c, i) => { cairnAt[key(c.r, c.c)] = i; });
@@ -99,10 +99,10 @@
 
       const FORK_LINES = [
         "The gorge splits here. Which way, Silvia?",
-        "Another fork. I will wait while you look at the sheet.",
+        "Another fork. I will wait while you look at the page.",
         "Two ways again. Take your time; the rock is not going anywhere.",
         "The walls open into a small crossing. Where now?",
-        "A fork. The wind is coming down both passages, so it is no help to me. Your sheet is."
+        "A fork. The wind is coming down both passages, so it is no help to me. Your page is."
       ];
       const WHISPERS = ['…this way… the water is this way…', '…come… come along the wall…', '…here… the stones are here…', '…follow… follow the cold air…'];
       const MIN_PER_CELL = 1.2, START_MIN = 6 * 60 + 10, CELLS_PER_SKIN = 60, REST_S = 40;
@@ -114,7 +114,7 @@
         texts: [
           "Keep your pencil on the canyon in your journal and move it every time I move, so you always know where I am. The top of the page is north, like the N on the compass in the corner of your screen.",
           "The walkers' laws, in plain words: never walk the same ground twice; the quick road to the Oasis skips the cairns, so do not take it; the six cairns must come in order; and a gorge that ends in a wall, a drop or a false cairn is a trap.",
-          "Let us take the first turn together. Just inside the North Portal the gorge splits: one way drops south straight away. That is the quick road the second law warns about. Keep going east, along the top of the sheet, and the first cairn your pencil meets is M."
+          "Let us take the first turn together. Just inside the North Portal the gorge splits: one way drops south straight away. It looks tempting, but it meets the later cairns first, and the cairns must come in order. Keep going east, along the top of the page, and the first cairn your pencil meets is M."
         ]
       });
 
@@ -1379,7 +1379,7 @@
         const k = key(S.pos[0], S.pos[1]);
         let text;
         if (stop === 'decoy') text = `There is a cairn here, Silvia, with a letter ${decoyAt[k].letter} painted on its top stone. But look around: the gorge ends right behind it. A true cairn never stands at a dead end. This one was built to fool travellers, exactly as the walkers warned us.`;
-        else if (stop === 'early') text = "Another cairn, but something is wrong. Look at your sheet: this is not the next one. We must have skipped a cairn on the way, and the third law says they must be found in order. I will not touch this one.";
+        else if (stop === 'early') text = "Another cairn, but something is wrong. Look at your page: this is not the next one. We must have skipped a cairn on the way, and the third law says they must be found in order. I will not touch this one.";
         else if (stop === 'exit-early') text = `I can see the way out! Light, and open sand… But we have only ${S.runes} of the six runes, and the third law is clear: all six before we leave the canyon.`;
         else if (stop === 'tracks') text = "Wait. These are my own footprints, crossing the gorge in front of me. The first law says never walk the same ground twice. This way is closed to us.";
         else if (stop === 'stuck') text = "Every way out of this place crosses my own footprints. The first law closes all of them.";
@@ -1545,7 +1545,7 @@
         save();
         hints.refresh();
         if (first && typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
-        if (first && typeof window.selectMapNode === 'function') window.selectMapNode(11, false);
+        if (first && typeof window.selectMapNode === 'function') window.selectMapNode(21, false);
         if (first) document.dispatchEvent(new Event('chasm:cleared'));   // Hermes has news on the Field Wire
         paintHud();
         // Live, the reward rises over the canyon once the confetti has had its moment
@@ -1808,7 +1808,14 @@
           return false;
         }
         if (typeof window.isChasmMarchOver === 'function' && !window.isChasmMarchOver()) {
-          toast('✦ ON THE ROAD ✦ Hermes is still walking across the scree to the North Portal. The Field Wire shows how long he has left.');
+          toast(typeof window.isChasmCamped === 'function' && window.isChasmCamped()
+            ? '✦ CAMP BY THE NORTH PORTAL ✦ Hermes is resting before the descent. He will call you on the Field Wire when he is ready.'
+            : '✦ ON THE ROAD ✦ Hermes is still walking across the scree to the North Portal. The Field Wire shows how long he has left.');
+          return false;
+        }
+        if (typeof window.isChasmBriefHeard === 'function' && !window.isChasmBriefHeard()) {
+          toast('✦ THE NORTH PORTAL ✦ Hermes is calling you on the Field Wire: answer him before he steps into the canyon.');
+          if (typeof activateHubView === 'function') activateHubView('view-field-wire');
           return false;
         }
         return true;
@@ -1819,6 +1826,9 @@
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');
+        // The speaker of the ambient sound sits in the header, next to the ✕, while the canyon is open
+        const speaker = document.getElementById('ambience-toggle');
+        if (speaker && el.close && speaker.parentElement !== el.close.parentElement) el.close.parentElement.insertBefore(speaker, el.close);
         returnFocusTo = document.activeElement;
         const building = !G && window.THREE && el.canvas;
         if (building) {
@@ -2011,7 +2021,7 @@
         else focusFirst();
       }
 
-      // ---- How to play: three short pages, the first time she opens the canyon and whenever she presses ? ----
+      // ---- How to play: three short pages, the first time she opens the canyon and whenever she presses How to play ----
       const howto = { box: $('chasm3d-howto'), page: 0, back: null };
       const howtoPages = howto.box ? [...howto.box.querySelectorAll('.chasm3d-howto-page')] : [];
       const howtoOpen = () => !!howto.box && !howto.box.hidden;
@@ -2061,7 +2071,13 @@
         if (howto.box) howto.box.hidden = true;
         hideReward(true);
         modal.classList.add('closing');
-        setTimeout(() => { modal.style.display = 'none'; modal.classList.remove('closing'); document.dispatchEvent(new Event('chasm:closed')); }, 220);
+        setTimeout(() => {
+          modal.style.display = 'none';
+          modal.classList.remove('closing');
+          const speaker = document.getElementById('ambience-toggle');
+          if (speaker && modal.contains(speaker)) document.body.appendChild(speaker);
+          document.dispatchEvent(new Event('chasm:closed'));
+        }, 220);
         if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) returnFocusTo.focus();
         returnFocusTo = null;
       }

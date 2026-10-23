@@ -164,7 +164,9 @@
     if (reached && storm) lvl = 1;
     if (lvl >= 1 && dawn >= 1) lvl = 2;
     if (dawn >= 3) lvl = Math.max(lvl, 3);
-    if (d.chasm) lvl = Math.max(lvl, 4);
+    // Station 11: out of the canyon Hermes sleeps at the Oasis Gate; the Salt Playa (lvl 4) only at first light
+    var playaArrived = d.playa || (typeof window.isPlayaMarchOver === 'function' && window.isPlayaMarchOver());
+    if (d.chasm) lvl = Math.max(lvl, playaArrived ? 4 : 3);
     if (d.playa) lvl = Math.max(lvl, 5);
     if (d.lex) lvl = Math.max(lvl, 6);
     // Station 14: Hermes reaches the Sun Monolith (lvl 7) only when the 12-hour crossing is over.
@@ -727,18 +729,25 @@
 
     function toast(msg) { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); }
     var hub = function (name, fallback) { return typeof window[name] === 'function' ? window[name]() : fallback; };
+    function playaProgress() { return hub('getPlayaMarchProgress', 1); }
     function monolithProgress() { return hub('getMonolithMarchProgress', 1); }
     function labyrinthProgress() { return hub('getLabyrinthMarchProgress', 1); }
     function cairnFourProgress() { return hub('getCairnFourMarchProgress', 1); }
     function solsticeProgress() { return hub('getSolsticeMarchProgress', 1); }
     function steleProgress() { return hub('getSteleMarchProgress', 1); }
     // The leg Hermes is walking right now, if any:
+    // · after Station 10: asleep at the Oasis Gate, out of the canyon, until first light on the salt (segment 4, not walked yet);
     // · after Station 13: at the gates of Tower II, then the 12-hour crossing to the Sun Monolith (segment 7, from the gates);
     // · after Station 14: resting under the Monolith, then the 6-hour walk down to the Sandstone Labyrinth (segment 8);
     // · after Station 15: hiding at the Western Cleft, then the 18-hour crossing to Cairn IV (segment 9);
     // · after Station 16: waiting for dusk at Cairn IV, then the 18-hour walk to the Arch of the Solstice (segment 10);
     // · after Station 17: resting under the Arch, then the 6-hour walk to the burning Tower II (segment 11).
     function currentCrossing() {
+      if (state.done.chasm && !state.done.playa && playaProgress() < 1) {
+        var etaP = hub('getPlayaMarchEta', '');
+        return { progress: 0, from: route.cum[3], to: route.cum[4],
+                 text: etaP ? '🌙 NIGHT AT THE OASIS GATE · FIRST LIGHT IN: ' + etaP : 'Out of the canyon, at the Oasis Gate' };
+      }
       if (state.done.clep && !state.done.monolith && monolithProgress() < 1 && route.gates !== null) {
         var etaM = hub('getMonolithMarchEta', '');
         return { progress: monolithProgress(), from: route.gates, to: route.cum[7],
@@ -825,7 +834,9 @@
               var remMs = Math.max(0, (26 * 3600 * 1000) - (start ? Date.now() - start : 0));
               var hrs = Math.floor(remMs / 3600000);
               var mins = Math.floor((remMs % 3600000) / 60000);
-              toast('Hermes is trekking across the scree slopes to the North Portal. Reaching the Whispering Chasm in ' + hrs + ' hours and ' + mins + ' minutes.');
+              toast(remMs > 0
+                ? 'Hermes is trekking across the scree slopes to the North Portal. Reaching the Whispering Chasm in ' + hrs + ' hours and ' + mins + ' minutes.'
+                : 'Hermes has made camp in sight of the North Portal. He is resting before the descent and will call you on the Field Wire when he is ready.');
               return;
             }
             if (st.say) toast(st.say);
@@ -857,7 +868,7 @@
         var remMs = Math.max(0, (26 * 3600 * 1000) - (start ? Date.now() - start : 0));
         var hrs = Math.floor(remMs / 3600000);
         var mins = Math.floor((remMs % 3600000) / 60000);
-        hudText.textContent = '🚶 EN ROUTE TO NORTH PORTAL · ETA: ' + hrs + 'h ' + mins + 'm';
+        hudText.textContent = remMs > 0 ? '🚶 EN ROUTE TO NORTH PORTAL · ETA: ' + hrs + 'h ' + mins + 'm' : '⛺ CAMPED BY THE NORTH PORTAL';
       } else if (currentCrossing()) {
         hud.style.display = '';
         hudText.textContent = currentCrossing().text;
@@ -966,7 +977,7 @@
                 var remMs = Math.max(0, (26 * 3600 * 1000) - (start ? Date.now() - start : 0));
                 var hrs = Math.floor(remMs / 3600000);
                 var mins = Math.floor((remMs % 3600000) / 60000);
-                hudText.textContent = '🚶 EN ROUTE TO NORTH PORTAL · ETA: ' + hrs + 'h ' + mins + 'm';
+                hudText.textContent = remMs > 0 ? '🚶 EN ROUTE TO NORTH PORTAL · ETA: ' + hrs + 'h ' + mins + 'm' : '⛺ CAMPED BY THE NORTH PORTAL';
               } else {
                 var leg = currentCrossing();   // stopped part-way along a walking leg: keep its countdown
                 hudText.textContent = leg ? leg.text : (state.waiting ? 'Sheltering at ' : '') + WHERE[state.lvl];

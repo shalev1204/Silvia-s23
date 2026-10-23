@@ -214,7 +214,24 @@ def test_wire_gating(browser):
                                         "order_oasis_clepsydra_completed": "true"})
     check(len(info["choices"]) == 3 and not errors, "Clepsydra done: Camp VIII debrief opens", "; ".join(errors[:2]))
 
-    portal = dict(DESERT_BASE, order_whispering_chasm_completed="false", order_salt_playa_completed="false", order_silvia_waypoint_v2="done")
+    # The Operator's hold (CHASM_HOLD in hub-core.js): the 26 hours are over, but Hermes stays at his camp for Silvia
+    camp = dict(DESERT_BASE, order_whispering_chasm_completed="false", order_salt_playa_completed="false", order_silvia_waypoint_v2="done")
+    ctx, page, errors = new_page(browser, camp)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    if page.evaluate("typeof window.isChasmCamped === 'function' && window.isChasmCamped()"):
+        page.evaluate("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+        bar = page.evaluate("document.getElementById('wire-completed-bar').innerText")
+        page.evaluate("window.openWhisperingChasmModal(); window.selectMapNode(10, false)"); page.wait_for_timeout(600)
+        check("Camp in Sight of the North Portal" in bar and "narrower than I imagined" not in page.evaluate("document.getElementById('view-field-wire').innerText")
+              and page.evaluate("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") == "none"
+              and "Camp Below the North Portal" in page.evaluate("document.getElementById('insp-title').innerText"),
+              "the hold: after 26 hours Hermes camps by the North Portal, no brief, the canyon stays shut", bar[:160])
+    else:
+        print("  · the hold is off: the Chasm opens for Silvia after her 26 hours")
+    ctx.close()
+
+    # Past the hold (here, as after the Operator's OK): the North Portal
+    portal = dict(camp, order_chasm_march_bypassed="true")
     ctx, page, errors = new_page(browser, portal)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -238,8 +255,10 @@ def test_wire_gating(browser):
           "back from the canyon: at the Oasis Gate Hermes tells the lore of MIRAGE, the third rune and the tracks, with 3 replies", wire[-300:].replace("\n", " "))
     js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(4500)
     wire = js("document.getElementById('view-field-wire').innerText")
-    check("PASSPHRASE RECORDED" in wire and "The Salt Playa (Dry Basin)" in wire and "Sheet 10A" not in wire and "Gorge Cleared" in js("document.getElementById('wire-completed-bar').innerText"),
-          "her reply: the page The Salt Playa (Dry Basin), the telemetry, then the way to the Salt Playa")
+    bar = js("document.getElementById('wire-completed-bar').innerText")
+    check("PASSPHRASE RECORDED" in wire and "The Salt Playa (Dry Basin)" in wire and "Sheet 10A" not in wire and "Oasis Gate" in bar and "FIRST LIGHT ON THE SALT IN 9 H" in bar.upper()
+          and js("!!localStorage.getItem('order_playa_march_start')"),
+          "her reply: the page The Salt Playa (Dry Basin), the telemetry, then the night at the Oasis Gate with its countdown to first light", bar[:200])
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
     wire = js("document.getElementById('view-field-wire').innerText")
@@ -2640,7 +2659,7 @@ def test_whispering_gallery(browser):
 def test_whispering_chasm(browser):
     print("\n31. Station 10 · The Whispering Chasm in 3D: forks, whispers, wrong turns, water, relics and the way out")
     seed = dict(DESERT_BASE, order_whispering_chasm_completed="false", order_salt_playa_completed="false",
-                order_silvia_waypoint_v2="done", order_desert_station_active="10")
+                order_silvia_waypoint_v2="done", order_desert_station_active="10", order_chasm_march_bypassed="true")   # past the hold
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -2649,6 +2668,21 @@ def test_whispering_chasm(browser):
     st = lambda: js("window.__chasm.state()")
     voice = lambda: js("document.getElementById('chasm3d-voice').innerText")
     reopen = lambda: (page.reload(wait_until="load"), page.wait_for_timeout(2500), js("window.openWhisperingChasmModal()"), page.wait_for_timeout(400))
+    shown = lambda: js("getComputedStyle(document.getElementById('modal-whispering-chasm')).display") != "none"
+
+    # Hermes speaks first at the North Portal: until she answers him, the card and the game send her to the wire
+    js("window.selectMapNode(10, false)"); page.wait_for_timeout(300)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("HERMES IS CALLING" in card.upper() and not any(w in card for w in ("Passphrase", "relic", "rune", "Ledger", "MIRAGE")),
+          "Station 10 card before the brief: Hermes is calling, nothing about what the canyon keeps", card[:240])
+    js("window.openWhisperingChasmModal()"); page.wait_for_timeout(600)
+    check(not shown() and js("document.body.getAttribute('data-active-view')") == "view-field-wire",
+          "before Hermes's brief the canyon stays shut and the Field Wire opens")
+    js("localStorage.setItem('order_chasm_wire', JSON.stringify({seen0: true, reply0: 0}))")
+    js("window.selectMapNode(10, false)"); page.wait_for_timeout(300)
+    check("ENTER THE CANYON" in js("document.getElementById('insp-btn-primary').innerText").upper()
+          and js("(c => c.display === 'none' || c.visibility === 'hidden')(getComputedStyle(document.getElementById('insp-btn-reset')))"),
+          "once she has answered him the card opens the canyon (no Return button on the active station)")
 
     js("window.openWhisperingChasmModal()"); page.wait_for_timeout(600)
     s = st()
@@ -2801,6 +2835,55 @@ def test_whispering_chasm(browser):
     ctx.close()
 
 
+def test_veiled_stations(browser):
+    print("\n32. Sealed stations: the next station stays a mystery, with a live countdown, until Hermes arrives")
+    hour = 3600 * 1000
+    night = json.dumps({"seen0": True, "reply0": 0, "seen1": True, "reply1": 0})
+    seed = dict(DESERT_BASE, order_salt_playa_completed="false", order_chasm_wire=night,
+                order_playa_march_start=str(int(time.time() * 1000) - hour))
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    card = lambda: js("document.getElementById('star-inspector').innerText")
+    title = lambda: js("document.getElementById('insp-title').innerText")
+    bar_on = lambda: js("getComputedStyle(document.getElementById('insp-march-bar')).display") != "none"
+
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(1200)
+    c = card()
+    check(title() == "Station 11 · [ Sealed ]" and "Salt" not in c and "CRYSTAL" not in c and "Playa" not in c,
+          "the night at the Oasis Gate: Station 11 is sealed, no name, no page, no rewards", c[:240])
+    digits = js("[...document.querySelectorAll('#insp-march-bar .countdown-unit-box strong')].map(e => e.textContent).join(':')")
+    check(bar_on() and digits.startswith("08:5"), "a live countdown to first light (about 9 hours)", digits)
+    check(js("document.getElementById('insp-btn-primary').getAttribute('aria-disabled')") == "true"
+          and js("document.querySelector('#star-inspector .inspector-thumb-frame').classList.contains('is-veiled')"),
+          "its button waits and its picture stays in the fog")
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") == "none", "the Salt Playa does not open in the night")
+    js("window.selectMapNode(10, false)"); page.wait_for_timeout(300)
+    check("RETURN TO ACTIVE QUEST (STATION 11)" in js("document.getElementById('insp-btn-reset').innerText").upper(),
+          "from Station 10 the Return button goes back to Station 11, not Station 09",
+          js("document.getElementById('insp-btn-reset').innerText"))
+
+    # First light comes while she looks at the card: it opens by itself
+    js(f"localStorage.setItem('order_playa_march_start', String(Date.now() - {10 * hour} + 2500))")
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(4500)
+    check(title() == "The Salt Playa (Dry Basin)" and not bar_on(), "at first light the card opens: the Salt Playa, whole", title())
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") != "none", "and the game opens")
+    js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
+
+    # Station 14 while Hermes crosses the Great Erg
+    js("localStorage.setItem('order_salt_playa_completed', 'true'); localStorage.setItem('order_desert_lexicon_completed', 'true');"
+       f"localStorage.setItem('order_oasis_clepsydra_completed', 'true'); localStorage.setItem('order_monolith_march_start', String(Date.now() - {hour}))")
+    js("window.selectMapNode(23, false)"); page.wait_for_timeout(300)
+    c = card()
+    check(title() == "Station 14 · [ Sealed ]" and "Monolith" not in c and "Cairn II" not in c and bar_on(),
+          "Station 14 on the road: sealed, with its countdown", c[:240])
+    check(not errors, "no JS errors on the sealed cards", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -2811,10 +2894,10 @@ SECTIONS = {
     "ambience": test_ambience, "speaker": test_speaker, "letters": test_letters,
     "journey": test_journey, "seals": test_seals, "a11y": test_a11y, "offline": test_offline,
     "camera": test_camera_obscura, "gallery": test_whispering_gallery,
-    "chasm": test_whispering_chasm,
+    "chasm": test_whispering_chasm, "veil": test_veiled_stations,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 
