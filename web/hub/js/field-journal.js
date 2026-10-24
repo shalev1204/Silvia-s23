@@ -32,12 +32,14 @@
           earned: ['The way through the gorge', 'The Nomad\'s Passphrase'], ledger: ['The Line of the Gate'], sketch: './assets/chat/sketch_chasm_mouth.webp'
         },
         playa: {
-          note: 'The Salt Playa. Every slab looked solid, and half of them were not. Silvia read the facets, I walked where she said, and the crust held.',
-          earned: ['A safe road across the salt'], sketch: T + 'salt_playa_preview.webp'
+          note: 'The Salt Playa. Every slab looked solid, and half of them were not. Silvia read the facets and I walked where she said: seven stones, the letters of CRYSTAL for the post of the Order, and then the Great Salt Sump at noon, where I was only her eyes. On the far shore a marker of the Order kept a line to check and a little brass balance.',
+          quote: 'If we had walked where the salt looked firmest, I would be in the brine.',
+          earned: ['A safe road across the salt', 'The keyword CRYSTAL', 'The Surveyor\'s Balance'], ledger: ['The Line of the Salt'], sketch: T + 'salt_playa_preview.webp'
         },
         lexicon: {
-          note: 'Camp VII, among the nomad steles. Silvia read their words and the Al-Qibla bearing locked: from here on, we know the road to Tower II.',
-          earned: ['The Al-Qibla bearing'], ledger: ['The Stargazer Proportion'], sketch: T + 'desert_lexicon_preview.webp'
+          note: 'Camp VII, among the nomad steles, by moonlight. Two of the riders stayed behind: one asleep by the fire, one walking a round with a torch past the stones. Silvia read the ten words and I brushed them clean between his turns; PHOENIX freed the needle and 194° rang the bronze like a bell. It woke the camp, and I ran through the old walls by the letters of the sigil. At the cold hearth the raider\'s knife had cut their name: the BC Ashes.',
+          quote: 'On the hearth stone their name is scratched under a bird of fire: the BC Ashes.',
+          earned: ['The Desert Sigil: PHOENIX', 'The Al-Qibla bearing: 194° SSW, and 14° NNE to Tower II', 'Their name: the BC Ashes'], ledger: ['The Stargazer Proportion'], sketch: T + 'desert_lexicon_preview.webp'
         },
         clepsydra: {
           note: 'Camp VIII, the Four Wells. Four seekers, four shadow-hours, four counterweights. When the last one dropped, the basins filled and we drank.',
@@ -102,6 +104,13 @@
       function num(k) { return parseInt(get(k) || '0', 10) || 0; }
 
       // Misses and Hermes's notes, summed over the game's puzzles on the hint ladder
+      // The two games with three hearts keep how many times Hermes had to begin again (tries - 1)
+      var WALK_STATE = { playa: 'order_playa_walk', lexicon: 'order_lexicon_walk' };
+      function restarts(id) {
+        var s = null;
+        try { s = JSON.parse(get(WALK_STATE[id]) || 'null'); } catch (e) { s = null; }
+        return WALK_STATE[id] && s && s.tries > 1 ? s.tries - 1 : 0;
+      }
       function effort(id) {
         var prefix = HINT_PREFIX[id] || id + '-', fails = 0, notes = 0;
         (window.EclipseHints ? window.EclipseHints.ids() : []).forEach(function (h) {
@@ -109,7 +118,7 @@
           fails += num('order_hint_' + h + '_fails');
           notes += num('order_hint_' + h + '_level');
         });
-        return { fails: fails, notes: notes };
+        return { fails: fails, notes: notes, restarts: restarts(id) };
       }
       function arrival(id) {
         var w = WALKS[id];
@@ -127,7 +136,7 @@
           var done = isDone(g.id);
           if (done && !seenDone[g.id] && !(j[g.id] && j[g.id].at)) {
             var e = effort(g.id);
-            j[g.id] = { at: Date.now(), fails: e.fails, notes: e.notes, arrived: arrival(g.id) };
+            j[g.id] = { at: Date.now(), fails: e.fails, notes: e.notes, restarts: e.restarts, arrived: arrival(g.id) };
             changed = true;
           } else if (!done && j[g.id]) {
             delete j[g.id];
@@ -160,6 +169,7 @@
         var text = r.fails === 0 && r.notes === 0 ? 'Solved at the first try, without a single note from me.'
           : r.fails === 0 ? 'Solved without a single miss, with ' + notes + '.'
           : 'Solved after ' + miss + (r.notes ? ', with ' + notes + '.' : ', without a single note from me.');
+        if (r.restarts) text += ' I had to begin again ' + (r.restarts === 1 ? 'once' : r.restarts === 2 ? 'twice' : r.restarts + ' times') + ' on the way.';
         if (r.arrived && r.at > r.arrived) text += ' ' + span(r.at - r.arrived) + ' after I got there.';
         return text;
       }

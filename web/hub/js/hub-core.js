@@ -1468,7 +1468,7 @@
             statusClass: 'status-live-badge',
             title: 'The Desert Lexicon & Al-Qibla',
             thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-            lore: 'In the ruins of Camp VII, in the dunes south of the Salt Playa (South-East Quadrant, on the map page “Grand Desert Map · South-East”), Hermes hid behind a broken wall while a band of riders watered their camels at dusk. When they rode off south, three sandstone stelae were waiting in the moonlight: ten nomad words crossing like a net, and a bronze sun compass, Al-Qibla, whose needle will not move. Open the page “The Desert Lexicon & Al-Qibla” in your journal, solve the crossword and set the sun compass.',
+            lore: 'In the ruins of Camp VII, in the dunes south of the Salt Playa (South-East Quadrant, on the map page “Grand Desert Map · South-East”), Hermes hid behind a broken wall while a band of riders watered their camels at dusk. The band rode off south with its wagon, but two men stayed behind to watch the trail: one asleep by the fire, one walking a round with a torch past three sandstone stelae. In the moonlight they hold ten nomad words crossing like a net, and a bronze sun compass, Al-Qibla, whose needle will not move. Open the page “The Desert Lexicon & Al-Qibla” in your journal, solve the crossword and set the sun compass. Hermes has three hearts tonight: three mistakes and the night is lost.',
             rewards: [
               { icon: '📜', label: 'Journal page “The Desert Lexicon & Al-Qibla”', desc: '10 words of the nomad pilgrims' },
               { icon: '🦅', label: 'The Desert Sigil', desc: '7 circled letters' },
@@ -1931,7 +1931,7 @@
             title: 'The Salt Playa (Dry Basin)',
             thumb: './assets/thumbnails/salt_playa_preview.webp',
             lore: edgeHeard
-              ? 'South of the Oasis Gate the ground opens into a blinding white salt basin, and every slab of its crust looks the same. Brine sinkholes hide under it. Cross it with Hermes step by step, with the page “The Salt Playa (Dry Basin)” of your journal as your map: only the page shows the facets, the letters and the sinkholes. Beyond the stones waits the Great Salt Sump, and the page “Study on the Dry Salt Playa”.'
+              ? 'South of the Oasis Gate the ground opens into a blinding white salt basin, and every slab of its crust looks the same. Brine sinkholes hide under it. Cross it with Hermes step by step, with the page “The Salt Playa (Dry Basin)” of your journal as your map: only the page shows the facets, the letters and the sinkholes. Beyond the stones waits the Great Salt Sump, and the page “Study on the Dry Salt Playa”. Hermes has three hearts for the whole crossing: three false steps and he walks back to the North Edge.'
               : 'Hermes is standing on the North Edge of the salt, by an old surveyor\'s tripod of the Order, and he wants a word with you before he steps onto the crust. Open the Field Wire and answer him.',
             rewards: [
               { icon: '🧂', label: 'Journal page “The Salt Playa (Dry Basin)”', desc: '7×7 slab grid with brine sinkholes' },
@@ -5120,7 +5120,7 @@
           title: "What are the three sandstone steles at the Nomad Ruins?",
           category: "The Nomad Ruins",
           group: "desert",
-          answer: "Standing among the ruined walls of the nomad camp at Camp VII are three monolithic sandstone steles erected during the Second Age of Stargazers. The central stele bears a 10-word crossword of desert navigation terms. The second stele reveals the sacred mathematical proportion [R] × 2 = [F] carved under its shadow curb, and the third carries the brass Al-Qibla sun compass."
+          answer: "Standing among the ruined walls of the nomad camp at Camp VII are three tall sandstone steles. The middle one holds the same ten words as the page “The Desert Lexicon & Al-Qibla”, every groove packed with sand. The second one has a stone curb at its foot, where the needle's shadow lights the line [R] × 2 = [F] once Al-Qibla is locked. The tallest carries the bronze Al-Qibla sun compass. Two of the raiders stayed behind to watch them, one asleep and one walking a round with a torch."
         },
         {
           id: "inq-al-qibla",

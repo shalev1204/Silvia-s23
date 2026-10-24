@@ -2738,6 +2738,7 @@
                 <div><b data-count="${S.heavy || 0}">${S.heavy || 0}</b><span>heavy steps</span></div>
               </div>` : ''}
               ${flawless ? '<div class="rw-flawless">✦ A measured crossing ✦</div>' : ''}
+              ${S.tries > 1 ? `<div class="rw-flawless">✦ Crossed at the ${['', 'first', 'second', 'third', 'fourth', 'fifth'][S.tries] || S.tries + 'th'} attempt ✦</div>` : ''}
             </section>
             <section class="rw-loot">
               <div class="chasm3d-reward-word"><span>The Passage Keyword</span>

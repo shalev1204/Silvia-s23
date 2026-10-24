@@ -84,6 +84,18 @@ Cada prompt se escribe así: STYLE + HERMES (si sale) + el texto del plano.
 
 ## 5. Referencias del juego para el modo image-to-video
 
+Las capturas limpias (sin interfaz, 1280×720) están en `docs/cinematic_refs/`. Se generaron desde el propio juego, con el estilo exacto del Hub. Están hechas en una partida de prueba: en `r18_playa_south_shore.jpg` y `r25_lexicon_hearth_name.jpg` puede verse algo de confeti arriba, que hay que descartar si el modelo lo copia.
+
+| Archivo | Plano que ilustra |
+|---|---|
+| `r09_playa_edge_tripod.jpg` | 9 (el borde norte, visto desde el cielo) |
+| `r11_playa_sky_trail.jpg` | 11 (el rastro de huellas sobre las losas) |
+| `r13_playa_post_console.jpg` | 13 (Hermes llega a la última fila, ante el poste de la Orden) |
+| `r15_playa_sump_glare.jpg` | 14–15 (el Sump a mediodía, tres placas en el resplandor) |
+| `r16_playa_sump_signs.jpg` | 16 (las señales aparecen sobre las placas) |
+| `r17_playa_sump_midway.jpg` | 17 (la caravana en el borde oeste, la orilla delante) |
+| `r18_playa_south_shore.jpg` | 18 (la orilla sur con el mojón y la balanza) |
+
 | Planos | Captura |
 |---|---|
 | 1–3 | La atalaya y la tormenta: el mapa del desierto en el Hub (vista Desert) con la tormenta activa |
@@ -91,7 +103,7 @@ Cada prompt se escribe así: STYLE + HERMES (si sale) + el texto del plano.
 | 5–8 | El juego 3D de la Whispering Chasm (dentro del cañón y la salida a la Oasis Gate) |
 | 9–13 | La Salt Playa, fase I: el borde norte con el trípode, la vista cenital y el poste de la Orden |
 | 14–18 | La Salt Playa, fase II: el Sump detrás de Hermes, las placas con resplandor, la caravana del borde y la orilla sur con el mojón |
-| 19–20 | No hay escena 3D. Use la miniatura `web/assets/thumbnails/desert_lexicon_preview.webp` |
+| 19–20 | El Lexicon ya es un juego 3D («The Steles of Camp VII»): use `r19_lexicon_steles_night.jpg` (las tres estelas), `r20_lexicon_dial_sigil.jpg` y `r20b_lexicon_dial_locked.jpg` (el dial de bronce) |
 
 ---
 
@@ -104,3 +116,22 @@ Cada prompt se escribe así: STYLE + HERMES (si sale) + el texto del plano.
 - **Reproductor.** Una capa propia sobre el Hub con el póster, el botón de reproducir, los subtítulos VTT activados por defecto, Escape para cerrar y el foco atrapado. El volumen sigue el ajuste del Hub. Elige 720p en pantallas pequeñas o con `navigator.connection.saveData` activo.
 - **Peso.** El MP4 no entra en la precarga offline del service worker (`scripts/web/offline_list.py`): pesaría más que todo el juego, que ahora ocupa 31 MB. Se descarga en streaming solo al pulsar *play*. Sin conexión, el botón dice *Available when you are online*.
 - **Medición.** Un indicador `order_cinematic_road_of_salt_seen` registra si se vio. No guarda nada más.
+
+---
+
+## 7. Parte 2 propuesta: «The Night of the Steles» (≈ 1:10, para después del Lexicon)
+
+El Lexicon ahora tiene su propio clímax (la campanada de Al-Qibla, la fuga por los muros y el nombre en el hogar), que esta cinemática no cuenta. Proponemos una segunda pieza corta que se vería al terminar la Estación 12 y enlazaría con el paso final del chat («past midnight at Camp VII»). Mismo STYLE, mismo HERMES y misma música de fondo, ahora más grave. Se genera igual que la primera (8 s por plano, se recorta a 6–7 s).
+
+| # | Uso | Plano | Prompt (inglés) | On-screen / Voice | Referencia |
+|---|---|---|---|---|---|
+| 21 | 0:00–0:07 | General, luna | Moonlit nomad camp: three tall carved sandstone steles in a ring of broken mud-brick walls, a fire burning low by a dry cistern, a sleeper rolled in a blanket and a guard walking a slow round with a torch past the stones. Slow lateral move. | On-screen: *CAMP VII · MIDNIGHT* | `r19_lexicon_steles_night.jpg` |
+| 22 | 0:07–0:14 | Primer plano | Hermes crouched at the foot of a stele with a small brush, sweeping sand out of carved grooves so that a crossword of words appears; in the background the torch light drifts away. | Voice: *"Watch where he is before every move."* | `r19b_lexicon_steles_clean.jpg` |
+| 23 | 0:14–0:22 | Detalle | A bronze sun-compass dial set into a tall stele; seven small windows turn and click into the letters P H O E N I X, and the needle spins free like a weathervane, then locks pointing south-south-west. | On-screen: *PHOENIX* · *194° SSW* | `r20_lexicon_dial_sigil.jpg`, `r20b_lexicon_dial_locked.jpg` |
+| 24 | 0:22–0:30 | Medio | The needle locks and the whole dial rings like a great bell across the camp; the sleeping man sits bolt upright, the guard turns with his torch raised, shouting. Hermes freezes in the shadow of the stele. | Sound: una campanada larga | `r21_lexicon_ambush.jpg` |
+| 25 | 0:30–0:45 | Persecución, cámara baja | Hermes runs through seven rows of crumbling brick walls with three doorways each, a carved letter over every lintel; torchlight flickers closer behind him; he chooses one doorway after another without looking back. | Voice: *"One letter for each wall, in order."* | `r22_lexicon_walls.jpg` |
+| 26 | 0:45–0:55 | Detalle | Hermes folded into a dark niche under a fallen lintel, holding his breath; two torches and two pairs of boots pass along the passage a few steps away. | — | `r23_lexicon_niche.jpg` |
+| 27 | 0:55–1:03 | General | Moonlit desert: the riders mount their camels and gallop away south, a banner opening in the wind, a bird with its wings up rising out of three flames. | — | — |
+| 28 | 1:03–1:10 | Cenital → detalle | The cold hearth; Hermes kneels beside a flat dark stone where a knife has cut a bird of fire, the words BC ASHES and an arrow marked 194. Slow push-in, then hold. | On-screen: *THE BC ASHES* | `r24_lexicon_hearth_unread.jpg`, `r25_lexicon_hearth_name.jpg` |
+
+La integración sería la misma que la de la primera cinemática (apartado 6), con su botón junto al premio del Lexicon y el indicador `order_cinematic_night_of_steles_seen`.

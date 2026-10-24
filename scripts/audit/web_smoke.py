@@ -3493,11 +3493,17 @@ def test_desert_lexicon(browser):
     check(st()["phase"] == "hide", "seven walls by the letters of the sigil, then a hiding place", st()["phase"])
     js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(1000)
     check(st()["phase"] == "hearth" and "hoofbeats" in voice(), "the torches pass; the riders ride south; back to the cold hearth")
+    if st()["gl"]:
+        js("window.__lexicon.frames(3)")
+        check(js("(G => G.hearthMat.map === G.hearthPlain)(window.__lexicon.gfx())"), "at the cold hearth the stone shows only scratches: the name is not readable yet")
     js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(300)
     s = st()
     check(s["phase"] == "done" and get("order_desert_lexicon_completed") == "true" and "BC ASHES" in voice()
           and js("getComputedStyle(document.getElementById('lexicon-victory-card')).display") != "none",
           "the hearth stone gives their name: the BC Ashes, and the station is done")
+    if st()["gl"]:
+        js("window.__lexicon.frames(3)")
+        check(js("(G => G.hearthMat.map === G.hearthCv)(window.__lexicon.gfx())"), "once she reads it, the stone shows BC ASHES")
     page.wait_for_timeout(3300)
     reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-desert-lexicon .chasm3d-reward'))")
     rw = reward()

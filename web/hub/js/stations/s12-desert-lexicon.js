@@ -445,7 +445,16 @@
           g.beginPath(); g.moveTo(w - 70, 40); g.lineTo(w - 86, 100); g.moveTo(w - 86, 100); g.lineTo(w - 98, 84); g.moveTo(w - 86, 100); g.lineTo(w - 72, 90); g.stroke();
           g.font = '600 26px Cinzel, Georgia, serif'; g.fillText('194', w - 78, 136);
         });
-        const hearth = new T.Mesh(new T.BoxGeometry(1.5, 0.16, 1.1), [stone, stone, new T.MeshToonMaterial({ map: hearthCv, gradientMap: sandstone.gradientMap, emissive: 0x2a1408 }), stone, stone, stone]);
+        // until Hermes bends over it, the stone shows only scratches: nothing readable (the name is the reward)
+        const hearthPlain = P.canvasTex(512, 384, (g, w, h) => {
+          g.fillStyle = '#4a3c34'; g.fillRect(0, 0, w, h);
+          const r2 = P.rng(11);
+          for (let i = 0; i < 700; i++) { g.fillStyle = r2() < 0.5 ? 'rgba(20,14,10,0.3)' : 'rgba(150,130,110,0.16)'; g.fillRect(r2() * w, r2() * h, 2 + r2() * 4, 2 + r2() * 4); }
+          g.strokeStyle = 'rgba(200,184,160,0.16)'; g.lineWidth = 3;
+          for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(60 + r2() * 380, 90 + r2() * 220); g.lineTo(60 + r2() * 380, 90 + r2() * 220); g.stroke(); }
+        });
+        const hearthMat = new T.MeshToonMaterial({ map: hearthPlain, gradientMap: sandstone.gradientMap, emissive: 0x2a1408 });
+        const hearth = new T.Mesh(new T.BoxGeometry(1.5, 0.16, 1.1), [stone, stone, hearthMat, stone, stone, stone]);
         hearth.position.set(HEARTH.x, 0.08, HEARTH.z); hearth.rotation.y = 0.35; hearth.receiveShadow = true;
         scene.add(hearth);
 
@@ -565,7 +574,7 @@
         const burst = new T.Points(bG, new T.PointsMaterial({ color: 0xffe2a0, size: 0.08, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
         burst.visible = false; scene.add(burst);
 
-        return { T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN,
+        return { T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv,
                  steleI, faceCv, glowCv, baseCv, faceTex, glowTexS, GRID_X0, GRID_Y0, CS, CV_W, CV_H, SW, SH,
                  curbLine, curbGlow, dialCv, dialTex, needle, needleMat, dialGlow, bezel, DIAL_Y, POINTS16,
                  watcher, torch, tFlame, sleeper, torch2, camels, banner, lance, hearth, fleeRows, pursuers, chaseLight,
@@ -1593,6 +1602,8 @@
           } else if (!rm) ud.head.rotation.x = Math.sin(now / 1100 + ud.ph) * 0.15;
         });
         G.banner.scale.x = ride > 0 ? 1 : 0.12;
+        const readIt = view.phase === 'done';
+        if (G.hearthMat.map !== (readIt ? G.hearthCv : G.hearthPlain)) { G.hearthMat.map = readIt ? G.hearthCv : G.hearthPlain; G.hearthMat.needsUpdate = true; }
         G.lance.visible = ride === 0;
         if (!rm) { const bp = G.banner.geometry.attributes.position; for (let i = 0; i < bp.count; i++) { const x = bp.getX(i); bp.setZ(i, Math.sin(x * 4 - tt * 5) * 0.08 * x); } bp.needsUpdate = true; }
 
@@ -1872,6 +1883,7 @@
                 <div><b data-count="${S.dead}">${S.dead}</b><span>dead ends</span></div>
               </div>` : ''}
               ${quietNight ? '<div class="rw-flawless">✦ Unseen, unheard ✦</div>' : ''}
+              ${S.tries > 1 ? `<div class="rw-flawless">✦ Read on the ${['', 'first', 'second', 'third', 'fourth', 'fifth'][S.tries] || S.tries + 'th'} night ✦</div>` : ''}
             </section>
             <section class="rw-loot">
               <div class="chasm3d-reward-word"><span>The Desert Sigil</span>
