@@ -18,7 +18,7 @@
       const $ = (id) => document.getElementById(id);
       const el = {
         stage: $('playa3d-stage'), canvas: $('playa3d-canvas'), fade: $('playa3d-fade'), subtitle: $('playa3d-subtitle'),
-        log: $('playa3d-log'), rose: $('playa3d-rose'), facing: $('playa3d-facing'), clock: $('playa3d-clock'),
+        log: $('playa3d-log'), rose: $('playa3d-rose'), facing: $('playa3d-facing'), clock: $('playa3d-clock'), hearts: $('playa3d-hearts'),
         voice: $('playa3d-voice'), where: $('playa3d-where'), controls: $('playa3d-controls'),
         victory: $('playa-victory-card'), finish: $('btn-playa-finish'), again: $('btn-playa-again'), close: $('btn-close-playa')
       };
@@ -81,7 +81,16 @@
       let S = null;
       function fresh() {
         return { path: [], edge: 0, min: START_MIN, fails: 0, sinks: 0, cracks: 0, heavy: 0, light: 0, revealed: {}, mirage: 0,
-                 sent: false, words: 0, sump: [], sRevealed: {}, sFails: 0, asked: {}, asks: 0 };
+                 sent: false, words: 0, sump: [], sRevealed: {}, sFails: 0, asked: {}, asks: 0, hearts: HEARTS, tries: 1 };
+      }
+      // Three hearts for the whole crossing, the stones and the Sump alike: a heart is lost when the salt gives way under
+      // him (a sinkhole, a slab that cracks, the wrong first slab, a bad plate of the Sump). The third sends him back to the
+      // North Edge to begin again from Row I; what she has learned (the counts of her mistakes) goes with her.
+      const HEARTS = 3;
+      function startOver() {
+        const keep = {};
+        ['fails', 'sinks', 'cracks', 'heavy', 'light', 'words', 'sFails', 'asks'].forEach((k) => { keep[k] = S[k]; });
+        S = Object.assign(fresh(), keep, { tries: (S.tries || 1) + 1 });
       }
       function load() {
         try {
@@ -91,6 +100,8 @@
             delete t.water; delete t.rest;   // the water skins of the first version of this walk
             if (!Array.isArray(t.sump) || !t.sump.every((d, k) => d === SUMP_SOL[k])) { t.sump = []; t.sRevealed = {}; t.asked = {}; }
             if (!t.asked || typeof t.asked !== 'object') t.asked = {};
+            t.hearts = Math.max(0, Math.min(HEARTS, t.hearts | 0));
+            if (t.hearts <= 0) { S = t; startOver(); return S; }   // closed on the card of the third heart
             if (t.path.length < ROWS) t.sent = false;
             else if (!('sent' in s) && isDone()) { t.sent = true; t.sump = SUMP_SOL.slice(); }
             return t;
@@ -1485,9 +1496,27 @@
         if (el.clock) {
           el.clock.textContent = '☀ ' + clock(S.min);
         }
+        paintHearts();
         if (fxEl.heat) fxEl.heat.style.opacity = (heat() * 0.4).toFixed(2);
         paintFacing();
       }
+      function paintHearts(breaking) {
+        if (!el.hearts) return;
+        if (el.hearts.children.length !== HEARTS) el.hearts.innerHTML = Array.from({ length: HEARTS }, () => '<i class="chasm3d-heart" aria-hidden="true">♥</i>').join('');
+        [...el.hearts.children].forEach((h, i) => {
+          h.classList.toggle('is-lost', i >= S.hearts);
+          if (breaking && i === S.hearts) replay(h, 'is-breaking');
+        });
+        el.hearts.setAttribute('aria-label', `${S.hearts} of ${HEARTS} hearts left`);
+      }
+      // A false step on the salt: one heart less. True when it was the last one
+      function loseHeart() {
+        S.hearts = Math.max(0, S.hearts - 1);
+        paintHearts(true);
+        if (soundOn() && S.hearts > 0) tone(220, 0.15, 0.5, { to: 150, gain: 0.08, type: 'triangle' });
+        return S.hearts <= 0;
+      }
+      const heartsLine = () => `${'♥'.repeat(S.hearts)}${'♡'.repeat(HEARTS - S.hearts)} · ${S.hearts ? `${S.hearts === 1 ? 'one heart' : 'two hearts'} left` : 'no hearts left'}`;
       // A false step costs time: the clock flares and the edges of the picture burn
       function burn() { replay(el.clock, 'is-hot'); replay(fxEl.hurt, 'is-on'); }
       function paintFacing() {
@@ -1910,11 +1939,12 @@
         }
         const cost = COST[kind];
         S.min += cost;
+        const lost = loseHeart();
         burn();
         save();
         paintHud();
-        say(text);
-        where(`A false step: Hermes is back on ${row() ? `his slab of Row ${ROMAN[row() - 1]}` : 'the North Edge'}.`);
+        say(lost ? `${text} …And that was the third time, Silvia. My legs are shaking. I cannot trust this crossing any more: I am going back along my own prints to the North Edge, and we begin again from the tripod.` : text);
+        where(lost ? 'Three false steps: Hermes walks back to the North Edge.' : `A false step: Hermes is back on ${row() ? `his slab of Row ${ROMAN[row() - 1]}` : 'the North Edge'}.`);
         alertCard(kind === 'sink' ? 'Sinkhole' : 'False step', kind === 'sink' ? '≈' : '✕', title, why, cost,
           kind === 'start' ? 'Hermes is back on the edge.' : 'Hermes stays on his slab. Choose again.');
       }
@@ -1926,9 +1956,10 @@
             <div class="chasm3d-alert-kicker">${kicker}</div>
             <div class="chasm3d-alert-title">${title}</div>
             <p class="chasm3d-alert-why">${why}</p>
+            <p class="chasm3d-alert-hearts${S.hearts ? '' : ' is-out'}" aria-label="${S.hearts} of ${HEARTS} hearts left">${heartsLine()}</p>
             <p class="chasm3d-alert-cost">☀ +${cost} min · the sun climbs, and the gold of the balance narrows</p>
-            <p class="chasm3d-alert-next">${next}</p>
-            <button type="button" class="chasm3d-alert-btn">↺ Choose again</button>
+            <p class="chasm3d-alert-next">${S.hearts ? next : 'All three hearts are gone. Back to the North Edge: the crossing begins again from Row I.'}</p>
+            <button type="button" class="chasm3d-alert-btn">${S.hearts ? '↺ Choose again' : '↺ Begin again from the North Edge'}</button>
           </div>`;
           fxEl.alert.hidden = false;
           replay(fxEl.alert, 'is-on');
@@ -1936,11 +1967,17 @@
           b.addEventListener('click', goOn);
           setTimeout(() => b.focus({ preventScroll: true }), 30);
         }
-        btn('↺ Choose again', goOn, { cls: 'is-back' });
+        btn(S.hearts ? '↺ Choose again' : '↺ Begin again from the North Edge', goOn, { cls: 'is-back' });
       }
       function goOn() {
         if (view.phase !== 'setback') return;
         if (fxEl.alert) fxEl.alert.hidden = true;
+        if (S.hearts <= 0) {
+          startOver();
+          save();
+          beginAgain(`Back on the North Edge, by the tripod, with three hearts again. Every slab looks the same as before, Silvia, and only your page knows which ones hold. This is crossing number ${S.tries}. Where does it begin?`);
+          return;
+        }
         if (stage() === 'sump') { showSump('Let us try again, Silvia. Ask me what you need, and weigh it against the Study before I lean.'); return; }
         showChoice(row() ? 'Let us try again. Look at the page before I lean.' : 'Back on the edge. Count the slabs with me.');
       }
@@ -2167,11 +2204,12 @@
         }[kind];
         const cost = COST[kind];
         S.min += cost;
+        const lost = loseHeart();
         burn();
         save();
         paintHud();
-        say(T2[2]);
-        where('A false step: Hermes is back on his plate.');
+        say(lost ? `${T2[2]} …That is three, Silvia. The Sump has beaten us today. I am going all the way back, across the stones, to the North Edge, and we begin the crossing again from the tripod.` : T2[2]);
+        where(lost ? 'Three false steps: Hermes walks back to the North Edge.' : 'A false step: Hermes is back on his plate.');
         alertCard(kind === 'split' ? 'False step' : 'Sinkhole', kind === 'split' ? '✕' : '≈', T2[0], T2[1] + ' (The page “Study on the Dry Salt Playa”.)', cost, 'Hermes stays on his plate. Choose again.');
       }
       function toShore() {
@@ -2828,13 +2866,16 @@
         hideReward(true);
         S = fresh();
         save();
+        beginAgain("Back on the North Edge, by the tripod, for one more crossing. The wind has smoothed the salt again, and every slab looks the same.");
+      }
+      function beginAgain(line) {
         if (el.victory) el.victory.style.display = 'none';
         view.mirageAt = -1; view.sky = true; view.look = 0; view.rings = 0; camPos.ok = false;
         placeHermes();
         paintSlabs();
         paintPrints();
         paintHud();
-        showChoice("Back on the North Edge, by the tripod, for one more crossing. The wind has smoothed the salt again, and every slab looks the same.");
+        showChoice(line);
       }
 
       window.openSaltPlayaModal = openPlaya;

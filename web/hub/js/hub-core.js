@@ -672,7 +672,7 @@
             id: 'lexicon', tag: 'Station 12', label: 'The Desert Lexicon', flag: 'order_desert_lexicon_completed', built: true,
             complete() { set('order_desert_lexicon_completed', 'true'); set('order_desert_station_active', '12'); },
             reset() {   // Hermes calls again from the ruins at dusk (the walk there stays walked)
-              dels(['order_desert_lexicon_completed', 'order_lexicon_solved_words']);
+              dels(['order_desert_lexicon_completed', 'order_lexicon_solved_words', 'order_lexicon_walk', 'order_lexicon_howto']);
               let w = null;
               try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
               if (w && typeof w === 'object') { ['seen4', 'reply4'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
@@ -1401,13 +1401,14 @@
               statusClass: 'status-done-badge',
               title: 'The Desert Lexicon & Al-Qibla',
               thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-              lore: 'Translating the ten words carved on the stelae of the nomad ruins, on the page “The Desert Lexicon & Al-Qibla”, Silvia formed the PHOENIX Sigil and set the Al-Qibla sun compass: its needle points 194° SSW, the way the raiders fled, and its tail 14° NNE, toward Tower II.',
+              lore: 'By moonlight at Camp VII, under the torch of the raiders\' rearguard, Silvia read the ten words of the steles from the page “The Desert Lexicon & Al-Qibla” while Hermes brushed them clean. The circled letters gave the PHOENIX Sigil, and the Al-Qibla sun compass locked at 194° SSW, the way the raiders rode, its tail at 14° NNE toward Tower II. Its chime woke the camp: Hermes escaped through the walls of the old camp by the letters of the sigil, and on the cold hearth he read the raiders\' name, the BC Ashes.',
               rewards: [
                 { icon: '🦅', label: 'The Desert Sigil: PHOENIX', desc: 'Master key of 7 circled letters' },
                 { icon: '🧭', label: 'Al-Qibla: 194° SSW · 14° NNE', desc: 'The raiders\' heading, and its reverse to Tower II' },
-                { icon: '📐', label: 'Stargazer Equation: [R] × 2 = [F]', desc: 'Cipher Ledger: work out F and T' }
+                { icon: '📐', label: 'Stargazer Equation: [R] × 2 = [F]', desc: 'Cipher Ledger: work out F and T' },
+                { icon: '🔥', label: 'Their name: the BC Ashes', desc: 'Scratched on the hearth, under the sign of the phoenix' }
               ],
-              btnText: 'Review the Lexicon & Compass ➔',
+              btnText: 'Return to the steles of Camp VII ➔',
               action: () => (window.openDesertLexiconModal ? window.openDesertLexiconModal() : null)
             };
           }
@@ -4333,7 +4334,7 @@
         },
         {
           step: 5,
-          hermesInitial: "Silvia, the moon is high over Camp VII and the riders' fire has burned down to red eyes. I am sitting with my back against the tallest stele, and the needle of Al-Qibla is free at last. It turns in the moonlight as easily as a weathervane.\n\nI keep thinking of what the nomads knew. When the wind moves the dunes overnight, every track is gone by morning, and the raiders' wagon ruts with them. Out on the Great Erg a man without a true bearing walks in circles until his water runs out. These people carved their bearings into stone so that the desert could never take them away.\n\nTell me again how we read the steles, Silvia. I want to write it down in my own log before I sleep, the way you would tell it.",
+          hermesInitial: "Silvia, it is past midnight at Camp VII and my heart has only just slowed down. The two watchers are gone, south after the others, and their fire has burned down to red eyes. I am sitting with my back against the tallest stele, and the needle of Al-Qibla still points the way they rode. On the hearth stone their name is scratched under a bird of fire: the BC Ashes.\n\nI keep thinking of what the nomads knew. When the wind moves the dunes overnight, every track is gone by morning, and the raiders' wagon ruts with them. Out on the Great Erg a man without a true bearing walks in circles until his water runs out. These people carved their bearings into stone so that the desert could never take them away.\n\nTell me again how we read the steles, Silvia. I want to write it down in my own log before I sleep, the way you would tell it.",
           choices: [
             {
               id: "choice-5-crossword",
@@ -4358,7 +4359,7 @@
         {
           step: 6,
           completed: true,
-          hermesFinal: "Silvia! Al-Qibla is locked: the raiders fled 194° South-Southwest, and Tower II lies the other way, 14° North-Northeast! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: the raiders left scorched banners hanging in these ruins, and the burned mark matches the one on their wagons. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check the page “The Oasis Clepsydra” in your journal to balance the water flow!"
+          hermesFinal: "Silvia! Al-Qibla is locked: the raiders fled 194° South-Southwest, and Tower II lies the other way, 14° North-Northeast! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: when the two watchers rode off, their banner opened in the wind, and it bears the same bird of fire that is burned into the wagon's oilcloth. Under that bird, on the hearth stone, their name is cut with a knife. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check the page “The Oasis Clepsydra” in your journal to balance the water flow!"
         },
         {
           step: 7,
@@ -7496,19 +7497,19 @@
               tag: '🤫',
               text: 'Stay flat and do not move, Hermes. I have the page open: we read the steles the moment they ride away.',
               silviaMsg: 'Stay flat and do not move, Hermes. I have the page “The Desert Lexicon & Al-Qibla” open in front of me: we read the steles the moment they ride away.',
-              hermesReply: "Flat as a lizard, and about as warm. I have been counting their camels to keep calm: eleven, and the wagon.\n\nThey are going now. Before they left, one of them crouched by the fire and scratched something into the stone of the hearth with the point of his knife, and the others laughed. Then they rode out south, into the dark, singing. The square is empty, the moon is up, and the steles are waiting for us.\n\nOpen the Desert Lexicon, Silvia. Station 12. Let us read them."
+              hermesReply: "Flat as a lizard, and about as warm. I have been counting their camels to keep calm: eleven, and the wagon.\n\nThey are going now, most of them. Before they left, one of them crouched by the fire and scratched something into the stone of the hearth with the point of his knife, and the others laughed. Then the wagon rolled out south, into the dark, with the riders singing round it.\n\nBut not all of them, Silvia. Two stayed behind with two camels, to watch the trail they came by. One has rolled himself in a blanket by the fire. The other is walking a slow round with a torch, and his round passes the steles. I am ten paces from the middle one, and the moon is up.\n\nOpen the Desert Lexicon, Silvia. Station 12. We read the stones under his nose, quietly."
             },
             {
               tag: '👂',
               text: 'Can you hear what they are saying? Anything about the Astrolabe?',
               silviaMsg: 'Can you hear what they are saying, Hermes? Anything about the Astrolabe?',
-              hermesReply: "Bits, over the noise of the camels. They were laughing at the salt. One of them said they had sat on the rim all morning waiting for a fool to fall through it, and that the fool walked across instead. I think the fool was me, Silvia, and I think the one who walked was you.\n\nNot a word about the Astrolabe. But when they rode off south into the dark, the wagon went with them, and its wheels cut deep, as if it carried something very heavy. One of them scratched something into the hearth with his knife before he left.\n\nThe square is empty now and the moon is up. Open the Desert Lexicon, Station 12, and let us read the steles."
+              hermesReply: "Bits, over the noise of the camels. They were laughing at the salt. One of them said they had sat on the rim all morning waiting for a fool to fall through it, and that the fool walked across instead. I think the fool was me, Silvia, and I think the one who walked was you.\n\nNot a word about the Astrolabe. But when they rode off south into the dark, the wagon went with them, and its wheels cut deep, as if it carried something very heavy. One of them scratched something into the hearth with his knife before he went.\n\nAnd they left two men behind, Silvia, to watch their back trail: one asleep by the fire, one walking a round with a torch that passes right by the steles. The moon is up. Open the Desert Lexicon, Station 12, and let us read the stones without waking the camp."
             },
             {
               tag: '🐫',
               text: 'Are they the ones who took the Astrolabe? Look at their wagon, Hermes.',
               silviaMsg: 'Are they the ones who took the Astrolabe from the observatory? Look at their wagon, Hermes.',
-              hermesReply: "I looked, as long as I dared. Deep iron wheels, like the ruts I followed down from the mountains. And on the oilcloth there is a mark, burned into the canvas, that I could not make out in the dusk. A bird, perhaps, or a flame.\n\nThey are gone now, south, into the dark, and one of them stopped by the fire to scratch something into the hearth with his knife. I will look at it later. First the steles, while the moon is up.\n\nOpen the Desert Lexicon, Silvia. Station 12."
+              hermesReply: "I looked, as long as I dared. Deep iron wheels, like the ruts I followed down from the mountains. And on the oilcloth there is a mark, burned into the canvas, that I could not make out in the dusk. A bird, perhaps, or a flame.\n\nThe wagon is gone now, south, into the dark, and one of them stopped by the fire to scratch something into the hearth with his knife. I will look at it later. Two of them stayed behind with their camels: a sleeper by the fire, and a watcher with a torch who walks round the square, past the steles.\n\nFirst the steles, while the moon is up and his back is turned. Open the Desert Lexicon, Silvia. Station 12."
             }
           ]
         }
@@ -7653,7 +7654,7 @@
 
       // Out of the canyon: the Oasis Gate waits on the wire (a badge while the chat is closed)
       // and back from the canyon with the chat already open, Hermes speaks there and then
-      ['chasm:cleared', 'chasm:closed', 'playa:cleared', 'playa:closed'].forEach((ev) => document.addEventListener(ev, () => { if (wireCurrentStep === 4 && !chasmWirePlaying) renderWireChoices(); }));
+      ['chasm:cleared', 'chasm:closed', 'playa:cleared', 'playa:closed', 'lexicon:cleared', 'lexicon:closed'].forEach((ev) => document.addEventListener(ev, () => { if (wireCurrentStep === 4 && !chasmWirePlaying) renderWireChoices(); }));
 
       function rewindToChasmWire(step) {
         if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();

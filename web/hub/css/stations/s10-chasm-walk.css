@@ -1,14 +1,14 @@
     /* ---- Station 10 · The Whispering Chasm: the walk behind Hermes (3D); the Salt Playa (Station 11) wears the same window ---- */
     /* The canyon fills the whole screen: a thin living border, the picture as large as it can be */
-    :is(#modal-whispering-chasm, #modal-salt-playa) { padding: 8px; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) { padding: 8px; }
     .chasm3d-window { --sun: 0.6; max-width: none; height: 100%; max-height: none; isolation: isolate; }
     .chasm3d-window > :not(.chasm3d-ambient) { position: relative; z-index: 1; }
     .chasm3d-window > .chasm3d-howto, .chasm3d-window > .map-frame-corner { position: absolute; }
     /* clear of the brass corners (24 px, 8 px in), so the ✕ and the compass never sit on them */
-    :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-bar { padding: 8px 44px; background: rgba(22, 16, 10, 0.55); }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-bar { padding: 8px 44px; background: rgba(22, 16, 10, 0.55); }
     /* The ✕ and the speaker (moved into the header while the canyon is open): brass and leather, like the guiding buttons */
-    :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-close-btn,
-    :is(#modal-whispering-chasm, #modal-salt-playa) .ambience-toggle {
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-close-btn,
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .ambience-toggle {
       position: static; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 8px;
       border: 1px solid rgba(212, 168, 83, 0.6); background: rgba(60, 36, 16, 0.85); color: #fde68a;
       box-shadow: inset 0 0 0 2px rgba(20, 12, 4, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35);
@@ -16,15 +16,15 @@
       display: inline-flex; align-items: center; justify-content: center;
       transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
     }
-    :is(#modal-whispering-chasm, #modal-salt-playa) .ambience-toggle { margin: 0 10px 0 auto; }
-    :is(#modal-whispering-chasm, #modal-salt-playa) .ambience-toggle[aria-pressed="true"] { opacity: 0.6; }
-    :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-close-btn:hover,
-    :is(#modal-whispering-chasm, #modal-salt-playa) .ambience-toggle:hover {
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .ambience-toggle { margin: 0 10px 0 auto; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .ambience-toggle[aria-pressed="true"] { opacity: 0.6; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-close-btn:hover,
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .ambience-toggle:hover {
       background: rgba(110, 66, 24, 0.9); color: #fff3c4; transform: translateY(-2px);
       box-shadow: inset 0 0 0 2px rgba(20, 12, 4, 0.55), 0 6px 18px rgba(253, 230, 138, 0.2);
     }
-    :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-close-btn:focus-visible,
-    :is(#modal-whispering-chasm, #modal-salt-playa) .ambience-toggle:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-close-btn:focus-visible,
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .ambience-toggle:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
     .chasm3d-body {
       flex: 1;
       display: grid;
@@ -71,6 +71,21 @@
     }
     .chasm3d-skin::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--fill) * 100%); background: #5fa8d8; }
     .chasm3d-clock { font-family: 'Cinzel', serif; font-size: 0.85rem; color: #fde68a; }
+    /* Three hearts: a false step breaks one; the third sends Hermes back to the beginning */
+    .chasm3d-hearts { display: flex; gap: 3px; }
+    .chasm3d-heart {
+      font-style: normal; font-size: 1.05rem; line-height: 1; color: #ef5a4a;
+      text-shadow: 0 0 8px rgba(239, 90, 74, 0.55); transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease;
+    }
+    .chasm3d-heart.is-lost { color: rgba(232, 220, 192, 0.32); text-shadow: none; }
+    .chasm3d-heart.is-breaking { animation: chasm-heart-break 0.9s cubic-bezier(.3, .7, .4, 1) both; }
+    @keyframes chasm-heart-break {
+      0% { transform: scale(1); color: #ef5a4a; }
+      25% { transform: scale(1.6); color: #ff8a6e; text-shadow: 0 0 16px rgba(255, 120, 90, 0.9); }
+      45% { transform: scale(1.3) rotate(-14deg); }
+      65% { transform: scale(1.1) rotate(10deg) translateY(2px); }
+      100% { transform: none; }
+    }
     .chasm3d-subtitle {
       position: absolute; left: 50%; bottom: 58px; transform: translateX(-50%); max-width: min(92%, 640px);
       padding: 8px 14px; border-radius: 10px; background: rgba(10, 6, 3, 0.82); color: #f3e2b8;
@@ -252,15 +267,15 @@
       animation: amb-rise var(--d) linear var(--delay) infinite;
     }
     @keyframes amb-rise { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 0.55; } 80% { opacity: 0.35; } 100% { opacity: 0; transform: translate(var(--dx), -105vh); } }
-    :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-bar::after {
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-bar::after {
       content: ''; position: absolute; left: 0; right: 0; bottom: -1.5px; height: 1.5px; pointer-events: none;
       background: linear-gradient(90deg, transparent, #fde68a 50%, transparent) no-repeat; background-size: 30% 100%;
       animation: amb-sweep 7s ease-in-out infinite;
     }
     @keyframes amb-sweep { from { background-position: -40% 0; } to { background-position: 140% 0; } }
-    :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-icon { display: inline-block; animation: amb-needle 6s ease-in-out infinite; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-icon { display: inline-block; animation: amb-needle 6s ease-in-out infinite; }
     @keyframes amb-needle { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(14deg); } }
-    :is(#modal-whispering-chasm, #modal-salt-playa) .map-frame-corner { animation: amb-corner 4s ease-in-out infinite; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .map-frame-corner { animation: amb-corner 4s ease-in-out infinite; }
     @keyframes amb-corner { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 6px rgba(253, 230, 138, 0.8)); } }
     /* the radio crackles while Hermes speaks */
     .chasm3d-voice-label::after { content: ''; display: inline-block; width: 14px; height: 10px; margin-left: 8px; vertical-align: -1px; opacity: 0;
@@ -295,6 +310,8 @@
     .chasm3d-alert-card p { margin: 0 0 8px; }
     .chasm3d-alert-cost { display: inline-block; padding: 3px 12px; border-radius: 20px; background: rgba(95, 168, 216, 0.16); color: #cfe6f5; font-size: 1rem; }
     .chasm3d-alert-next { color: #e8dcc0; }
+    .chasm3d-alert-hearts { font-family: 'Cinzel', serif; font-size: 1.05rem; letter-spacing: 0.08em; color: #f4a08a; }
+    .chasm3d-alert-hearts.is-out { color: #ff7a62; font-weight: 700; text-shadow: 0 0 12px rgba(255, 110, 80, 0.55); }
     .chasm3d-alert-btn {
       margin-top: 6px; min-height: 50px; width: 100%; padding: 10px 16px; border-radius: 12px; cursor: pointer;
       border: 1.5px solid #fde68a; background: linear-gradient(#8a5420, #5c3412); color: #fff3c4;
@@ -457,13 +474,13 @@
     }
     @media (max-width: 520px) {
       /* a compact header on the phone: the title on one or two lines, the buttons still clear of the corners */
-      :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-bar { padding: 10px 40px 10px 36px; }
-      :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-title-wrap { gap: 8px; min-width: 0; }
-      :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-icon { font-size: 1.15rem; }
-      :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-title { font-size: 0.95rem; }
-      :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-header-subtitle { display: none; }
-      :is(#modal-whispering-chasm, #modal-salt-playa) .chasm-close-btn, :is(#modal-whispering-chasm, #modal-salt-playa) .ambience-toggle { width: 36px; height: 36px; }
-      :is(#modal-whispering-chasm, #modal-salt-playa) .ambience-toggle { margin-right: 8px; }
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-bar { padding: 10px 40px 10px 36px; }
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-title-wrap { gap: 8px; min-width: 0; }
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-icon { font-size: 1.15rem; }
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-title { font-size: 0.95rem; }
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-header-subtitle { display: none; }
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .chasm-close-btn, :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .ambience-toggle { width: 36px; height: 36px; }
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .ambience-toggle { margin-right: 8px; }
       .chasm3d-rune { width: 26px; height: 32px; font-size: 0.95rem; }
       .chasm3d-rose { width: 60px; height: 60px; }
       .chasm3d-subtitle { bottom: 54px; font-size: 0.9rem; }
@@ -490,6 +507,7 @@
       .rw-letter { font-size: 1.6rem; }
     }
     @media (prefers-reduced-motion: reduce) {
+      .chasm3d-heart.is-breaking { animation: none; }
       .chasm3d-rose, .chasm3d-subtitle, .chasm3d-fade { transition: none; }
       .chasm3d-window *, .chasm3d-window *::after, .chasm3d-howto, .chasm3d-howto-card { animation: none !important; transition: none !important; }
       .amb-motes { display: none; }

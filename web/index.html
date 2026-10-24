@@ -2607,6 +2607,7 @@
             </div>
             <div class="chasm3d-status">
               <div class="chasm3d-clock" id="playa3d-clock">☀ 06:00</div>
+              <div class="chasm3d-hearts" id="playa3d-hearts" role="img" aria-label="3 of 3 hearts left"></div>
             </div>
           </div>
           <div class="chasm3d-subtitle" id="playa3d-subtitle" role="status" aria-live="polite"></div>
@@ -2639,7 +2640,8 @@
               <li>The letters along the seven steps spell the passage keyword.</li>
             </ol>
             <p>Then transmit the seven letters to the Web Navigator Console, on the Order's post at the end of the stones, to unlock the way south. Beyond it lies the Great Salt Sump, where only the page “Study on the Dry Salt Playa” can tell good crust from bad.</p>
-            <p>There is no water to lose, only time: a sinkhole or a split plate costs up to 40 minutes, a slab that breaks the Law 25, a step too heavy 10. The higher the sun, the thicker the haze and the narrower the gold.</p>
+            <p>Hermes has <strong>three hearts</strong> for the whole crossing, the stones and the Sump alike. A sinkhole, a slab that cracks, the wrong first slab or a bad plate of the Sump costs one heart. When the third is lost, he walks back to the North Edge and the crossing begins again from Row I. A step too heavy, a wrong word on the Console and a word of the wrong length cost no heart.</p>
+            <p>Every mistake also costs time: a sinkhole or a split plate up to 40 minutes, a slab that breaks the Law 25, a step too heavy 10. The higher the sun, the thicker the haze and the narrower the gold.</p>
           </details>
         </div>
       </div>
@@ -2668,6 +2670,8 @@
                 <span><strong>The balance.</strong> Before each step Hermes leans on his staff. The needle shows his weight, rising at a steady pace: a chime rings as it enters the gold, and that is the moment to let go. The bright heart of the gold is perfect balance, and a notch on the arc shows where you let go last time.</span></li>
               <li><span class="chasm3d-howto-pic"><span class="chasm3d-clock">☀ 06:00</span></span>
                 <span><strong>The sun.</strong> Every false step costs time. The higher the sun, the thicker the haze and the narrower the gold. There is no time limit.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-hearts"><i class="chasm3d-heart">♥</i><i class="chasm3d-heart">♥</i><i class="chasm3d-heart is-lost">♥</i></span></span>
+                <span><strong>Three hearts.</strong> A sinkhole, a cracked slab or a bad plate of the Sump costs one. <strong>Lose all three and Hermes goes back to the North Edge</strong>: the whole crossing begins again, stones and Sump.</span></li>
             </ul>
           </section>
 
@@ -2705,216 +2709,132 @@
   <!-- =====================================================================
        TACTICAL EXPEDITION MODAL: THE DESERT LEXICON & AL-QIBLA (STATION 12)
        ===================================================================== -->
-  <div class="lexicon-modal-backdrop" id="modal-desert-lexicon" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="lexicon-modal-title">
-    <div class="lexicon-workbench-window">
-      <!-- Tactical Corner Brackets -->
+  <div class="chasm-modal-backdrop" id="modal-desert-lexicon" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="lexicon-modal-title">
+    <div class="chasm-workbench-window chasm3d-window lex3d-window">
       <div class="map-frame-corner corner-tl"></div>
       <div class="map-frame-corner corner-tr"></div>
       <div class="map-frame-corner corner-bl"></div>
       <div class="map-frame-corner corner-br"></div>
 
-      <!-- Header -->
-      <div class="lexicon-header-bar">
-        <div class="lexicon-header-title-wrap">
-          <span class="lexicon-header-icon">📜</span>
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🦅</span>
           <div>
-            <div class="lexicon-header-title" id="lexicon-modal-title">The Desert Lexicon & Al-Qibla · Station 12</div>
-            <div class="lexicon-header-subtitle">Tactical Crossword & Sun Compass · Open its page in your journal</div>
+            <div class="chasm-header-title" id="lexicon-modal-title">The Desert Lexicon · Station 12</div>
+            <div class="chasm-header-subtitle">The steles of Camp VII, by moonlight · the page “The Desert Lexicon &amp; Al-Qibla” of your journal</div>
           </div>
         </div>
-        <button type="button" class="lexicon-close-btn" id="btn-close-lexicon" title="Close Tactical View">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-lexicon" title="Close" aria-label="Close the Desert Lexicon">✕</button>
       </div>
 
-      <!-- Telemetry Strip -->
-      <div class="lexicon-telemetry-strip">
-        <div class="lexicon-telemetry-pill">
-          <span>🚶 Explorer:</span>
-          <strong>Hermes</strong>
-        </div>
-        <div class="lexicon-telemetry-pill">
-          <span>📍 Camp:</span>
-          <strong>Camp VII [Nomad Ruins]</strong>
-        </div>
-        <div class="lexicon-telemetry-pill">
-          <span>🧭 Target:</span>
-          <strong>Tower II (Desert Oracle)</strong>
-        </div>
-        <div class="lexicon-telemetry-pill">
-          <span>📐 Al-Qibla Bearing:</span>
-          <strong id="lexicon-telem-bearing">— [Oscillating]</strong>
-        </div>
-        <div class="lexicon-telemetry-pill">
-          <span>🦅 Desert Sigil:</span>
-          <strong id="lexicon-telem-sigil">— — — — — — —</strong>
-        </div>
-      </div>
-
-      <!-- Workbench Body -->
-      <div class="lexicon-workbench-body">
-        <!-- Left: Sandstone Stele Crossword -->
-        <div class="lexicon-stele-frame">
-          <div class="lexicon-stele-header">
-            <div class="lexicon-stele-title">The Sandstone Crossword Stele</div>
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #bae6fd;" id="lexicon-words-count">0 / 10 WORDS SOLVED</div>
-          </div>
-
-          <!-- Crossword Table (15 rows x 12 cols matching Sheet 11A) -->
-          <div class="lexicon-grid-container">
-            <table class="lexicon-crossword-table" id="lexicon-grid-table">
-              <!-- Dynamically populated or rendered -->
-            </table>
-          </div>
-
-          <!-- Stele Input Bar for active word -->
-          <div class="lexicon-stele-input-bar">
-            <span style="font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 700; color: #f59e0b;" id="lexicon-active-clue-label">Select Clue:</span>
-            <input type="text" class="lexicon-word-input" id="lexicon-word-input" placeholder="ENTER WORD..." maxlength="12" autocomplete="off" spellcheck="false">
-            <button type="button" class="btn-carve-word" id="btn-carve-word">Carve on Stele ➔</button>
-            <button type="button" class="btn-carve-word" id="btn-auto-fill-word" style="background: rgba(56, 189, 248, 0.2); border-color: #38bdf8;" title="Use journal deduction">Reveal from Journal</button>
-          </div>
-
-          <!-- Clues Section -->
-          <div class="lexicon-clues-section">
-            <div>
-              <div class="lexicon-clue-col-title">Across (The Lateral Trails)</div>
-              <div class="lexicon-clue-item" data-word-id="ac-2" onclick="window.selectLexiconClue('ac-2')">
-                <span class="lexicon-clue-num">2.</span>
-                <span>The blistering south-easterly wind that sweeps the dunes (7)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="ac-3" onclick="window.selectLexiconClue('ac-3')">
-                <span class="lexicon-clue-num">3.</span>
-                <span>The eternal wanderer whose only roof is the starry vault (5)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="ac-6" onclick="window.selectLexiconClue('ac-6')">
-                <span class="lexicon-clue-num">6.</span>
-                <span>A verdant sanctuary where hidden subterranean springs quench thirst (5)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="ac-8" onclick="window.selectLexiconClue('ac-8')">
-                <span class="lexicon-clue-num">8.</span>
-                <span>The sacred occultation when noon sun is crowned in darkness (7)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="ac-9" onclick="window.selectLexiconClue('ac-9')">
-                <span class="lexicon-clue-num">9.</span>
-                <span>The boundless circle where desert sands meet the vault of heaven (7)</span>
-              </div>
-            </div>
-            <div>
-              <div class="lexicon-clue-col-title">Down (The Vertical Meridians)</div>
-              <div class="lexicon-clue-item" data-word-id="dn-1" onclick="window.selectLexiconClue('dn-1')">
-                <span class="lexicon-clue-num">1.</span>
-                <span>The solemn march of laden camels navigating by night stars (7)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="dn-2" onclick="window.selectLexiconClue('dn-2')">
-                <span class="lexicon-clue-num">2.</span>
-                <span>The stone guardian of ancient dynasties keeping silent watch (6)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="dn-4" onclick="window.selectLexiconClue('dn-4')">
-                <span class="lexicon-clue-num">4.</span>
-                <span>The shimmering illusion of non-existent waters conjured by heat (6)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="dn-5" onclick="window.selectLexiconClue('dn-5')">
-                <span class="lexicon-clue-num">5.</span>
-                <span>The shifting hills of golden powder sculpted by the midnight breeze (5)</span>
-              </div>
-              <div class="lexicon-clue-item" data-word-id="dn-7" onclick="window.selectLexiconClue('dn-7')">
-                <span class="lexicon-clue-num">7.</span>
-                <span>The unseen whisperer whistling through sandstone canyons (6)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Navigator's Al-Qibla Table & Sigil -->
-        <div class="lexicon-desk-panel">
-          <!-- The Desert Sigil Assembly Rack (Circled Letters 1 to 7) -->
-          <div class="lexicon-sigil-slots-box">
-            <div class="lexicon-slots-label">
-              <span>THE DESERT SIGIL (CIRCLED LETTERS 1 TO 7)</span>
-              <span id="lexicon-sigil-status">AWAITING 7 LETTERS</span>
-            </div>
-            <div class="lexicon-slots-row">
-              <div class="lexicon-slot-box" id="lex-sigil-0"><span class="slot-letter"></span><span class="slot-idx">1</span></div>
-              <div class="lexicon-slot-box" id="lex-sigil-1"><span class="slot-letter"></span><span class="slot-idx">2</span></div>
-              <div class="lexicon-slot-box" id="lex-sigil-2"><span class="slot-letter"></span><span class="slot-idx">3</span></div>
-              <div class="lexicon-slot-box" id="lex-sigil-3"><span class="slot-letter"></span><span class="slot-idx">4</span></div>
-              <div class="lexicon-slot-box" id="lex-sigil-4"><span class="slot-letter"></span><span class="slot-idx">5</span></div>
-              <div class="lexicon-slot-box" id="lex-sigil-5"><span class="slot-letter"></span><span class="slot-idx">6</span></div>
-              <div class="lexicon-slot-box" id="lex-sigil-6"><span class="slot-letter"></span><span class="slot-idx">7</span></div>
-            </div>
-          </div>
-
-          <!-- Al-Qibla Brass Sun Compass -->
-          <div class="lexicon-compass-box">
-            <div class="lexicon-compass-title">Al-Qibla & Desert Bearing Dial</div>
-            <div class="lexicon-compass-dial-wrap">
-              <svg viewBox="0 0 160 160" class="lexicon-compass-svg" id="lexicon-compass-svg">
-                <!-- Compass Rose Background -->
-                <circle cx="80" cy="80" r="74" fill="#140e08" stroke="#d4a853" stroke-width="2" />
-                <circle cx="80" cy="80" r="62" fill="none" stroke="#d4a853" stroke-width="0.8" stroke-dasharray="3, 3" />
-                <circle cx="80" cy="80" r="50" fill="#1e140c" stroke="#854d0e" stroke-width="1.2" />
-                <!-- Cardinal Notches -->
-                <line x1="80" y1="10" x2="80" y2="22" stroke="#fbbf24" stroke-width="2" />
-                <line x1="150" y1="80" x2="138" y2="80" stroke="#d4a853" stroke-width="1.5" />
-                <line x1="80" y1="150" x2="80" y2="138" stroke="#d4a853" stroke-width="1.5" />
-                <line x1="10" y1="80" x2="22" y2="80" stroke="#d4a853" stroke-width="1.5" />
-                <!-- Cardinal Labels -->
-                <text x="80" y="32" text-anchor="middle" font-family="'Cinzel', serif" font-size="11" font-weight="700" fill="#fbbf24">N</text>
-                <text x="130" y="84" text-anchor="middle" font-family="'Cinzel', serif" font-size="9" fill="#d4a853">E</text>
-                <text x="80" y="134" text-anchor="middle" font-family="'Cinzel', serif" font-size="9" fill="#d4a853">S</text>
-                <text x="30" y="84" text-anchor="middle" font-family="'Cinzel', serif" font-size="9" fill="#d4a853">W</text>
-                <!-- Compass Needle (Rotates dynamically) -->
-                <g id="lexicon-compass-needle" transform="rotate(0 80 80)">
-                  <polygon points="80,18 74,80 86,80" fill="#ef4444" stroke="#b91c1c" stroke-width="1" />
-                  <polygon points="80,142 74,80 86,80" fill="#64748b" stroke="#334155" stroke-width="1" />
-                  <circle cx="80" cy="80" r="6" fill="#fbbf24" stroke="#000" stroke-width="1.5" />
-                </g>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="lex3d-stage">
+          <canvas id="lex3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/desert_lexicon_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="chasm3d-runes lex3d-sigil" id="lex3d-sigil" role="img" aria-label="The Desert Sigil: no circled letters clean"></div>
+            <div class="chasm3d-compass" aria-hidden="true">
+              <svg viewBox="-50 -50 100 100" id="lex3d-rose" class="chasm3d-rose">
+                <circle r="44" class="rose-ring"/>
+                <path d="M0,-40 L8,-6 L0,-12 L-8,-6 Z" class="rose-north"/>
+                <path d="M0,40 L8,6 L0,12 L-8,6 Z" class="rose-south"/>
+                <text y="-24" text-anchor="middle" class="rose-n">N</text>
+                <text x="30" y="5" text-anchor="middle" class="rose-l">E</text>
+                <text y="34" text-anchor="middle" class="rose-l">S</text>
+                <text x="-30" y="5" text-anchor="middle" class="rose-l">W</text>
               </svg>
+              <div class="chasm3d-facing" id="lex3d-facing">Facing north</div>
             </div>
-            <div class="lexicon-compass-bearing-label" id="lexicon-compass-label">HEADING: OSCILLATING IN THE GALE...</div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="lex3d-clock">☾ 21:50</div>
+              <div class="chasm3d-hearts" id="lex3d-hearts" role="img" aria-label="3 of 3 hearts left"></div>
+              <div class="lex3d-watch is-safe" id="lex3d-watch" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="lex3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="lex3d-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="lex3d-voice" role="status" aria-live="polite"></div>
+          <div class="chasm3d-where" id="lex3d-where"></div>
+          <div class="chasm3d-controls lex3d-controls" id="lex3d-controls" role="group" aria-label="Guide Hermes"></div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-lexicon-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
+
+          <div class="chasm-victory-card" id="lexicon-victory-card" style="display: none;">
+            <div class="chasm-victory-title"><span>🦅</span><span>The Name of the Raiders</span></div>
+            <div class="chasm-victory-text">The words are clean, Al-Qibla is locked at 194° SSW, the walls let Hermes through, and the hearth stone gave up the name: the BC Ashes. Hermes is waiting for you on the Field Wire.</div>
+            <button type="button" class="btn-chasm-finish" id="btn-lexicon-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-lexicon-reward">🏆 See your reward</button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-lexicon-again">↺ Read the steles again</button>
           </div>
 
-          <!-- Stargazer's Arithmetic Stele Fragment -->
-          <div class="lexicon-math-box">
-            <div class="lexicon-math-title">✦ NOMAD RUINS MATHEMATICAL STELE · CANONICAL CIPHER ✦</div>
-            <div style="color: #cbd5e1; font-size: 0.8rem;">Carved under the gnomon shadow-curb:</div>
-            <div class="lexicon-math-formula">[R] × 2 = [F]</div>
-            <div style="color: #cbd5e1; font-size: 0.8rem;">
-              • Your Whispering Chasm markers gave you a clue for <strong style="color: #86efac;">[R]</strong>, so this stele lets you work out <strong style="color: #86efac;">[F]</strong>.<br>
-              • Your Vector I Card says <strong>[F] + [T] = 22</strong>, so you can work out <strong style="color: #86efac;">[T]</strong> too.<br>
-              <span style="color: #fde68a;">Work out F and T in your Cipher Ledger!</span>
-            </div>
-          </div>
+          <details class="chasm3d-laws">
+            <summary>The Law of the Steles</summary>
+            <ol>
+              <li>The ten words of the middle stele are the ten words of your page, with the same clues and the same squares.</li>
+              <li>Where two words cross they share a letter.</li>
+              <li>The seven circled squares, read from 1 to 7, give the Desert Sigil. The dial of Al-Qibla wakes on the sigil.</li>
+              <li>The needle is set to the Al-Qibla Vector printed in the title of your page. A needle has two ends: the head shows where the raiders rode, the tail shows where the Order goes next.</li>
+            </ol>
+            <p>Hermes has <strong>three hearts</strong> for the whole night. A word that does not fit, a scrape the watcher hears, a wrong sigil, a wrong bearing or a false doorway costs one. When the third is lost, the night is lost: Hermes slips back into the dunes, the camp settles again, and the steles must be read again from the first word. A word of the wrong length costs nothing.</p>
+            <p>Every mistake also costs moonlight: a word that does not fit 5 minutes, a scrape the watcher hears 20, a false doorway 8.</p>
+          </details>
+        </div>
+      </div>
 
-          <!-- Live Telegram Ticker -->
-          <div class="lexicon-dispatch-box">
-            <div class="lexicon-dispatch-sender">
-              <span>📻 FIELD WIRE DISPATCH // NOMAD RUINS · CAMP VII</span>
-            </div>
-            <div id="lexicon-dispatch-text">
-              "Silvia, the riders are gone and the moon is up over the ruined nomad camp. I am kneeling in front of the three sandstone steles, brushing the sand off with my hat. Ten desert words cross each other like old pilgrim paths. Which word does your journal transcribe first?"
-            </div>
-          </div>
+      <!-- How to play: four short pages, shown the first time and whenever she asks -->
+      <div class="chasm3d-howto" id="lex3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="lex3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="lex3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
 
-          <!-- Victory Card (Shown when PHOENIX and Al-Qibla solved) -->
-          <div class="lexicon-victory-card" id="lexicon-victory-card" style="display: none;">
-            <div class="lexicon-victory-title">
-              <span>🦅</span>
-              <span>Al-Qibla Locked! Raiders 194° SSW · Tower II 14° NNE</span>
-            </div>
-            <div class="lexicon-victory-text">
-              "Silvia! PHOENIX! The Sigil of the Sun-Bird! The bronze dial clicked into place and the needle swung to 194° South-Southwest: the heading the raiders carved in their bivouac, the way they fled with the Astrolabe. But a needle has two ends, and the sun-bird's tail points 14° North-Northeast, straight to the Sanctuary of the Desert Oracle. The path across the Great Erg is unlocked! Look at the second stele: a mathematical inscription carved by ancient stargazers: [R] × 2 = [F]. Update your Cipher Ledger! The scorched banners on these walls name the raiders: the BC Ashes! Our next stop is the Four Wells of the Oasis Clepsydra!"
-            </div>
-            <button type="button" class="btn-lexicon-finish" id="btn-lexicon-finish">
-              <span>🗺️ Return to Grand Desert Map & Unlock Clepsydra Trail ➔</span>
-            </button>
-          </div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Night at Camp VII, the nomad ruins. The raiders rode south at dusk, but <strong>two men stayed behind</strong>: one asleep by the fire, one walking a round with a torch.</p>
+            <p>Hermes is crouched at the foot of three old steles. The middle one holds <strong>the same ten words as your page</strong> “The Desert Lexicon &amp; Al-Qibla”, every groove packed with sand. You solve the clues on your page; he brushes the words clean.</p>
+            <p>Then the tallest stele, with its bronze dial, and whatever the dial wakes up.</p>
+          </section>
 
-          <!-- Actions Row -->
-          <div style="display: flex; gap: 10px; margin-top: auto;">
-            <button type="button" class="btn-chasm-reset" id="btn-lexicon-solve-all" style="background: rgba(56, 189, 248, 0.15); border-color: #38bdf8; color: #bae6fd;">
-              <span>✦ Transcribe Complete Journal Notes</span>
-            </button>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>What you see on the screen</h3>
+            <ul class="chasm3d-howto-keys">
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-rune lex3d-sigilbox is-found" data-n="1">P</span><span class="chasm3d-rune lex3d-sigilbox" data-n="2"></span><span class="chasm3d-rune lex3d-sigilbox" data-n="3"></span></span>
+                <span><strong>The Desert Sigil.</strong> Seven boxes, one for each circled square. A letter appears when the word through its circle is clean.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="lex3d-watch is-danger"><span class="lex3d-eye">👁</span> <span>Ten paces away!</span></span></span>
+                <span><strong>The watcher.</strong> Where he is on his round. <strong>Green</strong>: brush freely. <strong>Amber</strong>: he is turning this way. <strong>Red</strong>: he is by the steles. In amber and red, any scrape is heard.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-clock">☾ 21:50</span></span>
+                <span><strong>The moon.</strong> Every action and every mistake costs minutes of the night. There is no time limit.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-hearts"><i class="chasm3d-heart">♥</i><i class="chasm3d-heart">♥</i><i class="chasm3d-heart is-lost">♥</i></span></span>
+                <span><strong>Three hearts.</strong> A wrong word, a scrape the watcher hears, a wrong sigil or bearing, a false doorway: each costs one. <strong>Lose all three and the night is lost</strong>: the steles must be read again from the first word.</span></li>
+            </ul>
+          </section>
+
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>I · The Crossword Stele</h3>
+            <ol class="chasm3d-howto-steps">
+              <li><strong>Choose a word</strong>: press its number in the list, or tap its squares on the stele. A gold ring marks the seven words that pass through a circle.</li>
+              <li><strong>Type the word</strong> from your page and press <em>🪶 Brush it clean</em>. If it is right, the letters come up out of the sand.</li>
+              <li>Every brush, and every <em>🤫 Lie still</em>, moves the watcher one place on his round. <strong>Never brush while he is amber or red</strong>: lie still and let him pass.</li>
+              <li>When the seven circled words are clean, <strong>creep to the tall stele</strong>. The other three words are for the pride of it.</li>
+            </ol>
+          </section>
+
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>II · Al-Qibla, and after</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Type the <strong>Desert Sigil</strong> into the seven windows of the dial: the circled letters, in their order 1 to 7.</li>
+              <li>Turn the needle to the <strong>Al-Qibla Vector</strong> printed in the title of your page, with the slider, the buttons or the ← → keys, then <strong>lock it</strong>.</li>
+              <li>What happens next is Hermes's to tell. If he has to choose between doorways, <strong>read the letters over them</strong>: ← left, ↑ ahead, → right, as he sees them.</li>
+            </ol>
+          </section>
+
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-lexicon-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-lexicon-howto-next">Next →</button>
           </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-lexicon-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>

@@ -1518,10 +1518,11 @@ def test_early_hints(browser):
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
 
     js("window.openDesertLexiconModal()"); page.wait_for_timeout(400)
-    for _ in range(3):
-        page.fill("#lexicon-word-input", "WRONG"); page.click("#btn-carve-word")
-    page.fill("#lexicon-word-input", ""); page.click("#btn-carve-word")   # an empty carve is not a miss
-    check(get("order_hint_s12-lexicon_fails") == "3" and "note 1 of 3" in note("modal-desert-lexicon", ".lexicon-stele-input-bar"),
+    js("window.__lexicon.select('ac-3')")
+    for _ in range(3):       # while the watcher's back is turned, three words that do not fit the grooves
+        js("window.__lexicon.brush('WRONG')")
+    js("window.__lexicon.select('ac-3'); window.__lexicon.brush('')")   # an empty brush is not a miss
+    check(get("order_hint_s12-lexicon_fails") == "3" and "note 1 of 3" in note("modal-desert-lexicon", "#lex3d-controls"),
           "Station 12: three refused words bring the first note")
     js("window.closeDesertLexiconModal()"); page.wait_for_timeout(300)
 
@@ -3061,6 +3062,8 @@ def test_salt_playa(browser):
     page.wait_for_timeout(150)
     check(s["phase"] == "setback" and s["min"] == m0 + 20 and "NOT WHERE WE BEGIN" in alert().upper() and "Column D" in alert() and "+20 min" in alert(),
           "the wrong first slab: Hermes says the page names where the crossing begins, and the sun climbs 20 minutes", f"{s['phase']} {s['min'] - m0}")
+    hearts = lambda: js("[...document.querySelectorAll('#playa3d-hearts .chasm3d-heart')].map(h => h.classList.contains('is-lost') ? 0 : 1).join('')")
+    check(s["hearts"] == 2 and hearts() == "110" and "two hearts left" in alert(), "the wrong first slab costs a heart: two are left, on the HUD and on the card", f"{s['hearts']} {hearts()}")
     js("window.__playa.goOn(); window.__playa.edge(1)")
     js("window.__playa.pick(3)")
     check(st()["phase"] == "test" and js("document.querySelector('.playa3d-balance').classList.contains('is-on')")
@@ -3091,11 +3094,20 @@ def test_salt_playa(browser):
     s = st()
     check(s["phase"] == "setback" and s["cracks"] == 1 and s["min"] == m0 + 65 and "Law of the Basin" in alert(),
           "a slab that breaks the Law cracks: 25 minutes", f"{s['phase']} {s['min'] - m0}")
-    js("window.__playa.goOn(); window.__playa.pick(4)")
+    check(s["hearts"] == 0 and "no hearts left" in alert() and "BEGIN AGAIN FROM THE NORTH EDGE" in alert().upper(),
+          "the third false step takes the last heart: the card sends Hermes back to the North Edge", alert()[-160:].replace("\n", " "))
+    js("window.__playa.goOn()")
+    s = st()
+    check(s["phase"] == "edge" and s["path"] == [] and s["edge"] == 0 and s["hearts"] == 3 and s["tries"] == 2 and s["sinks"] == 1 and s["cracks"] == 1
+          and hearts() == "111" and "crossing number 2" in voice(),
+          "back on the North Edge with three hearts: the crossing begins again from Row I, her mistakes still counted", f"{s['phase']} {s['path']} {s['hearts']} {s['tries']}")
+    js("window.__playa.edge(1); window.__playa.edge(1); window.__playa.edge(1); window.__playa.pick(3)"); good(); js("window.__playa.walkOn()")
+    m0 = st()["min"]
+    js("window.__playa.pick(4)")
     js("window.__playa.lean(0.99)")
     s = st()
-    check(s["phase"] == "heavy" and s["heavy"] == 1 and s["min"] == m0 + 75 and "groan" in voice(),
-          "too much weight on a sound slab: the crust groans, 10 minutes, nothing broken", f"{s['phase']} {s['min'] - m0}")
+    check(s["phase"] == "heavy" and s["heavy"] == 1 and s["min"] == m0 + 10 and s["hearts"] == 3 and "groan" in voice(),
+          "too much weight on a sound slab: the crust groans, 10 minutes, nothing broken and no heart lost", f"{s['phase']} {s['min'] - m0} {s['hearts']}")
     for _ in range(20):
         page.wait_for_timeout(200)
         if st()["phase"] == "test":
@@ -3117,8 +3129,8 @@ def test_salt_playa(browser):
     check(s["band"][1] - s["band"][0] < hi - lo, "the gold band is narrower in the heat of mid-morning", f"{s['band']} vs {[lo, hi]}")
     js("window.__playa.pick(1)"); good()
     s = st(); page.wait_for_timeout(150)
-    check(s["phase"] == "setback" and "MIRAGE" in alert().upper() and s["mirage"] == 3 and "rest" not in alert().lower(),
-          "the pool was the mirage: brine, and the sun climbs", f"{s['phase']} {s['mirage']}")
+    check(s["phase"] == "setback" and "MIRAGE" in alert().upper() and s["mirage"] == 3 and "rest" not in alert().lower() and s["hearts"] == 2,
+          "the pool was the mirage: brine, a heart, and the sun climbs", f"{s['phase']} {s['mirage']} {s['hearts']}")
     js("window.__playa.goOn()")
     for r in (4, 5, 6):
         js(f"window.__playa.pick({PLAYA_SOLUTION[r]})"); good()
@@ -3140,8 +3152,8 @@ def test_salt_playa(browser):
     page.click(".playa3d-console input[data-i='0']")
     page.keyboard.type("crystax"); page.keyboard.press("Enter"); page.wait_for_timeout(200)
     s = st()
-    check(s["phase"] == "console" and s["words"] == 1 and s["min"] == m0 + 5 and not s["sent"] and "silent" in voice(),
-          "a wrong keyword: the post stays silent, 5 minutes", f"{s['words']} {s['min'] - m0}")
+    check(s["phase"] == "console" and s["words"] == 1 and s["min"] == m0 + 5 and not s["sent"] and "silent" in voice() and s["hearts"] == 2,
+          "a wrong keyword: the post stays silent, 5 minutes, no heart", f"{s['words']} {s['min'] - m0} {s['hearts']}")
     js("window.__playa.transmit('CRYS')")
     check(st()["words"] == 1 and "seven" in voice(), "too few letters: Hermes counts them, nothing spent")
     js("document.querySelector('.playa3d-console input[data-i=\"6\"]').focus()")
@@ -3180,12 +3192,12 @@ def test_salt_playa(browser):
     kinds = []
     for k, d in enumerate(sol):
         wrong = [x for x in (-1, 0, 1) if x != d][0]
-        if k < 2:
+        if k < 1:        # one bad plate: the heart lost on the stones goes with Hermes into the Sump
             m0 = st()["min"]
             js(f"window.__playa.spick({wrong})"); good()
             s = st(); page.wait_for_timeout(120)
             kinds.append((alert().split("\n")[2] if alert() else "", s["min"] - m0))
-            check(s["phase"] == "setback" and s["sFails"] == k + 1 and "Study on the Dry Salt Playa" in alert(),
+            check(s["phase"] == "setback" and s["sFails"] == k + 1 and "Study on the Dry Salt Playa" in alert() and s["hearts"] == 1 and "one heart left" in alert(),
                   f"plate {k + 1}: a plate the Study would not trust gives way, and the card names the page", alert()[:120].replace("\n", " "))
             js("window.__playa.goOn()")
         js(f"window.__playa.spick({d})")
@@ -3363,6 +3375,161 @@ def test_balance(browser):
     ctx.close()
 
 
+def test_desert_lexicon(browser):
+    print("\n37. Station 12 · The Desert Lexicon in 3D: the steles of Camp VII by moonlight, the watcher, Al-Qibla, the walls and the BC Ashes")
+    wire_gate = json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1, "seen2": True, "reply2": 0, "seen3": True, "reply3": 0, "seen4": True, "reply4": 0})
+    seed = dict(DESERT_BASE, order_chasm_wire=wire_gate, order_desert_station_active="12", order_lexicon_march_start="1", order_lexicon_march_bypassed="true")
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    get = lambda key: js("k => localStorage.getItem(k)", key)
+    st = lambda: js("window.__lexicon.state()")
+    voice = lambda: js("document.getElementById('lex3d-voice').innerText")
+    shown = lambda: js("getComputedStyle(document.getElementById('modal-desert-lexicon')).display") != "none"
+    alert = lambda: js("(a => a && !a.hidden ? a.innerText : '')(document.querySelector('#lex3d-stage .chasm3d-alert'))")
+    sigil = lambda: js("[...document.querySelectorAll('#lex3d-sigil .lex3d-sigilbox')].map(b => b.textContent).join('')")
+
+    js("window.openDesertLexiconModal()"); page.wait_for_timeout(900)
+    s = st()
+    check(shown() and s["stage"] == "stele" and s["phase"] == "stele" and "two men behind" in voice() and "Sheet" not in voice(),
+          "the steles open at night: Hermes crouched at the middle stele, the rearguard told", f"{s['stage']} {s['phase']}")
+    howto_on = lambda: js("!document.getElementById('lex3d-howto').hidden")
+    pages = []
+    if howto_on():
+        pages.append(js("document.getElementById('lex3d-howto-count').innerText"))
+        for _ in range(3):
+            js("document.getElementById('btn-lexicon-howto-next').click()")
+            pages.append(js("document.getElementById('lex3d-howto-count').innerText"))
+    check(pages == ["1 of 4", "2 of 4", "3 of 4", "4 of 4"], "the first time, How to play opens on top: four short pages", str(pages))
+    dim = low_contrast(page, "#lex3d-howto")
+    check(not dim, "How to play: text contrast is at least WCAG AA", "; ".join(dim[:4]))
+    page.keyboard.press("Escape"); page.wait_for_timeout(400)
+    check(not howto_on() and shown() and get("order_lexicon_howto") == "seen", "Escape closes only How to play, and it is remembered")
+    if s["gl"]:
+        js("window.__lexicon.frames(4)")
+        check(st()["drawn"] > 0, "the ruins are drawn in 3D")
+    check(js("document.querySelectorAll('#lex3d-controls .lex3d-word').length") == 10 and js("document.querySelectorAll('#lex3d-controls .lw-ring').length") == 7,
+          "ten words to choose, seven of them through a circle")
+
+    # A word, a wrong word, then the watcher close: the scrape is heard
+    js("window.__lexicon.select('dn-1'); window.__lexicon.brush('caravan')")
+    s = st()
+    check("dn-1" in s["carved"] and s["watch"] == 1 and s["min"] == 21 * 60 + 56, "CARAVAN brushed clean; the watcher walks on; the moon climbs 6 minutes", f"{s['carved']} {s['watch']} {s['min']}")
+    js("window.__lexicon.select('ac-3'); window.__lexicon.brush('NOMAX')")
+    s = st()
+    hearts = lambda: js("[...document.querySelectorAll('#lex3d-hearts .chasm3d-heart')].map(h => h.classList.contains('is-lost') ? 0 : 1).join('')")
+    check(s["wrong"] == 1 and "ac-3" not in s["carved"] and s["watch"] == 2 and s["hearts"] == 2 and hearts() == "110",
+          "a word that does not fit is refused and costs time and a heart", f"{s['wrong']} {s['hearts']} {hearts()}")
+    js("window.__lexicon.select('ac-3'); window.__lexicon.brush('NOMAD')")
+    s = st()
+    check("ac-3" in s["carved"] and s["watch"] == 3 and not s["watchSafe"] and "N" in sigil() and "Turning" in js("document.getElementById('lex3d-watch').innerText"),
+          "NOMAD: its circle lights the sigil; the watcher turns this way", f"{sigil()} {s['watch']}")
+    js("window.__lexicon.select('ac-2'); window.__lexicon.brush('SIROCCO')")
+    s = st()
+    check(s["phase"] == "setback" and s["heard"] == 1 and "ac-2" not in s["carved"] and "He heard you" in alert() and s["hearts"] == 1 and "one heart left" in alert(),
+          "brushing while he turns this way: he hears it, the word stays under the sand, one heart left", alert()[:160].replace("\n", " "))
+    js("window.__lexicon.goOn()")
+    s = st()
+    check(s["phase"] == "stele" and s["watch"] == 5 and not alert(), "he walks on to the cistern")
+    js("window.__lexicon.select('ac-6'); window.__lexicon.brush('OASES')")
+    s = st()
+    check(s["phase"] == "setback" and s["hearts"] == 0 and "The night is lost" in alert() and "no hearts left" in alert() and "BEGIN THE NIGHT AGAIN" in alert().upper(),
+          "a third mistake: the last heart, and the night is lost", alert()[:200].replace("\n", " "))
+    js("window.__lexicon.goOn()")
+    s = st()
+    check(s["phase"] == "stele" and s["carved"] == [] and s["hearts"] == 3 and s["tries"] == 2 and s["wrong"] == 2 and s["heard"] == 1
+          and sigil() == "" and hearts() == "111" and "night number 2" in voice(),
+          "the next night: sand in every groove, three hearts again, her mistakes still counted", f"{s['carved']} {s['hearts']} {s['tries']}")
+    js("window.closeDesertLexiconModal()"); page.wait_for_timeout(400)
+    js("window.openDesertLexiconModal()"); page.wait_for_timeout(600)
+    check(st()["hearts"] == 3 and st()["tries"] == 2, "closed and opened again, the new night is kept")
+    for wid, word in [("dn-1", "CARAVAN"), ("ac-3", "NOMAD"), ("ac-2", "SIROCCO"), ("ac-6", "OASIS"), ("ac-8", "ECLIPSE"), ("ac-9", "HORIZON"), ("dn-5", "DUNES"), ("dn-2", "SPHINX")]:
+        for _ in range(6):
+            if st()["watchSafe"]:
+                break
+            js("window.__lexicon.wait()")
+        js(f"window.__lexicon.select('{wid}'); window.__lexicon.brush('{word}')")
+    s = st()
+    check(sigil() == "PHOENIX" and s["heard"] == 1 and js("!!document.querySelector('#lex3d-controls .lex3d-creep')"),
+          "the seven circled words clean: the sigil boxes read PHOENIX, and the way to the tall stele opens", sigil())
+    for _ in range(6):
+        if st()["watchSafe"]:
+            break
+        js("window.__lexicon.wait()")
+    js("window.__lexicon.creep()")
+    check(st()["stage"] == "sigil" and "seven little windows" in voice(), "Hermes creeps to the dial; the watcher dozes")
+
+    # Al-Qibla: the sigil, then the vector
+    js("window.__lexicon.sigil('PHOEN')")
+    check(st()["dialWrong"] == 0 and st()["hearts"] == 3 and st()["stage"] == "sigil", "too few letters for the dial: Hermes counts them, no heart")
+    js("window.__lexicon.sigil('PHOENIX')")
+    check(st()["stage"] == "bearing" and js("!!document.getElementById('lex3d-bear-range')"), "PHOENIX frees the needle")
+    js("window.__lexicon.turn(14); window.__lexicon.lock()")
+    check(st()["bearWrong"] == 1 and st()["hearts"] == 2 and "tail" in voice(), "14: the tail, not the head, and a heart", voice()[:100])
+    js("window.__lexicon.turn(194); window.__lexicon.lock()")
+    s = st()
+    check(s["phase"] == "locked" and s["locked"] and "[R] × 2 = [F]" in voice(), "194° SSW locks it; the needle's shadow lights [R] × 2 = [F]")
+
+    # The ambush and the walls of the old camp
+    js("window.__lexicon.ambush()")
+    check(st()["phase"] == "ambush", "the chime wakes the camp")
+    js("window.__lexicon.run()")
+    s = st()
+    check(s["phase"] == "flee" and s["stage"] == "flee" and js("document.querySelectorAll('#lex3d-controls .lex3d-doorbtn').length") == 3,
+          "Hermes runs into the walls: three doorways, a letter over each", s["phase"])
+    sol = js("window.__lexicon.sol()")
+    wrong = [d for d in (-1, 0, 1) if d != sol[0]][0]
+    js(f"window.__lexicon.door({wrong})")
+    s = st()
+    check(s["phase"] == "setback" and s["dead"] == 1 and "Fallen in" in alert() and s["hearts"] == 1 and "one more and the night is lost" in voice(),
+          "a false doorway: fallen in, the torches gain, and Hermes warns her: one heart left", voice()[-120:])
+    js("window.__lexicon.goOn()")
+    check(st()["phase"] == "flee" and js("document.querySelectorAll('#lex3d-controls .lex3d-doorbtn:disabled').length") == 1, "back at the wall, the false doorway is shut")
+    for d in sol:
+        js(f"window.__lexicon.door({d})")
+    check(st()["phase"] == "hide", "seven walls by the letters of the sigil, then a hiding place", st()["phase"])
+    js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(1000)
+    check(st()["phase"] == "hearth" and "hoofbeats" in voice(), "the torches pass; the riders ride south; back to the cold hearth")
+    js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(300)
+    s = st()
+    check(s["phase"] == "done" and get("order_desert_lexicon_completed") == "true" and "BC ASHES" in voice()
+          and js("getComputedStyle(document.getElementById('lexicon-victory-card')).display") != "none",
+          "the hearth stone gives their name: the BC Ashes, and the station is done")
+    page.wait_for_timeout(3300)
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-desert-lexicon .chasm3d-reward'))")
+    rw = reward()
+    check("The BC Ashes" in rw and "194° SSW" in rw and "Stargazer Proportion" in rw and "Sheet" not in rw
+          and js("document.querySelector('#modal-desert-lexicon .chasm3d-reward-word strong').getAttribute('aria-label')") == "PHOENIX"
+          and js("document.querySelectorAll('#modal-desert-lexicon .lx-cell.is-circle.is-on').length") == 7,
+          "the reward: the stele as she cleaned it, PHOENIX, Al-Qibla, the Ledger line and the name of the raiders", rw[:200].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and shown(), "Escape puts the reward away, the ruins stay open")
+    text = js("document.getElementById('modal-desert-lexicon').innerText")
+    bad = [w for w in ("Sunken", "Coastal", "Coast", "Hermit", "Stage Mistress", "Pope", "Sheet") if w in text]
+    check(not bad, "no forbidden words in the steles", str(bad))
+    js("window.closeDesertLexiconModal()"); page.wait_for_timeout(500)
+    js("window.selectMapNode(11, false)"); page.wait_for_timeout(300)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("BC Ashes" in card and "PHOENIX" in card, "the done card names PHOENIX and the BC Ashes", card[:240].replace("\n", " "))
+
+    js("window.openDesertLexiconModal()"); page.wait_for_timeout(600)
+    check(st()["phase"] == "done", "opened again, the night is over at the hearth")
+    js("document.getElementById('btn-lexicon-again').click()")
+    s = st()
+    check(s["stage"] == "stele" and s["carved"] == [] and get("order_desert_lexicon_completed") == "true", "read it again: sand in the grooves, the station stays done")
+
+    page.set_viewport_size({"width": 390, "height": 844}); page.wait_for_timeout(600)
+    wide = js("""() => { const vw = document.documentElement.clientWidth, out = [];
+      document.querySelectorAll('#modal-desert-lexicon *').forEach(e => { const r = e.getBoundingClientRect();
+        if (r.width && e.offsetParent && (r.right > vw + 1 || r.left < -1) && !e.closest('.chasm3d-ambient')) out.push(e.id || String(e.className.baseVal ?? e.className)); });
+      return out.slice(0, 4); }""")
+    check(not wide, "at 390 px the steles fit the screen", str(wide))
+    js("window.closeDesertLexiconModal()"); page.wait_for_timeout(400)
+    check(not errors, "no JS errors at the steles", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -3376,10 +3543,11 @@ SECTIONS = {
     "chasm": test_whispering_chasm, "veil": test_veiled_stations, "portal": test_silvia_north_portal,
     "playahold": test_playa_hold,
     "playa": test_salt_playa,
+    "lexicon": test_desert_lexicon,
     "balance": test_balance,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 
