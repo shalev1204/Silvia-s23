@@ -404,7 +404,13 @@
       background: radial-gradient(circle at 38% 32%, #e05252, #9b1c1c 55%, #6b1010); box-shadow: 0 0 0 4px rgba(155, 28, 28, 0.35), 0 6px 14px rgba(0, 0, 0, 0.45), inset 0 -4px 10px rgba(0, 0, 0, 0.35);
     }
     .rw-seal::before { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 1.5px dashed rgba(255, 220, 200, 0.45); }
-    .rw-seal span { font: 700 2.4rem 'Cinzel', serif; color: #ffe4c4; text-shadow: 0 2px 0 #6b1010, 0 0 12px rgba(255, 200, 150, 0.6); }
+    .rw-glyph { flex: 0 0 auto; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .rw-glyph .rw-seal::before { display: none; }
+    .rw-seal svg { width: 56px; height: 75px; margin-top: -1px; fill: none; stroke: #fff1dc; stroke-width: 3.6; stroke-linecap: round; filter: drop-shadow(0 1.5px 0 #5a0c0c) drop-shadow(0 0 6px rgba(255, 210, 160, 0.7)); }
+    .rw-seal svg .dot { fill: #fff1dc; stroke: none; }
+    .rw-glyph figcaption { font: 600 0.82rem 'Cinzel', serif; letter-spacing: 0.06em; color: #5c2a0c; white-space: nowrap; }
+    .rw-glyph figcaption b { color: #9b1c1c; font-size: 1rem; }
+    .chasm3d-reward.is-on .rw-glyph figcaption { animation: chasm-rise 0.35s ease 4.9s both; }
     .chasm3d-reward.is-on .rw-seal { animation: rw-seal 0.7s cubic-bezier(.2, .9, .3, 1.4) 4.3s both; }
     @keyframes rw-seal { 0% { opacity: 0; transform: scale(2.6) rotate(-40deg); } 55% { opacity: 1; transform: scale(0.88) rotate(6deg); } 100% { transform: none; } }
     .rw-ledger-text { flex: 1; min-width: 0; }
@@ -469,7 +475,7 @@
       .chasm3d-reward-relics { grid-template-columns: repeat(3, 1fr); }
       .chasm3d-reward-word strong { font-size: 2.1rem; }
       .rw-seal { width: 60px; height: 60px; }
-      .rw-seal span { font-size: 2rem; }
+      .rw-seal svg { width: 46px; height: 61px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .chasm3d-rose, .chasm3d-subtitle, .chasm3d-fade { transition: none; }

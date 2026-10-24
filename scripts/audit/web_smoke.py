@@ -2817,6 +2817,7 @@ def test_whispering_chasm(browser):
     check("The Line of the Gate" in reward() and "Sheet" not in reward() and js("document.querySelectorAll('.chasm3d-reward .chasm3d-medal').length") == 6
           and js("document.querySelector('.chasm3d-reward-word strong').getAttribute('aria-label')") == "MIRAGE"
           and js("document.querySelector('.rw-eq').getAttribute('aria-label')") == "X plus E equals 17"
+          and js("document.querySelectorAll('.rw-seal svg line').length") == 2 and "Glyph = X" in reward()
           and js("document.querySelectorAll('.rw-map .rw-cairn').length") == 6 and js("document.querySelector('.rw-road').points.length") > 40
           and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')"),
           "the reward rises over the canyon: her road on the map, six relics, MIRAGE and the new Ledger line [X] + [E] = 17", reward()[:200].replace("\n", " "))
