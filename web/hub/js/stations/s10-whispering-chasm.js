@@ -1964,13 +1964,12 @@
               <div class="rw-ledger">
                 <figure class="rw-glyph" aria-label="The glyph of the letter X in the Order's secret alphabet">
                   <div class="rw-seal" aria-hidden="true"><svg viewBox="0 0 48 64"><line x1="12" y1="16" x2="36" y2="48"/><line x1="36" y1="16" x2="12" y2="48"/><circle cx="24" cy="32" r="8"/><circle class="dot" cx="24" cy="32" r="3"/></svg></div>
-                  <figcaption>Glyph = <b>X</b></figcaption>
                 </figure>
                 <div class="rw-ledger-text">
                   <div class="rw-ledger-kicker">The Cipher Ledger · a new letter</div>
                   <div class="rw-ledger-title">The Line of the Gate</div>
-                  <div class="rw-eq" aria-label="X plus E equals 17"><i>X</i><u>+</u><i>E</i><u>=</u><b>17</b></div>
-                  <p>Carved above the Oasis Gate in the Order's secret alphabet. This glyph is the X, a letter you have never had before: work out its value in your Cipher Ledger.</p>
+                  <div class="rw-eq" aria-label="Glyph equals X"><u>Glyph</u><u>=</u><i>X</i></div>
+                  <p>Carved above the Oasis Gate in the Order's secret alphabet. This glyph is the letter X, one you have never had before: its line is now in your Cipher Ledger, and its value is yours to work out.</p>
                 </div>
               </div>
               <div class="rw-next">Next · Station 11 · The Salt Playa</div>
