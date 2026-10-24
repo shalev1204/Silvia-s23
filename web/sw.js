@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = 'c227feeb60b6';  // 150 files, 31.1 MB
+var VERSION = '77d86622a128';  // 152 files, 31.3 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -97,6 +97,7 @@ var PRECACHE = [
   "./hub/css/gate-profiles.css",
   "./hub/css/hint-ladder.css",
   "./hub/css/layout.css",
+  "./hub/css/ledger-balance.css",
   "./hub/css/living-mirror.css",
   "./hub/css/path-themes.css",
   "./hub/css/previously.css",
@@ -134,6 +135,7 @@ var PRECACHE = [
   "./hub/js/hint-ladder.js",
   "./hub/js/hub-core.js",
   "./hub/js/journey-profile.js",
+  "./hub/js/ledger-balance.js",
   "./hub/js/mirror-speaker.js",
   "./hub/js/offline.js",
   "./hub/js/previously.js",

@@ -661,7 +661,12 @@
           {
             id: 'playa', tag: 'Station 11', label: 'The Salt Playa', flag: 'order_salt_playa_completed', built: true,
             complete() { set('order_salt_playa_completed', 'true'); set('order_salt_playa_path', JSON.stringify([3, 4, 3, 2, 2, 3, 3])); },
-            reset() { dels(['order_salt_playa_completed', 'order_salt_playa_path']); }   // its night at the Oasis Gate goes with the Chasm
+            reset() {   // its night at the Oasis Gate goes with the Chasm; its two calls on the wire (the North Edge, the south shore) go with it
+              dels(['order_salt_playa_completed', 'order_salt_playa_path', 'order_playa_walk', 'order_playa_howto']);
+              let w = null;
+              try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
+              if (w && typeof w === 'object') { ['seen2', 'reply2', 'seen3', 'reply3'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
+            }
           },
           {
             id: 'lexicon', tag: 'Station 12', label: 'The Desert Lexicon', flag: 'order_desert_lexicon_completed', built: true,
@@ -1820,10 +1825,12 @@
               statusClass: 'status-done-badge',
               title: 'The Salt Playa (Dry Basin)',
               thumb: './assets/thumbnails/salt_playa_preview.webp',
-              lore: 'Guiding Hermes with the Law of the Basin and the page “The Salt Playa (Dry Basin)” of her journal, Silvia found the one safe crossing of seven slabs, dodging the brine sinkholes. The letters along the path spelled CRYSTAL and opened the south shore.',
+              lore: 'Guiding Hermes with the Law of the Basin and the page “The Salt Playa (Dry Basin)” of her journal, Silvia found the one safe crossing of seven slabs, dodging the brine sinkholes. The letters along the path spelled CRYSTAL and opened the south shore, where a marker of the Order kept a line to check and a little brass balance.',
               rewards: [
                 { icon: '🧂', label: 'Basin Crossed', desc: '7 safe slabs, north to south' },
                 { icon: '🗝️', label: 'Passage Keyword Verified: CRYSTAL', desc: 'The key to the south shore' },
+                ...(localStorage.getItem('order_chasm_wire') && (JSON.parse(localStorage.getItem('order_chasm_wire') || '{}') || {}).reply2 !== undefined
+                  ? [{ icon: '⚖️', label: 'The Surveyor\'s Balance', desc: 'In your Cipher Ledger, with the Line of the Salt' }] : []),
                 { icon: '🏜️', label: 'Nomad Ruins in Sight', desc: 'Station 12 unlocked' }
               ],
               btnText: 'Review the Crossing ➔',
@@ -1858,20 +1865,27 @@
                 : 'The road beyond the Whispering Chasm is still unknown. Guide Hermes through the canyon first.'
             });
           }
+          // Hermes speaks first on the North Edge: until Silvia has answered him, the button takes her to the wire
+          let edgeHeard = false;
+          try { edgeHeard = (JSON.parse(localStorage.getItem('order_chasm_wire') || '{}') || {}).reply2 !== undefined; } catch (e) { edgeHeard = false; }
           return {
             badge: 'STATION 11 // DESERT PATH',
-            status: 'FIRST LIGHT ON THE SALT ✦',
+            status: edgeHeard ? 'FIRST LIGHT ON THE SALT ✦' : 'FIRST LIGHT ON THE SALT · HERMES IS CALLING 📻',
             statusClass: 'status-live-badge',
             title: 'The Salt Playa (Dry Basin)',
             thumb: './assets/thumbnails/salt_playa_preview.webp',
-            lore: 'Out of the Whispering Chasm, the ground opens into a blinding white salt basin. Pockets of brine hide under the crust. Open the page “The Salt Playa (Dry Basin)” of your journal, follow the Law of the Basin from Row I to Row VII and read the letters along your path to find the passage keyword that guides Hermes across.',
+            lore: edgeHeard
+              ? 'South of the Oasis Gate the ground opens into a blinding white salt basin, and every slab of its crust looks the same. Brine sinkholes hide under it. Cross it with Hermes step by step, with the page “The Salt Playa (Dry Basin)” of your journal as your map: only the page shows the facets and the sinkholes.'
+              : 'Hermes is standing on the North Edge of the salt, by an old surveyor\'s tripod of the Order, and he wants a word with you before he steps onto the crust. Open the Field Wire and answer him.',
             rewards: [
               { icon: '🧂', label: 'Journal page “The Salt Playa (Dry Basin)”', desc: '7×7 slab grid with brine sinkholes' },
-              { icon: '📜', label: 'Law of the Basin', desc: 'Each step changes the facet count by exactly 1' },
-              { icon: '🗝️', label: 'Passage Keyword', desc: 'Seven letters that open the south shore' }
+              { icon: '⚖️', label: 'Measured Footsteps', desc: 'Every step is tested before he trusts it' },
+              { icon: '🔒', label: 'What the South Shore Keeps', desc: 'Revealed when Hermes reaches it' }
             ],
-            btnText: '✦ CROSS THE SALT PLAYA ➔',
-            action: () => (window.openSaltPlayaModal ? window.openSaltPlayaModal() : null)
+            btnText: edgeHeard ? '✦ STEP ONTO THE SALT WITH HERMES ➔' : '📻 HERMES IS CALLING · OPEN THE FIELD WIRE ➔',
+            action: edgeHeard
+              ? () => (window.openSaltPlayaModal ? window.openSaltPlayaModal() : null)
+              : () => { if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire'); }
           };
         },
         22: () => {
@@ -2994,6 +3008,7 @@
         { id: 'diff-ve', station: 'Station 09 · Folio Limen', name: 'Solar Amplitude', expr: 'V − E', l1: 'V', op: '-', l2: 'E', target: 10, unit: ' S' },
         { id: 'diff-tf', station: 'Station 09 · Folio Limen', name: 'Polar Resonance', expr: 'T − F', l1: 'T', op: '-', l2: 'F', target: 10, unit: ' W' },
         { id: 'chasm-xe', station: 'Station 10 · Above the Oasis Gate', name: 'The Line of the Gate', expr: 'X + E', l1: 'X', op: '+', l2: 'E', target: 17, unit: '', requires: 'order_whispering_chasm_completed' },
+        { id: 'playa-ta', station: 'Station 11 · The South Shore marker', name: 'The Line of the Salt', expr: 'T − A', l1: 'T', op: '-', l2: 'A', target: 9, unit: '', requires: 'order_salt_playa_completed' },
         { id: 'stele-rf', station: 'Station 12 · Nomad Ruins Stele', name: 'Stargazer Proportion', expr: 'R × 2', l1: 'R', op: 'x2', l2: 'F', target: null, unit: '', requires: 'order_desert_lexicon_completed' },
         { id: 'falcon-pa', station: 'Station 13 · Falcon Stone', name: 'Falcon Inscription', expr: 'P − A', l1: 'P', op: '-', l2: 'A', target: 14, unit: '', requires: 'order_oasis_clepsydra_completed' },
         { id: 'cairn2-df', station: 'Station 14 · Lid of Cairn II', name: 'The Deneb Line', expr: 'D + F', l1: 'D', op: '+', l2: 'F', target: 24, unit: '', requires: 'order_sun_monolith_completed' },
@@ -3124,6 +3139,12 @@
         if (testerPanel) testerPanel.style.display = allowDev ? '' : 'none';
       }
       window.syncStormDevControlsVisibility = syncStormDevControlsVisibility;
+      // The Ledger as the Surveyor's Balance reads it (js/ledger-balance.js): her lines and her letters, nothing more
+      window.EclipseLedger = {
+        equations: () => getVisibleEquations().map((eq) => Object.assign({}, eq)),
+        value: (ch) => cipherLedger[ch],
+        set: (ch, n) => { cipherLedger[ch] = n; saveCipherLedger(); renderAlphabetGrid(); renderClueEquations(); updateAllLedgerUI(ch); }
+      };
 
       function updateProfileHeaderUI() {
         const seekerActivePill = document.getElementById('seeker-active-pill');
@@ -3686,6 +3707,7 @@
 
       // Update All Ledger UI (both Alphabet Grid and Clue Equations)
       function updateAllLedgerUI(activeChar) {
+        document.dispatchEvent(new CustomEvent('ledger:changed', { detail: activeChar || null }));
         const valFreq = {};
         Object.entries(cipherLedger).forEach(([k, val]) => {
           if (val !== undefined && val !== null && val !== '') {
@@ -5678,6 +5700,7 @@
         '9A': { title: 'Grand Desert Map · North-East', note: 'The second quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_2_ne.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '9B': { title: 'The Whispering Chasm', note: 'The 25×25 canyon labyrinth and the Law of the Canyon Walkers.', thumb: './assets/thumbnails/whispering_chasm_preview.webp', path: 'desert', node: 10, nodeLabel: 'Station 10 · The Whispering Chasm' },
         '10A': { title: 'The Salt Playa (Dry Basin)', note: 'A 7×7 field of salt slabs. Read the facets and the letters along a safe path.', thumb: './assets/thumbnails/salt_playa_preview.webp', path: 'desert', node: 21, nodeLabel: 'Station 11 · The Salt Playa' },
+        '10B': { title: 'Study on the Dry Salt Playa', note: 'The Architect\'s study of the salt: the sinkholes that form unseen, and the warning to walk with measured footsteps.', thumb: './assets/thumbnails/salt_playa_preview.webp', path: 'desert', node: 21, nodeLabel: 'Station 11 · The Salt Playa' },
         '11A': { title: 'The Desert Lexicon & Al-Qibla', note: 'The nomad crossword and the sun compass.', thumb: './assets/thumbnails/desert_lexicon_preview.webp', path: 'desert', node: 11, nodeLabel: 'Station 12 · The Desert Lexicon' },
         '11B': { title: 'Grand Desert Map · South-West', note: 'The third quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_3_sw.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '12A': { title: 'Grand Desert Map · South-East', note: 'The fourth quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_4_se.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
@@ -7080,7 +7103,7 @@
         walkingDesc: 'Hermes is asleep by the rocks of the Oasis Gate, his satchel under his head. Study the page “The Salt Playa (Dry Basin)” of your journal tonight: at first light he will call you from the edge of the salt.',
         etaLabel: 'FIRST LIGHT ON THE SALT',
         arrivedTitle: 'First Light · Station 11 Awaits',
-        arrivedDesc: 'Hermes is standing at the edge of the white salt, his boots tied twice. Open the Grand Desert Map and guide him across the Salt Playa (Station 11, the page “The Salt Playa (Dry Basin)”).',
+        arrivedDesc: 'Hermes is standing on the North Edge of the white salt, by an old surveyor\'s tripod, and calling you on the Field Wire. Answer him, then guide him across the Salt Playa (Station 11, the page “The Salt Playa (Dry Basin)”).',
         campedTitle: '✦ First Light · Camp at the Edge of the Salt ✦',
         campedDesc: 'First light has come. Hermes has walked out of the Oasis Gate to the edge of the white salt and made camp beside an old surveyor\'s tripod. He is testing the crust with his staff, slab by slab, and will call you on the Field Wire when he is ready to step onto it. Keep the page “The Salt Playa (Dry Basin)” of your journal close.'
       };
@@ -7311,8 +7334,10 @@
       // her journal before he goes in; at the Oasis Gate, after it, he tells what the canyon gave them.
       // Only for a journey standing there: a save already past the Salt Playa never hears them.
       // =======================================================================
-      const CHASM_WIRE_KEY = 'order_chasm_wire';   // { seen0, reply0, seen1, reply1 }: 0 the North Portal, 1 the Oasis Gate
+      const CHASM_WIRE_KEY = 'order_chasm_wire';   // { seenN, replyN }: 0 the North Portal, 1 the Oasis Gate, 2 the North Edge of the salt, 3 its south shore
       const CHASM_WIRE_TELEMETRY = "✦ NOMAD'S PASSPHRASE RECORDED [MIRAGE] · NEW LEDGER LINE [X] + [E] = 17 · THE SALT PLAYA AWAITS ✦";
+      const PLAYA_WIRE_TELEMETRY = "✦ PASSAGE KEYWORD RECORDED [CRYSTAL] · CHECK LINE [T] − [A] = 9 · THE SURVEYOR'S BALANCE IN THE CIPHER LEDGER ✦";
+      const WIRE_TELEMETRY = { 1: CHASM_WIRE_TELEMETRY, 3: PLAYA_WIRE_TELEMETRY };
       const CHASM_WIRE = [
         {
           divider: 'The North Portal · Before the Descent',
@@ -7361,6 +7386,54 @@
               hermesReply: "Like a key. I have written it on the inside of my hat band, where the sun cannot fade it, next to the bearing of the watchtower.\n\nTomorrow the Salt Playa. The crust is thin in places, and under it there are holes full of brine, dark as ink. I need a safe way across, Silvia, and that way is on the page “The Salt Playa (Dry Basin)” of your journal. Study it tonight and find me a path. I sleep here, by the gate, and at first light I will call you from the edge of the salt."
             }
           ]
+        },
+        {
+          divider: 'First Light · The North Edge',
+          hermesInitial: "Good morning, Silvia. The sun is not up yet, but the sky over the salt has already turned pink, and the whole playa glows as if someone had lit it from underneath.\n\nI left the Oasis Gate in the dark and I am standing on the North Edge now, where the old track runs out onto the salt. It is the most beautiful thing I have ever seen, and it frightens me a little. From here the crust looks like one white sheet, polished and perfectly firm, all the way to the Sentinel Mesa on the horizon. But last night I tossed a pebble onto it near the gate, and it went straight through with a sound like a cork leaving a bottle. The brine underneath is black.\n\nThe camel tracks from the gate do not go onto the salt. They swing west and follow the rim. Whoever made them did not dare to cross.\n\nWe are not the first to stand here, though. At the west end of the edge there is an old surveyor's tripod of the Order, its legs bleached white by the salt and a red rag still tied to its head. Someone measured this basin long ago, slab by slab, and I am sure that measurement is the grid on the page “The Salt Playa (Dry Basin)” of your journal. And on the page “Study on the Dry Salt Playa” the Architect left a warning: walk with measured footsteps, because weight without balance always yields to the deep.\n\nSo this is how we will do it. I cannot see a single number on the salt, and the sinkholes look exactly like good crust. You have the grid. Walk me along the edge to the first slab, then choose every step with me. Before each one I will plant my staff and lean my weight on it, slowly, and you tell me when to stop. Whatever we find under my boots goes into the Waypoint Log.",
+          choices: [
+            {
+              tag: '🧭',
+              text: 'I have the grid open, Hermes. We begin where the page says, and every step keeps the Law of the Basin.',
+              silviaMsg: 'I have the grid open in front of me, Hermes. We begin exactly where the page says, and every step keeps the Law of the Basin: one facet more or one facet less.',
+              hermesReply: "One facet more or one less. You read a grid the way I read a sextant, Silvia.\n\nThen I will count the slabs from the tripod as I walk along the edge, and I will not lift a boot until you have checked it on the page. Open the Salt Playa and keep your pencil on the grid: from the moment I step off the edge, it is the only map we have."
+            },
+            {
+              tag: '🤝',
+              text: 'Take it slowly, Hermes. If the crust groans, come back. No keyword is worth a fall into the brine.',
+              silviaMsg: 'Take it slowly, Hermes. If the crust groans under you, come back to the edge. No keyword is worth a fall into the brine.',
+              hermesReply: "Slowly, I promise. I have tied my water skins to my belt with a long cord, so that I can throw them onto a firm slab if I ever need my hands, and I will not take a step until you say so.\n\nOpen the Salt Playa when you are ready. I am waiting on the edge, with my staff in my hand and the tripod at my back."
+            },
+            {
+              tag: '🔭',
+              text: 'Look at the tripod first, Hermes. Did the Order leave anything on it?',
+              silviaMsg: 'Look at the tripod first, Hermes. Did the Order leave anything on it?',
+              hermesReply: "You were right to ask. On its brass head, under a crust of salt, there is a little engraved circle, half black and half white: the sign of the Order. Next to it there is a line of tiny numbers that the salt has eaten away. And the telescope does not point at the mesa. It points straight down into the basin, along one line of slabs. Whoever stood here was surveying the one safe way across.\n\nI cannot read the numbers any more, but you have the page they came from. Open the Salt Playa and we start from the tripod."
+            }
+          ]
+        },
+        {
+          divider: 'The South Shore · Mid-morning',
+          hermesInitial: "Silvia, I am sitting on solid sand with my back against a stone of the Order, and my legs are still shaking.\n\nC, R, Y, S, T, A, L. CRYSTAL. Seven slabs of salt, and under every one a letter that someone cut long ago and the wind has been burying ever since. When I looked back from the shore, the haze had swallowed everything: the edge, the tripod, the whole way we came. If we had walked where the salt looked firmest, I would be in the brine.\n\nThe stone behind me is a squat marker, as high as my waist, the kind the Order set at the end of every survey line. On its face, in the small neat hand we know by now: T − A = 9. Two letters of CRYSTAL, and no new one. I think it is a check. Whoever cut it wanted the next traveller to prove their reckoning before trusting it. If the A is already in your Cipher Ledger, see whether the T agrees.\n\nAnd in a niche in its side, wrapped in oiled cloth, there was this: a little brass balance no bigger than my hand, with two pans and a needle, and on its beam the same circle, half black and half white. I think it is how the surveyors weighed out two numbers when all they knew was their sum and their difference. I have drawn it for you in the Cipher Ledger. Lay a sum on one pan and a difference on the other, and see what it teaches you. Your Ledger is full of lines that come in pairs.\n\nThe Nomad Ruins are just beyond the dunes. And Silvia, the camel tracks are back. They came around the rim of the salt, and they go the same way we do.",
+          choices: [
+            {
+              tag: '⚖️',
+              text: 'I will try the balance on the pairs in my Ledger right now. Rest in the shadow of the marker, Hermes.',
+              silviaMsg: 'I will try the Surveyor\'s Balance on the pairs in my Cipher Ledger right now, and check T − A = 9. Rest in the shadow of the marker, Hermes.',
+              hermesReply: "The marker's shadow is just wide enough for one tired cartographer, and I am taking all of it.\n\nWeigh carefully, Silvia. Every letter you set in the Ledger now is a letter we will not have to fight for later. When I have my breath back, I will walk on to the Nomad Ruins and call you from the first stele."
+            },
+            {
+              tag: '💧',
+              text: 'How much water do you have left? Drink first, Hermes. The balance can wait a minute.',
+              silviaMsg: 'How much water do you have left, Hermes? Drink first. The balance can wait a minute.',
+              hermesReply: "Enough, and now a little less, because I did as you said. The salt dries you from the inside, even when you are not thirsty.\n\nThank you for asking before the puzzle, Silvia. When the Ledger is weighed, I will walk on to the Nomad Ruins, just beyond the dunes, and call you from the first stele."
+            },
+            {
+              tag: '🐫',
+              text: 'The tracks again… Keep the balance hidden, and watch the dunes before you go on.',
+              silviaMsg: 'The tracks again… Keep the balance hidden in your satchel, Hermes, and watch the dunes for a while before you go on.',
+              hermesReply: "Hidden, at the bottom of the satchel. I lay flat on the top of the dune for a long time with my spyglass. Nothing moves out there but the heat. Whoever they are, they are ahead of us, not behind.\n\nI will keep to the hollows between the dunes as far as the Nomad Ruins and call you from the first stele. Weigh the Ledger in the meantime, Silvia."
+            }
+          ]
         }
       ];
       function chasmWire() {
@@ -7380,7 +7453,7 @@
           if (!c) return;
           appendWireMessage('SILVIA · NAVIGATOR', c.silviaMsg, false, false, null, null, { type: 'chasm', step: i });
           appendWireMessage(getCartographerTitle(), c.hermesReply, false, false, null, null, { type: 'chasm', step: i });
-          if (i === 1) appendWireMessage('SYSTEM TELEMETRY', CHASM_WIRE_TELEMETRY, true, false, null, null, { type: 'chasm', step: 1 });
+          if (WIRE_TELEMETRY[i]) appendWireMessage('SYSTEM TELEMETRY', WIRE_TELEMETRY[i], true, false, null, null, { type: 'chasm', step: i });
         });
       }
 
@@ -7426,9 +7499,9 @@
           showTyping(false);
           if (sfx) sfx.playChimeHover();
           appendWireMessage(getCartographerTitle(), choice.hermesReply, false, true, () => {
-            if (i === 1) {
+            if (WIRE_TELEMETRY[i]) {
               if (sfx) sfx.playCelestialChime();
-              appendWireMessage('SYSTEM TELEMETRY', CHASM_WIRE_TELEMETRY, true, false, null, null, { type: 'chasm', step: 1 });
+              appendWireMessage('SYSTEM TELEMETRY', WIRE_TELEMETRY[i], true, false, null, null, { type: 'chasm', step: i });
             }
             chasmWirePlaying = false;
             renderWireChoices();
@@ -7447,8 +7520,8 @@
         const w = chasmWire();
         const header = document.getElementById('wire-prompt-header-text');
         if (!w['seen' + i]) {
-          const chasmModal = document.getElementById('modal-whispering-chasm');
-          if (document.body.getAttribute('data-active-view') !== 'view-field-wire' || (chasmModal && chasmModal.style.display !== 'none' && chasmModal.style.display !== '')) {
+          const gameModal = document.getElementById(i >= 2 ? 'modal-salt-playa' : 'modal-whispering-chasm');
+          if (document.body.getAttribute('data-active-view') !== 'view-field-wire' || (gameModal && gameModal.style.display !== 'none' && gameModal.style.display !== '')) {
             if (getMessengerUnreadCount() < 1) setMessengerUnreadCount(1);   // Hermes has something to say
             return false;
           }
@@ -7477,12 +7550,22 @@
           }));
           return true;
         }
+        if (i === 2) {
+          wirePromptBox.style.display = 'block';
+          wireCompletedBar.style.display = 'none';
+          wireChoicesGrid.innerHTML = '';
+          if (header) header.textContent = 'Hermes is waiting on the North Edge of the salt:';
+          wireChoicesGrid.appendChild(makeChoicePill('🧂', 'Step onto the Salt Playa with Hermes (Station 11)', () => {
+            if (typeof window.openSaltPlayaModal === 'function') window.openSaltPlayaModal();
+          }));
+          return true;
+        }
         return false;
       }
 
       // Out of the canyon: the Oasis Gate waits on the wire (a badge while the chat is closed)
       // and back from the canyon with the chat already open, Hermes speaks there and then
-      ['chasm:cleared', 'chasm:closed'].forEach((ev) => document.addEventListener(ev, () => { if (wireCurrentStep === 4 && !chasmWirePlaying) renderWireChoices(); }));
+      ['chasm:cleared', 'chasm:closed', 'playa:cleared', 'playa:closed'].forEach((ev) => document.addEventListener(ev, () => { if (wireCurrentStep === 4 && !chasmWirePlaying) renderWireChoices(); }));
 
       function rewindToChasmWire(step) {
         if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();
@@ -7882,6 +7965,8 @@
         if (wireCurrentStep === 4) {
           if (!isChasmDone && isChasmMarchOver() && chasmWireTurn(0)) return;
           if (isChasmDone && !isPlayaDone && !isLexiconDone && chasmWireTurn(1)) return;
+          if (isChasmDone && !isPlayaDone && !isLexiconDone && chasmWire().reply1 !== undefined && playaMarch.over() && chasmWireTurn(2)) return;
+          if (isPlayaDone && !isLexiconDone && chasmWire().reply2 !== undefined && chasmWireTurn(3)) return;
           if (!isChasmDone) {
             wirePromptBox.style.display = 'none';
             wireCompletedBar.style.display = 'flex';

@@ -60,6 +60,7 @@
   <link rel="stylesheet" href="./hub/css/stations/s10-whispering-chasm.css">
   <link rel="stylesheet" href="./hub/css/stations/s10-chasm-walk.css">
   <link rel="stylesheet" href="./hub/css/stations/s11-salt-playa.css">
+  <link rel="stylesheet" href="./hub/css/ledger-balance.css">
   <link rel="stylesheet" href="./hub/css/stations/s12-desert-lexicon.css">
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-clepsydra.css">
   <link rel="stylesheet" href="./hub/css/stations/s14-sun-monolith.css">
@@ -1919,6 +1920,9 @@
             </div>
           </div>
 
+          <!-- The Surveyor's Balance (Station 11 reward): js/ledger-balance.js, shown once the Salt Playa is crossed -->
+          <div class="surveyors-balance-card" id="surveyors-balance" hidden></div>
+
         </div>
       </section>
 
@@ -2563,10 +2567,10 @@
   </div>
 
   <!-- =====================================================================
-       TACTICAL EXPEDITION MODAL: THE SALT PLAYA (STATION 11 · SHEET 10A)
+       STATION 11 · THE SALT PLAYA: MEASURED FOOTSTEPS (3D, SHEET 10A + 10B)
        ===================================================================== -->
   <div class="chasm-modal-backdrop" id="modal-salt-playa" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="playa-modal-title">
-    <div class="chasm-workbench-window">
+    <div class="chasm-workbench-window chasm3d-window playa3d-window">
       <div class="map-frame-corner corner-tl"></div>
       <div class="map-frame-corner corner-tr"></div>
       <div class="map-frame-corner corner-bl"></div>
@@ -2577,87 +2581,113 @@
           <span class="chasm-header-icon">🧂</span>
           <div>
             <div class="chasm-header-title" id="playa-modal-title">The Salt Playa · Station 11</div>
-            <div class="chasm-header-subtitle">Brine Crust Crossing · the page “The Salt Playa (Dry Basin)” of your journal</div>
+            <div class="chasm-header-subtitle">Cross the salt with Hermes · the page “The Salt Playa (Dry Basin)” of your journal</div>
           </div>
         </div>
-        <button type="button" class="chasm-close-btn" id="btn-close-playa" title="Close Tactical View">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-playa" title="Close" aria-label="Close the Salt Playa">✕</button>
       </div>
 
-      <div class="chasm-telemetry-strip">
-        <div class="chasm-telemetry-pill"><span>🚶 Explorer:</span><strong>Hermes</strong></div>
-        <div class="chasm-telemetry-pill"><span>📜 Law of the Basin:</span><strong>±1 facet per step</strong></div>
-        <div class="chasm-telemetry-pill"><span>↧ Row:</span><strong id="playa-telem-row">I / VII</strong></div>
-        <div class="chasm-telemetry-pill"><span>◇ Facets underfoot:</span><strong id="playa-telem-facets">—</strong></div>
-        <div class="chasm-telemetry-pill"><span>📍 Waypoint:</span><strong id="playa-telem-waypoint">North Edge</strong></div>
-      </div>
-
-      <div class="chasm-workbench-body">
-        <div class="chasm-maze-frame">
-          <div class="playa-board-wrap">
-            <div id="playa-board"></div>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="playa3d-stage">
+          <canvas id="playa3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/salt_playa_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="chasm3d-runes playa3d-log" id="playa3d-log" role="img" aria-label="Waypoint Log: empty"></div>
+            <div class="chasm3d-compass" aria-hidden="true">
+              <svg viewBox="-50 -50 100 100" id="playa3d-rose" class="chasm3d-rose">
+                <circle r="44" class="rose-ring"/>
+                <path d="M0,-40 L8,-6 L0,-12 L-8,-6 Z" class="rose-north"/>
+                <path d="M0,40 L8,6 L0,12 L-8,6 Z" class="rose-south"/>
+                <text y="-24" text-anchor="middle" class="rose-n">N</text>
+                <text x="30" y="5" text-anchor="middle" class="rose-l">E</text>
+                <text y="34" text-anchor="middle" class="rose-l">S</text>
+                <text x="-30" y="5" text-anchor="middle" class="rose-l">W</text>
+              </svg>
+              <div class="chasm3d-facing" id="playa3d-facing">Facing south</div>
+            </div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-skins" id="playa3d-skins" role="img" aria-label="Water: 3 of 3 skins"></div>
+              <div class="chasm3d-clock" id="playa3d-clock">☀ 06:00</div>
+            </div>
           </div>
+          <div class="chasm3d-subtitle" id="playa3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="playa3d-fade"></div>
         </div>
 
-        <div class="chasm-desk-panel">
-          <div class="chasm-desk-header">
-            <div class="chasm-desk-title">The Law of the Basin</div>
-            <div class="chasm-desk-rule">
-              1. Start at Row I, Column D (the slab marked 3 and [C]).<br>
-              2. Advance one row per step, from Row I down to Row VII.<br>
-              3. Move to an adjacent slab in the row below: straight down or diagonal.<br>
-              4. Dark hatched slabs (✕) are sinkholes. Never step on them.<br>
-              5. The facet number must change by exactly 1 at each step (+1 or -1).<br>
-              6. The letters along your 7-step path reveal the passage keyword.
-            </div>
-          </div>
-
-          <div class="chasm-passphrase-slots-box">
-            <div class="chasm-slots-label">
-              <span>PASSAGE KEYWORD</span>
-              <span id="playa-progress-count">0 / 7 STEPS</span>
-            </div>
-            <div class="chasm-slots-row">
-              <div class="chasm-slot-box" id="playa-slot-0"><span class="slot-letter"></span><span class="chasm-slot-idx">I</span></div>
-              <div class="chasm-slot-box" id="playa-slot-1"><span class="slot-letter"></span><span class="chasm-slot-idx">II</span></div>
-              <div class="chasm-slot-box" id="playa-slot-2"><span class="slot-letter"></span><span class="chasm-slot-idx">III</span></div>
-              <div class="chasm-slot-box" id="playa-slot-3"><span class="slot-letter"></span><span class="chasm-slot-idx">IV</span></div>
-              <div class="chasm-slot-box" id="playa-slot-4"><span class="slot-letter"></span><span class="chasm-slot-idx">V</span></div>
-              <div class="chasm-slot-box" id="playa-slot-5"><span class="slot-letter"></span><span class="chasm-slot-idx">VI</span></div>
-              <div class="chasm-slot-box" id="playa-slot-6"><span class="slot-letter"></span><span class="chasm-slot-idx">VII</span></div>
-            </div>
-          </div>
-
-          <div class="chasm-cairns-keypad-box">
-            <div class="chasm-keypad-label">Click each slab on the basin map to guide Hermes, or transmit the keyword you found in your journal:</div>
-            <div class="playa-btn-row">
-              <button type="button" class="chasm-cairn-btn" id="btn-playa-undo"><span>↶ Step back one slab</span></button>
-              <button type="button" class="chasm-cairn-btn" id="btn-playa-reset"><span>↺ Retrace to the North Edge</span></button>
-            </div>
-            <div class="playa-keyword-row">
-              <input type="text" class="playa-keyword-input" id="playa-keyword-input" maxlength="7" autocomplete="off" spellcheck="false" placeholder="KEYWORD" aria-label="Passage keyword (7 letters)">
-              <button type="button" class="chasm-cairn-btn" id="btn-playa-transmit"><span>📡 Transmit</span></button>
-            </div>
-          </div>
-
-          <div class="chasm-dispatch-box" id="playa-dispatch-box">
-            <div class="chasm-dispatch-sender">
-              <span>📻 FIELD WIRE DISPATCH // HERMES</span>
-            </div>
-            <div id="playa-dispatch-text"></div>
-          </div>
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="playa3d-voice" role="status" aria-live="polite"></div>
+          <div class="chasm3d-where" id="playa3d-where"></div>
+          <div class="chasm3d-controls" id="playa3d-controls" role="group" aria-label="Guide Hermes"></div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-playa-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
           <div class="chasm-victory-card" id="playa-victory-card" style="display: none;">
-            <div class="chasm-victory-title">
-              <span>🧂</span>
-              <span>The Basin Is Crossed!</span>
-            </div>
-            <div class="chasm-victory-text">
-              "Silvia, we crossed the Salt Playa! The seven letters under my boots spell CRYSTAL, and the crust held on every step. The south shore is ahead, and I can see the ruins of an old nomad camp. When I reach them, open the page “The Desert Lexicon & Al-Qibla” in your journal."
-            </div>
-            <button type="button" class="btn-chasm-finish" id="btn-playa-finish">
-              <span>🗺️ Return to Grand Desert Map &amp; Head for the Nomad Ruins ➔</span>
-            </button>
+            <div class="chasm-victory-title"><span>🧂</span><span>Across the Salt!</span></div>
+            <div class="chasm-victory-text">The seven letters under Hermes's feet spell the passage keyword. Write them in the seven boxes of the Waypoint Log in your journal. Hermes is waiting for you on the Field Wire.</div>
+            <button type="button" class="btn-chasm-finish" id="btn-playa-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-playa-reward">🏆 See your reward</button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-playa-again">↺ Cross the salt again</button>
           </div>
+
+          <details class="chasm3d-laws">
+            <summary>The Law of the Basin</summary>
+            <ol>
+              <li>Start at Row I, Column D (marked with 3 and [C]).</li>
+              <li>Advance one row per step, from Row I down to Row VII.</li>
+              <li>Move only to an adjacent slab in the row below: straight ahead or diagonal.</li>
+              <li>Slabs marked [ X ] on the page are sinkholes. Never step on them.</li>
+              <li>Each step must have exactly one facet more or one facet less.</li>
+              <li>The letters along the seven steps spell the passage keyword.</li>
+            </ol>
+            <p>A sinkhole swallows a skin of water. A slab that breaks the Law cracks and costs half a skin. Leaning too heavily makes the crust groan and costs a little water. With no water left, Hermes must rest for 45 seconds.</p>
+          </details>
+        </div>
+      </div>
+
+      <!-- How to play: three short pages, shown the first time and whenever she asks -->
+      <div class="chasm3d-howto" id="playa3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="playa3d-howto-count">1 of 3</div>
+          <div class="chasm3d-howto-dots" id="playa3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
+
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes stands on the North Edge of the Salt Playa. On the salt <strong>every slab looks the same</strong>: no numbers, no letters, and the brine sinkholes look just like firm crust.</p>
+            <p><strong>You have the map</strong>: the page “The Salt Playa (Dry Basin)” of your journal. Take him across, one row at a time, to the south shore. The letter under each slab he stands on goes into the Waypoint Log, and the seven letters spell the passage keyword.</p>
+          </section>
+
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>What you see on the screen</h3>
+            <ul class="chasm3d-howto-keys">
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-rune playa3d-logbox" data-row="I"></span><span class="chasm3d-rune playa3d-logbox" data-row="II"></span><span class="chasm3d-rune playa3d-logbox" data-row="III"></span></span>
+                <span><strong>Waypoint Log.</strong> One box for each row, I to VII, as on your page.</span></li>
+              <li><span class="chasm3d-howto-pic"><svg viewBox="-50 -50 100 100" class="chasm3d-rose chasm3d-howto-rose" aria-hidden="true" style="transform: rotate(180deg)"><circle r="44" class="rose-ring"/><path d="M0,-40 L8,-6 L0,-12 L-8,-6 Z" class="rose-north"/><path d="M0,40 L8,6 L0,12 L-8,6 Z" class="rose-south"/><text y="-24" text-anchor="middle" class="rose-n">N</text></svg></span>
+                <span><strong>Compass.</strong> Hermes faces south, so the red point of north is behind him. <strong>His left hand is east</strong>: the right-hand side of your page.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="playa3d-howto-balance"><i></i></span></span>
+                <span><strong>The balance.</strong> Before each step Hermes leans on his staff. The needle shows his weight: let go when it is in the gold.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-skin"></span><span class="chasm3d-skin"></span><span class="chasm3d-skin"></span></span>
+                <span><strong>Water.</strong> Three skins. False steps cost water. With none left, he rests for 45 seconds.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-clock">☀ 06:00</span></span>
+                <span><strong>The sun.</strong> It climbs as he walks. The hotter it gets, the thicker the haze and the narrower the gold. There is no time limit.</span></li>
+            </ul>
+          </section>
+
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>How to play</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>On the North Edge, <strong>walk Hermes east or west</strong> to the slab where your page says the crossing begins, then step onto it.</li>
+              <li>On every row, <strong>choose one of the three slabs</strong> within his reach: press a button, tap a ringed slab, or use the arrow keys.</li>
+              <li><strong>Measured footsteps</strong>: hold the button (or the space bar) and let go in the gold. Too light, and he leans again. Too heavy, and the crust groans.</li>
+              <li><strong>Follow him on the page</strong> with your pencil. Only the page shows the sinkholes and the facets.</li>
+              <li>In the heat of the morning, <strong>not everything that shines is real</strong>.</li>
+            </ol>
+          </section>
+
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-playa-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-playa-howto-next">Next →</button>
+          </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-playa-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
@@ -4243,6 +4273,7 @@
   <script src="./hub/js/dawn-map-layer.js"></script>
   <script src="./hub/js/hide-solve-shortcuts.js"></script>
   <script src="./hub/js/stations/s11-salt-playa.js"></script>
+  <script src="./hub/js/ledger-balance.js"></script>
   <script src="./hub/js/stations/s12-desert-lexicon.js"></script>
   <script src="./hub/js/stations/s13-oasis-clepsydra.js"></script>
   <script src="./hub/js/stations/s14-sun-monolith.js"></script>

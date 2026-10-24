@@ -1511,10 +1511,10 @@ def test_early_hints(browser):
     js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(300)
 
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
-    for _ in range(3):
-        page.click('#playa-board .playa-slab[data-r="0"][data-c="0"]')
-    check(get("order_hint_s11-playa_level") == "1" and "note 1 of 3" in note("modal-salt-playa", "#playa-board"),
-          "Station 11: three refused strides bring the first note")
+    for _ in range(3):       # stepping onto the salt from the tripod, not where the page says the crossing begins
+        js("window.__playa.pick(0); window.__playa.goOn()")
+    check(get("order_hint_s11-playa_level") == "1" and "note 1 of 3" in note("modal-salt-playa", "#playa3d-controls"),
+          "Station 11: three false steps on the salt bring the first note")
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
 
     js("window.openDesertLexiconModal()"); page.wait_for_timeout(400)
@@ -2878,9 +2878,15 @@ def test_veiled_stations(browser):
           "at first light the card is drawn again: the camp at the edge of the salt while held, else the Salt Playa, whole", title())
     js("localStorage.setItem('order_playa_march_bypassed', 'true')")
     js("window.selectMapNode(21, false)"); page.wait_for_timeout(600)
-    check(title() == "The Salt Playa (Dry Basin)", "released, the card opens: the Salt Playa, whole", title())
+    check(title() == "The Salt Playa (Dry Basin)" and "HERMES IS CALLING" in card().upper() and "CRYSTAL" not in card(),
+          "released, the card opens: the Salt Playa, with Hermes calling from the North Edge", title())
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
-    check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") != "none", "and the game opens")
+    check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") == "none"
+          and js("document.body.getAttribute('data-active-view')") == "view-field-wire",
+          "until she answers Hermes on the North Edge, the salt stays shut and the Field Wire opens")
+    js("localStorage.setItem('order_chasm_wire', JSON.stringify(Object.assign(JSON.parse(localStorage.getItem('order_chasm_wire')), {seen2: true, reply2: 0})))")
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") != "none", "once she has answered him, the game opens")
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
 
     # Station 14 while Hermes crosses the Great Erg
@@ -2975,6 +2981,284 @@ def test_playa_hold(browser):
     ctx.close()
 
 
+PLAYA_SOLUTION = [3, 4, 3, 2, 2, 3, 3]
+
+
+def test_salt_playa(browser):
+    print("\n35. Station 11 · The Salt Playa in 3D: the North Edge, measured footsteps, sinkholes, cracks, the mirage, rest and the south shore")
+    hour = 3600 * 1000
+    gate = json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1})
+    seed = dict(DESERT_BASE, order_salt_playa_completed="false", order_chasm_wire=gate, order_desert_station_active="11",
+                order_playa_march_start=str(int(time.time() * 1000) - 11 * hour), order_playa_march_bypassed="true")   # past the hold
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    get = lambda key: js("k => localStorage.getItem(k)", key)
+    st = lambda: js("window.__playa.state()")
+    voice = lambda: js("document.getElementById('playa3d-voice').innerText")
+    shown = lambda: js("getComputedStyle(document.getElementById('modal-salt-playa')).display") != "none"
+    wire = lambda: js("document.getElementById('view-field-wire').innerText")
+    pills = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].map(b => b.innerText)")
+    alert = lambda: js("(a => a && !a.hidden ? a.innerText : '')(document.querySelector('#playa3d-stage .chasm3d-alert'))")
+    good = lambda: js("window.__playa.lean(window.__playa.measured())")
+
+    # First light: Hermes speaks from the North Edge before he steps onto the salt
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(400)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("HERMES IS CALLING" in card.upper() and not any(w in card for w in ("CRYSTAL", "Ledger", "Balance", "Sheet")),
+          "Station 11 card at first light: Hermes is calling, nothing about what the south shore keeps", card[:240])
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(600)
+    check(not shown() and js("document.body.getAttribute('data-active-view')") == "view-field-wire",
+          "before his call is answered the salt stays shut and the Field Wire opens")
+    page.wait_for_timeout(3000)
+    w = wire()
+    check("FIRST LIGHT" in w.upper() and "North Edge" in w and len(pills()) == 3 and "Sheet" not in w[w.upper().rfind("FIRST LIGHT"):],
+          "on the wire, Hermes on the North Edge at first light, with 3 replies", w[-300:].replace("\n", " "))
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(4500)
+    check(len(pills()) == 1 and "Step onto the Salt Playa" in pills()[0] and json.loads(get("order_chasm_wire")).get("reply2") == 0,
+          "after her reply, one way on: step onto the Salt Playa with Hermes", str(pills()))
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(300)
+    check("STEP ONTO THE SALT" in js("document.getElementById('insp-btn-primary').innerText").upper(), "the card now opens the salt")
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(1200)
+    s = st()
+    check(shown() and s["phase"] == "edge" and s["edge"] == 0 and "Salt Playa (Dry Basin)" in voice() + js("document.getElementById('modal-salt-playa').innerText")
+          and "Sheet" not in voice(), "the salt opens on the North Edge, by the tripod", f"{s['phase']} {s['edge']}")
+
+    # How to play, the first time
+    howto_on = lambda: js("!document.getElementById('playa3d-howto').hidden")
+    pages = []
+    if howto_on():
+        pages.append(js("document.getElementById('playa3d-howto-count').innerText"))
+        for _ in range(2):
+            js("document.getElementById('btn-playa-howto-next').click()")
+            pages.append(js("document.getElementById('playa3d-howto-count').innerText"))
+    check(pages == ["1 of 3", "2 of 3", "3 of 3"], "the first time, How to play opens on top: three short pages", str(pages))
+    dim = low_contrast(page, "#playa3d-howto")
+    check(not dim, "How to play: text contrast is at least WCAG AA", "; ".join(dim[:4]))
+    page.keyboard.press("Escape"); page.wait_for_timeout(500)
+    check(not howto_on() and shown() and get("order_playa_howto") == "seen", "Escape closes only How to play, and it is remembered")
+    js("document.getElementById('btn-playa-howto').click()")
+    check(howto_on() and js("document.getElementById('playa3d-howto-count').innerText") == "1 of 3", "the How to play button opens it again")
+    js("document.getElementById('btn-playa-howto-skip').click()")
+    check(not howto_on(), "Skip closes it")
+    if s["gl"]:
+        js("window.__playa.frames(4)")
+        check(st()["drawn"] > 0, "the salt is drawn in 3D")
+
+    # The wrong start: the slab next to the tripod
+    js("window.__playa.edge(1); window.__playa.edge(1)")
+    check(st()["edge"] == 2 and "east of the tripod" in js("document.getElementById('playa3d-where').innerText"), "Hermes walks east along the edge, counting slabs")
+    js("window.__playa.pick(2)")
+    s = st()
+    page.wait_for_timeout(150)
+    check(s["phase"] == "setback" and abs(s["water"] - 2.5) < 0.01 and "NOT WHERE WE BEGIN" in alert().upper() and "Column D" in alert(),
+          "the wrong first slab: Hermes says the page names where the crossing begins, half a skin spent", f"{s['phase']} {s['water']}")
+    js("window.__playa.goOn(); window.__playa.edge(1)")
+    js("window.__playa.pick(3)")
+    check(st()["phase"] == "test" and js("document.querySelector('.playa3d-balance').classList.contains('is-on')")
+          and js("!!document.querySelector('#playa3d-controls .playa3d-hold')"), "on the right slab he leans on his staff: the balance and the Hold button")
+    lo, hi = st()["band"]
+    js("window.__playa.lean(0.1)")
+    check(st()["phase"] == "test" and st()["light"] == 1 and "longer" in voice(), "let go too soon: too light, he leans again, nothing spent")
+    check(good() in ("found", "step") and st()["path"] == [3], "let go in the gold: the slab holds", str(st()["path"]))
+    page.wait_for_timeout(300)
+    check(js("document.querySelector('#playa3d-log .playa3d-logbox').innerText") == "C", "the C goes into the first box of the Waypoint Log")
+    js("window.__playa.walkOn()")
+
+    # Row II: the brine, the crack and too much weight
+    check(sorted(o["c"] for o in st()["reach"]) == [2, 3, 4] and js("document.querySelectorAll('#playa3d-controls .chasm3d-btn.is-way').length") == 3,
+          "Row II: three slabs within reach, one button for each")
+    js("window.__playa.pick(2)"); good()
+    s = st(); page.wait_for_timeout(150)
+    check(s["phase"] == "setback" and s["sinks"] == 1 and abs(s["water"] - 1.5) < 0.01 and "SINKHOLE" in alert().upper(),
+          "a brine sinkhole: his staff goes through, a skin of water lost", f"{s['phase']} {s['water']}")
+    js("window.__playa.goOn()")
+    check(js("document.querySelector('#playa3d-controls .chasm3d-btn.is-tracks')?.disabled") is True, "the open brine stays marked, its button shut")
+    js("window.__playa.pick(3)"); good()
+    s = st()
+    check(s["phase"] == "setback" and s["cracks"] == 1 and abs(s["water"] - 1.0) < 0.01 and "Law of the Basin" in alert(),
+          "a slab that breaks the Law cracks: half a skin", f"{s['phase']} {s['water']}")
+    js("window.__playa.goOn(); window.__playa.pick(4)")
+    js("window.__playa.lean(0.99)")
+    s = st()
+    check(s["phase"] == "heavy" and s["heavy"] == 1 and abs(s["water"] - 0.75) < 0.01 and "groan" in voice(),
+          "too much weight on a sound slab: the crust groans, a quarter skin, nothing broken", f"{s['phase']} {s['water']}")
+    for _ in range(20):
+        page.wait_for_timeout(200)
+        if st()["phase"] == "test":
+            break
+    check(st()["phase"] == "test", "he leans again on the same slab", st()["phase"])
+    good(); js("window.__playa.walkOn()")
+    for r in (2, 3):
+        js(f"window.__playa.pick({PLAYA_SOLUTION[r]})"); good(); js("window.__playa.walkOn()")
+    before = st()
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(600)
+    after = st()
+    check(after["path"] == before["path"] == PLAYA_SOLUTION[:4] and after["phase"] == "choose" and abs(after["water"] - before["water"]) < 0.01,
+          "a reload in the middle of the salt puts Hermes back on his slab", f"{before['path']} {after['path']}")
+
+    # Row V: the mirage
+    s = st()
+    check(s["mirage"] == 1 and "water" in voice().lower() and "MIRAGE" in voice(), "Row V: the heat paints a pool of water over a sinkhole", voice()[:160])
+    check(s["band"][1] - s["band"][0] < hi - lo, "the gold band is narrower in the heat of mid-morning", f"{s['band']} vs {[lo, hi]}")
+    js("window.__playa.pick(1)"); good()
+    s = st(); page.wait_for_timeout(150)
+    check(s["phase"] == "setback" and "MIRAGE" in alert().upper() and s["water"] < 0.01 and "rest" in alert().lower() and s["mirage"] == 3,
+          "the pool was the mirage: brine, the last skin, and Hermes must rest", f"{s['phase']} {s['water']}")
+    js("window.__playa.goOn()")
+    check(st()["phase"] == "rest" and "Hermes is resting" in js("document.getElementById('playa3d-controls').innerText"),
+          "out of water: Hermes rests under his cloak, with a countdown")
+    js("window.__playa.endRest()")
+    check(st()["phase"] == "choose" and abs(st()["water"] - 1) < 0.01, "after the rest, one skin")
+    for r in (4, 5, 6):
+        js(f"window.__playa.pick({PLAYA_SOLUTION[r]})"); good()
+        if r < 6:
+            js("window.__playa.walkOn()")
+    page.wait_for_timeout(2400)
+    s = st()
+    check(s["phase"] == "done" and s["path"] == PLAYA_SOLUTION and get("order_salt_playa_completed") == "true"
+          and json.loads(get("order_salt_playa_path") or "[]") == PLAYA_SOLUTION and "CRYSTAL" in voice()
+          and js("getComputedStyle(document.getElementById('playa-victory-card')).display") != "none",
+          "the south shore: CRYSTAL under his feet, the station is done", f"{s['phase']} {s['path']}")
+    check("".join(js("[...document.querySelectorAll('#playa3d-log .playa3d-logbox')].map(x => x.innerText)")) == "CRYSTAL", "the Waypoint Log spells CRYSTAL")
+    page.wait_for_timeout(3200)
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-salt-playa .chasm3d-reward'))")
+    rw = reward()
+    check("The Line of the Salt" in rw and "Surveyor" in rw and "Sheet" not in rw
+          and js("document.querySelector('#modal-salt-playa .chasm3d-reward-word strong').getAttribute('aria-label')") == "CRYSTAL"
+          and js("document.querySelector('#modal-salt-playa .playa-rw-ledger .rw-eq').getAttribute('aria-label')") == "T minus A equals 9"
+          and js("document.querySelectorAll('#modal-salt-playa .pl-cell.is-on').length") == 7,
+          "the reward: her crossing lit on the page, CRYSTAL, the Line of the Salt [T] − [A] = 9 and the Surveyor's Balance", rw[:200].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and shown(), "Escape puts the reward away, the salt stays open")
+    js("window.closeSaltPlayaModal()"); page.wait_for_timeout(600)
+
+    # The south shore on the Field Wire
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(3500)
+    w = wire()
+    check("SOUTH SHORE" in w.upper() and "CRYSTAL" in w and len(pills()) == 3, "back on the wire, Hermes on the south shore with 3 replies", w[-300:].replace("\n", " "))
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(4500)
+    w = wire()
+    check("CHECK LINE [T] − [A] = 9" in w and "SURVEYOR'S BALANCE" in w.upper() and json.loads(get("order_chasm_wire")).get("reply3") == 0,
+          "her reply, then the telemetry: CRYSTAL, the check line and the Surveyor's Balance", w[-260:].replace("\n", " "))
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(300)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("CRYSTAL" in card and "Surveyor" in card, "the done card names CRYSTAL and the Surveyor's Balance", card[:240])
+
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(600)
+    check(st()["phase"] == "done", "opened again, the salt shows the south shore")
+    js("document.getElementById('btn-playa-again').click()")
+    s = st()
+    check(s["phase"] == "edge" and s["path"] == [] and get("order_salt_playa_completed") == "true", "cross it again: back on the edge, the station stays done")
+    js("window.closeSaltPlayaModal()"); page.wait_for_timeout(400)
+    check(not errors, "no JS errors on the salt", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+
+def test_balance(browser):
+    print("\n36. The Surveyor's Balance (Station 11 reward): the pairs, three steps she types herself, her letters in her Ledger")
+    import re
+    seed = dict(DESERT_BASE, order_silvia_oa_ledger_v1="done", seeker_silvia_cipher_ledger="{}")
+    ctx, page, errors = new_page(browser, seed)
+    js = page.evaluate
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js("window.activateHubView('view-cipher')"); page.wait_for_timeout(700)
+    shown = lambda sel: js("s => { const e = document.querySelector(s); return !!e && !e.closest('[hidden]') && e.getClientRects().length > 0; }", sel)
+    feedback = lambda: js("document.querySelector('#surveyors-balance .sb-feedback').innerText")
+    weigh = lambda i, n: (page.fill(f"#sb-in-{i}", str(n)), page.press(f"#sb-in-{i}", "Enter"), page.wait_for_timeout(350))
+
+    check(shown("#surveyors-balance") and "The Surveyor's Balance" in js("document.getElementById('surveyors-balance').innerText"),
+          "Salt Playa crossed: the balance shows in the Ledger, after the Coordinate Equations")
+    chips = js("[...document.querySelectorAll('#surveyors-balance .sb-chip')].map(c => c.innerText.replace(/\\s+/g, ' '))")
+    check(len(chips) == 5 and any("K + G = 48" in c and "K − G = 4" in c for c in chips),
+          "it lists the five pairs of lines, K and G among them", str(chips))
+    check(js("EclipseLedger.value('K') === undefined && EclipseLedger.value('G') === undefined")
+          and not js("[...document.querySelectorAll('#surveyors-balance .sb-chip-done')].some(e => !e.closest('[hidden]'))"),
+          "K and G start empty, and no pair carries a ✓")
+
+    page.click("#surveyors-balance .sb-chip[data-pair='lat-deg|diff-kg']"); page.wait_for_timeout(500)
+    bench = js("document.querySelector('#surveyors-balance .sb-bench').innerText")
+    check(shown("#surveyors-balance .sb-bench") and "K + G = 48" in bench and "K − G = 4" in bench
+          and not re.search(r"\b(52|26|22)\b", bench) and js("document.activeElement.id") == "sb-in-0",
+          "the K and G pair goes on the beam: both lines shown, no total or letter given away, the first box has the focus", bench[:200].replace("\n", " "))
+    check(js("document.getElementById('sb-in-1').disabled && document.getElementById('sb-in-2').disabled"), "steps II and III wait their turn")
+
+    weigh(0, 50)
+    hint = feedback()
+    check(js("document.getElementById('sb-in-0') && !document.getElementById('sb-in-0').disabled")
+          and js("document.querySelector('#surveyors-balance .sb-feedback').classList.contains('is-hint')")
+          and "Not quite" in hint and not re.search(r"\d", hint),
+          "a wrong total: the sum shakes and a hint explains the step in words, with no number", hint)
+    weigh(0, 52)
+    check(js("!document.getElementById('sb-in-1').disabled") and "52 ÷ 2" in js("document.querySelector('label[for=\"sb-in-1\"]').innerText"),
+          "52 is right: step II opens with her own total")
+    weigh(1, 26)
+    weigh(2, 22)
+    page.wait_for_timeout(400)
+    write = "#surveyors-balance .sb-finish .sb-btn-primary"
+    check(shown("#surveyors-balance .sb-finish") and js(f"document.querySelector('{write}').innerText") == "Write K and G in my Ledger"
+          and js("EclipseLedger.value('K') === undefined"),
+          "the beam rests level and offers to write K and G, without writing them yet")
+    state = js("JSON.parse(localStorage.getItem('order_balance_state') || '{}')").get("silvia", {})
+    check(state.get("open") == "lat-deg|diff-kg" and state.get("pairs", {}).get("lat-deg|diff-kg", {}).get("step") == 3,
+          "order_balance_state keeps the open pair and her step", str(state))
+
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    js("window.activateHubView('view-cipher')"); page.wait_for_timeout(600)
+    check(shown("#surveyors-balance .sb-finish") and js("document.querySelector('#surveyors-balance .sb-chip.is-open').dataset.pair") == "lat-deg|diff-kg",
+          "after a reload she finds the same pair, still level")
+    page.click(write); page.wait_for_timeout(400)
+    check(js("EclipseLedger.value('K')") == 26 and js("EclipseLedger.value('G')") == 22,
+          "“Write K and G in my Ledger” writes her own 26 and 22")
+    check(js("!document.querySelector(\"#surveyors-balance .sb-chip[data-pair='lat-deg|diff-kg'] .sb-chip-done\").hidden")
+          and js(f"document.querySelector('{write}').disabled"),
+          "the pair now carries a ✓ and the button says they are in her Ledger")
+
+    js("EclipseLedger.set('K', 25)"); page.wait_for_timeout(300)
+    check("different value for K" in js("document.querySelector('#surveyors-balance .sb-conflict').innerText"),
+          "a different K in her Ledger: the balance warns her")
+    page.click(write); page.wait_for_timeout(300)
+    check(shown("#surveyors-balance .sb-confirm") and js("EclipseLedger.value('K')") == 25,
+          "it does not overwrite silently: it asks first")
+    page.click("#surveyors-balance .sb-confirm .sb-btn-primary"); page.wait_for_timeout(300)
+    check(js("EclipseLedger.value('K')") == 26 and not shown("#surveyors-balance .sb-confirm"), "she chooses to replace it: K is 26 again")
+
+    # The Line of the Salt, from her own Ledger values only
+    page.click("#surveyors-balance .sb-chip[data-pair='lat-min|zod-diff']"); page.wait_for_timeout(400)
+    weigh(0, 46); weigh(1, 23); weigh(2, 7)
+    salt = "#surveyors-balance .sb-finish .sb-actions .sb-btn:not(.sb-btn-primary):not(.sb-btn-quiet)"
+    check(shown(salt) and "Line of the Salt" in js(f"document.querySelector('{salt}').innerText"), "the A and O pair offers to check with The Line of the Salt")
+    page.click(salt); page.wait_for_timeout(300)
+    out = js("document.querySelector('#surveyors-balance .sb-salt').innerText")
+    check("needs both letters" in out and not re.search(r"\b(16|7)\b", out), "without T and A in her Ledger it only says what is missing", out)
+    js("EclipseLedger.set('T', 16); EclipseLedger.set('A', 7)"); page.wait_for_timeout(200)
+    page.click(salt); page.wait_for_timeout(300)
+    check("holds" in js("document.querySelector('#surveyors-balance .sb-salt').innerText"), "with her T and A, T − A = 9 holds")
+
+    # A phone: no sideways scroll
+    page.set_viewport_size({"width": 375, "height": 812}); page.wait_for_timeout(500)
+    wide = js("""() => { const vw = document.documentElement.clientWidth, out = [];
+      document.querySelectorAll('#surveyors-balance, #surveyors-balance *').forEach(e => { const r = e.getBoundingClientRect();
+        if (r.width && (r.right > vw + 1 || r.left < -1)) out.push(e.className.baseVal ?? e.className); });
+      return out.slice(0, 3); }""")
+    check(not wide, "at 375 px the balance fits the screen", str(wide))
+
+    js("localStorage.setItem('order_salt_playa_completed', 'false'); document.dispatchEvent(new CustomEvent('ledger:changed'))"); page.wait_for_timeout(200)
+    check(not shown("#surveyors-balance"), "the Playa not crossed: the card hides")
+    check(not errors, "no JS errors at the balance", "; ".join(errors[:2]))
+    ctx.close()
+
+    ctx, page, errors = new_page(browser, dict(SILVIA, order_whispering_chasm_completed="true"))
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    page.evaluate("window.activateHubView('view-cipher')"); page.wait_for_timeout(500)
+    check(page.evaluate("document.getElementById('surveyors-balance').hidden"), "before the Salt Playa, the Ledger has no balance")
+    check(not errors, "no JS errors before the Playa", "; ".join(errors[:2]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -2987,9 +3271,11 @@ SECTIONS = {
     "camera": test_camera_obscura, "gallery": test_whispering_gallery,
     "chasm": test_whispering_chasm, "veil": test_veiled_stations, "portal": test_silvia_north_portal,
     "playahold": test_playa_hold,
+    "playa": test_salt_playa,
+    "balance": test_balance,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

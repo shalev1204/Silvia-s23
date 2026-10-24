@@ -1,102 +1,85 @@
-    /* ===================================================================
-       THE SALT PLAYA TACTICAL MODAL (STATION 11) · reuses the .chasm-* chrome
-       =================================================================== */
-    .playa-board-wrap { width: 100%; max-width: 620px; }
-    .playa-col-heads, .playa-row {
-      display: grid;
-      grid-template-columns: 34px repeat(7, minmax(0, 1fr));
-      gap: 6px;
-      align-items: center;
-    }
-    .playa-col-heads {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      color: rgba(212, 168, 83, 0.7);
-      text-align: center;
-      margin-bottom: 4px;
-    }
-    .playa-row { margin-bottom: 6px; padding: 3px 0; border-radius: 6px; transition: background 0.25s ease; }
-    .playa-row.current { background: rgba(212, 168, 83, 0.10); box-shadow: inset 0 0 0 1px rgba(212, 168, 83, 0.35); }
-    .playa-row-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--brass-bright);
-      text-align: center;
-    }
-    .playa-slab {
-      aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      border: 1.5px solid rgba(60, 50, 35, 0.55);
-      background: linear-gradient(145deg, #efe8d6 0%, #d9cfb6 100%);
-      color: #3a2f1c;
-      font-family: 'Cinzel', serif;
-      cursor: pointer;
-      position: relative;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      line-height: 1.05;
-      transition: transform 0.15s ease, box-shadow 0.2s ease;
-      box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.18), 0 2px 5px rgba(0, 0, 0, 0.5);
-    }
-    .playa-slab::after {
-      content: '';
-      position: absolute;
-      inset: 5px;
-      border-radius: 5px;
-      background:
-        linear-gradient(135deg, transparent 46%, rgba(80, 64, 40, 0.18) 47%, transparent 49%),
-        linear-gradient(60deg, transparent 62%, rgba(80, 64, 40, 0.14) 63%, transparent 65%);
-      pointer-events: none;
-    }
-    .playa-num { font-size: 1.3rem; font-weight: 700; }
-    .playa-let { font-size: 0.72rem; font-weight: 700; color: #57400f; letter-spacing: 0.04em; }
-    .playa-slab.reachable { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.9), 0 0 14px rgba(245, 158, 11, 0.5); }
-    .playa-slab:hover:not(.sink):not(.chosen) { transform: translateY(-2px); }
-    .playa-slab.chosen {
-      background: linear-gradient(145deg, #fde68a 0%, #d4a853 100%);
-      border-color: #92661a;
-      box-shadow: 0 0 0 2px #fbbf24, 0 0 16px rgba(251, 191, 36, 0.55);
-    }
-    .playa-slab.sink {
-      background: repeating-linear-gradient(135deg, #2a1d12 0 5px, #120c07 5px 10px);
-      border-color: #5b3a1d;
-      color: #8a5530;
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-    .playa-slab.sink::after { display: none; }
-    .playa-step-badge {
-      position: absolute;
-      top: 2px;
-      right: 5px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.55rem;
-      color: #5a3d0f;
-    }
-    .playa-slab.shake { animation: playaShake 0.35s; }
-    @keyframes playaShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-    .playa-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-    .playa-btn-row .chasm-cairn-btn { flex: 1 1 140px; font-size: 0.85rem; }
-    .playa-keyword-row { display: flex; gap: 8px; }
-    .playa-keyword-input {
-      flex: 1 1 auto;
-      min-width: 0;
-      background: #1d1610;
-      border: 1.5px solid rgba(212, 168, 83, 0.35);
-      color: var(--parchment-base);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-    }
-    .playa-keyword-input:focus { outline: none; border-color: var(--brass-bright); }
-    .playa-keyword-input.shake { animation: playaShake 0.35s; }
-    .playa-keyword-row .chasm-cairn-btn { flex: 0 0 auto; }
+    /* ---- Station 11 · The Salt Playa: measured footsteps behind Hermes (3D) ---- */
+    /* The window, the HUD, the panel, the guide, the alerts and the reward are the Whispering Chasm's (s10-chasm-walk.css);
+       here only what the salt adds: its pale light, the Waypoint Log, the balance and the crossing drawn on the page */
+    .playa3d-window .chasm3d-stage { background: #efe2dc; }
+    .playa3d-window .chasm3d-ambient { background: #15101a; }
+    .playa3d-window .amb-haze { background: radial-gradient(circle, hsla(calc(330 + var(--sun) * 40), 70%, 78%, calc(0.16 + var(--sun) * 0.12)), transparent 70%); }
+    .playa3d-window .amb-haze-2 { background: radial-gradient(circle, rgba(156, 136, 184, 0.24), transparent 70%); }
+    .playa3d-window .amb-motes i { background: #ffffff; box-shadow: 0 0 6px #f5c2e7; }
 
+    /* The Waypoint Log: seven boxes, each with its row under it, as on the page */
+    .playa3d-log { gap: 5px; }
+    .playa3d-logbox { position: relative; margin-bottom: 14px; }
+    .playa3d-logbox::after {
+      content: attr(data-row); position: absolute; left: 0; right: 0; top: calc(100% + 2px); text-align: center;
+      font: 600 0.6rem 'Cinzel', serif; letter-spacing: 0.04em; color: #fde68a; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    }
+    .chasm3d-howto-pic .playa3d-logbox { margin-bottom: 12px; }
+
+    /* The balance: a brass arc, the measured band in gold, the red of too much weight, the needle of his lean */
+    .playa3d-balance {
+      position: absolute; left: 50%; bottom: 16px; transform: translate(-50%, 14px); opacity: 0; pointer-events: none; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 18px 8px; border-radius: 18px;
+      background: rgba(16, 9, 5, 0.74); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .playa3d-balance.is-on { opacity: 1; transform: translate(-50%, 0); }
+    .playa3d-balance svg { width: 170px; height: 94px; overflow: visible; }
+    .playa3d-balance path { fill: none; stroke-width: 9; }
+    .playa3d-balance .b-track { stroke: rgba(253, 230, 138, 0.16); stroke-linecap: round; }
+    .playa3d-balance .b-band { stroke: #fbbf24; filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.8)); }
+    .playa3d-balance .b-heavy { stroke: rgba(226, 114, 91, 0.75); }
+    .playa3d-balance .b-needle line { stroke: #fff3c4; stroke-width: 3.5; stroke-linecap: round; }
+    .playa3d-balance .b-needle circle { fill: #d4a853; stroke: #fff3c4; stroke-width: 1.5; }
+    .playa3d-balance .b-label { font-family: 'Cinzel', serif; font-size: 0.86rem; letter-spacing: 0.06em; color: #fde68a; white-space: nowrap; }
+    .playa3d-balance.is-gold .b-label { color: #fff3c4; text-shadow: 0 0 10px #fbbf24; }
+    .playa3d-balance.is-gold svg { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.7)); }
+    .playa3d-balance.is-red .b-label { color: #f4a08a; }
+    .playa3d-balance.is-red { animation: chasm-shake 0.4s ease infinite; }
+    @media (max-width: 600px) { .playa3d-balance { bottom: 70px; } .playa3d-balance svg { width: 140px; height: 78px; } }
+    /* the subtitle rises above the balance while it is out, so they never overlap */
+    .playa3d-window .chasm3d-stage:has(.playa3d-balance.is-on) .chasm3d-subtitle { bottom: 160px; }
+    @media (max-width: 600px) { .playa3d-window .chasm3d-stage:has(.playa3d-balance.is-on) .chasm3d-subtitle { bottom: 190px; } }
+    .chasm3d-btn.playa3d-hold { flex-basis: 100%; min-height: 58px; font-size: 1rem; touch-action: none; user-select: none; -webkit-user-select: none; }
+    .chasm3d-btn.playa3d-hold:active:not(:disabled) { background: rgba(140, 90, 28, 0.95); box-shadow: inset 0 0 18px rgba(253, 230, 138, 0.35); }
+    /* in the guide, a little needle that rocks into the gold */
+    .playa3d-howto-balance {
+      position: relative; width: 64px; height: 34px; border-radius: 64px 64px 0 0; overflow: hidden;
+      background: conic-gradient(from -90deg at 50% 100%, rgba(253, 230, 138, 0.2) 0deg 95deg, #fbbf24 95deg 125deg, rgba(226, 114, 91, 0.7) 125deg 180deg, transparent 180deg);
+    }
+    .playa3d-howto-balance i { position: absolute; left: calc(50% - 1.5px); bottom: 0; width: 3px; height: 30px; background: #fff3c4; border-radius: 3px; transform-origin: 50% 100%; animation: playa-needle 3.2s ease-in-out infinite; }
+    @keyframes playa-needle { 0% { transform: rotate(-90deg); } 60% { transform: rotate(22deg); } 70%, 100% { transform: rotate(18deg); } }
+
+    /* ---- The reward: the grid of the page, her crossing in gold, the Line of the Salt and the Surveyor's Balance ---- */
+    .playa-rw-map svg { max-width: 330px; }
+    .pl-cell rect { fill: rgba(255, 250, 236, 0.55); stroke: rgba(122, 74, 24, 0.45); stroke-width: 0.3; }
+    .pl-cell text { text-anchor: middle; font-family: 'Cinzel', serif; fill: #6b4520; }
+    .pl-cell .n { font-size: 3.6px; font-weight: 700; }
+    .pl-cell .l { font-size: 2.4px; opacity: 0.8; }
+    .pl-cell.is-on rect { fill: #fde68a; stroke: #b45309; stroke-width: 0.5; }
+    .pl-cell.is-on text { fill: #7c2d12; }
+    .pl-cell.is-on { transform-box: fill-box; transform-origin: center; }
+    .chasm3d-reward.is-on .pl-cell.is-on { animation: playa-cell 0.5s cubic-bezier(.2, .9, .3, 1.4) var(--t) both; }
+    @keyframes playa-cell { 0% { transform: none; } 50% { transform: scale(1.22); } 100% { transform: none; } }
+    .chasm3d-reward.is-on .pl-cell.is-on rect { animation: playa-lit 0.5s ease var(--t) both; }
+    @keyframes playa-lit { from { fill: rgba(255, 250, 236, 0.55); stroke: rgba(122, 74, 24, 0.45); } to { fill: #fde68a; stroke: #b45309; } }
+    .pl-sink rect { fill: rgba(42, 74, 88, 0.55); stroke: rgba(30, 50, 60, 0.6); stroke-width: 0.3; }
+    .pl-sink path { stroke: rgba(230, 240, 245, 0.7); stroke-width: 0.6; stroke-linecap: round; }
+    .playa-rw-map .rw-road { stroke-width: 1.1; }
+    .playa-rw-map .rw-road-glow { stroke-width: 3; }
+    .playa-rw-ledger .rw-eq i:first-child { border-color: #8a4b12; color: #3d2410; box-shadow: none; }
+    .playa-rw-balance { margin-bottom: 10px; }
+    .chasm3d-reward.is-on .playa-rw-balance { animation-delay: 4.5s; }
+    .playa-balance-icon {
+      flex: 0 0 auto; margin: 0; width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center;
+      background: radial-gradient(circle at 38% 32%, #f4d58a, #c8902e 55%, #8a5a18); box-shadow: 0 0 0 4px rgba(200, 144, 46, 0.3), 0 6px 14px rgba(0, 0, 0, 0.4), inset 0 -4px 10px rgba(0, 0, 0, 0.3);
+    }
+    .playa-balance-icon svg { width: 52px; height: 46px; fill: none; stroke: #3d2410; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .playa-balance-icon svg circle { fill: #3d2410; }
+    .chasm3d-reward.is-on .playa-balance-icon { animation: rw-seal 0.7s cubic-bezier(.2, .9, .3, 1.4) 4.8s both; }
+    .chasm3d-reward.is-on .playa-balance-icon svg { animation: playa-tip 2.6s ease-in-out 5.6s infinite; }
+    @keyframes playa-tip { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-7deg); } 70% { transform: rotate(5deg); } }
+    @media (max-width: 520px) {
+      .playa3d-logbox::after { font-size: 0.52rem; }
+      .playa-balance-icon { width: 60px; height: 60px; }
+      .playa-balance-icon svg { width: 42px; height: 38px; }
+    }

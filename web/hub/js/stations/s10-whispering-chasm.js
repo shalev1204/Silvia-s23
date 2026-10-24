@@ -2106,6 +2106,9 @@
       });
       modal.addEventListener('click', (e) => { if (e.target === modal) closeChasm(); });
 
+      // The painted look and Hermes himself, for the other 3D walks (the Salt Playa, s11-salt-playa.js)
+      window.EclipsePaint = { rng, canvasTex, speckle, toon, rim, worldPainted, buildHermes };
+
       // Test hook (scripts/audit/web_smoke.py)
       window.__chasm = {
         state: () => Object.assign({ phase: view.phase, gl: !!G, options: S ? options() : [], drawn: G ? G.renderer.info.render.calls : 0 }, S),

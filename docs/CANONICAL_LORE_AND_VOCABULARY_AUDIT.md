@@ -721,6 +721,13 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$[X] = 17 - 2 \implies \mathbf{X = 15}$$
 - **Asignación en el Ledger**: $\mathbf{X = 15}$, el valor libre que se había reservado para la Estación 27. La X no aparece en la frase final. La pista de la R (tercera runa) se mantiene en la historia del cañón porque la Estación 12 la usa ($[R] \times 2 = [F]$).
 
+#### 7.B.15 · Estación 11 · The Line of the Salt y The Surveyor's Balance (Salt Playa)
+- **Origen** (decisión del Operador, 24-10-2026: el premio de la Salt Playa es una línea de comprobación y un artefacto que ayude a resolver las ecuaciones que Silvia ya acumula): en la orilla sur, un mojón de la Orden guarda en un nicho, envuelta en tela encerada, una balanza de latón con el círculo mitad negro, mitad blanco en el astil. La línea aparece en el Ledger con `requires: 'order_salt_playa_completed'` (id `playa-ta`).
+- **Ecuación de comprobación (The Line of the Salt)**, con dos letras de CRYSTAL:
+  $$[T] - [A] = 9$$
+- **Comprobación**: con $A = 7$ (Latitude Minutes y Meridian Resonance) y $T = 16$ (Longitude Seconds y Polar Resonance: $F + T = 22$, $T - F = 10$), $16 - 7 = 9$. No introduce letras nuevas; sirve para confirmar.
+- **The Surveyor's Balance** (`web/hub/js/ledger-balance.js`, tarjeta `#surveyors-balance` en el Cipher Ledger): enseña el método suma-diferencia con las parejas de líneas visibles que suman y restan las mismas dos letras ($K{+}G$/$K{-}G$, $A{+}O$/$O{-}A$, $B{+}P$/$P{-}B$, $E{+}V$/$V{-}E$, $F{+}T$/$T{-}F$). En tres pasos (sumar los totales, partir por la mitad la letra mayor, restar para la menor), Silvia teclea cada número. La balanza no da ningún valor (Regla 9): un error recibe una pista en palabras, sin cifras. Al final, «Write … in my Ledger» escribe sus propios valores (pidiendo confirmación si ya había otros) y, para las parejas con T o A, comprueba la Line of the Salt. Estado en `order_balance_state`.
+
 ---
 
 ## 8. DIRECTORIO GEOGRÁFICO Y ONOMÁSTICO CANÓNICO
