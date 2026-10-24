@@ -184,4 +184,9 @@
         linear-gradient(180deg, #0a1120 0%, #050912 50%, #020408 100%);
     }
 
-
+    /* Under a game window nothing of the hub needs to move */
+    html.game-open .game-hub-container *,
+    html.game-open .hub-theme-backdrop,
+    html.game-open .cosmic-nebula-layer,
+    html.game-open .cosmic-vignette,
+    html.game-open .hub-dynamic-backdrop { animation-play-state: paused !important; }

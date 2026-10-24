@@ -957,7 +957,7 @@
     var t0 = performance.now(), last = t0, introStart = null;
     function frame(now) {
       requestAnimationFrame(frame);
-      if (!visible || document.hidden || stage.clientWidth === 0 || !uniforms.uInk.value) return;
+      if (!visible || document.hidden || window.__eclipseGameOpen || stage.clientWidth === 0 || !uniforms.uInk.value) return;
       var dt = Math.min((now - last) / 1000, 0.1);
       last = now;
       var time = (now - t0) / 1000;

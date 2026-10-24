@@ -177,7 +177,7 @@
       }
       float id = sHash(n + mg).x;
       md = 8.0;
-      for (int j = -2; j <= 2; j++) for (int i = -2; i <= 2; i++) {
+      for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
         vec2 g = mg + vec2(float(i), float(j)), o = 0.5 + 0.38 * sin(6.2831 * sHash(n + g)), r = g + o - f;
         if (dot(mr - r, mr - r) > 0.00001) md = min(md, dot(0.5 * (mr + r), normalize(r - mr)));
       }
@@ -2263,7 +2263,9 @@
       function frame(now) {
         raf = requestAnimationFrame(frame);
         if (!G || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;
-        tick(now, Math.min(0.1, (now - (last || now)) / 1000));
+        const dt = Math.min(0.1, (now - (last || now)) / 1000);
+        tick(now, dt);
+        (G.adapt || (G.adapt = P.fitSpeed(G.renderer)))(dt);
         last = now;
       }
       function finishWalk() {
@@ -2891,6 +2893,7 @@
 
       // Test hook (scripts/audit/web_smoke.py)
       window.__playa = {
+        gfx: () => G,
         state: () => Object.assign({ phase: view.phase, stage: S ? stage() : '', sky: view.sky, gl: !!G, reach: S ? reach() : [], drawn: G ? G.renderer.info.render.calls : 0, band: [BAND_C - bandHalf(), BAND_C + bandHalf()],
           cam: G ? G.camera.position.toArray().map((v) => +v.toFixed(2)) : [], up: G ? G.camera.up.toArray() : [] }, S),
         edge: (d) => { alongEdge(d); finishWalk(); return view.phase; },

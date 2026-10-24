@@ -1,6 +1,23 @@
     (function () {
       'use strict';
 
+      // A game window covers the whole hub. While one is open, everything painted behind it (the 3D map, the star canvas
+      // and the hub's CSS animations) stands still, so the game keeps the whole GPU and holds a steady frame rate.
+      (function watchGameWindows() {
+        const sel = '.chasm-modal-backdrop:has(.chasm3d-window), .monolith-modal-backdrop, .clepsydra-modal-backdrop';
+        const sync = () => {
+          const open = [...document.querySelectorAll(sel)].some((m) => m.style.display && m.style.display !== 'none');
+          window.__eclipseGameOpen = open;
+          document.documentElement.classList.toggle('game-open', open);
+        };
+        const start = () => {
+          const mo = new MutationObserver(sync);
+          document.querySelectorAll(sel).forEach((m) => mo.observe(m, { attributes: true, attributeFilter: ['style'] }));
+          sync();
+        };
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+      })();
+
       // 1. Tactile Audio Synthesizer (Web Audio API)
       class TactileSound {
         constructor() {
@@ -4066,7 +4083,7 @@
 
         function renderStars(timestamp) {
           requestAnimationFrame(renderStars);
-          if (document.hidden) return; // Completely idle in background tabs
+          if (document.hidden || window.__eclipseGameOpen) return; // Completely idle in background tabs, and under a game window
 
           const elapsed = timestamp - lastStarsTime;
           if (elapsed < frameInterval) return;

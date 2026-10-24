@@ -3038,6 +3038,7 @@ def test_salt_playa(browser):
             js("document.getElementById('btn-playa-howto-next').click()")
             pages.append(js("document.getElementById('playa3d-howto-count').innerText"))
     check(pages == ["1 of 4", "2 of 4", "3 of 4", "4 of 4"], "the first time, How to play opens on top: four short pages, both phases", str(pages))
+    page.wait_for_timeout(1500)   # the last page slides in and its list items rise, in turn, before the text is measured
     dim = low_contrast(page, "#playa3d-howto")
     check(not dim, "How to play: text contrast is at least WCAG AA", "; ".join(dim[:4]))
     page.keyboard.press("Escape"); page.wait_for_timeout(500)
@@ -3402,6 +3403,7 @@ def test_desert_lexicon(browser):
             js("document.getElementById('btn-lexicon-howto-next').click()")
             pages.append(js("document.getElementById('lex3d-howto-count').innerText"))
     check(pages == ["1 of 4", "2 of 4", "3 of 4", "4 of 4"], "the first time, How to play opens on top: four short pages", str(pages))
+    page.wait_for_timeout(1500)   # the last page slides in and its list items rise, in turn, before the text is measured
     dim = low_contrast(page, "#lex3d-howto")
     check(not dim, "How to play: text contrast is at least WCAG AA", "; ".join(dim[:4]))
     page.keyboard.press("Escape"); page.wait_for_timeout(400)

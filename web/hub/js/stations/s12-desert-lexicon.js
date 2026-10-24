@@ -1465,7 +1465,9 @@
       function frame(now) {
         raf = requestAnimationFrame(frame);
         if (!G || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;
-        tick(now, Math.min(0.1, (now - (last || now)) / 1000));
+        const dt = Math.min(0.1, (now - (last || now)) / 1000);
+        tick(now, dt);
+        (G.adapt || (G.adapt = P.fitSpeed(G.renderer)))(dt);
         last = now;
       }
       function finishWalk() {
@@ -2033,6 +2035,7 @@
 
       // Test hook (scripts/audit/web_smoke.py)
       window.__lexicon = {
+        gfx: () => G,
         state: () => Object.assign({ phase: view.phase, stage: S ? stage() : '', gl: !!G, sel: view.sel, bear: view.bear, drawn: G ? G.renderer.info.render.calls : 0,
           cam: G ? G.camera.position.toArray().map((v) => +v.toFixed(2)) : [], watchSafe: S ? WATCH[S.watch].safe : null }, S),
         select: (id) => { selectWord(id); return view.phase; },

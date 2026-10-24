@@ -1561,7 +1561,9 @@
       function frame(now) {
         raf = requestAnimationFrame(frame);
         if (!G || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;   // no frames while it fades out
-        tick(now, Math.min(0.1, (now - (last || now)) / 1000));
+        const dt = Math.min(0.1, (now - (last || now)) / 1000);
+        tick(now, dt);
+        (G.adapt || (G.adapt = fitSpeed(G.renderer)))(dt);
         last = now;
       }
       function tick(now, dt) {
@@ -2106,11 +2108,27 @@
       });
       modal.addEventListener('click', (e) => { if (e.target === modal) closeChasm(); });
 
+      // Keeps the 3D walks smooth on any screen: if the GPU cannot hold about 45 frames a second, the picture is drawn with
+      // fewer pixels (never below 0.75 per CSS pixel) until it can. It only ever steps down, so it never flickers between two sizes.
+      function fitSpeed(renderer) {
+        let ema = 16.7, seen = 0, ratio = renderer.getPixelRatio();
+        return function (dt) {
+          if (!(dt > 0) || dt >= 0.09 || ++seen < 45) return;   // a pause or a hitch says nothing about the GPU
+          ema += (dt * 1000 - ema) * 0.08;
+          if (ema > 23 && ratio > 0.75) {
+            ratio = Math.max(0.75, ratio * 0.85);
+            renderer.setPixelRatio(ratio);
+            ema = 16.7; seen = 20;
+          }
+        };
+      }
+
       // The painted look and Hermes himself, for the other 3D walks (the Salt Playa, s11-salt-playa.js)
-      window.EclipsePaint = { rng, canvasTex, speckle, toon, rim, worldPainted, buildHermes };
+      window.EclipsePaint = { rng, canvasTex, speckle, toon, rim, worldPainted, buildHermes, fitSpeed };
 
       // Test hook (scripts/audit/web_smoke.py)
       window.__chasm = {
+        gfx: () => G,
         state: () => Object.assign({ phase: view.phase, gl: !!G, options: S ? options() : [], drawn: G ? G.renderer.info.render.calls : 0 }, S),
         choose: (name) => { const d = DIRS.findIndex((x) => x[2] === name); go(d); finishWalk(); return view.phase; },
         guide: () => { const d = whisperDir(); return d < 0 ? null : DIRS[d][2]; },
