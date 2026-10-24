@@ -746,7 +746,8 @@
       if (state.done.chasm && !state.done.playa && playaProgress() < 1) {
         var etaP = hub('getPlayaMarchEta', '');
         return { progress: 0, from: route.cum[3], to: route.cum[4],
-                 text: etaP ? '🌙 NIGHT AT THE OASIS GATE · FIRST LIGHT IN: ' + etaP : 'Out of the canyon, at the Oasis Gate' };
+                 text: etaP ? '🌙 NIGHT AT THE OASIS GATE · FIRST LIGHT IN: ' + etaP
+                   : (hub('isPlayaCamped', false) ? '⛺ CAMPED AT THE EDGE OF THE SALT' : 'Out of the canyon, at the Oasis Gate') };
       }
       if (state.done.clep && !state.done.monolith && monolithProgress() < 1 && route.gates !== null) {
         var etaM = hub('getMonolithMarchEta', '');

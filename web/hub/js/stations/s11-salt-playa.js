@@ -234,6 +234,10 @@
         // Out of the canyon, Hermes spends the night at the Oasis Gate and walks onto the salt at first light
         if (!isDone() && !(window.isAdminTester && window.isAdminTester()) && typeof window.isPlayaMarchOver === 'function' && !window.isPlayaMarchOver()) {
           const eta = typeof window.getPlayaMarchEta === 'function' ? window.getPlayaMarchEta() : '';
+          if (typeof window.isPlayaCamped === 'function' && window.isPlayaCamped()) {
+            toast('✦ THE EDGE OF THE SALT ✦ Hermes has made camp by the old surveyor\'s tripod and is testing the crust. He will call you on the Field Wire when he is ready.');
+            return;
+          }
           toast(eta
             ? '✦ NIGHT AT THE OASIS GATE ✦ Hermes is asleep by the gate. First light in ' + eta + ': then he calls you from the edge of the salt.'
             : '✦ THE OASIS GATE ✦ Hermes is calling you from the Oasis Gate on the Field Wire.');

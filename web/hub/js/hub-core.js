@@ -1831,6 +1831,24 @@
             };
           }
 
+          if (window.EclipseMarches && window.EclipseMarches.playa.camped()) {
+            return {
+              badge: 'STATION 11 // DESERT PATH',
+              status: 'CAMP AT THE EDGE OF THE SALT ⛺',
+              statusClass: 'status-live-badge',
+              title: 'Camp at the Edge of the Salt',
+              thumb: './assets/thumbnails/salt_playa_preview.webp',
+              veiled: true,
+              lore: 'First light has come. Hermes has walked out of the Oasis Gate to the edge of the white salt and made camp beside an old surveyor\'s tripod. He is testing the crust with his staff, slab by slab, and will call you on the Field Wire when he is ready to step onto it. Meanwhile, keep the page “The Salt Playa (Dry Basin)” of your journal close.',
+              rewards: [
+                { icon: '⛺', label: 'Camp at the Edge of the Salt', desc: 'Hermes tests the crust before he trusts it' },
+                { icon: '🧭', label: 'Journal page “The Salt Playa (Dry Basin)”', desc: 'The crossing, seen from above' },
+                { icon: '📻', label: 'Field Wire on Standby', desc: 'He will call you when he is ready' }
+              ],
+              btnText: '⛺ HERMES IS TESTING THE CRUST',
+              btnDisabled: true
+            };
+          }
           if (!marchOver('playa')) {
             return veiledStation({
               station: 11, march: 'playa', thumb: './assets/thumbnails/salt_playa_preview.webp', etaLabel: 'FIRST LIGHT IN',
@@ -6881,10 +6899,13 @@
           return Math.max(0, Math.min(1.0, (Date.now() - start) / ms));
         };
         const started = () => !!localStorage.getItem(keys.start) || progress() >= 1.0;
-        const over = () => progress() >= 1.0;
+        // The hours are up but the Operator holds the station: Hermes camps where he is (keys.held)
+        const camped = () => !!keys.held && progress() >= 1.0 && localStorage.getItem(keys.done) !== 'true'
+          && localStorage.getItem(keys.bypassed) !== 'true' && keys.held();
+        const over = () => progress() >= 1.0 && !camped();
         // "5 h 12 min" while Hermes walks; '' before he sets out or once he has arrived
         const eta = () => {
-          if (!started() || over()) return '';
+          if (!started() || progress() >= 1.0) return '';
           const remMs = Math.max(0, ms * (1 - progress()));
           return Math.floor(remMs / 3600000) + ' h ' + String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0') + ' min';
         };
@@ -6896,15 +6917,23 @@
         };
         // When Hermes arrives (ms since epoch), 0 before he sets out
         const arrivesAt = () => { const t = parseInt(localStorage.getItem(keys.start) || '0', 10); return t > 1 ? t + ms : 0; };
-        return { progress, started, over, eta, start, skip, arrivesAt };
+        return { progress, started, over, camped, eta, start, skip, arrivesAt };
       }
+
+      // The Operator's hold on Station 11 (24-10-2026): the Salt Playa is being rebuilt as a 3D game. While true,
+      // first light comes but Hermes camps at the edge of the salt and the crossing stays shut for Silvia
+      // (testers go on). To release it: set PLAYA_HOLD = false and deploy, only on the Operator's OK.
+      const PLAYA_HOLD = true;
 
       // Station 11: the night at the Oasis Gate. Hermes sleeps outside the canyon and sets out on the salt at
       // first light, 10 hours after Silvia answers him there (the Oasis Gate reply starts it).
-      const playaMarch = makeMarch(10, { start: 'order_playa_march_start', bypassed: 'order_playa_march_bypassed', done: 'order_salt_playa_completed' });
+      const playaMarch = makeMarch(10, { start: 'order_playa_march_start', bypassed: 'order_playa_march_bypassed', done: 'order_salt_playa_completed',
+        held: () => PLAYA_HOLD && !isCarlesTester() });
       window.isPlayaMarchOver = playaMarch.over;
+      window.isPlayaCamped = playaMarch.camped;
       window.getPlayaMarchEta = playaMarch.eta;
-      window.getPlayaMarchProgress = playaMarch.progress;
+      // While he camps, the 3D map keeps him at the Oasis Gate, short of the salt
+      window.getPlayaMarchProgress = () => (playaMarch.camped() ? 0.999 : playaMarch.progress());
       window.skipPlayaMarch = playaMarch.skip;
 
       // Station 14: the 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (wire step 9 starts it)
@@ -7051,7 +7080,9 @@
         walkingDesc: 'Hermes is asleep by the rocks of the Oasis Gate, his satchel under his head. Study the page “The Salt Playa (Dry Basin)” of your journal tonight: at first light he will call you from the edge of the salt.',
         etaLabel: 'FIRST LIGHT ON THE SALT',
         arrivedTitle: 'First Light · Station 11 Awaits',
-        arrivedDesc: 'Hermes is standing at the edge of the white salt, his boots tied twice. Open the Grand Desert Map and guide him across the Salt Playa (Station 11, the page “The Salt Playa (Dry Basin)”).'
+        arrivedDesc: 'Hermes is standing at the edge of the white salt, his boots tied twice. Open the Grand Desert Map and guide him across the Salt Playa (Station 11, the page “The Salt Playa (Dry Basin)”).',
+        campedTitle: '✦ First Light · Camp at the Edge of the Salt ✦',
+        campedDesc: 'First light has come. Hermes has walked out of the Oasis Gate to the edge of the white salt and made camp beside an old surveyor\'s tripod. He is testing the crust with his staff, slab by slab, and will call you on the Field Wire when he is ready to step onto it. Keep the page “The Salt Playa (Dry Basin)” of your journal close.'
       };
       const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair, 33: masksMarch };
 
@@ -7662,12 +7693,17 @@
         // then the arrival bar stays until the station is solved. Returns true while that leg is not finished.
         const showMarchLeg = (leg) => {
           leg.march.start();   // a save that stands here without a start time (e.g. after a tester replay) sets out now
+          if (leg.campedTitle && leg.march.camped()) {
+            showWaypointBar(leg.campedTitle, leg.campedDesc, leg.step);
+            return true;
+          }
           if (!leg.march.over()) {
             const descEl = showWaypointBar(leg.walkingTitle, '', leg.step);
             const updateTrek = () => {
-              if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || leg.march.over()) {
+              const arrived = leg.march.over() || leg.march.camped();
+              if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || arrived) {
                 if (window.__wireMarchTimer) { clearInterval(window.__wireMarchTimer); window.__wireMarchTimer = null; }
-                if (leg.march.over()) renderWireChoices();
+                if (arrived) renderWireChoices();
                 return;
               }
               if (!descEl) return;

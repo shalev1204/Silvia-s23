@@ -2869,10 +2869,16 @@ def test_veiled_stations(browser):
           "from Station 10 the Return button goes back to Station 11, not Station 09",
           js("document.getElementById('insp-btn-reset').innerText"))
 
-    # First light comes while she looks at the card: it opens by itself
+    # First light comes while she looks at the card: it is drawn again by itself. While the Operator holds the Salt Playa
+    # (PLAYA_HOLD in hub-core.js), Hermes camps at the edge of the salt; once released, the card opens whole.
     js(f"localStorage.setItem('order_playa_march_start', String(Date.now() - {10 * hour} + 2500))")
     js("window.selectMapNode(21, false)"); page.wait_for_timeout(4500)
-    check(title() == "The Salt Playa (Dry Basin)" and not bar_on(), "at first light the card opens: the Salt Playa, whole", title())
+    held = js("window.isPlayaCamped()")
+    check(title() == ("Camp at the Edge of the Salt" if held else "The Salt Playa (Dry Basin)") and not bar_on(),
+          "at first light the card is drawn again: the camp at the edge of the salt while held, else the Salt Playa, whole", title())
+    js("localStorage.setItem('order_playa_march_bypassed', 'true')")
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(600)
+    check(title() == "The Salt Playa (Dry Basin)", "released, the card opens: the Salt Playa, whole", title())
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
     check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") != "none", "and the game opens")
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
@@ -2935,6 +2941,40 @@ def test_silvia_north_portal(browser):
     ctx.close()
 
 
+def test_playa_hold(browser):
+    print("\n34. The Operator's hold on the Salt Playa (24 Oct): first light comes, Hermes camps at the edge of the salt, the crossing stays shut")
+    now = int(time.time() * 1000)
+    seed = dict(SILVIA, order_dawn_step="3", order_cairn1_completed="true", order_seal_cairn_1="true", order_chasm_march_start="1",
+                order_whispering_chasm_completed="true", order_field_wire_step="4", order_field_wire_completed="true",
+                order_desert_path_unlocked="true", order_active_map_path="desert",
+                order_chasm_wire=json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1}))
+    ctx, page, errors = new_page(browser, dict(seed, order_playa_march_start=str(now - 5 * 3600 * 1000)))
+    js = page.evaluate
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    check(js("window.getPlayaMarchEta()").startswith("4 h") and not js("window.isPlayaCamped()") and not js("window.isPlayaMarchOver()"),
+          "halfway through the night: the countdown to first light still runs")
+    ctx.close()
+    ctx, page, errors = new_page(browser, dict(seed, order_playa_march_start=str(now - 11 * 3600 * 1000)))
+    js = page.evaluate
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    check(js("window.isPlayaCamped()") and not js("window.isPlayaMarchOver()") and js("window.getPlayaMarchEta()") == ""
+          and js("window.getPlayaMarchProgress()") < 1, "first light has come, but Hermes camps: no countdown, the map keeps him short of the salt")
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(400)
+    card = js("document.getElementById('insp-title').innerText")
+
+    check("Camp at the Edge of the Salt" in card and js("document.getElementById('insp-btn-primary').getAttribute('aria-disabled')") == "true",
+          "the Station 11 card: camp at the edge of the salt, its button shut", card)
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") == "none", "the old crossing does not open")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(3000)
+    wire = js("document.getElementById('view-field-wire').innerText")
+    check("Camp at the Edge of the Salt" in wire and "FIRST LIGHT ON THE SALT IN" not in wire.upper().replace("\n", " ")
+          and js("localStorage.getItem('order_playa_first_light_called')") is None,
+          "the Field Wire shows the camp, and Hermes does not call yet", wire[-200:].replace("\n", " "))
+    check(not errors, "no JS errors while Hermes camps", "; ".join(errors[:2]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -2946,9 +2986,10 @@ SECTIONS = {
     "journey": test_journey, "seals": test_seals, "a11y": test_a11y, "offline": test_offline,
     "camera": test_camera_obscura, "gallery": test_whispering_gallery,
     "chasm": test_whispering_chasm, "veil": test_veiled_stations, "portal": test_silvia_north_portal,
+    "playahold": test_playa_hold,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 
