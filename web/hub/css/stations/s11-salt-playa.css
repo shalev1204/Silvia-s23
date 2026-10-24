@@ -22,20 +22,49 @@
       display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 18px 8px; border-radius: 18px;
       background: rgba(16, 9, 5, 0.74); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); transition: opacity 0.3s ease, transform 0.3s ease;
     }
-    .playa3d-balance.is-on { opacity: 1; transform: translate(-50%, 0); }
-    .playa3d-balance svg { width: 170px; height: 94px; overflow: visible; }
+    .playa3d-balance.is-on { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+    /* the dial keeps the exact proportions of the SVG (120 × 66), so the needle's pivot sits on the arc's centre */
+    .playa3d-balance .b-dial { position: relative; width: 170px; aspect-ratio: 120 / 66; transition: filter 0.15s ease; }
+    .playa3d-balance svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
     .playa3d-balance path { fill: none; stroke-width: 9; }
     .playa3d-balance .b-track { stroke: rgba(253, 230, 138, 0.16); stroke-linecap: round; }
     .playa3d-balance .b-band { stroke: #fbbf24; filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.8)); }
     .playa3d-balance .b-heavy { stroke: rgba(226, 114, 91, 0.75); }
-    .playa3d-balance .b-needle line { stroke: #fff3c4; stroke-width: 3.5; stroke-linecap: round; }
-    .playa3d-balance .b-needle circle { fill: #d4a853; stroke: #fff3c4; stroke-width: 1.5; }
+    .playa3d-balance .b-heart { stroke: #fffbe8; stroke-width: 3; }
+    /* pivot at (0, 0) of the viewBox: 8 of its 66 units above the bottom; the needle is 46 units long, the notch reaches 56 */
+    .playa3d-balance .b-needle, .playa3d-balance .b-mark {
+      position: absolute; left: 50%; bottom: 12.12%; transform-origin: 50% 100%; transform: rotate(-90deg); will-change: transform; pointer-events: none;
+    }
+    .playa3d-balance .b-needle { width: 4px; margin-left: -2px; height: 69.7%; border-radius: 3px; background: linear-gradient(to top, #d4a853, #fff3c4 40%); box-shadow: 0 0 6px rgba(255, 243, 196, 0.55); }
+    .playa3d-balance .b-mark { width: 4px; margin-left: -2px; height: 84.85%; color: #fff; opacity: 0; transition: opacity 0.2s ease; background: linear-gradient(to top, transparent 78%, currentColor 78%); border-radius: 2px; }
+    .playa3d-balance.has-mark .b-mark { opacity: 1; }
+    .playa3d-balance .b-hub { position: absolute; left: 50%; bottom: 12.12%; width: 12px; height: 12px; margin: 0 0 -6px -6px; border-radius: 50%; background: #d4a853; border: 1.5px solid #fff3c4; }
     .playa3d-balance .b-label { font-family: 'Cinzel', serif; font-size: 0.86rem; letter-spacing: 0.06em; color: #fde68a; white-space: nowrap; }
     .playa3d-balance.is-gold .b-label { color: #fff3c4; text-shadow: 0 0 10px #fbbf24; }
-    .playa3d-balance.is-gold svg { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.7)); }
+    .playa3d-balance.is-gold .b-dial { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.7)); }
     .playa3d-balance.is-red .b-label { color: #f4a08a; }
     .playa3d-balance.is-red { animation: chasm-shake 0.4s ease infinite; }
-    @media (max-width: 600px) { .playa3d-balance { bottom: 70px; } .playa3d-balance svg { width: 140px; height: 78px; } }
+    /* the verdict of her release: the notch takes its colour, the word pops */
+    .playa3d-balance.is-perfect .b-mark, .playa3d-balance.is-good .b-mark { color: #fff3c4; }
+    .playa3d-balance.is-light .b-mark { color: #bfe3ff; }
+    .playa3d-balance.is-heavy .b-mark { color: #f4a08a; }
+    .playa3d-balance.is-perfect .b-label { color: #fffbe8; text-shadow: 0 0 12px #fbbf24, 0 0 22px rgba(251, 191, 36, 0.6); }
+    .playa3d-balance.is-light .b-label { color: #cfe8ff; }
+    .playa3d-balance.is-heavy .b-label { color: #f4a08a; }
+    .playa3d-balance.is-verdict .b-label { animation: playa-verdict 0.5s cubic-bezier(.2, .9, .3, 1.4); }
+    .playa3d-balance.is-perfect .b-dial::after {
+      content: ''; position: absolute; left: 50%; bottom: 12.12%; width: 84%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, 50%) scale(0.4);
+      border: 2px solid rgba(255, 243, 196, 0.9); opacity: 0; animation: playa-perfect 0.7s ease-out;
+    }
+    @keyframes playa-verdict { 0% { transform: scale(0.6); opacity: 0.3; } 60% { transform: scale(1.14); opacity: 1; } 100% { transform: none; } }
+    @keyframes playa-perfect { 0% { opacity: 0.9; transform: translate(-50%, 50%) scale(0.4); } 100% { opacity: 0; transform: translate(-50%, 50%) scale(1.25); } }
+    @media (max-width: 600px) { .playa3d-balance { bottom: 70px; } .playa3d-balance .b-dial { width: 140px; } }
+    @media (prefers-reduced-motion: reduce) { .playa3d-balance.is-verdict .b-label, .playa3d-balance.is-perfect .b-dial::after { animation: none; } }
+    /* depth: the corners of the picture fall into a soft lilac shade (under the HUD) */
+    .playa3d-vignette {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 75% 70% at 50% 46%, transparent 58%, rgba(70, 44, 82, 0.16) 82%, rgba(46, 26, 58, 0.34) 100%);
+    }
     /* the subtitle rises above the balance while it is out, so they never overlap */
     .playa3d-window .chasm3d-stage:has(.playa3d-balance.is-on) .chasm3d-subtitle { bottom: 160px; }
     @media (max-width: 600px) { .playa3d-window .chasm3d-stage:has(.playa3d-balance.is-on) .chasm3d-subtitle { bottom: 190px; } }

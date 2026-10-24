@@ -171,6 +171,15 @@
       return vec2(md, id);
     }
 `;
+      // The shadows of high clouds drifting over the salt: soft, lilac, a few at a time (uCloud fades them at noon)
+      const CLOUD = `
+    float cHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float cNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+      return mix(mix(cHash(i), cHash(i + vec2(1.0, 0.0)), f.x), mix(cHash(i + vec2(0.0, 1.0)), cHash(i + vec2(1.0, 1.0)), f.x), f.y); }
+    vec3 sCloud(vec2 p) { p = p * 0.034 + vec2(uTime * 0.011, uTime * 0.004);
+      float n = cNoise(p) * 0.55 + cNoise(p * 2.1 + 5.2) * 0.3 + cNoise(p * 4.3 + 1.7) * 0.15;
+      return mix(vec3(1.0), vec3(0.8, 0.77, 0.92), smoothstep(0.5, 0.7, n) * uCloud); }
+`;
 
       function buildWorld() {
         const T = window.THREE;
@@ -191,7 +200,7 @@
         const camera = new T.PerspectiveCamera(58, 16 / 10, 0.1, 420);
         const rand = P.rng(1110);
         const ucol = (hex) => ({ value: new T.Color(hex) });
-        const uTime = { value: 0 };
+        const uTime = { value: 0 }, uCloud = { value: 1 };
 
         // Sky: a dome painted by the clock, the rising sun, a few long dawn clouds
         const skyGeo = new T.SphereGeometry(300, 32, 14);
@@ -237,17 +246,19 @@
         // The playa: polygons of white halite to the horizon, their buckled ridges lit, lavender in the cracks,
         // glints of salt that come and go (Sheet 10B, Fig. I: the 120° triple junctions)
         const crust = P.worldPainted(P.toon(), {
-          uSalt: ucol(0xf4ece4), uSaltLo: ucol(0xe2d2d4), uRidge: ucol(0xffffff), uCrack: ucol(0x9c88b8), uWarm: ucol(0xf6d2b0), uTime
-        }, 'uniform vec3 uSalt, uSaltLo, uRidge, uCrack, uWarm;\nuniform float uTime;\n' + VORONOI, `
+          uSalt: ucol(0xf4ece4), uSaltLo: ucol(0xe2d2d4), uRidge: ucol(0xffffff), uCrack: ucol(0x9c88b8), uWarm: ucol(0xf6d2b0), uPink: ucol(0xf3c6cc), uTime, uCloud
+        }, 'uniform vec3 uSalt, uSaltLo, uRidge, uCrack, uWarm, uPink;\nuniform float uTime, uCloud;\n' + VORONOI + CLOUD, `
     vec2 v = sVoro(vWp.xz * 0.55);
     vec3 c = mix(uSalt, uSaltLo, v.y * 0.5);
+    float pk = smoothstep(0.5, 0.78, cNoise(vWp.xz * 0.045 + 7.0) * 0.7 + cNoise(vWp.xz * 0.16 + 3.0) * 0.3);
+    c = mix(c, uPink, pk * 0.38);
     c = mix(c, uRidge, smoothstep(0.11, 0.04, v.x) * 0.9);
     c = mix(c, uCrack, smoothstep(0.035, 0.0, v.x) * 0.75);
     float far = smoothstep(30.0, 140.0, length(vWp.xz));
     c = mix(c, uWarm, far * 0.35);
     float g = fract(sin(dot(floor(vWp.xz * 7.0), vec2(12.9898, 78.233))) * 43758.5453);
     c += vec3(0.45) * step(0.9965, fract(g + uTime * 0.07)) * (1.0 - far);
-    diffuseColor.rgb *= c;`);
+    diffuseColor.rgb *= c * sCloud(vWp.xz);`);
         const ground = new T.Mesh(new T.PlaneGeometry(700, 700), crust);
         ground.rotation.x = -Math.PI / 2;
         ground.position.set(0, 0, 60);
@@ -256,15 +267,15 @@
 
         // The slabs of the crossing: thick plates of salt, slightly irregular, a little raised above the crust
         const slabMat = P.worldPainted(P.toon(), {
-          uTop: ucol(0xfdf8f2), uTopLo: ucol(0xeee2dc), uSide: ucol(0xcfb6c6), uFoot: ucol(0x8f7aac), uRidge: ucol(0xffffff), uCrack: ucol(0xa894c4)
-        }, 'uniform vec3 uTop, uTopLo, uSide, uFoot, uRidge, uCrack;\n' + VORONOI, `
+          uTop: ucol(0xfdf8f2), uTopLo: ucol(0xeee2dc), uSide: ucol(0xcfb6c6), uFoot: ucol(0x8f7aac), uRidge: ucol(0xffffff), uCrack: ucol(0xa894c4), uTime, uCloud
+        }, 'uniform vec3 uTop, uTopLo, uSide, uFoot, uRidge, uCrack;\nuniform float uTime, uCloud;\n' + VORONOI + CLOUD, `
     vec2 v = sVoro(vWp.xz * 1.6 + 11.0);
     vec3 top = mix(uTop, uTopLo, v.y * 0.6);
     top = mix(top, uRidge, smoothstep(0.08, 0.03, v.x) * 0.7);
     top = mix(top, uCrack, smoothstep(0.025, 0.0, v.x) * 0.45);
     float h = clamp(vWp.y / 0.22, 0.0, 1.0);
     vec3 side = mix(uFoot, uSide, h);
-    diffuseColor.rgb *= mix(side, top, smoothstep(0.82, 0.97, h));`);
+    diffuseColor.rgb *= mix(side, top, smoothstep(0.82, 0.97, h)) * sCloud(vWp.xz);`);
         const slabs = [];
         for (let r = 0; r < ROWS; r++) {
           slabs.push([]);
@@ -347,14 +358,26 @@
           peb.castShadow = true; scene.add(peb);
         }
         // The red rocks of the Oasis Gate behind him, to the north
-        const rockMat = P.rim(P.toon({ color: 0xc8643e }), 0xffc89a, 0.35);
+        // (sandstone in bands: rust, ochre, a paler layer, each tier a little narrower, like the hoodoos of the Gate)
+        const rockMats = [0xc8643e, 0xdc8c5a, 0xb4502e, 0xe8b07a].map((c) => P.rim(P.toon({ color: c, flatShading: true }), 0xffc89a, 0.35));
         for (let i = 0; i < 14; i++) {
-          const w = 4 + rand() * 7, h = 6 + rand() * 12, d = 4 + rand() * 6;
-          const rock = new T.Mesh(new T.BoxGeometry(w, h, d), rockMat);
+          const w = 4 + rand() * 7, h = 6 + rand() * 12, d = 4 + rand() * 6, tiers = 3 + Math.floor(rand() * 3);
+          const rock = new T.Group();
+          let y = 0;
+          for (let t = 0; t < tiers; t++) {
+            const th = h / tiers * (0.8 + rand() * 0.4), k = 1 - t * 0.13 + (rand() - 0.5) * 0.12;
+            const m = new T.Mesh(new T.CylinderGeometry(w * 0.5 * k * 0.9, w * 0.5 * k, th, 7), rockMats[(t + i) % 4]);
+            m.scale.z = d / w;
+            m.position.set((rand() - 0.5) * 0.5, y + th / 2, (rand() - 0.5) * 0.5);
+            m.rotation.y = rand() * 3;
+            m.castShadow = true;
+            rock.add(m);
+            y += th;
+          }
           const gap = i < 7 ? -1 : 1;
-          rock.position.set(gap * (7 + (i % 7) * 6 + rand() * 3), h / 2, EDGE_Z - 9 - rand() * 10);
+          rock.position.set(gap * (7 + (i % 7) * 6 + rand() * 3), 0, EDGE_Z - 9 - rand() * 10);
           rock.rotation.y = (rand() - 0.5) * 0.5;
-          rock.castShadow = true; scene.add(rock);
+          scene.add(rock);
         }
 
         // The old surveyor's tripod at the west end of the edge, its wood bleached by the salt, a rag on its head
@@ -375,20 +398,37 @@
 
         // The Sentinel Mesa on the southern horizon (Sheet 10A, "Southern Prospect"), with lesser buttes: far,
         // in the haze, painted in bands of rose and lilac
+        // (eroded walls in bands of rose and lilac, a skirt of fallen scree at the foot, pale with the distance)
         function butte(x, z, w, d, h, tiers) {
-          const g = new T.Group();
-          for (let t = 0; t < tiers; t++) {
-            const k = 1 - t * 0.12, geo = new T.CylinderGeometry(w * k * 0.92, w * k, h / tiers, 9, 1);
-            geo.scale(1, 1, d / w);
+          const g = new T.Group(), br = P.rng(Math.round(Math.abs(x * 7 + z * 3)) + 1);
+          const paint = (geo, y0, span, band) => {
             const cols = new Float32Array(geo.attributes.position.count * 3), cc = new T.Color(), p = geo.attributes.position;
             for (let i = 0; i < p.count; i++) {
-              const up = (p.getY(i) / (h / tiers) + 0.5 + t) / tiers;
-              cc.setHSL(0.98 - up * 0.06, 0.38, 0.62 + up * 0.14, 'srgb');
+              const up = Math.max(0, Math.min(1, (p.getY(i) + y0) / span));
+              cc.setHSL(0.97 - up * 0.07, 0.3, 0.72 + up * 0.1 + band, 'srgb');
               cols.set([cc.r, cc.g, cc.b], i * 3);
             }
             geo.setAttribute('color', new T.BufferAttribute(cols, 3));
+          };
+          const wobble = (geo, amt) => {   // gullies and buttresses: every column of the wall pushed in or out
+            const p = geo.attributes.position, off = [];
+            for (let i = 0; i < 24; i++) off.push(1 + (br() - 0.5) * amt);
+            for (let i = 0; i < p.count; i++) {
+              const a = Math.atan2(p.getZ(i), p.getX(i)), k = off[Math.floor(((a + Math.PI) / (Math.PI * 2)) * 24) % 24];
+              p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k);
+            }
+          };
+          const skirt = new T.CylinderGeometry(w * 1.0, w * 1.5, h * 0.2, 24, 1);
+          wobble(skirt, 0.18); skirt.scale(1, 1, d / w); paint(skirt, 0, h, 0.04);
+          const sk = new T.Mesh(skirt, new T.MeshBasicMaterial({ vertexColors: true, fog: false }));
+          sk.position.y = h * 0.1;
+          g.add(sk);
+          for (let t = 0; t < tiers; t++) {
+            const k = 1 - t * 0.12, th = h / tiers, geo = new T.CylinderGeometry(w * k * 0.9, w * k, th, 24, 3);
+            wobble(geo, 0.22); geo.scale(1, 1, d / w);
+            paint(geo, th * (t + 0.5), h, t % 2 ? 0.03 : 0);
             const m = new T.Mesh(geo, new T.MeshBasicMaterial({ vertexColors: true, fog: false }));
-            m.position.y = h / tiers * (t + 0.5);
+            m.position.y = th * (t + 0.5);
             g.add(m);
           }
           g.position.set(x, 0, z);
@@ -498,12 +538,12 @@
 
         // ---- The Great Salt Sump: polygon plates of halite (Sheet 10B, Fig. I), each with the signs the Study teaches
         const sumpMat = P.worldPainted(P.toon(), {
-          uTop: ucol(0xfbf7f2), uLo: ucol(0xe9dfe6), uSide: ucol(0xc6b2c8), uFoot: ucol(0x8a76aa)
-        }, 'uniform vec3 uTop, uLo, uSide, uFoot;\n' + VORONOI, `
+          uTop: ucol(0xfbf7f2), uLo: ucol(0xe9dfe6), uSide: ucol(0xc6b2c8), uFoot: ucol(0x8a76aa), uTime, uCloud
+        }, 'uniform vec3 uTop, uLo, uSide, uFoot;\nuniform float uTime, uCloud;\n' + VORONOI + CLOUD, `
     vec2 v = sVoro(vWp.xz * 2.4 + 3.0);
     float h = clamp(vWp.y / ${SUMP_TOP.toFixed(2)}, 0.0, 1.0);
     vec3 top = mix(uTop, uLo, v.y * 0.45);
-    diffuseColor.rgb *= mix(mix(uFoot, uSide, h), top, smoothstep(0.8, 0.97, h));`);
+    diffuseColor.rgb *= mix(mix(uFoot, uSide, h), top, smoothstep(0.8, 0.97, h)) * sCloud(vWp.xz);`);
         const ridgeMat = P.rim(P.toon({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.12 }), 0xffffff, 0.5);
         const cubeMat = P.rim(P.toon({ color: 0xf4eefc, emissive: 0x6a4a8a, emissiveIntensity: 0.15 }), 0xfff6ff, 0.8);
         const hexAt = (r, i) => [Math.sin(i * Math.PI / 3) * r, Math.cos(i * Math.PI / 3) * r];   // the corners of a CylinderGeometry with 6 sides
@@ -600,8 +640,422 @@
         marker.position.set(0.6, 0.3, SHORE_Z + 2.2);
         scene.add(marker);
         // The Sanctuary Approach, the far cliffs to the south of the Sump (Sheet 10B, the transect)
-        butte(-24, 120, 30, 12, 16, 2);
-        butte(18, 128, 20, 9, 12, 2);
+        butte(-46, 175, 26, 11, 15, 3);
+        butte(34, 168, 16, 9, 11, 2);
+
+        // ---- Life around the crossing (never on the stones, the post or the Sump): the salt's own relief, a little brine,
+        // the Order's old survey line, a cart wheel the crust is swallowing; above it birds, dust devils and wisps on the wind
+        const ar = P.rng(2323), many = lowPower ? 0.6 : 1;
+        const clear = (x, z) => !(Math.abs(x) < 13.5 && z > -6 && z < 22.5) && !(Math.abs(x) < 21 && z >= 19 && z < 47)
+          && !(Math.abs(x) < 18.5 && z > -5.5 && z < -1.5) && z < 41.5 && z > -12 && !(Math.abs(x) > 6 && z < -9);
+        const spot = (m) => {
+          for (let i = 0; i < 60; i++) {
+            const x = (ar() * 2 - 1) * 32, z = -12 + ar() * 54;
+            if (clear(x - m, z - m) && clear(x + m, z - m) && clear(x - m, z + m) && clear(x + m, z + m)) return [x, z];
+          }
+          return [30, 30];
+        };
+        const m4 = new T.Matrix4(), q4 = new T.Quaternion(), e4 = new T.Euler(), v4 = new T.Vector3(), s4 = new T.Vector3();
+        const place = (mesh, i, x, y, z, rx, ry, rz, sx, sy, sz) => mesh.setMatrixAt(i, m4.compose(v4.set(x, y, z), q4.setFromEuler(e4.set(rx, ry, rz)), s4.set(sx, sy, sz)));
+        const saltMat = P.rim(P.toon({ color: 0xfbf5ee }), 0xffffff, 0.35);
+        // pressure ridges: where the polygons of the crust shove into each other they buckle into low tents, three arms at 120°
+        const ridgeGeo = new T.BoxGeometry(1, 0.42, 0.42);
+        ridgeGeo.rotateX(Math.PI / 4);
+        const ridgeN = Math.round(16 * many) * 3, ridges = new T.InstancedMesh(ridgeGeo, saltMat, ridgeN);
+        for (let i = 0; i < ridgeN; i += 3) {
+          const [x, z] = spot(3), a0 = ar() * Math.PI * 2;
+          for (let j = 0; j < 3; j++) {
+            const a = a0 + j * Math.PI * 2 / 3, len = 1.2 + ar() * 2.2;
+            place(ridges, i + j, x + Math.cos(a) * len / 2, 0, z + Math.sin(a) * len / 2, 0, -a, 0, len, 0.5 + ar() * 0.6, 1);
+          }
+        }
+        ridges.receiveShadow = true;   // (the décor casts no shadow: under the low dawn sun they would stripe the whole basin)
+        scene.add(ridges);
+        // low mounds of salt, and clusters of halite crystals catching the light
+        const moundN = Math.round(18 * many), mounds = new T.InstancedMesh(new T.SphereGeometry(1, 14, 6, 0, Math.PI * 2, 0, Math.PI / 2), saltMat, moundN);
+        for (let i = 0; i < moundN; i++) { const [x, z] = spot(1.5), r = 0.5 + ar() * 1.3; place(mounds, i, x, 0, z, 0, ar() * 3, 0, r, r * (0.18 + ar() * 0.2), r * (0.6 + ar() * 0.4)); }
+        mounds.receiveShadow = true;
+        scene.add(mounds);
+        const clusterN = Math.round(26 * many), halite = new T.InstancedMesh(prismGeo, prismMat, clusterN * 5);
+        for (let i = 0; i < clusterN; i++) {
+          const [x, z] = spot(0.6), sc = 1.1 + ar() * 0.8;
+          for (let j = 0; j < 5; j++) {
+            const a = ar() * Math.PI * 2, d = j ? 0.12 + ar() * 0.18 : 0;
+            place(halite, i * 5 + j, x + Math.cos(a) * d * sc, -0.04, z + Math.sin(a) * d * sc, Math.sin(a) * 0.5 * (j ? 1 : 0.2), ar() * 3, -Math.cos(a) * 0.5 * (j ? 1 : 0.2), sc, sc * (0.6 + ar() * 0.9), sc);
+          }
+        }
+        scene.add(halite);
+        // little pools of brine in the open salt, with a white rim of new crystals
+        const steam = [];
+        const steamMat = new T.SpriteMaterial({ map: glowTex, color: 0xf2eef8, transparent: true, depthWrite: false, opacity: 0 });
+        function addSteam(parent, x, y, z, n, size, born, tint) {
+          for (let j = 0; j < n; j++) {
+            const sp = new T.Sprite(steamMat.clone());
+            if (tint) sp.material.color.setHex(tint);
+            parent.add(sp);
+            steam.push({ sp, x, y, z, ph: j / n + ar() * 0.2, spd: 0.16 + ar() * 0.08, size, rise: 1.6 + ar() * 0.8, born: born || 0 });
+          }
+        }
+        const pondRimGeo = new T.TorusGeometry(1, 0.09, 4, 32);
+        pondRimGeo.rotateX(Math.PI / 2);
+        for (let i = 0; i < Math.round(7 * many); i++) {
+          const [x, z] = spot(2), sx = 0.7 + ar() * 1.1, sz = sx * (0.55 + ar() * 0.4), g = new T.Group();
+          const pool = new T.Mesh(new T.CircleGeometry(1, 32), poolMat.clone());
+          pool.material.uniforms.uTime = uTime; pool.material.uniforms.uA.value = 0.85;
+          pool.rotation.x = -Math.PI / 2; pool.position.y = 0.03;
+          const rimP = new T.Mesh(pondRimGeo, saltMat); rimP.position.y = 0.02;
+          g.add(pool, rimP);
+          g.scale.set(sx, 1, sz);
+          g.position.set(x, 0, z); g.rotation.y = ar() * 3;
+          scene.add(g);
+          if (i % 2 === 0) addSteam(scene, x, 0.1, z, 1, 1.1);
+        }
+        // the Order's old survey line down both sides of the basin: bleached stakes with red tips and a sagging cord
+        const stakeGeo = new T.CylinderGeometry(0.035, 0.045, 0.7, 6);
+        stakeGeo.translate(0, 0.35, 0);
+        const cordMat = P.rim(P.toon({ color: 0xc8352c, emissive: 0x5a0a06, emissiveIntensity: 0.35 }), 0xffb0a0, 0.6);
+        const tipGeo = new T.BoxGeometry(0.1, 0.16, 0.1);
+        const lineN = 9, stakes = new T.InstancedMesh(stakeGeo, bleached, lineN * 2), tips = new T.InstancedMesh(tipGeo, cordMat, lineN * 2);
+        [-1, 1].forEach((side, si) => {
+          const pts = [];
+          for (let i = 0; i < lineN; i++) {
+            const x = side * (14.6 + ar() * 0.4), z = -1 + i * 2.8, lean = i === 5 + si ? 0.5 : (ar() - 0.5) * 0.12;
+            place(stakes, si * lineN + i, x, 0, z, lean, 0, (ar() - 0.5) * 0.12, 1, 1, 1);
+            place(tips, si * lineN + i, x + Math.sin(lean) * 0, 0.66 * Math.cos(lean), z + Math.sin(lean) * 0.66, lean, 0, 0, 1, 1, 1);
+            if (i) { const px = pts[pts.length - 1]; for (let k = 1; k <= 6; k++) { const f2 = k / 6; pts.push(new T.Vector3(px.x + (x - px.x) * f2, 0.6 - Math.sin(f2 * Math.PI) * 0.16, px.z + (z - px.z) * f2)); } }
+            else pts.push(new T.Vector3(x, 0.6, z));
+          }
+          scene.add(new T.Line(new T.BufferGeometry().setFromPoints(pts), new T.LineBasicMaterial({ color: 0xb2423a })));
+        });
+        scene.add(stakes, tips);
+        // a cart wheel from some older crossing, lying on its side, half swallowed by the salt
+        const wheel = new T.Group();
+        const tyre = new T.Mesh(new T.TorusGeometry(0.95, 0.07, 6, 28), bleached); wheel.add(tyre);
+        for (let i = 0; i < 6; i++) { const sp = new T.Mesh(new T.BoxGeometry(0.06, 1.85, 0.05), bleached); sp.rotation.z = i * Math.PI / 6; wheel.add(sp); }
+        const nave = new T.Mesh(new T.CylinderGeometry(0.16, 0.16, 0.22, 10), bleached); nave.rotation.x = Math.PI / 2; wheel.add(nave);
+        wheel.rotation.set(-1.25, 0.6, 0.2);
+        wheel.position.set(-18.5, 0.12, 11);
+        scene.add(wheel);
+
+        // Birds, high over the salt: three of them circling, gliding and beating their wings, their shadows sliding below
+        const birdMat = P.toon({ color: 0x4a3640, side: T.DoubleSide });
+        const wingGeo = new T.BufferGeometry();
+        wingGeo.setAttribute('position', new T.Float32BufferAttribute([0, 0, -0.14, 0, 0, 0.16, 0.62, 0, -0.02], 3));
+        wingGeo.computeVertexNormals();
+        const birds = [0, 1, 2].map((i) => {
+          const g = new T.Group();
+          const body = new T.Mesh(new T.SphereGeometry(0.09, 8, 6), birdMat); body.scale.set(1, 0.8, 2.6); g.add(body);
+          const wr = new T.Mesh(wingGeo, birdMat), wl = new T.Mesh(wingGeo, birdMat);
+          wl.scale.x = -1;
+          g.add(wr, wl);
+          g.rotation.order = 'YXZ';
+          g.scale.setScalar(0.75);
+          scene.add(g);
+          return { g, wr, wl, a: i * 2.1, w: (i % 2 ? -1 : 1) * (0.22 + i * 0.05), r: 6 + i * 2.4, h: 6 + i * 0.9, ph: i * 1.7, ox: (i - 1) * 2.5, oz: (1 - i) * 3, cx: 0, cz: 8, hy: 6 };
+        });
+        // dust devils: columns of sand that wander across the far salt, live a while and fade
+        const devilN = lowPower ? 50 : 90;
+        const devils = [0, 1].map((i) => {
+          const geo = new T.BufferGeometry();
+          geo.setAttribute('position', new T.BufferAttribute(new Float32Array(devilN * 3), 3));
+          const pts = new T.Points(geo, new T.PointsMaterial({ map: glowTex, color: 0xcfa478, size: 0.34, transparent: true, opacity: 0, depthWrite: false }));
+          pts.frustumCulled = false;
+          scene.add(pts);
+          return { pts, life: 0.15 + i * 0.5, x: 0, z: 0, vx: 0, vz: 0, born: false };
+        });
+        // wisps of salt dust drifting low on the wind, east across the whole basin
+        const wispTex = P.canvasTex(256, 32, (g, w, h) => {
+          g.clearRect(0, 0, w, h);
+          const gr = g.createLinearGradient(0, 0, w, 0);
+          gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.35, 'rgba(255,255,255,0.9)'); gr.addColorStop(0.7, 'rgba(255,255,255,0.6)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+          g.fillStyle = gr;
+          for (let k = 0; k < 6; k++) { g.globalAlpha = 0.3 + (k % 3) * 0.2; g.fillRect(k * 9, 3 + k * 4.6, w - k * 18, 1.5 + (k % 2)); }
+        });
+        const wispGeo = new T.PlaneGeometry(8, 1.1);
+        wispGeo.rotateX(-Math.PI / 2);
+        const wisps = Array.from({ length: lowPower ? 4 : 7 }, (_, i) => {
+          const m = new T.Mesh(wispGeo, new T.MeshBasicMaterial({ map: wispTex, color: 0xe6cfb4, transparent: true, opacity: 0, depthWrite: false }));
+          m.position.set(-34 + ar() * 68, 0.4 + ar() * 0.35, -6 + ar() * 48);
+          m.rotation.y = (ar() - 0.5) * 0.2;
+          m.renderOrder = 5;
+          scene.add(m);
+          return { m, sp: 0.7 + ar() * 0.7, z0: m.position.z, ph: i * 1.3 };
+        });
+        // steam over the brine around the Sump at noon
+        for (let i = 0; i < Math.round(6 * many); i++) {
+          const side = i % 2 ? 1 : -1, x = side * (13.7 + ar() * 1.3), z = SZ0 + ar() * SC * 5.5;
+          const vent = new T.Mesh(new T.CircleGeometry(0.55, 20), poolMat.clone());
+          vent.material.uniforms.uTime = uTime; vent.material.uniforms.uA.value = 0.9;
+          vent.rotation.x = -Math.PI / 2; vent.position.set(x, 0.03, z);
+          const vr = new T.Mesh(pondRimGeo, saltMat); vr.scale.setScalar(0.58); vr.position.set(x, 0.02, z);
+          scene.add(vent, vr);
+          addSteam(scene, x, 0.1, z, 3, 1.3);
+        }
+
+        // ---- From the sky the slabs sit on the salt: a soft lilac shade under each (and under every plate of the Sump),
+        // and little flowers of salt crystals in the gaps between four slabs
+        const aoTex = P.canvasTex(64, 64, (g, w) => {
+          g.clearRect(0, 0, w, w);
+          const gr = g.createRadialGradient(w / 2, w / 2, w * 0.16, w / 2, w / 2, w / 2);
+          gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.55, 'rgba(255,255,255,0.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+          g.fillStyle = gr; g.fillRect(0, 0, w, w);
+        });
+        const aoGeo = new T.PlaneGeometry(1, 1);
+        aoGeo.rotateX(-Math.PI / 2);
+        const aoMat = new T.MeshBasicMaterial({ map: aoTex, color: 0x6a4a82, transparent: true, opacity: 0.4, depthWrite: false });
+        const plateList = [];
+        sumpPlates.forEach((rowP) => Object.values(rowP).forEach((pp) => plateList.push(pp)));
+        const ao = new T.InstancedMesh(aoGeo, aoMat, ROWS * ROWS + plateList.length);
+        slabs.forEach((rowS, r) => rowS.forEach((sl, c) => place(ao, r * ROWS + c, X(c), 0.012, Z(r), 0, 0, 0, PLATE * 1.5, 1, PLATE * 1.5)));
+        plateList.forEach((pp, i) => place(ao, ROWS * ROWS + i, pp.base.x, 0.014, pp.base.z, 0, 0, 0, SR * 2.7, 1, SR * 2.7));
+        ao.renderOrder = 1;
+        scene.add(ao);
+        const flowerN = (ROWS + 1) * (ROWS + 1) * 4, flowers = new T.InstancedMesh(cubeGeo, cubeMat, flowerN);
+        let fi = 0;
+        for (let r = -0.5; r <= ROWS - 0.5; r++) for (let c = -0.5; c <= ROWS - 0.5; c++) for (let j = 0; j < 4; j++) {
+          const a = ar() * Math.PI * 2, d = ar() * 0.22, sc = 0.35 + ar() * 0.5;
+          place(flowers, fi++, X(c) + Math.cos(a) * d, 0.02, Z(r) + Math.sin(a) * d, ar() * 3, ar() * 3, ar() * 3, sc, sc, sc);
+        }
+        scene.add(flowers);
+
+        // ---- Hermes's camp at the west end of the North Edge, beside the tripod: his little tent, the bedroll, the pack,
+        // and last night's fire still smoking in its ring of stones
+        const camp = new T.Group();
+        const canvasMat = P.rim(P.toon({ color: 0xe9dcc2, flatShading: true }), 0xfff6e8, 0.35);
+        const tent = new T.Mesh(new T.ConeGeometry(0.9, 1.15, 4), canvasMat);
+        tent.rotation.y = Math.PI / 4; tent.position.set(-1.3, 0.58, -0.15); tent.castShadow = true;
+        const flap = new T.Mesh(new T.PlaneGeometry(0.42, 0.62), new T.MeshBasicMaterial({ color: 0x5a3e44, side: T.DoubleSide }));
+        flap.position.set(-1.3, 0.32, 0.5); flap.rotation.x = -0.32;
+        const roll = new T.Mesh(new T.CylinderGeometry(0.15, 0.15, 0.9, 10), P.toon({ color: 0x8a3a2e }));
+        roll.rotation.z = Math.PI / 2; roll.position.set(0.15, 0.15, -0.55); roll.castShadow = true;
+        const pack = new T.Mesh(new T.BoxGeometry(0.36, 0.42, 0.26), P.toon({ color: 0x7a5232 }));
+        pack.position.set(0.55, 0.21, 0.15); pack.rotation.y = 0.4; pack.castShadow = true;
+        camp.add(tent, flap, roll, pack);
+        const stoneMat = P.toon({ color: 0x9c8478, flatShading: true });
+        for (let i = 0; i < 8; i++) {
+          const a = i / 8 * Math.PI * 2, st = new T.Mesh(new T.DodecahedronGeometry(0.1, 0), stoneMat);
+          st.position.set(0.25 + Math.cos(a) * 0.34, 0.06, 0.65 + Math.sin(a) * 0.34); st.rotation.set(a, a * 2, 0);
+          camp.add(st);
+        }
+        const ash = new T.Mesh(new T.CircleGeometry(0.28, 16), new T.MeshBasicMaterial({ color: 0x3a2e30 }));
+        ash.rotation.x = -Math.PI / 2; ash.position.set(0.25, 0.012, 0.65);
+        const ember = new T.Mesh(new T.SphereGeometry(0.09, 8, 6), new T.MeshBasicMaterial({ color: 0xff7a2a, transparent: true, opacity: 0.9, toneMapped: false }));
+        ember.scale.y = 0.45; ember.position.set(0.25, 0.04, 0.65);
+        camp.add(ash, ember);
+        camp.position.set(X(0) - 4.6, SLAB_TOP, EDGE_Z - 0.8);
+        scene.add(camp);
+        addSteam(camp, 0.25, 0.1, 0.65, 3, 0.8, 0, 0xb9aeb4);
+        // dry tufts of grass along the edge of the sand, where the salt has not reached
+        const tuftN = Math.round(70 * many), tufts = new T.InstancedMesh(new T.ConeGeometry(0.035, 0.38, 3), P.toon({ color: 0xc49a5a }), tuftN * 3);
+        for (let i = 0; i < tuftN; i++) {
+          const x = -ROWS * CELL / 2 - 7 + ar() * (ROWS * CELL + 14), z = EDGE_Z - 1.9 + ar() * 1.3;
+          if (Math.abs(x - (X(0) - 4.6)) < 1.8 && z < EDGE_Z - 0.2) continue;
+          for (let j = 0; j < 3; j++) place(tufts, i * 3 + j, x + (ar() - 0.5) * 0.12, SLAB_TOP + 0.15, z + (ar() - 0.5) * 0.12, (ar() - 0.5) * 0.7, 0, (ar() - 0.5) * 0.7, 1, 0.7 + ar() * 0.6, 1);
+        }
+        scene.add(tufts);
+
+        // ---- The Great Salt Sump: a pan of rose-pink salt (the colour that brine-loving life gives the old lakes),
+        // netted with ridges of new white halite, the plates of the crossing laid on it
+        const SUMP_CZ = (SZ0 - 3 + SHORE_Z) / 2, SUMP_HD = (SHORE_Z - SZ0 + 3) / 2 + 1, SUMP_HW = 15.5;
+        const panMat = new T.ShaderMaterial({
+          transparent: true, depthWrite: false, uniforms: { uTime, uCloud },
+          vertexShader: 'varying vec3 vWp; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vWp = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+          fragmentShader: 'uniform float uTime, uCloud;\nvarying vec3 vWp;\n' + VORONOI + CLOUD + `
+            void main() {
+              vec2 v = sVoro(vWp.xz * 0.8 + 2.0);
+              vec3 c = mix(vec3(0.97, 0.80, 0.82), vec3(0.93, 0.68, 0.74), v.y);
+              c = mix(c, vec3(0.99, 0.88, 0.82), smoothstep(0.55, 0.85, cNoise(vWp.xz * 0.12)) * 0.5);
+              c = mix(c, vec3(1.0, 0.98, 0.97), smoothstep(0.1, 0.035, v.x) * 0.9);
+              c = mix(c, vec3(0.70, 0.50, 0.66), smoothstep(0.03, 0.0, v.x) * 0.55);
+              float g = fract(sin(dot(floor(vWp.xz * 9.0), vec2(12.9898, 78.233))) * 43758.5453);
+              c += vec3(0.5) * step(0.9972, fract(g + uTime * 0.09));
+              c *= sCloud(vWp.xz);
+              vec2 q = (vWp.xz - vec2(0.0, ${SUMP_CZ.toFixed(2)})) / vec2(${SUMP_HW.toFixed(1)}, ${SUMP_HD.toFixed(2)});
+              float e = length(pow(abs(q), vec2(2.6))) + (cNoise(vWp.xz * 0.35) - 0.5) * 0.25;
+              gl_FragColor = vec4(c, smoothstep(1.0, 0.72, e));
+            }`
+        });
+        const pan = new T.Mesh(new T.PlaneGeometry(SUMP_HW * 2.2, SUMP_HD * 2.2), panMat);
+        pan.rotation.x = -Math.PI / 2;
+        pan.position.set(0, 0.008, SUMP_CZ);
+        pan.renderOrder = -1;
+        scene.add(pan);
+        // its banks: low terraces of salt in bands of white, rose and ochre, stepping up to the east and the west
+        const sumpCasters = [];   // they cast shadows only at noon: under the dawn sun they would stripe the stones
+        const strata = [0xf7efe9, 0xefc4c6, 0xe4b48e, 0xf6e6da].map((c) => P.rim(P.toon({ color: c, flatShading: true }), 0xffffff, 0.25));
+        const terraceGeo = new T.CylinderGeometry(0.5, 0.56, 1, 8);
+        const steps = [], tStep = 1.7;
+        for (let z = SZ0 - 4.5; z < SHORE_Z + 4; z += tStep) [-1, 1].forEach((side) => steps.push({ z, side, wob: Math.sin(z * 0.37 + side) * 0.9 + Math.sin(z * 0.11) * 0.6 }));
+        strata.slice(0, 3).forEach((mat, t) => {
+          const tm = new T.InstancedMesh(terraceGeo, mat, steps.length);
+          steps.forEach((st, i) => {
+            const wdt = 3.6 - t * 0.9 + ar() * 0.4, h = 0.42 + ar() * 0.12;
+            place(tm, i, st.side * (16.2 + t * 1.15 + st.wob), t * 0.4 + h / 2, st.z + (ar() - 0.5) * 0.4, 0, ar() * 3, 0, wdt, h, 2.2 + ar() * 0.6);
+          });
+          tm.receiveShadow = true;
+          sumpCasters.push(tm);
+          scene.add(tm);
+        });
+        // a crown of pale salt along the top terrace
+        const crown = new T.InstancedMesh(terraceGeo, strata[3], steps.length);
+        steps.forEach((st, i) => place(crown, i, st.side * (19.8 + st.wob), 1.3, st.z, 0, ar() * 3, 0, 2.6 + ar(), 0.3, 2.4));
+        crown.receiveShadow = true;
+        scene.add(crown);
+        // pinnacles of salt in the shallows between the plates and the banks, white and rose
+        const pinGeo = new T.ConeGeometry(0.34, 1.6, 7, 3);
+        const pinPos = pinGeo.attributes.position, pr = P.rng(717);
+        for (let i = 0; i < pinPos.count; i++) { const y = pinPos.getY(i); if (y < 0.79) { const k = 1 + (pr() - 0.5) * 0.35; pinPos.setX(i, pinPos.getX(i) * k); pinPos.setZ(i, pinPos.getZ(i) * k); } }
+        pinGeo.computeVertexNormals();
+        pinGeo.translate(0, 0.8, 0);
+        const pinN = Math.round(16 * many);
+        [saltMat, strata[1]].forEach((mat, mi) => {
+          const pins = new T.InstancedMesh(pinGeo, mat, pinN * 3);
+          for (let i = 0; i < pinN; i++) {
+            const side = (i + mi) % 2 ? 1 : -1, x = side * (14 + ar() * 1.8), z = SZ0 - 2 + ar() * (SHORE_Z - SZ0 + 3);
+            for (let j = 0; j < 3; j++) {
+              const sc = (j ? 0.45 + ar() * 0.4 : 0.8 + ar() * 0.6);
+              place(pins, i * 3 + j, x + (j ? (ar() - 0.5) * 0.9 : 0), -0.05, z + (j ? (ar() - 0.5) * 0.9 : 0), (ar() - 0.5) * 0.15, ar() * 3, (ar() - 0.5) * 0.15, sc, sc * (0.7 + ar() * 0.7), sc);
+            }
+          }
+          sumpCasters.push(pins);
+          scene.add(pins);
+        });
+        // beyond the south shore: rolling dunes, dry shrubs and a few dark stones
+        const duneMat = P.rim(P.toon({ color: 0xeed8bc }), 0xfff6ea, 0.3);
+        const dunes = new T.InstancedMesh(new T.SphereGeometry(1, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2), duneMat, 12);
+        for (let i = 0; i < 12; i++) place(dunes, i, -34 + i * 6.2 + ar() * 3, -0.25, SHORE_Z + 10 + ar() * 9, 0, ar() * 0.6, 0, 5 + ar() * 4, 0.7 + ar() * 1.0, 3 + ar() * 2.5);
+        dunes.receiveShadow = true;
+        scene.add(dunes);
+        const shrubs = new T.InstancedMesh(new T.IcosahedronGeometry(0.32, 0), P.toon({ color: 0x6e6a3e, flatShading: true }), 30);
+        for (let i = 0; i < 30; i++) { const sc = 0.6 + ar() * 0.9; place(shrubs, i, -24 + ar() * 48, 0.3 + sc * 0.12, SHORE_Z + 2.5 + ar() * 7, ar(), ar() * 3, ar(), sc, sc * 0.7, sc); }
+        sumpCasters.push(shrubs);
+        scene.add(shrubs);
+
+        // ---- The far south at noon: three ranges, each paler with distance, floating on the shimmer of a mirage
+        // that lays their reflection upside down on the salt
+        function range(z, w, hMax, seed, top, base, yBase) {
+          const n = 140, geo = new T.PlaneGeometry(w, 1, n, 1), pos = geo.attributes.position, rr = P.rng(seed);
+          const hs = [];
+          for (let i = 0; i <= n; i++) {
+            const u = i / n;
+            hs.push(hMax * (0.35 + 0.3 * Math.sin(u * 9.0 + seed) + 0.2 * Math.sin(u * 23.0 + seed * 2) + 0.12 * Math.sin(u * 57.0) + rr() * 0.06) * (0.6 + 0.4 * Math.sin(u * Math.PI)));
+          }
+          const cols = new Float32Array(pos.count * 3), ct = new T.Color(top), cb = new T.Color(base), cc = new T.Color();
+          for (let i = 0; i < pos.count; i++) {
+            const ix = i % (n + 1), up = pos.getY(i) > 0;
+            pos.setY(i, up ? Math.max(0.5, hs[ix]) : 0);
+            cc.copy(up ? ct : cb);
+            cols.set([cc.r, cc.g, cc.b], i * 3);
+          }
+          geo.setAttribute('color', new T.BufferAttribute(cols, 3));
+          const m = new T.Mesh(geo, new T.MeshBasicMaterial({ vertexColors: true, fog: false, side: T.DoubleSide }));
+          m.position.set(0, yBase, z);
+          scene.add(m);
+          const refl = new T.Mesh(geo, new T.MeshBasicMaterial({ vertexColors: true, fog: false, side: T.DoubleSide, transparent: true, opacity: 0.28, depthWrite: false }));
+          refl.scale.y = -0.32;
+          refl.position.set(0, yBase, z - 1);
+          scene.add(refl);
+          return m;
+        }
+        range(330, 760, 34, 3, 0xd6cce6, 0xf2e8f0, 3.2);
+        range(285, 700, 26, 7, 0xc7a8cc, 0xeedae2, 2.6);
+        range(240, 640, 16, 11, 0xb88aa4, 0xe8ccd2, 2.0);
+        // the mirage itself: a band of shining sky-blue "water" between the salt and the ranges
+        const shimmerMat = new T.ShaderMaterial({
+          transparent: true, depthWrite: false, fog: false, uniforms: { uTime },
+          vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+          fragmentShader: `uniform float uTime; varying vec2 vUv;
+            void main(){ float s = sin(vUv.y * 60.0 - uTime * 2.0 + sin(vUv.x * 80.0 + uTime) * 1.5) * 0.5 + 0.5;
+              float band = smoothstep(0.0, 0.35, vUv.y) * smoothstep(1.0, 0.55, vUv.y);
+              gl_FragColor = vec4(mix(vec3(0.78, 0.86, 0.98), vec3(0.97, 0.98, 1.0), s), band * 0.55); }`
+        });
+        const shimmer = new T.Mesh(new T.PlaneGeometry(900, 4.2), shimmerMat);
+        shimmer.position.set(0, 1.6, 225);
+        scene.add(shimmer);
+        // high cirrus in the noon sky, to the south
+        const cirrusTex = P.canvasTex(256, 64, (g, w, h) => {
+          g.clearRect(0, 0, w, h);
+          const r2 = P.rng(919);
+          for (let i = 0; i < 26; i++) {
+            const y = h * 0.25 + r2() * h * 0.5, x0 = r2() * w * 0.4, len = w * (0.3 + r2() * 0.5);
+            const gr = g.createLinearGradient(x0, 0, x0 + len, 0);
+            gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.5, `rgba(255,255,255,${(0.25 + r2() * 0.35).toFixed(2)})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+            g.strokeStyle = gr; g.lineWidth = 1 + r2() * 2.5;
+            g.beginPath(); g.moveTo(x0, y); g.quadraticCurveTo(x0 + len / 2, y - 6 + r2() * 12, x0 + len, y + (r2() - 0.5) * 10); g.stroke();
+          }
+        });
+        const cirrus = [];
+        for (let i = 0; i < 5; i++) {
+          const cl = new T.Sprite(new T.SpriteMaterial({ map: cirrusTex, fog: false, depthWrite: false, transparent: true, toneMapped: false, opacity: 0 }));
+          const az = -0.7 + i * 0.35 + ar() * 0.15, elv = 0.1 + ar() * 0.22, sz = 120 + ar() * 60;
+          cl.position.set(Math.sin(az) * Math.cos(elv) * 270, Math.sin(elv) * 270, Math.cos(az) * Math.cos(elv) * 270);
+          cl.scale.set(sz, sz * 0.25, 1);
+          sky.add(cl);
+          cirrus.push(cl);
+        }
+
+        // ---- A sinkhole found by a false step stays open: lids of crust broken around black brine that steams and bubbles,
+        // and Hermes rings it with his red survey cord on stakes, and plants a flag, so that no one steps there again
+        const shardGeo = (() => {
+          const sh = new T.Shape(); sh.moveTo(-0.34, 0); sh.lineTo(0.3, 0.07); sh.lineTo(0.02, 0.52); sh.closePath();
+          const g = new T.ExtrudeGeometry(sh, { depth: 0.08, bevelEnabled: false });
+          g.rotateX(Math.PI / 2); g.translate(0, 0.08, -0.24);
+          return g;
+        })();
+        const flagGeo = new T.PlaneGeometry(0.66, 0.4, 6, 1);
+        flagGeo.translate(0.33, 0, 0);
+        const flagMat = new T.MeshLambertMaterial({ color: 0xd23a2c, side: T.DoubleSide, emissive: 0x3a0804 });
+        const bubbleGeo = new T.SphereGeometry(0.07, 8, 6), bubbleMat = new T.MeshBasicMaterial({ color: 0xd8f2f2, transparent: true, opacity: 0.8 });
+        const hazards = [];
+        function makeHazard(x, z, rad, top, seed, born) {
+          const hr = P.rng(seed), g = new T.Group(), plant = new T.Group();
+          g.position.set(x, 0, z);
+          for (let i = 0; i < 9; i++) {   // the broken lid, tipped up around the edge of the brine
+            const a = i / 9 * Math.PI * 2 + hr() * 0.4, piv = new T.Group(), sh = new T.Mesh(shardGeo, saltMat), rr = rad * (0.8 + hr() * 0.14);
+            piv.position.set(Math.cos(a) * rr, top * 0.45, Math.sin(a) * rr);
+            piv.rotation.y = -a;
+            sh.rotation.set(0, hr() * 3, 0.25 + hr() * 0.45);
+            sh.scale.setScalar((0.9 + hr() * 0.7) * rad / 1.5);
+            sh.castShadow = true;
+            piv.add(sh); g.add(piv);
+          }
+          for (let i = 0; i < 12; i++) {   // new crystals of halite growing on the rim
+            const a = hr() * Math.PI * 2, cb = new T.Mesh(cubeGeo, cubeMat), rr = rad * (0.9 + hr() * 0.16);
+            cb.position.set(Math.cos(a) * rr, top * 0.6 + hr() * 0.08, Math.sin(a) * rr);
+            cb.rotation.set(hr() * 3, hr() * 3, hr() * 3);
+            cb.scale.setScalar(0.8 + hr() * 0.9);
+            g.add(cb);
+          }
+          const rc = rad * 0.93, cordY = top + 0.42;   // the cord, a hexagon on six stakes, and the flag on the north stake
+          for (let i = 0; i < 6; i++) {
+            const a = i * Math.PI / 3 - Math.PI / 2, st = new T.Mesh(stakeGeo, bleached);
+            st.position.set(Math.cos(a) * rc, top - 0.06, Math.sin(a) * rc);
+            if (i === 0) st.scale.y = 2.4;
+            st.castShadow = true; plant.add(st);
+            const tp = new T.Mesh(tipGeo, cordMat); tp.position.set(Math.cos(a) * rc, top - 0.06 + (i === 0 ? 1.62 : 0.66), Math.sin(a) * rc); plant.add(tp);
+          }
+          const cord = new T.Mesh(new T.TorusGeometry(rc, 0.032, 4, 6), cordMat);
+          cord.rotation.set(Math.PI / 2, 0, -Math.PI / 2);
+          cord.position.y = cordY; cord.castShadow = true;
+          plant.add(cord);
+          const flag = new T.Mesh(flagGeo, flagMat);
+          flag.position.set(0, top + 1.42, -rc);
+          flag.castShadow = true;
+          plant.add(flag);
+          plant.scale.y = born ? 0.001 : 1;
+          g.add(plant);
+          const bubbles = [0, 1, 2].map(() => { const b = new T.Mesh(bubbleGeo, bubbleMat); b.position.set((hr() - 0.5) * rad * 0.8, 0.07, (hr() - 0.5) * rad * 0.8); g.add(b); return b; });
+          addSteam(g, 0, 0.1, 0, lowPower ? 2 : 4, 1.2 * rad / 1.5, born);
+          scene.add(g);
+          const hz = { g, plant, flag, bubbles, born: born || 0, seed: seed % 7 };
+          hazards.push(hz);
+          return hz;
+        }
+        function dropHazard(hz) {
+          scene.remove(hz.g);
+          hazards.splice(hazards.indexOf(hz), 1);
+          for (let i = steam.length - 1; i >= 0; i--) if (steam[i].sp.parent === hz.g) steam.splice(i, 1);
+        }
 
         // Hermes: the Cartographer of Distant Light, as in the canyon. In the daylight his lantern is out.
         const H = P.buildHermes(T, glowTex);
@@ -610,6 +1064,7 @@
 
         return { T, renderer, scene, camera, sky, sunDisc, hemi, sun, uTime, slabs, crackTex, crackGeo, poolMat, makeCrystal, post, postRings, beam, sumpPlates,
                  hazeMat, mirage, mirageMat, ringGeo, markers, prints, motes, motesBase, motesN, burst, burstN, rag, glowTex,
+                 uCloud, steam, hazards, makeHazard, dropHazard, birds, devils, devilN, wisps, spot, ember, cirrus, sumpCasters,
                  hermes: H.hermes, legL: H.legL, legR: H.legR, staff: H.staff, lamp: H.lamp, cloak: H.cloak, lowPower };
       }
 
@@ -649,6 +1104,8 @@
           s.pool.position.set(X(c), 0.05, Z(r));
           G.scene.add(s.pool);
         }
+        // from now on it is an obstacle, open and roped off, for the rest of the crossing
+        if (!s.hole) s.hole = G.makeHazard(X(c), Z(r), PLATE * 0.6, FACE, r * 31 + c * 7 + 11, instant ? 0 : performance.now());
         s.sunk = instant ? 1 : 0.001;
         if (instant) applySink(s, 1);
       }
@@ -663,7 +1120,8 @@
         G.slabs.forEach((rowS, r) => rowS.forEach((s, c) => {
           s.mesh.position.copy(s.base); s.mesh.rotation.set(0, s.rot, 0);
           [s.crystal, s.crack, s.pool].forEach((m) => { if (m) { G.scene.remove(m); } });
-          s.crystal = s.crack = s.pool = null; s.show = s.cracked = s.sunk = 0;
+          if (s.hole) G.dropHazard(s.hole);
+          s.crystal = s.crack = s.pool = s.hole = null; s.show = s.cracked = s.sunk = 0;
         }));
         S.path.forEach((c, r) => showCrystal(r, c, true));
         Object.keys(S.revealed).forEach((k) => {
@@ -673,6 +1131,7 @@
         G.sumpPlates.forEach((rowP) => Object.values(rowP).forEach((p) => {
           p.group.position.copy(p.base); p.group.rotation.x = p.group.rotation.z = 0; p.sunk = p.split = 0;
           if (p.pool) { G.scene.remove(p.pool); p.pool = null; }
+          if (p.hole) { G.dropHazard(p.hole); p.hole = null; }
           p.crack.material.opacity = 1;
         }));
         Object.keys(S.sRevealed).forEach((key) => showSumpFail(Math.floor(key / 3), key % 3 - 1, S.sRevealed[key], true));
@@ -694,6 +1153,7 @@
           p.pool.position.set(p.base.x, 0.04, p.base.z);
           G.scene.add(p.pool);
         }
+        if (!p.hole) p.hole = G.makeHazard(p.base.x, p.base.z, SR * 0.98, SUMP_TOP + 0.02, k * 13 + d * 5 + 101, instant ? 0 : performance.now());
         p.sunk = instant ? 1 : 0.001;
         if (instant) applySumpSink(p, 1);
       }
@@ -741,9 +1201,10 @@
           colr.needsUpdate = true;
           if (win) win.style.setProperty('--sun', k.toFixed(2));
         }
-        G.sun.intensity = 0.75 + 0.55 * k;
-        G.sun.color.setHSL(0.07 + 0.04 * k, 0.85 - 0.4 * k, 0.72 + 0.2 * k, 'srgb');
-        G.hemi.intensity = 0.7 + 0.3 * k;
+        // (the light grows gently with the sun: stronger, and the white salt burns out and loses its polygons and colour)
+        G.sun.intensity = 0.75 + 0.3 * k;
+        G.sun.color.setHSL(0.07 + 0.04 * k, 0.85 - 0.4 * k, 0.72 + 0.14 * k, 'srgb');
+        G.hemi.intensity = 0.66 + 0.14 * k;
         // the haze closes in as the salt heats up: the far rows melt into white
         G.scene.fog.color.copy(horizon).lerp(new T.Color(0xfff8f2), 0.4 + 0.4 * k);
         G.scene.fog.near = 12 - 4 * k; G.scene.fog.far = 58 - 26 * k;
@@ -797,28 +1258,28 @@
         osc.connect(g); g.connect(a.master);
         osc.start(t); osc.stop(t + dur + 0.05);
       }
-      // The creak of the crust while he leans: a filtered hiss that rises with his weight
+      // The creak of the crust while he leans: a filtered hiss that rises with his weight, laid on the audio clock
+      // in one smooth ramp from empty to full (secs), so it follows the needle exactly
       let creak = null;
-      function creakOn() {
+      function creakOn(secs, since) {
         const a = ensureAudio();
         if (!a || creak) return;
         const { ctx } = a, src = ctx.createBufferSource(); src.buffer = a.noise; src.loop = true;
-        const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 6; f.frequency.value = 300;
-        const g = ctx.createGain(); g.gain.value = 0.0001;
+        const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 6;
+        const g = ctx.createGain();
+        const t = ctx.currentTime, left = Math.max(0.05, secs - since), w0 = Math.min(1, since / secs);
+        f.frequency.setValueAtTime(260 + w0 * 900, t); f.frequency.linearRampToValueAtTime(1160, t + left);
+        const curve = new Float32Array(32).map((_, i) => { const w = w0 + (1 - w0) * i / 31; return 0.02 + w * w * 0.12; });
+        g.gain.setValueCurveAtTime(curve, t, left);
         src.connect(f); f.connect(g); g.connect(a.master); src.start();
         creak = { src, f, g };
-      }
-      function creakAt(w) {
-        if (!creak || !audio) return;
-        const t = audio.ctx.currentTime;
-        creak.f.frequency.setTargetAtTime(260 + w * 900, t, 0.05);
-        creak.g.gain.setTargetAtTime(0.02 + w * w * 0.12 * (0.6 + Math.random() * 0.4), t, 0.03);
       }
       function creakOff() {
         if (!creak || !audio) { creak = null; return; }
         const c = creak, t = audio.ctx.currentTime;
+        if (c.g.gain.cancelAndHoldAtTime) c.g.gain.cancelAndHoldAtTime(t); else c.g.gain.cancelScheduledValues(t);
         c.g.gain.setTargetAtTime(0.0001, t, 0.04);
-        setTimeout(() => { try { c.src.stop(); } catch (e) {} }, 200);
+        setTimeout(() => { try { c.src.stop(); } catch (e) {} }, 220);
         creak = null;
       }
       const NOTE = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5, E6: 1318.5, G6: 1567.98 };
@@ -829,6 +1290,7 @@
         sink: () => { noise(0.25, 'highpass', 2200, 0.2); tone(120, 0.05, 0.6, { to: 45, gain: 0.22 }); noise(0.9, 'lowpass', 500, 0.16, 0.12); [0, 1, 2, 3].forEach((i) => tone(300 + i * 90, 0.3 + i * 0.12, 0.12, { to: 500 + i * 120, gain: 0.04 })); },
         groan: () => { tone(110, 0, 0.5, { to: 70, gain: 0.12, type: 'triangle' }); noise(0.3, 'bandpass', 900, 0.08, 0, 4); },
         light: () => tone(420, 0, 0.2, { to: 360, gain: 0.05, type: 'triangle' }),
+        cry: () => { tone(2150, 0, 0.32, { to: 1500, gain: 0.016, attack: 0.04 }); tone(1950, 0.4, 0.5, { to: 1250, gain: 0.012, attack: 0.05 }); },
         mirage: () => ['E6', 'G6', 'C6'].forEach((n, i) => tone(NOTE[n], i * 0.4, 2.2, { gain: 0.03, attack: 0.6 })),
         fill: () => [0, 1, 2].forEach((i) => tone(520 + i * 160, i * 0.07, 0.12, { to: 900 + i * 160, gain: 0.06 })),
         win: () => {
@@ -844,13 +1306,24 @@
         fxEl.flash = mk('chasm3d-flash');
         fxEl.hurt = mk('chasm3d-hurt');
         fxEl.heat = mk('playa3d-heat');
-        // The balance: a brass arc, the measured band in gold, the needle of his weight
-        fxEl.gauge = mk('playa3d-balance', `<svg viewBox="-60 -58 120 66">
+        // The balance: a brass arc, the measured band in gold with its perfect heart, the red of too much weight,
+        // the needle of his weight and the notch where she last let go (both turned by the compositor, not the SVG)
+        fxEl.gauge = mk('playa3d-balance', `<div class="b-dial"><svg viewBox="-60 -58 120 66">
             <path class="b-track" d="M-50 0 A50 50 0 0 1 50 0" pathLength="100"/>
             <path class="b-band" d="M-50 0 A50 50 0 0 1 50 0" pathLength="100"/>
             <path class="b-heavy" d="M-50 0 A50 50 0 0 1 50 0" pathLength="100"/>
-            <g class="b-needle"><line x1="0" y1="0" x2="0" y2="-46"/><circle r="5"/></g>
-          </svg><span class="b-label">Hold to lean</span>`);
+            <path class="b-heart" d="M-50 0 A50 50 0 0 1 50 0" pathLength="100"/>
+          </svg><i class="b-mark"></i><i class="b-needle"></i><i class="b-hub"></i></div><span class="b-label">Hold to lean</span>`);
+        fxEl.needle = fxEl.gauge.querySelector('.b-needle');
+        fxEl.mark = fxEl.gauge.querySelector('.b-mark');
+        fxEl.label = fxEl.gauge.querySelector('.b-label');
+        // the dial itself is a hold button too: pressing anywhere on it leans exactly like the button in the panel
+        fxEl.gauge.addEventListener('pointerdown', (e) => { if (e.button > 0 || view.phase !== 'test') return; e.preventDefault(); try { fxEl.gauge.setPointerCapture(e.pointerId); } catch (err) {} leanStart(e); });
+        fxEl.gauge.addEventListener('pointerup', (e) => leanEnd(e));
+        fxEl.gauge.addEventListener('pointercancel', (e) => leanEnd(e));
+        fxEl.gauge.addEventListener('contextmenu', (e) => e.preventDefault());
+        // a soft vignette over the picture, under the HUD, for depth
+        if (el.canvas) { const vg = document.createElement('div'); vg.className = 'playa3d-vignette'; vg.setAttribute('aria-hidden', 'true'); el.canvas.after(vg); }
         fxEl.alert = document.createElement('div');
         fxEl.alert.className = 'chasm3d-alert';
         fxEl.alert.hidden = true;
@@ -1090,6 +1563,8 @@
       const leanSpeed = () => (stage() === 'sump' ? 0.62 + heat2() * 0.15 + S.sump.length * 0.02 : 0.42 + heat() * 0.2 + row() * 0.02);
       const tx3 = (t) => (t.sump ? SX(lane() + t.d) : X(t.c)), tz3 = (t) => (t.sump ? SZ(t.k) : Z(t.r));
       function startTest(t) {
+        stopLean();
+        const again = view.target === t;   // after a groan he tries the same slab: the notch of her last release stays
         view.phase = 'test';
         view.target = t;
         view.weight = 0; view.leaning = false;
@@ -1097,18 +1572,25 @@
         paintMarkers([t.sump ? { k: t.k, d: t.d } : { r: t.r, c: t.c }]);
         const half = bandHalf();
         if (fxEl.gauge) {
-          const lo = (BAND_C - half) * 100, hi = (BAND_C + half) * 100;
-          fxEl.gauge.querySelector('.b-band').setAttribute('stroke-dasharray', `0 ${lo.toFixed(1)} ${(hi - lo).toFixed(1)} 200`);
-          fxEl.gauge.querySelector('.b-heavy').setAttribute('stroke-dasharray', `0 ${hi.toFixed(1)} ${(100 - hi).toFixed(1)} 200`);
+          const lo = (BAND_C - half) * 100, hi = (BAND_C + half) * 100, h0 = (BAND_C - half * HEART) * 100, h1 = (BAND_C + half * HEART) * 100;
+          fxEl.gauge.querySelector('.b-band').setAttribute('stroke-dasharray', `0 ${lo.toFixed(2)} ${(hi - lo).toFixed(2)} 200`);
+          fxEl.gauge.querySelector('.b-heavy').setAttribute('stroke-dasharray', `0 ${hi.toFixed(2)} ${(100 - hi).toFixed(2)} 200`);
+          fxEl.gauge.querySelector('.b-heart').setAttribute('stroke-dasharray', `0 ${h0.toFixed(2)} ${(h1 - h0).toFixed(2)} 200`);
+          clearTimeout(gauge.hide);
+          gauge.verdict = '';
+          fxEl.gauge.classList.remove('is-gold', 'is-red', 'is-light', 'is-heavy', 'is-perfect', 'is-good', 'is-verdict');
+          if (!again) fxEl.gauge.classList.remove('has-mark');
           fxEl.gauge.classList.add('is-on');
+          needleTo(0);
           paintGauge();
         }
         const hold = btn('<span class="chasm3d-arrow">⇩</span> Hold to lean <small>let go in the gold</small>', null, { cls: 'is-way playa3d-hold', aria: 'Hold to lean Hermes onto the slab, let go when the needle is in the gold band' });
-        hold.addEventListener('pointerdown', (e) => { e.preventDefault(); try { hold.setPointerCapture(e.pointerId); } catch (err) {} leanStart(); });
-        hold.addEventListener('pointerup', leanEnd);
-        hold.addEventListener('pointercancel', leanEnd);
-        hold.addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); leanStart(); } });
-        hold.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); leanEnd(); } });
+        hold.addEventListener('pointerdown', (e) => { if (e.button > 0) return; e.preventDefault(); try { hold.setPointerCapture(e.pointerId); } catch (err) {} leanStart(e); });
+        hold.addEventListener('pointerup', (e) => leanEnd(e));
+        hold.addEventListener('pointercancel', (e) => leanEnd(e));
+        hold.addEventListener('contextmenu', (e) => e.preventDefault());
+        hold.addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); leanStart(e); } });
+        hold.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); leanEnd(e); } });
         btn(t.sump ? '↺ Another plate' : '↺ Another slab', () => { endGauge(); showChoice(); }, { cls: 'is-back', aria: t.sump ? 'Choose another plate' : 'Choose another slab' });
         if (t.sump) {
           say(`My staff is on the ${WAY(t.d)[2]} plate. The crust is hot through my boots. Hold, Silvia, and let go when my weight sits in the gold.`);
@@ -1121,43 +1603,123 @@
         }
         setTimeout(() => { if (view.phase === 'test') hold.focus({ preventScroll: true }); }, 30);
       }
+      // The balance is exact: from the instant she presses, his weight grows at one steady rate, and it is read at the
+      // instant she lets go (the time stamps of her own press and release, not the next frame). The needle turns on the
+      // compositor in step with that clock, a chime is laid on the audio clock for the moment it enters the gold, and
+      // the notch of her release stays on the arc so she can correct the next one.
+      const HEART = 0.35;   // the inner part of the gold that counts as perfect balance
+      const gauge = { anim: null, t0: 0, v: 1, timers: [], ping: null, pingAt: 0, hide: 0, verdict: '' };
+      const stamp = (e) => { const n = performance.now(), t = e && e.timeStamp; return t > n - 1000 && t <= n + 5 ? t : n; };
+      const weightAt = (t) => Math.min(1.05, Math.max(0, (t - gauge.t0) / 1000 * gauge.v));
+      const needleTurn = (w) => `rotate(${(-90 + Math.min(1, Math.max(0, w)) * 180).toFixed(2)}deg)`;
+      function needleTo(w, ms) {   // settle the needle at a weight, gliding there in ms (or at once)
+        const n = fxEl.needle;
+        if (!n) return;
+        const from = ms && n.animate && !reducedMotion() ? getComputedStyle(n).transform : '';
+        if (gauge.anim) { gauge.anim.cancel(); gauge.anim = null; }
+        n.style.transform = needleTurn(w);
+        if (from && from !== 'none') n.animate([{ transform: from }, { transform: needleTurn(w) }], { duration: ms, easing: 'cubic-bezier(.2,.8,.3,1)' });
+      }
       function paintGauge() {
         if (!fxEl.gauge) return;
-        fxEl.gauge.querySelector('.b-needle').setAttribute('transform', `rotate(${(-90 + Math.min(1, view.weight) * 180).toFixed(1)})`);
         const lo = BAND_C - bandHalf(), hi = BAND_C + bandHalf(), w = view.weight;
-        const label = !view.leaning && w === 0 ? 'Hold to lean' : w < lo ? 'Leaning…' : w <= hi ? 'Now! Let go' : 'Too heavy!';
-        const span = fxEl.gauge.querySelector('.b-label');
-        if (span.textContent !== label) span.textContent = label;
-        fxEl.gauge.classList.toggle('is-gold', w >= lo && w <= hi);
-        fxEl.gauge.classList.toggle('is-red', w > hi);
+        if (view.leaning && !gauge.anim && fxEl.needle) fxEl.needle.style.transform = needleTurn(w);   // no Web Animations: by frame
+        const label = gauge.verdict && !view.leaning ? gauge.verdict : !view.leaning ? 'Hold to lean' : w < lo ? 'Leaning…' : w <= hi ? 'Now! Let go' : 'Too heavy!';
+        if (fxEl.label.textContent !== label) fxEl.label.textContent = label;
+        fxEl.gauge.classList.toggle('is-gold', view.leaning && w >= lo && w <= hi);
+        fxEl.gauge.classList.toggle('is-red', view.leaning && w > hi);
       }
-      function endGauge() { if (fxEl.gauge) fxEl.gauge.classList.remove('is-on', 'is-gold', 'is-red'); creakOff(); view.leaning = false; }
-      function leanStart() {
+      function stopLean() {
+        gauge.timers.forEach(clearTimeout);
+        gauge.timers = [];
+        if (gauge.ping && audio && audio.ctx.currentTime < gauge.pingAt) { try { gauge.ping.stop(); } catch (e) {} }
+        gauge.ping = null;
+        creakOff();
+      }
+      function endGauge(linger) {
+        stopLean();
+        view.leaning = false;
+        clearTimeout(gauge.hide);
+        if (!fxEl.gauge) return;
+        const off = () => fxEl.gauge.classList.remove('is-on', 'is-gold', 'is-red');
+        if (linger && !reducedMotion()) gauge.hide = setTimeout(off, 950); else off();
+      }
+      // The gold arrives: a high clear chime, exactly then, and a tick of the phone in her hand
+      function goldCue(ms) {
+        if (ms < 0) return;
+        gauge.timers.push(setTimeout(() => { if (view.leaning && navigator.vibrate) { try { navigator.vibrate(12); } catch (e) {} } }, ms));
+        const a = ensureAudio();
+        if (!a) return;
+        const { ctx } = a, t = ctx.currentTime + ms / 1000, osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(NOTE.E6, t);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.07, t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+        osc.connect(g); g.connect(a.master);
+        osc.start(t); osc.stop(t + 0.45);
+        gauge.ping = osc; gauge.pingAt = t;
+      }
+      function leanStart(e) {
         if (view.phase !== 'test' || view.leaning) return;
+        stopLean();
+        clearTimeout(gauge.hide);
         view.leaning = true;
         view.weight = 0;
-        view.wob = Math.random() * 6;
-        creakOn();
-        if (!G) view.weight = BAND_C;   // without 3D (no frames run) the lean lands in the band
+        gauge.verdict = '';
+        gauge.t0 = stamp(e);
+        gauge.v = leanSpeed();
+        const full = 1000 / gauge.v, since = performance.now() - gauge.t0;
+        if (fxEl.gauge) {
+          fxEl.gauge.classList.remove('is-light', 'is-heavy', 'is-perfect', 'is-good', 'is-verdict');
+          if (gauge.anim) { gauge.anim.cancel(); gauge.anim = null; }
+          fxEl.needle.style.transform = needleTurn(0);
+          if (fxEl.needle.animate) {
+            gauge.anim = fxEl.needle.animate([{ transform: needleTurn(0) }, { transform: needleTurn(1) }], { duration: full, easing: 'linear', fill: 'forwards' });
+            gauge.anim.currentTime = since;   // in step with the instant she pressed, not the instant this ran
+          }
+        }
+        creakOn(full / 1000, since / 1000);
+        goldCue((BAND_C - bandHalf()) * full - since);
+        // past full weight the crust will not wait for her: too heavy
+        gauge.timers.push(setTimeout(() => { if (view.leaning) leanEnd(null, 1.05); }, 1.05 * full - since));
+        if (!G) view.weight = BAND_C;   // without 3D the lean lands in the band
+        paintGauge();
       }
-      function leanEnd() {
+      function leanEnd(e, forced) {
         if (view.phase !== 'test' || !view.leaning) return;
         view.leaning = false;
-        creakOff();
-        release(view.weight);
+        stopLean();
+        release(forced || (G ? weightAt(stamp(e)) : BAND_C));
+      }
+      // Where she let go, on the arc, and what it was worth
+      function showVerdict(w, text, cls) {
+        gauge.verdict = text;
+        view.weight = w;
+        if (!fxEl.gauge) return;
+        needleTo(w);
+        fxEl.mark.style.transform = needleTurn(w);
+        fxEl.gauge.classList.remove('is-gold', 'is-red', 'is-light', 'is-heavy', 'is-perfect', 'is-good');
+        fxEl.gauge.classList.add('has-mark', cls);
+        replay(fxEl.gauge, 'is-verdict');
+        paintGauge();
       }
       // Her weight at the moment she lets go decides; then the crust answers
       function release(w) {
-        const lo = BAND_C - bandHalf(), hi = BAND_C + bandHalf(), t = view.target;
+        const half = bandHalf(), lo = BAND_C - half, hi = BAND_C + half, t = view.target;
+        if (w < lo) showVerdict(w, 'Too light', 'is-light');
+        else if (w > hi) showVerdict(w, 'Too heavy!', 'is-heavy');
+        else if (Math.abs(w - BAND_C) <= half * HEART) showVerdict(w, 'Perfect balance!', 'is-perfect');
+        else showVerdict(w, 'In the gold', 'is-good');
         if (w < lo) {
           S.light++;
           if (soundOn()) sounds.light();
-          view.weight = 0;
-          paintGauge();
+          // the needle rests a moment where she let go, then swings back for another try
+          gauge.timers.push(setTimeout(() => { if (view.phase === 'test' && !view.leaning) { view.weight = 0; needleTo(0, 420); } }, reducedMotion() ? 0 : 260));
           say(w < lo * 0.5 ? 'I barely touched it, Silvia. Lean with me: hold a little longer.' : 'Not quite enough weight to trust it. Again, a little longer.');
           return;
         }
-        endGauge();
+        endGauge(true);
         if (t.sump) {
           const truth = sumpWhy(SUMP[t.k][t.d + 1]);
           if (truth !== 'good') { sumpSetback(truth, t.k, t.d); return; }
@@ -1553,6 +2115,74 @@
         view.x = w.tx; view.z = w.tz;
         if (w.then) w.then();
       }
+      // ---- Life around the crossing, every frame: steam, the open sinkholes, birds, dust devils, wisps ----
+      function ambience(now, dt, rm) {
+        const tt = now / 1000;
+        G.ember.material.opacity = rm ? 0.8 : 0.65 + Math.sin(tt * 7.3) * 0.15 + Math.sin(tt * 13.1) * 0.1;
+        const ci = view.sky ? 0.15 + heat() * 0.35 : 0.85;
+        G.cirrus.forEach((cl) => { cl.material.opacity += (ci - cl.material.opacity) * Math.min(1, dt * 2); });
+        if (G.sumpCasters[0].castShadow === view.sky) G.sumpCasters.forEach((m) => { m.castShadow = !view.sky; });
+        G.steam.forEach((st) => {
+          const ph = (tt * st.spd + st.ph) % 1, k = st.born ? Math.min(1, Math.max(0, (now - st.born) / 1600)) : 1;
+          st.sp.position.set(st.x + ph * 0.5, st.y + ph * st.rise, st.z - ph * 0.15);
+          st.sp.scale.setScalar(st.size * (0.45 + ph * 1.5));
+          st.sp.material.opacity = Math.pow(Math.sin(ph * Math.PI), 1.3) * 0.42 * k;
+        });
+        G.hazards.forEach((hz) => {
+          // Hermes plants the stakes once the brine has settled: they spring up, the cord tightens, the flag waves
+          const e = hz.born ? Math.min(1, Math.max(0, ((now - hz.born) / 1000 - 1.0) / 0.55)) : 1;
+          hz.plant.scale.y = Math.max(0.001, 1 + 2.7 * Math.pow(e - 1, 3) + 1.7 * Math.pow(e - 1, 2));
+          hz.plant.visible = e > 0;
+          hz.flag.rotation.y = rm ? -0.3 : Math.sin(tt * 2.4 + hz.seed) * 0.32 - 0.3;
+          hz.flag.rotation.x = rm ? 0 : Math.sin(tt * 5.1 + hz.seed) * 0.06;
+          hz.bubbles.forEach((b, j) => { const ph = (tt * 0.55 + j * 0.37 + hz.seed * 0.13) % 1; b.scale.setScalar(ph < 0.86 ? 0.25 + ph : 0.001); });
+        });
+        // the birds circle over the basin (over Hermes and higher in the Sump), gliding, then a few wingbeats
+        const bx = view.sky ? 0 : view.x, bz = view.sky ? GRID_Z : view.z + 8, bh = view.sky ? 0 : 3.5, kb = Math.min(1, dt * 0.4);
+        const shade = !!G.sunDir && G.sunDir.y > 0.5;   // their shadows only once the sun is high: at dawn they would stretch across the whole basin
+        G.birds.forEach((b) => {
+          if (b.shade !== shade) { b.shade = shade; b.g.children.forEach((m) => { m.castShadow = shade; }); }
+          b.cx += (bx + b.ox - b.cx) * kb; b.cz += (bz + b.oz - b.cz) * kb; b.hy += (b.h + bh - b.hy) * kb;
+          b.a += dt * b.w;
+          const x = b.cx + Math.cos(b.a) * b.r, z = b.cz + Math.sin(b.a) * b.r * 0.8;
+          b.g.position.set(x, b.hy + Math.sin(b.a * 2 + b.ph) * 0.4, z);
+          b.g.rotation.set(0, Math.atan2(-Math.sin(b.a) * Math.sign(b.w), Math.cos(b.a) * 0.8 * Math.sign(b.w)), -0.3 * Math.sign(b.w));
+          const beat = rm ? 0 : Math.max(0, Math.sin(tt * 0.45 + b.ph) - 0.35) * 1.6;
+          const fl = 0.14 + Math.sin(tt * 12 + b.ph) * 0.65 * Math.min(1, beat);
+          b.wr.rotation.z = fl; b.wl.rotation.z = -fl;
+        });
+        // dust devils: born somewhere out on the open salt, they drift with the wind, spin, and die away
+        G.devils.forEach((d) => {
+          d.life += dt / 15;
+          if (d.life >= 1 || !d.born) {
+            const [x, z] = G.spot(2);
+            d.x = x; d.z = z; d.vx = 0.4 + Math.random() * 0.5; d.vz = (Math.random() - 0.5) * 0.3; d.life = d.born ? 0 : d.life; d.born = true;
+          }
+          d.x += d.vx * dt; d.z += d.vz * dt;
+          const op = Math.pow(Math.sin(Math.min(1, d.life) * Math.PI), 0.7), pos = d.pts.geometry.attributes.position, n = G.devilN;
+          d.pts.material.opacity = op * 0.6;
+          d.pts.visible = op > 0.01;
+          for (let i = 0; i < n; i++) {
+            const f = i / n, skirt = i % 4 === 0;
+            const y = skirt ? 0.08 + (i % 7) * 0.03 : f * 4.6;
+            const rad = skirt ? 0.7 + ((i * 0.37) % 1) * 0.9 : 0.14 + f * 0.95;
+            const ang = tt * (skirt ? 3 : 6 - f * 2.5) + i * 2.39996, sway = Math.sin(tt * 0.8 + f * 3) * f * 0.7;
+            pos.setXYZ(i, d.x + Math.cos(ang) * rad + sway, y, d.z + Math.sin(ang) * rad);
+          }
+          pos.needsUpdate = true;
+        });
+        G.wisps.forEach((w) => {
+          w.m.position.x += w.sp * dt;
+          if (w.m.position.x > 36) { w.m.position.x = -36; w.z0 = -6 + Math.random() * 48; }
+          w.m.position.z = w.z0 + Math.sin(tt * 0.3 + w.ph) * 0.6;
+          w.m.material.opacity = Math.min(1, (36 - Math.abs(w.m.position.x)) / 9) * 0.3;
+        });
+        // now and then, far off, a bird cries
+        if (audio && soundOn() && !rm) {
+          if (!view.cryAt) view.cryAt = now + 9000;
+          else if (now > view.cryAt) { sounds.cry(); view.cryAt = now + 14000 + Math.random() * 16000; }
+        }
+      }
       function tick(now, dt) {
         const T = G.T, rm = reducedMotion();
         G.uTime.value = now / 1000;
@@ -1566,14 +2196,11 @@
           if (Math.floor(w.t * 4) !== (w.steps || 0)) { w.steps = Math.floor(w.t * 4); if (soundOn() && audio) sounds.crunch(); }
           if (k >= 1) finishWalk();
         }
-        // While she holds, his weight climbs with a wobble (the heat makes it less steady); past full, it is too heavy
+        // While she holds, his weight is read from the clock of her press; past full, it is too heavy
         if (view.phase === 'test' && view.leaning) {
-          view.wob = (view.wob || 0) + dt;
-          const sp = leanSpeed() * (1 + Math.sin(view.wob * 5.3) * 0.35 + Math.sin(view.wob * 11.7) * 0.12);
-          view.weight = Math.min(1.05, view.weight + dt * sp);
-          creakAt(view.weight);
+          view.weight = weightAt(performance.now());
           paintGauge();
-          if (view.weight >= 1.05) { view.leaning = false; creakOff(); release(1.05); }
+          if (view.weight >= 1.05) leanEnd(null, 1.05);
         }
         const leanTo = view.phase === 'test' ? 0.25 + view.weight * 0.55 : 0;
         view.lean += (leanTo - view.lean) * Math.min(1, dt * 8);
@@ -1586,6 +2213,7 @@
         H.position.set(view.x, floor + hop, view.z);
         H.rotation.set(0, view.yaw, 0);
         H.scale.setScalar(view.sky ? 1.5 : 1);
+        if (!moving && !rm) H.scale.y *= 1 + Math.sin(now / 640) * 0.012;   // he breathes
         const swing = moving && !rm ? Math.sin(now / 120) : 0;
         G.legL.position.z = swing * 0.17; G.legR.position.z = -swing * 0.17;
         G.legL.position.y = Math.max(0, swing) * 0.05; G.legR.position.y = Math.max(0, -swing) * 0.05;
@@ -1613,7 +2241,7 @@
           const yaw = view.yaw + view.look;
           const fx = -Math.sin(yaw), fz = -Math.cos(yaw);
           tx = view.x - fx * 4.6; ty = 5.6; tz = view.z - fz * 4.6;
-          lx = view.x + fx * 3.4; ly = 0.4; lz = view.z + fz * 3.4;
+          lx = view.x + fx * 3.4; ly = G.camera.aspect < 1 ? 1.2 : 2.4; lz = view.z + fz * 3.4;   // (on a tall phone screen the plates stay in the middle)
           if (test && view.target) {
             const gx = tx3(view.target), gz = tz3(view.target);
             // over his shoulder, a little to the side, so the plate under his staff is in the middle of the picture
@@ -1694,11 +2322,17 @@
           mp.setXYZ(i, view.x - 8 + wrap(b0[i * 3] + t * 0.25 + Math.sin(t * 0.4 + i) * 0.3), b0[i * 3 + 1] + Math.sin(t * 0.5 + i * 1.7) * 0.15, view.z - 8 + wrap(b0[i * 3 + 2] + t * 0.12));
         }
         mp.needsUpdate = true;
+        ambience(now, dt, rm);
 
         paintSky();
         if (view.sky) {
           const d = camPos.y, hk = heat();
           G.scene.fog.near = d * (1.15 - 0.1 * hk); G.scene.fog.far = d * (2.9 - 0.9 * hk);
+        } else {
+          // at noon in the Sump the distance is a soft lilac haze, not a white wall: the banks, the shore and the far
+          // ranges keep their depth
+          G.scene.fog.near = 18; G.scene.fog.far = 90;
+          G.scene.fog.color.setRGB(0.95, 0.91, 0.95);
         }
         const sx = view.sky ? 0 : view.x, sz = view.sky ? GRID_Z : view.z;
         G.sun.position.set(sx, 0, sz).addScaledVector(G.sunDir, 60);
@@ -1757,7 +2391,7 @@
         const tag = (e.target && e.target.tagName) || '';
         if (/INPUT|TEXTAREA|SELECT|BUTTON/.test(tag) && (e.key === ' ' || e.key === 'Enter')) return;
         if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
-        if (view.phase === 'test' && e.key === ' ' && !e.repeat) { e.preventDefault(); leanStart(); return; }
+        if (view.phase === 'test' && e.key === ' ' && !e.repeat) { e.preventDefault(); leanStart(e); return; }
         if (view.phase === 'edge') {
           if (e.key === 'ArrowLeft') { e.preventDefault(); alongEdge(-1); }
           else if (e.key === 'ArrowRight') { e.preventDefault(); alongEdge(1); }
@@ -1778,7 +2412,7 @@
         if (modal.style.display === 'none' || e.key !== ' ' || view.phase !== 'test') return;
         const tag = (e.target && e.target.tagName) || '';
         if (tag === 'BUTTON') return;
-        e.preventDefault(); leanEnd();
+        e.preventDefault(); leanEnd(e);
       });
 
       // =====================================================================

@@ -1679,6 +1679,9 @@ def test_ambience(browser):
     check(st["bed"] == "four wells" and st["running"] and not st["muted"], "the Four Wells play their own bed", str(st))
     js("window.closeOasisClepsydraModal()"); page.wait_for_timeout(1500)
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(1500)
+    # (the Playa builds a rich 3D scene on the main thread: under software GL the bed's 600 ms poll can wait a few seconds)
+    try: page.wait_for_function("EclipseAmbience.state().bed === 'salt flat'", timeout=9000)
+    except Exception: pass
     check(state()["bed"] == "salt flat", "closing one game and opening another changes the bed", str(state()))
     page.click("#ambience-toggle"); page.wait_for_timeout(300)
     check(state()["muted"] and js("localStorage.getItem('order_ambience_muted')") == "true", "the speaker, above the game, mutes it")
