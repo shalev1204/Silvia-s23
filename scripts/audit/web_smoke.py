@@ -2985,7 +2985,7 @@ PLAYA_SOLUTION = [3, 4, 3, 2, 2, 3, 3]
 
 
 def test_salt_playa(browser):
-    print("\n35. Station 11 · The Salt Playa in 3D: the North Edge, measured footsteps, sinkholes, cracks, the mirage, rest and the south shore")
+    print("\n35. Station 11 · The Salt Playa in 3D, two phases: the stones from the sky, the Console, the Sump at noon and the south shore")
     hour = 3600 * 1000
     gate = json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1})
     seed = dict(DESERT_BASE, order_salt_playa_completed="false", order_chasm_wire=gate, order_desert_station_active="11",
@@ -3030,30 +3030,34 @@ def test_salt_playa(browser):
     pages = []
     if howto_on():
         pages.append(js("document.getElementById('playa3d-howto-count').innerText"))
-        for _ in range(2):
+        for _ in range(3):
             js("document.getElementById('btn-playa-howto-next').click()")
             pages.append(js("document.getElementById('playa3d-howto-count').innerText"))
-    check(pages == ["1 of 3", "2 of 3", "3 of 3"], "the first time, How to play opens on top: three short pages", str(pages))
+    check(pages == ["1 of 4", "2 of 4", "3 of 4", "4 of 4"], "the first time, How to play opens on top: four short pages, both phases", str(pages))
     dim = low_contrast(page, "#playa3d-howto")
     check(not dim, "How to play: text contrast is at least WCAG AA", "; ".join(dim[:4]))
     page.keyboard.press("Escape"); page.wait_for_timeout(500)
     check(not howto_on() and shown() and get("order_playa_howto") == "seen", "Escape closes only How to play, and it is remembered")
     js("document.getElementById('btn-playa-howto').click()")
-    check(howto_on() and js("document.getElementById('playa3d-howto-count').innerText") == "1 of 3", "the How to play button opens it again")
+    check(howto_on() and js("document.getElementById('playa3d-howto-count').innerText") == "1 of 4", "the How to play button opens it again")
     js("document.getElementById('btn-playa-howto-skip').click()")
     check(not howto_on(), "Skip closes it")
     if s["gl"]:
         js("window.__playa.frames(4)")
         check(st()["drawn"] > 0, "the salt is drawn in 3D")
 
-    # The wrong start: the slab next to the tripod
+    # The wrong start: the slab next to the tripod. No water: the sun climbs
+    check(s["sky"] and s["up"] == [0, 0, -1] and js("document.getElementById('playa3d-facing').innerText") == "North is up"
+          and not js("!!document.getElementById('playa3d-skins')"),
+          "Phase I is seen from the sky, north up as on the page, and there are no water skins", f"{s['sky']} {s['up']}")
     js("window.__playa.edge(1); window.__playa.edge(1)")
     check(st()["edge"] == 2 and "east of the tripod" in js("document.getElementById('playa3d-where').innerText"), "Hermes walks east along the edge, counting slabs")
+    m0 = st()["min"]
     js("window.__playa.pick(2)")
     s = st()
     page.wait_for_timeout(150)
-    check(s["phase"] == "setback" and abs(s["water"] - 2.5) < 0.01 and "NOT WHERE WE BEGIN" in alert().upper() and "Column D" in alert(),
-          "the wrong first slab: Hermes says the page names where the crossing begins, half a skin spent", f"{s['phase']} {s['water']}")
+    check(s["phase"] == "setback" and s["min"] == m0 + 20 and "NOT WHERE WE BEGIN" in alert().upper() and "Column D" in alert() and "+20 min" in alert(),
+          "the wrong first slab: Hermes says the page names where the crossing begins, and the sun climbs 20 minutes", f"{s['phase']} {s['min'] - m0}")
     js("window.__playa.goOn(); window.__playa.edge(1)")
     js("window.__playa.pick(3)")
     check(st()["phase"] == "test" and js("document.querySelector('.playa3d-balance').classList.contains('is-on')")
@@ -3063,27 +3067,32 @@ def test_salt_playa(browser):
     check(st()["phase"] == "test" and st()["light"] == 1 and "longer" in voice(), "let go too soon: too light, he leans again, nothing spent")
     check(good() in ("found", "step") and st()["path"] == [3], "let go in the gold: the slab holds", str(st()["path"]))
     page.wait_for_timeout(300)
-    check(js("document.querySelector('#playa3d-log .playa3d-logbox').innerText") == "C", "the C goes into the first box of the Waypoint Log")
+    log = lambda: "".join(js("[...document.querySelectorAll('#playa3d-log .playa3d-logbox')].map(x => x.innerText)"))
+    check(log() == "✦" and "C" not in voice() + js("document.getElementById('playa3d-where').innerText").replace("Column", "")
+          and "your page" in voice(), "no letter on the salt: the log marks the row crossed, and Hermes sends her to her page for the letter", voice()[:160])
     js("window.__playa.walkOn()")
 
-    # Row II: the brine, the crack and too much weight
+    # Row II: the brine, the crack and too much weight, each costing time
     check(sorted(o["c"] for o in st()["reach"]) == [2, 3, 4] and js("document.querySelectorAll('#playa3d-controls .chasm3d-btn.is-way').length") == 3,
           "Row II: three slabs within reach, one button for each")
+    labels = js("[...document.querySelectorAll('#playa3d-controls .chasm3d-btn.is-way')].map(b => b.innerText.replace(/\\s+/g, ' '))")
+    check("South-west" in labels[0] and "South" in labels[1] and "South-east" in labels[2], "seen from the sky, the ways are named by the compass, west to east", str(labels))
+    m0 = st()["min"]
     js("window.__playa.pick(2)"); good()
     s = st(); page.wait_for_timeout(150)
-    check(s["phase"] == "setback" and s["sinks"] == 1 and abs(s["water"] - 1.5) < 0.01 and "SINKHOLE" in alert().upper(),
-          "a brine sinkhole: his staff goes through, a skin of water lost", f"{s['phase']} {s['water']}")
+    check(s["phase"] == "setback" and s["sinks"] == 1 and s["min"] == m0 + 40 and "SINKHOLE" in alert().upper(),
+          "a brine sinkhole: his staff goes through, 40 minutes lost", f"{s['phase']} {s['min'] - m0}")
     js("window.__playa.goOn()")
     check(js("document.querySelector('#playa3d-controls .chasm3d-btn.is-tracks')?.disabled") is True, "the open brine stays marked, its button shut")
     js("window.__playa.pick(3)"); good()
     s = st()
-    check(s["phase"] == "setback" and s["cracks"] == 1 and abs(s["water"] - 1.0) < 0.01 and "Law of the Basin" in alert(),
-          "a slab that breaks the Law cracks: half a skin", f"{s['phase']} {s['water']}")
+    check(s["phase"] == "setback" and s["cracks"] == 1 and s["min"] == m0 + 65 and "Law of the Basin" in alert(),
+          "a slab that breaks the Law cracks: 25 minutes", f"{s['phase']} {s['min'] - m0}")
     js("window.__playa.goOn(); window.__playa.pick(4)")
     js("window.__playa.lean(0.99)")
     s = st()
-    check(s["phase"] == "heavy" and s["heavy"] == 1 and abs(s["water"] - 0.75) < 0.01 and "groan" in voice(),
-          "too much weight on a sound slab: the crust groans, a quarter skin, nothing broken", f"{s['phase']} {s['water']}")
+    check(s["phase"] == "heavy" and s["heavy"] == 1 and s["min"] == m0 + 75 and "groan" in voice(),
+          "too much weight on a sound slab: the crust groans, 10 minutes, nothing broken", f"{s['phase']} {s['min'] - m0}")
     for _ in range(20):
         page.wait_for_timeout(200)
         if st()["phase"] == "test":
@@ -3096,8 +3105,8 @@ def test_salt_playa(browser):
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(600)
     after = st()
-    check(after["path"] == before["path"] == PLAYA_SOLUTION[:4] and after["phase"] == "choose" and abs(after["water"] - before["water"]) < 0.01,
-          "a reload in the middle of the salt puts Hermes back on his slab", f"{before['path']} {after['path']}")
+    check(after["path"] == before["path"] == PLAYA_SOLUTION[:4] and after["phase"] == "choose" and after["min"] == before["min"],
+          "a reload in the middle of the salt puts Hermes back on his slab, at the same hour", f"{before['path']} {after['path']}")
 
     # Row V: the mirage
     s = st()
@@ -3105,24 +3114,84 @@ def test_salt_playa(browser):
     check(s["band"][1] - s["band"][0] < hi - lo, "the gold band is narrower in the heat of mid-morning", f"{s['band']} vs {[lo, hi]}")
     js("window.__playa.pick(1)"); good()
     s = st(); page.wait_for_timeout(150)
-    check(s["phase"] == "setback" and "MIRAGE" in alert().upper() and s["water"] < 0.01 and "rest" in alert().lower() and s["mirage"] == 3,
-          "the pool was the mirage: brine, the last skin, and Hermes must rest", f"{s['phase']} {s['water']}")
+    check(s["phase"] == "setback" and "MIRAGE" in alert().upper() and s["mirage"] == 3 and "rest" not in alert().lower(),
+          "the pool was the mirage: brine, and the sun climbs", f"{s['phase']} {s['mirage']}")
     js("window.__playa.goOn()")
-    check(st()["phase"] == "rest" and "Hermes is resting" in js("document.getElementById('playa3d-controls').innerText"),
-          "out of water: Hermes rests under his cloak, with a countdown")
-    js("window.__playa.endRest()")
-    check(st()["phase"] == "choose" and abs(st()["water"] - 1) < 0.01, "after the rest, one skin")
     for r in (4, 5, 6):
         js(f"window.__playa.pick({PLAYA_SOLUTION[r]})"); good()
         if r < 6:
             js("window.__playa.walkOn()")
-    page.wait_for_timeout(2400)
+
+    # The Order's post: the Web Navigator Console wants the keyword from her page
+    for _ in range(30):
+        page.wait_for_timeout(200)
+        js("window.__playa.frames(4)")
+        if st()["phase"] == "console":
+            break
     s = st()
-    check(s["phase"] == "done" and s["path"] == PLAYA_SOLUTION and get("order_salt_playa_completed") == "true"
-          and json.loads(get("order_salt_playa_path") or "[]") == PLAYA_SOLUTION and "CRYSTAL" in voice()
+    check(s["phase"] == "console" and s["stage"] == "console" and js("document.querySelectorAll('.playa3d-console input').length") == 7
+          and get("order_salt_playa_completed") == "false", "after Row VII, the Console on the Order's post: seven boxes, the station not done yet", s["phase"])
+    check(log() == "✦" * 7 and "CRYSTAL" not in js("document.getElementById('modal-salt-playa').innerText"),
+          "the web never spells the keyword before she transmits it")
+    m0 = st()["min"]
+    page.click(".playa3d-console input[data-i='0']")
+    page.keyboard.type("crystax"); page.keyboard.press("Enter"); page.wait_for_timeout(200)
+    s = st()
+    check(s["phase"] == "console" and s["words"] == 1 and s["min"] == m0 + 5 and not s["sent"] and "silent" in voice(),
+          "a wrong keyword: the post stays silent, 5 minutes", f"{s['words']} {s['min'] - m0}")
+    js("window.__playa.transmit('CRYS')")
+    check(st()["words"] == 1 and "seven" in voice(), "too few letters: Hermes counts them, nothing spent")
+    js("document.querySelector('.playa3d-console input[data-i=\"6\"]').focus()")
+    page.keyboard.press("Backspace"); page.keyboard.type("L"); page.keyboard.press("Enter"); page.wait_for_timeout(300)
+    s = st()
+    check(s["sent"] and s["phase"] == "sent" and log() == "CRYSTAL" and "Sump" in voice() and get("order_salt_playa_completed") == "false",
+          "CRYSTAL: the rings turn, the log fills with her letters and the plate tells of the Sump", f"{s['phase']} {log()}")
+
+    # Phase II: the Great Salt Sump at noon, behind Hermes, read with the Study
+    js("document.querySelector('#playa3d-controls .chasm3d-btn.is-way').click()")
+    for _ in range(20):
+        page.wait_for_timeout(200)
+        if st()["phase"] == "schoose":
+            break
+    s = st()
+    check(s["phase"] == "schoose" and not s["sky"] and s["up"] == [0, 1, 0] and s["min"] >= 12 * 60
+          and js("document.getElementById('playa3d-clock').innerText").startswith("☀ 1") and "Study" in voice(),
+          "noon in the Sump: the camera comes down behind Hermes, the clock at noon, and he names the Study", f"{s['phase']} {s['min']}")
+    check(howto_on() and js("document.getElementById('playa3d-howto-count').innerText") == "4 of 4" and "Sump" in js("document.getElementById('playa3d-howto').innerText"),
+          "the first time in the Sump, How to play opens on its own page")
+    js("document.getElementById('btn-playa-howto-next').click()")
+    check(not howto_on() and get("order_playa_howto2") == "seen", "and it is remembered")
+    plates = js("[...document.querySelectorAll('#playa3d-controls .playa3d-plate')].map(b => b.innerText.replace(/\\s+/g, ' '))")
+    check(len(plates) == 3 and all(any(w in p for w in ("ridged", "smooth")) and any(w in p for w in ("wet seam", "dry")) for p in plates),
+          "three plates in reach, each button naming what Hermes sees", str(plates))
+    sol = js("window.__playa.sol()")
+    kinds = []
+    for k, d in enumerate(sol):
+        wrong = [x for x in (-1, 0, 1) if x != d][0]
+        if k < 2:
+            m0 = st()["min"]
+            js(f"window.__playa.spick({wrong})"); good()
+            s = st(); page.wait_for_timeout(120)
+            kinds.append((alert().split("\n")[2] if alert() else "", s["min"] - m0))
+            check(s["phase"] == "setback" and s["sFails"] == k + 1 and "Study on the Dry Salt Playa" in alert(),
+                  f"plate {k + 1}: a plate the Study would not trust gives way, and the card names the page", alert()[:120].replace("\n", " "))
+            js("window.__playa.goOn()")
+        js(f"window.__playa.spick({d})")
+        lb = st()["band"]
+        good()
+    check(all(c in (25, 30, 40) for _, c in kinds), "in the Sump, brine costs 30 minutes, a hollow 40, a split plate 25", str(kinds))
+    check(lb[1] - lb[0] < hi - lo, "the gold is narrower at noon than at dawn", f"{lb} vs {[lo, hi]}")
+    for _ in range(40):
+        page.wait_for_timeout(200)
+        js("window.__playa.frames(4)")
+        if st()["phase"] == "done":
+            break
+    s = st()
+    check(s["phase"] == "done" and s["stage"] == "shore" and s["sump"] == sol and get("order_salt_playa_completed") == "true"
+          and json.loads(get("order_salt_playa_path") or "[]") == PLAYA_SOLUTION and "Study" in voice()
           and js("getComputedStyle(document.getElementById('playa-victory-card')).display") != "none",
-          "the south shore: CRYSTAL under his feet, the station is done", f"{s['phase']} {s['path']}")
-    check("".join(js("[...document.querySelectorAll('#playa3d-log .playa3d-logbox')].map(x => x.innerText)")) == "CRYSTAL", "the Waypoint Log spells CRYSTAL")
+          "the south shore: six sound plates of the Sump, and the station is done", f"{s['phase']} {s['sump']}")
+    check(log() == "CRYSTAL", "the Waypoint Log spells CRYSTAL")
     page.wait_for_timeout(3200)
     reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-salt-playa .chasm3d-reward'))")
     rw = reward()
@@ -3151,7 +3220,8 @@ def test_salt_playa(browser):
     check(st()["phase"] == "done", "opened again, the salt shows the south shore")
     js("document.getElementById('btn-playa-again').click()")
     s = st()
-    check(s["phase"] == "edge" and s["path"] == [] and get("order_salt_playa_completed") == "true", "cross it again: back on the edge, the station stays done")
+    check(s["phase"] == "edge" and s["path"] == [] and not s["sent"] and s["sump"] == [] and s["sky"] and get("order_salt_playa_completed") == "true",
+          "cross it again: back on the edge, seen from the sky, the station stays done")
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(400)
     check(not errors, "no JS errors on the salt", "; ".join(sorted(set(errors))[:3]))
     ctx.close()

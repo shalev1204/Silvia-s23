@@ -723,6 +723,7 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 
 #### 7.B.15 · Estación 11 · The Line of the Salt y The Surveyor's Balance (Salt Playa)
 - **Origen** (decisión del Operador, 24-10-2026: el premio de la Salt Playa es una línea de comprobación y un artefacto que ayude a resolver las ecuaciones que Silvia ya acumula): en la orilla sur, un mojón de la Orden guarda en un nicho, envuelta en tela encerada, una balanza de latón con el círculo mitad negro, mitad blanco en el astil. La línea aparece en el Ledger con `requires: 'order_salt_playa_completed'` (id `playa-ta`).
+- **Recorrido hasta el mojón** (rediseño en dos fases, 24-10-2026): al final de las siete losas, un poste de piedra de la Orden con siete anillos de latón sostiene la **Web Navigator Console** de la página «The Salt Playa (Dry Basin)»; con CRYSTAL se abre una placa que lleva al **Great Salt Sump** (el «Basin Depression» del transecto de la página «Study on the Dry Salt Playa»), que Hermes cruza a mediodía leyendo la costra con el §I y la Fig. I de esa página. El mojón con la línea y la balanza está en la orilla sur, al otro lado del Sump.
 - **Ecuación de comprobación (The Line of the Salt)**, con dos letras de CRYSTAL:
   $$[T] - [A] = 9$$
 - **Comprobación**: con $A = 7$ (Latitude Minutes y Meridian Resonance) y $T = 16$ (Longitude Seconds y Polar Resonance: $F + T = 22$, $T - F = 10$), $16 - 7 = 9$. No introduce letras nuevas; sirve para confirmar.

@@ -83,3 +83,52 @@
       .playa-balance-icon { width: 60px; height: 60px; }
       .playa-balance-icon svg { width: 42px; height: 38px; }
     }
+
+    /* ---- The sun instead of water: the clock flares at every false step, and the noon heat whitens the picture ---- */
+    .playa3d-window .chasm3d-hurt { box-shadow: inset 0 0 90px 30px rgba(255, 168, 48, 0.7); }
+    .playa3d-window .chasm3d-clock { display: inline-block; padding: 3px 9px; border-radius: 12px; background: rgba(16, 9, 5, 0.55); }
+    .playa3d-window .chasm3d-clock.is-hot { animation: playa-hot 1.1s ease; }
+    @keyframes playa-hot {
+      0% { transform: none; } 20% { transform: scale(1.35); color: #fff3c4; background: rgba(220, 110, 20, 0.9); box-shadow: 0 0 18px rgba(255, 170, 60, 0.9); }
+      100% { transform: none; }
+    }
+    .playa3d-heat {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease; mix-blend-mode: screen;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255, 246, 228, 0.55), rgba(255, 236, 214, 0.12) 55%, transparent 80%);
+    }
+    /* once the Console has the keyword, the boxes show its letters in gold */
+    .playa3d-logbox.is-word { color: #fff3c4; text-shadow: 0 0 8px rgba(251, 191, 36, 0.8); }
+
+    /* ---- The Web Navigator Console on the Order's post: seven boxes for the seven rows ---- */
+    .playa3d-console {
+      flex-basis: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 10px 10px;
+      border-radius: 14px; border: 1px solid rgba(253, 230, 138, 0.35); background: linear-gradient(180deg, rgba(40, 24, 10, 0.85), rgba(24, 14, 6, 0.9));
+      animation: chasm-rise 0.45s ease both;
+    }
+    .playa3d-console .pc-title { font-family: 'Cinzel', serif; font-size: 0.95rem; letter-spacing: 0.06em; color: #fde68a; }
+    .playa3d-console .pc-sub { margin: 0; font-size: 0.8rem; color: #e8d6b8; text-align: center; }
+    .playa3d-console .pc-boxes { display: flex; gap: 6px; flex-wrap: nowrap; }
+    .playa3d-console label { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .playa3d-console label span { font: 600 0.6rem 'Cinzel', serif; color: #fde68a; opacity: 0.8; }
+    .playa3d-console input {
+      width: 38px; height: 46px; padding: 0; text-align: center; text-transform: uppercase; font: 700 1.35rem 'Cinzel', serif; color: #fff3c4;
+      border-radius: 8px; border: 1.5px solid rgba(253, 230, 138, 0.45); background: rgba(255, 246, 228, 0.06); caret-color: #fbbf24;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+    }
+    .playa3d-console input:focus { outline: none; border-color: #fbbf24; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3); transform: translateY(-2px); }
+    .playa3d-console .pc-send { width: 100%; max-width: 320px; }
+    .playa3d-console.is-wrong { animation: chasm-shake 0.45s ease; }
+    .playa3d-console.is-wrong input { border-color: #e2725b; }
+    .playa3d-console.is-short { animation: chasm-shake 0.3s ease; }
+    @media (max-width: 420px) {
+      .playa3d-console .pc-boxes { gap: 4px; }
+      .playa3d-console input { width: 32px; height: 42px; font-size: 1.15rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .playa3d-console, .playa3d-console.is-wrong, .playa3d-console.is-short, .playa3d-window .chasm3d-clock.is-hot { animation: none; }
+    }
+
+    /* ---- The plates of the Sump: one wide button each, the signs Hermes sees spelled out on the right ---- */
+    .playa3d-window .chasm3d-btn small { text-transform: none; }
+    .chasm3d-btn.playa3d-plate { flex-basis: 100%; justify-content: flex-start; text-align: left; gap: 10px; }
+    .chasm3d-btn.playa3d-plate small { margin-left: auto; text-align: right; line-height: 1.2; }

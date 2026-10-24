@@ -2603,10 +2603,9 @@
                 <text y="34" text-anchor="middle" class="rose-l">S</text>
                 <text x="-30" y="5" text-anchor="middle" class="rose-l">W</text>
               </svg>
-              <div class="chasm3d-facing" id="playa3d-facing">Facing south</div>
+              <div class="chasm3d-facing" id="playa3d-facing">North is up</div>
             </div>
             <div class="chasm3d-status">
-              <div class="chasm3d-skins" id="playa3d-skins" role="img" aria-label="Water: 3 of 3 skins"></div>
               <div class="chasm3d-clock" id="playa3d-clock">☀ 06:00</div>
             </div>
           </div>
@@ -2623,7 +2622,7 @@
 
           <div class="chasm-victory-card" id="playa-victory-card" style="display: none;">
             <div class="chasm-victory-title"><span>🧂</span><span>Across the Salt!</span></div>
-            <div class="chasm-victory-text">The seven letters under Hermes's feet spell the passage keyword. Write them in the seven boxes of the Waypoint Log in your journal. Hermes is waiting for you on the Field Wire.</div>
+            <div class="chasm-victory-text">The stones gave you the passage keyword, the Study took Hermes through the Sump at noon, and he stands on the sand of the south shore. Hermes is waiting for you on the Field Wire.</div>
             <button type="button" class="btn-chasm-finish" id="btn-playa-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
             <button type="button" class="chasm3d-btn chasm3d-again" id="btn-playa-reward">🏆 See your reward</button>
             <button type="button" class="chasm3d-btn chasm3d-again" id="btn-playa-again">↺ Cross the salt again</button>
@@ -2639,47 +2638,57 @@
               <li>Each step must have exactly one facet more or one facet less.</li>
               <li>The letters along the seven steps spell the passage keyword.</li>
             </ol>
-            <p>A sinkhole swallows a skin of water. A slab that breaks the Law cracks and costs half a skin. Leaning too heavily makes the crust groan and costs a little water. With no water left, Hermes must rest for 45 seconds.</p>
+            <p>Then transmit the seven letters to the Web Navigator Console, on the Order's post at the end of the stones, to unlock the way south. Beyond it lies the Great Salt Sump, where only the page “Study on the Dry Salt Playa” can tell good crust from bad.</p>
+            <p>There is no water to lose, only time: a sinkhole or a split plate costs up to 40 minutes, a slab that breaks the Law 25, a step too heavy 10. The higher the sun, the thicker the haze and the narrower the gold.</p>
           </details>
         </div>
       </div>
 
-      <!-- How to play: three short pages, shown the first time and whenever she asks -->
+      <!-- How to play: four short pages, shown the first time and whenever she asks (the last one again at noon) -->
       <div class="chasm3d-howto" id="playa3d-howto" hidden role="region" aria-label="How to play">
         <div class="chasm3d-howto-card">
-          <div class="chasm3d-howto-count" id="playa3d-howto-count">1 of 3</div>
-          <div class="chasm3d-howto-dots" id="playa3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
+          <div class="chasm3d-howto-count" id="playa3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="playa3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
 
           <section class="chasm3d-howto-page" data-page="0">
             <h3>What you are doing</h3>
-            <p>Hermes stands on the North Edge of the Salt Playa. On the salt <strong>every slab looks the same</strong>: no numbers, no letters, and the brine sinkholes look just like firm crust.</p>
-            <p><strong>You have the map</strong>: the page “The Salt Playa (Dry Basin)” of your journal. Take him across, one row at a time, to the south shore. The letter under each slab he stands on goes into the Waypoint Log, and the seven letters spell the passage keyword.</p>
+            <p>Hermes must cross the Salt Playa, from the North Edge to the south shore, <strong>in two parts</strong>.</p>
+            <p><strong>I. The stones, in the morning.</strong> You see the whole basin from the sky, like your page “The Salt Playa (Dry Basin)”. On the salt every slab looks the same: <strong>the numbers, the letters and the sinkholes are only on your page</strong>. Copy each letter into your Waypoint Log, then transmit the keyword to the Console.</p>
+            <p><strong>II. The Sump, at noon.</strong> No grid at all. You read the crust with the page “Study on the Dry Salt Playa”.</p>
           </section>
 
           <section class="chasm3d-howto-page" data-page="1" hidden>
             <h3>What you see on the screen</h3>
             <ul class="chasm3d-howto-keys">
-              <li><span class="chasm3d-howto-pic"><span class="chasm3d-rune playa3d-logbox" data-row="I"></span><span class="chasm3d-rune playa3d-logbox" data-row="II"></span><span class="chasm3d-rune playa3d-logbox" data-row="III"></span></span>
-                <span><strong>Waypoint Log.</strong> One box for each row, I to VII, as on your page.</span></li>
-              <li><span class="chasm3d-howto-pic"><svg viewBox="-50 -50 100 100" class="chasm3d-rose chasm3d-howto-rose" aria-hidden="true" style="transform: rotate(180deg)"><circle r="44" class="rose-ring"/><path d="M0,-40 L8,-6 L0,-12 L-8,-6 Z" class="rose-north"/><path d="M0,40 L8,6 L0,12 L-8,6 Z" class="rose-south"/><text y="-24" text-anchor="middle" class="rose-n">N</text></svg></span>
-                <span><strong>Compass.</strong> Hermes faces south, so the red point of north is behind him. <strong>His left hand is east</strong>: the right-hand side of your page.</span></li>
+              <li><span class="chasm3d-howto-pic"><span class="chasm3d-rune playa3d-logbox is-found" data-row="I">✦</span><span class="chasm3d-rune playa3d-logbox" data-row="II"></span><span class="chasm3d-rune playa3d-logbox" data-row="III"></span></span>
+                <span><strong>Waypoint Log.</strong> A star for every row crossed. The letters you write on your page, not here.</span></li>
+              <li><span class="chasm3d-howto-pic"><svg viewBox="-50 -50 100 100" class="chasm3d-rose chasm3d-howto-rose" aria-hidden="true"><circle r="44" class="rose-ring"/><path d="M0,-40 L8,-6 L0,-12 L-8,-6 Z" class="rose-north"/><path d="M0,40 L8,6 L0,12 L-8,6 Z" class="rose-south"/><text y="-24" text-anchor="middle" class="rose-n">N</text></svg></span>
+                <span><strong>Compass.</strong> On the stones <strong>north is up and west is on the left</strong>, as on your page. In the Sump you walk behind Hermes: he faces south, so <strong>his left hand is east</strong>.</span></li>
               <li><span class="chasm3d-howto-pic"><span class="playa3d-howto-balance"><i></i></span></span>
                 <span><strong>The balance.</strong> Before each step Hermes leans on his staff. The needle shows his weight: let go when it is in the gold.</span></li>
-              <li><span class="chasm3d-howto-pic"><span class="chasm3d-skin"></span><span class="chasm3d-skin"></span><span class="chasm3d-skin"></span></span>
-                <span><strong>Water.</strong> Three skins. False steps cost water. With none left, he rests for 45 seconds.</span></li>
               <li><span class="chasm3d-howto-pic"><span class="chasm3d-clock">☀ 06:00</span></span>
-                <span><strong>The sun.</strong> It climbs as he walks. The hotter it gets, the thicker the haze and the narrower the gold. There is no time limit.</span></li>
+                <span><strong>The sun.</strong> Every false step costs time. The higher the sun, the thicker the haze and the narrower the gold. There is no time limit.</span></li>
             </ul>
           </section>
 
           <section class="chasm3d-howto-page" data-page="2" hidden>
-            <h3>How to play</h3>
+            <h3>I · The stones</h3>
             <ol class="chasm3d-howto-steps">
               <li>On the North Edge, <strong>walk Hermes east or west</strong> to the slab where your page says the crossing begins, then step onto it.</li>
-              <li>On every row, <strong>choose one of the three slabs</strong> within his reach: press a button, tap a ringed slab, or use the arrow keys.</li>
+              <li>On every row, <strong>choose one of the slabs</strong> within his reach: press a button, tap a ringed slab, or use the arrow keys (← west, ↓ south, → east).</li>
               <li><strong>Measured footsteps</strong>: hold the button (or the space bar) and let go in the gold. Too light, and he leans again. Too heavy, and the crust groans.</li>
-              <li><strong>Follow him on the page</strong> with your pencil. Only the page shows the sinkholes and the facets.</li>
+              <li><strong>Follow him on the page</strong> with your pencil, and write each letter in your Waypoint Log. At the end of the stones, <strong>type the seven letters into the Console</strong>.</li>
               <li>In the heat of the morning, <strong>not everything that shines is real</strong>.</li>
+            </ol>
+          </section>
+
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>II · The Sump at noon</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>No grid, no numbers: only polygon plates. Hermes <strong>describes the plates within reach</strong>, and every button names what he sees: <em>ridged or smooth</em>, <em>wet seam or dry</em>, <em>cracks in threes or crossing</em>.</li>
+              <li>Open the page <strong>“Study on the Dry Salt Playa”</strong>. Its first section and Fig. I tell you which signs mean firm crust, and which mean brine or a hollow underneath.</li>
+              <li>Only one plate in reach is sound each time. Six strides to the shore. Lean on it with the same <strong>measured footsteps</strong>, and the gold is narrower now.</li>
+              <li>Here the arrow keys are as Hermes sees it: ↑ ahead, ← ahead-left (east), → ahead-right (west). Drag the picture to look around.</li>
             </ol>
           </section>
 

@@ -49,7 +49,7 @@
 | First Light · The North Edge (`reply2`) | *pendiente* | 🧭 rigurosa (empezar donde dice la página, cumplir la Ley) · 🤝 cuidadosa (despacio, volver si cruje) · 🔭 curiosa (mirar primero el trípode de la Orden) |
 | The South Shore · Mid-morning (`reply3`) | *pendiente* | ⚖️ probar ya la balanza en el Ledger · 💧 que Hermes beba primero · 🐫 esconder la balanza y vigilar las dunas |
 
-> Para leer su partida de la Salt Playa en Supabase: `order_playa_walk` (`fails`, `sinks`, `cracks`, `heavy`, `light`, `mirage` — 1 = lo tiene delante, 2 = lo vio y lo esquivó, 3 = lo pisó —, `min`, `water`), `order_hint_s11-playa_level` y `order_playa_howto`.
+> Para leer su partida de la Salt Playa en Supabase: `order_playa_walk` (`path`, `fails`, `sinks`, `cracks`, `heavy`, `light`, `mirage` — 1 = lo tiene delante, 2 = lo vio y lo esquivó, 3 = lo pisó —, `min` = minutos desde medianoche, `sent` = transmitió CRYSTAL en la consola, `words` = palabras equivocadas en la consola, `sump` = sus pasos en el Sump, `sFails` = placas del Sump que cedieron, `sRevealed`), `order_hint_s11-playa_level`, `order_hint_s11-sump_level`, `order_playa_howto` y `order_playa_howto2`.
 
 ---
 
