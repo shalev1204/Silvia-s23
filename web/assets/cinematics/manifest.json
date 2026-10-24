@@ -1,0 +1,14 @@
+{
+  "road_of_salt": {
+    "available": false,
+    "title": "The Road of Salt",
+    "length": "2:40",
+    "files": { "1080": "road_of_salt_1080.mp4", "720": "road_of_salt_720.mp4", "poster": "road_of_salt_poster.jpg", "vtt": "road_of_salt.en.vtt" }
+  },
+  "night_of_steles": {
+    "available": false,
+    "title": "The Night of the Steles",
+    "length": "1:10",
+    "files": { "1080": "night_of_steles_1080.mp4", "720": "night_of_steles_720.mp4", "poster": "night_of_steles_poster.jpg", "vtt": "night_of_steles.en.vtt" }
+  }
+}

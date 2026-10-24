@@ -105,7 +105,7 @@
         texts: [
           `The seven windows of the dial want the Desert Sigil: the circled letters of ${PAGE}, read in order from 1 to 7. Then the needle wants a bearing, and the page gives it in its own title.`,
           'Look at the line under the title of the page: “Al-Qibla Vector”, and a number of degrees with a direction after it. Turn the needle there. In the walls, after the chime, read the letter over each doorway: the nomads marked their way with the same word that woke the dial.',
-          'The sigil is P, H, O, E, N, I, X: PHOENIX. The vector is 194° SSW, a little west of due south. And in the walls, run through the doorway marked P, then H, then O, and so on to X.'
+          'Let us take the first steps together. Each circled square is one letter of the sigil, numbered 1 to 7: the circle in NOMAD (3 Across) is number 5, so it is the fifth letter, an N. Fill the other six from your page. In the walls, the doorway of the first wall carries the first letter of the sigil, the second wall the second, and so on. And the needle wants its head on the vector of the title, not its tail.'
         ]
       });
 
@@ -842,6 +842,7 @@
       function loseHeart() {
         S.hearts = Math.max(0, S.hearts - 1);
         paintHearts(true);
+        if (soundOn()) tone(S.hearts > 0 ? 220 : 110, 0, S.hearts > 0 ? 0.5 : 0.9, { to: S.hearts > 0 ? 150 : 60, gain: S.hearts > 0 ? 0.08 : 0.1, type: 'triangle' });
         return S.hearts <= 0;
       }
       const heartsLine = () => `${'♥'.repeat(S.hearts)}${'♡'.repeat(HEARTS - S.hearts)} · ${S.hearts ? `${S.hearts === 1 ? 'one heart' : 'two hearts'} left` : 'no hearts left'}`;
@@ -1439,6 +1440,7 @@
         say('A bird with its wings up, rising out of three flames: the same mark that was burned into the wagon\'s oilcloth. Under it, cut deep, two letters and a word: BC ASHES. And an arrow, with 194 beside it. The BC Ashes, Silvia. That is their name. That is who came down from the mountains with the Astrolabe, and that is the way they ride. We know their name, their sign and their road, and they do not know ours. The needle\'s tail points to Tower II. Talk to me on the Field Wire.');
         where('At the hearth of the BC Ashes, Camp VII. Al-Qibla is locked: 194° SSW for the raiders, 14° NNE for Tower II.');
         if (el.victory) el.victory.style.display = 'block';
+        if (window.EclipseCinematic) window.EclipseCinematic.attach(el.victory, 'night_of_steles');
         if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (live) confetti();
         const first = !isDone();

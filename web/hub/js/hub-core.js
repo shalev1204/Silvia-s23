@@ -1084,6 +1084,7 @@
             footer: '✦ The name of the place, its page in your journal and what it keeps open the moment Hermes arrives. ✦',
             skip: tester ? march.skip : null
           } : null,
+          cinematic: o.cinematic || null,
           btnText: started ? '⏳ Hermes is on his way' : '📻 OPEN THE FIELD WIRE ➔',
           btnDisabled: started,
           action: started ? null : () => { if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire'); }
@@ -1425,6 +1426,7 @@
                 { icon: '📐', label: 'Stargazer Equation: [R] × 2 = [F]', desc: 'Cipher Ledger: work out F and T' },
                 { icon: '🔥', label: 'Their name: the BC Ashes', desc: 'Scratched on the hearth, under the sign of the phoenix' }
               ],
+              cinematic: 'night_of_steles',
               btnText: 'Return to the steles of Camp VII ➔',
               action: () => (window.openDesertLexiconModal ? window.openDesertLexiconModal() : null)
             };
@@ -1434,10 +1436,18 @@
           // (A save that never heard him on the North Edge of the salt goes straight to the steles.)
           let ruinsWire = {};
           try { ruinsWire = JSON.parse(localStorage.getItem('order_chasm_wire') || '{}') || {}; } catch (e) { ruinsWire = {}; }
+          // Before Hermes has even stepped onto the salt, the ruins are not on his road yet: nothing of them is told
+          if (ruinsWire.reply2 === undefined && localStorage.getItem('order_salt_playa_completed') !== 'true') {
+            return veiledStation({
+              station: 12, march: 'lexicon', thumb: './assets/thumbnails/desert_lexicon_preview.webp', etaLabel: 'HERMES REACHES THE RUINS IN',
+              walking: 'The road beyond the Salt Playa is still unknown.',
+              waiting: 'The road beyond the Salt Playa is still unknown. Guide Hermes across the salt first.'
+            });
+          }
           if (ruinsWire.reply2 !== undefined) {
             if (!marchOver('lexicon')) {
               return veiledStation({
-                station: 12, march: 'lexicon', thumb: './assets/thumbnails/desert_lexicon_preview.webp', etaLabel: 'HERMES REACHES THE RUINS IN',
+                station: 12, march: 'lexicon', cinematic: 'road_of_salt', thumb: './assets/thumbnails/desert_lexicon_preview.webp', etaLabel: 'HERMES REACHES THE RUINS IN',
                 walking: 'Hermes has left the marker on the south shore of the salt and is walking south through the dunes, keeping to the hollows, toward the ruins of an old nomad camp. The riders from the rim went the same way. Weigh your Cipher Ledger with the Surveyor\'s Balance while he walks.',
                 waiting: localStorage.getItem('order_salt_playa_completed') === 'true'
                   ? 'Hermes is resting on the south shore of the salt, in the shadow of the Order\'s marker. Answer him on the Field Wire before he walks on.'
@@ -1889,6 +1899,7 @@
                   ? [{ icon: '⚖️', label: 'The Surveyor\'s Balance', desc: 'In your Cipher Ledger, with the Line of the Salt' }] : []),
                 { icon: '🏜️', label: 'Nomad Ruins in Sight', desc: 'Station 12 unlocked' }
               ],
+              cinematic: 'road_of_salt',
               btnText: 'Review the Crossing ➔',
               action: () => (window.openSaltPlayaModal ? window.openSaltPlayaModal() : null)
             };
@@ -2103,6 +2114,8 @@
             inspBtnReplay.style.display = 'none';
           }
         }
+
+        if (window.EclipseCinematic) window.EclipseCinematic.inspector(data.cinematic || null);
 
         const inspCountdownBar = document.getElementById('insp-countdown-bar');
         if (inspCountdownBar) {
@@ -5302,7 +5315,7 @@
           title: "Who are the raiders?",
           category: "The Stolen Relic",
           group: "desert",
-          answer: "They call themselves the BC Ashes. I saw their scorched banner hanging in the nomad ruins, the same burned mark that is on their wagons. They are bandits, but they do not steal blindly. They wanted the Astrolabe for what it might open."
+          answer: "They call themselves the BC Ashes. At Camp VII their banner opened in the wind as the last riders left: a bird of fire, the same mark that is burned into the oilcloth of their wagon, and on the hearth stone one of them had cut their name with a knife. They are bandits, but they do not steal blindly. They wanted the Astrolabe for what it might open."
         },
         {
           id: "inq-great-silence",
@@ -5664,8 +5677,8 @@
         'inq-desert-oracle': 'lexicon',
         'inq-chasm': 'cairn1',
         'inq-salt-playa': 'chasm',
-        'inq-bc-ashes': 'playa',
-        'inq-oasis-steles': 'playa',
+        'inq-bc-ashes': 'lexicon',
+        'inq-oasis-steles': 'lexicon',
         'inq-al-qibla': 'lexicon',
         'inq-phoenix-sigil': 'lexicon',
         'inq-four-wells': 'lexicon',
@@ -7175,6 +7188,7 @@
         walkingTitle: '✦ Through the Dunes · To the Nomad Ruins ✦',
         walkingDesc: 'Hermes has left the marker on the south shore and is walking south through the dunes, keeping to the hollows, toward the ruins of an old nomad camp. Weigh your Cipher Ledger with the Surveyor\'s Balance while he walks, and keep the page “The Desert Lexicon & Al-Qibla” close.',
         etaLabel: 'ARRIVAL AT THE NOMAD RUINS',
+        cinematic: 'road_of_salt',
         arrivedTitle: 'The Nomad Ruins at Dusk · Hermes Is Calling',
         arrivedDesc: 'Hermes has reached the ruins of Camp VII, in the dunes south of the salt. Keep the Field Wire open to hear him.'
       };
@@ -7901,6 +7915,7 @@
                 + (isCarlesTester() ? '<div style="margin-top:8px;"><button type="button" class="btn-admin-skip-march" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:\'Cinzel\',serif; cursor:pointer;">⏩ Tester: skip the walk</button></div>' : '');
               const skipBtn = descEl.querySelector('.btn-admin-skip-march');
               if (skipBtn) skipBtn.onclick = (e) => { e.stopPropagation(); leg.march.skip(); };
+              if (leg.cinematic && window.EclipseCinematic) window.EclipseCinematic.attach(descEl, leg.cinematic);
             };
             updateTrek();
             if (window.__wireMarchTimer) clearInterval(window.__wireMarchTimer);

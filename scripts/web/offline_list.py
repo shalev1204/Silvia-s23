@@ -22,6 +22,7 @@ SW = os.path.join(WEB, "sw.js")
 FOLDERS = ["hub", "assets", "shared"]
 FILES = ["favicon.ico", "favicon.svg"]
 SKIP = (".md", ".txt")
+SKIP_DIRS = ("assets/cinematics/",)   # the films stream when pressed: they weigh more than the whole Hub (only manifest.json stays)
 # pictures of the constellation games that the Hub itself shows (its cards, posters and plates)
 HUB_REFS = re.compile(r"constellation/[\w./-]+\.(?:jpg|png|webp|svg)")
 MARK = re.compile(r"(// <offline-list>.*?\n)(.*?)(\s*// </offline-list>)", re.S)
@@ -31,7 +32,8 @@ def files():
     out = [os.path.join(WEB, f) for f in FILES]
     for folder in FOLDERS:
         for root, _, names in os.walk(os.path.join(WEB, folder)):
-            out += [os.path.join(root, n) for n in names if not n.startswith(".") and not n.endswith(SKIP)]
+            out += [os.path.join(root, n) for n in names if not n.startswith(".") and not n.endswith(SKIP)
+                    and not (any(d in os.path.join(root, n).replace(os.sep, "/") for d in SKIP_DIRS) and n != "manifest.json")]
     text = ""
     for path in [os.path.join(WEB, "index.html")] + [p for p in out if p.endswith((".js", ".css"))]:
         with open(path, encoding="utf-8", errors="ignore") as f:

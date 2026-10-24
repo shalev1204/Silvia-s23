@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = 'f27b9bff219c';  // 152 files, 31.5 MB
+var VERSION = '2ff2f4be4972';  // 155 files, 31.5 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -18,6 +18,7 @@ var PRECACHE = [
   "./assets/chat/sketch_cairn_one.webp",
   "./assets/chat/sketch_chasm_mouth.webp",
   "./assets/chat/sketch_dry_wash.webp",
+  "./assets/cinematics/manifest.json",
   "./assets/cliffside_workshop_bg.jpg",
   "./assets/css/desert-map-3d.css",
   "./assets/emails/email-01-parchment-full.webp",
@@ -92,6 +93,7 @@ var PRECACHE = [
   "./hub/css/aurelia-letters.css",
   "./hub/css/base.css",
   "./hub/css/camp-messenger.css",
+  "./hub/css/cinematic.css",
   "./hub/css/desert-map.css",
   "./hub/css/field-journal.css",
   "./hub/css/gate-profiles.css",
@@ -127,6 +129,7 @@ var PRECACHE = [
   "./hub/js/a11y.js",
   "./hub/js/ambience.js",
   "./hub/js/aurelia-letters.js",
+  "./hub/js/cinematic.js",
   "./hub/js/cloud-config.js",
   "./hub/js/cloud-save.js",
   "./hub/js/dawn-map-layer.js",

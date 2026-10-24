@@ -21,7 +21,7 @@ Todo lo que se ve está en la Biblia Canónica: Hermes, la tormenta roja, Cairn 
    - Nombre y ubicación: `web/assets/cinematics/road_of_salt_1080.mp4` y `road_of_salt_720.mp4`.
    - Póster: un JPG del plano 20 en `web/assets/cinematics/road_of_salt_poster.jpg`.
    - Subtítulos: un archivo `road_of_salt.en.vtt` con los rótulos y las frases de Hermes de la columna «Voice».
-   - Entregue los archivos al agente. Él los integra (apartado 6).
+   - Los archivos se copian a esa carpeta y se activan en el manifiesto (apartado 6); no hay que tocar código.
 
 ---
 
@@ -107,15 +107,27 @@ Las capturas limpias (sin interfaz, 1280×720) están en `docs/cinematic_refs/`.
 
 ---
 
-## 6. Integración en el juego (cuando lleguen los archivos)
+## 6. Integración en el juego
 
-- **Dónde.** El vídeo se ofrece durante la marcha a las Nomad Ruins (`lexiconMarch`, 3 h).
-  - En la barra del Field Wire («Through the Dunes · To the Nomad Ruins») aparece el botón *▶ While Hermes walks: The Road of Salt (2:40)*.
-  - El mismo botón está en la tarjeta sellada de la Estación 12.
-  - Una vez vista, la cinemática queda en la tarjeta de la Estación 11 completada, como *Watch again*.
-- **Reproductor.** Una capa propia sobre el Hub con el póster, el botón de reproducir, los subtítulos VTT activados por defecto, Escape para cerrar y el foco atrapado. El volumen sigue el ajuste del Hub. Elige 720p en pantallas pequeñas o con `navigator.connection.saveData` activo.
-- **Peso.** El MP4 no entra en la precarga offline del service worker (`scripts/web/offline_list.py`): pesaría más que todo el juego, que ahora ocupa 31 MB. Se descarga en streaming solo al pulsar *play*. Sin conexión, el botón dice *Available when you are online*.
-- **Medición.** Un indicador `order_cinematic_road_of_salt_seen` registra si se vio. No guarda nada más.
+**Estado (25-10-2026): el reproductor ya está construido y dormido.** No hace falta tocar código cuando lleguen los vídeos:
+
+1. Copie los archivos a `web/assets/cinematics/` con los nombres de `manifest.json` (`road_of_salt_1080.mp4`, `road_of_salt_720.mp4`, `road_of_salt_poster.jpg`, `road_of_salt.en.vtt`, y los de `night_of_steles_*` para la Parte 2).
+2. En `web/assets/cinematics/manifest.json` ponga `"available": true` en la película que ya exista.
+3. Ejecute `python3 scripts/web/offline_list.py` y despliegue. Los vídeos, pósters y subtítulos quedan **fuera** de la precarga offline; solo `manifest.json` entra en ella.
+
+Hasta que una película figure como disponible no se muestra ningún botón en ningún sitio. Está en `web/hub/js/cinematic.js` y `web/hub/css/cinematic.css`, con la sección de humo `cinematic`.
+
+Dónde aparece el botón:
+
+- **«The Road of Salt»**: en la barra del Field Wire «Through the Dunes · To the Nomad Ruins», en la tarjeta sellada de la Estación 12 mientras Hermes camina, y como *Watch again* en la tarjeta de la Estación 11 terminada.
+- **«The Night of the Steles»** (Parte 2): en la tarjeta de la Estación 12 terminada y junto al botón de volver al mapa en la tarjeta de victoria del Lexicon.
+
+El reproductor (descripción de lo que ya hace):
+
+
+- **Capa propia** sobre el Hub, con el póster, los controles del navegador, los subtítulos activados por defecto, Escape y la ✕ para cerrar, foco atrapado y devuelto al botón. Elige el 720p en pantallas de menos de 760 px o con `navigator.connection.saveData`. Si Silvia tiene el sonido ambiental del Hub silenciado, el vídeo empieza silenciado; si no, el ambiente descansa mientras suena el vídeo y vuelve al cerrarlo.
+- **Peso.** Los archivos no entran en la precarga offline del service worker (`scripts/web/offline_list.py` ignora `assets/cinematics/` salvo el manifiesto): pesarían más que todo el juego, que ocupa 31 MB. Se descargan en streaming al pulsar *play*. Sin conexión, el botón dice *available when you are online*.
+- **Medición.** Un indicador `order_cinematic_<id>_seen` registra si se vio hasta el final (`road_of_salt`, `night_of_steles`). No guarda nada más. Al terminar se emite el evento `cinematic:seen`.
 
 ---
 

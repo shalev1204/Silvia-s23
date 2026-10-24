@@ -1513,9 +1513,10 @@
       function loseHeart() {
         S.hearts = Math.max(0, S.hearts - 1);
         paintHearts(true);
-        if (soundOn() && S.hearts > 0) tone(220, 0.15, 0.5, { to: 150, gain: 0.08, type: 'triangle' });
+        if (soundOn()) tone(S.hearts > 0 ? 220 : 110, 0.15, S.hearts > 0 ? 0.5 : 0.9, { to: S.hearts > 0 ? 150 : 60, gain: S.hearts > 0 ? 0.08 : 0.1, type: 'triangle' });
         return S.hearts <= 0;
       }
+      const heartsWarn = () => (S.hearts === 1 ? ' That is my second false step, Silvia: one more and I must walk back to the North Edge and begin again.' : '');
       const heartsLine = () => `${'♥'.repeat(S.hearts)}${'♡'.repeat(HEARTS - S.hearts)} · ${S.hearts ? `${S.hearts === 1 ? 'one heart' : 'two hearts'} left` : 'no hearts left'}`;
       // A false step costs time: the clock flares and the edges of the picture burn
       function burn() { replay(el.clock, 'is-hot'); replay(fxEl.hurt, 'is-on'); }
@@ -1943,7 +1944,7 @@
         burn();
         save();
         paintHud();
-        say(lost ? `${text} …And that was the third time, Silvia. My legs are shaking. I cannot trust this crossing any more: I am going back along my own prints to the North Edge, and we begin again from the tripod.` : text);
+        say(lost ? `${text} …And that was the third time, Silvia. My legs are shaking. I cannot trust this crossing any more: I am going back along my own prints to the North Edge, and we begin again from the tripod.` : text + heartsWarn());
         where(lost ? 'Three false steps: Hermes walks back to the North Edge.' : `A false step: Hermes is back on ${row() ? `his slab of Row ${ROMAN[row() - 1]}` : 'the North Edge'}.`);
         alertCard(kind === 'sink' ? 'Sinkhole' : 'False step', kind === 'sink' ? '≈' : '✕', title, why, cost,
           kind === 'start' ? 'Hermes is back on the edge.' : 'Hermes stays on his slab. Choose again.');
@@ -2208,7 +2209,7 @@
         burn();
         save();
         paintHud();
-        say(lost ? `${T2[2]} …That is three, Silvia. The Sump has beaten us today. I am going all the way back, across the stones, to the North Edge, and we begin the crossing again from the tripod.` : T2[2]);
+        say(lost ? `${T2[2]} …That is three, Silvia. The Sump has beaten us today. I am going all the way back, across the stones, to the North Edge, and we begin the crossing again from the tripod.` : T2[2] + heartsWarn());
         where(lost ? 'Three false steps: Hermes walks back to the North Edge.' : 'A false step: Hermes is back on his plate.');
         alertCard(kind === 'split' ? 'False step' : 'Sinkhole', kind === 'split' ? '✕' : '≈', T2[0], T2[1] + ' (The page “Study on the Dry Salt Playa”.)', cost, 'Hermes stays on his plate. Choose again.');
       }

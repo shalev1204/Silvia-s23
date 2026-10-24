@@ -146,8 +146,8 @@ def start_server(port=PORT, override=None):
     return server
 
 
-def new_page(browser, seed=None):
-    ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+def new_page(browser, seed=None, reduced_motion=False):
+    ctx = browser.new_context(viewport={"width": 1280, "height": 900}, reduced_motion="reduce" if reduced_motion else "no-preference")
     page = ctx.new_page()
     errors = []
     page.on("pageerror", lambda e: errors.append("JS error: " + str(e)[:200]))
@@ -2706,6 +2706,7 @@ def test_whispering_chasm(browser):
     check(pages == ["1 of 3", "2 of 3", "3 of 3"] and js("document.activeElement.id") == "btn-howto-next"
           and js("document.getElementById('btn-howto-next').innerText") == "Start walking",
           "the first time, How to play opens on top: three short pages, ending in Start walking", str(pages))
+    page.wait_for_timeout(1500)   # the last page slides in and its list items rise, in turn, before the text is measured
     dim = low_contrast(page, "#chasm3d-howto")
     check(not dim, "How to play: text contrast is at least WCAG AA", "; ".join(dim[:4]))
     page.keyboard.press("ArrowLeft")
@@ -3491,7 +3492,11 @@ def test_desert_lexicon(browser):
     for d in sol:
         js(f"window.__lexicon.door({d})")
     check(st()["phase"] == "hide", "seven walls by the letters of the sigil, then a hiding place", st()["phase"])
-    js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(1000)
+    js("document.querySelector('#lex3d-controls button').click()")
+    for _ in range(30):
+        page.wait_for_timeout(200)
+        if st()["phase"] == "hearth":
+            break
     check(st()["phase"] == "hearth" and "hoofbeats" in voice(), "the torches pass; the riders ride south; back to the cold hearth")
     if st()["gl"]:
         js("window.__lexicon.frames(3)")
@@ -3538,6 +3543,214 @@ def test_desert_lexicon(browser):
     ctx.close()
 
 
+def test_reduced_motion(browser):
+    print("\n38. Stations 11 and 12 with 'reduce motion' on: the games finish, the three hearts still restart them, and nothing keeps moving")
+    running = """sel => [...new Set(document.getAnimations().filter(a => a.playState === 'running' && a.effect && a.effect.target && a.effect.target.closest(sel)
+        && a.effect.getTiming().iterations === Infinity).map(a => a.animationName || '?'))]"""
+    hour = 3600 * 1000
+    seed = dict(DESERT_BASE, order_salt_playa_completed="false", order_desert_station_active="11", order_playa_march_bypassed="true", order_playa_howto="seen", order_playa_howto2="seen",
+                order_chasm_wire=json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1, "seen2": True, "reply2": 0}), order_playa_march_start=str(int(time.time() * 1000) - 11 * hour))
+    ctx, page, errors = new_page(browser, seed, reduced_motion=True)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    st = lambda: js("window.__playa.state()")
+    check(js("matchMedia('(prefers-reduced-motion: reduce)').matches"), "the browser asks for reduced motion")
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(1200)
+    for i in range(3):
+        js("window.__playa.pick(0)"); page.wait_for_timeout(250)
+        if i < 2:
+            js("window.__playa.goOn()")
+    s = st()
+    check(s["phase"] == "setback" and s["hearts"] == 0, "three false steps with reduced motion: the last heart goes", f"{s['phase']} {s['hearts']}")
+    js("window.__playa.goOn()")
+    s = st()
+    check(s["phase"] == "edge" and s["hearts"] == 3 and s["tries"] == 2 and s["path"] == [], "and Hermes is back on the North Edge with three hearts", f"{s['phase']} {s['hearts']} {s['tries']}")
+    js("window.__playa.edge(1);window.__playa.edge(1);window.__playa.edge(1)")
+    for r in range(7):
+        js(f"window.__playa.pick({PLAYA_SOLUTION[r]})"); js("window.__playa.lean(window.__playa.measured())")
+        if r < 6:
+            js("window.__playa.walkOn()")
+    for _ in range(40):
+        page.wait_for_timeout(150); js("window.__playa.frames(4)")
+        if st()["phase"] == "console":
+            break
+    js("window.__playa.transmit('CRYSTAL')"); page.wait_for_timeout(300)
+    js("document.querySelector('#playa3d-controls .chasm3d-btn.is-way').click()")
+    for _ in range(40):
+        page.wait_for_timeout(150)
+        if st()["phase"] == "schoose":
+            break
+    for d in js("window.__playa.sol()"):
+        js(f"window.__playa.spick({d})"); js("window.__playa.lean(window.__playa.measured())")
+    for _ in range(40):
+        page.wait_for_timeout(150); js("window.__playa.frames(4)")
+        if st()["phase"] == "done":
+            break
+    check(st()["phase"] == "done" and js("localStorage.getItem('order_salt_playa_completed')") == "true", "the Salt Playa is finished", st()["phase"])
+    page.wait_for_timeout(1200)
+    check(js("(r => !!r && !r.hidden)(document.querySelector('#modal-salt-playa .chasm3d-reward'))") and not js(running, "#modal-salt-playa"),
+          "its reward is up and nothing in it animates for ever", str(js(running, "#modal-salt-playa")))
+    check(not errors, "no JS errors in the Salt Playa", "; ".join(errors[:2]))
+    ctx.close()
+
+    gate = json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1, "seen2": True, "reply2": 0, "seen3": True, "reply3": 0, "seen4": True, "reply4": 0})
+    seed = dict(DESERT_BASE, order_chasm_wire=gate, order_desert_station_active="12", order_lexicon_march_start="1", order_lexicon_march_bypassed="true", order_lexicon_howto="seen")
+    ctx, page, errors = new_page(browser, seed, reduced_motion=True)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    js = page.evaluate
+    st = lambda: js("window.__lexicon.state()")
+    js("window.openDesertLexiconModal()"); page.wait_for_timeout(1200)
+    for _ in range(3):
+        js("window.__lexicon.select('ac-3'); window.__lexicon.brush('NOMAX')"); page.wait_for_timeout(250)
+    s = st()
+    check(s["phase"] == "setback" and s["hearts"] == 0, "three refused words with reduced motion: the night is lost", f"{s['phase']} {s['hearts']}")
+    js("window.__lexicon.goOn()")
+    s = st()
+    check(s["phase"] == "stele" and s["hearts"] == 3 and s["tries"] == 2 and s["carved"] == [], "the next night begins from the first word with three hearts", f"{s['phase']} {s['hearts']} {s['tries']}")
+    for wid, word in [("dn-1", "CARAVAN"), ("ac-3", "NOMAD"), ("ac-2", "SIROCCO"), ("ac-6", "OASIS"), ("ac-8", "ECLIPSE"), ("ac-9", "HORIZON"), ("dn-5", "DUNES"), ("dn-2", "SPHINX")]:
+        for _ in range(6):
+            if st()["watchSafe"]:
+                break
+            js("window.__lexicon.wait()")
+        js(f"window.__lexicon.select('{wid}'); window.__lexicon.brush('{word}')")
+    for _ in range(6):
+        if st()["watchSafe"]:
+            break
+        js("window.__lexicon.wait()")
+    js("window.__lexicon.creep()"); js("window.__lexicon.sigil('PHOENIX')"); js("window.__lexicon.turn(194); window.__lexicon.lock()")
+    js("window.__lexicon.ambush()"); js("window.__lexicon.run()")
+    for d in js("window.__lexicon.sol()"):
+        js(f"window.__lexicon.door({d})")
+    page.wait_for_timeout(300)
+    js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(400)
+    js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(1500)
+    check(st()["phase"] == "done" and js("localStorage.getItem('order_desert_lexicon_completed')") == "true", "the Desert Lexicon is finished", st()["phase"])
+    page.wait_for_timeout(600)
+    check(not js(running, "#modal-desert-lexicon"), "and nothing in it animates for ever", str(js(running, "#modal-desert-lexicon")))
+    check(not errors, "no JS errors in the steles", "; ".join(errors[:2]))
+    ctx.close()
+
+
+def test_cinematic(browser):
+    print("\n39. The cinematics of the desert: nothing shows until the films exist; then the buttons, the player and the 'watched' mark")
+    import base64, re, subprocess, tempfile
+    hour = 3600 * 1000
+    wire_to = lambda seen, reply: json.dumps(dict({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1}, **{f"seen{i}": True for i in range(2, seen + 1)}, **{f"reply{i}": 0 for i in range(2, reply + 1)}))
+    marching = dict(DESERT_BASE, order_chasm_wire=wire_to(3, 3), order_salt_playa_completed="true", order_lexicon_march_start=str(int(time.time() * 1000) - hour), order_desert_station_active="12")
+    ctx, page, errors = new_page(browser, marching)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("window.activateHubView('view-field-wire')"); page.wait_for_timeout(2500)
+    check(not js("document.querySelectorAll('.cine-btn').length"), "while the films do not exist (manifest: available false) no button shows on the wire bar")
+    js("window.selectMapNode(11, false)"); page.wait_for_timeout(500)
+    check(not js("document.querySelectorAll('.cine-btn').length"), "nor on the sealed card of Station 12")
+    check(not errors, "no JS errors without films", "; ".join(errors[:2]))
+    ctx.close()
+
+    tmp = tempfile.mkdtemp()
+    mp4 = os.path.join(tmp, "t.mp4")
+    try:
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-f", "lavfi", "-i", "color=c=black:s=64x36:d=1", "-pix_fmt", "yuv420p", mp4], check=True, timeout=30)
+        video_bytes = open(mp4, "rb").read()
+    except Exception:
+        video_bytes = b"\x00" * 1024
+    manifest = json.dumps({"road_of_salt": {"available": True, "title": "The Road of Salt", "length": "2:40", "files": {"1080": "road_of_salt_1080.mp4", "720": "road_of_salt_720.mp4", "poster": "p.jpg", "vtt": "r.vtt"}},
+                           "night_of_steles": {"available": True, "title": "The Night of the Steles", "length": "1:10", "files": {"1080": "night_1080.mp4", "720": "night_720.mp4", "poster": "p2.jpg", "vtt": "n.vtt"}}})
+
+    def with_films(width, seed):
+        ctx, page, errors = new_page(browser, seed)
+        page.set_viewport_size({"width": width, "height": 900})
+        page.route("**/assets/cinematics/manifest.json", lambda r: r.fulfill(status=200, content_type="application/json", body=manifest))
+        page.route(re.compile(r".*/assets/cinematics/.*\.mp4"), lambda r: r.fulfill(status=200, content_type="video/mp4", body=video_bytes, headers={"Accept-Ranges": "bytes"}))
+        page.route(re.compile(r".*/assets/cinematics/.*\.vtt"), lambda r: r.fulfill(status=200, content_type="text/vtt", body="WEBVTT\n\n00:00.000 --> 00:01.000\nTest\n"))
+        page.route(re.compile(r".*/assets/cinematics/.*\.jpg"), lambda r: r.fulfill(status=200, content_type="image/png", body=base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")))
+        return ctx, page, errors
+
+    ctx, page, errors = with_films(1280, marching)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("window.activateHubView('view-field-wire')"); page.wait_for_timeout(2500)
+    label = js("(b => b ? b.innerText : '')(document.querySelector('#wire-completed-bar .cine-btn'))")
+    check("The Road of Salt" in label and "2:40" in label and "Watch:" in label, "with the films there, the wire bar offers The Road of Salt while Hermes walks", label)
+    js("document.querySelector('#wire-completed-bar .cine-btn').click()"); page.wait_for_timeout(700)
+    shown = lambda: js("(l => !!l && !l.hidden)(document.getElementById('cinematic-layer'))")
+    check(shown() and js("document.querySelector('#cinematic-layer video').src").endswith("road_of_salt_1080.mp4") and js("document.querySelector('#cinematic-layer track').default")
+          and js("document.querySelector('#cinematic-layer .cine-title').innerText") == "The Road of Salt", "the player opens on the 1080 file, with its subtitle track on")
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not shown() and js("localStorage.getItem('order_cinematic_road_of_salt_seen')") is None and js("document.activeElement.className") == "cine-btn",
+          "Escape closes it without marking it as watched, and the focus goes back to the button")
+    js("document.querySelector('#wire-completed-bar .cine-btn').click()"); page.wait_for_timeout(500)
+    js("document.querySelector('#cinematic-layer video').dispatchEvent(new Event('ended'))"); page.wait_for_timeout(300)
+    check(not shown() and js("localStorage.getItem('order_cinematic_road_of_salt_seen')") == "true"
+          and "Watch again" in js("document.querySelector('#wire-completed-bar .cine-btn').innerText"), "watched to the end: the mark is kept and the button says Watch again")
+    js("window.selectMapNode(11, false)"); page.wait_for_timeout(600)
+    check(js("document.querySelectorAll('#star-inspector .inspector-actions-row .cine-btn').length") == 1, "the sealed card of Station 12 carries the same button")
+    js("window.selectMapNode(21, false)"); page.wait_for_timeout(600)
+    check(js("document.querySelectorAll('#star-inspector .inspector-actions-row .cine-btn').length") == 1, "and so does the done card of the Salt Playa")
+    check(not errors, "no JS errors with the player", "; ".join(errors[:2]))
+    ctx.close()
+
+    done = dict(DESERT_BASE, order_chasm_wire=wire_to(5, 4), order_salt_playa_completed="true", order_desert_lexicon_completed="true", order_lexicon_march_start="1", order_lexicon_march_bypassed="true", order_desert_station_active="12")
+    ctx, page, errors = with_films(390, done)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("window.selectMapNode(11, false)"); page.wait_for_timeout(600)
+    label = js("(b => b ? b.innerText : '')(document.querySelector('#star-inspector .inspector-actions-row .cine-btn'))")
+    check("The Night of the Steles" in label, "the done card of the Desert Lexicon offers The Night of the Steles", label)
+    js("document.querySelector('#star-inspector .inspector-actions-row .cine-btn').click()"); page.wait_for_timeout(600)
+    check(shown() and js("document.querySelector('#cinematic-layer video').src").endswith("night_720.mp4"), "on a phone the player picks the 720 file")
+    over = js("(() => { const c = document.querySelector('#cinematic-layer .cine-card').getBoundingClientRect(); return c.right > innerWidth + 1 || c.left < -1; })()")
+    check(not over, "and it fits the screen at 390 px")
+    js("document.querySelector('#cinematic-layer .cine-close').click()"); page.wait_for_timeout(300)
+    check(not shown(), "the close button closes it")
+    ctx.close()
+
+
+def test_desert_road(browser):
+    print("\n40. The road from the Salt Playa to the Desert Lexicon: no card, chat or archive entry tells the story before Hermes gets there")
+    hour = 3600 * 1000
+    now = int(time.time() * 1000)
+    wire = lambda seen, reply: json.dumps(dict({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1}, **{f"seen{i}": True for i in range(2, seen + 1)}, **{f"reply{i}": 0 for i in range(2, reply + 1)}))
+    base = {k: v for k, v in DESERT_BASE.items() if k != "order_salt_playa_completed"}
+
+    def visit(extra):
+        ctx, page, errors = new_page(browser, dict(base, order_whispering_chasm_completed="true", **extra))
+        page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+        return ctx, page, errors
+
+    def card(page, node):
+        page.evaluate(f"window.selectMapNode({node}, false)"); page.wait_for_timeout(450)
+        return page.evaluate("document.getElementById('star-inspector').innerText")
+
+    def questions(page):
+        page.evaluate("window.activateHubView('view-field-wire')"); page.wait_for_timeout(1500)
+        page.evaluate("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(500)
+        return page.evaluate("[...document.querySelectorAll('#inquiries-questions-grid button')].filter(b => !b.className.includes('lock') && !b.disabled).map(b => b.innerText.replace(/\\n/g, ' '))")
+    spoilers = ("Camp VII", "stelae", "BC Ashes", "PHOENIX", "rearguard", "Al-Qibla")
+
+    ctx, page, errors = visit(dict(order_chasm_wire=wire(1, 1), order_playa_march_start=str(now - 2 * hour), order_desert_station_active="11"))
+    text = card(page, 11)
+    check("[ Sealed ]" in text and not any(w in text for w in spoilers), "while the Playa is still ahead, the card of Station 12 is sealed and tells nothing of the ruins", text[:140].replace("\n", " "))
+    ctx.close()
+
+    ctx, page, errors = visit(dict(order_chasm_wire=wire(3, 3), order_salt_playa_completed="true", order_lexicon_march_start=str(now - hour), order_desert_station_active="12"))
+    q = questions(page)
+    check(not any("raiders?" in t for t in q) and not any("sandstone steles" in t for t in q),
+          "with the Playa done but the ruins not reached, the archive keeps «Who are the raiders?» and the steles for later", str(q)[:200])
+    ctx.close()
+
+    ctx, page, errors = visit(dict(order_chasm_wire=wire(5, 4), order_salt_playa_completed="true", order_desert_lexicon_completed="true", order_lexicon_march_start="1", order_lexicon_march_bypassed="true", order_desert_station_active="12"))
+    q = questions(page)
+    check(any("raiders?" in t for t in q) and any("sandstone steles" in t for t in q), "once the Lexicon is done, both questions are there", str(q)[:200])
+    page.evaluate("[...document.querySelectorAll('#inquiries-questions-grid button')].find(b => b.innerText.includes('raiders?')).click()"); page.wait_for_timeout(1500)
+    said = page.evaluate("document.getElementById('wire-inquiries-stream').innerText")
+    check("hearth stone" in said and "scorched banner hanging" not in said, "and the answer about the raiders tells the banner in the wind and the name on the hearth", said[-240:].replace("\n", " "))
+    check(not errors, "no JS errors on the road", "; ".join(errors[:2]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -3552,10 +3765,13 @@ SECTIONS = {
     "playahold": test_playa_hold,
     "playa": test_salt_playa,
     "lexicon": test_desert_lexicon,
+    "reduced": test_reduced_motion,
+    "cinematic": test_cinematic,
+    "road": test_desert_road,
     "balance": test_balance,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon", "reduced", "cinematic", "road"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 

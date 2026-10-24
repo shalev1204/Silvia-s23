@@ -509,6 +509,6 @@
     @media (prefers-reduced-motion: reduce) {
       .chasm3d-heart.is-breaking { animation: none; }
       .chasm3d-rose, .chasm3d-subtitle, .chasm3d-fade { transition: none; }
-      .chasm3d-window *, .chasm3d-window *::after, .chasm3d-howto, .chasm3d-howto-card { animation: none !important; transition: none !important; }
+      .chasm3d-window *, .chasm3d-window *::before, .chasm3d-window *::after, .chasm3d-howto, .chasm3d-howto-card, .chasm3d-reward-card::before { animation: none !important; transition: none !important; }
       .amb-motes { display: none; }
     }
