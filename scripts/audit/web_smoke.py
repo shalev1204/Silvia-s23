@@ -2816,11 +2816,11 @@ def test_whispering_chasm(browser):
     reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('.chasm3d-reward'))")
     check("The Line of the Gate" in reward() and "Sheet" not in reward() and js("document.querySelectorAll('.chasm3d-reward .chasm3d-medal').length") == 6
           and js("document.querySelector('.chasm3d-reward-word strong').getAttribute('aria-label')") == "MIRAGE"
-          and js("document.querySelector('.rw-eq').getAttribute('aria-label')") == "Glyph equals X"
-          and js("document.querySelectorAll('.rw-seal svg line').length") == 2 and " ".join(js("document.querySelector('.rw-eq').innerText").split()).upper() == "GLYPH = X" and "= 17" not in reward() and "+ E" not in reward()
+          and js("document.querySelector('.rw-eq').getAttribute('aria-label')") == "X plus E equals 17"
+          and js("document.querySelectorAll('.rw-seal svg line').length") == 2 and " ".join(js("document.querySelector('.rw-glyph figcaption').innerText").split()).upper() == "GLYPH = X"
           and js("document.querySelectorAll('.rw-map .rw-cairn').length") == 6 and js("document.querySelector('.rw-road').points.length") > 40
           and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')"),
-          "the reward rises over the canyon: her road on the map, six relics, MIRAGE and the glyph of the new letter X", reward()[:200].replace("\n", " "))
+          "the reward rises over the canyon: her road on the map, six relics, MIRAGE, the glyph = X and the Ledger line [X] + [E] = 17", reward()[:200].replace("\n", " "))
     page.keyboard.press("Escape"); page.wait_for_timeout(300)
     check(not reward() and js("document.getElementById('modal-whispering-chasm').style.display") != "none", "Escape puts the reward away, the canyon stays open")
     js("document.getElementById('btn-chasm-reward').click()"); page.wait_for_timeout(300)
