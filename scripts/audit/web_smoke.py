@@ -3164,9 +3164,18 @@ def test_salt_playa(browser):
           "the first time in the Sump, How to play opens on its own page")
     js("document.getElementById('btn-playa-howto-next').click()")
     check(not howto_on() and get("order_playa_howto2") == "seen", "and it is remembered")
-    plates = js("[...document.querySelectorAll('#playa3d-controls .playa3d-plate')].map(b => b.innerText.replace(/\\s+/g, ' '))")
-    check(len(plates) == 3 and all(any(w in p for w in ("ridged", "smooth")) and any(w in p for w in ("wet seam", "dry")) for p in plates),
-          "three plates in reach, each button naming what Hermes sees", str(plates))
+    plates = lambda: js("[...document.querySelectorAll('#playa3d-controls .playa3d-plate')].map(b => b.innerText.replace(/\\s+/g, ' '))")
+    asks = lambda: js("[...document.querySelectorAll('#playa3d-controls .playa3d-ask')].map(b => b.disabled)")
+    check(len(plates()) == 3 and all("glare" in p for p in plates()) and asks() == [False, False, False],
+          "three plates in reach, lost in the glare, and three questions she can ask Hermes", str(plates()))
+    m0 = st()["min"]
+    js("window.__playa.ask('wet')")
+    s = st()
+    check(s["min"] - m0 == 4 and s["asked"].get("0") == ["wet"] and asks() == [False, True, False]
+          and all(any(w in p for w in ("damp seam", "dry rim")) for p in plates()) and "seam" in voice(),
+          "she asks him to feel the seams: he kneels, tells her in his own words, the buttons name it and the sun climbs 4 minutes", f"{s['min'] - m0} {plates()}")
+    js("window.__playa.ask('wet')")
+    check(st()["min"] - m0 == 4, "the same question is not asked twice")
     sol = js("window.__playa.sol()")
     kinds = []
     for k, d in enumerate(sol):
@@ -3218,6 +3227,28 @@ def test_salt_playa(browser):
     js("window.selectMapNode(21, false)"); page.wait_for_timeout(300)
     card = js("document.getElementById('star-inspector').innerText")
     check("CRYSTAL" in card and "Surveyor" in card, "the done card names CRYSTAL and the Surveyor's Balance", card[:240])
+
+    # The road to Station 12: three hours through the dunes, then Hermes calls from the Nomad Ruins at dusk
+    js("window.selectMapNode(11, false)"); page.wait_for_timeout(300)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("Sealed" in card and "Lexicon" not in card and get("order_lexicon_march_start"),
+          "her answer sends Hermes through the dunes: Station 12 is sealed, with its countdown", card[:200].replace("\n", " "))
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
+    bar = js("document.getElementById('wire-completed-bar').innerText")
+    check("Through the Dunes" in bar and ("2 H" in bar.upper() or "3 H" in bar.upper()), "on the wire, the walk to the Nomad Ruins with its hours", bar[:200].replace("\n", " "))
+    js("window.skipLexiconMarch()"); page.wait_for_timeout(500)
+    js("window.selectMapNode(11, false)"); page.wait_for_timeout(300)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("HERMES IS CALLING" in card.upper() and "Camp VII" in card, "at dusk the card names the ruins, and Hermes is calling", card[:200].replace("\n", " "))
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(3500)
+    w = wire()
+    check("NOMAD RUINS" in w.upper() and "Al-Qibla" in w and len(pills()) == 3, "on the wire, Hermes whispers from the Nomad Ruins with 3 replies", w[-300:].replace("\n", " "))
+    js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(4500)
+    check(json.loads(get("order_chasm_wire")).get("reply4") == 0 and any("steles" in p for p in pills()),
+          "her reply, and one way on: read the steles with Hermes", str(pills()))
+    js("window.selectMapNode(11, false)"); page.wait_for_timeout(300)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("TRANSCRIBE" in card.upper() and "moonlight" in card, "the Station 12 card opens the steles", card[:200].replace("\n", " "))
 
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(600)
     check(st()["phase"] == "done", "opened again, the salt shows the south shore")

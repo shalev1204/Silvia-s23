@@ -102,7 +102,7 @@
       flex: 0 0 auto; margin: 0; width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center;
       background: radial-gradient(circle at 38% 32%, #f4d58a, #c8902e 55%, #8a5a18); box-shadow: 0 0 0 4px rgba(200, 144, 46, 0.3), 0 6px 14px rgba(0, 0, 0, 0.4), inset 0 -4px 10px rgba(0, 0, 0, 0.3);
     }
-    .playa-balance-icon svg { width: 52px; height: 46px; fill: none; stroke: #3d2410; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .playa-balance-icon svg { width: 56px; height: 46px; overflow: visible; transform-origin: 50% 20%; fill: none; stroke: #3d2410; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
     .playa-balance-icon svg circle { fill: #3d2410; }
     .chasm3d-reward.is-on .playa-balance-icon { animation: rw-seal 0.7s cubic-bezier(.2, .9, .3, 1.4) 4.8s both; }
     .chasm3d-reward.is-on .playa-balance-icon svg { animation: playa-tip 2.6s ease-in-out 5.6s infinite; }
@@ -110,7 +110,7 @@
     @media (max-width: 520px) {
       .playa3d-logbox::after { font-size: 0.52rem; }
       .playa-balance-icon { width: 60px; height: 60px; }
-      .playa-balance-icon svg { width: 42px; height: 38px; }
+      .playa-balance-icon svg { width: 46px; height: 38px; }
     }
 
     /* ---- The sun instead of water: the clock flares at every false step, and the noon heat whitens the picture ---- */
@@ -161,3 +161,16 @@
     .playa3d-window .chasm3d-btn small { text-transform: none; }
     .chasm3d-btn.playa3d-plate { flex-basis: 100%; justify-content: flex-start; text-align: left; gap: 10px; }
     .chasm3d-btn.playa3d-plate small { margin-left: auto; text-align: right; line-height: 1.2; }
+    /* ---- What she can ask Hermes at noon: three questions in a row, in the blue of the brine and the shade ---- */
+    .chasm3d-btn.playa3d-ask {
+      flex: 1 1 calc(33.333% - 8px); flex-direction: column; gap: 2px; min-height: 56px; padding: 6px 6px; font-size: 0.8rem; line-height: 1.15;
+      border-color: rgba(156, 200, 230, 0.7); color: #dcefff; background: rgba(20, 40, 56, 0.86);
+      background-image: linear-gradient(100deg, transparent 30%, rgba(207, 230, 245, 0.16) 50%, transparent 70%); background-size: 250% 100%;
+    }
+    .chasm3d-controls .chasm3d-btn.playa3d-ask:not(:disabled) { animation: chasm-pop 0.38s cubic-bezier(.2, .9, .3, 1.25) both, chasm-shimmer 2.8s ease-in-out 0.8s infinite; }
+    .chasm3d-btn.playa3d-ask:hover:not(:disabled) { background-color: rgba(34, 66, 90, 0.92); }
+    .chasm3d-btn.playa3d-ask small { color: #bcd9ec; font-size: 0.76rem; }
+    .chasm3d-btn.playa3d-ask.is-asked { opacity: 1; border-style: dashed; background: rgba(20, 40, 56, 0.55); color: #a9c6d8; }
+    .chasm3d-btn.playa3d-ask.is-asked small { color: #a9c6d8; }
+    .playa3d-ask-icon { font-size: 1.05rem; line-height: 1; }
+    @media (prefers-reduced-motion: reduce) { .chasm3d-controls .chasm3d-btn.playa3d-ask:not(:disabled) { animation: none; } }

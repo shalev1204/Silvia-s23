@@ -662,16 +662,21 @@
             id: 'playa', tag: 'Station 11', label: 'The Salt Playa', flag: 'order_salt_playa_completed', built: true,
             complete() { set('order_salt_playa_completed', 'true'); set('order_salt_playa_path', JSON.stringify([3, 4, 3, 2, 2, 3, 3])); },
             reset() {   // its night at the Oasis Gate goes with the Chasm; its two calls on the wire (the North Edge, the south shore) go with it
-              dels(['order_salt_playa_completed', 'order_salt_playa_path', 'order_playa_walk', 'order_playa_howto', 'order_playa_howto2']);
+              dels(['order_salt_playa_completed', 'order_salt_playa_path', 'order_playa_walk', 'order_playa_howto', 'order_playa_howto2', 'order_lexicon_march_start', 'order_lexicon_march_bypassed']);
               let w = null;
               try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
-              if (w && typeof w === 'object') { ['seen2', 'reply2', 'seen3', 'reply3'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
+              if (w && typeof w === 'object') { ['seen2', 'reply2', 'seen3', 'reply3', 'seen4', 'reply4'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
             }
           },
           {
             id: 'lexicon', tag: 'Station 12', label: 'The Desert Lexicon', flag: 'order_desert_lexicon_completed', built: true,
             complete() { set('order_desert_lexicon_completed', 'true'); set('order_desert_station_active', '12'); },
-            reset() { dels(['order_desert_lexicon_completed', 'order_lexicon_solved_words']); }
+            reset() {   // Hermes calls again from the ruins at dusk (the walk there stays walked)
+              dels(['order_desert_lexicon_completed', 'order_lexicon_solved_words']);
+              let w = null;
+              try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
+              if (w && typeof w === 'object') { ['seen4', 'reply4'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
+            }
           },
           {
             id: 'clepsydra', tag: 'Station 13', label: 'The Oasis Clepsydra', flag: 'order_oasis_clepsydra_completed', built: true,
@@ -740,8 +745,8 @@
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
           const a22 = isDone('s22'), a21 = isDone('s21'), a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = a22 ? 43 : a21 ? 39 : a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch && p) ? 5 : (ch || k) ? 4 : 0;
-          const cap = a22 ? 44 : a21 ? 42 : a20 ? 38 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : (ch && p) ? 5 : 4;
+          const floor = a22 ? 43 : a21 ? 39 : a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch || k || p) ? 4 : 0;
+          const cap = a22 ? 44 : a21 ? 42 : a20 ? 38 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : 4;   // until the Lexicon is read, the chat stays on the road of the Chasm and the salt (step 4)
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -756,7 +761,7 @@
           cairn1: { wire: 4, node: 22, dawn: 2 },
           chasm: { wire: 4, node: 10, walk: 'order_chasm_march_bypassed' },
           playa: { wire: 4, node: 21, walk: 'order_playa_march_bypassed' },
-          lexicon: { wire: 5, node: 11 },
+          lexicon: { wire: 4, node: 11, walk: 'order_lexicon_march_bypassed' },
           clepsydra: { wire: 6, node: 12 },
           s14: { wire: 10, node: 23, walk: 'order_monolith_march_bypassed' },
           s15: { wire: 14, node: 24, walk: 'order_labyrinth_march_bypassed' },
@@ -768,7 +773,7 @@
           s21: { wire: 38, node: 41 },
           s22: { wire: 42, node: 42 }
         };
-        const WALKS = ['order_chasm_march_bypassed', 'order_playa_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
+        const WALKS = ['order_chasm_march_bypassed', 'order_playa_march_bypassed', 'order_lexicon_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
 
         // Puts the Hermes chat exactly at `step`: the replies before it are kept (first reply if none was saved)
         function setWire(step) {
@@ -1407,13 +1412,45 @@
             };
           }
 
+          // The road from the south shore: three hours through the dunes, then Hermes calls from the ruins at dusk.
+          // (A save that never heard him on the North Edge of the salt goes straight to the steles.)
+          let ruinsWire = {};
+          try { ruinsWire = JSON.parse(localStorage.getItem('order_chasm_wire') || '{}') || {}; } catch (e) { ruinsWire = {}; }
+          if (ruinsWire.reply2 !== undefined) {
+            if (!marchOver('lexicon')) {
+              return veiledStation({
+                station: 12, march: 'lexicon', thumb: './assets/thumbnails/desert_lexicon_preview.webp', etaLabel: 'HERMES REACHES THE RUINS IN',
+                walking: 'Hermes has left the marker on the south shore of the salt and is walking south through the dunes, keeping to the hollows, toward the ruins of an old nomad camp. The riders from the rim went the same way. Weigh your Cipher Ledger with the Surveyor\'s Balance while he walks.',
+                waiting: localStorage.getItem('order_salt_playa_completed') === 'true'
+                  ? 'Hermes is resting on the south shore of the salt, in the shadow of the Order\'s marker. Answer him on the Field Wire before he walks on.'
+                  : 'The road beyond the Salt Playa is still unknown. Guide Hermes across the salt first.'
+              });
+            }
+            if (ruinsWire.reply4 === undefined) {
+              return {
+                badge: 'STATION 12 // DESERT PATH',
+                status: 'THE NOMAD RUINS AT DUSK · HERMES IS CALLING 📻',
+                statusClass: 'status-live-badge',
+                title: 'The Desert Lexicon & Al-Qibla',
+                thumb: './assets/thumbnails/desert_lexicon_preview.webp',
+                lore: 'Hermes has reached the ruins of Camp VII, an old nomad camp in the dunes south of the salt, at sunset. He is calling you in a whisper: he is not alone there. Open the Field Wire and answer him.',
+                rewards: [
+                  { icon: '📻', label: 'Hermes is calling', desc: 'From behind a broken wall' },
+                  { icon: '🔒', label: 'What the Ruins Keep', desc: 'Revealed when you answer him' }
+                ],
+                btnText: '📻 HERMES IS CALLING · OPEN THE FIELD WIRE ➔',
+                action: () => { if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire'); }
+              };
+            }
+          }
+
           return {
             badge: 'STATION 12 // DESERT PATH',
-            status: 'NOMAD RUINS DISCOVERED ✦',
+            status: 'NOMAD RUINS AT MOONRISE ✦',
             statusClass: 'status-live-badge',
             title: 'The Desert Lexicon & Al-Qibla',
             thumb: './assets/thumbnails/desert_lexicon_preview.webp',
-            lore: 'In nomad ruins beside the Salt Playa (South-East Quadrant, on the map page “Grand Desert Map · South-East”), Hermes slipped past an ambush of raiders and found the desert stelae. Open the page “The Desert Lexicon & Al-Qibla” in your journal, solve the crossword and set the sun compass.',
+            lore: 'In the ruins of Camp VII, in the dunes south of the Salt Playa (South-East Quadrant, on the map page “Grand Desert Map · South-East”), Hermes hid behind a broken wall while a band of riders watered their camels at dusk. When they rode off south, three sandstone stelae were waiting in the moonlight: ten nomad words crossing like a net, and a bronze sun compass, Al-Qibla, whose needle will not move. Open the page “The Desert Lexicon & Al-Qibla” in your journal, solve the crossword and set the sun compass.',
             rewards: [
               { icon: '📜', label: 'Journal page “The Desert Lexicon & Al-Qibla”', desc: '10 words of the nomad pilgrims' },
               { icon: '🦅', label: 'The Desert Sigil', desc: '7 circled letters' },
@@ -4296,13 +4333,13 @@
         },
         {
           step: 5,
-          hermesInitial: "Silvia! Can you hear this across the line? I hooked my copper transmitter to the wire running all the way down to Camp VII, a ruined nomad camp at the edge of the Salt Playa!\n\nRaiders swept through here at dusk and I had to hide behind the broken walls until they passed. But look what stood right beside my hiding place: three massive sandstone steles carved with nomadic words and an astronomical sun compass called Al-Qibla.\n\nThe sandstorm shifted the dunes across the Great Erg, completely burying the raiders' wagon tracks. Our only hope of finding where they took the Master Astrolabe is locating Tower II—the Sanctuary of the Desert Oracle. But navigating the Erg without the true bearing would be suicide.\n\nLook at the page “The Desert Lexicon & Al-Qibla” in your physical journal. How do we unlock the Al-Qibla bearing on these steles?",
+          hermesInitial: "Silvia, the moon is high over Camp VII and the riders' fire has burned down to red eyes. I am sitting with my back against the tallest stele, and the needle of Al-Qibla is free at last. It turns in the moonlight as easily as a weathervane.\n\nI keep thinking of what the nomads knew. When the wind moves the dunes overnight, every track is gone by morning, and the raiders' wagon ruts with them. Out on the Great Erg a man without a true bearing walks in circles until his water runs out. These people carved their bearings into stone so that the desert could never take them away.\n\nTell me again how we read the steles, Silvia. I want to write it down in my own log before I sleep, the way you would tell it.",
           choices: [
             {
               id: "choice-5-crossword",
               text: "Check the page “The Desert Lexicon & Al-Qibla”: Solve the 10 crossword words to assemble the circled letters.",
               silviaMsg: "I'm looking at the page “The Desert Lexicon & Al-Qibla” in my journal. We must carve the 10 desert terms on the sandstone stele to assemble the circled letters.",
-              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nWhen you solve the grid on the page “The Desert Lexicon & Al-Qibla”, what word do the circled letters 1 to 7 spell?"
+              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nMIRAGE is there too, Silvia: the passphrase of the canyon walkers, carved by the same hands. And the seven circles, read from 1 to 7, gave us the word that woke the dial."
             },
             {
               id: "choice-5-sigil",
@@ -5520,7 +5557,7 @@
       } else if (isLexiconDoneForWire) {
         if (wireCurrentStep < 6) wireCurrentStep = 6;
       } else if (isChasmDoneForWire && isPlayaDoneForWire) {
-        if (wireCurrentStep < 5) wireCurrentStep = 5;
+        if (wireCurrentStep > 4) wireCurrentStep = 4;   // the south shore, the walk to the ruins and the call at dusk are all step 4
       } else if (isChasmDoneForWire) {
         if (wireCurrentStep > 4) wireCurrentStep = 4;
       } else {
@@ -6960,6 +6997,13 @@
       window.getPlayaMarchProgress = () => (playaMarch.camped() ? 0.999 : playaMarch.progress());
       window.skipPlayaMarch = playaMarch.skip;
 
+      // Station 12: the 3-hour walk from the marker on the south shore, through the dunes, to the Nomad Ruins at dusk
+      // (her answer on the south shore starts it)
+      const lexiconMarch = makeMarch(3, { start: 'order_lexicon_march_start', bypassed: 'order_lexicon_march_bypassed', done: 'order_desert_lexicon_completed' });
+      window.isLexiconMarchOver = lexiconMarch.over;
+      window.getLexiconMarchEta = lexiconMarch.eta;
+      window.skipLexiconMarch = lexiconMarch.skip;
+
       // Station 14: the 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (wire step 9 starts it)
       const monolithMarch = makeMarch(12, { start: 'order_monolith_march_start', bypassed: 'order_monolith_march_bypassed', done: 'order_sun_monolith_completed' });
       const getMonolithMarchProgress = monolithMarch.progress;
@@ -7097,7 +7141,7 @@
       }, 15000);
 
       // Every walk by its station, for the sealed cards of the Quest Map (the countdown reads arrivesAt)
-      window.EclipseMarches = { playa: playaMarch, monolith: monolithMarch, labyrinth: labyrinthMarch, cairnFour: cairnFourMarch, solstice: solsticeMarch, stele: steleMarch };
+      window.EclipseMarches = { playa: playaMarch, lexicon: lexiconMarch, monolith: monolithMarch, labyrinth: labyrinthMarch, cairnFour: cairnFourMarch, solstice: solsticeMarch, stele: steleMarch };
       const PLAYA_LEG = {
         step: 4, march: playaMarch, doneKey: 'order_salt_playa_completed',
         walkingTitle: '✦ Night at the Oasis Gate · The Salt Waits for First Light ✦',
@@ -7107,6 +7151,14 @@
         arrivedDesc: 'Hermes is standing on the North Edge of the white salt, by an old surveyor\'s tripod, and calling you on the Field Wire. Answer him, then guide him across the Salt Playa (Station 11, the page “The Salt Playa (Dry Basin)”).',
         campedTitle: '✦ First Light · Camp at the Edge of the Salt ✦',
         campedDesc: 'First light has come. Hermes has walked out of the Oasis Gate to the edge of the white salt and made camp beside an old surveyor\'s tripod. He is testing the crust with his staff, slab by slab, and will call you on the Field Wire when he is ready to step onto it. Keep the page “The Salt Playa (Dry Basin)” of your journal close.'
+      };
+      const LEXICON_LEG = {
+        step: 4, march: lexiconMarch, doneKey: 'order_desert_lexicon_completed',
+        walkingTitle: '✦ Through the Dunes · To the Nomad Ruins ✦',
+        walkingDesc: 'Hermes has left the marker on the south shore and is walking south through the dunes, keeping to the hollows, toward the ruins of an old nomad camp. Weigh your Cipher Ledger with the Surveyor\'s Balance while he walks, and keep the page “The Desert Lexicon & Al-Qibla” close.',
+        etaLabel: 'ARRIVAL AT THE NOMAD RUINS',
+        arrivedTitle: 'The Nomad Ruins at Dusk · Hermes Is Calling',
+        arrivedDesc: 'Hermes has reached the ruins of Camp VII, in the dunes south of the salt. Keep the Field Wire open to hear him.'
       };
       const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair, 33: masksMarch };
 
@@ -7335,7 +7387,7 @@
       // her journal before he goes in; at the Oasis Gate, after it, he tells what the canyon gave them.
       // Only for a journey standing there: a save already past the Salt Playa never hears them.
       // =======================================================================
-      const CHASM_WIRE_KEY = 'order_chasm_wire';   // { seenN, replyN }: 0 the North Portal, 1 the Oasis Gate, 2 the North Edge of the salt, 3 its south shore
+      const CHASM_WIRE_KEY = 'order_chasm_wire';   // { seenN, replyN }: 0 the North Portal, 1 the Oasis Gate, 2 the North Edge of the salt, 3 its south shore, 4 the Nomad Ruins at dusk
       const CHASM_WIRE_TELEMETRY = "✦ NOMAD'S PASSPHRASE RECORDED [MIRAGE] · NEW LEDGER LINE [X] + [E] = 17 · THE SALT PLAYA AWAITS ✦";
       const PLAYA_WIRE_TELEMETRY = "✦ PASSAGE KEYWORD RECORDED [CRYSTAL] · CHECK LINE [T] − [A] = 9 · THE SURVEYOR'S BALANCE IN THE CIPHER LEDGER ✦";
       const WIRE_TELEMETRY = { 1: CHASM_WIRE_TELEMETRY, 3: PLAYA_WIRE_TELEMETRY };
@@ -7414,25 +7466,49 @@
         },
         {
           divider: 'The South Shore · Afternoon',
-          hermesInitial: "Silvia, I am sitting on solid sand with my back against a stone of the Order, and my legs are still shaking.\n\nC, R, Y, S, T, A, L. CRYSTAL. The letters were never on the salt: they were on your page all along, and the post of the Order did not open until you sent them. Then the Sump at noon, with no grid at all, only the Study and your eyes: ridged, dry, cracks in threes, six times over. When I looked back from the shore, the haze had swallowed everything: the Sump, the stones, the tripod, the whole way we came. If we had walked where the salt looked firmest, I would be in the brine.\n\nThe stone behind me is a squat marker, as high as my waist, the kind the Order set at the end of every survey line. On its face, in the small neat hand we know by now: T − A = 9. Two letters of CRYSTAL, and no new one. I think it is a check. Whoever cut it wanted the next traveller to prove their reckoning before trusting it. If the A is already in your Cipher Ledger, see whether the T agrees.\n\nAnd in a niche in its side, wrapped in oiled cloth, there was this: a little brass balance no bigger than my hand, with two pans and a needle, and on its beam the same circle, half black and half white. I think it is how the surveyors weighed out two numbers when all they knew was their sum and their difference. I have drawn it for you in the Cipher Ledger. Lay a sum on one pan and a difference on the other, and see what it teaches you. Your Ledger is full of lines that come in pairs.\n\nThe Nomad Ruins are just beyond the dunes. And Silvia, the camel tracks are back. They came around the rim of the salt, and they go the same way we do.",
+          hermesInitial: "Silvia, I am sitting on solid sand with my back against a stone of the Order, and my legs are still shaking.\n\nC, R, Y, S, T, A, L. CRYSTAL. The letters were never on the salt: they were on your page all along, and the post of the Order did not open until you sent them. Then the Sump at noon, with no grid at all and a glare that made every plate the same. I was only your eyes down there: you asked, I knelt and looked, and the Study chose. Ridged, dry, cracks in threes, six times over. When I looked back from the shore, the haze had swallowed everything: the Sump, the stones, the tripod, the whole way we came. If we had walked where the salt looked firmest, I would be in the brine.\n\nThe stone behind me is a squat marker, as high as my waist, the kind the Order set at the end of every survey line. On its face, in the small neat hand we know by now: T − A = 9. Two letters of CRYSTAL, and no new one. I think it is a check. Whoever cut it wanted the next traveller to prove their reckoning before trusting it. If the A is already in your Cipher Ledger, see whether the T agrees.\n\nAnd in a niche in its side, wrapped in oiled cloth, there was this: a little brass balance no bigger than my hand, with two pans and a needle, and on its beam the same circle, half black and half white. I think it is how the surveyors weighed out two numbers when all they knew was their sum and their difference. I have drawn it for you in the Cipher Ledger. Lay a sum on one pan and a difference on the other, and see what it teaches you. Your Ledger is full of lines that come in pairs.\n\nThe Nomad Ruins are beyond the dunes, three hours' walk to the south if I keep to the hollows. And Silvia, the camel tracks are back. The riders I saw on the rim, the ones with the spyglass, came all the way around the salt while we crossed it, and their tracks go the same way we do.",
           choices: [
             {
               tag: '⚖️',
               text: 'I will try the balance on the pairs in my Ledger right now. Rest in the shadow of the marker, Hermes.',
               silviaMsg: 'I will try the Surveyor\'s Balance on the pairs in my Cipher Ledger right now, and check T − A = 9. Rest in the shadow of the marker, Hermes.',
-              hermesReply: "The marker's shadow is just wide enough for one tired cartographer, and I am taking all of it.\n\nWeigh carefully, Silvia. Every letter you set in the Ledger now is a letter we will not have to fight for later. When I have my breath back, I will walk on to the Nomad Ruins and call you from the first stele."
+              hermesReply: "The marker's shadow is just wide enough for one tired cartographer, and I am taking all of it.\n\nWeigh carefully, Silvia. Every letter you set in the Ledger now is a letter we will not have to fight for later. When I have my breath back, I will walk on through the dunes to the Nomad Ruins and call you when I get there. Three hours, if the sand is kind."
             },
             {
               tag: '💧',
               text: 'How much water do you have left? Drink first, Hermes. The balance can wait a minute.',
               silviaMsg: 'How much water do you have left, Hermes? Drink first. The balance can wait a minute.',
-              hermesReply: "Enough, and now a little less, because I did as you said. The salt dries you from the inside, even when you are not thirsty.\n\nThank you for asking before the puzzle, Silvia. When the Ledger is weighed, I will walk on to the Nomad Ruins, just beyond the dunes, and call you from the first stele."
+              hermesReply: "Enough, and now a little less, because I did as you said. The salt dries you from the inside, even when you are not thirsty.\n\nThank you for asking before the puzzle, Silvia. When the Ledger is weighed, I will walk on through the dunes to the Nomad Ruins, about three hours south, and call you when I get there."
             },
             {
               tag: '🐫',
               text: 'The tracks again… Keep the balance hidden, and watch the dunes before you go on.',
               silviaMsg: 'The tracks again… Keep the balance hidden in your satchel, Hermes, and watch the dunes for a while before you go on.',
-              hermesReply: "Hidden, at the bottom of the satchel. I lay flat on the top of the dune for a long time with my spyglass. Nothing moves out there but the heat. Whoever they are, they are ahead of us, not behind.\n\nI will keep to the hollows between the dunes as far as the Nomad Ruins and call you from the first stele. Weigh the Ledger in the meantime, Silvia."
+              hermesReply: "Hidden, at the bottom of the satchel. I lay flat on the top of the dune for a long time with my spyglass. Nothing moves out there but the heat. Whoever they are, they are ahead of us, not behind.\n\nI will keep to the hollows between the dunes as far as the Nomad Ruins, three hours south, and call you when I get there. Weigh the Ledger in the meantime, Silvia."
+            }
+          ]
+        },
+        {
+          divider: 'The Nomad Ruins · Dusk',
+          hermesInitial: "Silvia, keep your voice low, even on the wire. I am lying flat behind a broken wall at Camp VII, the old nomad camp in the dunes south of the salt, and there are riders twenty paces from me.\n\nI walked the hollows between the dunes all afternoon, as I promised. The ruins came up out of the sand at sunset: a ring of mud-brick walls, a dry cistern, and three tall stones standing in the middle like people waiting for someone. I had only just reached them when I heard harness bells. The camels from the rim of the salt. They came in at dusk from the west, a dozen riders with scarves over their faces and a heavy wagon with an oilcloth tied over its load, and now they are lighting a fire by the cistern and shouting at each other over the animals.\n\nThey have not seen me. My hat is off, my lantern is out, and the satchel with the balance in it is under my chest.\n\nAnd Silvia, the three stones beside me are steles: tall slabs of sandstone carved all over with words, ten of them, crossing each other like the threads of a net. On the tallest one a bronze dial is set into the rock, with a needle that will not move, and under it, in letters older than the Order, one word: Al-Qibla. A sun compass. The nomads used it to find their way when the dunes moved and every track was gone.\n\nWhen the riders leave, I want to read those stones with you. Open the page “The Desert Lexicon & Al-Qibla” in your journal and keep it ready.",
+          choices: [
+            {
+              tag: '🤫',
+              text: 'Stay flat and do not move, Hermes. I have the page open: we read the steles the moment they ride away.',
+              silviaMsg: 'Stay flat and do not move, Hermes. I have the page “The Desert Lexicon & Al-Qibla” open in front of me: we read the steles the moment they ride away.',
+              hermesReply: "Flat as a lizard, and about as warm. I have been counting their camels to keep calm: eleven, and the wagon.\n\nThey are going now. Before they left, one of them crouched by the fire and scratched something into the stone of the hearth with the point of his knife, and the others laughed. Then they rode out south, into the dark, singing. The square is empty, the moon is up, and the steles are waiting for us.\n\nOpen the Desert Lexicon, Silvia. Station 12. Let us read them."
+            },
+            {
+              tag: '👂',
+              text: 'Can you hear what they are saying? Anything about the Astrolabe?',
+              silviaMsg: 'Can you hear what they are saying, Hermes? Anything about the Astrolabe?',
+              hermesReply: "Bits, over the noise of the camels. They were laughing at the salt. One of them said they had sat on the rim all morning waiting for a fool to fall through it, and that the fool walked across instead. I think the fool was me, Silvia, and I think the one who walked was you.\n\nNot a word about the Astrolabe. But when they rode off south into the dark, the wagon went with them, and its wheels cut deep, as if it carried something very heavy. One of them scratched something into the hearth with his knife before he left.\n\nThe square is empty now and the moon is up. Open the Desert Lexicon, Station 12, and let us read the steles."
+            },
+            {
+              tag: '🐫',
+              text: 'Are they the ones who took the Astrolabe? Look at their wagon, Hermes.',
+              silviaMsg: 'Are they the ones who took the Astrolabe from the observatory? Look at their wagon, Hermes.',
+              hermesReply: "I looked, as long as I dared. Deep iron wheels, like the ruts I followed down from the mountains. And on the oilcloth there is a mark, burned into the canvas, that I could not make out in the dusk. A bird, perhaps, or a flame.\n\nThey are gone now, south, into the dark, and one of them stopped by the fire to scratch something into the hearth with his knife. I will look at it later. First the steles, while the moon is up.\n\nOpen the Desert Lexicon, Silvia. Station 12."
             }
           ]
         }
@@ -7491,6 +7567,7 @@
         w['reply' + i] = idx;
         saveChasmWire(w);
         if (i === 1) playaMarch.start();   // he sleeps at the Oasis Gate and walks onto the salt at first light
+        if (i === 3) lexiconMarch.start();   // he rests in the shadow of the marker, then walks through the dunes to the ruins
         chasmWirePlaying = true;
         wirePromptBox.style.display = 'none';
         showTyping(true);
@@ -7521,7 +7598,7 @@
         const w = chasmWire();
         const header = document.getElementById('wire-prompt-header-text');
         if (!w['seen' + i]) {
-          const gameModal = document.getElementById(i >= 2 ? 'modal-salt-playa' : 'modal-whispering-chasm');
+          const gameModal = document.getElementById(i >= 4 ? 'modal-desert-lexicon' : i >= 2 ? 'modal-salt-playa' : 'modal-whispering-chasm');
           if (document.body.getAttribute('data-active-view') !== 'view-field-wire' || (gameModal && gameModal.style.display !== 'none' && gameModal.style.display !== '')) {
             if (getMessengerUnreadCount() < 1) setMessengerUnreadCount(1);   // Hermes has something to say
             return false;
@@ -7558,6 +7635,16 @@
           if (header) header.textContent = 'Hermes is waiting on the North Edge of the salt:';
           wireChoicesGrid.appendChild(makeChoicePill('🧂', 'Step onto the Salt Playa with Hermes (Station 11)', () => {
             if (typeof window.openSaltPlayaModal === 'function') window.openSaltPlayaModal();
+          }));
+          return true;
+        }
+        if (i === 4) {
+          wirePromptBox.style.display = 'block';
+          wireCompletedBar.style.display = 'none';
+          wireChoicesGrid.innerHTML = '';
+          if (header) header.textContent = 'Hermes is waiting by the steles of the Nomad Ruins:';
+          wireChoicesGrid.appendChild(makeChoicePill('📜', 'Read the steles with Hermes (Station 12)', () => {
+            if (typeof window.openDesertLexiconModal === 'function') window.openDesertLexiconModal();
           }));
           return true;
         }
@@ -7968,6 +8055,11 @@
           if (isChasmDone && !isPlayaDone && !isLexiconDone && chasmWireTurn(1)) return;
           if (isChasmDone && !isPlayaDone && !isLexiconDone && chasmWire().reply1 !== undefined && playaMarch.over() && chasmWireTurn(2)) return;
           if (isPlayaDone && !isLexiconDone && chasmWire().reply2 !== undefined && chasmWireTurn(3)) return;
+          // her answer on the south shore sends him through the dunes; at the ruins, at dusk, he calls again
+          if (isPlayaDone && !isLexiconDone && chasmWire().reply3 !== undefined) {
+            if (!lexiconMarch.over()) { showMarchLeg(LEXICON_LEG); return; }
+            if (chasmWireTurn(4)) return;
+          }
           if (!isChasmDone) {
             wirePromptBox.style.display = 'none';
             wireCompletedBar.style.display = 'flex';

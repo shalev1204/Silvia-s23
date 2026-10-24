@@ -7,8 +7,9 @@
     // the Architect's "measured footsteps"). The letters exist only on her page: at the end of the stones she must
     // transmit the keyword to the Web Navigator Console, as the page orders, to unlock the way south.
     // Phase II, the Great Salt Sump at noon (the page "Study on the Dry Salt Playa"): behind Hermes, on polygon plates
-    // with no grid at all. Only the Study tells which crust is sound: brine drawn up through fissures, ridges buckled by
-    // crystallizing salt, sinkholes formed unseen, the 120° junctions of Fig. I.
+    // with no grid at all, under a glare that whitens every sign. Hermes is her eyes: she asks him to look at the edges,
+    // feel the seams or trace the cracks (each question costs minutes of sun), and the Study tells which crust is sound:
+    // brine drawn up through fissures, ridges buckled by crystallizing salt, sinkholes formed unseen, the 120° junctions of Fig. I.
     // There is no water to lose: every false step costs time, the sun climbs, the haze thickens and the gold narrows.
     (function initSaltPlaya() {
       const modal = document.getElementById('modal-salt-playa');
@@ -50,7 +51,7 @@
       const cell = (r, c) => GRID[r][c];
       const START_MIN = 6 * 60, MIN_PER_STRIDE = 14, NOON = 12 * 60;
       // What a false step costs: minutes of sun (the heat narrows the gold of the balance)
-      const COST = { sink: 40, crack: 25, start: 20, heavy: 10, word: 5, wet: 30, hollow: 40, split: 25 };
+      const COST = { sink: 40, crack: 25, start: 20, heavy: 10, word: 5, wet: 30, hollow: 40, split: 25, ask: 4 };
       // The row whose sinkhole the mirage covers: Row V, where the haze of mid-morning first plays tricks
       const MIRAGE_ROW = 4;
 
@@ -70,9 +71,9 @@
         solved: isDone,
         active: () => !!(S && S.sent),
         texts: [
-          'In the Sump there is no grid. Read section I of the page “Study on the Dry Salt Playa” line by line, and match each line to what Hermes sees: brine pulled up through fissures, salt that buckles plate edges into ridges, sinkholes that form unseen.',
+          'In the Sump the noon glare hides every sign, so ask Hermes: he can look at the edges, feel the seams or trace the cracks of the plates in reach. Read section I of the page “Study on the Dry Salt Playa” and match each line to what he tells you: brine pulled up through fissures, salt that buckles plate edges into ridges, sinkholes that form unseen.',
           'A dark, damp seam is brine climbing up through the cracks: there is brine beneath. Ridges are crystallizing salt pushing up from below: a smooth plate has nothing growing under it. And look at Fig. I on that page: sound crust breaks in threes, at 120°.',
-          'Trust only a plate that is ridged, dry, and whose cracks meet in threes like a Y. Smooth plates are lids over sinkholes, a wet seam means brine, and a cross of cracks at right angles is crust that is already failing.'
+          'Trust only a plate that is ridged, dry, and whose cracks meet in threes like a Y. Smooth plates are lids over sinkholes, a wet seam means brine, and a cross of cracks at right angles is crust that is already failing. One bad sign is enough to rule a plate out, so you rarely need all three questions.'
         ]
       });
 
@@ -80,7 +81,7 @@
       let S = null;
       function fresh() {
         return { path: [], edge: 0, min: START_MIN, fails: 0, sinks: 0, cracks: 0, heavy: 0, light: 0, revealed: {}, mirage: 0,
-                 sent: false, words: 0, sump: [], sRevealed: {}, sFails: 0 };
+                 sent: false, words: 0, sump: [], sRevealed: {}, sFails: 0, asked: {}, asks: 0 };
       }
       function load() {
         try {
@@ -88,7 +89,8 @@
           if (s && Array.isArray(s.path) && s.path.every((c, r) => c === SOLUTION[r])) {
             const t = Object.assign(fresh(), s);
             delete t.water; delete t.rest;   // the water skins of the first version of this walk
-            if (!Array.isArray(t.sump) || !t.sump.every((d, k) => d === SUMP_SOL[k])) { t.sump = []; t.sRevealed = {}; }
+            if (!Array.isArray(t.sump) || !t.sump.every((d, k) => d === SUMP_SOL[k])) { t.sump = []; t.sRevealed = {}; t.asked = {}; }
+            if (!t.asked || typeof t.asked !== 'object') t.asked = {};
             if (t.path.length < ROWS) t.sent = false;
             else if (!('sent' in s) && isDone()) { t.sent = true; t.sump = SUMP_SOL.slice(); }
             return t;
@@ -586,6 +588,13 @@
             void main(){ float s = pow(max(0.0, sin(vP.x * 7.0 + vP.z * 5.0 + uTime * 1.4)), 10.0);
               gl_FragColor = vec4(mix(vec3(0.16, 0.32, 0.38), vec3(0.9, 0.97, 1.0), s * 0.6), 0.62); }`
         });
+        const glareTex = P.canvasTex(128, 128, (g, w) => {
+          const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+          gr.addColorStop(0, 'rgba(255,255,250,0.95)'); gr.addColorStop(0.5, 'rgba(255,250,240,0.55)'); gr.addColorStop(1, 'rgba(255,250,240,0)');
+          g.fillStyle = gr; g.fillRect(0, 0, w, w);
+        });
+        const glareGeo = new T.PlaneGeometry(SR * 2.6, SR * 2.6);
+        glareGeo.rotateX(-Math.PI / 2);
         const sumpPlates = [];
         const sr = P.rng(4242);
         let ln = 0;
@@ -599,29 +608,36 @@
             const plate = new T.Mesh(plateGeo, sumpMat);
             plate.castShadow = true; plate.receiveShadow = true;
             g.add(plate);
+            // its signs, each shown only once Hermes has looked for it (or walked past it)
+            const signs = { ridge: [], wet: [], crack: [] };
             if (a.ridge) {
-              const rim = new T.Mesh(rimGeo, ridgeMat); rim.castShadow = true; g.add(rim);
+              const rim = new T.Mesh(rimGeo, ridgeMat); rim.castShadow = true; g.add(rim); signs.ridge.push(rim);
               for (let i = 0; i < 6; i++) {
                 const [x, z] = hexAt(SR * 0.88, i), cube = new T.Mesh(cubeGeo, cubeMat);
                 cube.position.set(x, SUMP_TOP + 0.26, z);
                 cube.rotation.set(sr() * 2, sr() * 2, sr() * 2);
                 cube.scale.setScalar(0.7 + sr() * 0.6);
-                cube.castShadow = true; g.add(cube);
+                cube.castShadow = true; g.add(cube); signs.ridge.push(cube);
               }
             }
             const crack = new T.Mesh(decalGeo, new T.MeshBasicMaterial({ map: a.j === 3 ? crackY : crackX, transparent: true, depthWrite: false }));
             crack.position.y = SUMP_TOP + 0.012; crack.rotation.y = (sr() - 0.5) * 0.5; crack.renderOrder = 3;
-            g.add(crack);
+            g.add(crack); signs.crack.push(crack);
             if (a.wet) {
               const seam = new T.Mesh(seamGeo, wetMat); seam.position.y = SUMP_TOP + (a.ridge ? 0.27 : 0.016); seam.renderOrder = 3; g.add(seam);
               const seep = new T.Mesh(seepGeo, wetMat); seep.position.y = 0.03; g.add(seep);
+              signs.wet.push(seam, seep);
             }
+            Object.values(signs).forEach((list) => list.forEach((m) => { m.userData.s0 = m.scale.x; }));
+            // the noon glare over a plate whose signs are still unknown
+            const glare = new T.Mesh(glareGeo, new T.MeshBasicMaterial({ map: glareTex, transparent: true, opacity: 0, depthWrite: false }));
+            glare.position.y = SUMP_TOP + 0.34; glare.renderOrder = 5; glare.visible = false; g.add(glare);
             g.position.set(SX(l) + (sr() - 0.5) * 0.25, 0, SZ(k) + (sr() - 0.5) * 0.25);
             g.rotation.y = (sr() - 0.5) * 0.12;
             g.userData = { k, l };
             plate.userData = { k, l };
             scene.add(g);
-            row2[l] = { group: g, plate, a, base: g.position.clone(), crack, sunk: 0, split: 0, pool: null };
+            row2[l] = { group: g, plate, a, base: g.position.clone(), crack, sunk: 0, split: 0, pool: null, signs, shown: { ridge: true, wet: true, crack: true }, glare };
           }
           sumpPlates.push(row2);
           ln += SUMP_SOL[k];
@@ -930,6 +946,38 @@
         for (let i = 0; i < 30; i++) { const sc = 0.6 + ar() * 0.9; place(shrubs, i, -24 + ar() * 48, 0.3 + sc * 0.12, SHORE_Z + 2.5 + ar() * 7, ar(), ar() * 3, ar(), sc, sc * 0.7, sc); }
         sumpCasters.push(shrubs);
         scene.add(shrubs);
+        // The riders on the western rim (they went round the salt while Hermes crossed it): eleven camels and a wagon
+        // under oilcloth, dark in the noon haze, and the flash of a spyglass when they stop to watch him
+        const camelMat = P.toon({ color: 0x80605e }), clothMat = P.toon({ color: 0x9c8a7a });
+        const caravan = new T.Group(), camels = [];
+        const legGeo = new T.CylinderGeometry(0.05, 0.04, 0.9, 5), bodyGeo = new T.SphereGeometry(0.5, 10, 8), humpGeo = new T.SphereGeometry(0.28, 8, 6);
+        const neckGeo = new T.CylinderGeometry(0.08, 0.11, 0.7, 6), headGeo = new T.BoxGeometry(0.16, 0.14, 0.34), riderGeo = new T.ConeGeometry(0.17, 0.62, 6);
+        for (let i = 0; i < 11; i++) {
+          const c = new T.Group();
+          const body = new T.Mesh(bodyGeo, camelMat); body.scale.set(0.62, 0.48, 1); body.position.y = 1.05; c.add(body);
+          const hump = new T.Mesh(humpGeo, camelMat); hump.position.set(0, 1.36, -0.05); c.add(hump);
+          const neck = new T.Mesh(neckGeo, camelMat); neck.position.set(0, 1.3, 0.5); neck.rotation.x = 0.7; c.add(neck);
+          const head = new T.Mesh(headGeo, camelMat); head.position.set(0, 1.6, 0.74); c.add(head);
+          const legs = [[-0.16, 0.3], [0.16, 0.3], [-0.16, -0.3], [0.16, -0.3]].map(([x, z]) => { const l = new T.Mesh(legGeo, camelMat); l.position.set(x, 0.45, z); c.add(l); return l; });
+          if (i % 2 === 0) { const r = new T.Mesh(riderGeo, clothMat); r.position.set(0, 1.78, -0.05); c.add(r); }
+          c.position.set((ar() - 0.5) * 0.7, 0, -i * 1.55 + (ar() - 0.5) * 0.3);
+          c.userData = { ph: ar() * 6, legs };
+          caravan.add(c); camels.push(c);
+        }
+        const wagon = new T.Group();
+        const bed = new T.Mesh(new T.BoxGeometry(1.0, 0.5, 1.8), camelMat); bed.position.y = 0.7; wagon.add(bed);
+        const tarp = new T.Mesh(new T.CylinderGeometry(0.55, 0.55, 1.7, 8, 1, false, 0, Math.PI), clothMat); tarp.rotation.set(0, 0, Math.PI / 2); tarp.rotation.order = 'ZYX'; tarp.rotation.y = Math.PI / 2; tarp.position.y = 0.95; wagon.add(tarp);
+        [-0.6, 0.6].forEach((z) => [-0.55, 0.55].forEach((x) => { const wh = new T.Mesh(new T.CylinderGeometry(0.32, 0.32, 0.08, 10), camelMat); wh.rotation.z = Math.PI / 2; wh.position.set(x, 0.32, z); wagon.add(wh); }));
+        wagon.position.set(0.2, 0, -17.6);
+        caravan.add(wagon);
+        const glint = new T.Sprite(new T.SpriteMaterial({ map: glareTex, color: 0xffffff, transparent: true, opacity: 0, depthWrite: false }));
+        glint.scale.setScalar(1.6); glint.position.set(0.3, 2.0, -1.55 * 2);
+        caravan.add(glint);
+        caravan.rotation.y = Math.PI / 2 - 0.12;   // in single file, walking east along the far shore, the way Hermes goes
+        caravan.position.set(-14, 0.25, SHORE_Z + 27);
+        caravan.scale.setScalar(0.75);
+        caravan.visible = false;
+        scene.add(caravan);
 
         // ---- The far south at noon: three ranges, each paler with distance, floating on the shimmer of a mirage
         // that lays their reflection upside down on the salt
@@ -1064,7 +1112,7 @@
 
         return { T, renderer, scene, camera, sky, sunDisc, hemi, sun, uTime, slabs, crackTex, crackGeo, poolMat, makeCrystal, post, postRings, beam, sumpPlates,
                  hazeMat, mirage, mirageMat, ringGeo, markers, prints, motes, motesBase, motesN, burst, burstN, rag, glowTex,
-                 uCloud, steam, hazards, makeHazard, dropHazard, birds, devils, devilN, wisps, spot, ember, cirrus, sumpCasters,
+                 uCloud, steam, hazards, makeHazard, dropHazard, birds, devils, devilN, wisps, spot, ember, cirrus, sumpCasters, caravan, camels, glint,
                  hermes: H.hermes, legL: H.legL, legR: H.legR, staff: H.staff, lamp: H.lamp, cloak: H.cloak, lowPower };
       }
 
@@ -1135,12 +1183,39 @@
           p.crack.material.opacity = 1;
         }));
         Object.keys(S.sRevealed).forEach((key) => showSumpFail(Math.floor(key / 3), key % 3 - 1, S.sRevealed[key], true));
+        paintSigns(false);
         G.postRings.forEach((ring, i) => { ring.rotation.z = S.sent ? 0 : i * 0.9; ring.material.emissiveIntensity = S.sent ? 0.6 : 0.2; });
       }
       // A plate of the Sump that gave way: brine or a hollow swallow it, a failing one splits along its cross
       function sumpPlate(k, d) {
         const before = S.sump.slice(0, k).reduce((a, x) => a + x, 0);
         return G && G.sumpPlates[k] && G.sumpPlates[k][before + d];
+      }
+      // What the noon glare lets her see of the Sump: the plates behind him whole, the three in reach only as far as
+      // Hermes has looked (a plate that gave way shows everything), and nothing of the plates ahead
+      const SIGNS = ['ridge', 'wet', 'crack'];
+      function paintSigns(animate) {
+        if (!G) return;
+        const k0 = S.sump.length, now = performance.now();
+        G.sumpPlates.forEach((rowP, k) => {
+          const before = S.sump.slice(0, k).reduce((a, x) => a + x, 0), asked = S.asked[k] || [];
+          Object.keys(rowP).forEach((l) => {
+            const p = rowP[l], d = +l - before, near = k === k0 && Math.abs(d) <= 1 && stage() === 'sump';
+            const failed = Math.abs(d) <= 1 && !!S.sRevealed[sKey(k, d)];
+            SIGNS.forEach((kind) => {
+              const on = k < k0 || stage() === 'shore' || failed || (near && asked.includes(kind));
+              if (!!p.shown[kind] === on) return;
+              p.shown[kind] = on;
+              p.signs[kind].forEach((m) => {
+                m.visible = on;
+                if (on && animate && !reducedMotion()) { m.userData.pop = now; m.scale.setScalar(0.001); }
+              });
+            });
+            p.glare.visible = near && !failed && asked.length < SIGNS.length;
+            p.glareTo = p.glare.visible ? 0.62 * (1 - asked.length / SIGNS.length) + 0.12 : 0;
+            if (!animate) p.glare.material.opacity = p.glareTo;
+          });
+        });
       }
       function showSumpFail(k, d, kind, instant) {
         const p = sumpPlate(k, d);
@@ -1776,12 +1851,12 @@
         where(`Row ${ROMAN[r]}: Hermes stands on his slab. Its letter is on your page, not on the salt.`);
         const crystal = `a crystal of ${['one facet', 'two facets', 'three facets', 'four facets', 'five facets', 'six facets'][n - 1]} grows at my feet`;
         const lines = [
-          `The crust holds! I brushed the salt from under my boots: no letter, Silvia, only ${crystal}. The letter is on your page. Write it in the box of Row I of your Waypoint Log.`,
-          `It held, and ${crystal}. Row II: into your log with its letter.`,
-          `Firm. ${crystal[0].toUpperCase() + crystal.slice(1)}. The sun is getting stronger on the back of my neck.`,
-          `Row IV, and ${crystal}. The crust ticks and pops in the heat, Silvia. I do not like that sound.`,
-          `Held again, and ${crystal}. The haze is so thick now that the far rows are only white.`,
-          `${crystal[0].toUpperCase() + crystal.slice(1)}. One more row, and there is a post of the Order just beyond it.`,
+          `The crust holds! I brushed the salt from under my boots: no letter, Silvia, only ${crystal}. The letter is on your page. Write it in the box of Row I of your Waypoint Log. And look: beside my boot, the round print of a tripod foot, filled with salt. Someone of the Order stood on this very slab.`,
+          `It held, and ${crystal}. Row II: into your log with its letter. Behind me the tripod already looks small, its red rag hanging still. Not a breath of wind out here.`,
+          `Firm. ${crystal[0].toUpperCase() + crystal.slice(1)}. The sun is getting stronger on the back of my neck. Far to the west, along the rim, I can still see the camel tracks from the gate: a thin dark thread going round the salt.`,
+          `Row IV, and ${crystal}. The crust ticks and pops in the heat, Silvia. I do not like that sound. Weight without balance always yields to the deep, the Architect wrote. I am leaning very slowly.`,
+          `Held again, and ${crystal}. The haze is so thick now that the far rows are only white. Half of what shines out here is not there at all, Silvia. Only your page stays still.`,
+          `${crystal[0].toUpperCase() + crystal.slice(1)}. One more row, and there is a post of the Order just beyond it. I can see its brass rings winking at me through the heat.`,
           `The last row! ${crystal[0].toUpperCase() + crystal.slice(1)}… and right in front of me stands a stone post with seven brass rings.`
         ];
         say(lines[r]);
@@ -1866,7 +1941,7 @@
       function goOn() {
         if (view.phase !== 'setback') return;
         if (fxEl.alert) fxEl.alert.hidden = true;
-        if (stage() === 'sump') { showSump('Let us try again. Read the plates with your page before I lean.'); return; }
+        if (stage() === 'sump') { showSump('Let us try again, Silvia. Ask me what you need, and weigh it against the Study before I lean.'); return; }
         showChoice(row() ? 'Let us try again. Look at the page before I lean.' : 'Back on the edge. Count the slabs with me.');
       }
 
@@ -1945,7 +2020,7 @@
         if (el.log) [...el.log.children].forEach((b, n) => { b.style.animationDelay = `${n * 120}ms`; replay(b, 'is-wave'); });
         subtitle('CRYSTAL · the passage keyword is transmitted', 5);
         where('The Console has the keyword. The way south is open.');
-        say('C, R, Y, S, T, A, L. The rings turned one by one, and the last one clicked like a lock. A brass plate swung open on the side of the post, and inside, in the small neat hand of the Order: “The stones end here. Beyond them lies the Sump, where no surveyor could lay a grid, for its crust changes with every noon. Cross it as the Study teaches.” The South Shore is past the Sump, Silvia. And it is nearly noon.');
+        say('C, R, Y, S, T, A, L. The rings turned one by one, and the last one clicked like a lock. A brass plate swung open on the side of the post, and inside, in the small neat hand of the Order: “The stones end here. Beyond them lies the Sump, where no surveyor could lay a grid, for its crust changes with every noon. Cross it as the Study teaches, and at the end of the line the marker of the south shore will keep what the surveyor carried.” So that is where the line goes: to a marker, and to something left in it for whoever reads the salt right. The South Shore is past the Sump, Silvia. And it is nearly noon.');
         const go = btn('Down into the Sump <small>at noon</small> <span class="chasm3d-arrow">➔</span>', toSump, { cls: 'is-way' });
         setTimeout(() => go.focus({ preventScroll: true }), 30);
       }
@@ -1966,33 +2041,71 @@
           paintHud();
           if (el.fade) el.fade.classList.remove('is-on');
           subtitle('Noon · The Great Salt Sump', 4);
-          showSump("Noon. I am down in the Sump, Silvia, and the sun stands straight over my head. No grid here, nothing to count: only polygon plates. I will tell you what I see on the plates in reach, and the Study in your journal tells you which one to trust.");
+          paintSigns(false);
+          showSump("Noon. I am down in the Sump, Silvia, and the sun stands straight over my head. The glare is so white that every plate looks the same, to me standing here and to you watching. No grid, nothing to count. So I will be your eyes: ask me what the Study needs, and I will kneel and look. But ask with care, because every minute I spend on my knees the sun climbs and the crust grows weaker.");
           if (get(HOWTO2_KEY) !== 'seen') showHowto(howtoPages.length - 1, true);
         }, reducedMotion() || !G ? 0 : 650);
       }
-      const plateTags = (a) => [a.ridge ? 'ridged' : 'smooth', a.wet ? 'wet seam' : 'dry', a.j === 3 ? 'cracks in threes' : 'cracks cross'];
-      const plateWords = (a) => `${a.ridge ? 'edges buckled into sharp ridges, with cubes of salt on them' : 'smooth and flat as glass'}, `
-        + `${a.wet ? 'a dark, damp seam all round it' : 'dry'}, `
-        + `${a.j === 3 ? 'cracks meeting in threes like a Y' : 'two cracks crossing like a plus sign'}`;
+      // The three questions she can ask him about the plates in reach. What he answers is a sign, in his own words;
+      // which sign the Study trusts is for her to read on the page.
+      const ASK = {
+        ridge: { icon: '👁', label: 'Look at the edges', doing: 'Hermes looks at the edges' },
+        wet: { icon: '✋', label: 'Feel the seams', doing: 'Hermes feels the seams' },
+        crack: { icon: '⌇', label: 'Trace the cracks', doing: 'Hermes traces the cracks' }
+      };
+      const signOf = (a, kind) => (kind === 'ridge' ? a.ridge : kind === 'wet' ? a.wet : a.j === 3 ? 1 : 0);
+      const SIGN_WORD = { ridge: ['flat as glass', 'buckled edges'], wet: ['dry rim', 'damp seam'], crack: ['crossing cracks', 'cracks in threes'] };
+      const SIGN_SAY = {
+        ridge: [['smooth and flat as a pane of glass, not a ridge on it', 'flat and polished, its edges lying low', 'smooth as a dinner plate, the edges hardly there'],
+                ['its edges buckled up into sharp little tents, crusted with cubes of salt', 'ridged all round, the edges shoved up like the crust of a pie', 'edges pushed up into white ridges, sharp under my thumb']],
+        wet: [['dry as chalk all round its rim', 'dry: the salt squeaks under my finger', 'dry, and hot as the top of a stove'],
+              ['a dark seam all round it, and my finger comes back damp and bitter', 'a grey wet line along its seam, and it smells of the sea', 'its seam is dark and soft, and it shines']],
+        crack: [['two cracks crossing in the middle like a plus sign', 'a cross of cracks, square, like the frame of a window', 'cracks that cross at right angles'],
+                ['cracks meeting in threes, like the foot of a bird', 'three cracks from one point, like a Y', 'cracks in threes, wide apart as the spokes of a three-spoked wheel']]
+      };
+      const knownOf = (k, d) => (S.asked[k] || []).map((kind) => SIGN_WORD[kind][signOf(SUMP[k][d + 1], kind)]);
       function showSump(line) {
         if (S.sump.length >= SUMP.length) { toShore(); return; }
         view.phase = 'schoose';
         clearControls();
-        const k = S.sump.length, opts = [-1, 0, 1];
+        const k = S.sump.length, opts = [-1, 0, 1], asked = S.asked[k] || [];
         paintMarkers(opts.filter((d) => !S.sRevealed[sKey(k, d)]).map((d) => ({ k, d })));
-        // as Hermes sees them, facing south: east on his left
+        // first what she can ask him, then the plates themselves, as Hermes sees them facing south (east on his left)
+        Object.keys(ASK).forEach((kind) => {
+          const q = ASK[kind], done = asked.includes(kind);
+          btn(`<span class="playa3d-ask-icon" aria-hidden="true">${q.icon}</span> ${q.label} <small>${done ? 'asked' : `☀ +${COST.ask} min`}</small>`, () => askSump(kind),
+              { cls: 'playa3d-ask' + (done ? ' is-asked' : ''), disabled: done, aria: done ? `${q.label}: already asked` : `Ask Hermes: ${q.label.toLowerCase()} of the plates in reach, ${COST.ask} minutes of sun` });
+        });
         opts.slice().reverse().forEach((d) => {
-          const [arrow, word, compass] = WAY(d), a = SUMP[k][d + 1], shut = S.sRevealed[sKey(k, d)];
-          btn(`<span class="chasm3d-arrow">${arrow}</span> ${word} <small>${shut ? (shut === 'split' ? 'split' : 'brine') : plateTags(a).join(' · ')}</small>`, () => chooseSump(d),
+          const [arrow, word, compass] = WAY(d), shut = S.sRevealed[sKey(k, d)], known = knownOf(k, d);
+          const tag = shut ? (shut === 'split' ? 'split' : shut === 'wet' ? 'brine' : 'hollow') : known.length ? known.join(' · ') : 'lost in the glare';
+          btn(`<span class="chasm3d-arrow">${arrow}</span> ${word} <small>${tag}</small>`, () => chooseSump(d),
               { cls: 'playa3d-plate ' + (shut ? 'is-tracks' : 'is-way'), disabled: !!shut, plate: d,
-                aria: shut ? `${word}, ${compass}: gave way` : `${word}, ${compass}: ${plateTags(a).join(', ')}` });
+                aria: shut ? `${word}, ${compass}: gave way` : `Step ${word.toLowerCase()}, ${compass}: ${tag}` });
         });
         const open = opts.filter((d) => !S.sRevealed[sKey(k, d)]);
         where(`The Sump, plate ${k + 1} of ${SUMP.length}, facing south. In reach: ${open.map((d) => `${WAY(d)[1].toLowerCase()} (${WAY(d)[2]})`).join(', ')}.`);
-        const look = open.reverse().map((d) => `${WAY(d)[1]}: ${plateWords(SUMP[k][d + 1])}.`).join(' ');
-        say((line ? line + ' ' : '') + look + (k === 0 ? ' To my eyes, every one of them would hold. Which does the Study trust?' : ''));
+        if (line !== null) say(line || (asked.length ? 'What else shall I look at, Silvia? Or tell me where to step.' : 'Three plates in reach, all white in the glare. What shall I look at first?'));
+        paintSigns(true);
         paintHud();
         save();
+      }
+      // She asks; he kneels by the plates in reach, looks, and tells her in his own words. The sun climbs meanwhile.
+      function askSump(kind) {
+        if (view.phase !== 'schoose') return;
+        const k = S.sump.length, asked = S.asked[k] || (S.asked[k] = []);
+        if (asked.includes(kind)) return;
+        asked.push(kind);
+        S.asks = (S.asks || 0) + 1;
+        S.min += COST.ask;
+        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        if (soundOn()) tone(NOTE[['E5', 'G5', 'A5'][SIGNS.indexOf(kind)]], 0, 0.5, { gain: 0.05, type: 'sine' });
+        view.kneel = performance.now();
+        const open = [1, 0, -1].filter((d) => !S.sRevealed[sKey(k, d)]);
+        const told = open.map((d) => `${WAY(d)[1]}, ${SIGN_SAY[kind][signOf(SUMP[k][d + 1], kind)][(k + d + 3) % 3]}.`).join(' ');
+        const lead = { ridge: 'I crouch and sight along the edges.', wet: 'I kneel and run a finger round each seam.', crack: 'I brush the salt off with my sleeve and follow the cracks.' }[kind];
+        subtitle(`${ASK[kind].doing} · ☀ +${COST.ask} min`, 3);
+        showSump(`${lead} ${told}`);
       }
       function chooseSump(d) {
         if (view.phase !== 'schoose') return;
@@ -2010,6 +2123,7 @@
         S.sump.push(d);
         S.min += 9;
         save();
+        paintSigns(true);
         view.walk = { fx: view.x, fz: view.z, tx: x, tz: SZ(k) - 0.3, t: 0, dur: 0.9, hop: true, then: () => sumpHeld(k) };
         where(`Stepping onto plate ${k + 1}…`);
         if (!G) finishWalk();
@@ -2019,11 +2133,15 @@
         burstAt(view.x, SUMP_TOP + 0.3, view.z + 0.3, 0xfff6ff);
         paintHud();
         subtitle(`Plate ${k + 1} of ${SUMP.length} holds`, 3);
-        const lines = ['It holds. Ridged, dry, cracks in threes: the Study was right.', 'Firm under me. The heat comes up off the plates like an oven door.',
-          'Holding. I can see the far cliffs now, the Sanctuary Approach, shaking in the heat.', 'Good salt. My boots are white to the ankle.',
-          'It holds. The shore is close: I can see sand, and a stone.', ''];
+        // the story of the Sump, told plate by plate: the riders on the rim, the haze closing behind, the marker ahead
+        const lines = [
+          'It holds. Ridged, dry, cracks in threes: the Study was right, Silvia. Under my boots the salt ticks in the heat, like a tin roof at noon.',
+          'Holding. Silvia… far off to the west, on the rim of the salt, there is a line of dark dots. Camels. The tracks from the Oasis Gate: they are going round the basin, and we are going straight across it.',
+          'Firm. The camels have stopped on the rim. Something up there flashed twice, like glass in the sun. A spyglass, I think. If they are watching, they are watching us walk where they did not dare.',
+          'Good salt. When I look back now, the haze has swallowed the stones and the post of the Order. There is no way back but the way you choose for me.',
+          'It holds. The shore is close: I can see sand, and a squat stone of the Order with a dark niche in its side. One more plate, Silvia.', ''];
         if (k + 1 >= SUMP.length) { say('It holds… and the next step is sand.'); setTimeout(toShore, reducedMotion() ? 300 : 1100); return; }
-        showSump(lines[k]);
+        showSump(lines[k] + ' What shall I look at?');
       }
       function sumpSetback(kind, k, d) {
         view.phase = 'setback';
@@ -2033,6 +2151,7 @@
         S.fails++; S.sFails++;
         if (kind === 'split') S.cracks++; else S.sinks++;
         S.sRevealed[sKey(k, d)] = kind;
+        paintSigns(true);
         showSumpFail(k, d, kind, !G || reducedMotion());
         const p = sumpPlate(k, d);
         if (p) burstAt(p.base.x, SUMP_TOP, p.base.z, kind === 'split' ? 0xffffff : 0x3a7a88);
@@ -2058,6 +2177,7 @@
       function toShore() {
         view.phase = 'step';
         clearControls();
+        paintSigns(true);
         view.walk = { fx: view.x, fz: view.z, tx: SX(lane()), tz: SHORE_Z + 0.9, t: 0, dur: 1.1, hop: true, then: () => victory(true) };
         if (!G) finishWalk();
       }
@@ -2068,7 +2188,7 @@
         paintMarkers([]);
         clearControls();
         endGauge();
-        say("Sand! Real sand under my boots, Silvia. I stepped off the last plate of the Sump onto the south shore and my knees nearly gave way. Ridged, dry, cracks in threes: six times the Study told the truth. Behind me the salt is a white sea in the noon glare, and the stones and the Order's post are lost in the haze. And in front of me stands a squat stone marker of the Order, with a niche in its side. There is something in it, wrapped in oiled cloth. I will tell you everything on the Field Wire.");
+        say("Sand! Real sand under my boots, Silvia. I stepped off the last plate of the Sump onto the south shore and my knees nearly gave way. You asked, I knelt and looked, and six times the Study told the truth. Behind me the salt is a white sea in the noon glare, and the stones and the Order's post are lost in the haze. And in front of me stands a squat stone marker of the Order, with a niche in its side. There is something in it, wrapped in oiled cloth. I will tell you everything on the Field Wire.");
         where('Across the Salt Playa, on the south shore.');
         if (el.victory) el.victory.style.display = 'block';
         if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
@@ -2122,6 +2242,21 @@
         const ci = view.sky ? 0.15 + heat() * 0.35 : 0.85;
         G.cirrus.forEach((cl) => { cl.material.opacity += (ci - cl.material.opacity) * Math.min(1, dt * 2); });
         if (G.sumpCasters[0].castShadow === view.sky) G.sumpCasters.forEach((m) => { m.castShadow = !view.sky; });
+        // the riders on the far shore: they walk while he crosses, stop to watch him (a spyglass flashes), then go on
+        const sumpK = S.sent ? S.sump.length : -1;
+        G.caravan.visible = !view.sky && sumpK >= 0;
+        if (G.caravan.visible) {
+          const walking = sumpK !== 3;
+          G.caravan.userData.x = (G.caravan.userData.x === undefined ? -14 + sumpK * 2.2 : G.caravan.userData.x) + (walking && !rm ? dt * 0.3 : 0);
+          G.caravan.position.x = Math.min(14, G.caravan.userData.x);
+          G.camels.forEach((c) => {
+            const sw = walking && !rm ? Math.sin(tt * 3.2 + c.userData.ph) : 0;
+            c.position.y = Math.abs(sw) * 0.05;
+            c.userData.legs.forEach((l, i) => { l.rotation.x = (i % 2 ? sw : -sw) * 0.35; });
+          });
+          const fl = sumpK === 3 && !rm ? Math.pow(Math.max(0, Math.sin(tt * 2.2)), 18) : 0;
+          G.glint.material.opacity = fl;
+        }
         G.steam.forEach((st) => {
           const ph = (tt * st.spd + st.ph) % 1, k = st.born ? Math.min(1, Math.max(0, (now - st.born) / 1600)) : 1;
           st.sp.position.set(st.x + ph * 0.5, st.y + ph * st.rise, st.z - ph * 0.15);
@@ -2214,6 +2349,10 @@
         H.rotation.set(0, view.yaw, 0);
         H.scale.setScalar(view.sky ? 1.5 : 1);
         if (!moving && !rm) H.scale.y *= 1 + Math.sin(now / 640) * 0.012;   // he breathes
+        if (view.kneel && !rm) {   // he crouches to look at the plates, then rises
+          const kt = (now - view.kneel) / 1300;
+          if (kt >= 1) view.kneel = 0; else H.scale.y *= 1 - 0.22 * Math.sin(Math.PI * Math.min(1, kt));
+        }
         const swing = moving && !rm ? Math.sin(now / 120) : 0;
         G.legL.position.z = swing * 0.17; G.legR.position.z = -swing * 0.17;
         G.legL.position.y = Math.max(0, swing) * 0.05; G.legR.position.y = Math.max(0, -swing) * 0.05;
@@ -2277,6 +2416,17 @@
         G.sumpPlates.forEach((rowP) => Object.values(rowP).forEach((p) => {
           if (p.sunk > 0 && p.sunk < 1) { p.sunk = Math.min(1, p.sunk + dt * 1.6); applySumpSink(p, p.sunk); }
           if (p.split > 0 && p.split < 1) { p.split = Math.min(1, p.split + dt * 2.5); applySplit(p, p.split); }
+          // a sign Hermes has just found rises out of the glare
+          SIGNS.forEach((kind) => p.signs[kind].forEach((m) => {
+            if (!m.userData.pop) return;
+            const t = Math.min(1, (now - m.userData.pop) / 520), back = 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
+            m.scale.setScalar(Math.max(0.001, m.userData.s0 * back));
+            if (t >= 1) { m.userData.pop = 0; m.scale.setScalar(m.userData.s0); }
+          }));
+          if (p.glare.visible || p.glare.material.opacity > 0.005) {
+            const to = (p.glareTo || 0) * (rm ? 1 : 0.88 + Math.sin(now / 520 + p.base.x) * 0.12);
+            p.glare.material.opacity += (to - p.glare.material.opacity) * Math.min(1, dt * 4);
+          }
         }));
         // The Order's post: its seven rings turn into place one after another once the keyword is transmitted, and a light rises
         if (view.rings > 0 && view.rings < 1) view.rings = Math.min(1, view.rings + dt * (rm ? 3 : 0.45));
@@ -2406,6 +2556,8 @@
         if (view.phase === 'schoose') {
           const d = { ArrowLeft: 1, ArrowUp: 0, ArrowRight: -1 }[e.key];
           if (d !== undefined) { e.preventDefault(); chooseSump(d); }
+          const kind = { 1: 'ridge', 2: 'wet', 3: 'crack' }[e.key];
+          if (kind) { e.preventDefault(); askSump(kind); }
         }
       });
       document.addEventListener('keyup', (e) => {
@@ -2481,7 +2633,7 @@
           victory();
           say("We are on the south shore, Silvia, and the salt behind us shines like a frozen lake. CRYSTAL opened the way, and the Study carried us through the Sump at noon.");
         } else if (firstTime && !isDone()) showChoice("Silvia, I am on the North Edge, by the old surveyor's tripod, at the west end of the first row. From where you are you see the whole basin from the sky, exactly as your page draws it: north at the top, west on the left. Down here every slab looks the same, white and firm, and I cannot see a single number. You have the page “The Salt Playa (Dry Basin)”. Walk me east along the edge to the slab where the crossing begins, and we will test it together.");
-        else if (st === 'sump') showChoice(S.sump.length ? `Still in the Sump, Silvia, on my plate, ${S.sump.length} of ${SUMP.length} from the stones. The sun has not moved off my head.` : "I am at the edge of the Sump, where the stones end. Nothing has changed: no grid, only plates. Read me the Study again.");
+        else if (st === 'sump') showChoice(S.sump.length ? `Still in the Sump, Silvia, on my plate, ${S.sump.length} of ${SUMP.length} from the stones. The sun has not moved off my head.` : "I am at the edge of the Sump, where the stones end. Nothing has changed: no grid, only plates white in the glare. Ask me what you need, and keep the Study open.");
         else if (st === 'console') showChoice("I am still by the Order's post, at the end of the stones. Its seven rings wait for the passage keyword.");
         else showChoice(S.path.length ? `I am still here, Silvia, on my slab of Row ${ROMAN[row() - 1]}. Find me on your page and tell me where to step.` : "I am back on the North Edge, by the tripod. Walk me east along the edge to where the crossing begins.");
         if (building && G) tick(performance.now(), 1 / 60);
@@ -2560,7 +2712,7 @@
                 </div>
               </div>
               <div class="rw-ledger playa-rw-balance">
-                <figure class="playa-balance-icon" aria-hidden="true"><svg viewBox="-32 -30 64 56"><path d="M0 -24 V18 M-16 22 H16 M-26 -14 H26"/><circle cy="-24" r="3"/><path d="M-26 -14 L-34 2 H-18 Z M26 -14 L18 2 H34 Z"/></svg></figure>
+                <figure class="playa-balance-icon" aria-hidden="true"><svg viewBox="-39 -33 78 64"><path d="M0 -24 V18 M-16 22 H16 M-26 -14 H26"/><circle cy="-24" r="3"/><path d="M-26 -14 L-34 2 H-18 Z M26 -14 L18 2 H34 Z"/></svg></figure>
                 <div class="rw-ledger-text">
                   <div class="rw-ledger-kicker">Found in the marker · a new instrument</div>
                   <div class="rw-ledger-title">The Surveyor's Balance</div>
@@ -2709,6 +2861,7 @@
         transmit: (word) => { transmit(word); return view.phase; },
         down: () => { toSump(); return view.phase; },
         spick: (d) => { chooseSump(d); return view.phase; },
+        ask: (kind) => { askSump(kind); return view.phase; },
         sol: () => SUMP_SOL.slice(),
         frames: (n) => { for (let i = 0; i < (n || 1); i++) tick(performance.now() + i * 33, 1 / 30); }
       };

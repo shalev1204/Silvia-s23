@@ -352,6 +352,25 @@
           }
           return;
         }
+        // After the salt: the walk through the dunes, then his call from the ruins at dusk (a save that never heard him
+        // on the North Edge of the salt goes straight to the steles)
+        if (!isLexiconAlreadyDone && !(window.isAdminTester && window.isAdminTester())) {
+          let w = {};
+          try { w = JSON.parse(localStorage.getItem('order_chasm_wire') || '{}') || {}; } catch (e) { w = {}; }
+          if (w.reply2 !== undefined) {
+            const walking = typeof window.isLexiconMarchOver === 'function' && !window.isLexiconMarchOver();
+            if (walking || w.reply4 === undefined) {
+              const eta = walking && typeof window.getLexiconMarchEta === 'function' ? window.getLexiconMarchEta() : '';
+              if (typeof window.showDesertToast === 'function') {
+                window.showDesertToast(eta
+                  ? '✦ THROUGH THE DUNES ✦ Hermes is walking to the Nomad Ruins. He arrives in ' + eta + ', and calls you from there.'
+                  : '✦ THE NOMAD RUINS ✦ Hermes is calling you on the Field Wire: answer him before you read the steles.');
+              }
+              if (!eta && typeof window.activateHubView === 'function') window.activateHubView('view-field-wire');
+              return;
+            }
+          }
+        }
         if (sfx) sfx.playMechanicalClick();
         if (!modal) return;
         modal.style.display = 'flex';
