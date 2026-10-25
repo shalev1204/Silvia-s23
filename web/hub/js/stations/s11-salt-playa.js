@@ -2775,9 +2775,9 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
       // The opening: the white basin from the north, the surveyor's tripod, Hermes ready to step onto the salt
       function openingShots() {
         return [
-          { from: { p: [-3, 10, -10], l: [0, 0, 18] }, to: { p: [-3, 4.6, -6.6], l: [0, 0.5, 12] }, dur: 6.5, kicker: 'STATION 11', title: 'THE SALT PLAYA', line: 'A white basin to the horizon, and every slab looks the same.' },
+          { from: { p: [-4, 7.5, -9.5], l: [0, 0, 11] }, to: { p: [-3, 4.2, -6.4], l: [0, 0.4, 9] }, dur: 6.5, kicker: 'STATION 11', title: 'THE SALT PLAYA', line: 'A white basin to the horizon, and every slab looks the same.' },
           { from: { p: [-3, 5.5, -13], l: [0, 0.3, 6] }, to: { p: [-8, 3.4, -8], l: [-9, 0.6, -3] }, dur: 5.5, kicker: 'THE NORTH EDGE', title: "THE SURVEYOR'S TRIPOD", line: 'Someone measured this basin long ago, slab by slab.' },
-          { from: { p: [-9, 1.6, -5.2], l: [-9, 1.0, 6] }, to: { p: [-9, 2.1, -6], l: [-9, 0.6, 8] }, dur: 5.5, kicker: 'MEASURED FOOTSTEPS', line: 'Weight without balance always yields to the deep.' }
+          { from: { p: [-9, 1.9, -7.6], l: [-9, 1.0, 6] }, to: { p: [-9, 2.6, -8.6], l: [-9, 0.6, 8] }, dur: 5.5, kicker: 'MEASURED FOOTSTEPS', line: 'Weight without balance always yields to the deep.' }
         ];
       }
       // The ending: the little brass balance, the salt behind us, the riders on the western rim
@@ -3001,6 +3001,11 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
       modal.addEventListener('click', (e) => { if (e.target === modal) closePlaya(); });
 
       // Test hook (scripts/audit/web_smoke.py)
+      // Escape during a cinematic only skips it (the Hub would also close the window)
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && cine && cine.active && modal.style.display !== 'none') { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); }
+      }, true);
+
       window.__playa = {
         cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
         gfx: () => G,

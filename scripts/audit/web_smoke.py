@@ -146,7 +146,7 @@ def start_server(port=PORT, override=None):
     return server
 
 
-def new_page(browser, seed=None, reduced_motion=False):
+def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
     ctx = browser.new_context(viewport={"width": 1280, "height": 900}, reduced_motion="reduce" if reduced_motion else "no-preference")
     page = ctx.new_page()
     errors = []
@@ -156,7 +156,8 @@ def new_page(browser, seed=None, reduced_motion=False):
     page.add_init_script("document.addEventListener('securitypolicyviolation', e => console.error('CSP blocked ' + e.violatedDirective + ' ' + e.blockedURI))")
     if seed:
         # the openings and endings of the Salt Playa and the Desert Lexicon play once: the tests that are not about them find them seen
-        seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen"}, **seed)
+        if cine_seen:
+            seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen"}, **seed)
         page.add_init_script(SEED_JS % json.dumps(seed))
     return ctx, page, errors
 
@@ -1513,7 +1514,11 @@ def test_early_hints(browser):
     js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(300)
 
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
-    js("window.__playa.skipCine()"); page.wait_for_timeout(700)   # (the tester profile starts every station afresh, so its opening plays: skip it)
+    js("window.__playa.skipCine()")   # (the tester profile starts every station afresh, so its opening plays: skip it)
+    for _ in range(30):
+        if js("window.__playa.state().phase") != "cine":
+            break
+        page.wait_for_timeout(200)
     for _ in range(3):       # stepping onto the salt from the tripod, not where the page says the crossing begins
         js("window.__playa.pick(0); window.__playa.goOn()")
     check(get("order_hint_s11-playa_level") == "1" and "note 1 of 3" in note("modal-salt-playa", "#playa3d-controls"),
@@ -1521,7 +1526,11 @@ def test_early_hints(browser):
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
 
     js("window.openDesertLexiconModal()"); page.wait_for_timeout(400)
-    js("window.__lexicon.skipCine()"); page.wait_for_timeout(300)
+    js("window.__lexicon.skipCine()")
+    for _ in range(30):
+        if js("window.__lexicon.state().phase") != "cine":
+            break
+        page.wait_for_timeout(200)
     js("window.__lexicon.select('ac-3')")
     for _ in range(3):       # while the watcher's back is turned, three words that do not fit the grooves
         js("window.__lexicon.brush('WRONG')")
@@ -2186,7 +2195,7 @@ CLOUD_JS = f"window.ECLIPSE_CLOUD = {{ url: '{BASE}/__cloud', key: 'smoke-key' }
 
 def cloud_page(browser, seed, query="?cloud=1", saved=None, fail_rpc=False, down=None):
     """The Hub with cloud-config.js pointed at a fake Supabase that records every call (none while down["v"])."""
-    ctx, page, errors = new_page(browser, seed)
+    ctx, page, errors = new_page(browser, seed, cine_seen=False)   # (an "empty browser" must hold nothing but the seeker)
     calls = []
 
     def fake_cloud(route):
@@ -2234,11 +2243,12 @@ def test_cloud_save(browser):
 
     # A new browser: only the seeker is known. The latest save comes back before the Hub is played
     ctx, page, errors, calls = cloud_page(browser, {"the_eclipse_active_seeker": "Silvia"}, saved=DESERT_BASE)
-    page.wait_for_timeout(6000)
     get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    page.wait_for_timeout(6000)
     check(get("order_field_wire_step") == "4" and get("order_whispering_chasm_completed") == "true"
           and get("eclipse_cloud_ready_silvia") == "1",
-          "an empty browser recovers Silvia's journey on its own")
+          "an empty browser recovers Silvia's journey on its own",
+          f"{get('order_field_wire_step')} {get('order_whispering_chasm_completed')} {get('eclipse_cloud_ready_silvia')}")
     rpc = [c for c in calls if c["path"] == "rpc/eclipse_latest_save"]
     check(len(rpc) == 1 and saves(calls) and saves(calls)[0]["progress"].get("order_field_wire_step") == "4",
           "after the reload it asks no more and saves the recovered journey, not an empty start")
@@ -3776,7 +3786,7 @@ def test_game_cinematics(browser):
         title = js("document.querySelector('#playa3d-stage .cine-title strong').innerText")
         check(title and js("window.__playa.cine()"), "its shots follow one another, each with its title", title)
         page.keyboard.press("Escape"); page.wait_for_timeout(700)
-        check(not js("window.__playa.cine()") and st()["phase"] == "edge" and js("localStorage.getItem('order_playa_cine_intro')") == "seen" and not js("document.getElementById('modal-salt-playa').style.display === 'none'") is False,
+        check(not js("window.__playa.cine()") and st()["phase"] == "edge" and js("localStorage.getItem('order_playa_cine_intro')") == "seen" and js("document.getElementById('modal-salt-playa').style.display !== 'none'"),
               "Escape skips it (not the whole game) and the first choice is there", st()["phase"])
         js("window.closeSaltPlayaModal()"); page.wait_for_timeout(400)
         js("window.openSaltPlayaModal()"); page.wait_for_timeout(700)

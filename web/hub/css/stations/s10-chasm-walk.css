@@ -522,8 +522,8 @@
     .chasm3d-cine.is-on .cine-bar { transform: none; }
     .cine-fade { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 0.35s ease; }
     .cine-fade.is-on { opacity: 1; }
-    .cine-title { position: absolute; left: 0; right: 0; bottom: 17%; text-align: center; opacity: 0; font-family: 'Cinzel', serif; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85); }
-    .cine-title small { display: block; font-size: 0.8rem; letter-spacing: 0.34em; color: #f4d896; }
+    .cine-title { position: absolute; left: 0; right: 0; bottom: 17%; text-align: center; opacity: 0; font-family: 'Cinzel', serif; text-shadow: 0 0 5px rgba(0, 0, 0, 0.9), 0 2px 16px rgba(0, 0, 0, 0.9), 0 0 44px rgba(0, 0, 0, 0.7); }
+    .cine-title small { display: block; font-size: 0.8rem; letter-spacing: 0.34em; color: #ffe7a8; }
     .cine-title strong { display: block; margin-top: 4px; font-size: clamp(1.4rem, 4vw, 2.5rem); letter-spacing: 0.16em; color: #fff3cf; font-weight: 700; }
     .cine-title.is-on { animation: cine-title 4.6s ease both; }
     @keyframes cine-title { 0% { opacity: 0; transform: translateY(10px); letter-spacing: 0.3em; } 18% { opacity: 1; transform: none; } 78% { opacity: 1; } 100% { opacity: 0; } }

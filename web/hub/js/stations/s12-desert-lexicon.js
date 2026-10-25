@@ -979,7 +979,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         view.phase = 'setback';
         clearControls();
         where('Three mistakes: the night is lost.');
-        say(`That is three, Silvia. The camp is stirring, and I cannot stay by the steles another minute. I am slipping back into the dunes to lie flat until the fire burns low and both of them are asleep again. When I come back the wind will have packed the grooves with sand, as it does every night. We begin again from the first word.`);
+        say(`That is three, Silvia. The camp is stirring, and I cannot stay by the steles another minute. I am slipping back into the dunes to lie hidden until the moon comes round again. When I come back the wind will have packed the grooves with sand, as it does every day. We begin again from the first word.`);
         alertCard('Night lost', '☾', 'The night is lost', why, cost, '');
       }
       function paintFacing() {
@@ -1241,7 +1241,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         if (S.hearts <= 0) {
           startOver();
           save();
-          beginAgain(`Past midnight, Silvia. I lay in the dunes until the fire burned low, and I am back at the foot of the steles with three hearts again. The wind has packed every groove with sand, as I feared. The watcher has woken and walks his round with his torch. This is night number ${S.tries}. Choose a word.`);
+          beginAgain(`A new night, Silvia. I lay hidden in the dunes all day and crept back at moonrise, and I am at the foot of the steles with three hearts again. The wind has packed every groove with sand, as I feared, and the watcher walks his round with his torch. This is night number ${S.tries}. Choose a word.`);
           return;
         }
         const st = stage();
@@ -2211,6 +2211,11 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
       modal.addEventListener('click', (e) => { if (e.target === modal) closeLexicon(); });
 
       // Test hook (scripts/audit/web_smoke.py)
+      // Escape during a cinematic only skips it (the Hub would also close the window)
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && cine && cine.active && modal.style.display !== 'none') { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); }
+      }, true);
+
       window.__lexicon = {
         cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
         gfx: () => G,

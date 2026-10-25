@@ -4370,13 +4370,13 @@
               id: "choice-5-crossword",
               text: "Check the page “The Desert Lexicon & Al-Qibla”: Solve the 10 crossword words to assemble the circled letters.",
               silviaMsg: "I'm looking at the page “The Desert Lexicon & Al-Qibla” in my journal. We must carve the 10 desert terms on the sandstone stele to assemble the circled letters.",
-              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nMIRAGE is there too, Silvia: the passphrase of the canyon walkers, carved by the same hands. And the seven circles, read from 1 to 7, gave us the word that woke the dial."
+              hermesReply: "Ten desert terms... Yes! I can see them carved in the stone: SIROCCO, NOMAD, OASIS, ECLIPSE, HORIZON across... and CARAVAN, SPHINX, MIRAGE, DUNES, SPIRIT down. And seven cells have etched numbered circles!\n\nMIRAGE is there too, Silvia: the passphrase of the canyon walkers, carved by the same hands. And the seven circles, read from 1 to 7, gave us the word that woke the dial.\n\nI will hear that watcher's footsteps in my sleep, Silvia. Every brush I made, I counted his steps with you: toward the cistern, back toward the stones, and the long still moments when I lay with my face in the sand. A word at a time, between his rounds. That is how those ten words came clean."
             },
             {
               id: "choice-5-sigil",
               text: "The circled letters spell PHOENIX. That Desert Sigil unlocks the Al-Qibla sun compass!",
               silviaMsg: "The circled letters spell PHOENIX! That Desert Sigil unlocks the Al-Qibla sun compass dial.",
-              hermesReply: "PHOENIX! The sacred Sun-Bird of the desert that rises from its own embers! When I tapped those seven letters into the brass dial, the needle broke free of the sand with a crisp click!\n\nIt settled steadily on 194° South-Southwest: the heading the raiders carved here, the way they fled with the Astrolabe! And the sun-bird's tail points the other way, 14° North-Northeast. That is our true line across the Great Erg to Tower II!"
+              hermesReply: "PHOENIX! The sacred Sun-Bird of the desert that rises from its own embers! When I tapped those seven letters into the brass dial, the needle broke free of the sand with a crisp click!\n\nIt settled steadily on 194° South-Southwest: the heading the raiders carved here, the way they fled with the Astrolabe! And the sun-bird's tail points the other way, 14° North-Northeast. That is our true line across the Great Erg to Tower II!\n\nAnd when the bronze rang like a bell, I thought my heart would stop. That run through the walls, one doorway at a time, was your sigil spelled out in brick, Silvia: P, H, O, E, N, I, X. I owe you my skin, and I mean to say so again when we are safe."
             },
             {
               id: "choice-5-oracle",
