@@ -4,16 +4,22 @@
       // A game window covers the whole hub. While one is open, everything painted behind it (the 3D map, the star canvas
       // and the hub's CSS animations) stands still, so the game keeps the whole GPU and holds a steady frame rate.
       (function watchGameWindows() {
-        const sel = '.chasm-modal-backdrop:has(.chasm3d-window), .monolith-modal-backdrop, .clepsydra-modal-backdrop';
+        // (an older browser without :has() falls back to the three 3D game windows by id: nothing here may ever stop the Hub from loading)
+        const find = () => {
+          try { return [...document.querySelectorAll('.chasm-modal-backdrop:has(.chasm3d-window), .monolith-modal-backdrop, .clepsydra-modal-backdrop')]; }
+          catch (e) { return ['modal-whispering-chasm', 'modal-salt-playa', 'modal-desert-lexicon'].map((id) => document.getElementById(id)).filter(Boolean); }
+        };
         const sync = () => {
-          const open = [...document.querySelectorAll(sel)].some((m) => m.style.display && m.style.display !== 'none');
+          const open = find().some((m) => m.style.display && m.style.display !== 'none');
           window.__eclipseGameOpen = open;
           document.documentElement.classList.toggle('game-open', open);
         };
         const start = () => {
-          const mo = new MutationObserver(sync);
-          document.querySelectorAll(sel).forEach((m) => mo.observe(m, { attributes: true, attributeFilter: ['style'] }));
-          sync();
+          try {
+            const mo = new MutationObserver(sync);
+            find().forEach((m) => mo.observe(m, { attributes: true, attributeFilter: ['style'] }));
+            sync();
+          } catch (e) {}
         };
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
       })();
@@ -1509,6 +1515,23 @@
             };
           }
 
+          if (window.isNextAdventureHeld && window.isNextAdventureHeld()) {
+            return {
+              badge: 'STATION 13 // DESERT PATH',
+              status: 'HERMES IS RESTING AT CAMP VII ⛺',
+              statusClass: 'status-live-badge',
+              title: 'Station 13 · [ Sealed ]',
+              thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
+              veiled: true,
+              lore: 'Hermes has read the steles of Camp VII and learned the name of the raiders. He is resting by the cold hearth, the needle of Al-Qibla pointing the way they rode. The next stretch of the road, across the Great Erg, is not open yet. He will call you on the Field Wire the moment it is.',
+              rewards: [
+                { icon: '⛺', label: 'Camp VII', desc: 'Hermes rests by the cold hearth' },
+                { icon: '🔒', label: 'What the Next Stretch Keeps', desc: 'Revealed when the road opens' }
+              ],
+              btnText: '⛺ HERMES IS RESTING AT CAMP VII',
+              btnDisabled: true
+            };
+          }
           return {
             badge: 'STATION 13 // DESERT PATH',
             status: 'THE FOUR WELLS DISCOVERED ✦',
@@ -4389,7 +4412,7 @@
         {
           step: 6,
           completed: true,
-          hermesFinal: "Silvia! Al-Qibla is locked: the raiders fled 194° South-Southwest, and Tower II lies the other way, 14° North-Northeast! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: when the two watchers rode off, their banner opened in the wind, and it bears the same bird of fire that is burned into the wagon's oilcloth. Under that bird, on the hearth stone, their name is cut with a knife. They call themselves the BC Ashes!\n\nBefore we begin the trek across the Great Erg, we must secure water supplies. Ahead at Camp VIII stands the hydraulic Clepsydra of the Four Wells. When you are ready, check the page “The Oasis Clepsydra” in your journal to balance the water flow!"
+          hermesFinal: "Silvia! Al-Qibla is locked: the raiders fled 194° South-Southwest, and Tower II lies the other way, 14° North-Northeast! And we possess the sacred Desert Sigil PHOENIX to present at the gates of Tower II!\n\nDon't forget to record the math stele in your Cipher Ledger: the Chasm gave you a clue for [R], so [R] × 2 = [F] lets you find [F]! And combined with your Vector Card [F] + [T] = 22, you can work out [T] too!\n\nOne more thing: when the two watchers rode off, their banner opened in the wind, and it bears the same bird of fire that is burned into the wagon's oilcloth. Under that bird, on the hearth stone, their name is cut with a knife. They call themselves the BC Ashes!\n\nBefore we cross the Great Erg we will need water, and somewhere ahead, at Camp VIII, the old nomads built a clepsydra of four wells. But not tonight.\n\nThe camp is quiet, my legs are still shaking, and the road beyond the dunes is not open yet. I am going to sleep by the cold hearth with the needle of Al-Qibla at my head. Rest too, Silvia: you earned it. I will call you on the Field Wire the moment the road opens."
         },
         {
           step: 7,
@@ -7014,8 +7037,15 @@
 
       // The Operator's hold on Station 11 (24-10-2026): the Salt Playa is being rebuilt as a 3D game. While true,
       // first light comes but Hermes camps at the edge of the salt and the crossing stays shut for Silvia
-      // (testers go on). To release it: set PLAYA_HOLD = false and deploy, only on the Operator's OK.
-      const PLAYA_HOLD = true;
+      // (testers go on). Released on 25-10-2026 by the Operator's OK (set it back to true to hold the crossing again).
+      const PLAYA_HOLD = false;
+
+      // The Operator's hold after the Desert Lexicon (25-10-2026): the road waits for the next adventure. While true, when Silvia has
+      // read the steles Hermes rests at Camp VII, Station 13 stays sealed and the chat says goodnight (testers go on). To release it:
+      // set NEXT_ADVENTURE_HOLD = false and deploy, only on the Operator's OK.
+      const NEXT_ADVENTURE_HOLD = true;
+      window.isNextAdventureHeld = () => NEXT_ADVENTURE_HOLD && localStorage.getItem('order_desert_lexicon_completed') === 'true'
+        && localStorage.getItem('order_oasis_clepsydra_completed') !== 'true' && !isCarlesTester();
 
       // Station 11: the night at the Oasis Gate. Hermes sleeps outside the canyon and sets out on the salt at
       // first light, 10 hours after Silvia answers him there (the Oasis Gate reply starts it).
@@ -8051,8 +8081,11 @@
             wireCompletedBar.style.display = 'flex';
             const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
             const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
-            if (titleEl) titleEl.textContent = 'Al-Qibla Bearing Locked · The Four Wells Await';
-            if (descEl) descEl.textContent = 'Open the Grand Desert Map and help Hermes at the Four Wells of Camp VIII (Station 13, the page “The Oasis Clepsydra”).';
+            const resting = window.isNextAdventureHeld && window.isNextAdventureHeld();
+            if (titleEl) titleEl.textContent = resting ? 'Camp VII · Resting Until the Road Opens' : 'Al-Qibla Bearing Locked · The Four Wells Await';
+            if (descEl) descEl.textContent = resting
+              ? 'Hermes is asleep by the cold hearth, with the needle of Al-Qibla pointing the way the raiders rode. The next stretch of the road is not open yet: he will call you on the Field Wire the moment it is.'
+              : 'Open the Grand Desert Map and help Hermes at the Four Wells of Camp VIII (Station 13, the page “The Oasis Clepsydra”).';
             try {
               localStorage.setItem('order_field_wire_completed', 'true');
               localStorage.setItem('order_field_wire_step', '6');

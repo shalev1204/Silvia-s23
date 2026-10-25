@@ -426,6 +426,10 @@
           }
           return;
         }
+        if (window.isNextAdventureHeld && window.isNextAdventureHeld()) {
+          if (typeof window.showDesertToast === 'function') window.showDesertToast('⛺ CAMP VII ⛺ Hermes is resting by the cold hearth. The next stretch of the road is not open yet: he will call you on the Field Wire.');
+          return;
+        }
         if (sfx) sfx.playMechanicalClick();
         if (!modal) return;
         modal.style.display = 'flex';

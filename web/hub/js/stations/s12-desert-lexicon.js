@@ -2077,7 +2077,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
                   <p>A bird rising out of three flames, the mark on their wagon. These are the raiders who took the Astrolabe of Distant Light.</p>
                 </div>
               </div>
-              <div class="rw-next">Next · Station 13 · The Oasis Clepsydra</div>
+              <div class="rw-next">${window.isNextAdventureHeld && window.isNextAdventureHeld() ? 'Next · The road waits: Hermes rests at Camp VII' : 'Next · Station 13 · The Oasis Clepsydra'}</div>
             </section>
           </div>
           <div class="chasm3d-reward-actions">

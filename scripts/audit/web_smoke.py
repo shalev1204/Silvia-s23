@@ -2967,7 +2967,7 @@ def test_silvia_north_portal(browser):
 
 
 def test_playa_hold(browser):
-    print("\n34. The Operator's hold on the Salt Playa (24 Oct): first light comes, Hermes camps at the edge of the salt, the crossing stays shut")
+    print("\n34. The Salt Playa is released (25 Oct, the Operator's OK): first light comes and Hermes calls from the North Edge")
     now = int(time.time() * 1000)
     seed = dict(SILVIA, order_dawn_step="3", order_cairn1_completed="true", order_seal_cairn_1="true", order_chasm_march_start="1",
                 order_whispering_chasm_completed="true", order_field_wire_step="4", order_field_wire_completed="true",
@@ -2982,21 +2982,17 @@ def test_playa_hold(browser):
     ctx, page, errors = new_page(browser, dict(seed, order_playa_march_start=str(now - 11 * 3600 * 1000)))
     js = page.evaluate
     page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
-    check(js("window.isPlayaCamped()") and not js("window.isPlayaMarchOver()") and js("window.getPlayaMarchEta()") == ""
-          and js("window.getPlayaMarchProgress()") < 1, "first light has come, but Hermes camps: no countdown, the map keeps him short of the salt")
+    check(js("window.isPlayaMarchOver()") and not js("window.isPlayaCamped()") and js("window.getPlayaMarchEta()") == "",
+          "first light has come: Hermes does not camp, the walk is over")
     js("window.selectMapNode(21, false)"); page.wait_for_timeout(400)
     card = js("document.getElementById('insp-title').innerText")
-
-    check("Camp at the Edge of the Salt" in card and js("document.getElementById('insp-btn-primary').getAttribute('aria-disabled')") == "true",
-          "the Station 11 card: camp at the edge of the salt, its button shut", card)
-    js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
-    check(js("getComputedStyle(document.getElementById('modal-salt-playa')).display") == "none", "the old crossing does not open")
+    check("Salt Playa (Dry Basin)" in card and "HERMES IS CALLING" in js("document.getElementById('insp-btn-primary').innerText").upper()
+          and js("document.getElementById('insp-btn-primary').getAttribute('aria-disabled')") != "true",
+          "the Station 11 card is open: Hermes is calling, its button takes her to the Field Wire", card)
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(3000)
     wire = js("document.getElementById('view-field-wire').innerText")
-    check("Camp at the Edge of the Salt" in wire and "FIRST LIGHT ON THE SALT IN" not in wire.upper().replace("\n", " ")
-          and js("localStorage.getItem('order_playa_first_light_called')") is None,
-          "the Field Wire shows the camp, and Hermes does not call yet", wire[-200:].replace("\n", " "))
-    check(not errors, "no JS errors while Hermes camps", "; ".join(errors[:2]))
+    check("FIRST LIGHT" in wire.upper() and "CAMP AT THE EDGE OF THE SALT" not in wire.upper(), "the Field Wire has Hermes calling at first light", wire[-200:].replace("\n", " "))
+    check(not errors, "no JS errors at first light", "; ".join(errors[:2]))
     ctx.close()
 
 
@@ -3762,6 +3758,14 @@ def test_desert_road(browser):
     said = page.evaluate("document.getElementById('wire-inquiries-stream').innerText")
     check("hearth stone" in said and "scorched banner hanging" not in said, "and the answer about the raiders tells the banner in the wind and the name on the hearth", said[-240:].replace("\n", " "))
     check(not errors, "no JS errors on the road", "; ".join(errors[:2]))
+    # after the steles the road waits: Hermes rests at Camp VII and Station 13 stays sealed (the Operator's hold)
+    text = card(page, 12)
+    check("RESTING AT CAMP VII" in text.upper() and "[ Sealed ]" in text and "OPEN THE CLEPSYDRA" not in text.upper(), "after the Lexicon, the card of Station 13 says Hermes is resting at Camp VII", text[:160].replace("\n", " "))
+    page.evaluate("window.openOasisClepsydraModal()"); page.wait_for_timeout(500)
+    check(page.evaluate("getComputedStyle(document.getElementById('modal-oasis-clepsydra')).display") == "none", "and the Clepsydra will not open")
+    page.evaluate("window.activateHubView('view-field-wire')"); page.wait_for_timeout(1500)
+    said = page.evaluate("document.getElementById('view-field-wire').innerText")
+    check("Four Wells Await" not in said, "the chat does not send her on to the next game")
     ctx.close()
 
 
