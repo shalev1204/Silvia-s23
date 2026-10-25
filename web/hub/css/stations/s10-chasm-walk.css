@@ -512,3 +512,28 @@
       .chasm3d-window *, .chasm3d-window *::before, .chasm3d-window *::after, .chasm3d-howto, .chasm3d-howto-card, .chasm3d-reward-card::before { animation: none !important; transition: none !important; }
       .amb-motes { display: none; }
     }
+
+    /* In-engine cinematics (EclipsePaint.cinema): black bars, a title card, a Skip button; the HUD steps aside */
+    .chasm3d-cine { position: absolute; inset: 0; z-index: 7; pointer-events: none; overflow: hidden; }
+    .chasm3d-cine[hidden] { display: none; }
+    .cine-bar { position: absolute; left: 0; right: 0; height: 11%; background: #000; transition: transform 0.7s cubic-bezier(.3, .7, .3, 1); }
+    .cine-top { top: 0; transform: translateY(-101%); }
+    .cine-bottom { bottom: 0; transform: translateY(101%); }
+    .chasm3d-cine.is-on .cine-bar { transform: none; }
+    .cine-fade { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 0.35s ease; }
+    .cine-fade.is-on { opacity: 1; }
+    .cine-title { position: absolute; left: 0; right: 0; bottom: 17%; text-align: center; opacity: 0; font-family: 'Cinzel', serif; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85); }
+    .cine-title small { display: block; font-size: 0.8rem; letter-spacing: 0.34em; color: #f4d896; }
+    .cine-title strong { display: block; margin-top: 4px; font-size: clamp(1.4rem, 4vw, 2.5rem); letter-spacing: 0.16em; color: #fff3cf; font-weight: 700; }
+    .cine-title.is-on { animation: cine-title 4.6s ease both; }
+    @keyframes cine-title { 0% { opacity: 0; transform: translateY(10px); letter-spacing: 0.3em; } 18% { opacity: 1; transform: none; } 78% { opacity: 1; } 100% { opacity: 0; } }
+    .cine-skip {
+      position: absolute; right: 14px; bottom: calc(11% + 12px); pointer-events: auto; min-height: 40px; padding: 6px 16px; border-radius: 10px; cursor: pointer;
+      border: 1.5px solid rgba(253, 230, 138, 0.8); background: rgba(16, 9, 5, 0.7); color: #fde68a; font: 600 0.85rem 'Cinzel', serif; letter-spacing: 0.08em;
+    }
+    .cine-skip:hover { background: rgba(60, 36, 14, 0.85); }
+    .cine-skip:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+    .chasm3d-stage.is-cine .chasm3d-hud, .chasm3d-stage.is-cine .chasm3d-subtitle { opacity: 0.0; }
+    .chasm3d-stage.is-cine .chasm3d-subtitle.is-on { opacity: 1; z-index: 8; }
+    :is(#modal-salt-playa, #modal-desert-lexicon) .chasm3d-body:has(.is-cine) .chasm3d-controls { visibility: hidden; }
+    @media (prefers-reduced-motion: reduce) { .cine-bar, .cine-fade { transition: none; } .cine-title.is-on { animation: none; opacity: 1; } }

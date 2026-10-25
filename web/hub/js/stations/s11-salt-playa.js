@@ -29,6 +29,9 @@
       const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const toast = (msg) => { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); };
       const WALK_KEY = 'order_playa_walk';
+      // The opening and the ending that the engine plays itself (EclipsePaint.cinema): seen once, then skipped
+      const CINE_INTRO = 'order_playa_cine_intro', CINE_OUTRO = 'order_playa_cine_outro';
+      let cine = null;
       const HOWTO_KEY = 'order_playa_howto';
       const HOWTO2_KEY = 'order_playa_howto2';
 
@@ -164,21 +167,24 @@
       let G = null;
       const P = window.EclipsePaint;   // the painted look of the Whispering Chasm (s10-whispering-chasm.js)
 
+      // The salt's polygons and its drifting cloud shadows are looked up in two small textures (made in makeNoise below), not
+      // computed with a dozen sines per pixel: the same pattern, a fraction of the cost on a big screen.
       const VORONOI = `
-    vec2 sHash(vec2 p) { p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3))); return fract(sin(p) * 43758.5453); }
+    uniform sampler2D uRand;
+    vec3 sRand(vec2 c) { return texture2D(uRand, (c + 0.5) / 128.0).rgb; }
     // distance to the nearest border of the salt polygons (Inigo Quilez), and a random value per polygon
     vec2 sVoro(vec2 x) {
       vec2 n = floor(x), f = fract(x), mg = vec2(0.0), mr = vec2(0.0);
       float md = 8.0;
       for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
-        vec2 g = vec2(float(i), float(j)), o = 0.5 + 0.38 * sin(6.2831 * sHash(n + g)), r = g + o - f;
+        vec2 g = vec2(float(i), float(j)), r = g + sRand(n + g).rg - f;
         float d = dot(r, r);
         if (d < md) { md = d; mr = r; mg = g; }
       }
-      float id = sHash(n + mg).x;
+      float id = sRand(n + mg).b;
       md = 8.0;
       for (int j = -1; j <= 1; j++) for (int i = -1; i <= 1; i++) {
-        vec2 g = mg + vec2(float(i), float(j)), o = 0.5 + 0.38 * sin(6.2831 * sHash(n + g)), r = g + o - f;
+        vec2 g = mg + vec2(float(i), float(j)), r = g + sRand(n + g).rg - f;
         if (dot(mr - r, mr - r) > 0.00001) md = min(md, dot(0.5 * (mr + r), normalize(r - mr)));
       }
       return vec2(md, id);
@@ -186,24 +192,51 @@
 `;
       // The shadows of high clouds drifting over the salt: soft, lilac, a few at a time (uCloud fades them at noon)
       const CLOUD = `
-    float cHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-    float cNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
-      return mix(mix(cHash(i), cHash(i + vec2(1.0, 0.0)), f.x), mix(cHash(i + vec2(0.0, 1.0)), cHash(i + vec2(1.0, 1.0)), f.x), f.y); }
+    uniform sampler2D uSmooth;
+    float cNoise(vec2 p) { return texture2D(uSmooth, p / 16.0).r; }
     vec3 sCloud(vec2 p) { p = p * 0.034 + vec2(uTime * 0.011, uTime * 0.004);
       float n = cNoise(p) * 0.55 + cNoise(p * 2.1 + 5.2) * 0.3 + cNoise(p * 4.3 + 1.7) * 0.15;
       return mix(vec3(1.0), vec3(0.8, 0.77, 0.92), smoothstep(0.5, 0.7, n) * uCloud); }
 `;
+      // 128 × 128 random cells for the polygons (the jittered centre of each, and a value for its tint), and 16 × 16 cells of
+      // smooth noise that tile, for the clouds
+      function makeNoise(T) {
+        const hash = (x, y) => { const a = Math.sin(x * 127.1 + y * 311.7) * 43758.5453, b = Math.sin(x * 269.5 + y * 183.3) * 43758.5453; return [a - Math.floor(a), b - Math.floor(b)]; };
+        const rand = new Uint8Array(128 * 128 * 4);
+        for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+          const h = hash(x, y), k = (y * 128 + x) * 4;
+          rand[k] = Math.round((0.5 + 0.38 * Math.sin(6.2831 * h[0])) * 255);
+          rand[k + 1] = Math.round((0.5 + 0.38 * Math.sin(6.2831 * h[1])) * 255);
+          rand[k + 2] = Math.round(h[0] * 255); rand[k + 3] = 255;
+        }
+        const tr = new T.DataTexture(rand, 128, 128, T.RGBAFormat);
+        tr.wrapS = tr.wrapT = T.RepeatWrapping; tr.magFilter = tr.minFilter = T.NearestFilter; tr.generateMipmaps = false; tr.needsUpdate = true;
+        const lat = new Float32Array(16 * 16), r2 = P.rng(4711);
+        for (let i = 0; i < 256; i++) lat[i] = r2();
+        const sm = new Uint8Array(128 * 128 * 4);
+        for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+          const fx = x / 8, fy = y / 8, ix = Math.floor(fx), iy = Math.floor(fy);
+          let ux = fx - ix, uy = fy - iy; ux = ux * ux * (3 - 2 * ux); uy = uy * uy * (3 - 2 * uy);
+          const L = (a, b) => lat[((b + 16) % 16) * 16 + ((a + 16) % 16)];
+          const v = (L(ix, iy) * (1 - ux) + L(ix + 1, iy) * ux) * (1 - uy) + (L(ix, iy + 1) * (1 - ux) + L(ix + 1, iy + 1) * ux) * uy, k = (y * 128 + x) * 4;
+          sm[k] = sm[k + 1] = sm[k + 2] = Math.round(v * 255); sm[k + 3] = 255;
+        }
+        const ts = new T.DataTexture(sm, 128, 128, T.RGBAFormat);
+        ts.wrapS = ts.wrapT = T.RepeatWrapping; ts.magFilter = ts.minFilter = T.LinearFilter; ts.generateMipmaps = false; ts.needsUpdate = true;
+        return { uRand: { value: tr }, uSmooth: { value: ts } };
+      }
 
       function buildWorld() {
         const T = window.THREE;
         if (!P) return null;
         if (T.ColorManagement) T.ColorManagement.legacyMode = false;
+        const NZ = makeNoise(T);
         let renderer;
         try {
           renderer = new T.WebGLRenderer({ canvas: el.canvas, antialias: true, powerPreference: 'high-performance' });
         } catch (e) { return null; }
         const lowPower = (navigator.hardwareConcurrency || 4) <= 4;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75));
+        renderer.setPixelRatio(lowPower ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = T.PCFSoftShadowMap;
         renderer.outputEncoding = T.sRGBEncoding;
@@ -259,7 +292,7 @@
         // The playa: polygons of white halite to the horizon, their buckled ridges lit, lavender in the cracks,
         // glints of salt that come and go (Sheet 10B, Fig. I: the 120° triple junctions)
         const crust = P.worldPainted(P.toon(), {
-          uSalt: ucol(0xf4ece4), uSaltLo: ucol(0xe2d2d4), uRidge: ucol(0xffffff), uCrack: ucol(0x9c88b8), uWarm: ucol(0xf6d2b0), uPink: ucol(0xf3c6cc), uTime, uCloud
+          uSalt: ucol(0xf4ece4), uSaltLo: ucol(0xe2d2d4), uRidge: ucol(0xffffff), uCrack: ucol(0x9c88b8), uWarm: ucol(0xf6d2b0), uPink: ucol(0xf3c6cc), uTime, uCloud, uRand: NZ.uRand, uSmooth: NZ.uSmooth
         }, 'uniform vec3 uSalt, uSaltLo, uRidge, uCrack, uWarm, uPink;\nuniform float uTime, uCloud;\n' + VORONOI + CLOUD, `
     vec2 v = sVoro(vWp.xz * 0.55);
     vec3 c = mix(uSalt, uSaltLo, v.y * 0.5);
@@ -276,11 +309,12 @@
         ground.rotation.x = -Math.PI / 2;
         ground.position.set(0, 0, 60);
         ground.receiveShadow = true;
+        ground.renderOrder = 5;   // drawn after the slabs and the post, so the GPU skips its heavy shader wherever they already cover it
         scene.add(ground);
 
         // The slabs of the crossing: thick plates of salt, slightly irregular, a little raised above the crust
         const slabMat = P.worldPainted(P.toon(), {
-          uTop: ucol(0xfdf8f2), uTopLo: ucol(0xeee2dc), uSide: ucol(0xcfb6c6), uFoot: ucol(0x8f7aac), uRidge: ucol(0xffffff), uCrack: ucol(0xa894c4), uTime, uCloud
+          uTop: ucol(0xfdf8f2), uTopLo: ucol(0xeee2dc), uSide: ucol(0xcfb6c6), uFoot: ucol(0x8f7aac), uRidge: ucol(0xffffff), uCrack: ucol(0xa894c4), uTime, uCloud, uRand: NZ.uRand, uSmooth: NZ.uSmooth
         }, 'uniform vec3 uTop, uTopLo, uSide, uFoot, uRidge, uCrack;\nuniform float uTime, uCloud;\n' + VORONOI + CLOUD, `
     vec2 v = sVoro(vWp.xz * 1.6 + 11.0);
     vec3 top = mix(uTop, uTopLo, v.y * 0.6);
@@ -551,7 +585,7 @@
 
         // ---- The Great Salt Sump: polygon plates of halite (Sheet 10B, Fig. I), each with the signs the Study teaches
         const sumpMat = P.worldPainted(P.toon(), {
-          uTop: ucol(0xfbf7f2), uLo: ucol(0xe9dfe6), uSide: ucol(0xc6b2c8), uFoot: ucol(0x8a76aa), uTime, uCloud
+          uTop: ucol(0xfbf7f2), uLo: ucol(0xe9dfe6), uSide: ucol(0xc6b2c8), uFoot: ucol(0x8a76aa), uTime, uCloud, uRand: NZ.uRand, uSmooth: NZ.uSmooth
         }, 'uniform vec3 uTop, uLo, uSide, uFoot;\nuniform float uTime, uCloud;\n' + VORONOI + CLOUD, `
     vec2 v = sVoro(vWp.xz * 2.4 + 3.0);
     float h = clamp(vWp.y / ${SUMP_TOP.toFixed(2)}, 0.0, 1.0);
@@ -654,7 +688,18 @@
           ln += SUMP_SOL[k];
         }
         // The south shore: hard sand, and the squat marker of the Order with its niche
-        const sandMat = P.rim(P.toon({ color: 0xe6bf90 }), 0xfff0dc, 0.25);
+        // the shore's sand is painted per pixel: little ripples the wind left, a fine grain, a few glints
+        const sandMat = P.worldPainted(P.rim(P.toon({ color: 0xe6bf90 }), 0xfff0dc, 0.25), {},
+          `float shHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(shHash(i), shHash(i + vec2(1.0, 0.0)), f.x), mix(shHash(i + vec2(0.0, 1.0)), shHash(i + vec2(1.0, 1.0)), f.x), f.y); }
+`,
+          `  vec2 p = vWp.xz;
+  float rip = sin(dot(p, vec2(0.96, 0.28)) * 5.2 + shNoise(p * 0.5) * 6.0) * 0.5 + 0.5;
+  float rip2 = sin(dot(p, vec2(-0.3, 0.95)) * 11.0 + shNoise(p * 1.3) * 5.0) * 0.5 + 0.5;
+  float grain = shHash(floor(p * 44.0));
+  diffuseColor.rgb *= 1.0 + (rip - 0.5) * 0.12 + (rip2 - 0.5) * 0.05 + (grain - 0.5) * 0.06 + (shNoise(p * 0.15) - 0.5) * 0.1;
+  diffuseColor.rgb += vec3(0.25, 0.22, 0.16) * step(0.9985, grain);`);
         const shore = new T.Mesh(new T.BoxGeometry(60, 0.3, 14), sandMat);
         shore.position.set(0, 0.15, SHORE_Z + 7);
         shore.receiveShadow = true;
@@ -885,7 +930,7 @@
         // netted with ridges of new white halite, the plates of the crossing laid on it
         const SUMP_CZ = (SZ0 - 3 + SHORE_Z) / 2, SUMP_HD = (SHORE_Z - SZ0 + 3) / 2 + 1, SUMP_HW = 15.5;
         const panMat = new T.ShaderMaterial({
-          transparent: true, depthWrite: false, uniforms: { uTime, uCloud },
+          transparent: true, depthWrite: false, uniforms: { uTime, uCloud, uRand: NZ.uRand, uSmooth: NZ.uSmooth },
           vertexShader: 'varying vec3 vWp; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vWp = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
           fragmentShader: 'uniform float uTime, uCloud;\nvarying vec3 vWp;\n' + VORONOI + CLOUD + `
             void main() {
@@ -953,10 +998,35 @@
         for (let i = 0; i < 12; i++) place(dunes, i, -34 + i * 6.2 + ar() * 3, -0.25, SHORE_Z + 10 + ar() * 9, 0, ar() * 0.6, 0, 5 + ar() * 4, 0.7 + ar() * 1.0, 3 + ar() * 2.5);
         dunes.receiveShadow = true;
         scene.add(dunes);
-        const shrubs = new T.InstancedMesh(new T.IcosahedronGeometry(0.32, 0), P.toon({ color: 0x6e6a3e, flatShading: true }), 30);
-        for (let i = 0; i < 30; i++) { const sc = 0.6 + ar() * 0.9; place(shrubs, i, -24 + ar() * 48, 0.3 + sc * 0.12, SHORE_Z + 2.5 + ar() * 7, ar(), ar() * 3, ar(), sc, sc * 0.7, sc); }
-        sumpCasters.push(shrubs);
-        scene.add(shrubs);
+        // dry bushes: a smooth tuft of grey-green leaves over a spray of thin twigs
+        const shrubs = new T.InstancedMesh(new T.IcosahedronGeometry(0.32, 2), P.toon({ color: 0x77723f }), 30);
+        const twigs = new T.InstancedMesh(new T.ConeGeometry(0.02, 0.55, 4), P.toon({ color: 0x5a4a30 }), 30 * 7);
+        for (let i = 0; i < 30; i++) {
+          const sc = 0.6 + ar() * 0.9, bx = -24 + ar() * 48, bz = SHORE_Z + 2.5 + ar() * 7;
+          place(shrubs, i, bx, 0.3 + sc * 0.22, bz, ar() * 0.3, ar() * 3, ar() * 0.3, sc, sc * 0.62, sc);
+          for (let j = 0; j < 7; j++) { const a = j / 7 * Math.PI * 2 + ar(); place(twigs, i * 7 + j, bx + Math.cos(a) * 0.12 * sc, 0.4 * sc + 0.3, bz + Math.sin(a) * 0.12 * sc, Math.sin(a) * 0.55, ar() * 3, -Math.cos(a) * 0.55, sc * 1.1, sc, sc * 1.1); }
+        }
+        sumpCasters.push(shrubs, twigs);
+        scene.add(shrubs, twigs);
+        // dark stones of the shore, rough and rounded, in little groups; bleached bones; the tracks the riders left
+        const rockGeo = new T.IcosahedronGeometry(0.5, 2), rp = rockGeo.attributes.position;
+        for (let i = 0; i < rp.count; i++) { const k = 1 + 0.2 * Math.sin(rp.getX(i) * 7.3 + rp.getZ(i) * 5.1) * Math.cos(rp.getY(i) * 6.7) + 0.08 * Math.sin(rp.getY(i) * 19); rp.setXYZ(i, rp.getX(i) * k, rp.getY(i) * k * 0.78, rp.getZ(i) * k); }
+        rockGeo.computeVertexNormals();
+        const rocks = new T.InstancedMesh(rockGeo, P.rim(P.toon({ color: 0x8a7a68 }), 0xfff0dc, 0.25), 34), rc = new T.Color();
+        for (let i = 0; i < 34; i++) {
+          const cx = [-17, -9, 8, 15, 22][i % 5] + (ar() - 0.5) * 6, cz = SHORE_Z + 3.5 + ar() * 8, k = 0.35 + Math.pow(ar(), 2) * 1.4;
+          place(rocks, i, cx, 0.3 + 0.1 * k, cz, ar() * 0.4, ar() * 3, ar() * 0.4, k, k * (0.7 + ar() * 0.4), k * (0.8 + ar() * 0.4));
+          rocks.setColorAt(i, rc.setHSL(0.07 + ar() * 0.03, 0.18 + ar() * 0.12, 0.34 + ar() * 0.14));
+        }
+        rocks.castShadow = true; rocks.receiveShadow = true; sumpCasters.push(rocks);
+        scene.add(rocks);
+        const boneMat = P.rim(P.toon({ color: 0xf0e8d8 }), 0xffffff, 0.3);
+        [[-11.5, 3.2, 0.4], [-10.6, 3.8, 1.9], [-12.4, 4.4, 1.1]].forEach(([x, dz, ry]) => {
+          const bone = new T.Mesh(new T.CapsuleGeometry(0.045, 0.5, 4, 8), boneMat); bone.rotation.set(0, ry, Math.PI / 2); bone.position.set(x, 0.34, SHORE_Z + dz); scene.add(bone);
+          const knob = new T.Mesh(new T.SphereGeometry(0.075, 8, 6), boneMat); knob.position.set(x + Math.cos(ry) * 0.27, 0.34, SHORE_Z + dz - Math.sin(ry) * 0.27); scene.add(knob);
+        });
+        const track = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ color: 0x9a7a52, transparent: true, opacity: 0.32, depthWrite: false }));
+        for (let i = 0; i < 26; i++) { const t2 = track.clone(); t2.rotation.x = -Math.PI / 2; t2.rotation.z = (ar() - 0.5) * 0.4; t2.scale.set(0.34, 0.5, 1); t2.position.set(-24 + i * 0.9 + (i % 2) * 0.35, 0.307, SHORE_Z + 6.6 + (i % 2) * 0.55 + Math.sin(i * 0.4) * 0.35); scene.add(t2); }
         // The riders on the western rim (they went round the salt while Hermes crossed it): eleven camels and a wagon
         // under oilcloth, dark in the noon haze, and the flash of a spyglass when they stop to watch him
         const camelMat = P.toon({ color: 0x80605e }), clothMat = P.toon({ color: 0x9c8a7a });
@@ -2230,8 +2300,8 @@
         say("Sand! Real sand under my boots, Silvia. I stepped off the last plate of the Sump onto the south shore and my knees nearly gave way. You asked, I knelt and looked, and six times the Study told the truth. Behind me the salt is a white sea in the noon glare, and the stones and the Order's post are lost in the haze. And in front of me stands a squat stone marker of the Order, with a niche in its side. There is something in it, wrapped in oiled cloth. I will tell you everything on the Field Wire.");
         where('Across the Salt Playa, on the south shore.');
         if (el.victory) el.victory.style.display = 'block';
-        if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
-        if (live) confetti();
+        const fanfare = () => { if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime(); };
+        if (!live) fanfare();
         const first = !isDone();
         put('order_salt_playa_completed', 'true');
         put('order_salt_playa_path', JSON.stringify(SOLUTION));
@@ -2240,7 +2310,13 @@
         paintHud();
         if (first && typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (first) document.dispatchEvent(new Event('playa:cleared'));   // Hermes has news on the Field Wire
-        if (live) setTimeout(() => { if (view.phase === 'done' && modal.style.display !== 'none') showReward(); }, reducedMotion() ? 300 : 2600);
+        if (live) {
+          const after = () => {
+            fanfare(); confetti();
+            setTimeout(() => { if (view.phase === 'done' && modal.style.display !== 'none') showReward(); }, reducedMotion() ? 300 : 2600);
+          };
+          if (G && cine && !reducedMotion() && get(CINE_OUTRO) !== 'seen') { put(CINE_OUTRO, 'seen'); cine.start(endingShots(), after); } else after();
+        }
         if (el.log) [...el.log.children].forEach((b, n) => { b.style.animationDelay = `${n * 120}ms`; replay(b, 'is-wave'); });
       }
 
@@ -2431,8 +2507,12 @@
           }
           if (view.phase === 'done') { tx = view.x + 2.5; ty = 3.2; tz = view.z - 5; lx = view.x; ly = 1.2; lz = view.z + 6; }
         }
-        G.camera.up.set(0, view.sky ? 0 : 1, view.sky ? -1 : 0);
-        const k = camPos.ok && !rm ? Math.min(1, dt * 3.2) : 1;
+        const cf = cine && cine.active ? cine.frame(dt) : null;
+        if (cf) { [tx, ty, tz] = cf.p; [lx, ly, lz] = cf.l; }
+        const topDown = view.sky && !cf;
+        G.camera.up.set(0, topDown ? 0 : 1, topDown ? -1 : 0);
+        let k = camPos.ok && !rm ? Math.min(1, dt * 3.2) : 1;
+        if (cf) k = 1;
         ['x', 'y', 'z'].forEach((a, i) => { camPos[a] += ([tx, ty, tz][i] - camPos[a]) * k; camPos['l' + a] += ([lx, ly, lz][i] - camPos['l' + a]) * k; });
         camPos.ok = true;
         G.camera.position.set(camPos.x, camPos.y, camPos.z);
@@ -2578,7 +2658,7 @@
       // ---- Keyboard: arrows pick a way (as on the page on the stones, as Hermes sees it in the Sump), the space bar leans ----
       document.addEventListener('keydown', (e) => {
         if (modal.style.display === 'none') return;
-        if (e.key === 'Escape') { closePlaya(); return; }
+        if (e.key === 'Escape') { if (cine && cine.active) cine.skip(); else closePlaya(); return; }
         const tag = (e.target && e.target.tagName) || '';
         if (/INPUT|TEXTAREA|SELECT|BUTTON/.test(tag) && (e.key === ' ' || e.key === 'Enter')) return;
         if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
@@ -2654,6 +2734,7 @@
           else window.addEventListener('resize', fit);
         }
         if (el.stage) el.stage.classList.toggle('is-flat', !G);
+        if (G && !cine && el.stage) cine = P.cinema(el.stage, { reduced: reducedMotion, onShot: (i, sh) => { if (sh.line) subtitle(sh.line, sh.dur - 0.4); } });
         fit();
         const firstTime = !get(WALK_KEY);
         view.quiet = true;
@@ -2670,18 +2751,43 @@
         paintPrints();
         paintHud();
         const st = stage();
+        let introPending = false;
+        const finishOpen = () => { if (get(HOWTO_KEY) !== 'seen' && !isDone()) showHowto(0); else focusFirst(); };
         if (st === 'shore') {
           victory();
           say("We are on the south shore, Silvia, and the salt behind us shines like a frozen lake. CRYSTAL opened the way, and the Study carried us through the Sump at noon.");
-        } else if (firstTime && !isDone()) showChoice("Silvia, I am on the North Edge, by the old surveyor's tripod, at the west end of the first row. From where you are you see the whole basin from the sky, exactly as your page draws it: north at the top, west on the left. Down here every slab looks the same, white and firm, and I cannot see a single number. You have the page “The Salt Playa (Dry Basin)”. Walk me east along the edge to the slab where the crossing begins, and we will test it together.");
+        } else if (firstTime && !isDone()) {
+          const intro = "Silvia, I am on the North Edge, by the old surveyor's tripod, at the west end of the first row. From where you are you see the whole basin from the sky, exactly as your page draws it: north at the top, west on the left. Down here every slab looks the same, white and firm, and I cannot see a single number. You have the page “The Salt Playa (Dry Basin)”. Walk me east along the edge to the slab where the crossing begins, and we will test it together.";
+          if (G && cine && !reducedMotion() && get(CINE_INTRO) !== 'seen') {
+            introPending = true; put(CINE_INTRO, 'seen');
+            view.phase = 'cine'; clearControls();
+            cine.start(openingShots(), () => { showChoice(intro); finishOpen(); }, { fade: true });
+          } else showChoice(intro);
+        }
         else if (st === 'sump') showChoice(S.sump.length ? `Still in the Sump, Silvia, on my plate, ${S.sump.length} of ${SUMP.length} from the stones. The sun has not moved off my head.` : "I am at the edge of the Sump, where the stones end. Nothing has changed: no grid, only plates white in the glare. Ask me what you need, and keep the Study open.");
         else if (st === 'console') showChoice("I am still by the Order's post, at the end of the stones. Its seven rings wait for the passage keyword.");
         else showChoice(S.path.length ? `I am still here, Silvia, on my slab of Row ${ROMAN[row() - 1]}. Find me on your page and tell me where to step.` : "I am back on the North Edge, by the tripod. Walk me east along the edge to where the crossing begins.");
         if (building && G) tick(performance.now(), 1 / 60);
         view.quiet = false;
         if (!raf) raf = requestAnimationFrame(frame);
-        if (get(HOWTO_KEY) !== 'seen' && !isDone()) showHowto(0);
-        else focusFirst();
+        if (!introPending) finishOpen();
+      }
+      // The opening: the white basin from the north, the surveyor's tripod, Hermes ready to step onto the salt
+      function openingShots() {
+        return [
+          { from: { p: [-3, 10, -10], l: [0, 0, 18] }, to: { p: [-3, 4.6, -6.6], l: [0, 0.5, 12] }, dur: 6.5, kicker: 'STATION 11', title: 'THE SALT PLAYA', line: 'A white basin to the horizon, and every slab looks the same.' },
+          { from: { p: [-3, 5.5, -13], l: [0, 0.3, 6] }, to: { p: [-8, 3.4, -8], l: [-9, 0.6, -3] }, dur: 5.5, kicker: 'THE NORTH EDGE', title: "THE SURVEYOR'S TRIPOD", line: 'Someone measured this basin long ago, slab by slab.' },
+          { from: { p: [-9, 1.6, -5.2], l: [-9, 1.0, 6] }, to: { p: [-9, 2.1, -6], l: [-9, 0.6, 8] }, dur: 5.5, kicker: 'MEASURED FOOTSTEPS', line: 'Weight without balance always yields to the deep.' }
+        ];
+      }
+      // The ending: the little brass balance, the salt behind us, the riders on the western rim
+      function endingShots() {
+        const x = view.x, z = view.z;
+        return [
+          { from: { p: [x - 3, 1.3, z + 4.5], l: [x, 1.2, z + 0.5] }, to: { p: [x - 1.2, 1.7, z + 2.6], l: [x, 1.2, z + 0.3] }, dur: 5.5, kicker: 'THE SOUTH SHORE', title: "THE SURVEYOR'S BALANCE", line: 'A little brass balance, wrapped in oiled cloth.' },
+          { from: { p: [x + 1, 2.4, z + 3], l: [x, 1.6, z - 12] }, to: { p: [x + 1.5, 3.2, z + 4], l: [x, 1.8, z - 28] }, dur: 6.5, line: 'Behind us the salt shines like a frozen lake, and we crossed it.' },
+          { from: { p: [x + 2, 2.2, z - 2.5], l: [-14, 1.2, SHORE_Z + 27] }, to: { p: [x + 0.5, 2.6, z - 1.5], l: [-14, 1.4, SHORE_Z + 27] }, dur: 5.5, kicker: 'ON THE WESTERN RIM', title: 'THE RIDERS WATCH', line: 'Eleven camels and a wagon. They went round the salt while we crossed it.' }
+        ];
       }
       function focusFirst() {
         const first = [...el.controls.querySelectorAll('button:not([disabled])'), ...(el.victory ? el.victory.querySelectorAll('button') : []), el.close]
@@ -2850,6 +2956,7 @@
       }
       function closePlaya() {
         if (modal.style.display === 'none') return;
+        if (cine && cine.active) cine.skip();
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (view.walk) finishWalk();
         if (view.phase === 'test') { endGauge(); showChoice(); }
@@ -2895,6 +3002,7 @@
 
       // Test hook (scripts/audit/web_smoke.py)
       window.__playa = {
+        cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
         gfx: () => G,
         state: () => Object.assign({ phase: view.phase, stage: S ? stage() : '', sky: view.sky, gl: !!G, reach: S ? reach() : [], drawn: G ? G.renderer.info.render.calls : 0, band: [BAND_C - bandHalf(), BAND_C + bandHalf()],
           cam: G ? G.camera.position.toArray().map((v) => +v.toFixed(2)) : [], up: G ? G.camera.up.toArray() : [] }, S),

@@ -679,7 +679,7 @@
             id: 'playa', tag: 'Station 11', label: 'The Salt Playa', flag: 'order_salt_playa_completed', built: true,
             complete() { set('order_salt_playa_completed', 'true'); set('order_salt_playa_path', JSON.stringify([3, 4, 3, 2, 2, 3, 3])); },
             reset() {   // its night at the Oasis Gate goes with the Chasm; its two calls on the wire (the North Edge, the south shore) go with it
-              dels(['order_salt_playa_completed', 'order_salt_playa_path', 'order_playa_walk', 'order_playa_howto', 'order_playa_howto2', 'order_lexicon_march_start', 'order_lexicon_march_bypassed']);
+              dels(['order_salt_playa_completed', 'order_salt_playa_path', 'order_playa_walk', 'order_playa_howto', 'order_playa_howto2', 'order_playa_cine_intro', 'order_playa_cine_outro', 'order_lexicon_march_start', 'order_lexicon_march_bypassed']);
               let w = null;
               try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
               if (w && typeof w === 'object') { ['seen2', 'reply2', 'seen3', 'reply3', 'seen4', 'reply4'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
@@ -689,7 +689,7 @@
             id: 'lexicon', tag: 'Station 12', label: 'The Desert Lexicon', flag: 'order_desert_lexicon_completed', built: true,
             complete() { set('order_desert_lexicon_completed', 'true'); set('order_desert_station_active', '12'); },
             reset() {   // Hermes calls again from the ruins at dusk (the walk there stays walked)
-              dels(['order_desert_lexicon_completed', 'order_lexicon_solved_words', 'order_lexicon_walk', 'order_lexicon_howto']);
+              dels(['order_desert_lexicon_completed', 'order_lexicon_solved_words', 'order_lexicon_walk', 'order_lexicon_howto', 'order_lexicon_cine_intro', 'order_lexicon_cine_outro']);
               let w = null;
               try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
               if (w && typeof w === 'object') { ['seen4', 'reply4'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }

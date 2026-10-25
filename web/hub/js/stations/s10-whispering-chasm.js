@@ -215,6 +215,7 @@
         paint(cv.getContext('2d'), w, h);
         const t = new THREE.CanvasTexture(cv);
         t.encoding = THREE.sRGBEncoding;
+        t.anisotropy = 8;   // clamped to what the GPU offers: painted surfaces stay sharp at a grazing angle
         if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
         return t;
       }
@@ -277,7 +278,7 @@
           renderer = new T.WebGLRenderer({ canvas: el.canvas, antialias: true, powerPreference: 'high-performance' });
         } catch (e) { return null; }
         const lowPower = (navigator.hardwareConcurrency || 4) <= 4;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75));
+        renderer.setPixelRatio(lowPower ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2));   // never below 1.5 on a good GPU: a little supersampling smooths every edge, and fitSpeed backs off if the frame rate suffers
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = T.PCFSoftShadowMap;
         // Painted colour: what is written is what shows, saturated, with no film curve dulling it
@@ -636,123 +637,294 @@
                  staff: H.staff, lamp: H.lamp, cloak: H.cloak, arrows, arrowGeo, dust, dustN, motes, motesBase, motesN, relicLight, relicGlow, sparks, sparksN, relic: null, lowPower, stoneAt, shafts };
       }
 
-      // ---- Hermes as the Cartographer of Distant Light: silver hair and white beard, the deep blue robe embroidered
-      // with gold constellations, brown boots, a walking staff, his satchel, the brass spyglass and the lantern ----
+      // ---- Hermes as the Cartographer of Distant Light: silver hair and white beard, kind tired eyes, the deep blue robe
+      // embroidered with gold constellations (the big one on his back, where the camera mostly sees him), the hood laid
+      // down on his shoulders, a satchel strap across the back, a bedroll, brown boots, a walking staff topped with a small
+      // brass sphere, the brass spyglass and the lantern ----
       // Adds a part to its parent at height y (Object3D.add returns the parent, so its position cannot be chained)
       function pin(parent, mesh, y) { mesh.position.y = y; parent.add(mesh); return mesh; }
+      // A surface of revolution with folds: profile [[radius, height]…], u runs round from his back (0) through his front (0.5).
+      // fold(theta, t) gives {r: radius factor, y: height shift}, so the hem can scallop and the cloth can fall in pleats
+      function foldedLathe(T, profile, segs, fold) {
+        const n = profile.length, pos = [], uv = [], idx = [];
+        for (let i = 0; i < n; i++) {
+          const t = i / (n - 1);
+          for (let j = 0; j <= segs; j++) {
+            const th = (j / segs) * Math.PI * 2, f = fold ? fold(th, t) : { r: 1, y: 0 };
+            const r = profile[i][0] * f.r;
+            pos.push(r * Math.sin(th), profile[i][1] + f.y, r * Math.cos(th));
+            uv.push(j / segs, t);
+          }
+        }
+        for (let i = 0; i < n - 1; i++) {
+          for (let j = 0; j < segs; j++) {
+            const a = i * (segs + 1) + j, b = a + segs + 1;
+            idx.push(a, b, a + 1, b, b + 1, a + 1);
+          }
+        }
+        const g = new T.BufferGeometry();
+        g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+        g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+        g.setIndex(idx);
+        g.computeVertexNormals();
+        return g;
+      }
       function buildHermes(T, glowTex) {
         const hermes = new T.Group();
-        // The robe is painted in broad strokes: royal blue that deepens towards the hem, gold constellations whose
-        // stars glow faintly of their own light, the gold border along the hem and down the front opening
-        const stars = [];
+        const aniso = (t) => { t.anisotropy = 8; return t; };
+        // ---- The robe, painted at 1024 × 512 so it stays crisp close up: royal blue that deepens towards the hem, small
+        // constellations all over, the great one on the back, the gold border at the hem and down the front opening
         const r2 = rng(43);
-        for (let k = 0; k < 16; k++) {
-          const cx = r2() * 512, cy = 40 + r2() * 166, pts = [];
-          for (let s = 0; s < 4 + Math.floor(r2() * 3); s++) pts.push([cx + (r2() - 0.5) * 70, cy + (r2() - 0.5) * 50, 2.4 + r2() * 1.8]);
-          stars.push(pts);
+        const small = [];
+        for (let k = 0; k < 26; k++) {
+          const cx = r2() * 1024, cy = 70 + r2() * 300, pts = [];
+          for (let q = 0; q < 4 + Math.floor(r2() * 3); q++) pts.push([cx + (r2() - 0.5) * 100, cy + (r2() - 0.5) * 70, 2.6 + r2() * 2.2]);
+          small.push(pts);
         }
-        const drawStars = (g, thread) => stars.forEach((pts) => {
-          if (thread) { g.strokeStyle = thread; g.lineWidth = 1.6; g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke(); }
-          pts.forEach(([x, y, rr]) => { g.fillStyle = '#ffe9a8'; g.beginPath(); g.arc(x, y, rr, 0, Math.PI * 2); g.fill(); });
-        });
-        const robeTex = canvasTex(512, 256, (g, w, h) => {
+        // the Great Bear over his shoulder blades, centred on the seam of the cloth (his back) so it is drawn at both edges
+        const bear = [[0, 120], [34, 100], [70, 104], [100, 82], [136, 60], [150, 100], [112, 138]];
+        const drawBear = (g, cx, thread) => {
+          if (thread) { g.strokeStyle = thread; g.lineWidth = 2.4; g.beginPath(); bear.forEach(([x, y], i) => (i ? g.lineTo(cx + x - 70, y + 20) : g.moveTo(cx + x - 70, y + 20))); g.stroke(); }
+          bear.forEach(([x, y], i) => {
+            const rr = 5 + (i % 3) * 1.4;
+            g.fillStyle = '#fff0b8'; g.beginPath(); g.arc(cx + x - 70, y + 20, rr, 0, Math.PI * 2); g.fill();
+            g.fillStyle = 'rgba(255,224,150,0.35)'; g.beginPath(); g.arc(cx + x - 70, y + 20, rr + 5, 0, Math.PI * 2); g.fill();
+          });
+        };
+        const drawStars = (g, thread) => {
+          small.forEach((pts) => {
+            if (thread) { g.strokeStyle = thread; g.lineWidth = 1.8; g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke(); }
+            pts.forEach(([x, y, rr]) => { g.fillStyle = '#ffe9a8'; g.beginPath(); g.arc(x, y, rr, 0, Math.PI * 2); g.fill(); });
+          });
+          drawBear(g, 0, thread); drawBear(g, 1024, thread);
+        };
+        const robeTex = aniso(canvasTex(1024, 512, (g, w, h) => {
           const grad = g.createLinearGradient(0, 0, 0, h);
-          grad.addColorStop(0, '#3a6fd0'); grad.addColorStop(0.55, '#24479c'); grad.addColorStop(1, '#152a66');
+          grad.addColorStop(0, '#4678d8'); grad.addColorStop(0.5, '#28489e'); grad.addColorStop(1, '#14275f');
           g.fillStyle = grad; g.fillRect(0, 0, w, h);
-          speckle(g, w, h, 41, 'rgba(0,0,0,0)', [['rgba(120,170,255,0.18)', 14], ['rgba(10,20,60,0.22)', 16]], 120);
+          speckle(g, w, h, 41, 'rgba(0,0,0,0)', [['rgba(130,180,255,0.16)', 22], ['rgba(10,20,60,0.2)', 26]], 200);
+          // vertical pleat shading, a hand-painted cloth
+          for (let x = 0; x < w; x += 32) { g.fillStyle = (x / 32) % 2 ? 'rgba(10,20,70,0.10)' : 'rgba(150,190,255,0.07)'; g.fillRect(x, 0, 16, h); }
           drawStars(g, 'rgba(240,200,110,0.85)');
-          g.fillStyle = '#d9a440'; g.fillRect(0, h - 28, w, 16);
-          g.fillStyle = '#ffe08a'; g.fillRect(0, h - 25, w, 3); g.fillRect(0, h - 17, w, 2);
-          g.fillStyle = '#d9a440'; g.fillRect(w / 2 - 6, 0, 12, h);
-          g.fillStyle = '#ffe08a'; g.fillRect(w / 2 - 1.5, 0, 3, h);
-        });
-        const starGlow = canvasTex(512, 256, (g, w, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, w, h); drawStars(g, null); });
+          g.fillStyle = '#d9a440'; g.fillRect(0, h - 46, w, 28);
+          g.fillStyle = '#ffe08a'; g.fillRect(0, h - 42, w, 4); g.fillRect(0, h - 28, w, 3);
+          g.fillStyle = 'rgba(255,224,138,0.9)'; for (let x = 8; x < w; x += 24) { g.beginPath(); g.moveTo(x, h - 38); g.lineTo(x + 8, h - 32); g.lineTo(x, h - 26); g.lineTo(x - 8, h - 32); g.closePath(); g.fill(); }
+          // the opening down his front (the middle of the cloth), with its gold edge
+          g.fillStyle = '#1c3270'; g.fillRect(w / 2 - 14, 0, 28, h - 46);
+          g.fillStyle = '#d9a440'; g.fillRect(w / 2 - 18, 0, 6, h); g.fillRect(w / 2 + 12, 0, 6, h);
+          g.fillStyle = '#ffe08a'; g.fillRect(w / 2 - 16, 0, 2, h); g.fillRect(w / 2 + 14, 0, 2, h);
+        }));
+        const starGlow = aniso(canvasTex(1024, 512, (g, w, h) => { g.fillStyle = '#000'; g.fillRect(0, 0, w, h); drawStars(g, null); }));
         const warm = 0xffdcae;
-        const robe = rim(toon({ map: robeTex, emissive: 0xffd27a, emissiveMap: starGlow, emissiveIntensity: 0.7 }), 0x9cc4ff, 0.45);
-        const blue = rim(toon({ color: 0x2c58b8 }), 0x9cc4ff, 0.45);
+        const robe = rim(toon({ map: robeTex, emissive: 0xffd27a, emissiveMap: starGlow, emissiveIntensity: 0.75, side: T.DoubleSide }), 0x9cc4ff, 0.45);
+        const blue = rim(toon({ color: 0x2c58b8, side: T.DoubleSide }), 0x9cc4ff, 0.45);
+        // the mantle over the shoulders: darker blue, the Great Bear in gold thread on its back, a gold edge
+        const mantleTex = aniso(canvasTex(1024, 256, (g, w, h) => {
+          const gr = g.createLinearGradient(0, 0, 0, h);
+          gr.addColorStop(0, '#2c4c9c'); gr.addColorStop(1, '#1a3280');
+          g.fillStyle = gr; g.fillRect(0, 0, w, h);
+          speckle(g, w, h, 17, 'rgba(0,0,0,0)', [['rgba(130,180,255,0.14)', 20], ['rgba(10,20,60,0.2)', 22]], 120);
+          const bearBig = [[0, 0.52], [0.09, 0.40], [0.19, 0.43], [0.27, 0.30], [0.36, 0.20], [0.40, 0.42], [0.30, 0.60]];
+          const put = (cx) => {
+            g.strokeStyle = 'rgba(245,205,115,0.95)'; g.lineWidth = 3; g.beginPath();
+            bearBig.forEach(([x, y], i) => (i ? g.lineTo(cx + (x - 0.2) * 300, y * h) : g.moveTo(cx + (x - 0.2) * 300, y * h))); g.stroke();
+            bearBig.forEach(([x, y], i) => {
+              const X = cx + (x - 0.2) * 300, Y = y * h;
+              g.fillStyle = 'rgba(255,224,150,0.3)'; g.beginPath(); g.arc(X, Y, 13, 0, 7); g.fill();
+              g.fillStyle = '#fff0b8'; g.beginPath(); g.arc(X, Y, 5.5 + (i % 3), 0, 7); g.fill();
+            });
+          };
+          put(0); put(w);
+          g.fillStyle = '#d9a440'; g.fillRect(0, h - 22, w, 14);
+          g.fillStyle = '#ffe08a'; g.fillRect(0, h - 20, w, 3);
+          for (let x = 10; x < w; x += 26) { g.beginPath(); g.moveTo(x, h - 15); g.lineTo(x + 7, h - 11); g.lineTo(x, h - 7); g.lineTo(x - 7, h - 11); g.closePath(); g.fill(); }
+        }));
+        const mantleGlow = aniso(canvasTex(1024, 256, (g, w, h) => {
+          g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+          const bearBig = [[0, 0.52], [0.09, 0.40], [0.19, 0.43], [0.27, 0.30], [0.36, 0.20], [0.40, 0.42], [0.30, 0.60]];
+          const put = (cx) => bearBig.forEach(([x, y]) => { g.fillStyle = '#fff0b8'; g.beginPath(); g.arc(cx + (x - 0.2) * 300, y * h, 6, 0, 7); g.fill(); });
+          put(0); put(w);
+        }));
+        const deep = rim(toon({ map: mantleTex, emissive: 0xffd27a, emissiveMap: mantleGlow, emissiveIntensity: 0.8, side: T.DoubleSide }), 0x9cc4ff, 0.4);
         const skin = rim(toon({ color: 0xf0b48c }), warm, 0.3);
-        const silver = rim(toon({ color: 0xf4f2ee }), 0xffffff, 0.35);
+        const blush = rim(toon({ color: 0xe8957a }), warm, 0.2);
+        // silver hair and beard: fine strands painted in, so a close look still shows hair and not a smooth shell
+        const hairTex = aniso(canvasTex(256, 256, (g, w, h) => {
+          g.fillStyle = '#f2f0ec'; g.fillRect(0, 0, w, h);
+          const rr = rng(5);
+          for (let i = 0; i < 520; i++) {
+            const x = rr() * w, y = rr() * h, l = 24 + rr() * 60, dark = rr() < 0.5;
+            g.strokeStyle = dark ? 'rgba(150,158,176,0.35)' : 'rgba(255,255,255,0.7)'; g.lineWidth = 1 + rr() * 1.6;
+            g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + (rr() - 0.5) * 10, y + l / 2, x + (rr() - 0.5) * 14, y + l); g.stroke();
+          }
+        }));
+        const silver = rim(toon({ color: 0xffffff, map: hairTex }), 0xffffff, 0.35);
+        const grey = rim(toon({ color: 0xcfd2da }), 0xffffff, 0.3);
         const leather = rim(toon({ color: 0x7a4a26 }), warm, 0.3);
+        const leatherDk = rim(toon({ color: 0x4e2e16 }), warm, 0.25);
         const boot = rim(toon({ color: 0x5e3418 }), warm, 0.25);
         const wood = rim(toon({ color: 0x8a5a2e }), warm, 0.3);
+        const woodDk = rim(toon({ color: 0x5c3a1c }), warm, 0.25);
         const brass = rim(toon({ color: 0xf0c060 }), 0xfff0b0, 0.6);
         const gold = rim(toon({ color: 0xf2c25a, emissive: 0x3a2404 }), 0xfff0b0, 0.5);
-        const V = (a) => a.map((p) => new T.Vector2(p[0], p[1]));
+        const ink = new T.MeshBasicMaterial({ color: 0x2a1a12 });
+        const eyeWhite = new T.MeshBasicMaterial({ color: 0xfffaf0 });
         const add = (mesh, x, y, z, parent) => { mesh.position.set(x, y, z); mesh.castShadow = true; (parent || hermes).add(mesh); return mesh; };
+        const ell = (geo, mat, sx, sy, sz) => { const m = new T.Mesh(geo, mat); m.scale.set(sx, sy, sz); return m; };
 
-        // The robe falls from the shoulders to just above the boots; a short cape covers the shoulders
+        // ---- The robe: pleats all round, a scalloped hem, falling from the shoulders to just above the boots
         const cloak = new T.Group();
         hermes.add(cloak);
-        const robeGeo = new T.LatheGeometry(V([[0.4, 0.1], [0.37, 0.3], [0.33, 0.55], [0.29, 0.8], [0.26, 1.0], [0.25, 1.15], [0.27, 1.28], [0.22, 1.38], [0.09, 1.44]]), 24);
-        robeGeo.rotateY(Math.PI);    // the gold opening (the middle of the texture) comes to the front, which is -Z
-        add(new T.Mesh(robeGeo, robe), 0, 0, 0, cloak);
-        add(new T.Mesh(new T.LatheGeometry(V([[0.36, 1.06], [0.34, 1.2], [0.29, 1.34], [0.18, 1.43], [0.1, 1.46]]), 24), blue), 0, 0, 0, cloak);
-        add(new T.Mesh(new T.CylinderGeometry(0.27, 0.27, 0.05, 20, 1, true), gold), 0, 0.97, 0, cloak);   // the sash
-        // The hood lies down around his neck, as in the portraits
-        const cowl = add(new T.Mesh(new T.TorusGeometry(0.13, 0.065, 8, 18), blue), 0, 1.45, 0.01);
+        const pleat = (th, t) => ({ r: 1 + 0.045 * Math.sin(th * 9 + t * 2.2) * (1 - t * 0.55) + 0.02 * Math.sin(th * 5 + 1), y: t < 0.04 ? 0.025 * Math.sin(th * 9) : 0 });
+        const robeProfile = [[0.43, 0.1], [0.40, 0.22], [0.36, 0.4], [0.32, 0.6], [0.29, 0.8], [0.265, 0.98], [0.25, 1.14], [0.265, 1.27], [0.23, 1.37], [0.14, 1.44], [0.09, 1.47]];
+        add(new T.Mesh(foldedLathe(T, robeProfile, 56, pleat), robe), 0, 0, 0, cloak);
+        // the shoulder mantle with a scalloped edge and a gold trim
+        const mantleFold = (th, t) => ({ r: 1 + 0.03 * Math.sin(th * 7), y: t > 0.85 ? -0.035 * (0.5 + 0.5 * Math.cos(th * 14)) : 0 });
+        add(new T.Mesh(foldedLathe(T, [[0.12, 1.47], [0.2, 1.45], [0.29, 1.4], [0.35, 1.32], [0.375, 1.22], [0.385, 1.14]], 56, mantleFold), deep), 0, 0, 0, cloak);
+        const trim = add(new T.Mesh(new T.TorusGeometry(0.378, 0.011, 8, 56), gold), 0, 1.15, 0, cloak);
+        trim.rotation.x = Math.PI / 2; trim.scale.set(1, 1, 1);
+        // belt of gold brocade with its buckle, and a hanging cord
+        const sash = add(new T.Mesh(new T.TorusGeometry(0.262, 0.032, 10, 48), gold), 0, 0.98, 0, cloak);
+        sash.rotation.x = Math.PI / 2;
+        add(new T.Mesh(new T.BoxGeometry(0.075, 0.07, 0.025), brass), 0, 0.98, -0.268, cloak);
+        add(new T.Mesh(new T.CylinderGeometry(0.008, 0.008, 0.28, 6), gold), 0.07, 0.84, -0.26, cloak);
+        // ---- The hood lies down on his shoulders: a pool of cloth behind the neck, a soft ring in front
+        const cowl = add(new T.Mesh(new T.TorusGeometry(0.15, 0.06, 10, 28), blue), 0, 1.47, 0.0);
         cowl.rotation.x = Math.PI / 2;
-        const hood = add(new T.Mesh(new T.SphereGeometry(0.16, 14, 10), blue), 0, 1.45, 0.11);
-        hood.scale.set(1.05, 0.65, 0.75);
-        // Head: the face, silver hair swept back, the white beard
-        add(new T.Mesh(new T.SphereGeometry(0.14, 16, 12), skin), 0, 1.61, 0);
-        add(new T.Mesh(new T.SphereGeometry(0.148, 16, 12), silver), 0, 1.638, 0.03);
-        const mane = add(new T.Mesh(new T.SphereGeometry(0.11, 12, 10), silver), 0, 1.54, 0.08);
-        mane.scale.set(1.15, 1, 0.7);
-        const beard = add(new T.Mesh(new T.ConeGeometry(0.095, 0.24, 12), silver), 0, 1.47, -0.09);
-        beard.rotation.x = Math.PI + 0.35;
-        add(new T.Mesh(new T.SphereGeometry(0.024, 8, 6), skin), 0, 1.61, -0.14);   // the nose
-        // Arms in wide sleeves; fingerless leather gloves
+        const drape = add(ell(new T.SphereGeometry(0.17, 20, 14), blue, 1.15, 0.7, 0.95), 0, 1.44, 0.12);
+        drape.rotation.x = -0.35;
+        const tip = add(new T.Mesh(new T.ConeGeometry(0.075, 0.26, 14), blue), 0, 1.24, 0.2);
+        tip.rotation.x = 0.12;
+        add(new T.Mesh(new T.TorusGeometry(0.095, 0.012, 8, 20), gold), 0, 1.31, 0.17).rotation.x = 0.4;
+        // ---- Head: a long kind face, tired eyes under heavy lids, silver brows, a white moustache over a full beard
+        const head = new T.Group();
+        head.position.set(0, 1.64, 0);
+        hermes.add(head);
+        const hadd = (mesh, x, y, z) => { mesh.position.set(x, y, z); mesh.castShadow = true; head.add(mesh); return mesh; };
+        hadd(ell(new T.SphereGeometry(0.145, 28, 20), skin, 0.92, 1.08, 0.98), 0, 0, 0);
+        hadd(ell(new T.SphereGeometry(0.03, 12, 10), skin, 1, 1.2, 1.05), 0, -0.012, -0.145);                 // the nose
+        hadd(ell(new T.SphereGeometry(0.018, 10, 8), skin, 1.2, 1, 1), 0, -0.04, -0.152);                       // its tip
+        [-1, 1].forEach((sd) => {
+          hadd(ell(new T.SphereGeometry(0.026, 14, 10), eyeWhite, 1.15, 0.8, 0.5), sd * 0.052, 0.022, -0.13);
+          hadd(new T.Mesh(new T.SphereGeometry(0.0125, 10, 8), ink), sd * 0.052, 0.02, -0.1385);
+          hadd(ell(new T.SphereGeometry(0.03, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, 1.2, 0.75, 0.6), sd * 0.052, 0.028, -0.128);      // the heavy lid
+          const brow = hadd(ell(new T.CapsuleGeometry(0.012, 0.05, 4, 8), silver, 1, 1, 1), sd * 0.055, 0.058, -0.132);
+          brow.rotation.z = Math.PI / 2 + sd * 0.18;
+          hadd(ell(new T.SphereGeometry(0.03, 12, 10), blush, 1.2, 0.8, 0.6), sd * 0.085, -0.025, -0.11);                                    // ruddy cheeks
+          hadd(ell(new T.SphereGeometry(0.03, 10, 8), skin, 0.6, 1.3, 0.8), sd * 0.133, 0.0, 0.0);                                         // ears
+        });
+        // silver hair swept back from the brow, falling behind the ears
+        const hair = hadd(ell(new T.SphereGeometry(0.152, 28, 18, 0, Math.PI * 2, 0, 1.95), silver, 0.97, 1.08, 1.02), 0, 0.012, 0.018);
+        hair.rotation.x = -0.28;
+        [-1, 1].forEach((sd) => {
+          const lock = hadd(ell(new T.SphereGeometry(0.06, 12, 10), silver, 0.8, 1.7, 1), sd * 0.1, -0.075, 0.07);
+          lock.rotation.z = sd * 0.25;
+        });
+        const nape = hadd(ell(new T.SphereGeometry(0.085, 14, 10), silver, 1.1, 0.7, 0.7), 0, -0.095, 0.095);
+        nape.rotation.x = 0.4;
+        // moustache and beard in tufts
+        [-1, 1].forEach((sd) => {
+          const m = hadd(ell(new T.SphereGeometry(0.03, 12, 8), silver, 1.6, 0.7, 0.8), sd * 0.03, -0.062, -0.135);
+          m.rotation.z = sd * -0.35;
+        });
+        const beard = hadd(new T.Mesh(new T.ConeGeometry(0.105, 0.28, 20), silver), 0, -0.19, -0.075);
+        beard.rotation.x = Math.PI + 0.32;
+        [-1, 1].forEach((sd) => {
+          const tuft = hadd(new T.Mesh(new T.ConeGeometry(0.05, 0.17, 12), silver), sd * 0.065, -0.115, -0.09);
+          tuft.rotation.set(Math.PI + 0.25, 0, sd * 0.35);
+          hadd(ell(new T.SphereGeometry(0.052, 12, 10), silver, 1, 1.2, 0.9), sd * 0.075, -0.07, -0.07);
+        });
+        const chin = hadd(ell(new T.SphereGeometry(0.075, 16, 12), silver, 1, 0.9, 0.9), 0, -0.09, -0.1);
+        chin.rotation.x = 0.2;
+        // ---- Arms in wide sleeves with a gold cuff; leather gloves with their fingers
         function arm(side, ax, az) {
           const a = new T.Group();
-          a.position.set(side * 0.27, 1.33, 0);
+          a.position.set(side * 0.27, 1.34, 0);
           a.rotation.set(ax, 0, az);
-          const sleeve = new T.Mesh(new T.CylinderGeometry(0.06, 0.1, 0.48, 10), blue);
-          sleeve.position.y = -0.24; sleeve.castShadow = true; a.add(sleeve);
-          const glove = new T.Mesh(new T.SphereGeometry(0.068, 10, 8), leather);
-          glove.position.y = -0.52; a.add(glove);
+          const sleeve = new T.Mesh(new T.CylinderGeometry(0.058, 0.115, 0.5, 18, 3, true), blue);
+          sleeve.position.y = -0.25; sleeve.castShadow = true; a.add(sleeve);
+          const shoulder = new T.Mesh(new T.SphereGeometry(0.075, 14, 10), blue);
+          shoulder.castShadow = true; a.add(shoulder);
+          const cuff = new T.Mesh(new T.TorusGeometry(0.116, 0.014, 8, 20), gold);
+          cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.5; a.add(cuff);
+          const hand = new T.Group();
+          hand.position.y = -0.55;
+          a.add(hand);
+          const palm = new T.Mesh(new T.SphereGeometry(0.055, 14, 10), leather);
+          palm.scale.set(1, 0.9, 0.8); palm.castShadow = true; hand.add(palm);
+          for (let f = 0; f < 4; f++) {
+            const fin = new T.Mesh(new T.CapsuleGeometry(0.0125, 0.045, 3, 6), leather);
+            fin.position.set(-0.03 + f * 0.02, -0.062, -0.012); fin.rotation.x = 0.35; hand.add(fin);
+          }
+          const thumb = new T.Mesh(new T.CapsuleGeometry(0.014, 0.04, 3, 6), leather);
+          thumb.position.set(side * 0.05, -0.02, -0.02); thumb.rotation.z = side * 0.9; hand.add(thumb);
           hermes.add(a);
           return a;
         }
         const armR = arm(1, 0.55, 0.12), armL = arm(-1, 0.35, -0.15);
-        // The lantern hangs from his right hand, upright whatever the arm does
+        // ---- The lantern hangs from his right hand, upright whatever the arm does
         const lamp = new T.Group();
-        lamp.position.set(0, -0.6, 0);
+        lamp.position.set(0, -0.62, 0);
         lamp.rotation.x = -0.55;
         armR.add(lamp);
         const lampBody = new T.Group();
         lampBody.position.y = -0.08;
         lamp.add(lampBody);
-        pin(lampBody, new T.Mesh(new T.CylinderGeometry(0.075, 0.085, 0.03, 10), brass), -0.09);
-        pin(lampBody, new T.Mesh(new T.ConeGeometry(0.08, 0.07, 10), brass), 0.1);
-        const glass = new T.Mesh(new T.CylinderGeometry(0.065, 0.065, 0.16, 10), new T.MeshBasicMaterial({ color: 0xffc46a, transparent: true, opacity: 0.55 }));
+        pin(lampBody, new T.Mesh(new T.CylinderGeometry(0.078, 0.088, 0.03, 16), brass), -0.095);
+        pin(lampBody, new T.Mesh(new T.ConeGeometry(0.085, 0.075, 16), brass), 0.105);
+        pin(lampBody, new T.Mesh(new T.TorusGeometry(0.03, 0.007, 6, 14), brass), 0.165).rotation.x = Math.PI / 2;
+        for (let c = 0; c < 4; c++) {
+          const bar = new T.Mesh(new T.CylinderGeometry(0.005, 0.005, 0.19, 5), brass);
+          const a = c * Math.PI / 2 + Math.PI / 4;
+          bar.position.set(Math.cos(a) * 0.07, 0, Math.sin(a) * 0.07); lampBody.add(bar);
+        }
+        const glass = new T.Mesh(new T.CylinderGeometry(0.066, 0.066, 0.17, 16), new T.MeshBasicMaterial({ color: 0xffc46a, transparent: true, opacity: 0.5 }));
         lampBody.add(glass);
-        const flame = new T.Mesh(new T.SphereGeometry(0.035, 8, 8), new T.MeshBasicMaterial({ color: 0xfff0b8, toneMapped: false }));
+        const flame = new T.Mesh(new T.SphereGeometry(0.036, 12, 10), new T.MeshBasicMaterial({ color: 0xfff0b8, toneMapped: false }));
+        flame.scale.set(1, 1.35, 1);
         lampBody.add(flame);
         const halo = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffb860, transparent: true, opacity: 0.55, depthWrite: false, blending: T.AdditiveBlending }));
         halo.scale.set(0.7, 0.7, 1);
         flame.add(halo);
-        // The staff in his left hand, as he walks out of the sketch of the North Portal
+        // ---- The staff in his left hand: knotted wood, a leather grip, a small brass sphere on a ring
         const staff = new T.Group();
         staff.position.set(-0.34, 0.84, -0.18);
         hermes.add(staff);
-        const pole = new T.Mesh(new T.CylinderGeometry(0.022, 0.028, 1.8, 8), wood);
-        pole.position.y = 0.06; pole.castShadow = true; staff.add(pole);
-        pin(staff, new T.Mesh(new T.TorusGeometry(0.045, 0.014, 6, 12), brass), 0.98);
-        // A small star of brass set in the ring, that keeps a glint of light even in the shade
-        const finial = pin(staff, new T.Mesh(new T.OctahedronGeometry(0.035, 0), new T.MeshBasicMaterial({ color: 0xfff0b0, toneMapped: false })), 0.98);
+        const poleGeo = foldedLathe(T, [[0.026, -0.84], [0.022, -0.4], [0.025, 0.0], [0.03, 0.2], [0.024, 0.45], [0.02, 0.8], [0.024, 0.9], [0.03, 0.95]], 14, (th, t) => ({ r: 1 + 0.12 * Math.sin(t * 17), y: 0 }));
+        const pole = new T.Mesh(poleGeo, wood);
+        pole.castShadow = true; staff.add(pole);
+        pin(staff, new T.Mesh(new T.CylinderGeometry(0.034, 0.034, 0.16, 14), leatherDk), 0.1);                // the grip
+        pin(staff, new T.Mesh(new T.TorusGeometry(0.035, 0.011, 8, 16), brass), 0.97).rotation.x = Math.PI / 2;
+        const finial = pin(staff, new T.Mesh(new T.SphereGeometry(0.036, 18, 14), brass), 1.02);               // the small brass sphere
+        finial.castShadow = true;
+        pin(staff, new T.Mesh(new T.ConeGeometry(0.02, 0.05, 10), brass), -0.86).rotation.x = Math.PI;         // the iron-shod foot
         const glint = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffd890, transparent: true, opacity: 0.6, depthWrite: false, blending: T.AdditiveBlending }));
-        glint.scale.set(0.32, 0.32, 1);
+        glint.scale.set(0.3, 0.3, 1);
         finial.add(glint);
-        // The satchel on his right hip, the brass spyglass tucked behind the sash
-        add(new T.Mesh(new T.BoxGeometry(0.1, 0.22, 0.26), leather), 0.31, 0.86, 0.05);
-        const glassTube = add(new T.Mesh(new T.CylinderGeometry(0.03, 0.038, 0.36, 10), brass), -0.1, 1.02, 0.27);
-        glassTube.rotation.z = 0.9;
-        // Boots that show under the hem as he walks
+        // ---- The satchel on his right hip with its flap, the strap over his shoulder across his back, a bedroll, the spyglass
+        const bag = add(new T.Mesh(new T.BoxGeometry(0.11, 0.22, 0.27, 2, 2, 2), leather), 0.33, 0.86, 0.04);
+        const flap = add(new T.Mesh(new T.BoxGeometry(0.118, 0.1, 0.275), leatherDk), 0.33, 0.94, 0.04);
+        add(new T.Mesh(new T.BoxGeometry(0.02, 0.05, 0.04), brass), 0.395, 0.9, 0.04);
+        const strap = new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([new T.Vector3(-0.19, 1.41, 0.06), new T.Vector3(-0.1, 1.3, 0.26), new T.Vector3(0.12, 1.1, 0.29), new T.Vector3(0.3, 0.95, 0.17), new T.Vector3(0.33, 0.9, 0.06)]), 24, 0.012, 6, false), leatherDk);
+        strap.castShadow = true; hermes.add(strap);
+        const roll = add(new T.Mesh(new T.CylinderGeometry(0.062, 0.062, 0.46, 16), new T.MeshToonMaterial({ color: 0x9c7a50, gradientMap: toonRamp })), 0, 0.9, 0.3);
+        roll.rotation.set(0.12, 0, Math.PI / 2 - 0.1);
+        [-0.15, 0.15].forEach((x) => { const b = add(new T.Mesh(new T.TorusGeometry(0.066, 0.009, 6, 16), leatherDk), x, 0.9 + x * 0.1, 0.3); b.rotation.y = Math.PI / 2; });
+        const glassTube = add(new T.Mesh(new T.CylinderGeometry(0.03, 0.038, 0.36, 14), brass), -0.31, 0.92, 0.1);
+        glassTube.rotation.set(0.15, 0, 0.12);
+        pin(glassTube, new T.Mesh(new T.TorusGeometry(0.036, 0.007, 6, 14), gold), 0.1).rotation.x = Math.PI / 2;
+        // ---- Boots that show under the hem as he walks: shaft, rounded toe, sole
         const legL = new T.Group(), legR = new T.Group();
         [[legL, -0.1], [legR, 0.1]].forEach(([g, x]) => {
-          const b = new T.Mesh(new T.BoxGeometry(0.12, 0.1, 0.24), boot);
-          b.position.set(0, 0.05, -0.04); b.castShadow = true;
-          g.add(b); g.position.x = x; hermes.add(g);
+          const shaft = new T.Mesh(new T.CylinderGeometry(0.058, 0.066, 0.12, 14), boot);
+          shaft.position.set(0, 0.1, 0.0); shaft.castShadow = true; g.add(shaft);
+          const toe = new T.Mesh(new T.SphereGeometry(0.066, 14, 10), boot);
+          toe.scale.set(1, 0.6, 1.5); toe.position.set(0, 0.05, -0.06); toe.castShadow = true; g.add(toe);
+          const sole = new T.Mesh(new T.BoxGeometry(0.125, 0.02, 0.27), woodDk);
+          sole.position.set(0, 0.012, -0.03); g.add(sole);
+          const cuffB = new T.Mesh(new T.TorusGeometry(0.063, 0.011, 6, 14), leather);
+          cuffB.rotation.x = Math.PI / 2; cuffB.position.y = 0.16; g.add(cuffB);
+          g.position.x = x; hermes.add(g);
         });
         return { hermes, legL, legR, flame, staff, lamp, cloak };
       }
@@ -2108,23 +2280,80 @@
       });
       modal.addEventListener('click', (e) => { if (e.target === modal) closeChasm(); });
 
-      // Keeps the 3D walks smooth on any screen: if the GPU cannot hold about 45 frames a second, the picture is drawn with
-      // fewer pixels (never below 0.75 per CSS pixel) until it can. It only ever steps down, so it never flickers between two sizes.
+      // Keeps the 3D walks smooth on any screen: if the GPU cannot hold the frame rate (a good share of the last 90 frames took
+      // more than 26 ms), the picture is drawn with fewer pixels (never below 0.75 per CSS pixel) until it can. It only ever
+      // steps down, so it never flickers between two sizes; the first two seconds (shaders compiling) say nothing about the GPU.
       function fitSpeed(renderer) {
-        let ema = 16.7, seen = 0, ratio = renderer.getPixelRatio();
+        let ratio = renderer.getPixelRatio(), seen = 0, win = 0, slow = 0;
         return function (dt) {
-          if (!(dt > 0) || dt >= 0.09 || ++seen < 45) return;   // a pause or a hitch says nothing about the GPU
-          ema += (dt * 1000 - ema) * 0.08;
-          if (ema > 23 && ratio > 0.75) {
-            ratio = Math.max(0.75, ratio * 0.85);
-            renderer.setPixelRatio(ratio);
-            ema = 16.7; seen = 20;
+          if (!(dt > 0) || dt >= 0.09) return;   // a pause or a hitch says nothing about the GPU
+          if (++seen < 120) return;
+          win++; if (dt > 0.026) slow++;
+          if (win < 90) return;
+          if (slow >= 22 && ratio > 0.75) { ratio = Math.max(0.75, ratio * 0.85); renderer.setPixelRatio(ratio); }
+          win = 0; slow = 0;
+        };
+      }
+
+      // The director of the in-engine cinematics of the desert games (the openings and endings of the Salt Playa and the Desert
+      // Lexicon): a list of shots, each a camera that glides from one place to another with a soft start and stop, a title card,
+      // a line of subtitle, black bars above and below, and a Skip button. The game asks `frame(dt)` for the camera while it
+      // runs and takes over again when it ends. With reduced motion it does not play at all.
+      function cinema(stage, hooks) {
+        const box = document.createElement('div');
+        box.className = 'chasm3d-cine';
+        box.hidden = true;
+        box.innerHTML = '<i class="cine-bar cine-top"></i><i class="cine-bar cine-bottom"></i><div class="cine-title" aria-hidden="true"><small></small><strong></strong></div><i class="cine-fade"></i><button type="button" class="cine-skip">Skip ▸</button>';
+        stage.appendChild(box);
+        const titleEl = box.querySelector('.cine-title'), small = titleEl.querySelector('small'), strong = titleEl.querySelector('strong'), fade = box.querySelector('.cine-fade'), skipBtn = box.querySelector('.cine-skip');
+        let run = null;
+        const ease = (t) => t * t * (3 - 2 * t);
+        const mix = (a2, b2, k) => [a2[0] + (b2[0] - a2[0]) * k, a2[1] + (b2[1] - a2[1]) * k, a2[2] + (b2[2] - a2[2]) * k];
+        function shot(i) {
+          const sh = run.shots[i];
+          run.i = i; run.t = 0;
+          small.textContent = sh.kicker || ''; strong.textContent = sh.title || '';
+          titleEl.classList.remove('is-on'); void titleEl.offsetWidth;
+          if (sh.title || sh.kicker) titleEl.classList.add('is-on');
+          if (hooks.onShot) hooks.onShot(i, sh);
+        }
+        function finish() {
+          if (!run) return;
+          const r = run; run = null;
+          const done = () => {
+            box.hidden = true; box.classList.remove('is-on'); stage.classList.remove('is-cine'); fade.classList.remove('is-on');
+            if (r.onEnd) r.onEnd();
+          };
+          if (r.fade && !hooks.reduced()) { fade.classList.add('is-on'); setTimeout(done, 380); } else done();
+        }
+        skipBtn.addEventListener('click', (e) => { e.stopPropagation(); finish(); });
+        return {
+          get active() { return !!run; },
+          start(shots, onEnd, opts) {
+            if (hooks.reduced()) { if (onEnd) onEnd(); return false; }
+            run = { shots, onEnd, fade: !!(opts && opts.fade), i: 0, t: 0 };
+            box.hidden = false; stage.classList.add('is-cine');
+            requestAnimationFrame(() => box.classList.add('is-on'));
+            shot(0);
+            setTimeout(() => { if (run) skipBtn.focus({ preventScroll: true }); }, 60);
+            return true;
+          },
+          skip: finish,
+          // the camera for this frame: {p, l} (a place and a point to look at), or null when no cinematic is running
+          frame(dt) {
+            if (!run) return null;
+            const sh = run.shots[run.i];
+            run.t += dt;
+            const k = Math.min(1, run.t / sh.dur), e = sh.linear ? k : ease(k);
+            const out = { p: mix(sh.from.p, sh.to.p, e), l: mix(sh.from.l, sh.to.l, e) };
+            if (run.t >= sh.dur) { if (run.i + 1 < run.shots.length) shot(run.i + 1); else finish(); }
+            return out;
           }
         };
       }
 
       // The painted look and Hermes himself, for the other 3D walks (the Salt Playa, s11-salt-playa.js)
-      window.EclipsePaint = { rng, canvasTex, speckle, toon, rim, worldPainted, buildHermes, fitSpeed };
+      window.EclipsePaint = { rng, canvasTex, speckle, toon, rim, worldPainted, buildHermes, fitSpeed, cinema };
 
       // Test hook (scripts/audit/web_smoke.py)
       window.__chasm = {

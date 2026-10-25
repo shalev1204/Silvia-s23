@@ -109,6 +109,10 @@
         ]
       });
 
+      // The openings and endings that the engine plays itself (EclipsePaint.cinema): seen once, then skipped
+      const CINE_INTRO = 'order_lexicon_cine_intro', CINE_OUTRO = 'order_lexicon_cine_outro';
+      let cine = null;
+
       // ---- State (saved at every action, so she can close the Hub and come back to the same moment of the night) ----
       let S = null;
       function fresh() {
@@ -202,7 +206,7 @@
           renderer = new T.WebGLRenderer({ canvas: el.canvas, antialias: true, powerPreference: 'high-performance' });
         } catch (e) { return null; }
         const lowPower = (navigator.hardwareConcurrency || 4) <= 4;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, lowPower ? 1.25 : 1.75));
+        renderer.setPixelRatio(lowPower ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(Math.max(window.devicePixelRatio || 1, 1.5), 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = T.PCFSoftShadowMap;
         renderer.outputEncoding = T.sRGBEncoding;
@@ -224,6 +228,11 @@
         skyGeo.setAttribute('color', new T.BufferAttribute(sc, 3));
         const sky = new T.Mesh(skyGeo, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide, fog: false, depthWrite: false, toneMapped: false }));
         scene.add(sky);
+        const starTex = P.canvasTex(64, 64, (g, w) => {   // a round, soft point: stars are never little squares
+          const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+          gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,0.8)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+          g.fillStyle = gr; g.fillRect(0, 0, w, w);
+        });
         const starsOf = (n, size, seed, op) => {
           const r2 = P.rng(seed), v = new Float32Array(n * 3);
           for (let i = 0; i < n; i++) {
@@ -231,7 +240,7 @@
             v.set([Math.cos(a) * rr * 280, y * 280, Math.sin(a) * rr * 280], i * 3);
           }
           const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(v, 3));
-          const m = new T.Points(g, new T.PointsMaterial({ color: 0xf2f4ff, size, sizeAttenuation: false, transparent: true, opacity: op, fog: false, depthWrite: false }));
+          const m = new T.Points(g, new T.PointsMaterial({ color: 0xf2f4ff, size: size * 2.1, sizeAttenuation: false, map: starTex, transparent: true, opacity: op, fog: false, depthWrite: false, blending: T.AdditiveBlending }));
           scene.add(m);
           return m;
         };
@@ -271,7 +280,7 @@
         moonLight.position.set(16, 26, 22);
         moonLight.castShadow = true;
         moonLight.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
-        Object.assign(moonLight.shadow.camera, { left: -26, right: 26, top: 26, bottom: -26, near: 1, far: 90 });
+        Object.assign(moonLight.shadow.camera, { left: -21, right: 21, top: 21, bottom: -21, near: 1, far: 90 });   // a tighter frustum: sharper shadows from the same map
         moonLight.shadow.bias = -0.0006;
         scene.add(moonLight); scene.add(moonLight.target);
         const fireLight = new T.PointLight(0xff8a3c, 2.4, 18, 1.6);
@@ -281,7 +290,7 @@
         scene.add(torchLight);
 
         // ---- The sand: a flat square among the ruins, dunes all round, painted cool where the moon does not reach ----
-        const gGeo = new T.PlaneGeometry(240, 240, 140, 140);
+        const gGeo = new T.PlaneGeometry(240, 240, 210, 210);
         gGeo.rotateX(-Math.PI / 2);
         const gp = gGeo.attributes.position, gc = new Float32Array(gp.count * 3);
         const sandHi = new T.Color(0xbba68c), sandLo = new T.Color(0x5c5f86), dune = (x, z) => {
@@ -296,17 +305,64 @@
         }
         gGeo.setAttribute('color', new T.BufferAttribute(gc, 3));
         gGeo.computeVertexNormals();
-        const ground = new T.Mesh(gGeo, P.toon({ vertexColors: true }));
+        // painted per pixel, so it never blurs or pixelates: wind ripples that catch the moon, a fine grain, glints of lit grains
+        const sandTime = { value: 0 };
+        const sandPaint = P.worldPainted(P.toon({ vertexColors: true }), { uTime: sandTime },
+          `uniform float uTime;
+float sHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(sHash(i), sHash(i + vec2(1.0, 0.0)), f.x), mix(sHash(i + vec2(0.0, 1.0)), sHash(i + vec2(1.0, 1.0)), f.x), f.y); }
+`,
+          `  vec2 p = vWp.xz;
+  float w = sNoise(p * 0.35) * 5.0;
+  float rip = sin(dot(p, vec2(0.93, 0.36)) * 3.4 + w) * 0.5 + 0.5;
+  float rip2 = sin(dot(p, vec2(-0.2, 0.98)) * 7.5 + sNoise(p * 0.9) * 4.0) * 0.5 + 0.5;
+  float near = 1.0 - smoothstep(18.0, 70.0, length(p));
+  float grain = sHash(floor(p * 38.0));
+  float m = 1.0 + (rip - 0.5) * 0.17 * (0.4 + near) + (rip2 - 0.5) * 0.09 * near + (grain - 0.5) * 0.07 * near + (sNoise(p * 0.12) - 0.5) * 0.1;
+  diffuseColor.rgb *= m;
+  diffuseColor.rgb += vec3(0.5, 0.55, 0.85) * step(0.9985, grain) * near * (0.5 + 0.5 * sin(uTime * 2.0 + grain * 40.0));`);
+        const ground = new T.Mesh(gGeo, sandPaint);
         ground.receiveShadow = true;
         scene.add(ground);
 
         // ---- Mud-brick walls, broken at the top, and stone blocks fallen at their feet ----
-        const brick = P.toon({ color: 0xa7856a }), brickDark = P.toon({ color: 0x86684f }), stone = P.toon({ color: 0xb59a78 });
+        // mud brick in courses, with mortar that sits back (a bump map), and dressed stone: textures of 2 m a side
+        const brickCv = (tint) => P.canvasTex(512, 512, (g, w, h) => {
+          const r2 = P.rng(tint ? 31 : 17), rows = 8, bh = h / rows;
+          g.fillStyle = '#5a4030'; g.fillRect(0, 0, w, h);
+          for (let r = 0; r < rows; r++) {
+            const bw = 128 + (r % 3) * 16, off = (r % 2) * bw / 2;
+            for (let x = -bw; x < w + bw; x += bw) {
+              const l = 0.9 + r2() * 0.22, c = tint ? [140 * l, 106 * l, 80 * l] : [176 * l, 138 * l, 106 * l];
+              g.fillStyle = `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
+              g.fillRect(x + off + 3, r * bh + 3, bw - 6, bh - 6);
+              for (let k = 0; k < 14; k++) { g.fillStyle = r2() < 0.5 ? 'rgba(60,36,22,0.22)' : 'rgba(255,230,200,0.14)'; g.fillRect(x + off + 4 + r2() * (bw - 10), r * bh + 4 + r2() * (bh - 10), 2 + r2() * 5, 2 + r2() * 4); }
+            }
+          }
+          for (let i = 0; i < 6; i++) { g.strokeStyle = 'rgba(40,24,14,0.4)'; g.lineWidth = 1.5; g.beginPath(); let x = r2() * w, y = r2() * h; g.moveTo(x, y); for (let k = 0; k < 5; k++) { x += (r2() - 0.5) * 30; y += 10 + r2() * 20; g.lineTo(x, y); } g.stroke(); }
+        }, [1, 1]);
+        const stoneCv = P.canvasTex(512, 512, (g, w, h) => {
+          const r2 = P.rng(53);
+          g.fillStyle = '#b89c7c'; g.fillRect(0, 0, w, h);
+          for (let i = 0; i < 40; i++) { g.fillStyle = r2() < 0.5 ? 'rgba(90,64,40,0.12)' : 'rgba(255,236,206,0.13)'; const rr = 12 + r2() * 40; g.beginPath(); g.arc(r2() * w, r2() * h, rr, 0, 7); g.fill(); }
+          for (let i = 0; i < 1800; i++) { g.fillStyle = r2() < 0.5 ? 'rgba(70,46,28,0.18)' : 'rgba(255,240,216,0.16)'; g.fillRect(r2() * w, r2() * h, 1 + r2() * 3, 1 + r2() * 3); }
+        }, [1, 1]);
+        const brickA = brickCv(false), brickB = brickCv(true);
+        const brick = P.toon({ color: 0xffffff, map: brickA, bumpMap: brickA, bumpScale: 2.2 });
+        const brickDark = P.toon({ color: 0xd8c0aa, map: brickB, bumpMap: brickB, bumpScale: 2.2 });
+        const stone = P.toon({ color: 0xffffff, map: stoneCv, bumpMap: stoneCv, bumpScale: 1.6 });
         const box = new T.BoxGeometry(1, 1, 1);
+        // a box whose texture runs in tiles of `tile` metres, so bricks keep their size on a long thin wall
+        function sizedBox(w, h, d, tile) {
+          const g = new T.BoxGeometry(w, h, d), uv = g.attributes.uv, dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+          for (let f = 0; f < 6; f++) for (let v = 0; v < 4; v++) { const i = f * 4 + v; uv.setXY(i, uv.getX(i) * dims[f][0] / tile, uv.getY(i) * dims[f][1] / tile); }
+          return g;
+        }
         const casters = [];
         function block(x, y, z, w, h, d, mat, ry) {
-          const m = new T.Mesh(box, mat || brick);
-          m.scale.set(w, h, d); m.position.set(x, y + h / 2, z); m.rotation.y = ry || 0;
+          const m = new T.Mesh(sizedBox(w, h, d, 2), mat || brick);
+          m.position.set(x, y + h / 2, z); m.rotation.y = ry || 0;
           m.castShadow = true; m.receiveShadow = true;
           scene.add(m); casters.push(m);
           return m;
@@ -318,6 +374,9 @@
             if (gaps && gaps.some((g) => Math.hypot(x - g[0], z - g[1]) < (g[2] || 0.75))) continue;
             const hh = h * (0.55 + 0.45 * Math.abs(Math.sin(t * 7 + seed))) * (0.85 + r2() * 0.3);
             block(x, 0, z, len / n + 0.02, hh, 0.55, r2() < 0.3 ? brickDark : brick, ry);
+            for (let k = 0; k < 2; k++) {   // loose bricks and a broken crown along the top
+              if (r2() < 0.6) block(x + (r2() - 0.5) * 0.7, hh, z + (r2() - 0.5) * 0.3, 0.22 + r2() * 0.26, 0.13 + r2() * 0.16, 0.22 + r2() * 0.18, brickDark, ry + (r2() - 0.5) * 1.2);
+            }
           }
           for (let i = 0; i < Math.round(len / 3); i++) {   // fallen bricks
             const t = r2(), s = 0.25 + r2() * 0.3;
@@ -339,7 +398,15 @@
         cis.position.set(-10.5, 0, 4.5); scene.add(cis);
 
         // ---- The three steles ----
-        const sandstone = P.rim(P.toon({ color: 0xcfae86 }), 0x9fb4ff, 0.22);
+        const sandCv = P.canvasTex(512, 512, (g, w, h) => {
+          const r2 = P.rng(91);
+          const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#dcc096'); gr.addColorStop(1, '#bf9c74');
+          g.fillStyle = gr; g.fillRect(0, 0, w, h);
+          for (let i = 0; i < 16; i++) { const y = r2() * h; g.strokeStyle = `rgba(${r2() < 0.5 ? '120,84,54' : '240,214,176'},${0.05 + r2() * 0.06})`; g.lineWidth = 4 + r2() * 18; g.beginPath(); g.moveTo(0, y); g.bezierCurveTo(w * 0.3, y + (r2() - 0.5) * 40, w * 0.7, y + (r2() - 0.5) * 40, w, y + (r2() - 0.5) * 30); g.stroke(); }
+          for (let i = 0; i < 2400; i++) { g.fillStyle = r2() < 0.5 ? 'rgba(90,58,34,0.2)' : 'rgba(255,240,214,0.18)'; g.fillRect(r2() * w, r2() * h, 1 + r2() * 3, 1 + r2() * 3); }
+          for (let i = 0; i < 5; i++) { g.strokeStyle = 'rgba(60,38,22,0.35)'; g.lineWidth = 1.5; g.beginPath(); let x = r2() * w, y = r2() * h; g.moveTo(x, y); for (let k = 0; k < 6; k++) { x += (r2() - 0.5) * 24; y += 8 + r2() * 16; g.lineTo(x, y); } g.stroke(); }
+        }, [1, 1]);
+        const sandstone = P.rim(P.toon({ color: 0xf2e6d6, map: sandCv, bumpMap: sandCv, bumpScale: 0.9 }), 0x9fb4ff, 0.22);
         // I. The Crossword Stele: its face is a canvas, repainted whenever a word comes clean
         const SW = 3.4, SH = 4.6, SD = 0.62, CV_W = 960, CV_H = 1300;
         const GRID_X0 = 84, GRID_Y0 = 210, CS = 66;
@@ -371,6 +438,8 @@
         steleI.castShadow = true; steleI.receiveShadow = true;
         scene.add(steleI);
         const plinthI = block(STELE.x, 0, STELE.z, SW + 0.6, 0.35, SD + 0.7, stone);
+        block(STELE.x, 0.35, STELE.z, SW + 0.2, 0.12, SD + 0.3, stone);
+        for (let k = 0; k < 7; k++) { const r3 = P.rng(300 + k); block(STELE.x + (r3() - 0.5) * (SW + 1.6), 0, STELE.z + 0.6 + r3() * 0.9, 0.16 + r3() * 0.2, 0.08 + r3() * 0.1, 0.14 + r3() * 0.2, stone, r3() * 3); }
         const capI = new T.Mesh(new T.BoxGeometry(SW + 0.3, 0.32, SD + 0.24), sandstone);
         capI.position.set(STELE.x, 0.35 + SH + 0.16, STELE.z); capI.castShadow = true; scene.add(capI);
         const capI2 = new T.Mesh(new T.BoxGeometry(SW * 0.55, 0.26, SD), sandstone); capI2.position.set(STELE.x, 0.35 + SH + 0.45, STELE.z); scene.add(capI2);
@@ -419,7 +488,7 @@
 
         // ---- The rearguard's camp: the fire, a sleeper on his blanket, the watcher and his torch, two kneeling camels, a lance ----
         const fire = new T.Group();
-        for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; const s = new T.Mesh(new T.DodecahedronGeometry(0.22, 0), stone); s.position.set(Math.cos(a) * 0.75, 0.1, Math.sin(a) * 0.75); s.castShadow = true; fire.add(s); }
+        for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; const s = new T.Mesh(new T.DodecahedronGeometry(0.22, 0), P.toon({ color: 0xb59a78 })); s.position.set(Math.cos(a) * 0.75, 0.1, Math.sin(a) * 0.75); s.castShadow = true; fire.add(s); }
         const logMat = P.toon({ color: 0x3a2618 });
         for (let i = 0; i < 4; i++) { const l = new T.Mesh(new T.CylinderGeometry(0.07, 0.08, 1.1, 6), logMat); l.rotation.set(Math.PI / 2 - 0.3, i * Math.PI / 4, 0); l.position.y = 0.18; fire.add(l); }
         const flames = [0xffd27a, 0xff9a3c, 0xff6a2a].map((col, i) => {
@@ -428,7 +497,7 @@
         });
         const embersN = 26, eG = new T.BufferGeometry(), eV = new Float32Array(embersN * 3);
         eG.setAttribute('position', new T.BufferAttribute(eV, 3));
-        const embers = new T.Points(eG, new T.PointsMaterial({ color: 0xffb060, size: 0.09, transparent: true, opacity: 0.9, depthWrite: false, blending: T.AdditiveBlending }));
+        const embers = new T.Points(eG, new T.PointsMaterial({ color: 0xffb060, size: 0.13, map: glowTex, transparent: true, opacity: 0.9, depthWrite: false, blending: T.AdditiveBlending }));
         fire.add(embers);
         const emberSeed = Array.from({ length: embersN }, () => [rand() * 6, (rand() - 0.5) * 0.6, (rand() - 0.5) * 0.6]);
         fire.position.set(FIRE.x, 0, FIRE.z);
@@ -457,6 +526,64 @@
         const hearth = new T.Mesh(new T.BoxGeometry(1.5, 0.16, 1.1), [stone, stone, hearthMat, stone, stone, stone]);
         hearth.position.set(HEARTH.x, 0.08, HEARTH.z); hearth.rotation.y = 0.35; hearth.receiveShadow = true;
         scene.add(hearth);
+
+        // ---- The raiders' belongings and the small things of the desert: barrels and crates, saddle bags, firewood, a lantern
+        // post, then pebbles, dry tufts and drifts of sand scattered over the whole camp ----
+        const woodMat = P.toon({ color: 0x7a5232 }), woodDk = P.toon({ color: 0x4e3320 }), ironMat = P.toon({ color: 0x3a3a46 });
+        const clothRed = P.toon({ color: 0x8a3a2c }), clothSand = P.toon({ color: 0xa88c5c }), ropeMat = P.toon({ color: 0xb09a6a });
+        const prop = (mesh, x, y, z, ry, shadow) => { mesh.position.set(x, y, z); mesh.rotation.y = ry || 0; mesh.castShadow = shadow !== false; mesh.receiveShadow = true; scene.add(mesh); return mesh; };
+        function barrel(x, z, k) {
+          const g = new T.Group();
+          const b = new T.Mesh(new T.CylinderGeometry(0.3, 0.26, 0.74, 18, 1), woodMat); b.position.y = 0.37; b.castShadow = true; g.add(b);
+          [0.14, 0.5].forEach((y) => { const h = new T.Mesh(new T.TorusGeometry(y === 0.14 ? 0.272 : 0.298, 0.014, 6, 20), ironMat); h.rotation.x = Math.PI / 2; h.position.y = y + 0.07; g.add(h); });
+          const lid = new T.Mesh(new T.CylinderGeometry(0.27, 0.27, 0.02, 18), woodDk); lid.position.y = 0.745; g.add(lid);
+          g.position.set(x, dune(x, z), z); g.rotation.y = k; scene.add(g); return g;
+        }
+        function crate(x, z, s2, ry) {
+          const g = new T.Group();
+          const c = new T.Mesh(new T.BoxGeometry(0.62 * s2, 0.5 * s2, 0.62 * s2), woodMat); c.position.y = 0.25 * s2; c.castShadow = true; g.add(c);
+          [[0.33, 0.33], [-0.33, 0.33], [0.33, -0.33], [-0.33, -0.33]].forEach(([a2, b2]) => { const post = new T.Mesh(new T.BoxGeometry(0.06 * s2, 0.52 * s2, 0.06 * s2), woodDk); post.position.set(a2 * s2, 0.25 * s2, b2 * s2); g.add(post); });
+          const band = new T.Mesh(new T.BoxGeometry(0.64 * s2, 0.05 * s2, 0.64 * s2), woodDk); band.position.y = 0.38 * s2; g.add(band);
+          g.position.set(x, dune(x, z), z); g.rotation.y = ry; scene.add(g); return g;
+        }
+        barrel(-5.9, -9.6, 0.3); barrel(-5.0, -9.1, 1.1); barrel(-5.5, -8.4, 2.0).scale.setScalar(0.85);
+        crate(-7.2, -10.4, 1.15, 0.4); crate(-6.4, -10.7, 0.8, 1.1); crate(-6.9, -10.5, 0.7, 0.2).position.y += 0.57;
+        // saddle bags by the sleeper, a coil of rope, a water skin
+        [[-9.7, -3.4, 0.5], [-9.2, -3.1, -0.4]].forEach(([x, z, ry], i) => {
+          const bag = new T.Mesh(new T.SphereGeometry(0.3, 14, 10), i ? clothRed : clothSand); bag.scale.set(1.15, 0.7, 0.8);
+          prop(bag, x, dune(x, z) + 0.2, z, ry);
+        });
+        const rope = new T.Mesh(new T.TorusGeometry(0.28, 0.05, 8, 22), ropeMat); rope.rotation.x = Math.PI / 2; prop(rope, -8.3, dune(-8.3, -3.0) + 0.06, -3.0, 0);
+        const skin2 = new T.Mesh(new T.SphereGeometry(0.2, 14, 10), P.toon({ color: 0x7a5a38 })); skin2.scale.set(0.8, 1.15, 0.8); prop(skin2, -10.6, dune(-10.6, -2.6) + 0.22, -2.6, 0.6);
+        // firewood stacked by the fire
+        for (let k = 0; k < 7; k++) {
+          const log = new T.Mesh(new T.CylinderGeometry(0.06, 0.06, 0.8, 8), k % 2 ? woodMat : woodDk);
+          log.rotation.z = Math.PI / 2; prop(log, -6.4, dune(-6.4, -7.7) + 0.07 + (k > 3 ? 0.12 : 0) + 0.0, -7.7 + (k % 4) * 0.13 - 0.2, 0.2 + (k % 3) * 0.05);
+        }
+        // a lantern on a post at the edge of the camp, with its little halo
+        const post = new T.Mesh(new T.CylinderGeometry(0.05, 0.07, 2.1, 8), woodDk); prop(post, -3.6, dune(-3.6, -8.4) + 1.05, -8.4, 0);
+        const lampHead = new T.Mesh(new T.CylinderGeometry(0.1, 0.1, 0.22, 10), new T.MeshBasicMaterial({ color: 0xffc46a, toneMapped: false }));
+        prop(lampHead, -3.6, dune(-3.6, -8.4) + 2.05, -8.4, 0, false);
+        const lampHalo = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffb860, transparent: true, opacity: 0.6, depthWrite: false, blending: T.AdditiveBlending, fog: false }));
+        lampHalo.scale.set(1.8, 1.8, 1); lampHalo.position.set(-3.6, dune(-3.6, -8.4) + 2.05, -8.4); scene.add(lampHalo);
+        // pebbles, dry tufts and drifts, scattered round the whole camp
+        const sr = P.rng(2024), clear = (x, z) => x > -5.5 && x < 6.5 && z > -3.6 && z < 3.6;   // the stele square keeps its clean sand
+        const pebbleN = lowPower ? 260 : 560, pebbles = new T.InstancedMesh(new T.DodecahedronGeometry(0.12, 0), P.toon({ color: 0xffffff }), pebbleN), dm = new T.Object3D(), pc = new T.Color();
+        for (let i = 0; i < pebbleN; i++) {
+          let x, z; do { const a = sr() * Math.PI * 2, r = 3 + Math.pow(sr(), 0.7) * 30; x = Math.cos(a) * r; z = 6 + Math.sin(a) * r; } while (clear(x, z));
+          const k = 0.5 + sr() * 1.2; dm.position.set(x, dune(x, z) + 0.03 * k, z); dm.rotation.set(sr() * 3, sr() * 3, sr() * 3); dm.scale.set(k, k * (0.55 + sr() * 0.3), k * (0.8 + sr() * 0.4)); dm.updateMatrix();
+          pebbles.setMatrixAt(i, dm.matrix); pebbles.setColorAt(i, pc.setHSL(0.07 + sr() * 0.03, 0.2 + sr() * 0.15, 0.32 + sr() * 0.14));
+        }
+        pebbles.receiveShadow = true; scene.add(pebbles);
+        const tuftN = lowPower ? 60 : 130, blades = new T.InstancedMesh(new T.ConeGeometry(0.045, 0.42, 4), P.toon({ color: 0x9a8a5a }), tuftN * 6);
+        for (let i = 0; i < tuftN; i++) {
+          let x, z; do { const a = sr() * Math.PI * 2, r = 5 + Math.pow(sr(), 0.7) * 28; x = Math.cos(a) * r; z = 6 + Math.sin(a) * r; } while (clear(x, z));
+          for (let b2 = 0; b2 < 6; b2++) {
+            dm.position.set(x + (sr() - 0.5) * 0.3, dune(x, z) + 0.17, z + (sr() - 0.5) * 0.3); dm.rotation.set((sr() - 0.5) * 0.7, sr() * 3, (sr() - 0.5) * 0.7);
+            const k = 0.7 + sr() * 0.9; dm.scale.set(1, k, 1); dm.updateMatrix(); blades.setMatrixAt(i * 6 + b2, dm.matrix);
+          }
+        }
+        scene.add(blades);
 
         const robeMat = P.toon({ color: 0x4a4250 }), robeMat2 = P.toon({ color: 0x5c4436 }), skinMat = P.toon({ color: 0x6e4b38 }), wrapMat = P.toon({ color: 0x24202c });
         function raider(robe) {
@@ -568,13 +695,13 @@
         const motesBase = new Float32Array(motesN * 3);
         for (let i = 0; i < motesN; i++) { motesBase.set([rand() * 30, 0.2 + rand() * 3.5, rand() * 30], i * 3); }
         mG.setAttribute('position', new T.BufferAttribute(mV, 3));
-        const motes = new T.Points(mG, new T.PointsMaterial({ color: 0xdfe6ff, size: 0.05, transparent: true, opacity: 0.55, depthWrite: false }));
+        const motes = new T.Points(mG, new T.PointsMaterial({ color: 0xdfe6ff, size: 0.08, map: glowTex, transparent: true, opacity: 0.55, depthWrite: false, blending: T.AdditiveBlending }));
         scene.add(motes);
         const burstN = 60, bG = new T.BufferGeometry(); bG.setAttribute('position', new T.BufferAttribute(new Float32Array(burstN * 3), 3));
-        const burst = new T.Points(bG, new T.PointsMaterial({ color: 0xffe2a0, size: 0.08, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
+        const burst = new T.Points(bG, new T.PointsMaterial({ color: 0xffe2a0, size: 0.12, map: glowTex, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
         burst.visible = false; scene.add(burst);
 
-        return { T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv,
+        return { T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv, sandTime,
                  steleI, faceCv, glowCv, baseCv, faceTex, glowTexS, GRID_X0, GRID_Y0, CS, CV_W, CV_H, SW, SH,
                  curbLine, curbGlow, dialCv, dialTex, needle, needleMat, dialGlow, bezel, DIAL_Y, POINTS16,
                  watcher, torch, tFlame, sleeper, torch2, camels, banner, lance, hearth, fleeRows, pursuers, chaseLight,
@@ -1441,8 +1568,8 @@
         where('At the hearth of the BC Ashes, Camp VII. Al-Qibla is locked: 194° SSW for the raiders, 14° NNE for Tower II.');
         if (el.victory) el.victory.style.display = 'block';
         if (window.EclipseCinematic) window.EclipseCinematic.attach(el.victory, 'night_of_steles');
-        if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
-        if (live) confetti();
+        const fanfare = () => { if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime(); };
+        if (!live) fanfare();
         const first = !isDone();
         put('order_desert_lexicon_completed', 'true');
         put('order_desert_station_active', '12');
@@ -1455,7 +1582,13 @@
         paintDial();
         if (first && typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (first) document.dispatchEvent(new Event('lexicon:cleared'));
-        if (live) setTimeout(() => { if (view.phase === 'done' && modal.style.display !== 'none') showReward(); }, reducedMotion() ? 300 : 3000);
+        if (live) {
+          const after = () => {
+            fanfare(); confetti();
+            setTimeout(() => { if (view.phase === 'done' && modal.style.display !== 'none') showReward(); }, reducedMotion() ? 300 : 3000);
+          };
+          if (G && cine && !reducedMotion() && get(CINE_OUTRO) !== 'seen') { put(CINE_OUTRO, 'seen'); cine.start(endingShots(), after); } else after();
+        }
       }
       function burstAt(x, y, z, color) {
         if (!G || reducedMotion()) return;
@@ -1491,6 +1624,7 @@
       const ease = (k) => k * k * (3 - 2 * k);
       function tick(now, dt) {
         const T = G.T, rm = reducedMotion(), tt = now / 1000;
+        G.sandTime.value = tt;
         let moving = false;
         const w = view.walk;
         if (w) {
@@ -1677,7 +1811,9 @@
           tx = view.x - fx * 4.4; ty = narrow ? 4.4 : 3.6; tz = view.z - fz * 4.4;
           lx = view.x + fx * 3.6; ly = 1.7; lz = view.z + fz * 3.6;
         }
-        const k = camPos.ok && !rm ? Math.min(1, dt * 2.6) : 1;
+        let k = camPos.ok && !rm ? Math.min(1, dt * 2.6) : 1;
+        const cf = cine && cine.active ? cine.frame(dt) : null;
+        if (cf) { [tx, ty, tz] = cf.p; [lx, ly, lz] = cf.l; k = 1; }
         ['x', 'y', 'z'].forEach((a, i) => { camPos[a] += ([tx, ty, tz][i] - camPos[a]) * k; camPos['l' + a] += ([lx, ly, lz][i] - camPos['l' + a]) * k; });
         camPos.ok = true;
         G.camera.position.set(camPos.x, camPos.y, camPos.z);
@@ -1746,7 +1882,7 @@
       // ---- Keyboard: Escape closes; in the walls the arrows run (as Hermes sees it: ← left is east); at the dial they turn the needle ----
       document.addEventListener('keydown', (e) => {
         if (modal.style.display === 'none') return;
-        if (e.key === 'Escape') { closeLexicon(); return; }
+        if (e.key === 'Escape') { if (cine && cine.active) cine.skip(); else closeLexicon(); return; }
         const tag = (e.target && e.target.tagName) || '';
         if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
         if (/BUTTON/.test(tag) && (e.key === ' ' || e.key === 'Enter')) return;
@@ -1805,6 +1941,7 @@
           else window.addEventListener('resize', fit);
         }
         if (el.stage) el.stage.classList.toggle('is-flat', !G);
+        if (G && !cine && el.stage) cine = P.cinema(el.stage, { reduced: reducedMotion, onShot: (i, sh) => { if (sh.line) subtitle(sh.line, sh.dur - 0.4); } });
         fit();
         const firstTime = !get(WALK_KEY);
         view.quiet = true;
@@ -1822,19 +1959,44 @@
         paintDial();
         paintHud();
         const st = stage();
+        let introPending = false;
+        const finishOpen = () => { if (get(HOWTO_KEY) !== 'seen' && !isDone()) showHowto(0); else focusFirst(); };
         if (st === 'done' || isDone()) {
           if (st !== 'done') { S.flee = FLEE_SOL.slice(); S.locked = true; S.sigil = true; S.atDial = true; }
           victory(false);
           say('Camp VII, near midnight. The fire is cold, the steles are clean, and the needle of Al-Qibla still points the way the BC Ashes rode: 194°, south-south-west. Its tail points to Tower II.');
-        } else if (firstTime) showStele("Silvia, listen. The riders rode south at dusk with their wagon, but they left two men behind to watch the trail. One is asleep by the fire with his head on a saddle. The other walks a slow round with a torch, and his round passes these stones. I am crouched at the foot of the middle stele. The ten words are here, carved in a net exactly like your page, but the wind has packed every groove with sand. Choose a word, read it to me from your page, and I will brush it clean, gently. And watch his torch with me: when he turns this way, I lie still.");
+        } else if (firstTime) {
+          const intro = "Silvia, listen. The riders rode south at dusk with their wagon, but they left two men behind to watch the trail. One is asleep by the fire with his head on a saddle. The other walks a slow round with a torch, and his round passes these stones. I am crouched at the foot of the middle stele. The ten words are here, carved in a net exactly like your page, but the wind has packed every groove with sand. Choose a word, read it to me from your page, and I will brush it clean, gently. And watch his torch with me: when he turns this way, I lie still.";
+          if (G && cine && !reducedMotion() && get(CINE_INTRO) !== 'seen') {
+            introPending = true; put(CINE_INTRO, 'seen');
+            view.phase = 'cine'; clearControls();
+            cine.start(openingShots(), () => { showStele(intro); finishOpen(); });
+          } else showStele(intro);
+        }
         else if (st === 'stele') showStele(`I am still at the foot of the Crossword Stele, Silvia, ${S.carved.length} words clean. The watcher is ${WATCH[S.watch].at}.`);
         else if (st === 'sigil' || st === 'bearing') showDial(st === 'sigil' ? 'I am at the foot of the tall stele, by the dial. The watcher is still dozing. Tell me the sigil for its seven windows.' : 'The needle of the dial still swings free, Silvia. Tell me the vector, and I will set it.');
         else showFlee(`I am in the walls of the old camp, Silvia, at wall ${S.flee.length + 1}, and the torches are still behind me. Read me the letters.`);
         if (building && G) tick(performance.now(), 1 / 60);
         view.quiet = false;
         if (!raf) raf = requestAnimationFrame(frame);
-        if (get(HOWTO_KEY) !== 'seen' && !isDone()) showHowto(0);
-        else focusFirst();
+        if (!introPending) finishOpen();
+      }
+      // The opening: the camp from above, the rearguard by the fire, the stone where Hermes begins
+      function openingShots() {
+        return [
+          { from: { p: [-26, 13, 22], l: [-3, 1.5, -4] }, to: { p: [-15, 7.5, 13], l: [-3, 1.5, -5] }, dur: 6.5, kicker: 'STATION 12', title: 'CAMP VII · MIDNIGHT', line: 'The riders went south at dusk. Two men stayed behind.' },
+          { from: { p: [-14.5, 1.7, -0.5], l: [FIRE.x, 0.9, FIRE.z] }, to: { p: [-5.5, 1.9, -13.5], l: [FIRE.x, 0.9, FIRE.z] }, dur: 6, kicker: 'BY THE FIRE', title: 'THE REARGUARD', line: 'One sleeps with his head on a saddle. One walks a round with a torch.' },
+          { from: { p: [-8.5, 2.7, 7], l: [0.5, 2.4, -0.6] }, to: { p: [2.2, 3.0, 6.4], l: [-0.5, 2.55, -0.6] }, dur: 6, kicker: 'THE STELES', title: 'TEN WORDS IN THE SAND', line: 'Ten words, packed with sand. Brush them clean between his rounds.' }
+        ];
+      }
+      // The ending: the name on the hearth, the way they rode, the road to Tower II
+      function endingShots() {
+        const H0 = { x: HEARTH.x, z: HEARTH.z };
+        return [
+          { from: { p: [H0.x - 0.2, 2.7, H0.z + 2.8], l: [H0.x + 0.5, 0.25, H0.z - 0.2] }, to: { p: [H0.x + 2.2, 1.4, H0.z + 1.6], l: [H0.x, 0.2, H0.z] }, dur: 5, kicker: 'ON THE HEARTH STONE', title: 'THE BC ASHES', line: 'A bird with its wings up, rising out of three flames.' },
+          { from: { p: [H0.x + 2.2, 1.4, H0.z + 1.6], l: [H0.x, 0.2, H0.z] }, to: { p: [H0.x + 9, 9, H0.z + 11], l: [-6, 0.5, -2] }, dur: 6, kicker: 'AND THE NEEDLE POINTS', title: 'THE WAY THEY RODE', line: 'Their name, their sign and their road. And they do not know ours.' },
+          { from: { p: [H0.x + 9, 9, H0.z + 11], l: [-6, 0.5, -2] }, to: { p: [H0.x + 17, 17, H0.z + 25], l: [0, 3, 32] }, dur: 5, line: 'Tower II lies the other way: fourteen degrees north-north-east.' }
+        ];
       }
       function focusFirst() {
         const first = [...el.controls.querySelectorAll('button:not([disabled]), input:not([disabled])'), ...(el.victory ? el.victory.querySelectorAll('button') : []), el.close]
@@ -2002,6 +2164,7 @@
       }
       function closeLexicon() {
         if (modal.style.display === 'none') return;
+        if (cine && cine.active) cine.skip();
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (view.walk) finishWalk();
         if (view.phase === 'locked') ambush();
@@ -2049,6 +2212,7 @@
 
       // Test hook (scripts/audit/web_smoke.py)
       window.__lexicon = {
+        cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
         gfx: () => G,
         state: () => Object.assign({ phase: view.phase, stage: S ? stage() : '', gl: !!G, sel: view.sel, bear: view.bear, drawn: G ? G.renderer.info.render.calls : 0,
           cam: G ? G.camera.position.toArray().map((v) => +v.toFixed(2)) : [], watchSafe: S ? WATCH[S.watch].safe : null }, S),

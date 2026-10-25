@@ -155,6 +155,8 @@ def new_page(browser, seed=None, reduced_motion=False):
     page.on("response", lambda r: errors.append(f"HTTP {r.status}: {r.url}") if r.status >= 400 else None)
     page.add_init_script("document.addEventListener('securitypolicyviolation', e => console.error('CSP blocked ' + e.violatedDirective + ' ' + e.blockedURI))")
     if seed:
+        # the openings and endings of the Salt Playa and the Desert Lexicon play once: the tests that are not about them find them seen
+        seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen"}, **seed)
         page.add_init_script(SEED_JS % json.dumps(seed))
     return ctx, page, errors
 
@@ -1511,6 +1513,7 @@ def test_early_hints(browser):
     js("window.closeWhisperingChasmModal()"); page.wait_for_timeout(300)
 
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(400)
+    js("window.__playa.skipCine()"); page.wait_for_timeout(700)   # (the tester profile starts every station afresh, so its opening plays: skip it)
     for _ in range(3):       # stepping onto the salt from the tripod, not where the page says the crossing begins
         js("window.__playa.pick(0); window.__playa.goOn()")
     check(get("order_hint_s11-playa_level") == "1" and "note 1 of 3" in note("modal-salt-playa", "#playa3d-controls"),
@@ -1518,6 +1521,7 @@ def test_early_hints(browser):
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(300)
 
     js("window.openDesertLexiconModal()"); page.wait_for_timeout(400)
+    js("window.__lexicon.skipCine()"); page.wait_for_timeout(300)
     js("window.__lexicon.select('ac-3')")
     for _ in range(3):       # while the watcher's back is turned, three words that do not fit the grooves
         js("window.__lexicon.brush('WRONG')")
@@ -3751,6 +3755,87 @@ def test_desert_road(browser):
     ctx.close()
 
 
+def test_game_cinematics(browser):
+    print("\n41. The openings and endings of Stations 11 and 12 play in the engine: bars, titles, subtitles, a Skip button, and a camera that ends where the game begins")
+    hour = 3600 * 1000
+    unseen = {"order_playa_cine_intro": "x", "order_playa_cine_outro": "x", "order_lexicon_cine_intro": "x", "order_lexicon_cine_outro": "x"}
+    drop = lambda page: page.add_init_script("localStorage.removeItem('order_playa_cine_intro'); localStorage.removeItem('order_playa_cine_outro'); localStorage.removeItem('order_lexicon_cine_intro'); localStorage.removeItem('order_lexicon_cine_outro')")
+    seed = dict(DESERT_BASE, order_salt_playa_completed="false", order_desert_station_active="11", order_playa_march_bypassed="true", order_playa_howto="seen", order_playa_howto2="seen",
+                order_chasm_wire=json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1, "seen2": True, "reply2": 0}), order_playa_march_start=str(int(time.time() * 1000) - 11 * hour))
+    ctx, page, errors = new_page(browser, seed)
+    page.add_init_script("(() => { if (!sessionStorage.getItem('__c')) { ['order_playa_cine_intro', 'order_playa_cine_outro'].forEach(k => localStorage.removeItem(k)); sessionStorage.setItem('__c', '1'); } })()")
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    st = lambda: js("window.__playa.state()")
+    js("window.openSaltPlayaModal()"); page.wait_for_timeout(700)
+    gl = st()["gl"]
+    if gl:
+        check(js("window.__playa.cine()") and st()["phase"] == "cine" and js("!document.querySelector('#playa3d-stage .chasm3d-cine').hidden")
+              and js("document.querySelector('#playa3d-stage .cine-skip') !== null"), "the first time on the salt, the opening plays: the bars are down and Hermes waits", st()["phase"])
+        js("window.__playa.frames(150)")
+        title = js("document.querySelector('#playa3d-stage .cine-title strong').innerText")
+        check(title and js("window.__playa.cine()"), "its shots follow one another, each with its title", title)
+        page.keyboard.press("Escape"); page.wait_for_timeout(700)
+        check(not js("window.__playa.cine()") and st()["phase"] == "edge" and js("localStorage.getItem('order_playa_cine_intro')") == "seen" and not js("document.getElementById('modal-salt-playa').style.display === 'none'") is False,
+              "Escape skips it (not the whole game) and the first choice is there", st()["phase"])
+        js("window.closeSaltPlayaModal()"); page.wait_for_timeout(400)
+        js("window.openSaltPlayaModal()"); page.wait_for_timeout(700)
+        check(not js("window.__playa.cine()"), "it is not shown again")
+    else:
+        check(True, "no WebGL here: the cinematics are skipped with the picture")
+    check(not errors, "no JS errors in the Salt Playa opening", "; ".join(errors[:2]))
+    ctx.close()
+
+    gate = json.dumps({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1, "seen2": True, "reply2": 0, "seen3": True, "reply3": 0, "seen4": True, "reply4": 0})
+    seed = dict(DESERT_BASE, order_chasm_wire=gate, order_desert_station_active="12", order_lexicon_march_start="1", order_lexicon_march_bypassed="true", order_lexicon_howto="seen")
+    ctx, page, errors = new_page(browser, seed)
+    page.add_init_script("(() => { if (!sessionStorage.getItem('__c')) { ['order_lexicon_cine_intro', 'order_lexicon_cine_outro'].forEach(k => localStorage.removeItem(k)); sessionStorage.setItem('__c', '1'); } })()")
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    st = lambda: js("window.__lexicon.state()")
+    js("window.openDesertLexiconModal()"); page.wait_for_timeout(700)
+    if st()["gl"]:
+        check(js("window.__lexicon.cine()") and st()["phase"] == "cine", "the first night at Camp VII, the opening plays", st()["phase"])
+        js("window.__lexicon.frames(60)")
+        check("CAMP VII" in js("document.querySelector('#lex3d-stage .cine-title strong').innerText") and "riders" in js("document.getElementById('lex3d-subtitle').innerText"),
+              "with its title and the line of the subtitle")
+        js("document.querySelector('#lex3d-stage .cine-skip').click()"); page.wait_for_timeout(500)
+        s = st()
+        check(not js("window.__lexicon.cine()") and s["phase"] == "stele" and "two men" in js("document.getElementById('lex3d-voice').innerText"), "Skip leaves Hermes at the stele with his first words", s["phase"])
+        # the ending: read the whole night, then the hearth stone
+        for wid, word in [("dn-1", "CARAVAN"), ("ac-3", "NOMAD"), ("ac-2", "SIROCCO"), ("ac-6", "OASIS"), ("ac-8", "ECLIPSE"), ("ac-9", "HORIZON"), ("dn-5", "DUNES"), ("dn-2", "SPHINX")]:
+            for _ in range(6):
+                if st()["watchSafe"]:
+                    break
+                js("window.__lexicon.wait()")
+            js(f"window.__lexicon.select('{wid}'); window.__lexicon.brush('{word}')")
+        for _ in range(6):
+            if st()["watchSafe"]:
+                break
+            js("window.__lexicon.wait()")
+        js("window.__lexicon.creep()"); js("window.__lexicon.sigil('PHOENIX')"); js("window.__lexicon.turn(194); window.__lexicon.lock()")
+        js("window.__lexicon.ambush()"); js("window.__lexicon.run()")
+        for d in js("window.__lexicon.sol()"):
+            js(f"window.__lexicon.door({d})")
+        page.wait_for_timeout(300)
+        js("document.querySelector('#lex3d-controls button').click()")
+        for _ in range(30):
+            page.wait_for_timeout(200)
+            if st()["phase"] == "hearth":
+                break
+        js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(500)
+        check(st()["phase"] == "done" and js("window.__lexicon.cine()") and js("localStorage.getItem('order_desert_lexicon_completed')") == "true", "reading the hearth stone starts the ending, and the station is already done", st()["phase"])
+        check(not js("(r => !!r && !r.hidden)(document.querySelector('#modal-desert-lexicon .chasm3d-reward'))"), "the reward waits for the ending")
+        js("window.__lexicon.frames(60)")
+        check("BC ASHES" in js("document.querySelector('#lex3d-stage .cine-title strong').innerText").upper(), "its first card is the name: The BC Ashes")
+        js("window.__lexicon.skipCine()"); page.wait_for_timeout(4200)
+        check(not js("window.__lexicon.cine()") and js("(r => !!r && !r.hidden)(document.querySelector('#modal-desert-lexicon .chasm3d-reward'))"), "when the ending is over (or skipped), the reward rises")
+    else:
+        check(True, "no WebGL here: the cinematics are skipped with the picture")
+    check(not errors, "no JS errors in the Desert Lexicon cinematics", "; ".join(errors[:2]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -3768,10 +3853,11 @@ SECTIONS = {
     "reduced": test_reduced_motion,
     "cinematic": test_cinematic,
     "road": test_desert_road,
+    "gamecine": test_game_cinematics,
     "balance": test_balance,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
-QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon", "reduced", "cinematic", "road"]
+QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon", "reduced", "cinematic", "road", "gamecine"]
 REPORT = os.path.join(ROOT, "scripts", "audit", "smoke_report.json")
 
 
