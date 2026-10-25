@@ -34,12 +34,12 @@
         playa: {
           note: 'The Salt Playa. Every slab looked solid, and half of them were not. Silvia read the facets and I walked where she said: seven stones, the letters of CRYSTAL for the post of the Order, and then the Great Salt Sump at noon, where I was only her eyes. On the far shore a marker of the Order kept a line to check and a little brass balance.',
           quote: 'If we had walked where the salt looked firmest, I would be in the brine.',
-          earned: ['A safe road across the salt', 'The keyword CRYSTAL', 'The Surveyor\'s Balance'], ledger: ['The Line of the Salt'], sketch: T + 'salt_playa_preview.webp'
+          earned: ['A safe road across the salt', 'The keyword CRYSTAL', 'The Surveyor\'s Balance', 'A new glyph: Q'], ledger: ['The Line of the Salt', 'The Line of the Shore'], sketch: T + 'salt_playa_preview.webp'
         },
         lexicon: {
           note: 'Camp VII, among the nomad steles, by moonlight. Two of the riders stayed behind: one asleep by the fire, one walking a round with a torch past the stones. Silvia read the ten words and I brushed them clean between his turns; PHOENIX freed the needle and 194° rang the bronze like a bell. It woke the camp, and I ran through the old walls by the letters of the sigil. At the cold hearth the raider\'s knife had cut their name: the BC Ashes.',
           quote: 'On the hearth stone their name is scratched under a bird of fire: the BC Ashes.',
-          earned: ['The Desert Sigil: PHOENIX', 'The Al-Qibla bearing: 194° SSW, and 14° NNE to Tower II', 'Their name: the BC Ashes'], ledger: ['The Stargazer Proportion'], sketch: T + 'desert_lexicon_preview.webp'
+          earned: ['The Desert Sigil: PHOENIX', 'The Al-Qibla bearing: 194° SSW, and 14° NNE to Tower II', 'Their name: the BC Ashes', 'A new glyph: Z'], ledger: ['The Stargazer Proportion', 'The Line of the Dial'], sketch: T + 'desert_lexicon_preview.webp'
         },
         clepsydra: {
           note: 'Camp VIII, the Four Wells. Four seekers, four shadow-hours, four counterweights. When the last one dropped, the basins filled and we drank.',

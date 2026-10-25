@@ -454,6 +454,21 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const curbLine = new T.Mesh(new T.PlaneGeometry(2.0, 0.38), new T.MeshBasicMaterial({ map: lineTex, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
         curbLine.position.set(CURB.x, 0.22, CURB.z + 1.205);
         scene.add(curbLine);
+        // III bis. At the foot of the tall stele, under the dial, one more line and a glyph: the letter Z (it wakes with the curb's line)
+        const zLineTex = P.canvasTex(512, 128, (g, w, h) => {
+          g.strokeStyle = '#ffe2a0'; g.fillStyle = '#ffe2a0'; g.lineWidth = 4.5; g.lineCap = 'round'; g.lineJoin = 'round';
+          g.save(); g.translate(18, 14); g.scale(1.45, 1.45);
+          g.beginPath(); g.moveTo(12, 18); g.lineTo(36, 18); g.lineTo(12, 46); g.lineTo(36, 46); g.stroke();
+          g.beginPath(); g.arc(24, 32, 4, 0, Math.PI * 2); g.fill();
+          g.beginPath(); g.arc(12, 18, 2.5, 0, Math.PI * 2); g.fill();
+          g.beginPath(); g.arc(36, 46, 2.5, 0, Math.PI * 2); g.fill();
+          g.restore();
+          g.font = '700 50px Cinzel, Georgia, serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+          g.fillText('[ O ] − [ Z ] = 18', 118, h / 2 + 2);
+        });
+        const zLine = new T.Mesh(new T.PlaneGeometry(2.25, 0.5625), new T.MeshBasicMaterial({ map: zLineTex, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
+        zLine.position.set(DIAL.x, 0.17, DIAL.z + 0.62);
+        scene.add(zLine);
         const curbGlow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffc66a, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
         curbGlow.scale.set(3.2, 1.1, 1); curbGlow.position.set(CURB.x, 0.3, CURB.z + 1.4); scene.add(curbGlow);
         const curbMarks = new T.Mesh(new T.PlaneGeometry(1.4, 2.4), new T.MeshBasicMaterial({ map: P.canvasTex(128, 220, (g, w, h) => {
@@ -703,7 +718,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
 
         return { T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv, sandTime,
                  steleI, faceCv, glowCv, baseCv, faceTex, glowTexS, GRID_X0, GRID_Y0, CS, CV_W, CV_H, SW, SH,
-                 curbLine, curbGlow, dialCv, dialTex, needle, needleMat, dialGlow, bezel, DIAL_Y, POINTS16,
+                 curbLine, zLine, curbGlow, dialCv, dialTex, needle, needleMat, dialGlow, bezel, DIAL_Y, POINTS16,
                  watcher, torch, tFlame, sleeper, torch2, camels, banner, lance, hearth, fleeRows, pursuers, chaseLight,
                  hermes: H.hermes, legL: H.legL, legR: H.legR, staff: H.staff, lamp: H.lamp, cloak: H.cloak,
                  ringGeo, markers, motes, motesBase, motesN, burst, burstN, glowTex, lowPower, casters, plinthI, steleII, steleIII };
@@ -1564,7 +1579,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         circleWords.forEach((id) => { if (!S.carved.includes(id)) S.carved.push(id); });
         S.hidden = true;
         view.x = AT_HEARTH.x; view.z = AT_HEARTH.z; view.yaw = 1.4;
-        say('A bird with its wings up, rising out of three flames: the same mark that was burned into the wagon\'s oilcloth. Under it, cut deep, two letters and a word: BC ASHES. And an arrow, with 194 beside it. The BC Ashes, Silvia. That is their name. That is who came down from the mountains with the Astrolabe, and that is the way they ride. We know their name, their sign and their road, and they do not know ours. The needle\'s tail points to Tower II. Talk to me on the Field Wire.');
+        say('A bird with its wings up, rising out of three flames: the same mark that was burned into the wagon\'s oilcloth. Under it, cut deep, two letters and a word: BC ASHES. And an arrow, with 194 beside it. The BC Ashes, Silvia. That is their name. That is who came down from the mountains with the Astrolabe, and that is the way they ride. We know their name, their sign and their road, and they do not know ours. The needle\'s tail points to Tower II. And at the foot of the tall stele, under the dial, there was one more line I had missed: O − Z = 18, with a zigzag glyph beside it. A new letter, Silvia, the Z. Talk to me on the Field Wire.');
         where('At the hearth of the BC Ashes, Camp VII. Al-Qibla is locked: 194° SSW for the raiders, 14° NNE for Tower II.');
         if (el.victory) el.victory.style.display = 'block';
         if (window.EclipseCinematic) window.EclipseCinematic.attach(el.victory, 'night_of_steles');
@@ -1755,6 +1770,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         G.dialGlow.material.opacity = S.locked ? 0.25 + lk * 0.75 + (rm ? 0 : Math.sin(tt * 2) * 0.05) : S.sigil ? 0.18 : 0;
         G.needleMat.color.setHex(S.locked ? 0xfff0b8 : 0xffd98a);
         G.curbLine.material.opacity += ((S.locked ? 1 : 0) - G.curbLine.material.opacity) * Math.min(1, dt * (rm ? 10 : 0.8));
+        G.zLine.material.opacity = G.curbLine.material.opacity;
         G.curbGlow.material.opacity = G.curbLine.material.opacity * (view.phase === 'locked' ? 0.75 + (rm ? 0 : Math.sin(tt * 3) * 0.15) : 0.3);
 
         // Rings on the doorways she can choose, the one she points at glowing
@@ -2067,6 +2083,18 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
                   <div class="rw-ledger-title">The Stargazer Proportion</div>
                   <div class="rw-eq" aria-label="R times 2 equals F"><i>R</i><u>×</u><b>2</b><u>=</u><i>F</i></div>
                   <p>Cut into the curb of the second stele, lit by the needle's shadow. It is in your Cipher Ledger now.</p>
+                </div>
+              </div>
+              <div class="rw-ledger lex-rw-glyph">
+                <figure class="rw-glyph" aria-label="The glyph of the letter Z in the Order's secret alphabet equals the letter Z">
+                  <div class="rw-seal" aria-hidden="true"><svg viewBox="0 0 48 64"><path d="M12 18 L36 18 L12 46 L36 46"/><circle class="dot" cx="24" cy="32" r="4"/><circle class="dot" cx="12" cy="18" r="2.5"/><circle class="dot" cx="36" cy="46" r="2.5"/></svg></div>
+                  <figcaption><span>Glyph</span><u>=</u><i class="rw-letter">Z</i></figcaption>
+                </figure>
+                <div class="rw-ledger-text">
+                  <div class="rw-ledger-kicker">The Cipher Ledger · a new letter</div>
+                  <div class="rw-ledger-title">The Line of the Dial</div>
+                  <div class="rw-eq" aria-label="O minus Z equals 18"><i>O</i><u>−</u><i>Z</i><u>=</u><b>18</b></div>
+                  <p>Cut at the foot of the tall stele, under the bronze dial, in the Order's secret alphabet. The glyph on the seal is the letter Z, one you have never had before: work out its value in your Cipher Ledger.</p>
                 </div>
               </div>
               <div class="rw-ledger lex-rw-ashes">

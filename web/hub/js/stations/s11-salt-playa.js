@@ -710,6 +710,21 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         const mkSeal = new T.Mesh(new T.CircleGeometry(0.22, 24), new T.MeshBasicMaterial({ map: orderTex, transparent: true }));
         mkSeal.position.set(0, 0.6, -0.56); mkSeal.rotation.y = Math.PI; marker.add(mkSeal);
         marker.position.set(0.6, 0.3, SHORE_Z + 2.2);
+        // low on the marker's foot, a second line and a glyph: the letter Q (it fades in when Hermes stands before it)
+        const qPlateTex = P.canvasTex(512, 128, (g, w, h) => {
+          g.fillStyle = 'rgba(40,26,18,0.82)'; g.beginPath(); g.roundRect ? g.roundRect(4, 4, w - 8, h - 8, 14) : g.rect(4, 4, w - 8, h - 8); g.fill();
+          g.strokeStyle = '#ffe2a0'; g.fillStyle = '#ffe2a0'; g.lineWidth = 4.5; g.lineCap = 'round';
+          g.save(); g.translate(18, 14); g.scale(1.45, 1.45);
+          g.beginPath(); g.arc(20, 26, 13, 0, Math.PI * 2); g.stroke();
+          g.beginPath(); g.arc(20, 26, 5, 0, Math.PI * 2); g.fill();
+          g.beginPath(); g.moveTo(30, 36); g.lineTo(44, 50); g.moveTo(24, 40); g.lineTo(36, 52); g.moveTo(36, 30); g.lineTo(46, 40); g.stroke();
+          g.restore();
+          g.font = '700 50px Cinzel, Georgia, serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+          g.fillText('[ Q ] + [ E ] = 16', 118, h / 2 + 2);
+        });
+        const qPlate = new T.Mesh(new T.PlaneGeometry(2.3, 0.575), new T.MeshBasicMaterial({ map: qPlateTex, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }));
+        qPlate.rotation.x = -Math.PI / 2; qPlate.position.set(0.6, 0.317, SHORE_Z + 1.35);
+        scene.add(qPlate);
         scene.add(marker);
         // The Sanctuary Approach, the far cliffs to the south of the Sump (Sheet 10B, the transect)
         butte(-46, 175, 26, 11, 15, 3);
@@ -1191,7 +1206,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         H.flame.visible = false;
         scene.add(H.hermes);
 
-        return { T, renderer, scene, camera, sky, sunDisc, hemi, sun, uTime, slabs, crackTex, crackGeo, poolMat, makeCrystal, post, postRings, beam, sumpPlates,
+        return { T, renderer, scene, camera, sky, sunDisc, qPlate, hemi, sun, uTime, slabs, crackTex, crackGeo, poolMat, makeCrystal, post, postRings, beam, sumpPlates,
                  hazeMat, mirage, mirageMat, ringGeo, markers, prints, motes, motesBase, motesN, burst, burstN, rag, glowTex,
                  uCloud, steam, hazards, makeHazard, dropHazard, birds, devils, devilN, wisps, spot, ember, cirrus, sumpCasters, caravan, camels, glint,
                  hermes: H.hermes, legL: H.legL, legR: H.legR, staff: H.staff, lamp: H.lamp, cloak: H.cloak, lowPower };
@@ -2297,7 +2312,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         paintMarkers([]);
         clearControls();
         endGauge();
-        say("Sand! Real sand under my boots, Silvia. I stepped off the last plate of the Sump onto the south shore and my knees nearly gave way. You asked, I knelt and looked, and six times the Study told the truth. Behind me the salt is a white sea in the noon glare, and the stones and the Order's post are lost in the haze. And in front of me stands a squat stone marker of the Order, with a niche in its side. There is something in it, wrapped in oiled cloth. I will tell you everything on the Field Wire.");
+        say("Sand! Real sand under my boots, Silvia. I stepped off the last plate of the Sump onto the south shore and my knees nearly gave way. You asked, I knelt and looked, and six times the Study told the truth. Behind me the salt is a white sea in the noon glare, and the stones and the Order's post are lost in the haze. And in front of me stands a squat stone marker of the Order, with a niche in its side. There is something in it, wrapped in oiled cloth. And low on its foot, a glyph I have never seen: a circle with a dot in the middle and three little rays, and a line beside it. I will tell you everything on the Field Wire.");
         where('Across the Salt Playa, on the south shore.');
         if (el.victory) el.victory.style.display = 'block';
         const fanfare = () => { if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime(); };
@@ -2507,6 +2522,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
           }
           if (view.phase === 'done') { tx = view.x + 2.5; ty = 3.2; tz = view.z - 5; lx = view.x; ly = 1.2; lz = view.z + 6; }
         }
+        G.qPlate.material.opacity += ((view.phase === 'done' ? 1 : 0) - G.qPlate.material.opacity) * Math.min(1, dt * 0.9);
         const cf = cine && cine.active ? cine.frame(dt) : null;
         if (cf) { [tx, ty, tz] = cf.p; [lx, ly, lz] = cf.l; }
         const topDown = view.sky && !cf;
@@ -2857,6 +2873,18 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
                   <div class="rw-ledger-title">The Line of the Salt</div>
                   <div class="rw-eq" aria-label="T minus A equals 9"><i>T</i><u>−</u><i>A</i><u>=</u><b>9</b></div>
                   <p>Cut into the marker on the south shore, with two letters of CRYSTAL. No new letter: a line to prove the ones you work out.</p>
+                </div>
+              </div>
+              <div class="rw-ledger playa-rw-glyph">
+                <figure class="rw-glyph" aria-label="The glyph of the letter Q in the Order's secret alphabet equals the letter Q">
+                  <div class="rw-seal" aria-hidden="true"><svg viewBox="0 0 48 64"><circle cx="20" cy="26" r="13"/><circle class="dot" cx="20" cy="26" r="5"/><path d="M30 36 L44 50 M24 40 L36 52 M36 30 L46 40"/></svg></div>
+                  <figcaption><span>Glyph</span><u>=</u><i class="rw-letter">Q</i></figcaption>
+                </figure>
+                <div class="rw-ledger-text">
+                  <div class="rw-ledger-kicker">The Cipher Ledger · a new letter</div>
+                  <div class="rw-ledger-title">The Line of the Shore</div>
+                  <div class="rw-eq" aria-label="Q plus E equals 16"><i>Q</i><u>+</u><i>E</i><u>=</u><b>16</b></div>
+                  <p>Cut low on the foot of the marker, in the Order's secret alphabet. The glyph on the seal is the letter Q, one you have never had before: work out its value in your Cipher Ledger.</p>
                 </div>
               </div>
               <div class="rw-ledger playa-rw-balance">

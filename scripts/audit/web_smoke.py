@@ -280,16 +280,17 @@ def test_wire_gating(browser):
 def test_ledger_gating(browser):
     print("\n4. Cipher Ledger reveals desert equations only after their station")
     cases = [({}, []), ({"order_whispering_chasm_completed": "true"}, ["chasm-xe"]),
-             ({"order_desert_lexicon_completed": "true"}, ["stele-rf"]),
-             (DESERT_DONE, ["stele-rf", "falcon-pa"]),
-             (dict(DESERT_DONE, order_sun_monolith_completed="true"), ["stele-rf", "falcon-pa", "cairn2-df", "cairn2-ct"])]
+             ({"order_salt_playa_completed": "true"}, ["playa-qe"]),
+             ({"order_desert_lexicon_completed": "true"}, ["stele-rf", "stele-oz"]),
+             (DESERT_DONE, ["stele-rf", "stele-oz", "falcon-pa"]),
+             (dict(DESERT_DONE, order_sun_monolith_completed="true"), ["stele-rf", "stele-oz", "falcon-pa", "cairn2-df", "cairn2-ct"])]
     for extra, expected in cases:
         ctx, page, errors = new_page(browser, dict(SILVIA, **extra))
         page.goto(f"{BASE}/index.html", wait_until="load")
         page.wait_for_timeout(2500)
         page.evaluate("document.querySelector('[data-view=\"view-cipher\"]').click()")
         page.wait_for_timeout(600)
-        ids = page.evaluate("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id.replace('eq-item-', '')).filter(i => /stele|falcon|cairn2|chasm/.test(i))")
+        ids = page.evaluate("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id.replace('eq-item-', '')).filter(i => /stele|falcon|cairn2|chasm|playa-qe/.test(i))")
         check(ids == expected and not errors, f"desert equations shown: {expected or 'none'}", f"got {ids}; " + "; ".join(errors[:2]))
         ctx.close()
 
@@ -1839,10 +1840,20 @@ def test_letters(browser):
     rec = json.loads(js("localStorage.getItem('order_aurelia_letters')") or "{}")
     check(rec.get("I", {}).get("step") == 36 and js("localStorage.getItem('order_messenger_unread_count')") == "1",
           "the Field Wire gets a new message, kept at the step where she read it", str(rec))
-    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+    for _ in range(30):   # (the wire types his answer: under load it takes longer)
+        page.wait_for_timeout(300)
+        if js(LETTERS_JS)["wire"] >= 1:
+            break
+    page.wait_for_timeout(800)
     check(js(LETTERS_JS)["wire"] == 1, "Hermes answers the letter on the wire, once")
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
-    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+    for _ in range(30):
+        page.wait_for_timeout(300)
+        if js(LETTERS_JS)["wire"] >= 1:
+            break
+    page.wait_for_timeout(800)
     check(js(LETTERS_JS)["wire"] == 1, "after a reload his answer is still there, once")
     chron(page)
     check(not js(LETTERS_JS)["letters"][0]["sealed"], "an opened letter stays open")
@@ -3117,6 +3128,10 @@ def test_salt_playa(browser):
     m0 = st()["min"]
     js("window.__playa.pick(4)")
     js("window.__playa.lean(0.99)")
+    for _ in range(15):
+        if "groan" in voice():
+            break
+        page.wait_for_timeout(200)
     s = st()
     check(s["phase"] == "heavy" and s["heavy"] == 1 and s["min"] == m0 + 10 and s["hearts"] == 3 and "groan" in voice(),
           "too much weight on a sound slab: the crust groans, 10 minutes, nothing broken and no heart lost", f"{s['phase']} {s['min'] - m0} {s['hearts']}")
@@ -3236,6 +3251,11 @@ def test_salt_playa(browser):
           and js("document.querySelector('#modal-salt-playa .playa-rw-ledger .rw-eq').getAttribute('aria-label')") == "T minus A equals 9"
           and js("document.querySelectorAll('#modal-salt-playa .pl-cell.is-on').length") == 7,
           "the reward: her crossing lit on the page, CRYSTAL, the Line of the Salt [T] − [A] = 9 and the Surveyor's Balance", rw[:200].replace("\n", " "))
+    check(js("document.querySelector('#modal-salt-playa .playa-rw-glyph .rw-letter').innerText") == "Q" and js("document.querySelector('#modal-salt-playa .playa-rw-glyph .rw-eq').getAttribute('aria-label')") == "Q plus E equals 16"
+          and "Rule" not in rw and "= 14" not in js("document.querySelector('#modal-salt-playa .playa-rw-glyph').innerText"),
+          "the reward also gives a new glyph: the letter Q, with its line [Q] + [E] = 16 and no value")
+    js("window.__playa.frames(90)")
+    check(js("window.__playa.gfx().qPlate.material.opacity") > 0.5, "the line of the Q fades in at the foot of the marker")
     page.keyboard.press("Escape"); page.wait_for_timeout(300)
     check(not reward() and shown(), "Escape puts the reward away, the salt stays open")
     js("window.closeSaltPlayaModal()"); page.wait_for_timeout(600)
@@ -3526,6 +3546,10 @@ def test_desert_lexicon(browser):
           and js("document.querySelector('#modal-desert-lexicon .chasm3d-reward-word strong').getAttribute('aria-label')") == "PHOENIX"
           and js("document.querySelectorAll('#modal-desert-lexicon .lx-cell.is-circle.is-on').length") == 7,
           "the reward: the stele as she cleaned it, PHOENIX, Al-Qibla, the Ledger line and the name of the raiders", rw[:200].replace("\n", " "))
+    check(js("document.querySelector('#modal-desert-lexicon .lex-rw-glyph .rw-letter').innerText") == "Z" and js("document.querySelector('#modal-desert-lexicon .lex-rw-glyph .rw-eq').getAttribute('aria-label')") == "O minus Z equals 18",
+          "the reward also gives a new glyph: the letter Z, with its line [O] − [Z] = 18 and no value")
+    js("window.__lexicon.frames(60)")
+    check(js("window.__lexicon.gfx().zLine.material.opacity") > 0.5, "the line of the Z is cut at the foot of the tall stele")
     page.keyboard.press("Escape"); page.wait_for_timeout(300)
     check(not reward() and shown(), "Escape puts the reward away, the ruins stay open")
     text = js("document.getElementById('modal-desert-lexicon').innerText")

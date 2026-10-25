@@ -558,7 +558,7 @@ Orden impreso del alfabeto (`scripts/journal/build_page02_03.py`, `SHUFFLED_GLYP
 | **N** | `assets/general/glyphs/ecl-n.svg` | Solo Hoja 3A (alfabeto) |
 | **O** | `assets/general/glyphs/ecl-o.svg` | Solo Hoja 2B (alfabeto) |
 | **P** | `assets/general/glyphs/ecl-p.svg` | Estación 06 (The Celestial Matrix) / Hoja 2B |
-| **Q** | `assets/general/glyphs/ecl-q.svg` | Solo Hoja 3B (alfabeto) |
+| **Q** | `assets/general/glyphs/ecl-q.svg` | Estación 11 (pie del mojón de la orilla sur de la Salt Playa, §7.B.16) / Hoja 3B |
 | **R** | `assets/general/glyphs/ecl-r.svg` | Estación 10 (3.er mojón del Whispering Chasm) / Hoja 2A |
 | **S** | `assets/general/glyphs/ecl-s.svg` | Solo Hoja 2B (alfabeto) |
 | **T** | `assets/general/glyphs/ecl-t.svg` | Solo Hoja 2A (alfabeto) |
@@ -567,7 +567,7 @@ Orden impreso del alfabeto (`scripts/journal/build_page02_03.py`, `SHUFFLED_GLYP
 | **W** | `assets/general/glyphs/ecl-w.svg` | Solo Hoja 2B (alfabeto) |
 | **X** | `assets/general/glyphs/ecl-x.svg` | Solo Hoja 3A (alfabeto) |
 | **Y** | `assets/general/glyphs/ecl-y.svg` | Solo Hoja 2A (alfabeto) |
-| **Z** | `assets/general/glyphs/ecl-z.svg` | Solo Hoja 3B (alfabeto) |
+| **Z** | `assets/general/glyphs/ecl-z.svg` | Estación 12 (pie de la estela alta del Lexicon, bajo el dial, §7.B.17) / Hoja 3B |
 
 ---
 
@@ -702,7 +702,7 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   $$[Z] = 23 - 18 \implies \mathbf{Z = 5}$$
   $$[I] = 12 - 2 \implies \mathbf{I = 10}$$
 - **Asignación en el Ledger**: $\mathbf{Z = 5, \quad I = 10}$. Valores libres; ninguna letra repite valor.
-- **Letras aún sin ecuación (solo Operador)**: $J, Q, X$, con los valores libres $8, 14, 15$ (para el Stage Path).
+- **Letras aún sin ecuación (solo Operador)**: $J, Q, X$, con los valores libres $8, 14, 15$ (para el Stage Path). *(Actualización 25-10-2026: $X$ pasó a la Estación 10, $Q$ a la Estación 11 y $Z$ a la Estación 12; aquí la línea $[Z] + [D] = 23$ queda como comprobación de una letra que Silvia ya tiene, y $I$ sigue siendo la letra nueva de esta estación.)*
 
 #### 13. DEDUCCIÓN DE $J$ (Estación 22 · La puertecilla del nicho de la Whispering Gallery, solo en la web)
 - **Origen**: al tocar en espejo la melodía de seis campanas (Estación 22), el nicho del foco oeste se abre; en el interior de su puertecilla Aurelia arañó una línea, que aparece en el Ledger con `requires: 'order_whispering_gallery_completed'` (decisión del Operador, 23-10-2026).
@@ -711,7 +711,7 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Resolución** (con $T = 16$ de §7.B.5):
   $$[J] = 16 / 2 \implies \mathbf{J = 8}$$
 - **Asignación en el Ledger**: $\mathbf{J = 8}$. Valor libre; ninguna letra repite valor.
-- **Letras aún sin ecuación (solo Operador)**: $Q$, con el valor libre $14$ (Estación 24).
+- **Letras aún sin ecuación (solo Operador)**: $Q$, con el valor libre $14$ (Estación 24). *(Actualización 25-10-2026: $Q$ se entrega ya en la Estación 11, §7.B.16; la Estación 24 no tiene letra libre y, si hace falta, llevará una línea de comprobación.)*
 
 #### 7.B.14 · Estación 10 · The Line of the Gate (Whispering Chasm, X = 15)
 - **Origen** (decisión del Operador, 23-10-2026: el premio del Chasm es una operación y una letra que no esté en la frase y que Silvia no tuviera): sobre el arco de la Oasis Gate hay una gran X tallada y, debajo, una línea del Order; aparece en el Ledger con `requires: 'order_whispering_chasm_completed'` (id `chasm-xe`).
@@ -727,6 +727,19 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Camino a la Estación 12** (24-10-2026): tras la orilla sur, Hermes sigue a los jinetes 3 h hacia el sur hasta las ruinas de Camp VII. Al anochecer, escondido tras un muro, ve acampar a la banda junto a las tres estelas (paso del chat «The Nomad Ruins · Dusk»); en la lona del carro hay una marca quemada, «a bird, perhaps, or a flame». La banda sigue al sur con el carro y deja una retaguardia de dos hombres (uno duerme, otro ronda con antorcha). El nombre BC Ashes solo se revela al resolver el Lexicon.
 - **El Lexicon en 3D, «The Steles of Camp VII»** (24-10-2026): de noche, bajo la ronda del centinela, Silvia lee las diez palabras y Hermes las limpia de arena; con `PHOENIX` y 194° fija Al-Qibla, cuya campanada despierta a los vigías (la emboscada canónica de la Hoja 11A). Hermes despista a los perseguidores por los muros del antiguo campamento leyendo las letras de los dinteles (que siguen `PHOENIX`, las inscripciones de los sillares), se esconde, y al irse la retaguardia ve el estandarte del fénix desplegado; en la piedra del hogar lee lo que el raider rayó a cuchillo: el fénix, **«BC ASHES»** y una flecha con 194. $[R] \times 2 = [F]$ aparece en el bordillo de la segunda estela, iluminado por la sombra de la aguja.
 - **Tres corazones en la Salt Playa y en el Lexicon** (24-10-2026, por orden del Operador): Hermes tiene 3 corazones por partida. En la Salt Playa los pierde al hundirse o quebrar la sal (sima, losa agrietada, salida equivocada, placa mala del Sump) y, al perder el tercero, vuelve al trípode del borde norte y el cruce empieza de nuevo desde la fila I, Sump incluido. En el Lexicon los pierde con una palabra que no encaja, un roce que oye el centinela, un sigilo o un rumbo equivocados o una puerta falsa; al perder el tercero la noche está perdida, Hermes se esconde en las dunas y la estela se lee otra vez desde la primera palabra. Es mecánica de juego: no cambia ningún nombre ni dato canónico.
+#### 7.B.16 · Estación 11 · The Line of the Shore (Salt Playa, nueva letra Q = 14)
+- **Origen** (orden del Operador, 25-10-2026: un glifo-letra nuevo en cada juego, que no salga en el mensaje del 1 de septiembre y que Silvia no tuviera): en el pie del mojón de la orilla sur, bajo la línea de comprobación, hay una segunda línea más pequeña y, a su lado, un glifo que Silvia nunca ha tenido: un círculo con un punto en el centro y tres rayos (`ecl-q.svg`). Aparece en el Ledger con `requires: 'order_salt_playa_completed'` (id `playa-qe`).
+- **Mensaje del 1 de septiembre**: «YOU ARE THE REASON FOR ALL OF THIS. WHEN YOU READ THIS YOU WILL KNOW HOW MUCH I LOVE YOU. YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.» Letras presentes: A C D E F H I K L M N O R S T U V W Y. Ausentes: B G J P Q X Z.
+- **Ecuación (The Line of the Shore)**: $$[Q] + [E] = 16$$
+- **Resolución** (con $E = 2$ de §7.B.4): $$[Q] = 16 - 2 \implies \mathbf{Q = 14}$$ Valor libre (el reservado para la Estación 24); ninguna letra repite valor. La Q no aparece en la frase. La web nunca muestra el valor (Regla 9).
+- **Dónde se ve**: tarjeta de premio de la Playa (sello con el glifo, `= Q`, y la ecuación), placa en el suelo ante el mojón (se enciende al llegar), telemetría del chat («NEW GLYPH [Q]»), diario de campo y tarjeta de la estación.
+
+#### 7.B.17 · Estación 12 · The Line of the Dial (Desert Lexicon, nueva letra Z = 5)
+- **Origen** (misma orden): al pie de la estela alta, bajo el dial de bronce, los nómadas grabaron una línea y un glifo en zigzag con un punto en el centro (`ecl-z.svg`). Se enciende junto a la línea del bordillo cuando Al-Qibla queda fijado. Ledger con `requires: 'order_desert_lexicon_completed'` (id `stele-oz`).
+- **Ecuación (The Line of the Dial)**: $$[O] - [Z] = 18$$
+- **Resolución** (con $O = 23$ de §7.B.1): $$[Z] = 23 - 18 \implies \mathbf{Z = 5}$$ La Z no aparece en la frase. En la Estación 19, $[Z] + [D] = 23$ pasa a ser comprobación. Regla 9: la web no muestra el valor.
+- **Dónde se ve**: premio del Lexicon (sello `= Z` y ecuación), placa en la base de la estela alta, voz de Hermes al final, mensajes de Camp VII del chat, diario y tarjeta de la estación.
+
 - **Ecuación de comprobación (The Line of the Salt)**, con dos letras de CRYSTAL:
   $$[T] - [A] = 9$$
 - **Comprobación**: con $A = 7$ (Latitude Minutes y Meridian Resonance) y $T = 16$ (Longitude Seconds y Polar Resonance: $F + T = 22$, $T - F = 10$), $16 - 7 = 9$. No introduce letras nuevas; sirve para confirmar.
