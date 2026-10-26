@@ -1623,7 +1623,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
       const camPos = { x: 0, y: 0, z: 0, lx: 0, ly: 0, lz: 0, ok: false };
       function frame(now) {
         raf = requestAnimationFrame(frame);
-        if (!G || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;
+        if (!G || window.__filmMode || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;
         const dt = Math.min(0.1, (now - (last || now)) / 1000);
         tick(now, dt);
         (G.adapt || (G.adapt = P.fitSpeed(G.renderer)))(dt);
@@ -2261,6 +2261,6 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         run: () => { const b = el.controls.querySelector('.lex3d-run'); if (b) b.click(); if (view.walk) finishWalk(); return view.phase; },
         door: (d) => { chooseDoor(d); while (view.walk) finishWalk(); return view.phase; },
         sol: () => FLEE_SOL.slice(),
-        frames: (n) => { for (let i = 0; i < (n || 1); i++) tick(performance.now() + i * 33, 1 / 30); }
+        frames: (n, dt) => { const d = dt || 1 / 30; if (dt) { window.__vclock = (window.__vclock || performance.now()) + 0; } for (let i = 0; i < (n || 1); i++) { if (dt) { window.__vclock += d * 1000; tick(window.__vclock, d); } else tick(performance.now() + i * 33, 1 / 30); } }
       };
     })();

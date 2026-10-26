@@ -3674,6 +3674,8 @@ def test_cinematic(browser):
     wire_to = lambda seen, reply: json.dumps(dict({"seen0": True, "reply0": 2, "seen1": True, "reply1": 1}, **{f"seen{i}": True for i in range(2, seen + 1)}, **{f"reply{i}": 0 for i in range(2, reply + 1)}))
     marching = dict(DESERT_BASE, order_chasm_wire=wire_to(3, 3), order_salt_playa_completed="true", order_lexicon_march_start=str(int(time.time() * 1000) - hour), order_desert_station_active="12")
     ctx, page, errors = new_page(browser, marching)
+    unavailable = json.dumps({"road_of_salt": {"available": False, "title": "The Road of Salt", "length": "1:45", "files": {}}, "night_of_steles": {"available": False, "title": "The Night of the Steles", "length": "1:00", "files": {}}})
+    page.route("**/assets/cinematics/manifest.json", lambda r: r.fulfill(status=200, content_type="application/json", body=unavailable))
     page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
     js = page.evaluate
     js("window.activateHubView('view-field-wire')"); page.wait_for_timeout(2500)

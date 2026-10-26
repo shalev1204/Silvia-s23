@@ -109,7 +109,9 @@ Las capturas limpias (sin interfaz, 1280×720) están en `docs/cinematic_refs/`.
 
 ## 6. Integración en el juego
 
-**Estado (25-10-2026): el reproductor ya está construido y dormido.** No hace falta tocar código cuando lleguen los vídeos:
+**Estado (26-10-2026): las dos películas existen y están activas.** No son las generadas con Veo de este guion, sino películas rodadas con el propio motor 3D de los juegos (cámara dirigida, títulos, subtítulos VTT y banda sonora sintetizada): «The Road of Salt» (1:45, la marcha del Chasm al Lexicon, con una apertura 2D de la tormenta roja) y «The Night of the Steles» (0:59, la noche del Lexicon hasta el nombre de los BC Ashes). Un solo archivo de 720p por película (13–18 MB, bajo el límite de 25 MB de Cloudflare Pages; las claves `1080` y `720` del manifiesto apuntan al mismo archivo). Si algún día se generan las versiones de Veo, basta sustituir los archivos y los nombres del manifiesto.
+
+**Estado anterior (25-10-2026): el reproductor ya estaba construido y dormido.** No hace falta tocar código cuando lleguen los vídeos:
 
 1. Copie los archivos a `web/assets/cinematics/` con los nombres de `manifest.json` (`road_of_salt_1080.mp4`, `road_of_salt_720.mp4`, `road_of_salt_poster.jpg`, `road_of_salt.en.vtt`, y los de `night_of_steles_*` para la Parte 2).
 2. En `web/assets/cinematics/manifest.json` ponga `"available": true` en la película que ya exista.

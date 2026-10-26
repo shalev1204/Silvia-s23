@@ -1732,7 +1732,7 @@
       const camPos = { x: 0, y: 0, z: 0, ok: false };
       function frame(now) {
         raf = requestAnimationFrame(frame);
-        if (!G || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;   // no frames while it fades out
+        if (!G || window.__filmMode || modal.style.display === 'none' || modal.classList.contains('closing') || document.hidden) return;   // no frames while it fades out
         const dt = Math.min(0.1, (now - (last || now)) / 1000);
         tick(now, dt);
         (G.adapt || (G.adapt = fitSpeed(G.renderer)))(dt);
@@ -2366,7 +2366,7 @@
         facing: () => relicFacing(),
         turn: (ax, ang) => rotateRelic(ax, ang),
         solveRelic: () => relicFound(),
-        frames: (n) => { for (let i = 0; i < (n || 1); i++) tick(performance.now() + i * 33, 1 / 30); },
+        frames: (n, dt) => { const d = dt || 1 / 30; if (dt) { window.__vclock = (window.__vclock || performance.now()) + 0; } for (let i = 0; i < (n || 1); i++) { if (dt) { window.__vclock += d * 1000; tick(window.__vclock, d); } else tick(performance.now() + i * 33, 1 / 30); } },
         walkOn: () => { const b = el.controls.querySelector('.chasm3d-btn.is-way'); if (b) b.click(); }
       };
     })();
