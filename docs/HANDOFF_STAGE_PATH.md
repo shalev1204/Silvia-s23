@@ -49,5 +49,5 @@ Patrón por estación (plantilla: la Estación 20, `web/hub/js/stations/s20-mask
 
 - Textos del juego en inglés; vocabulario sencillo; prohibidos Sunken, Coastal, Coast, Hermit, Stage Mistress; solo A–Z.
 - El WHERE (Viena · Wiener Staatsoper) nunca en claro antes de la Estación 28 (está invertido en `stage-mirror.js`).
-- Pope-E es Carles: Silvia no lo sabe hasta la Torre I. Notas con sello de ceniza (círculo con una línea), siempre la llama *the treasure*; la Mirror Speaker nunca se ve, solo se refleja, y firma con una línea horizontal.
+- Pope-E es Carles: Silvia no lo sabe hasta la Torre I. Notas con sello de ceniza (círculo con una línea), siempre la llama *the key*; la Mirror Speaker nunca se ve, solo se refleja, y firma con una línea horizontal.
 - Git: commit y push a la rama de la sesión al terminar cada tarea; nunca PR, force-push ni borrar ramas sin orden.

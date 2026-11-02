@@ -4881,7 +4881,7 @@
               id: "choice-35-note",
               text: "What does the note say?",
               silviaMsg: "What does the note say, Hermes? Read it to me.",
-              hermesReply: "Seven words, in a fine and careful hand: 'Let her through. She is the treasure.' Then the seal. Aurelia went pale. She says the Ashes have a leader, and that he never writes to anyone. He has just written about you."
+              hermesReply: "Three words, in a fine and careful hand: 'Let her through.' Then the seal. Aurelia went pale. She says the Ashes have a leader, and that he never writes to anyone. He has just written about you."
             },
             {
               id: "choice-35-speaker",
@@ -5559,7 +5559,7 @@
           title: "Who left the note sealed with ash?",
           category: "Tower III",
           group: "stage",
-          answer: "We do not know yet. The note was pinned on the last mask of the gate: 'Let her through. She is the treasure.' The seal is a circle of ash with a line across it, a little like the sign of the Order, but not quite. Aurelia says the Ashes are older than the Order, and that they obey one leader they never name. Whoever he is, he wanted you to pass. I do not know whether that should comfort me."
+          answer: "We do not know yet. The note was pinned on the last mask of the gate: 'Let her through.' The seal is a circle of ash with a line across it, a little like the sign of the Order, but not quite. Aurelia says the Ashes are older than the Order, and that they obey one leader they never name. Whoever he is, he wanted you to pass. I do not know whether that should comfort me."
         },
         {
           id: "inq-camera-upside",
@@ -6556,7 +6556,7 @@
 
       // After the night behind the gate, a broken line from someone else slips onto the wire, sealed with ash
       // (docs/STAGE_PATH_BIBLE.md §9). Hermes never hears it and never mentions it.
-      const WIRE_INTERCEPT = "…kssh… tell the old man to hold the lamp lower… the treasure reads by it… kssh… the stair past the dressing rooms is rotten, she must keep to the wall… kssh… no harm comes to her in this tower. Not while I…";
+      const WIRE_INTERCEPT = "…kssh… tell the old man to hold the lamp lower… the key reads by it… kssh… the stair past the dressing rooms is rotten, she must keep to the wall… kssh… no harm comes to her in this tower. Not while I…";
       function appendWireIntercept() {
         if (!wireMessagesStream) return;
         const el = document.createElement('div');

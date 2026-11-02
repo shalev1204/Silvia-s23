@@ -4,20 +4,44 @@ Herramientas automatizadas de generación, renderizado y síntesis:
 
 ```text
 scripts/
-├── audio/
-│   ├── generate_raid_audio.py           ← Genera los stems de voz de la transmisión actual
-│   ├── build_raid_master.py             ← Mezcla el audio final (radio, telemetría, filtros)
-│   └── archive/                         ← Versiones y pruebas previas (distress drafts)
+├── audit/
+│   ├── web_smoke.py                     ← Suite integral end-to-end (Playwright) para el Hub y puzles
+│   ├── lint_lore_and_vocabulary.py      ← Linter estricto de vocabulario canónico y lore
+│   └── journey_report.py                ← Generador de perfil de viaje de Silvia para el cofre
+│
+├── audio/                               ← Ver audio/README.md para el desglose detallado
+│   ├── build_hyperrealistic_raid_master.py ← Master final Transmisión 1 (The Raid)
+│   ├── build_desert_master_v2.py        ← Master final Transmisión 2 (Deep Desert)
+│   ├── mix_alert_and_victory.py         ← Master final Transmisiones 5 y 6 (Tempest & Victory)
+│   └── archive/                         ← Bocetos de transmisiones de socorro iniciales
 │
 ├── glyphs/
 │   ├── generate-glyphs.py               ← Generador inicial de glifos SVG
 │   ├── generate-glyphs-v2.py            ← Generador v2 (refinamiento)
 │   └── generate-glyphs-v3.py            ← Generador canónico de los 27 glifos del Eclipse Script
 │
-└── render/
-    ├── export-icons.py                  ← Exporta emblemas de los 3 caminos y de la Orden
-    ├── render-parchment.sh              ← Renderiza el pergamino del Email 1 en alta resolución
-    └── render-gmail-view.sh             ← Renderiza la vista previa del pergamino para Gmail
+├── journal/
+│   ├── build_stage_path.py              ← Compilador maestro de las Hojas 19 a 26 del Stage Path
+│   ├── build_impresion_master.py        ← Ensamblador de pliegos y lotes de impresión A5 doble cara
+│   ├── stage_drawings.py                ← Motor de ilustraciones renacentistas de alta fidelidad
+│   ├── sheet_seal.py                    ← Generador y verificador OpenCV de sellos criptográficos QR
+│   ├── verify_sheets.py                 ← Verificador de colisiones texto-dibujo y márgenes de corte
+│   ├── stage_preview.py                 ← Generador de la vista previa de encuadernación A4
+│   ├── camera_city.py                   ← Datos vectoriales de la Camera Obscura (Estación 21)
+│   └── whisper_gallery.py               ← Datos vectoriales de la Whispering Gallery (Estación 22)
+│
+├── maps/
+│   └── build_desert_relief.py           ← Generador de mapas topográficos y relieve del desierto
+│
+├── render/
+│   ├── export-icons.py                  ← Exporta emblemas de los 3 caminos y de la Orden
+│   ├── render-parchment.sh              ← Renderiza el pergamino del Email 1 en alta resolución
+│   ├── render-gmail-view.sh             ← Renderiza la vista previa del pergamino para Gmail
+│   ├── build_chat_sketches.py           ← Bocetos de Hermes para el chat
+│   └── generate_tempest_cinematic.py    ← Cinematográfica de la tormenta de arena
+│
+└── web/
+    └── offline_list.py                  ← Generador del manifiesto PWA/Cache para web/sw.js
 ```
 
 ## Clave de la API de Gemini (scripts de voz y vídeo)

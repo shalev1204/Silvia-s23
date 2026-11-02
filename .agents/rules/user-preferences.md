@@ -93,9 +93,24 @@ Este documento recoge de forma vinculante el estilo de trabajo, preferencias est
 
 ---
 
-## 10. Consulta Obligatoria de la Biblia Maestra
-Cualquier agente debe consultar antes de cada sesión el documento maestro:
-**[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](../../docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)**.
+## 10. Cero Datos Numéricos Iniciales en The Cipher Ledger (Cripto-Aritmética Sin Spoilers)
+- **Silvia deduce, Silvia descubre**: Silvia comienza con CERO valores numéricos precargados o revelados en su Cuaderno de Cifrado (*The Cipher Ledger*).
+- Queda terminantemente prohibido pre-rellenar o mostrar en interfaces datos como $P = 21$ o $B = 17$; Silvia debe deducir el valor de cada letra por sí misma utilizando las pistas del diario y las deducciones algebraicas rigurosas.
+
+---
+
+## 11. Higiene del Repositorio y Cero Scripts Sueltos en la Raíz
+- **Prohibición absoluta**: Queda estrictamente prohibido crear scripts de prueba (`test_*.py`, `debug_*.py`), volcados de mockups o archivos temporales en la raíz del proyecto o sueltos en `scripts/journal/`.
+- **Uso de scratch**: Todo script auxiliar o prototipo debe ubicarse obligatoriamente en `scratch/` (`maps/`, `hub_tests/`, `verifications/`, `utils/`) o en carpetas de sesión temporal (`brain/`), y documentarse o limpiarse una vez integrado en los módulos de producción.
+
+---
+
+## 12. Consulta Obligatoria de las Biblias Maestras
+Cualquier agente debe consultar antes de cada sesión los documentos rectores del proyecto:
+1. **[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](../../docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)**: La Biblia Maestra Canónica 6.0.
+2. **[docs/DESERT_ODYSSEY_BIBLE.md](../../docs/DESERT_ODYSSEY_BIBLE.md)**: Desert Path (Estaciones 10 a 19).
+3. **[docs/STAGE_PATH_BIBLE.md](../../docs/STAGE_PATH_BIBLE.md)**: Stage Path (Estaciones 20 a 28, Hojas 19 a 26).
+4. **[AGENTS.md](../../AGENTS.md)**: Protocolo maestro de onboarding.
 
 
 

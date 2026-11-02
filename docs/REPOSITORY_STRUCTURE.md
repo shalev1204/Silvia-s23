@@ -26,11 +26,17 @@ Silvia's23/
 │   ├── stage/                 ← Reservado
 │   └── templates/             ← game_boilerplate/ (HTML, CSS, JS procedural para nuevos puzzles)
 │
-├── journal/                   ← DIARIO MANUSCRITO A5 (18 hojas, 36 caras)
-│   ├── page01 … page18/       ← Por hoja: mockups/ (JPG fotorrealistas) y pdf/ (A5 listos para imprimir)
+├── journal/                   ← DIARIO MANUSCRITO A5 (26 hojas, 52 caras)
+│   ├── page01 … page26/       ← Por hoja: mockups/ (JPG fotorrealistas) y pdf/ (A5 listos para imprimir)
+│   ├── seals/                 ← Sellos y vistas previas QR para las Hojas 20 a 26
+│   ├── stage_seals.json       ← Registro criptográfico de hashes y firmas de sellos del Stage Path
 │   ├── constellation_games/   ← Mockups de los juegos C1–C4
 │   ├── desert_games/          ← Mockups de los juegos de la primera tanda del desierto
-│   └── impresion/             ← PDFs de impresión completos (18 hojas doble cara y diario maestro de 36 págs)
+│   └── impresion/             ← PDFs de impresión maestros:
+│                                ├── 00_DIARIO_COMPLETO_36_PAGINAS_A5.pdf (Hojas 01 a 18)
+│                                ├── 01_STAGE_PATH_HOJAS_19_A_26_A5.pdf (Hojas 19 a 26)
+│                                ├── 02_STAGE_PATH_VISTA_PREVIA_A4.pdf (Pliego A4 encuadernación)
+│                                └── hojas_doble_cara/ (Hojas 01 a 26 individuales A5)
 │
 ├── assets/                    ← RECURSOS MULTIMEDIA DE PRODUCCIÓN
 │   ├── fonts/                 ← Tipografías manuscritas (Fondamento, etc.)
@@ -51,13 +57,19 @@ Silvia's23/
 │   └── desert/ · stage/
 │
 ├── scripts/                   ← HERRAMIENTAS
-│   ├── journal/               ← Generadores del diario (build_entire_journal.py, build_impresion_master.py, tests/, templates/template_new_sheet.py)
-│   ├── audio/                 ← Voz, foley y mezclas (stems intermedios no versionados en web/)
-│   ├── glyphs/                ← Generadores del Eclipse Script
-│   ├── render/                ← Renderizado de emails
-│   └── audit/lint_lore_and_vocabulary.py   ← Linter de lore y vocabulario
+│   ├── journal/               ← Generadores del diario (build_stage_path.py, build_impresion_master.py, stage_drawings.py, sheet_seal.py, verify_sheets.py, stage_preview.py)
+│   ├── audit/                 ← Suite de calidad (web_smoke.py, lint_lore_and_vocabulary.py, journey_report.py)
+│   ├── audio/                 ← Generadores de voz Gemini TTS, foley y mezclas (ver audio/README.md)
+│   ├── glyphs/                ← Generadores del Eclipse Script (v1, v2, v3)
+│   ├── maps/                  ← Generación de relieves y mapas vectoriales
+│   ├── render/                ← Renderizado de emails y cinemáticas
+│   └── web/                   ← Utilidades web (offline_list.py para web/sw.js)
 │
-├── scratch/                   ← Scripts auxiliares y verificaciones de trabajo
+├── scratch/                   ← Prototipos, pruebas y verificaciones aisladas
+│   ├── maps/                  ← Ajustes paramétricos de curvas SVG y mapas procedurales
+│   ├── hub_tests/             ← Pruebas de integración, talleres de juego y tormenta roja
+│   ├── verifications/         ← Verificaciones criptográficas, léxico y laberintos
+│   └── utils/                 ← Utilidades auxiliares de captura y depuración rápida
 │
 └── docs/                      ← DOCUMENTACIÓN
     ├── design_system/         ← SISTEMA DE DISEÑO Y MANUALES DE CREACIÓN
@@ -66,7 +78,9 @@ Silvia's23/
     │   ├── 02_WEB_GAMES_AND_HUB_GUIDE.md      ← Web: UI dark mode, tokens, micro-animaciones, Web Audio API
     │   └── 03_VOICE_TONE_AND_LORE_GUIDE.md    ← Narrativa: personajes, agencia Silvia, WHEN/WHERE/WHAT, vocabulario
     ├── CANONICAL_LORE_AND_VOCABULARY_AUDIT.md   ← Biblia Maestra 6.0 (fuente de verdad)
-    ├── DESERT_ODYSSEY_BIBLE.md                  ← Desert Path: hojas, juegos y estaciones 10–19
+    ├── DESERT_ODYSSEY_BIBLE.md                  ← Desert Path: hojas 08–18, juegos y estaciones 10–19
+    ├── STAGE_PATH_BIBLE.md                      ← Stage Path: hojas 19–26, fragmentos, Espejo Vivo y estaciones 20–28
+    ├── HANDOFF_STAGE_PATH.md                    ← Informe de entrega y auditoría del Stage Path
     ├── lore_and_puzzle_bible.md                 ← Diseño de puzzles, astronomía y mecánicas
     ├── LORE.md · PATHS_AND_CHARACTERS.md · GRIMOIRE.md · TIMELINE.md
     ├── WEB_ECOSYSTEM.md · EMAIL_SETUP.md · ASSETS.md · SESSION_LOG.md
@@ -78,6 +92,13 @@ Silvia's23/
 ## 2. Notas
 
 - **Hub dividido (20-10-2026):** `web/index.html` guarda solo el HTML (vistas y modales de las Estaciones 10–20); el CSS vive en `web/hub/css/` y el JS en `web/hub/js/` (`hub-core.js`, un archivo por estación en `stations/` y piezas como `tester-panel.js`), cargados con `<link>` y `<script src>` clásicos, sin build, para que funcione también por `file://`. El diseño de cada juego está en `docs/DESERT_ODYSSEY_BIBLE.md` y `docs/STAGE_PATH_BIBLE.md`.
-- **Regeneración del diario:** `python3 -m scripts.journal.build_entire_journal` desde la raíz reescribe las 36 caras y sincroniza los mapas en `web/assets/maps/`. Es determinista: una cara solo cambia si cambia su script.
-- **`journal/impresion/`:** contiene los PDFs de impresión doble cara actualizados para las 18 hojas (`hojas_doble_cara/`) y el diario unificado de 36 páginas (`00_DIARIO_COMPLETO_36_PAGINAS_A5.pdf`), generados con `python3 scripts/journal/build_impresion_master.py`.
-- **Audio:** los `*.wav` / `*.pcm` de `web/` están en `.gitignore`; solo se versionan los `.mp3` / `.mp4` finales.
+- **Regeneración del diario:**
+  - Hojas 01 a 18 (Constellation + Desert): generadas mediante `python3 -m scripts.journal.build_entire_journal`.
+  - Hojas 19 a 26 (Stage Path): compiladas mediante `python3 scripts/journal/build_stage_path.py` (con ilustraciones renacentistas de `stage_drawings.py` y sellos QR de `sheet_seal.py`).
+  - Verificación de maquetación: `python3 scripts/journal/verify_sheets.py --sheets 19-26` verifica márgenes de troquelado ($X < 165$ px cara A, $X > 1583$ px cara B), tamaños de fuente y cero colisiones texto-dibujo (margen $\ge 40$ px).
+- **`journal/impresion/`:** contiene los paquetes maestros de impresión:
+  - `00_DIARIO_COMPLETO_36_PAGINAS_A5.pdf`: Hojas 01 a 18 (36 páginas iniciales).
+  - `01_STAGE_PATH_HOJAS_19_A_26_A5.pdf`: Hojas 19 a 26 (16 páginas del Stage Path).
+  - `02_STAGE_PATH_VISTA_PREVIA_A4.pdf`: Pliego A4 con marcas de anillas y doblez.
+  - `hojas_doble_cara/`: PDFs individuales de dos caras para cada hoja (01 a 26).
+- **Audio:** los `*.wav` / `*.pcm` de `web/` están en `.gitignore`; solo se versionan los `.mp3` / `.mp4` finales. Ver `scripts/audio/README.md` para el mapa de generadores de stems y post-producción.

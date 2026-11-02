@@ -1740,7 +1740,7 @@ def test_ashes(browser):
     js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(12500)
     st = js(ASHES_JS)
     text = " ".join(st["intercepts"])
-    check(len(st["intercepts"]) == 1 and "the treasure" in text, "after step 36 one broken line arrives, calling her the treasure", text[:90])
+    check(len(st["intercepts"]) == 1 and "the key" in text, "after step 36 one broken line arrives, calling her the key", text[:90])
     check(not any(w in text.lower() for w in ("carles", "pope", "seeker")), "it never names its sender nor calls her the seeker")
     js("switchMapPath('stage', false)"); page.wait_for_timeout(600)
     st = js(ASHES_JS)
@@ -3553,7 +3553,7 @@ def test_desert_lexicon(browser):
     page.keyboard.press("Escape"); page.wait_for_timeout(300)
     check(not reward() and shown(), "Escape puts the reward away, the ruins stay open")
     text = js("document.getElementById('modal-desert-lexicon').innerText")
-    bad = [w for w in ("Sunken", "Coastal", "Coast", "Hermit", "Stage Mistress", "Pope", "Sheet") if w in text]
+    bad = [w for w in ("Sunken", "Coastal", "Coast", "Hermit", "Stage Mistress", "Pope", "Sheet") if w in text]  # CANONICAL_LORE: test de términos prohibidos
     check(not bad, "no forbidden words in the steles", str(bad))
     js("window.closeDesertLexiconModal()"); page.wait_for_timeout(500)
     js("window.selectMapNode(11, false)"); page.wait_for_timeout(300)

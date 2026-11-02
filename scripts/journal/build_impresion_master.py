@@ -36,8 +36,13 @@ SHEETS = [
 # The Stage Path (Tower III): sheets 19 to 26, delivered to Silvia all together in their own bundle.
 STAGE_SHEETS = [
     (19, 'Hoja_19_Carta_Nunca_Enviada_y_Juego_S1_Puerta_Mascaras.pdf', 'page19/pdf/page19_front_A5.pdf', 'page19/pdf/page19_back_A5.pdf'),
-    # back_rel None (a face not built yet) puts a blank A5 page in its place, so the duplex printing stays aligned
     (20, 'Hoja_20_Camera_Obscura_y_Whispering_Gallery.pdf', 'page20/pdf/page20_front_A5.pdf', 'page20/pdf/page20_back_A5.pdf'),
+    (21, 'Hoja_21_Memorias_Alpinas_y_Orquesta_Automatas.pdf', 'page21/pdf/page21_front_A5.pdf', 'page21/pdf/page21_back_A5.pdf'),
+    (22, 'Hoja_22_Tramoya_y_Cenizas_Antes_de_Cristo.pdf', 'page22/pdf/page22_front_A5.pdf', 'page22/pdf/page22_back_A5.pdf'),
+    (23, 'Hoja_23_Teatro_de_Sombras_y_Disco_del_Voto.pdf', 'page23/pdf/page23_front_A5.pdf', 'page23/pdf/page23_back_A5.pdf'),
+    (24, 'Hoja_24_Laberinto_de_Espejos_y_Doctrina.pdf', 'page24/pdf/page24_front_A5.pdf', 'page24/pdf/page24_back_A5.pdf'),
+    (25, 'Hoja_25_Farol_Caleidoscopico_y_Terraza_Estrellas.pdf', 'page25/pdf/page25_front_A5.pdf', 'page25/pdf/page25_back_A5.pdf'),
+    (26, 'Hoja_26_Escenario_del_Espejo_y_Retorno_Cumbres.pdf', 'page26/pdf/page26_front_A5.pdf', 'page26/pdf/page26_back_A5.pdf'),
 ]
 STAGE_TOTAL = 8
 

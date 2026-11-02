@@ -68,3 +68,12 @@ scratch/screenshots/
 
 # Sheet verifier pictures (scripts/journal/verify_sheets.py)
 journal/verify/
+
+# Scratch & temporary root test scripts/artifacts
+/test_*.py
+/test_*.png
+/test_*.jpg
+/test_*.html
+
+# Ad-hoc print batches (regenerated on demand)
+journal/impresion/LOTE_IMPRESION_*.pdf

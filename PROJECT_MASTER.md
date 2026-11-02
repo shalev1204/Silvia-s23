@@ -34,6 +34,8 @@ Caza del tesoro no lineal de ~56 días para el 23.º cumpleaños de Silvia. Rega
 | **[docs/ASSETS.md](docs/ASSETS.md)** | Todos los archivos generados y cómo regenerarlos |
 | **[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)** | Biblia Maestra 6.0: lore, emails, transmisiones, estaciones 01–09, tormenta, Cipher Ledger |
 | **[docs/DESERT_ODYSSEY_BIBLE.md](docs/DESERT_ODYSSEY_BIBLE.md)** | Desert Path: hojas 08–18, juegos, Cairns y Estaciones 10–19 |
+| **[docs/STAGE_PATH_BIBLE.md](docs/STAGE_PATH_BIBLE.md)** | Stage Path: hojas 19–26, fragmentos de espejo, Estaciones 20–28, mapa del Espejo Roto Vivo |
+| **[docs/HANDOFF_STAGE_PATH.md](docs/HANDOFF_STAGE_PATH.md)** | Auditoría, estado de entrega y verificación de las Hojas 19–26 |
 | **[docs/lore_and_puzzle_bible.md](docs/lore_and_puzzle_bible.md)** | Diseño de puzzles, astronomía y mecánicas |
 | **[AGENTS.md](AGENTS.md)** | Reglas de trabajo del Operador (Capa 2) |
 
@@ -110,11 +112,11 @@ YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.
 
 ---
 
-## Estado actual del juego (octubre 2026)
+## Estado actual del juego (octubre–noviembre 2026)
 
 - **Constellation Path (Estaciones 01–09):** completado. La Estación 09 terminó con el voto de Hermes y la gran tormenta de arena (Hub bloqueado 48 h; después, el telégrafo *Ask Hermes*).
-- **Desert Path (Estaciones 10–19, Hojas 08–18):** en curso. Jugables en el Hub, en orden estricto: Estación 10 (The Whispering Chasm), 11 (The Salt Playa), 12 (The Desert Lexicon) y 13 (The Oasis Clepsydra). Pendientes: 14–19.
-- **Stage Path (Torre III):** pendiente.
+- **Desert Path (Estaciones 10–19, Hojas 08–18):** jugables en el Hub. Estaciones 10 a 19 cubren la travesía hacia The Oracle's Horizon y los 5 Cairns.
+- **Stage Path (Estaciones 20–28, Hojas 19–26, Torre III):** diario manuscrito completado al 100% (16 páginas A5 con estética renacentista Da Vinci/Kepler, sellos criptográficos QR verificados y PDFs de imprenta compilados en `journal/impresion/`). Mecánica del Espejo Roto Vivo implementada en el Hub (`web/hub/js/stations/stage-mirror.js`).
 - **Final:** alinear las tres torres abre *The Vault of the Grand Eclipse* (entradas de ballet).
 - **Web:** Hub en `web/index.html`; mapa completo en [docs/WEB_ECOSYSTEM.md](docs/WEB_ECOSYSTEM.md).
 

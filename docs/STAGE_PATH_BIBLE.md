@@ -155,7 +155,7 @@ Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pid
 - **The Mirror Speaker**: guardiana de la Torre III. **Nunca se ve; solo se refleja.** Voz elegante, pausada y ceremonial; frases breves y perfectas. Firma: una línea horizontal. Habla de luz, umbral, reflejo y de lo que se ve cuando dejas de buscar (`docs/PATHS_AND_CHARACTERS.md`).
   - **Reacciona al estilo de Silvia** (idea #11): al abrirse cada sala escribe en el cristal, en espejo, una línea breve sobre cómo resolvió la anterior (hora, fallos y notas, ritmo, tono con Hermes), firmada con su línea. Cada sala nueva la muestra arriba de su juego con `EclipseMirrorSpeaker.render(nodo, elemento)`.
 - **The BC Ashes**: secta antiquísima (*Before Christ*), guardianes del «primer fuego», con túnicas manchadas de ceniza.
-- **Pope-E**: jefe enmascarado de la secta (máscara de plata ennegrecida). Nunca hace daño. Deja tres notas firmadas con un sello de ceniza, aparece una vez como reflejo de espaldas (Estación 26) e intercepta el Field Wire para escribir a Silvia directamente. Siempre la llama *the treasure*.
+- **Pope-E**: jefe enmascarado de la secta (máscara de plata ennegrecida). Nunca hace daño. Deja tres notas firmadas con un sello de ceniza, aparece una vez como reflejo de espaldas (Estación 26) e intercepta el Field Wire para escribir a Silvia directamente. Siempre la llama *the key*.
 
 ---
 
@@ -178,16 +178,16 @@ Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pid
   2. Cita la primera mitad del mensaje oculto, *«You were never only the seeker»*, sin decir de dónde la sacó.
   3. Deja una pluma dorada como la reliquia *Gilded Feather* del principio.
   4. Nunca hace daño a nadie: protege a Silvia incluso cuando parece amenazarla.
-  5. Siempre llama a Silvia *the treasure*, nunca *the seeker*.
+  5. Siempre llama a Silvia *the key*, nunca *the seeker*.
 - **Canales**: tres notas firmadas con el sello de ceniza; un reflejo de espaldas en la Sala de los Espejos (Estación 26); mensajes interceptando el Field Wire.
 
 **Reparto de las pistas (idea #10 del backlog, 21-10-2026)**
 
 | Momento | Pista | Estado |
 | :--- | :--- | :--- |
-| Estación 20 | Nota 1, clavada en la última máscara: *«Let her through. She is the treasure.»* (pistas 1 y 5) | ✅ Field Wire 35 y Ask Hermes |
+| Estación 20 | Nota 1, clavada en la última máscara: *«Let her through.»* (pista 1) | ✅ Field Wire 35 y Ask Hermes |
 | Tras la Estación 20 | Una **pluma dorada** pequeña aparece apoyada en el marco del Espejo Vivo, sin explicación (pista 3) | ✅ `stage-mirror.js` |
-| Tras la Estación 20 | **Mensaje interceptado**: una línea entrecortada por estática se cuela en el Field Wire después del paso 36, firmada con el sello de ceniza; protege a Silvia y la llama *the treasure*. Hermes no la comenta | ✅ `hub-core.js` |
+| Tras la Estación 20 | **Mensaje interceptado**: una línea entrecortada por estática se cuela en el Field Wire después del paso 36, firmada con el sello de ceniza; protege a Silvia y la llama *the key*. Hermes no la comenta | ✅ `hub-core.js` |
 | Estación 23 | Nota 2 (con la cita *«You were never only the seeker»*, pista 2) | ⏳ al construir la sala |
 | Estación 26 | Reflejo de espaldas en la Sala de los Espejos | ⏳ al construir la sala |
 | Estación 27 | Nota 3, justo antes del final | ⏳ al construir la sala |
@@ -239,4 +239,4 @@ Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{
 - **Hoja 19B**: 12 máscaras venecianas, 6 mienten (lágrima, ceja ausente, pluma, grieta, ojo distinto, cinta: siempre en un solo lado). Señuelos simétricos (dos lágrimas, dos plumas, dos cintas). Letras de las mentirosas en orden de lectura: **SILVER**. Las 12 letras: M S A I L O T V H E R U. Fragmento I dibujado y su lugar en el espejo.
 - **Web**: palabra `SILVER` (tolerante con espacios y guiones; 3 fallos → pista en Ask Hermes). Después, **The Missing Halves**: tres máscaras talladas en una mitad; Silvia dibuja la otra mitad, en espejo, con el dedo o el ratón. Se acepta si el dibujo cubre el 72 % de la mitad reflejada, cada línea al menos el 45 % y el 70 % de lo dibujado cae sobre una línea (tolerancia 15 unidades sobre 300). Un pulso tembloroso pasa; copiar sin reflejar, desplazar, agrandar o garabatear no. Tras 3 intentos: guía punteada y el botón «Let the Mirror Speaker carve it» (camino de teclado).
 - **Premio**: Fragmento I (destella en el Espejo Vivo al cerrar el modal). Sin ecuación (J, Q y X llegan en 22, 24 y 27).
-- **Field Wire**: 33 partida (las hojas 19–26 llegan con una paloma de la Orden) → 18 h → 35 balance: el reflejo de la Mirror Speaker (firma con una línea), el Fragmento I y **la primera nota de Pope-E**, clavada en la última máscara: *«Let her through. She is the treasure.»*, sello de ceniza (círculo cruzado por una línea). 36 cierre.
+- **Field Wire**: 33 partida (las hojas 19–26 llegan con una paloma de la Orden) → 18 h → 35 balance: el reflejo de la Mirror Speaker (firma con una línea), el Fragmento I y **la primera nota de Pope-E**, clavada en la última máscara: *«Let her through.»*, sello de ceniza (círculo cruzado por una línea). 36 cierre.
