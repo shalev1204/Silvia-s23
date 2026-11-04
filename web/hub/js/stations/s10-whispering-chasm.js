@@ -244,6 +244,35 @@
         }
         return new THREE.MeshToonMaterial(Object.assign({ gradientMap: toonRamp }, opts));
       }
+      // A softer ramp for new stations: the same painted steps, blended, so forms read like a hand-painted figure
+      // and not a hard poster. Older walks keep `toon`. New walks ask for `toonSoft`.
+      let toonRampSoft = null;
+      function toonSoft(opts) {
+        if (!toonRampSoft) {
+          const steps = [70, 92, 118, 148, 176, 200, 222, 240, 255];
+          const px = new Uint8Array(steps.length * 4);
+          steps.forEach((v, i) => px.set([v, v, v, 255], i * 4));
+          toonRampSoft = new THREE.DataTexture(px, steps.length, 1);
+          toonRampSoft.magFilter = toonRampSoft.minFilter = THREE.LinearFilter;
+          toonRampSoft.needsUpdate = true;
+        }
+        return new THREE.MeshToonMaterial(Object.assign({ gradientMap: toonRampSoft }, opts));
+      }
+      // The light rig for a painted figure: a warm key, a cool fill, a rim from behind, and a low sky.
+      // New stations call this instead of inventing three lights. Older walks keep their own sun.
+      function championLight(T, scene, o) {
+        o = o || {};
+        const key = new T.DirectionalLight(o.key || 0xfff0d4, o.keyI == null ? 1.2 : o.keyI);
+        key.position.set(o.kx == null ? 7 : o.kx, o.ky == null ? 16 : o.ky, o.kz == null ? 6 : o.kz);
+        const fill = new T.DirectionalLight(o.fill || 0xc9d6ff, o.fillI == null ? 0.28 : o.fillI);
+        fill.position.set(-6, 5, 9);
+        const back = new T.DirectionalLight(o.back || 0xffb060, o.backI == null ? 0.45 : o.backI);
+        back.position.set(-4, 8, -10);
+        const hemi = new T.HemisphereLight(o.sky || 0xffe7c4, o.ground || 0xc47a42, o.hemi == null ? 0.48 : o.hemi);
+        const amb = new T.AmbientLight(0xffe4c4, o.amb == null ? 0.18 : o.amb);
+        scene.add(key, fill, back, hemi, amb);
+        return { key, fill, back, hemi, amb };
+      }
       // A warm glow on the edges that turn away from the eye (one shader for all, the colour is per material)
       function rimShader(sh) {
         sh.uniforms.uRim = this.userData.rim;
@@ -807,6 +836,7 @@
         [-1, 1].forEach((sd) => {
           hadd(ell(new T.SphereGeometry(0.026, 14, 10), eyeWhite, 1.15, 0.8, 0.5), sd * 0.052, 0.022, -0.13);
           hadd(new T.Mesh(new T.SphereGeometry(0.0125, 10, 8), ink), sd * 0.052, 0.02, -0.1385);
+          hadd(new T.Mesh(new T.SphereGeometry(0.0042, 6, 6), new T.MeshBasicMaterial({ color: 0xfff8ee })), sd * 0.056, 0.024, -0.147);
           hadd(ell(new T.SphereGeometry(0.03, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, 1.2, 0.75, 0.6), sd * 0.052, 0.028, -0.128);      // the heavy lid
           const brow = hadd(ell(new T.CapsuleGeometry(0.012, 0.05, 4, 8), silver, 1, 1, 1), sd * 0.055, 0.058, -0.132);
           brow.rotation.z = Math.PI / 2 + sd * 0.18;
@@ -2353,7 +2383,7 @@
       }
 
       // The painted look and Hermes himself, for the other 3D walks (the Salt Playa, s11-salt-playa.js)
-      window.EclipsePaint = { rng, canvasTex, speckle, toon, rim, worldPainted, buildHermes, fitSpeed, cinema };
+      window.EclipsePaint = { rng, canvasTex, speckle, toon, toonSoft, rim, championLight, worldPainted, buildHermes, fitSpeed, cinema };
 
       // Test hook (scripts/audit/web_smoke.py)
       window.__chasm = {

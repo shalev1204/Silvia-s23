@@ -185,6 +185,11 @@
     }
 
     /* Under a game window nothing of the hub needs to move */
+    html.game-open,
+    html.game-open body {
+      overflow: hidden !important;
+      overscroll-behavior: none;
+    }
     html.game-open .game-hub-container *,
     html.game-open .hub-theme-backdrop,
     html.game-open .cosmic-nebula-layer,

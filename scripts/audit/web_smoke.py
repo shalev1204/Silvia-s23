@@ -282,8 +282,8 @@ def test_ledger_gating(browser):
     cases = [({}, []), ({"order_whispering_chasm_completed": "true"}, ["chasm-xe"]),
              ({"order_salt_playa_completed": "true"}, ["playa-qe"]),
              ({"order_desert_lexicon_completed": "true"}, ["stele-rf", "stele-oz"]),
-             (DESERT_DONE, ["stele-rf", "stele-oz", "falcon-pa"]),
-             (dict(DESERT_DONE, order_sun_monolith_completed="true"), ["stele-rf", "stele-oz", "falcon-pa", "cairn2-df", "cairn2-ct"])]
+             (DESERT_DONE, ["stele-rf", "stele-oz", "falcon-pa", "falcon-qz"]),
+             (dict(DESERT_DONE, order_sun_monolith_completed="true"), ["stele-rf", "stele-oz", "falcon-pa", "falcon-qz", "cairn2-df", "cairn2-ct"])]
     for extra, expected in cases:
         ctx, page, errors = new_page(browser, dict(SILVIA, **extra))
         page.goto(f"{BASE}/index.html", wait_until="load")
@@ -3784,9 +3784,9 @@ def test_desert_road(browser):
     said = page.evaluate("document.getElementById('wire-inquiries-stream').innerText")
     check("hearth stone" in said and "scorched banner hanging" not in said, "and the answer about the raiders tells the banner in the wind and the name on the hearth", said[-240:].replace("\n", " "))
     check(not errors, "no JS errors on the road", "; ".join(errors[:2]))
-    # after the steles the road waits: Hermes rests at Camp VII and Station 13 stays sealed (the Operator's hold)
+    # after the steles the road to Camp VIII is open, and the card does not give the key
     text = card(page, 12)
-    check("RESTING AT CAMP VII" in text.upper() and "[ Sealed ]" in text and "OPEN THE CLEPSYDRA" not in text.upper(), "after the Lexicon, the card of Station 13 says Hermes is resting at Camp VII", text[:160].replace("\n", " "))
+    check("Camp VIII" in text and "XXX" not in text and "OPEN THE CLEPSYDRA" not in text.upper(), "after the Lexicon, Station 13 points at Camp VIII and does not give the key", text[:180].replace("\n", " "))
     page.evaluate("window.openOasisClepsydraModal()"); page.wait_for_timeout(500)
     check(page.evaluate("getComputedStyle(document.getElementById('modal-oasis-clepsydra')).display") == "none", "and the Clepsydra will not open")
     page.evaluate("window.activateHubView('view-field-wire')"); page.wait_for_timeout(1500)
@@ -3876,6 +3876,122 @@ def test_game_cinematics(browser):
     ctx.close()
 
 
+def test_clepsydra_visions(browser):
+    print("\n42. Station 13: noon at Camp VIII, Transmit the Registry, and Silvia still waits at Camp VII")
+    gate = json.dumps({"seen0": True, "reply0": 0, "seen1": True, "reply1": 0, "seen2": True, "reply2": 0, "seen3": True, "reply3": 0, "seen4": True, "reply4": 0})
+    seed = dict(DESERT_BASE, the_eclipse_active_seeker="Carles", order_desert_lexicon_completed="true",
+                order_field_wire_step="6", order_clepsydra_march_start="1", order_clepsydra_march_bypassed="true",
+                order_clepsydra_howto="seen", order_chasm_wire=gate)
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2000)
+    js = page.evaluate
+    js("window.activateHubView('view-field-wire')")
+    text = ""
+    for _ in range(50):
+        text = js("document.getElementById('view-field-wire').innerText")
+        if "not sure I trust my own eyes" in text and js("document.querySelectorAll('#wire-choices-grid button').length") >= 3:
+            break
+        page.wait_for_timeout(300)
+    buttons = js("[...document.querySelectorAll('#wire-choices-grid button')].map(b => b.innerText)")
+    body = js("document.body.innerText")
+    spoil = ("sixth hour", "XXX", "sandglass", "Hr VI")
+    check(len(buttons) == 3 and "testimonies" in buttons[0] and "empty skin" in buttons[1]
+          and "trust my own eyes" in body and "Camp VIII" in body
+          and not any(any(s.lower() in b.lower() for s in spoil) for b in buttons),
+          "at noon Hermes calls from Camp VIII, and none of the three replies solves the page",
+          "buttons=%s bodyHasEyes=%s" % (len(buttons), "trust my own eyes" in body))
+    js("document.querySelector('#wire-choices-grid button').click()")
+    pill = ""
+    for _ in range(50):
+        pill = js("document.querySelector('#wire-choices-grid button') ? document.querySelector('#wire-choices-grid button').innerText : ''")
+        if "four wells" in pill:
+            break
+        page.wait_for_timeout(300)
+    check("four wells" in pill, "her reply opens the wells, and does not hand her the key", pill[:120])
+    js("document.querySelector('#wire-choices-grid button').click()")
+    page.wait_for_timeout(700)
+    check(js("getComputedStyle(document.getElementById('modal-oasis-visions')).display") != "none" and js("!!window.__visions.state()"),
+          "transmit the registry opens", js("window.__visions && window.__visions.state() && window.__visions.state().phase"))
+    for _ in range(3):
+        js("window.__visions.failOnce()")
+    lost = js("window.__visions.state()")
+    check(lost["lost"] and lost["hearts"] == 0 and lost["well"] == 0, "three false registry lines and the fever wins", str(lost))
+    js("window.__visions.again()")
+    for _ in range(4):
+        js("window.__visions.transmit(window.__visions.state().ok)")
+    key = js("window.__visions.state()")
+    check(key["phase"] == "key" and not key["done"] and js("localStorage.getItem('order_oasis_clepsydra_completed')") != "true",
+          "the four registry lines hold, and the cylinder is waiting", str(key))
+    js("window.__visions.engrave('XII')")
+    bad = js("window.__visions.state()")
+    check(bad["phase"] == "key" and bad["hearts"] == key["hearts"] - 1, "a false numeral costs a heart", str(bad))
+    js("window.__visions.engrave('XXX')")
+    cleft = js("window.__visions.state()")
+    check(cleft["phase"] == "cleft" and cleft["ok"] == 1, "XXX breaks the mirage and leaves the falcon", str(cleft))
+    js("window.__visions.choose(0)")
+    dry = js("window.__visions.state()")
+    check(dry["phase"] == "cleft" and dry["hearts"] == cleft["hearts"] - 1, "a dry crack is not the spring", str(dry))
+    js("window.__visions.choose(window.__visions.state().ok)")
+    won = js("window.__visions.state()")
+    relics = js("JSON.parse(localStorage.getItem('order_inventory_relics') || '[]')")
+    check(won["phase"] == "won" and won["done"] and js("localStorage.getItem('order_oasis_clepsydra_completed')") == "true"
+          and "water_skins" in relics and "falcon_weight" in relics,
+          "the cleft fills the skins and the falcon weight is in the satchel", str(won) + " " + str(relics))
+    js("window.closeOasisVisions()")
+    page.wait_for_timeout(400)
+    js("document.querySelector('[data-view=\"view-cipher\"]').click()")
+    page.wait_for_timeout(600)
+    ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
+    check("eq-item-falcon-pa" in ids and "eq-item-falcon-qz" in ids, "both checks are in the Cipher Ledger", str(ids))
+    step = ""
+    for _ in range(30):
+        step = js("localStorage.getItem('order_field_wire_step')")
+        wire = js("document.getElementById('view-field-wire').innerText")
+        if step in ("7", "8", "9") and "my hands are wet" in wire:
+            break
+        page.wait_for_timeout(300)
+    check(step in ("7", "8", "9") and "my hands are wet" in js("document.getElementById('view-field-wire').innerText"),
+          "the wire tells the spring, not the solution in advance", step)
+    js("window.activateHubView('view-field-wire')")
+    for _ in range(40):
+        if js("document.querySelectorAll('#wire-choices-grid button').length") >= 3:
+            break
+        page.wait_for_timeout(300)
+    js("document.querySelector('#wire-choices-grid button').click()")
+    page.wait_for_timeout(2500)
+    check(js("getComputedStyle(document.getElementById('modal-item-acquired')).display") == "none",
+          "answering Hermes does not open the item cards on its own")
+    js("window.__visions.open()")
+    page.wait_for_timeout(600)
+    titles = []
+    for relic in ("water_skins", "falcon_weight"):
+        js("document.querySelector('#modal-oasis-visions .clep-medal[data-relic=\"%s\"]').click()" % relic)
+        page.wait_for_timeout(400)
+        titles.append(js("document.getElementById('iac-title').innerText"))
+        js("document.getElementById('iac-btn-collect').click()")
+        page.wait_for_timeout(300)
+    check(titles == ["The Four Water Skins", "The Falcon Weight"],
+          "the reward card opens each item once, and only when its picture is tapped", str(titles))
+    check(not errors, "no JS errors in transmit the registry", "; ".join(errors[:2]))
+    ctx.close()
+
+    silvia = dict(DESERT_BASE, order_desert_lexicon_completed="true", order_field_wire_step="6", order_lexicon_march_bypassed="true")
+    ctx, page, errors = new_page(browser, silvia)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2000)
+    js = page.evaluate
+    page.evaluate("window.selectMapNode(12, false)")
+    page.wait_for_timeout(400)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("[ Sealed ]" in card and "XXX" not in card, "before noon the station stays sealed and does not give the key", card[:160].replace("\n", " "))
+    js("window.openOasisVisions && window.openOasisVisions()")
+    page.wait_for_timeout(300)
+    check(js("getComputedStyle(document.getElementById('modal-oasis-visions')).display") == "none", "and the registry will not open until Hermes calls")
+    check(not errors, "no JS errors on the walk to Camp VIII", "; ".join(errors[:2]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -3894,6 +4010,7 @@ SECTIONS = {
     "cinematic": test_cinematic,
     "road": test_desert_road,
     "gamecine": test_game_cinematics,
+    "visions": test_clepsydra_visions,
     "balance": test_balance,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list

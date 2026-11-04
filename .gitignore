@@ -64,6 +64,7 @@ web/**/*.wav
 web/**/*.pcm
 **/canvases/
 scratch/screenshots/
+scratch/**/shots/
 *.original.webp
 
 # Sheet verifier pictures (scripts/journal/verify_sheets.py)

@@ -7,7 +7,7 @@
         // (an older browser without :has() falls back to the three 3D game windows by id: nothing here may ever stop the Hub from loading)
         const find = () => {
           try { return [...document.querySelectorAll('.chasm-modal-backdrop:has(.chasm3d-window), .monolith-modal-backdrop, .clepsydra-modal-backdrop')]; }
-          catch (e) { return ['modal-whispering-chasm', 'modal-salt-playa', 'modal-desert-lexicon'].map((id) => document.getElementById(id)).filter(Boolean); }
+          catch (e) { return ['modal-whispering-chasm', 'modal-salt-playa', 'modal-desert-lexicon', 'modal-oasis-visions'].map((id) => document.getElementById(id)).filter(Boolean); }
         };
         const sync = () => {
           const open = find().some((m) => m.style.display && m.style.display !== 'none');
@@ -704,7 +704,12 @@
           {
             id: 'clepsydra', tag: 'Station 13', label: 'The Oasis Clepsydra', flag: 'order_oasis_clepsydra_completed', built: true,
             complete() { set('order_oasis_clepsydra_completed', 'true'); },
-            reset() { dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections']); }
+            reset() {
+              dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections', 'order_clepsydra_act1', 'order_clepsydra_visions', 'order_clepsydra_howto', 'order_clepsydra_march_start', 'order_clepsydra_march_bypassed']);
+              let w = null;
+              try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
+              if (w && typeof w === 'object') { ['seen5', 'reply5'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
+            }
           },
           {
             id: 's14', tag: 'Station 14', label: 'The Sun Monolith · Cairn II', flag: 'order_sun_monolith_completed', built: true,
@@ -1508,8 +1513,9 @@
               lore: 'The four seekers have been matched with their arrival hours and relics on the page “The Oasis Clepsydra” (Key XXX, 30 Hours). The four wells were a fever mirage, but the logic kept Hermes lucid: he found a real spring beneath a carved falcon and filled the four water skins.',
               rewards: [
                 { icon: '⏳', label: 'The Mirage of the 4 Wells', desc: 'Falcon, Jackal, Scarab, Serpent' },
-                { icon: '💧', label: '4 Full Canteens', desc: 'Great Erg crossing secured' },
-                { icon: '📐', label: 'Ledger Equation: [P] - [A] = 14', desc: 'Scratched beside the falcon carving' }
+                { icon: '💧', label: 'The Four Water Skins', desc: 'Full, in the satchel' },
+                { icon: '🦅', label: 'The Falcon Weight', desc: 'Brass, from the cache' },
+                { icon: '📐', label: 'Ledger: [P] − [A] = 14 and [Q] + [Z] = 19', desc: 'Two checks, scratched beside the falcon' }
               ],
               btnText: 'Review the Balanced Clepsydra ➔',
               action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
@@ -1533,20 +1539,93 @@
               btnDisabled: true
             };
           }
+          const thumb13 = './assets/thumbnails/oasis_clepsydra_preview.webp';
+          const act1 = localStorage.getItem('order_clepsydra_act1') === 'true';
+          const wire5 = (() => { try { return JSON.parse(localStorage.getItem('order_chasm_wire') || '{}'); } catch (e) { return {}; } })();
+          const replied = wire5.reply5 !== undefined;
+          const started = typeof window.isClepsydraMarchStarted === 'function' && window.isClepsydraMarchStarted();
+          const arrived = typeof window.isClepsydraMarchOver === 'function' && window.isClepsydraMarchOver();
+          const eta = typeof window.getClepsydraMarchEta === 'function' ? window.getClepsydraMarchEta() : '';
+          const tester = typeof window.isAdminTester === 'function' && window.isAdminTester();
+          const openWire = () => { if (typeof window.activateHubView === 'function') window.activateHubView('view-field-wire'); };
+          const openVisions = () => { if (typeof window.openOasisVisions === 'function') window.openOasisVisions(); };
+          if (act1) {
+            return {
+              badge: 'STATION 13 // DESERT PATH',
+              status: 'FOUR VISIONS HELD · THE KEY IS NEXT',
+              statusClass: 'status-live-badge',
+              title: 'The Oasis Clepsydra',
+              thumb: thumb13,
+              lore: 'Four Registry lines hold at the four wells. The bowls are still dry. The plate wants the sum of the hours, and that lock is not cut yet.',
+              rewards: [
+                { icon: '📖', label: 'Journal page “The Oasis Clepsydra”', desc: 'Five testimonies, still the judge' },
+                { icon: '☀️', label: 'Four weights, set', desc: 'One Registry line at each well' },
+                { icon: '🔒', label: 'The Clepsydra Key', desc: 'Not cut yet' }
+              ],
+              btnText: 'Engrave the clepsydra key ➔',
+              action: openVisions
+            };
+          }
+          if (!tester && !started) {
+            return {
+              badge: 'STATION 13 // DESERT PATH',
+              status: 'FIRST LIGHT AT CAMP VII ✦',
+              statusClass: 'status-live-badge',
+              title: 'The Oasis Clepsydra',
+              thumb: thumb13,
+              lore: 'The night at the steles is over. At first light Hermes walks the tail of the needle toward Camp VIII, and he will call you from there at noon. Open the Field Wire.',
+              rewards: [
+                { icon: '📖', label: 'Journal page “The Oasis Clepsydra”', desc: 'Read it while he walks' }
+              ],
+              btnText: 'Open the Field Wire ➔',
+              action: openWire
+            };
+          }
+          if (!tester && !arrived) {
+            return {
+              badge: 'STATION 13 // DESERT PATH',
+              status: 'CROSSING THE GREAT ERG ✦',
+              statusClass: 'status-live-badge',
+              title: 'Station 13 · [ Sealed ]',
+              thumb: thumb13,
+              veiled: true,
+              lore: 'Hermes is walking north-northeast across the Great Erg, toward Camp VIII. He arrives in ' + (eta || 'a few hours') + '. What he finds there stays sealed until noon.',
+              rewards: [
+                { icon: '⏱️', label: 'On the way', desc: eta ? ('Arrives in ' + eta) : 'Walking' }
+              ],
+              btnText: 'HERMES IS CROSSING THE ERG',
+              btnDisabled: true
+            };
+          }
+          if (!tester && !replied) {
+            return {
+              badge: 'STATION 13 // DESERT PATH',
+              status: 'NOON AT CAMP VIII · HERMES IS CALLING',
+              statusClass: 'status-live-badge',
+              title: 'The Oasis Clepsydra',
+              thumb: thumb13,
+              lore: 'Hermes has reached a ring of stone at Camp VIII, and he does not trust what the heat is showing him. Answer him on the Field Wire before you stand at the wells. Keep the page “The Oasis Clepsydra” open.',
+              rewards: [
+                { icon: '📻', label: 'The Field Wire', desc: 'He is calling from the shade' }
+              ],
+              btnText: 'Answer Hermes on the Field Wire ➔',
+              action: openWire
+            };
+          }
           return {
             badge: 'STATION 13 // DESERT PATH',
-            status: 'THE FOUR WELLS DISCOVERED ✦',
+            status: 'THE HEAT IS SPEAKING ✦',
             statusClass: 'status-live-badge',
-            title: 'The Oasis Clepsydra (4 Wells)',
-            thumb: './assets/thumbnails/oasis_clepsydra_preview.webp',
-            lore: 'In the Desert Oasis basin (South-East Quadrant, on the map page “Grand Desert Map · South-East”), Hermes has reached the Four Wells. Open the page “The Oasis Clepsydra” in your journal, balance the hydraulic siphons and fill your canteens.',
+            title: 'The Oasis Clepsydra',
+            thumb: thumb13,
+            lore: 'Four wells stand in a ring of stone at Camp VIII: Jackal, Scarab, Falcon and Serpent — the WELLS of the page “The Oasis Clepsydra”. Hermes walks that ring at noon; the heat lies. Transmit each line of The Oasis Registry — seeker, relic and hour in the page’s own words. A true line walks him to the next well. Four true lines break the mirage. Hermes has three hearts of lucidity.',
             rewards: [
-              { icon: '⏳', label: 'Journal page “The Oasis Clepsydra”', desc: 'Logic deduction of the 4 Seekers' },
-              { icon: '💧', label: '4 Water Canteens', desc: 'Vital supplies for the desert' },
-              { icon: '📐', label: 'The Clepsydra Key', desc: 'Written in Roman numerals' }
+              { icon: '📖', label: 'Journal page “The Oasis Clepsydra”', desc: 'The Oasis Registry' },
+              { icon: '☀️', label: 'One line a well', desc: 'Seeker, relic and hour, as the page wrote them' },
+              { icon: '♥', label: 'Three hearts', desc: 'Then the fever wins' }
             ],
-            btnText: '✦ OPEN THE CLEPSYDRA WORKSHOP ➔',
-            action: () => (window.openOasisClepsydraModal ? window.openOasisClepsydraModal() : null)
+            btnText: '✦ STAND AT THE FOUR WELLS ➔',
+            action: openVisions
           };
         },
         // Station 14 · The Sun Monolith & Cairn II (node id 23: 15–17 are aliases)
@@ -3107,6 +3186,7 @@
         { id: 'stele-rf', station: 'Station 12 · Nomad Ruins Stele', name: 'Stargazer Proportion', expr: 'R × 2', l1: 'R', op: 'x2', l2: 'F', target: null, unit: '', requires: 'order_desert_lexicon_completed' },
         { id: 'stele-oz', station: 'Station 12 · Foot of the Al-Qibla stele', name: 'The Line of the Dial', expr: 'O − Z', l1: 'O', op: '-', l2: 'Z', target: 18, unit: '', requires: 'order_desert_lexicon_completed' },
         { id: 'falcon-pa', station: 'Station 13 · Falcon Stone', name: 'Falcon Inscription', expr: 'P − A', l1: 'P', op: '-', l2: 'A', target: 14, unit: '', requires: 'order_oasis_clepsydra_completed' },
+        { id: 'falcon-qz', station: 'Station 13 · The cleft under the falcon', name: 'The Line of the Cleft', expr: 'Q + Z', l1: 'Q', op: '+', l2: 'Z', target: 19, unit: '', requires: 'order_oasis_clepsydra_completed' },
         { id: 'cairn2-df', station: 'Station 14 · Lid of Cairn II', name: 'The Deneb Line', expr: 'D + F', l1: 'D', op: '+', l2: 'F', target: 24, unit: '', requires: 'order_sun_monolith_completed' },
         { id: 'cairn2-ct', station: 'Station 14 · Lid of Cairn II', name: 'The Cygnus Line', expr: 'C − T', l1: 'C', op: '-', l2: 'T', target: 8, unit: '', requires: 'order_sun_monolith_completed' },
         { id: 'cairn3-wa', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The West Wind Line', expr: 'W + A', l1: 'W', op: '+', l2: 'A', target: 26, unit: '', requires: 'order_sandstone_labyrinth_completed' },
@@ -4420,32 +4500,32 @@
         },
         {
           step: 7,
-          hermesInitial: "Silvia, can you hear me? I hooked my copper wire into the rusted relay at Camp VIII beside the Four Wells!\n\nThe desert heat is merciless, and our canteens are running bone dry. Before us lie four sculpted stone basins: Falcon, Jackal, Scarab, and Serpent. But the surface water is dry! The underground siphons are sealed shut by heavy counterweights.\n\nAn engraved bronze plaque above the water gate reads: 'Only when the four seekers rest in their true shadow-hours will the living waters surge.' Four seekers came here before us: the Cartographer, the Alchemist, the Nomad, and the Astronomer. Each brought a sacred relic, arriving at a distinct shadow hour.\n\nLook at the page “The Oasis Clepsydra” in your physical journal. How do we deduce their arrival hours and balance the siphons?",
+          hermesInitial: "Silvia, my hands are wet, and the sand under me is real.\n\nThe four basins went out like a lamp the moment the cylinder took the sum. There was never any water in them. The heat had built them out of the plate and the thirst. What is left is one falcon, cut in the rock, and a cleft under its beak that breathes cold. I drank, and I filled the four skins.\n\nIn the cleft, with the old cache, there was a brass weight shaped like a falcon. The nomads buried their clock when the water left, and the fever invented the rest. Beside the carving, scratched deep: [P] − [A] = 14. Under it, smaller: [Q] + [Z] = 19. Two checks for your Cipher Ledger. Neither one is a new letter.\n\nAnd the camel tracks do not stop at the cleft. Whoever passed here did not find the water. The prints keep on, north-northeast, toward a red cliff I can just see when the heat thins.",
           choices: [
             {
-              id: "choice-7-matrix",
-              text: "Check the page “The Oasis Clepsydra”: The Cartographer carried the Astrolabe, arriving at the Scarab Well at Hr VI.",
-              silviaMsg: "I'm checking the page “The Oasis Clepsydra” in my journal: The Cartographer carried the Brass Astrolabe, arriving at the Scarab Well at Hr VI.",
-              hermesReply: "The Brass Astrolabe at the Scarab Well at Hour VI! Yes—the first counterweight groaned and water began trickling into the copper pipes! And what of the other three seekers?"
+              id: "choice-7-ledger",
+              text: "Both lines are in my Cipher Ledger. Drink, and sit in the shade.",
+              silviaMsg: "Both lines are in my Cipher Ledger: [P] − [A] = 14 and [Q] + [Z] = 19. Drink, Hermes, and sit in the shade.",
+              hermesReply: "Drunk, and sitting, with my back against the falcon. The skins are heavy and that is the best weight I have carried all week.\n\nThe brass falcon is in the satchel, wrapped in the spare shirt, next to the seal."
             },
             {
-              id: "choice-7-deduction",
-              text: "The Alchemist took Sandglass to Jackal (Hr III); Nomad took Dagger to Falcon (Hr IX); Astronomer took Scarab to Serpent (Hr XII).",
-              silviaMsg: "The Alchemist took the Sandglass to Jackal at Hr III; the Nomad took the Dagger to Falcon at Hr IX; the Astronomer took the Gold Scarab to Serpent at Hr XII.",
-              hermesReply: "Brilliant deduction, Silvia! The testimonies lock together like clockwork: Alchemist at Jackal (Hr III), Cartographer at Scarab (Hr VI), Nomad at Falcon (Hr IX), Astronomer at Serpent (Hr XII)!\n\nNow look at the master lock cylinder: it wants the Clepsydra Key, the sum of all four arrival hours in Roman numerals. What does your journal give?"
+              id: "choice-7-tracks",
+              text: "The tracks keep going. Do not walk in them.",
+              silviaMsg: "The tracks keep going, Hermes. Do not walk in them. Stay off to one side until you can see who made them.",
+              hermesReply: "Off to the side, on the hard pan, where a boot leaves less of a story. The prints are a day old, maybe two. Camels, and a wagon that bites deep. The same wagon, I think.\n\nThey did not stop for water. Either they did not see the falcon, or they were too hurried to care."
             },
             {
-              id: "choice-7-key",
-              text: "The Clepsydra Key is XXX (30 Hours). Carve Roman numeral XXX into the hydraulic lock!",
-              silviaMsg: "The Clepsydra Key is XXX! The sum of the four arrival hours is 30, carved in Roman numerals. Engage Key XXX into the hydraulic lock!",
-              hermesReply: "Key XXX! The instant you said it, the four wells shimmered and dissolved like smoke. Silvia... they were never there. The heat had me seeing things. But my head is clear now, and right below a carved falcon there is a real cleft in the rock, with cold water seeping out of it!"
+              id: "choice-7-weight",
+              text: "Keep the falcon weight hidden. It is the only solid thing the heat did not invent.",
+              silviaMsg: "Keep the falcon weight hidden, Hermes. It is the only solid thing the heat did not invent.",
+              hermesReply: "Hidden, at the bottom of the satchel. It is small enough to close my hand around, and it is cool, which the basins never were.\n\nI will not hold it up in the open. Not with those tracks still fresh."
             }
           ]
         },
         {
           step: 8,
           completed: true,
-          hermesFinal: "Silvia! The four wells were a fever mirage, but your logic kept me lucid long enough to find the real spring: a cleft in the rock beneath a carved falcon, with an old cache of supplies tucked inside. We filled our four leather water skins to capacity.\n\nAnd scratched into the stone beside the falcon, in deep letters: [P] - [A] = 14!\n\nRecord this relation in your Cipher Ledger right away. With our water skins full and Al-Qibla set on Tower II (14° NNE), I am ready to cross the treacherous Great Erg toward Station 14!"
+          hermesFinal: "The four skins are full, the falcon weight is in the satchel, and both lines are yours to check: [P] − [A] = 14 and [Q] + [Z] = 19.\n\nI am walking on, north-northeast, off the camel tracks, toward the red cliff. At last light I should see the gates of Tower II. Keep the page “At the Gates of Tower II” close. I will call you when I am on the steps."
         },
         {
           // Tower II · the gates (Sheet 13A). Hermes recognises the Servant he watched from a ridge in 1998 (Sheet 17B).
@@ -5174,21 +5254,21 @@
           title: "What are the Four Wells of Camp VIII?",
           category: "The Clepsydra",
           group: "desert",
-          answer: "Deep beneath Camp VIII lie the Four Wells: Falcon, Jackal, Scarab, and Serpent. Fed by a subterranean aquifer, they are interconnected by copper siphons and balanced by shadow counterweights that only open when the Four Seekers are aligned."
+          answer: "Camp VIII is the old water stop on the road toward Tower II. The nomads cut four basins there, a falcon, a jackal, a scarab and a serpent, and left a plate about seekers and shadow-hours. The page “The Oasis Clepsydra” is the account that keeps Hermes lucid. Do not trust what the heat shows him until that page agrees."
         },
         {
           id: "inq-shadow-hours",
           title: "How do shadow-hours work in the Clepsydra?",
           category: "Hydraulics",
           group: "desert",
-          answer: "Nomadic water clocks (clepsydras) measure time by water volume draining through precision orifices. The four canonical arrival intervals are Hour III, Hour VI, Hour IX, and Hour XII. The sum of all four hours (3 + 6 + 9 + 12 = 30, or Key XXX) unlocks the master release weir."
+          answer: "The page “The Oasis Clepsydra” gives four arrival hours, one for each seeker. Added together they are the Clepsydra Key, written in Roman numerals on the plate. When that key is engraved, the basins go out: they were the heat. The real water is the cleft under the falcon."
         },
         {
           id: "inq-falcon-weir",
           title: "What is the Falcon Weir inscription [P] - [A] = 14?",
           category: "The Cipher Ledger",
           group: "astrolabe",
-          answer: "Scratched into the rock beside the falcon carving, at the real spring Hermes found once the mirage of the four wells faded, is the algebraic relation [P] - [A] = 14. It provides a direct mathematical constraint between P and A in the Cipher Ledger without spoiling their raw numeric values, honoring the ancient laws of cryptography."
+          answer: "Scratched beside the falcon, at the real spring, are two checks and no new letter: [P] − [A] = 14, and under it, smaller, [Q] + [Z] = 19. They confirm letters Silvia can already calculate. The web does not show their values."
         },
         {
           id: "inq-phoenix-sigil",
@@ -6097,6 +6177,24 @@
           origin: "Wadi al-Hajar · Under Foundation of Cairn I",
           summary: "A flat sandstone disc carved with the radiant sun above a wavy water line.",
           lore: "Discovered inside the hollow bedrock beneath the third foundation of Cairn I after solving the ancient river stone trial. Its purpose is still unknown."
+        },
+        water_skins: {
+          id: "water_skins",
+          name: "The Four Water Skins",
+          category: "Expedition Supply",
+          image: "assets/items/item_water_skins.png",
+          origin: "The cleft under the falcon · Camp VIII · Oct 2026",
+          summary: "Four oiled goatskin flasks bound with rawhide thongs and turned brass stoppers.",
+          lore: "The four wells were a mirage of the heat. Under the rock-carved falcon, a narrow cleft breathed cold mountain air, weeping pure subterranean water into a hidden hollow. Hermes filled these four oil-cured leather skins to the brim, sealing each brass spout with wax and cork. Bound tightly across the satchel, they are the vital reserve that makes the burning crossing of the Great Erg to Tower II possible."
+        },
+        falcon_weight: {
+          id: "falcon_weight",
+          name: "The Falcon Weight",
+          category: "Nomad Relic",
+          image: "assets/items/item_falcon_weight.png",
+          origin: "The cache in the cleft · Camp VIII · Oct 2026",
+          summary: "A heavy cast-brass clepsydra counterweight with chased feathers and deep verdigris patina.",
+          lore: "The sole surviving bronze artifact of the ancient nomadic water-clock buried in the cleft when the aquifer dropped centuries ago. Sculpted in the likeness of a watchful desert falcon with folded wings and an eclipse notch upon its crown, its calibrated mass once marked the passage of the night hours as the water sank from well to well. Hermes keeps it in the satchel beside the water skins as an enduring anchor of clarity."
         }
       };
 
@@ -6150,6 +6248,10 @@
         if (localStorage.getItem('order_arch_solstice_completed') === 'true' && !list.includes('signal_mirror')) list.push('signal_mirror');
         if (localStorage.getItem('order_polybius_stele_completed') === 'true' && !list.includes('servant_key')) list.push('servant_key');
         if (localStorage.getItem('order_oracle_horizon_completed') === 'true' && !list.includes('gilded_star')) list.push('gilded_star');
+        if (localStorage.getItem('order_oasis_clepsydra_completed') === 'true') {
+          if (!list.includes('water_skins')) list.push('water_skins');
+          if (!list.includes('falcon_weight')) list.push('falcon_weight');
+        }
         return list;
       }
 
@@ -7044,10 +7146,8 @@
       // (testers go on). Released on 25-10-2026 by the Operator's OK (set it back to true to hold the crossing again).
       const PLAYA_HOLD = false;
 
-      // The Operator's hold after the Desert Lexicon (25-10-2026): the road waits for the next adventure. While true, when Silvia has
-      // read the steles Hermes rests at Camp VII, Station 13 stays sealed and the chat says goodnight (testers go on). To release it:
-      // set NEXT_ADVENTURE_HOLD = false and deploy, only on the Operator's OK.
-      const NEXT_ADVENTURE_HOLD = true;
+      // The road from Camp VII to Camp VIII is open (3 Nov 2026): the noon game is the station.
+      const NEXT_ADVENTURE_HOLD = false;
       window.isNextAdventureHeld = () => NEXT_ADVENTURE_HOLD && localStorage.getItem('order_desert_lexicon_completed') === 'true'
         && localStorage.getItem('order_oasis_clepsydra_completed') !== 'true' && !isCarlesTester();
 
@@ -7068,6 +7168,14 @@
       window.isLexiconMarchOver = lexiconMarch.over;
       window.getLexiconMarchEta = lexiconMarch.eta;
       window.skipLexiconMarch = lexiconMarch.skip;
+
+      // Station 13: eight hours of heat from the cold hearth of Camp VII to Camp VIII, on the tail of the needle.
+      // The Operator's hold keeps Silvia at the hearth. A tester walks.
+      const clepsydraMarch = makeMarch(8, { start: 'order_clepsydra_march_start', bypassed: 'order_clepsydra_march_bypassed', done: 'order_oasis_clepsydra_completed' });
+      window.isClepsydraMarchStarted = clepsydraMarch.started;
+      window.isClepsydraMarchOver = clepsydraMarch.over;
+      window.getClepsydraMarchEta = clepsydraMarch.eta;
+      window.skipClepsydraMarch = clepsydraMarch.skip;
 
       // Station 14: the 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (wire step 9 starts it)
       const monolithMarch = makeMarch(12, { start: 'order_monolith_march_start', bypassed: 'order_monolith_march_bypassed', done: 'order_sun_monolith_completed' });
@@ -7206,7 +7314,7 @@
       }, 15000);
 
       // Every walk by its station, for the sealed cards of the Quest Map (the countdown reads arrivesAt)
-      window.EclipseMarches = { playa: playaMarch, lexicon: lexiconMarch, monolith: monolithMarch, labyrinth: labyrinthMarch, cairnFour: cairnFourMarch, solstice: solsticeMarch, stele: steleMarch };
+      window.EclipseMarches = { playa: playaMarch, lexicon: lexiconMarch, clepsydra: clepsydraMarch, monolith: monolithMarch, labyrinth: labyrinthMarch, cairnFour: cairnFourMarch, solstice: solsticeMarch, stele: steleMarch };
       const PLAYA_LEG = {
         step: 4, march: playaMarch, doneKey: 'order_salt_playa_completed',
         walkingTitle: '✦ Night at the Oasis Gate · The Salt Waits for First Light ✦',
@@ -7225,6 +7333,14 @@
         cinematic: 'road_of_salt',
         arrivedTitle: 'The Nomad Ruins at Dusk · Hermes Is Calling',
         arrivedDesc: 'Hermes has reached the ruins of Camp VII, in the dunes south of the salt. Keep the Field Wire open to hear him.'
+      };
+      const CLEPSYDRA_LEG = {
+        step: 6, march: clepsydraMarch, doneKey: 'order_oasis_clepsydra_completed',
+        walkingTitle: '✦ First Light · Across the Great Erg to Camp VIII ✦',
+        walkingDesc: 'Hermes left the cold hearth at dawn and is walking the tail of the needle, 14° north-northeast, across the Great Erg. His water is almost gone. Keep the page “The Oasis Clepsydra” close: he will call you from Camp VIII at noon.',
+        etaLabel: 'CAMP VIII AT NOON',
+        arrivedTitle: 'Noon at Camp VIII · Hermes Is Calling',
+        arrivedDesc: 'Hermes is in the shade of a ring of stone at Camp VIII, and he is calling you on the Field Wire. Answer him before you believe what the heat is showing him.'
       };
       const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair, 33: masksMarch };
 
@@ -7577,6 +7693,30 @@
               hermesReply: "I looked, as long as I dared. Deep iron wheels, like the ruts I followed down from the mountains. And on the oilcloth there is a mark, burned into the canvas, that I could not make out in the dusk. A bird, perhaps, or a flame.\n\nThe wagon is gone now, south, into the dark, and one of them stopped by the fire to scratch something into the hearth with his knife. I will look at it later. Two of them stayed behind with their camels: a sleeper by the fire, and a watcher with a torch who walks round the square, past the steles.\n\nFirst the steles, while the moon is up and his back is turned. Open the Desert Lexicon, Silvia. Station 12."
             }
           ]
+        },
+        {
+          divider: 'Camp VIII · Noon',
+          hermesInitial: "Silvia, I am at Camp VIII, and I am not sure I trust my own eyes.\n\nI left the cold hearth at first light and walked eight hours on the tail of the needle, 14° north-northeast, into the Great Erg. The sun is straight overhead. My last water is a swallow at the bottom of the skin, and the heat comes off the sand in sheets.\n\nThere is a low ring of stone here, and four basins standing in it. A falcon, a jackal, a scarab and a serpent, each with a bowl cut in its crown. I can hear water. I put my hand in the nearest bowl and it came up dry, and full of heat.\n\nOn a bronze plate over the gate someone cut this: only when the four seekers rest in their true shadow-hours will the living waters surge. Four seekers. The Cartographer, the Alchemist, the Nomad and the Astronomer. A relic each, and an hour each.\n\nIt is all on the page “The Oasis Clepsydra” of your journal: five testimonies, and a grid to keep them in. Work it with your pencil before you believe a word I see out here. The heat is telling me stories, and I would rather have yours.",
+          choices: [
+            {
+              tag: '✏️',
+              text: 'I have the page open. Tell me only what you see, and I will check it against the testimonies.',
+              silviaMsg: 'I have the page “The Oasis Clepsydra” open. Tell me only what you see, Hermes, and I will check it against the five testimonies.',
+              hermesReply: "Then I will sit in the thin shade and not drink that last swallow until you say so.\n\nOpen The Oasis Clepsydra. Every basin shows me three stories at once. You tell me which one the page allows, and I will hold that one and let the other two go."
+            },
+            {
+              tag: '💧',
+              text: 'Sit down before you look again. A man with an empty skin sees water everywhere.',
+              silviaMsg: 'Sit down before you look again, Hermes. A man with an empty skin sees water everywhere.',
+              hermesReply: "I am sitting. My back is against the stone and the sky is white. You are right to doubt the water: my hand found none. But the basins are real under my fingers, and the plate is real.\n\nOpen The Oasis Clepsydra and we will sort the true story from the heat, one basin at a time."
+            },
+            {
+              tag: '📖',
+              text: 'Give me a quiet minute with the five testimonies. Do not move until the grid is sure.',
+              silviaMsg: 'Give me a quiet minute with the five testimonies, Hermes. Do not move until the grid is sure.',
+              hermesReply: "Gladly. I will not take one step toward a bowl until your pencil is sure.\n\nThe page has everything: who carried what, who came before whom, and which beast they drank at. When you are ready, open The Oasis Clepsydra. I will describe what the heat puts in front of me, and you will throw out the lies."
+            }
+          ]
         }
       ];
       function chasmWire() {
@@ -7664,7 +7804,7 @@
         const w = chasmWire();
         const header = document.getElementById('wire-prompt-header-text');
         if (!w['seen' + i]) {
-          const gameModal = document.getElementById(i >= 4 ? 'modal-desert-lexicon' : i >= 2 ? 'modal-salt-playa' : 'modal-whispering-chasm');
+          const gameModal = document.getElementById(i >= 5 ? 'modal-oasis-visions' : i >= 4 ? 'modal-desert-lexicon' : i >= 2 ? 'modal-salt-playa' : 'modal-whispering-chasm');
           if (document.body.getAttribute('data-active-view') !== 'view-field-wire' || (gameModal && gameModal.style.display !== 'none' && gameModal.style.display !== '')) {
             if (getMessengerUnreadCount() < 1) setMessengerUnreadCount(1);   // Hermes has something to say
             return false;
@@ -7714,12 +7854,30 @@
           }));
           return true;
         }
+        if (i === 5) {
+          wirePromptBox.style.display = 'block';
+          wireCompletedBar.style.display = 'none';
+          wireChoicesGrid.innerHTML = '';
+          if (header) header.textContent = 'Hermes is waiting in the shade at Camp VIII:';
+          const done = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+          const held = localStorage.getItem('order_clepsydra_act1') === 'true';
+          const label = done
+            ? 'The spring is real. Look again with Hermes.'
+            : held
+              ? 'Engrave the clepsydra key with Hermes'
+              : 'Stand with Hermes at the four wells (Station 13)';
+          wireChoicesGrid.appendChild(makeChoicePill(done ? '💧' : held ? '⏳' : '☀️', label, () => {
+            if (typeof window.openOasisVisions === 'function') window.openOasisVisions();
+          }));
+          return true;
+        }
         return false;
       }
 
       // Out of the canyon: the Oasis Gate waits on the wire (a badge while the chat is closed)
       // and back from the canyon with the chat already open, Hermes speaks there and then
       ['chasm:cleared', 'chasm:closed', 'playa:cleared', 'playa:closed', 'lexicon:cleared', 'lexicon:closed'].forEach((ev) => document.addEventListener(ev, () => { if (wireCurrentStep === 4 && !chasmWirePlaying) renderWireChoices(); }));
+      ['visions:cleared', 'visions:closed'].forEach((ev) => document.addEventListener(ev, () => { if (wireCurrentStep === 6 && !chasmWirePlaying) renderWireChoices(); }));
 
       function rewindToChasmWire(step) {
         if (sfx && typeof sfx.playMechanicalClick === 'function') sfx.playMechanicalClick();
@@ -8081,19 +8239,22 @@
 
         if (wireCurrentStep === 6) {
           if (!isClepsydraDone) {
-            wirePromptBox.style.display = 'none';
-            wireCompletedBar.style.display = 'flex';
-            const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
-            const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
-            const resting = window.isNextAdventureHeld && window.isNextAdventureHeld();
-            if (titleEl) titleEl.textContent = resting ? 'Camp VII · Resting Until the Road Opens' : 'Al-Qibla Bearing Locked · The Four Wells Await';
-            if (descEl) descEl.textContent = resting
-              ? 'Hermes is asleep by the cold hearth, with the needle of Al-Qibla pointing the way the raiders rode. The next stretch of the road is not open yet: he will call you on the Field Wire the moment it is.'
-              : 'Open the Grand Desert Map and help Hermes at the Four Wells of Camp VIII (Station 13, the page “The Oasis Clepsydra”).';
-            try {
-              localStorage.setItem('order_field_wire_completed', 'true');
-              localStorage.setItem('order_field_wire_step', '6');
-            } catch(e) {}
+            if (window.isNextAdventureHeld && window.isNextAdventureHeld()) {
+              wirePromptBox.style.display = 'none';
+              wireCompletedBar.style.display = 'flex';
+              const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
+              const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
+              if (titleEl) titleEl.textContent = 'Camp VII · Resting Until the Road Opens';
+              if (descEl) descEl.textContent = 'Hermes is asleep by the cold hearth, with the needle of Al-Qibla pointing the way the raiders rode. The next stretch of the road is not open yet: he will call you on the Field Wire the moment it is.';
+              try {
+                localStorage.setItem('order_field_wire_completed', 'true');
+                localStorage.setItem('order_field_wire_step', '6');
+              } catch(e) {}
+              return;
+            }
+            // Carles plays Station 13 at once: the eight-hour crossing does not seal the wire.
+            if (!isCarlesTester() && !clepsydraMarch.over()) { showMarchLeg(CLEPSYDRA_LEG); return; }
+            chasmWireTurn(5);
             return;
           } else {
             // Clepsydra is completed! Advance to Step 7 (the Camp VIII debrief)

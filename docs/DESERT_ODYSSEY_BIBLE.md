@@ -163,6 +163,10 @@ Son **5 Cairns en total, ninguno añadido**. Los «tres» del Field Log de 1998 
   - **Solución Canónica**: Constante hidráulica **`X X X`** ($30\text{ horas}$): es la respuesta real, no un marcador provisional. Ecuación: $[P] - [A] = 14$.
   - **Cuadrícula solución (solo para el Operador)**: Cartographer – Astrolabe – Scarab – VI · Alchemist – Sandglass – Jackal – III · Nomad – Dagger – Falcon – IX · Astronomer – Gold Scarab – Serpent – XII (VI + III + IX + XII = XXX).
   - **Canon (subtítulo impreso «Feverish Mirage of the Siphons — Maintaining Lucidity» y web)**: los cuatro pozos son un espejismo febril; resolver la lógica mantiene lúcido a Hermes. Los pozos se desvanecen y encuentra un manantial real en una grieta de la roca bajo un halcón tallado, con un viejo alijo de provisiones; junto al halcón está rayada la relación $[P] - [A] = 14$.
+  - **Hoja impresa congelada (3 Nov 2026)**: la 12B ya está impresa. No se reescribe el diario. El juego web usa la hoja tal cual: cinco testimonios, cuadrícula, registro y la clave XXX.
+  - **Premio (sin letra nueva)**: dos comprobaciones en el Ledger, `[P] − [A] = 14` (Falcon Inscription) y `[Q] + [Z] = 19` (The Line of the Cleft). Ninguna introduce letra. Al cerrar el Desert Path (Estación 19) Silvia debe poder calcular las 26 letras; la J, hoy en la Estación 22, hay que adelantarla a alguna estación entre la 14 y la 19. Biblia Maestra §7.0 y §7.B.18.
+  - **Inventario**: los cuatro odres llenos y el peso de latón del halcón entran en la Alforja.
+  - **Web (4 Nov 2026 · Transmit the Registry)**: aventura pintada en tres actos. Chat de Hermes al llegar a Camp VIII, sin entregar la solución. **Acto I**: Hermes camina el anillo (Jackal → Scarab → Falcon → Serpent); el calor miente; Silvia **transmite** una línea del Oasis Registry (seeker · relic · hour) con el vocabulario literal de la 12B (Astrolabe / Scarab / Sandglass / Dagger; III–XII); acierto = trago + contrapeso + marcha. **Acto II**: dial romano al sumatorio (XXX). **Acto III**: grieta fría bajo el pico del halcón → odres, peso de latón y `[P]−[A]=14`, `[Q]+[Z]=19`. Tres corazones. `NEXT_ADVENTURE_HOLD` está suelto.
 
 ---
 

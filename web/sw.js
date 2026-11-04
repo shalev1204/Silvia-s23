@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '7d02a74a9969';  // 155 files, 31.6 MB
+var VERSION = 'bf484b0f5994';  // 162 files, 34.2 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -28,6 +28,8 @@ var PRECACHE = [
   "./assets/emails/email-03-zodiac-outpost-full.webp",
   "./assets/emails/email-03-zodiac-outpost.webp",
   "./assets/items/item_brass_compass.png",
+  "./assets/items/item_falcon_weight.jpg",
+  "./assets/items/item_falcon_weight.png",
   "./assets/items/item_flint_juniper.jpg",
   "./assets/items/item_flint_tinder.png",
   "./assets/items/item_gilded_feather.jpg",
@@ -41,6 +43,8 @@ var PRECACHE = [
   "./assets/items/item_spyglass_lens.png",
   "./assets/items/item_surveyor_compass.jpg",
   "./assets/items/item_tuning_pebble.webp",
+  "./assets/items/item_water_skins.jpg",
+  "./assets/items/item_water_skins.png",
   "./assets/js/camera-city-data.js",
   "./assets/js/desert-map-3d.js",
   "./assets/js/stage-mirror-data.js",
@@ -109,6 +113,7 @@ var PRECACHE = [
   "./hub/css/stations/s11-salt-playa.css",
   "./hub/css/stations/s12-desert-lexicon.css",
   "./hub/css/stations/s13-oasis-clepsydra.css",
+  "./hub/css/stations/s13-oasis-visions.css",
   "./hub/css/stations/s14-sun-monolith.css",
   "./hub/css/stations/s15-sandstone-labyrinth.css",
   "./hub/css/stations/s16-cairn-iv.css",
@@ -133,6 +138,7 @@ var PRECACHE = [
   "./hub/js/cloud-config.js",
   "./hub/js/cloud-save.js",
   "./hub/js/dawn-map-layer.js",
+  "./hub/js/engine/eclipse-scenery.js",
   "./hub/js/field-journal.js",
   "./hub/js/hide-solve-shortcuts.js",
   "./hub/js/hint-ladder.js",
@@ -152,6 +158,7 @@ var PRECACHE = [
   "./hub/js/stations/s11-salt-playa.js",
   "./hub/js/stations/s12-desert-lexicon.js",
   "./hub/js/stations/s13-oasis-clepsydra.js",
+  "./hub/js/stations/s13-oasis-visions.js",
   "./hub/js/stations/s14-sun-monolith.js",
   "./hub/js/stations/s15-sandstone-labyrinth.js",
   "./hub/js/stations/s16-cairn-iv.js",

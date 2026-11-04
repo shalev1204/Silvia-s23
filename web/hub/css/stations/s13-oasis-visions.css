@@ -1,0 +1,538 @@
+/* Station 13 · Transmit the Registry — compact brass grid, as first designed, polished */
+
+#modal-oasis-visions {
+  padding: 8px;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+#modal-oasis-visions .chasm3d-window {
+  max-width: none;
+  height: 100%;
+  max-height: none;
+}
+#modal-oasis-visions .chasm-header-bar {
+  padding: 8px 44px;
+  background: rgba(22, 16, 10, 0.55);
+  flex-shrink: 0;
+}
+#modal-oasis-visions .chasm3d-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+#modal-oasis-visions .chasm3d-stage {
+  overflow: hidden;
+  touch-action: none;
+}
+#modal-oasis-visions .chasm3d-panel {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  max-height: 100%;
+}
+
+#modal-oasis-visions .chasm3d-controls {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 12px;
+  width: 100%;
+}
+#modal-oasis-visions .chasm3d-controls > * {
+  width: 100%;
+  flex: 0 0 auto;
+}
+#modal-oasis-visions .chasm3d-controls .chasm3d-btn {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---- Registry groups: label + compact grid (like the first build) ---- */
+#modal-oasis-visions .visions-reg-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: rgba(16, 10, 5, 0.45);
+  border: 1px solid rgba(212, 168, 83, 0.28);
+  box-shadow: inset 0 1px 0 rgba(253, 230, 138, 0.06);
+}
+#modal-oasis-visions .visions-reg-label {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(253, 230, 138, 0.72);
+  padding: 0 2px 2px;
+}
+#modal-oasis-visions .visions-reg-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  width: 100%;
+}
+#modal-oasis-visions .visions-reg-chips.is-hours {
+  grid-template-columns: repeat(4, 1fr);
+}
+#modal-oasis-visions .visions-reg-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 6px;
+  box-sizing: border-box;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  color: #e8dcc0;
+  background: linear-gradient(180deg, rgba(72, 44, 20, 0.92), rgba(48, 28, 12, 0.95));
+  border: 1px solid rgba(212, 168, 83, 0.45);
+  border-radius: 9px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: inset 0 1px 0 rgba(255, 236, 196, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+}
+#modal-oasis-visions .visions-reg-chip:hover:not(.is-on) {
+  border-color: rgba(253, 230, 138, 0.75);
+  color: #fff6d8;
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 236, 196, 0.12), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+#modal-oasis-visions .visions-reg-chip.is-on {
+  color: #1a1008;
+  background: linear-gradient(180deg, #f5d78a, #d4a853);
+  border-color: #fde68a;
+  box-shadow: 0 0 0 1px rgba(253, 230, 138, 0.55), 0 4px 14px rgba(212, 168, 83, 0.35);
+  font-weight: 700;
+}
+#modal-oasis-visions .visions-reg-chip:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: 2px;
+}
+#modal-oasis-visions .visions-reg-chip:active {
+  transform: translateY(1px);
+}
+
+#modal-oasis-visions .visions-reg-preview {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  text-align: center;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.12rem;
+  letter-spacing: 0.02em;
+  color: #f3e6c8;
+  background: rgba(12, 8, 4, 0.55);
+  border: 1px dashed rgba(212, 168, 83, 0.5);
+  border-radius: 10px;
+}
+#modal-oasis-visions .visions-transmit,
+#modal-oasis-visions .visions-engrave {
+  width: 100%;
+  min-height: 50px;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-color: rgba(253, 230, 138, 0.85);
+  background: linear-gradient(180deg, rgba(168, 100, 36, 0.95), rgba(110, 62, 18, 0.98));
+  color: #fff6d8;
+  box-shadow: inset 0 1px 0 rgba(255, 236, 196, 0.2), 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+#modal-oasis-visions .visions-transmit:hover,
+#modal-oasis-visions .visions-engrave:hover {
+  background: linear-gradient(180deg, rgba(190, 118, 42, 0.98), rgba(130, 72, 22, 1));
+}
+
+/* ---- Act II · dial ---- */
+#modal-oasis-visions .visions-dial {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: rgba(16, 10, 5, 0.5);
+  border: 1px solid rgba(212, 168, 83, 0.32);
+  box-shadow: inset 0 1px 0 rgba(253, 230, 138, 0.06);
+}
+#modal-oasis-visions .visions-dial-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+}
+#modal-oasis-visions .visions-dial-turn {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 44px;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+}
+#modal-oasis-visions .visions-dial-ticks {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  padding: 0 4px;
+}
+#modal-oasis-visions .visions-dial-ticks i {
+  flex: 1 1 0;
+  height: 8px;
+  border-radius: 8px;
+  background: rgba(212, 168, 83, 0.28);
+  border: 1px solid rgba(212, 168, 83, 0.35);
+}
+#modal-oasis-visions .visions-dial-ticks i.is-on {
+  background: linear-gradient(180deg, #f5d78a, #d4a853);
+  border-color: #fde68a;
+  box-shadow: 0 0 8px rgba(253, 230, 138, 0.45);
+}
+#modal-oasis-visions .visions-dial-face {
+  flex: 1 1 auto;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.55rem;
+  letter-spacing: 0.2em;
+  color: #fde68a;
+  background: radial-gradient(circle at 50% 35%, rgba(200, 130, 48, 0.5), rgba(28, 16, 6, 0.95) 70%);
+  border: 1.5px solid rgba(253, 230, 138, 0.7);
+  border-radius: 12px;
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.45), 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+#modal-oasis-visions .visions-dial-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 36px;
+  margin: 0;
+  padding: 6px 2px;
+  box-sizing: border-box;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 168, 83, 0.4);
+  background: rgba(40, 24, 10, 0.75);
+  color: #e8dcc0;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+#modal-oasis-visions .visions-dial-chip.is-on {
+  background: linear-gradient(180deg, #f5d78a, #d4a853);
+  border-color: #fde68a;
+  color: #1a1008;
+  font-weight: 700;
+}
+#modal-oasis-visions .visions-dial-chip:hover:not(.is-on) {
+  border-color: rgba(253, 230, 138, 0.7);
+  color: #fff6d8;
+}
+#modal-oasis-visions .visions-dial-chip:focus-visible {
+  outline: 2px solid #fde68a;
+  outline-offset: 1px;
+}
+
+/* ---- Act III · one brass row for questions and cracks ---- */
+#modal-oasis-visions .visions-cleft-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: rgba(16, 10, 5, 0.45);
+  border: 1px solid rgba(212, 168, 83, 0.28);
+  box-shadow: inset 0 1px 0 rgba(253, 230, 138, 0.06);
+}
+#modal-oasis-visions .visions-cleft-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  margin: 0;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  text-align: left;
+  cursor: pointer;
+  color: #f3e6c8;
+  background: linear-gradient(180deg, rgba(72, 44, 20, 0.92), rgba(48, 28, 12, 0.95));
+  border: 1px solid rgba(212, 168, 83, 0.45);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 236, 196, 0.08), 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.15s ease, transform 0.12s ease, background 0.15s ease;
+}
+#modal-oasis-visions .visions-cleft-btn:hover:not(:disabled) {
+  border-color: rgba(253, 230, 138, 0.8);
+  transform: translateY(-1px);
+}
+#modal-oasis-visions .visions-cleft-btn:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: 2px;
+}
+#modal-oasis-visions .visions-cleft-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+#modal-oasis-visions .visions-cleft-mark {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #1a1008;
+  background: linear-gradient(180deg, #f5d78a, #d4a853);
+  border: 1px solid #fde68a;
+  box-shadow: inset 0 1px 0 rgba(255, 248, 230, 0.7);
+}
+#modal-oasis-visions .visions-cleft-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+#modal-oasis-visions .visions-cleft-copy strong {
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  letter-spacing: 0.03em;
+  color: #fff6d8;
+}
+#modal-oasis-visions .visions-cleft-copy small {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 0.88rem;
+  color: #e8dcc0;
+  letter-spacing: 0;
+  text-transform: none;
+}
+#modal-oasis-visions .visions-cleft-btn.is-done {
+  opacity: 0.62;
+  border-style: dashed;
+  cursor: default;
+}
+#modal-oasis-visions .visions-cleft-btn.is-done .visions-cleft-mark {
+  background: rgba(40, 24, 10, 0.8);
+  color: #c9b48a;
+  border-color: rgba(212, 168, 83, 0.4);
+  box-shadow: none;
+}
+#modal-oasis-visions .visions-cleft-btn.is-read .visions-cleft-copy small {
+  color: #fde68a;
+}
+
+#modal-oasis-visions #visions-lost .chasm3d-voice { margin-bottom: 10px; }
+#modal-oasis-visions .chasm3d-fade {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+#modal-oasis-visions .chasm3d-fade.is-on { opacity: 1; }
+
+/* ---- Central reward, the Desert Path standard (Chasm / Playa / Lexicon) ---- */
+#modal-oasis-visions .clep-rw-page { text-align: left; }
+#modal-oasis-visions .clep-registry {
+  list-style: none;
+  margin: 8px 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#modal-oasis-visions .clep-line {
+  display: grid;
+  grid-template-columns: 1.15fr 1.15fr 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: rgba(255, 248, 230, 0.55);
+  border: 1px solid rgba(122, 74, 24, 0.35);
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: #5c3412;
+}
+#modal-oasis-visions .clep-line b { font-weight: 700; color: #7c2d12; }
+#modal-oasis-visions .clep-line em {
+  font-style: normal;
+  font-weight: 700;
+  min-width: 2.2em;
+  text-align: center;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #fde68a;
+  color: #7c2d12;
+}
+#modal-oasis-visions .chasm3d-reward.is-on .clep-line {
+  animation: chasm-rise 0.45s ease var(--t) both;
+}
+#modal-oasis-visions .clep-key {
+  margin-top: 4px;
+  text-align: center;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700;
+  font-size: 2.4rem;
+  letter-spacing: 0.28em;
+  color: #7c2d12;
+  text-shadow: 0 1px 0 rgba(255, 248, 230, 0.6);
+}
+#modal-oasis-visions .chasm3d-reward.is-on .clep-key {
+  animation: chasm-thump 0.7s 1.7s cubic-bezier(.2, .9, .3, 1.3) both;
+}
+#modal-oasis-visions .clep-key-note {
+  text-align: center;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  color: #6b4520;
+  margin-bottom: 8px;
+}
+#modal-oasis-visions .clep-relics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+#modal-oasis-visions .clep-medal {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 30% 30%, rgba(200, 130, 40, 0.45), rgba(60, 36, 16, 0.85) 72%);
+  border: 1.5px solid rgba(253, 230, 138, 0.65);
+  color: #f3e6c8;
+}
+#modal-oasis-visions .clep-medal svg {
+  width: 36px;
+  height: 42px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: #fde68a;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#modal-oasis-visions .clep-medal.is-brass svg { fill: rgba(253, 230, 138, 0.15); }
+#modal-oasis-visions .clep-medal figcaption {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #fff3c4;
+}
+#modal-oasis-visions .clep-medal small {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 0.82rem;
+  letter-spacing: 0;
+  color: #e8dcc0;
+}
+#modal-oasis-visions .chasm3d-reward.is-on .clep-medal {
+  animation: chasm-medal 0.65s cubic-bezier(.2, .9, .3, 1.3) 2.1s both;
+}
+#modal-oasis-visions .chasm3d-reward.is-on .clep-medal.is-brass { animation-delay: 2.35s; }
+#modal-oasis-visions .clep-seal {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  margin: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 38% 32%, #f4d58a, #c8902e 55%, #8a5a18);
+  box-shadow: 0 0 0 4px rgba(200, 144, 46, 0.28), 0 6px 14px rgba(0, 0, 0, 0.35);
+}
+#modal-oasis-visions .clep-seal svg {
+  width: 36px;
+  height: 42px;
+  fill: none;
+  stroke: #3d2410;
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+#modal-oasis-visions .clep-seal.is-water {
+  background: radial-gradient(circle at 38% 32%, #9fd4ea, #3d8eae 55%, #1a4e66);
+}
+#modal-oasis-visions .clep-seal.is-water svg { stroke: #f4fbff; fill: rgba(255, 255, 255, 0.15); }
+#modal-oasis-visions .chasm3d-reward.is-on .clep-rw-a { animation-delay: 2.7s; }
+#modal-oasis-visions .chasm3d-reward.is-on .clep-rw-b { animation-delay: 3.15s; }
+#modal-oasis-visions .chasm3d-reward.is-on .clep-seal { animation: rw-seal 0.65s cubic-bezier(.2, .9, .3, 1.3) 2.9s both; }
+#modal-oasis-visions .chasm3d-reward.is-on .clep-seal.is-water { animation-delay: 3.35s; }
+
+html.game-open,
+html.game-open body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+@media (max-width: 980px) {
+  #modal-oasis-visions .chasm3d-stage {
+    height: 34vh;
+    min-height: 180px;
+    max-height: 34vh;
+  }
+  #modal-oasis-visions .visions-reg-chip { font-size: 0.75rem; min-height: 40px; }
+  #modal-oasis-visions .visions-dial-face { font-size: 1.25rem; }
+  #modal-oasis-visions .visions-dial-marks { grid-template-columns: repeat(5, 1fr); }
+}
+@media (max-width: 420px) {
+  #modal-oasis-visions .visions-reg-chips.is-hours {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  #modal-oasis-visions .visions-dial-marks {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Painted vignette over the 3D stage: draws the eye to the camp */
+#modal-oasis-visions .chasm3d-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 58%, transparent 52%, rgba(40, 18, 6, 0.34) 100%);
+}
+
+/* The two relics on the reward card: the real item art, and a tap opens its card */
+#modal-oasis-visions .clep-relics { grid-template-columns: 1fr; }
+#modal-oasis-visions .clep-medal { cursor: pointer; text-align: left; color: inherit; font: inherit; }
+#modal-oasis-visions .clep-medal:hover, #modal-oasis-visions .clep-medal:focus-visible { border-color: #fde68a; transform: translateY(-1px); }
+#modal-oasis-visions .clep-medal img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.55));
+}
+#modal-oasis-visions .clep-medal-copy { display: flex; flex-direction: column; }
+#modal-oasis-visions .clep-medal-copy b { font-family: 'Cinzel', Georgia, serif; font-size: 0.82rem; letter-spacing: 0.04em; color: #fff3c4; font-weight: 700; }

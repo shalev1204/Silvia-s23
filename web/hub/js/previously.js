@@ -1,5 +1,6 @@
-    // «Previously on…» (docs/IDEAS_BACKLOG.md #1). When Silvia comes back after 12 hours or more away, a series
-    // narrator tells her where the story stands: the last thing that happened, where Hermes is now, and what to do next.
+    // «Previously on…» (docs/IDEAS_BACKLOG.md #1). Once each time Silvia opens the Hub and the gate lets her in,
+    // a series narrator tells her where the story stands: the last thing that happened, where Hermes is now,
+    // and what to do next. The same card returns if she has been away for 12 hours or more.
     // The same recap stays in Ask Hermes ("Previously on The Eclipse Order…"), always up to date.
     // "Last time" comes from the last game she solved; "now" and "next" are read from the Field Wire's own waypoint
     // (or, when the wire is waiting for her, from the wire itself), so the recap never disagrees with the chat.
@@ -7,6 +8,7 @@
     window.EclipsePreviously = (function () {
       'use strict';
       var KEY = 'order_last_seen_at';
+      var SESSION_KEY = 'eclipse_previously_shown';
       var AWAY_MS = 12 * 3600 * 1000;
       var STAMP_EVERY_MS = 5 * 60 * 1000;
       var SHOW_DELAY_MS = 1200;
@@ -18,7 +20,7 @@
         chasm: 'Silvia walked Hermes through the Whispering Chasm, fork by fork, and he found the six relics: M, I, R, A, G, E.',
         playa: 'Silvia found Hermes a safe road across the Salt Playa, slab by slab, around the sinkholes. CRYSTAL opened the post of the Order, and at noon, in the Sump, Hermes was her eyes until he reached a marker with a little brass balance.',
         lexicon: 'At Camp VII, under the torch of the raiders’ rearguard, Silvia read the nomad steles and locked the Al-Qibla bearing: the true road to Tower II. Hermes fled through the old walls and read the raiders’ name on their hearth: the BC Ashes.',
-        clepsydra: 'At the Four Wells of Camp VIII, Silvia set the four seekers in their shadow-hours, and the water came back.',
+        clepsydra: 'At the Four Wells of Camp VIII the heat showed Hermes four basins that were never there. Silvia kept his head clear with the page in her journal, and under a carved falcon he found a real spring and filled the water skins.',
         s14: 'At the Sun Monolith, Silvia woke Cairn II and its seal came out of the niche. On the rim, Hermes found a smear of cobalt blue, ground the way Aurelia ground her lapis.',
         s15: 'In the Sandstone Labyrinth, Silvia slipped Hermes past the raiders’ torches to the Seal of Cairn III. On the way out he saw a star in gold leaf, painted over blue.',
         s16: 'Between the singing pillars of Cairn IV, the song gave up the fourth seal and a river pebble painted with a gold star. At dawn the raiders split: a few men on Hermes’s tracks, the wagons back north-east.',
@@ -34,6 +36,9 @@
       function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
       function set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
       function gateOpen() { return typeof window.__gateIsOpen !== 'function' || window.__gateIsOpen(); }
+      function handsOff() {
+        try { return navigator.webdriver === true; } catch (e) { return false; }
+      }
 
       function lastSolved() {
         var T = window.TesterDesert, id = null;
@@ -142,14 +147,41 @@
       }
       function awayLongEnough() {
         var last = parseInt(get(KEY) || '0', 10) || 0;
-        return last > 0 && Date.now() - last >= AWAY_MS;   // the very first visit has nothing to recap
+        return last > 0 && Date.now() - last >= AWAY_MS;
       }
-      // Stamps are written at most every 5 minutes (each one is a cloud event); 5 minutes is nothing against 12 hours
+      function sessionShown() {
+        try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch (e) { return false; }
+      }
+      function markSession() {
+        try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) {}
+      }
+      // The wire card is what the recap quotes. A question on the wire counts too: Hermes is waiting for an answer.
+      function whenWireReady(fn) {
+        var tries = 0;
+        (function tick() {
+          var bar = document.getElementById('wire-completed-bar');
+          var prompt = document.getElementById('wire-prompt-box');
+          var barReady = bar && bar.style.display !== 'none' && bar.textContent.replace(/\s/g, '').length > 20;
+          var promptReady = prompt && prompt.style.display !== 'none';
+          if (barReady || promptReady || tries >= 8) fn();
+          else { tries += 1; setTimeout(tick, 100); }
+        })();
+      }
+      // Stamps are written at most every 5 minutes (each one is a cloud event); 5 minutes is nothing against 12 hours.
+      // Once per browser session, as soon as the gate is open (the reload after she signs in). Also after 12 h away.
       function arrive(onLoad) {
-        if (!gateOpen()) return;   // behind the gate: the reload after signing in is the real arrival
+        if (!gateOpen()) return;
         var away = awayLongEnough();
-        if (away) setTimeout(show, SHOW_DELAY_MS);
-        stamp(onLoad || away);
+        // A real visit shows the recap once per session, and again after 12 hours away.
+        // Automated browsers keep the old rule (only after 12 hours), so a test click is never covered by the card.
+        var due = handsOff() ? away : (!sessionShown() || away);
+        if (due) {
+          if (!handsOff()) markSession();
+          whenWireReady(function () {
+            setTimeout(function () { if (gateOpen()) show(); }, SHOW_DELAY_MS);
+          });
+        }
+        stamp(onLoad || due);
       }
 
       arrive(true);

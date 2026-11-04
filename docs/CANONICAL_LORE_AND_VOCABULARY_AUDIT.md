@@ -534,6 +534,18 @@ Este es el estado exacto en el que se encuentra Silvia en este preciso momento:
 
 ## 7. LA BIBLIA CRIPTOGRÁFICA Y MATEMÁTICA (*THE CIPHER LEDGER*)
 
+### 7.0 · Invariante del alfabeto (3 Nov 2026, orden del Operador)
+
+Al cerrar el **Desert Path** (Estación 19, audiencia en la Torre II), Silvia debe poder calcular **las 26 letras A–Z**. Ningún valor puede quedar para el Stage Path.
+
+La Estación 13 no entrega letra nueva. Si la entregara, el alfabeto se cerraría demasiado pronto y las estaciones 14 a 19 se quedarían sin letras que descubrir. Su premio matemático son **solo comprobaciones** de letras que Silvia ya tiene (§7.B.18).
+
+Letras con valor al terminar la Estación 12 (y por tanto antes de la 13): \(O, A, K, G, P, B, V, E, T, F, R, X, Q, Z\).
+
+Letras que aún deben aparecer **entre la Estación 14 y la 19**: \(D, C, W, N, S, U, Y, L, H, M, I\), y también **\(J\)**. Hoy la \(J\) sigue programada en la Estación 22 (§7.B.13, Stage Path). Hay que adelantarla a una estación del desierto entre la 14 y la 19 antes de dar el Desert Path por cerrado. No se mueve en la Estación 13.
+
+La web no muestra ningún valor (Regla 9). El diario impreso no se reescribe: las hojas 08 a 18 ya están impresas.
+
 ### A. Inventario Completo de Glifos del Eclipse Script
 Todos los glifos geométricos oficiales residen en:
 `assets/general/glyphs/ecl-[a-z].svg` y en `assets/general/glyphs/rendered_png/glyph_[a-z].png`.
@@ -739,6 +751,14 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Ecuación (The Line of the Dial)**: $$[O] - [Z] = 18$$
 - **Resolución** (con $O = 23$ de §7.B.1): $$[Z] = 23 - 18 \implies \mathbf{Z = 5}$$ La Z no aparece en la frase. En la Estación 19, $[Z] + [D] = 23$ pasa a ser comprobación. Regla 9: la web no muestra el valor.
 - **Dónde se ve**: premio del Lexicon (sello `= Z` y ecuación), placa en la base de la estela alta, voz de Hermes al final, mensajes de Camp VII del chat, diario y tarjeta de la estación.
+
+#### 7.B.18 · Estación 13 · El manantial del halcón (solo comprobaciones, ninguna letra nueva)
+- **Origen** (orden del Operador, 3 Nov 2026): el premio matemático de The Oasis Clepsydra son operaciones, no una letra. Véase el invariante §7.0. La hoja 12B impresa no cambia.
+- **Ecuación 1 (Falcon Inscription)**, ya reservada en §7.B.3. Con \(P = 21\) y \(A = 7\): \(21 - 7 = 14\). Ledger `falcon-pa`, `requires: 'order_oasis_clepsydra_completed'`.
+  $$[P] - [A] = 14$$
+- **Ecuación 2 (The Line of the Cleft)**: bajo la primera, en letras más pequeñas, junto a la grieta. Comprueba las dos letras del desierto que Silvia acaba de obtener (Q en la Estación 11, Z en la 12). Con \(Q = 14\) y \(Z = 5\): \(14 + 5 = 19\). El 19 no es una letra nueva. Ledger `falcon-qz`, mismo `requires`.
+  $$[Q] + [Z] = 19$$
+- **Alforja** (inventario, no letras): los cuatro odres llenos (`water_skins`) y el peso de latón del halcón (`falcon_weight`), lo único sólido de la clepsidra que la fiebre reconstruyó.
 
 - **Ecuación de comprobación (The Line of the Salt)**, con dos letras de CRYSTAL:
   $$[T] - [A] = 9$$

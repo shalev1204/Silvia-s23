@@ -42,8 +42,9 @@
           earned: ['The Desert Sigil: PHOENIX', 'The Al-Qibla bearing: 194° SSW, and 14° NNE to Tower II', 'Their name: the BC Ashes', 'A new glyph: Z'], ledger: ['The Stargazer Proportion', 'The Line of the Dial'], sketch: T + 'desert_lexicon_preview.webp'
         },
         clepsydra: {
-          note: 'Camp VIII, the Four Wells. Four seekers, four shadow-hours, four counterweights. When the last one dropped, the basins filled and we drank.',
-          ledger: ['The Falcon Inscription'], sketch: T + 'oasis_clepsydra_preview.webp'
+          note: 'Camp VIII, at noon. The heat built four basins and I nearly believed them. Silvia kept the one story the page allowed at each, engraved the sum, and the basins went out. Under a falcon cut in the rock the cleft was cold. Four skins full, a brass falcon in the cache, and two lines to check: P − A = 14 and Q + Z = 19. The camel tracks did not stop.',
+          quote: 'The basins went out like a lamp. The cleft under the beak is cold.',
+          earned: ['The four water skins', 'The falcon weight'], ledger: ['The Falcon Inscription', 'The Line of the Cleft'], sketch: T + 'oasis_clepsydra_preview.webp'
         },
         s14: {
           note: 'The Sun Monolith, Cairn II. The sun walked across the dial and the lid gave way. On the rim of the niche, a smear of cobalt blue. I know that blue.',

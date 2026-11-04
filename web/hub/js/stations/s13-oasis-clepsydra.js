@@ -305,7 +305,7 @@
         if (victoryCard) victoryCard.style.display = 'flex';
         if (btnEngage) btnEngage.style.display = 'none';
         if (dispatchText) {
-          dispatchText.textContent = '"Silvia! The moment Key XXX fell into place, the four wells shimmered and vanished. There were never any siphons: it was the fever, a mirage of the heat. But your logic kept my head clear, and with a clear head I saw what was really there: a narrow cleft in the rock beneath a carved falcon, cold water seeping from it, and an old cache of supplies. Our four leather water skins are full. Scratched into the stone beside the falcon: [P] - [A] = 14! With water in our skins and Al-Qibla set on Tower II (14° NNE), the crossing of the Great Erg is secured. Next: Station 14!"';
+          dispatchText.textContent = '"Silvia! The moment Key XXX fell into place, the four wells shimmered and vanished. There were never any siphons: it was the fever, a mirage of the heat. But your logic kept my head clear, and with a clear head I saw what was really there: a narrow cleft in the rock beneath a carved falcon, cold water seeping from it, and an old cache of supplies. Our four leather water skins are full. Scratched into the stone beside the falcon: [P] − [A] = 14, and under it, smaller, [Q] + [Z] = 19. Two checks for your Cipher Ledger, and no new letter. With water in our skins and Al-Qibla set on Tower II (14° NNE), the crossing of the Great Erg is secured. Next: the gates of Tower II!"';
         }
       }
 
@@ -428,6 +428,10 @@
         }
         if (window.isNextAdventureHeld && window.isNextAdventureHeld()) {
           if (typeof window.showDesertToast === 'function') window.showDesertToast('⛺ CAMP VII ⛺ Hermes is resting by the cold hearth. The next stretch of the road is not open yet: he will call you on the Field Wire.');
+          return;
+        }
+        if ((isLexiconDone || isClepsydraAlreadyDone) && typeof window.openOasisVisions === 'function') {
+          window.openOasisVisions();
           return;
         }
         if (sfx) sfx.playMechanicalClick();

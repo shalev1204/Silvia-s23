@@ -1,6 +1,6 @@
     /* ---- Station 10 · The Whispering Chasm: the walk behind Hermes (3D); the Salt Playa (Station 11) wears the same window ---- */
     /* The canyon fills the whole screen: a thin living border, the picture as large as it can be */
-    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) { padding: 8px; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon, #modal-oasis-visions) { padding: 8px; }
     .chasm3d-window { --sun: 0.6; max-width: none; height: 100%; max-height: none; isolation: isolate; }
     .chasm3d-window > :not(.chasm3d-ambient) { position: relative; z-index: 1; }
     .chasm3d-window > .chasm3d-howto, .chasm3d-window > .map-frame-corner { position: absolute; }

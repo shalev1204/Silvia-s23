@@ -64,6 +64,7 @@
   <link rel="stylesheet" href="./hub/css/cinematic.css">
   <link rel="stylesheet" href="./hub/css/stations/s12-desert-lexicon.css">
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-clepsydra.css">
+  <link rel="stylesheet" href="./hub/css/stations/s13-oasis-visions.css">
   <link rel="stylesheet" href="./hub/css/stations/s14-sun-monolith.css">
   <link rel="stylesheet" href="./hub/css/stations/s15-sandstone-labyrinth.css">
   <link rel="stylesheet" href="./hub/css/stations/s16-cairn-iv.css">
@@ -2841,6 +2842,98 @@
     </div>
   </div>
 
+  <!-- =====================================================================
+       STATION 13 · ACT I: THE FOUR VISIONS AT CAMP VIII
+       ===================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-oasis-visions" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="visions-modal-title">
+    <div class="chasm-workbench-window chasm3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">☀️</span>
+          <div>
+            <div class="chasm-header-title" id="visions-modal-title">The Oasis Clepsydra · Station 13</div>
+            <div class="chasm-header-subtitle">Transmit the Registry · noon at Camp VIII · page “The Oasis Clepsydra”</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-visions" title="Close" aria-label="Close the Oasis Clepsydra">✕</button>
+      </div>
+
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="visions-stage">
+          <canvas id="visions-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/oasis_clepsydra_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="visions-clock">☀ 12:00</div>
+              <div class="chasm3d-hearts" id="visions-hearts" role="img" aria-label="3 of 3 hearts left"></div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="visions-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="visions-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="visions-voice" role="status" aria-live="polite"></div>
+          <div class="chasm3d-where" id="visions-where"></div>
+          <div class="chasm3d-controls" id="visions-controls" role="group" aria-label="Transmit the Oasis Registry to Hermes"></div>
+          <div id="visions-lost" hidden>
+            <p class="chasm3d-voice">The heat has me. I cannot tell one well from another. Give me the shade for a minute, and we begin this hour again.</p>
+            <button type="button" class="chasm3d-btn" id="btn-visions-again">↺ Begin this heat again</button>
+          </div>
+          <div class="chasm-victory-card" id="visions-done" style="display: none;">
+            <div class="chasm-victory-title"><span>☀️</span><span>The Spring Is Real</span></div>
+            <div class="chasm-victory-text">The four wells were the heat. Under the falcon the cleft is cold and running, and the four skins are full. Beside the carving: [P] − [A] = 14, and under it [Q] + [Z] = 19. A brass falcon-weight was in the cache. The camel tracks do not stop. Hermes is waiting on the Field Wire.</div>
+            <button type="button" class="btn-chasm-finish" id="btn-visions-finish"><span>📻 Back to the Field Wire ➔</span></button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-visions-replay">↺ Transmit the ring again</button>
+          </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-visions-howto">📖 How to play</button>
+          <details class="chasm3d-laws">
+            <summary>The Law of the Wells</summary>
+            <ol>
+              <li>The five testimonies on the page “The Oasis Clepsydra” are true. The heat is not.</li>
+              <li>Each seeker has one well, one relic and one hour, and no two share any of them.</li>
+              <li>The hours run III, then VI, then IX, then XII. Earlier means a smaller one.</li>
+            </ol>
+            <p>Hermes has <strong>three hearts</strong> of lucidity. A Registry line the page does not allow costs one, and twenty minutes of sun. When the third is lost, the fever wins and the ring must be walked again from the first well.</p>
+          </details>
+        </div>
+      </div>
+
+      <div class="chasm3d-howto" id="visions-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="visions-howto-count">1 of 3</div>
+          <div class="chasm3d-howto-dots" id="visions-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>Transmit the Registry</h3>
+            <p>Noon at Camp VIII. Hermes walks the four wells in order: Jackal, Scarab, Falcon, Serpent. The heat lies; he cannot trust the bowls.</p>
+            <p>You have the page “The Oasis Clepsydra”. <strong>Solve the five testimonies and fill The Oasis Registry first.</strong> At each well, choose seeker, relic and hour as on the page, then press <strong>Transmit to Hermes</strong>. A true line lets him set a weight and walk on to the next well by himself — there is no separate “next” button.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>The cylinder</h3>
+            <p>When four weights are set, turn the <strong>Roman dial</strong> to the sum of the four hours you transmitted, and engrave it. The page asks for that total the Roman way.</p>
+            <p>A false mark costs a heart. The right mark breaks the mirage: the wells vanish, and only the falcon stone remains.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>The cold cleft</h3>
+            <p>Ask Hermes to look at the edges, feel for cold air, or touch the sand — then choose the crack that breathes cold. Under the falcon’s beak the spring is real.</p>
+            <p>Three hearts for the whole noon. Lose the third before the cleft and the fever wins: he rests, and you begin the ring again.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-visions-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-visions-howto-next">Next →</button>
+          </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-visions-howto-skip">Skip, I know how to play</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================================================================
        STATION 12: THE OASIS CLEPSYDRA & FOUR WELLS TACTICAL MODAL
        =================================================================== -->
@@ -4198,6 +4291,7 @@
   <script src="./hub/js/hub-core.js"></script>
   <script src="./hub/js/stations/s10-desert-map-and-chasm.js"></script>
   <script src="./hub/js/stations/s10-whispering-chasm.js"></script>
+  <script src="./hub/js/engine/eclipse-scenery.js"></script>
   <script src="./hub/js/satchel-and-cairn-one.js"></script>
   <script src="./hub/js/tester-panel.js"></script>
   <script src="./hub/js/dawn-map-layer.js"></script>
@@ -4206,6 +4300,7 @@
   <script src="./hub/js/ledger-balance.js"></script>
   <script src="./hub/js/stations/s12-desert-lexicon.js"></script>
   <script src="./hub/js/stations/s13-oasis-clepsydra.js"></script>
+  <script src="./hub/js/stations/s13-oasis-visions.js"></script>
   <script src="./hub/js/stations/s14-sun-monolith.js"></script>
   <script src="./hub/js/stations/s15-sandstone-labyrinth.js"></script>
   <script src="./hub/js/stations/s16-cairn-iv.js"></script>
