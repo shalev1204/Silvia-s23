@@ -1,0 +1,41 @@
+"""Screenshots of 'At the Gates of Tower II'. Run: python3 scratch/verifications/shoot_gates.py"""
+import os, sys, time
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "scripts", "audit"))
+import web_smoke as W
+from playwright.sync_api import sync_playwright
+
+OUT = os.path.join(os.path.dirname(__file__), "shots")
+seed = dict(W.DESERT_BASE, the_eclipse_active_seeker="Carles")
+server = W.start_server()
+with sync_playwright() as p:
+    b = p.chromium.launch(args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"])
+    ctx, page, errors = W.new_page(b, seed)
+    page.set_viewport_size({"width": 1500, "height": 900})
+    page.on("console", lambda m: print("console:", m.text[:300]) if m.type in ("error", "warning") else None)
+    page.goto(f"{W.BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(1500)
+    page.evaluate("window.openGatesTowerIIModal()")
+    page.wait_for_timeout(8000)
+    page.evaluate("document.getAnimations().forEach(a=>{try{a.finish()}catch(e){}})"); page.wait_for_timeout(1500)
+    print("op", page.evaluate("[getComputedStyle(document.getElementById('modal-gates-tower-ii')).opacity, document.getAnimations().length, document.getAnimations().map(a=>a.animationName+':'+a.playState+':'+a.currentTime).join()]"))
+    page.screenshot(path=os.path.join(OUT, "g01_overview.png"))
+    page.mouse.move(500, 500); page.mouse.down(); page.mouse.move(380, 440, steps=8); page.mouse.up()
+    page.wait_for_timeout(1500)
+    page.screenshot(path=os.path.join(OUT, "g02_orbit.png"))
+    page.mouse.move(500, 450)
+    for _ in range(6): page.mouse.wheel(0, -250)
+    page.wait_for_timeout(1800)
+    page.screenshot(path=os.path.join(OUT, "g03_zoom.png"))
+    print("dist", page.evaluate("window.__gates.world().orbit.state.dist"))
+    page.dblclick("#gates-canvas")
+    for name, tg in (("servant", (0.95, 2.45, 0.95)), ("hermes", (-1.35, 1.7, 3.6))):
+        page.evaluate("(a)=>{const o=window.__gates.world().orbit;o.setTarget(a[0],a[1],a[2]);o.state.tDist=3.6;o.state.tYaw=%s;o.state.tPitch=0.05}" % ("-0.4" if name=="servant" else "0.5"), list(tg))
+        page.wait_for_timeout(2500)
+        page.screenshot(path=os.path.join(OUT, "g05_%s.png" % name))
+    page.evaluate("window.__gates.world().orbit.reset()")
+    page.click("#choice-oracle"); page.wait_for_timeout(1800)
+    page.click("#choice-seal-2"); page.wait_for_timeout(900)
+    page.screenshot(path=os.path.join(OUT, "g04_seal.png"))
+    print("errors", sorted(set(errors))[:6])
+    b.close()
+server.shutdown()

@@ -102,6 +102,15 @@
         };
       }
 
+      // A gift from the story (an object, a kindness): opens the first n notes of a puzzle at once. Never takes any back.
+      function grant(id, n) {
+        n = Math.max(0, Math.min(3, n | 0));
+        if (!n || level(id) >= n) return false;
+        set(key(id, 'level'), String(n));
+        if (defs[id]) draw(defs[id], true);
+        return true;
+      }
+
       // Ask Hermes keeps every note she has unlocked
       function inquiries() {
         return order.map(function (id) {
@@ -127,5 +136,5 @@
         });
       }
 
-      return { define: define, inquiries: inquiries, reset: reset, level: level, ids: function () { return order.slice(); } };
+      return { define: define, grant: grant, inquiries: inquiries, reset: reset, level: level, ids: function () { return order.slice(); } };
     })();

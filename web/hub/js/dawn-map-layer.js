@@ -73,7 +73,7 @@
         buildMark(m, () => { if (typeof window.showDesertToast === 'function') window.showDesertToast(m.say); });
       });
       const cairnMark = buildMark({ id: 'dawn-mark-cairn', x: 538, y: 1203, icon: '?', label: '', w: 270 }, () => {
-        if (typeof window.selectDesertStation === 'function') window.selectDesertStation(22);
+        if (typeof window.selectMapNode === 'function') window.selectMapNode(22, true);
       });
 
       let lastSig = '';

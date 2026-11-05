@@ -91,6 +91,8 @@
 
       const isAwake = () => get(KEYS.awake) === 'true';
       const isDone = () => get(KEYS.done) === 'true';
+      // What the road to the gates and the night on the Erg left in Hermes's satchel (gates-road.js)
+      const road = () => (window.GatesRoad ? window.GatesRoad.flags() : {});
       const marksFound = () => Math.max(0, Math.min(MARKS.length, parseInt(get(KEYS.marks) || '0', 10) || 0));
 
       // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
@@ -313,6 +315,11 @@
         if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(2);
         else set('order_seal_cairn_2', 'true');
+        // The Ibis slab only looked like a trap: if the stone keepers of Tower II asked for an ibis, it was a lock, and here is the key
+        if (road().statues && typeof window.addRelicToInventory === 'function') {
+          window.addRelicToInventory('ibis_figure');
+          setTimeout(() => { if (typeof window.openItemAcquiredModal === 'function') window.openItemAcquiredModal({ id: 'ibis_figure' }); }, 1400);
+        }
         applyVictory();
         render();
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
@@ -321,7 +328,7 @@
 
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = "The Seal of Cairn II was resting inside, and two lines are carved into the lid. But Silvia, someone tried to open this before us: the rim is scarred by iron bars and there is ash in the cracks. The raiders know about the seals. They failed, because they tried to force what only the sun can open. There is something else on the rim... I need better light. I will tell you on the wire.";
+          el.victoryText.textContent = "The Seal of Cairn II was resting inside, and two lines are carved into the lid. But Silvia, someone tried to open this before us: the rim is scarred by iron bars and there is ash in the cracks. The raiders know about the seals. They failed, because they tried to force what only the sun can open. There is something else on the rim... I need better light. I will tell you on the wire." + (road().statues ? " And the Ibis slab shifted when the last mark answered: under it, a small brass ibis, the twin of my falcon. It was never a trap, Silvia. It was a lock." : "");
         }
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
@@ -363,6 +370,18 @@
         if (get('order_oasis_clepsydra_completed') !== 'true') return false;
         return typeof window.isMonolithMarchOver === 'function' ? window.isMonolithMarchOver() : false;
       }
+      // The road's gifts, in Hermes's voice. The red cord is a measuring line: twelve knots, one staff-length each,
+      // and the Monolith is twelve staffs tall, so it opens the first note of the sigil.
+      function arrivalNote() {
+        const f = road(), out = [];
+        if (f.blessing) {
+          out.push("I tied the Servant's red cord to my staff: twelve knots, one staff-length each. Whatever shadow the Monolith throws, I can measure it in staffs.");
+          if (window.EclipseHints && window.EclipseHints.grant) window.EclipseHints.grant('s14-sigil', 1);
+        }
+        if (f.nightLost) out.push("And I am sorry about last night. I arrived with half a skin of water, so let us not waste the sun.");
+        if (f.nightOil === 'all') out.push("My lantern is dry, but I do not regret it.");
+        return out.length ? ' ' + out.join(' ') : '';
+      }
       let returnFocusTo = null;
       function openSunMonolithModal() {
         if (!canOpen()) {
@@ -377,12 +396,17 @@
           }
           return;
         }
+        // Hermes tells Silvia about the night on the Erg before the stone: once, on arrival
+        if (!isDone() && typeof window.needsNightErg === 'function' && window.needsNightErg() && typeof window.openNightErgModal === 'function') {
+          window.openNightErgModal(openSunMonolithModal);
+          return;
+        }
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I made it to the Ridge of the Sun. The Monolith is taller than I imagined, and Cairn II sits at its feet like a sundial waiting for its hour. The stone tablet asks for the sigil of the page “The Sun Monolith & Cairn II” in your journal.");
+        else if (!isAwake()) say("Silvia, I made it to the Ridge of the Sun. The Monolith is taller than I imagined, and Cairn II sits at its feet like a sundial waiting for its hour. The stone tablet asks for the sigil of the page “The Sun Monolith & Cairn II” in your journal." + arrivalNote());
         else say("The rings are still glowing. Move the sun, Silvia, and let the shadow touch the marks the inscription names, in order.");
         render();
         const focusTarget = isDone() ? el.finish : isAwake() ? el.slider : el.keyInput;

@@ -484,10 +484,10 @@
           if (typeof window.updateDesertMapMarkers === 'function') {
             window.updateDesertMapMarkers();
           }
-          // Hermes walks on to the gates of Tower II (Sheet 13A); the scene plays on the wire, then the road to Station 14
-          if (typeof window.selectMapNode === 'function') window.selectMapNode(23, true);
+          // Hermes walks on to the gates of Tower II (Sheet 13A); the scene plays at the gates, then the road to Station 14
+          if (typeof window.selectMapNode === 'function') window.selectMapNode(27, true);
           if (typeof window.showDesertToast === 'function') {
-            window.showDesertToast('✦ TOWER II ✦ Hermes is walking to the gates of the Sandstone Sanctuary. Open the Cliffside Workshop to hear what he finds there, then the page “At the Gates of Tower II” of your journal.');
+            window.showDesertToast('✦ TOWER II · THE GATES ✦ Hermes has reached the Sandstone Sanctuary at last light. Stand with him at the threshold (Sheet 13A).');
           }
         });
       }

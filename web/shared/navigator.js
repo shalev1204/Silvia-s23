@@ -185,6 +185,11 @@
     }
 
     if (!document.getElementById('order-sidebar-backdrop')) {
+      let activePathNav = 'constellation';
+      try { activePathNav = localStorage.getItem('order_active_map_path') || 'constellation'; } catch(e) {}
+      const isDesertNav = (activePathNav === 'desert');
+      const isStageNav = (activePathNav === 'stage');
+
       const sidebarBackdrop = document.createElement('div');
       sidebarBackdrop.id = 'order-sidebar-backdrop';
       sidebarBackdrop.className = 'order-sidebar-backdrop';
@@ -240,7 +245,11 @@
 
           <!-- Atmospheric Lore Footer -->
           <div class="order-sidebar-footer-lore">
-            <div class="footer-lore-crest">✧ ✦ ✧</div>
+            <div class="footer-lore-crest" title="Order Path: Constellation · Desert · Stage">
+              <span class="crest-star crest-star-1 ${(!isDesertNav && !isStageNav) ? 'active' : ''}">${(!isDesertNav && !isStageNav) ? '✦' : '✧'}</span>
+              <span class="crest-star crest-star-2 ${isDesertNav ? 'active' : ''}">${isDesertNav ? '✦' : '✧'}</span>
+              <span class="crest-star crest-star-3 ${isStageNav ? 'active' : ''}">${isStageNav ? '✦' : '✧'}</span>
+            </div>
             <div class="footer-lore-text">The Eclipse Order · 2026</div>
             <div class="footer-lore-sub">Silvia's Journey</div>
           </div>

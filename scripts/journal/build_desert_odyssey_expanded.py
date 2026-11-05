@@ -930,7 +930,9 @@ def _render_13a_page(gc: tuple = GRAPHITE_COLOR, plate_override=None):
         "Here, carved deep into the sheer red cliffs, stands the Sandstone Sanctuary of the Oracle. "
         "Fluted columns of living rock frame an ancient archway sealed by heavy bronze gates. "
         "In the shadow of the portico stands the Sanctuary Servant, an elder of the Order "
-        "guarding the threshold with an iron staff topped by a celestial star-sight."
+        "guarding the threshold with an iron staff topped by a celestial star-sight. "
+        "Along the lintel, in worn capitals, the founders cut their rule: "
+        "«OPEN AT THE SETTING OF THE SUN»."
     )
     y = paragraph(sec1_text, X0, y, W, size=BODY, lh=BODY_LH, seed=3012)
     y += 50

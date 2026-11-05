@@ -8,9 +8,10 @@
   <script src="./hub/js/cloud-config.js"></script>
   <script src="./hub/js/cloud-save.js"></script>
   <script>
-    /* Path theme (constellation | desert) is set before first paint to avoid a flash of the wrong backdrop. */
+    /* Path theme (constellation | desert | stage) is set before first paint to avoid a flash of the wrong backdrop. */
     try {
-      document.documentElement.setAttribute('data-map-path', localStorage.getItem('order_active_map_path') === 'desert' ? 'desert' : 'constellation');
+      var savedPath = localStorage.getItem('order_active_map_path');
+      document.documentElement.setAttribute('data-map-path', (savedPath === 'desert' || savedPath === 'stage') ? savedPath : 'constellation');
     } catch (e) {
       document.documentElement.setAttribute('data-map-path', 'constellation');
     }
@@ -65,6 +66,7 @@
   <link rel="stylesheet" href="./hub/css/stations/s12-desert-lexicon.css">
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-clepsydra.css">
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-visions.css">
+  <link rel="stylesheet" href="./hub/css/stations/s13b-gates-tower-ii.css">
   <link rel="stylesheet" href="./hub/css/stations/s14-sun-monolith.css">
   <link rel="stylesheet" href="./hub/css/stations/s15-sandstone-labyrinth.css">
   <link rel="stylesheet" href="./hub/css/stations/s16-cairn-iv.css">
@@ -328,10 +330,38 @@
 
       <!-- Atmospheric Lore Footer -->
       <div class="sidebar-footer-lore">
-        <div class="footer-lore-crest">✧ ✦ ✧</div>
+        <div class="footer-lore-crest" id="sidebar-footer-lore-crest" title="Order Path: Constellation · Desert · Stage" aria-label="Order Path Indicator">
+          <span class="crest-star crest-star-1 active" data-path="constellation" title="Path I · The Constellation Trail">✦</span>
+          <span class="crest-star crest-star-2" data-path="desert" title="Path II · The Grand Desert Map">✧</span>
+          <span class="crest-star crest-star-3" data-path="stage" title="Path III · The Mirror Sanctuary">✧</span>
+        </div>
         <div class="footer-lore-text">The Eclipse Order · 2026</div>
         <div class="footer-lore-sub">Silvia's Journey</div>
       </div>
+      <script>
+        (function() {
+          try {
+            var p = localStorage.getItem('order_active_map_path') || 'constellation';
+            var el = document.getElementById('sidebar-footer-lore-crest');
+            if (el) {
+              var s1 = el.querySelector('.crest-star-1');
+              var s2 = el.querySelector('.crest-star-2');
+              var s3 = el.querySelector('.crest-star-3');
+              var isDesert = (p === 'desert');
+              var isStage = (p === 'stage');
+              var isConst = (!isDesert && !isStage);
+              if (s1 && s2 && s3) {
+                s1.textContent = isConst ? '✦' : '✧';
+                s2.textContent = isDesert ? '✦' : '✧';
+                s3.textContent = isStage ? '✦' : '✧';
+                s1.classList.toggle('active', isConst);
+                s2.classList.toggle('active', isDesert);
+                s3.classList.toggle('active', isStage);
+              }
+            }
+          } catch(e) {}
+        })();
+      </script>
     </aside>
 
     <button type="button" class="btn-floating-sidebar-toggle" id="btn-sidebar-open" title="Open Navigation Menu">
@@ -1305,7 +1335,7 @@
                   </g>
 
                   <!-- Station 10 · The Whispering Chasm -->
-                  <g class="desert-station-node" id="node-10-trigger" transform="translate(264, 2065) scale(1.5)" onclick="selectDesertStation(10)" style="cursor: pointer;">
+                  <g class="desert-station-node" id="node-10-trigger" transform="translate(264, 2065) scale(1.5)" onclick="selectMapNode(10, true)" style="cursor: pointer;">
                     <circle class="chasm-vortex-ring" id="node-10-ring" cx="0" cy="0" r="48" stroke="#f59e0b" stroke-width="3" stroke-dasharray="6, 5" fill="none" />
                     <circle id="node-10-glow" cx="0" cy="0" r="32" fill="url(#chasmVortexGlow)" />
                     <circle id="node-10-core" cx="0" cy="0" r="18" fill="#2d1507" stroke="#fbbf24" stroke-width="2.5" />
@@ -1314,19 +1344,19 @@
                     <text id="node-10-banner-text" x="0" y="-42" text-anchor="middle" font-family="'Cinzel', serif" font-size="12.5" font-weight="700" fill="#fde68a" letter-spacing="0.04em">✦ 10 · WHISPERING CHASM ➔</text>
                   </g>
 
-                  <g class="desert-station-node" id="node-21-trigger" transform="translate(1196, 2460) scale(1.5)" onclick="selectDesertStation(21)" style="cursor: pointer;">
+                  <g class="desert-station-node" id="node-21-trigger" transform="translate(1196, 2460) scale(1.5)" onclick="selectMapNode(21, true)" style="cursor: pointer;">
                     <circle cx="0" cy="0" r="24" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
                     <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">🧂</text>
                     <rect x="-117" y="30" width="233" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
                     <text id="node-21-banner-text" x="0" y="48" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a">✦ 11 · THE SALT PLAYA ➔</text>
                   </g>
-                  <g class="desert-station-node" id="node-11-trigger" transform="translate(1180, 2367) scale(1.5)" onclick="selectDesertStation(11)" style="cursor: pointer;">
+                  <g class="desert-station-node" id="node-11-trigger" transform="translate(1180, 2367) scale(1.5)" onclick="selectMapNode(11, true)" style="cursor: pointer;">
                     <circle cx="0" cy="0" r="24" fill="#2d1507" stroke="#fbbf24" stroke-width="2.2" />
                     <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fbbf24">📜</text>
                     <rect x="-147" y="-46" width="294" height="28" rx="4" fill="#180e07" stroke="#fbbf24" stroke-width="1.3" opacity="0.96" />
                     <text id="node-11-banner-text" x="0" y="-28" text-anchor="middle" font-family="'Cinzel', serif" font-size="11.5" font-weight="700" fill="#fde68a">✦ 12 · NOMAD RUINS (LEXICON) ➔</text>
                   </g>
-                  <g class="desert-station-node" id="node-14-trigger" transform="translate(1362, 1845) scale(1.5)" onclick="selectDesertStation(14)" style="cursor: pointer;">
+                  <g class="desert-station-node" id="node-14-trigger" transform="translate(1362, 1845) scale(1.5)" onclick="selectMapNode(14, true)" style="cursor: pointer;">
                     <circle cx="0" cy="0" r="24" fill="#1c1404" stroke="#fef08a" stroke-width="2.2" />
                     <text x="0" y="6" text-anchor="middle" font-size="14" fill="#fef08a">🏛️</text>
                     <rect x="-151" y="-46" width="302" height="28" rx="4" fill="#180e07" stroke="#fef08a" stroke-width="1.3" opacity="0.96" />
@@ -2346,6 +2376,47 @@
   </div>
 
   <!-- =====================================================================
+       ITEM RELINQUISHED / SUPPLY EXPENDED CINEMATIC POPUP
+       ===================================================================== -->
+  <div class="item-relinquished-overlay" id="modal-item-relinquished" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ir-title">
+    <div class="item-relinquished-card" id="ir-card">
+      <div class="ir-frame-corner corner-tl"></div>
+      <div class="ir-frame-corner corner-tr"></div>
+      <div class="ir-frame-corner corner-bl"></div>
+      <div class="ir-frame-corner corner-br"></div>
+      
+      <div class="ir-header">
+        <span class="ir-sparkles">✦ ✧ ✦</span>
+        <span class="ir-label" id="ir-header-label">SUPPLY RELINQUISHED</span>
+        <span class="ir-sparkles">✦ ✧ ✦</span>
+      </div>
+      
+      <div class="ir-art-wrap">
+        <div class="ir-art-glow"></div>
+        <img id="ir-art-img" src="assets/items/item_lamp_oil.png" alt="Relinquished Supply" class="ir-art-img">
+      </div>
+
+      <div class="ir-badge">
+        <span class="ir-badge-icon">✖</span>
+        <span class="ir-badge-text">REMOVED FROM SATCHEL</span>
+      </div>
+      
+      <div class="ir-info">
+        <div class="ir-category" id="ir-category">EXPEDITION SUPPLY</div>
+        <h3 class="ir-title" id="ir-title">The Lamp Oil</h3>
+        <div class="ir-origin" id="ir-origin">The Erg Dunes · 02:40 Deep Night</div>
+        <p class="ir-lore" id="ir-lore">Hermes poured every drop into the nomad’s lamp. The flask is empty, and his own lantern dies.</p>
+      </div>
+
+      <div class="ir-actions">
+        <button type="button" class="ir-btn-continue" id="ir-btn-continue">
+          <span>Continue Journey</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
        SATCHEL & RELICS INVENTORY MODAL
        ===================================================================== -->
   <div class="chasm-modal-backdrop satchel-inventory-backdrop" id="modal-satchel-inventory" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="si-modal-title">
@@ -3297,6 +3368,135 @@
             <button type="button" class="btn-chasm-reset" id="btn-clepsydra-solve-all" style="background: rgba(96, 165, 250, 0.15); border-color: #60a5fa; color: #bae6fd;">
               <span>✦ Transcribe Complete Journal Notes</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       STATION 13B: AT THE GATES OF TOWER II · THE SANDSTONE SANCTUARY (SHEET 13A)
+       Interactive 3D Encounter between Hermes, The Sanctuary Servant and Silvia
+       ===================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-gates-tower-ii" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="gates-modal-title">
+    <div class="chasm-workbench-window chasm3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🏛️</span>
+          <div>
+            <div class="chasm-header-title" id="gates-modal-title">At the Gates of Tower II</div>
+            <div class="chasm-header-subtitle">The Sandstone Sanctuary · The Threshold of the Oracle · Sheet 13A</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-gates-tower-ii" title="Close" aria-label="Close the Gates of Tower II">✕</button>
+      </div>
+
+      <div class="chasm3d-body">
+        <div class="gates-stage" id="gates-stage">
+          <canvas id="gates-canvas" class="gates-canvas" aria-hidden="true"></canvas>
+          <div class="gates-hud">
+            <div class="gates-hud-time">
+              <span>✦</span><span id="gates-hud-time">18:30 · LAST LIGHT</span>
+            </div>
+            <div class="gates-hud-sockets" id="gates-hud-sockets" title="The Five Medallion Sockets of the Archway">
+              <span class="gate-socket-chip" id="hud-socket-1" title="Cairn I · River Wash">I</span>
+              <span class="gate-socket-chip" id="hud-socket-2" title="Cairn II · Sun Monolith">II</span>
+              <span class="gate-socket-chip" id="hud-socket-3" title="Cairn III · Sandstone Labyrinth">III</span>
+              <span class="gate-socket-chip" id="hud-socket-4" title="Cairn IV · Canyon Sentry">IV</span>
+              <span class="gate-socket-chip" id="hud-socket-5" title="Cairn V · Solar Altar Arch">V</span>
+            </div>
+          </div>
+          <div class="gates-stage-subtitle" id="gates-stage-subtitle" role="status" aria-live="polite">
+            Hermes stands before the Sanctuary Servant on the stairs of Tower II.
+          </div>
+        </div>
+
+        <div class="gates-panel" id="gates-dialogue-panel">
+          <div class="gates-mission" id="gates-mission">
+            <span class="gm-label">GOAL</span>
+            <span class="gm-text" id="gates-mission-text">Get past the Servant of Tower II</span>
+          </div>
+
+          <div class="gates-log" id="gates-log" role="log" aria-live="polite"></div>
+
+          <div class="gates-choices-container">
+            <div class="gates-choice-label">📡 YOUR REPLY · SILVIA</div>
+            <div id="gates-choices" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+
+          <div class="gates-decree-card" id="gates-decree-card" style="display: none;">
+            <div class="gates-decree-title">
+              <span>🧭</span><span>The Great Circuit Decreed</span>
+            </div>
+            <p class="gates-decree-body">
+              The Servant has accepted the Seal of Cairn I and pointed his iron staff to the north-north-east (14° NNE). The bronze doors remain sealed until the five sacred cairn seals are gathered. Twelve hours on foot across the Great Erg lie ahead.
+            </p>
+            <button type="button" class="btn-gates-depart" id="btn-gates-depart">
+              <span>🗺️ Return to the Grand Desert Map (Begin March) ➔</span>
+            </button>
+            <button type="button" class="btn-gates-replay" id="btn-gates-replay">
+              <span>↺ Replay the Encounter</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       THE NIGHT ON THE ERG: Hermes tells Silvia about the crossing, and she lives it (s13c-night-erg.js).
+       Opens once, on arrival at the Sun Monolith (Station 14). Shares the stage look of At the Gates of Tower II.
+       =================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-night-erg" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="night-modal-title">
+    <div class="chasm-workbench-window chasm3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🌌</span>
+          <div>
+            <div class="chasm-header-title" id="night-modal-title">The Night on the Erg</div>
+            <div class="chasm-header-subtitle"><span id="night-title-kind">The Traveller</span> · Between the gates of Tower II and the Sun Monolith</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-night" title="Close" aria-label="Close the Night on the Erg">✕</button>
+      </div>
+
+      <div class="chasm3d-body">
+        <div class="gates-stage" id="night-stage">
+          <canvas id="night-canvas" class="gates-canvas" aria-hidden="true"></canvas>
+          <div class="gates-hud">
+            <div class="gates-hud-time"><span>✦</span><span id="night-hud-time">02:40 · DEEP NIGHT</span></div>
+          </div>
+          <div class="gates-stage-subtitle" id="night-subtitle" role="status" aria-live="polite">Hermes walks the Great Erg by night, 14° north-north-east.</div>
+        </div>
+
+        <div class="gates-panel" id="night-dialogue-panel">
+          <div class="gates-mission">
+            <span class="gm-label">GOAL</span>
+            <span class="gm-text" id="night-mission-text">The night on the Great Erg</span>
+          </div>
+
+          <div class="gates-log" id="night-log" role="log" aria-live="polite"></div>
+
+          <div class="gates-choices-container">
+            <div class="gates-choice-label">📡 YOUR REPLY · SILVIA</div>
+            <div id="night-choices" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+
+          <div class="gates-decree-card" id="night-finish-card" style="display: none;">
+            <div class="gates-decree-title"><span>🌅</span><span>First Light at the Monolith</span></div>
+            <p class="gates-decree-body" id="night-finish-body"></p>
+            <button type="button" class="btn-gates-depart" id="btn-night-finish"><span>☀️ Go to the Sun Monolith ➔</span></button>
           </div>
         </div>
       </div>
@@ -4286,12 +4486,14 @@
 
   <!-- Hub Controller Script -->
   <script src="./hub/js/hint-ladder.js"></script>
+  <script src="./hub/js/gates-road.js"></script>
   <script src="./hub/js/stage-pause.js"></script>
   <script src="./hub/js/sheet-seals.js"></script>
   <script src="./hub/js/hub-core.js"></script>
   <script src="./hub/js/stations/s10-desert-map-and-chasm.js"></script>
   <script src="./hub/js/stations/s10-whispering-chasm.js"></script>
   <script src="./hub/js/engine/eclipse-scenery.js"></script>
+  <script src="./hub/js/engine/story-chat.js"></script>
   <script src="./hub/js/satchel-and-cairn-one.js"></script>
   <script src="./hub/js/tester-panel.js"></script>
   <script src="./hub/js/dawn-map-layer.js"></script>
@@ -4301,6 +4503,9 @@
   <script src="./hub/js/stations/s12-desert-lexicon.js"></script>
   <script src="./hub/js/stations/s13-oasis-clepsydra.js"></script>
   <script src="./hub/js/stations/s13-oasis-visions.js"></script>
+  <script src="./hub/js/stations/s13b-gates-extras.js"></script>
+  <script src="./hub/js/stations/s13b-gates-tower-ii.js"></script>
+  <script src="./hub/js/stations/s13c-night-erg.js"></script>
   <script src="./hub/js/stations/s14-sun-monolith.js"></script>
   <script src="./hub/js/stations/s15-sandstone-labyrinth.js"></script>
   <script src="./hub/js/stations/s16-cairn-iv.js"></script>

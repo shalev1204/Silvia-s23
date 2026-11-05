@@ -59,7 +59,32 @@
           if (count) count.textContent = p.cleared + ' of ' + p.total + ' trials cleared' + (p.cleared === p.total ? ' ✓' : '');
           if (state) state.textContent = (currentMapPath === p.id) ? 'You are here' : (p.cleared === p.total ? 'Revisit' : 'Open path');
         });
+        updateFooterLoreCrest(currentMapPath);
       }
+
+      function updateFooterLoreCrest(path) {
+        const p = path || currentMapPath || document.documentElement.getAttribute('data-map-path') || 'constellation';
+        const crests = document.querySelectorAll('.footer-lore-crest');
+        const isDesert = (p === 'desert');
+        const isStage = (p === 'stage');
+        const isConst = (!isDesert && !isStage);
+        crests.forEach((el) => {
+          const s1 = el.querySelector('.crest-star-1');
+          const s2 = el.querySelector('.crest-star-2');
+          const s3 = el.querySelector('.crest-star-3');
+          if (s1 && s2 && s3) {
+            s1.textContent = isConst ? '✦' : '✧';
+            s2.textContent = isDesert ? '✦' : '✧';
+            s3.textContent = isStage ? '✦' : '✧';
+            s1.classList.toggle('active', isConst);
+            s2.classList.toggle('active', isDesert);
+            s3.classList.toggle('active', isStage);
+          } else {
+            el.textContent = isDesert ? '✧ ✦ ✧' : (isStage ? '✧ ✧ ✦' : '✦ ✧ ✧');
+          }
+        });
+      }
+      window.updateFooterLoreCrest = updateFooterLoreCrest;
 
       let currentMapPath = 'constellation';
       try {
@@ -107,7 +132,8 @@
         if (localStorage.getItem('order_cairn_iv_completed') === 'true') return 26;
         if (localStorage.getItem('order_sandstone_labyrinth_completed') === 'true') return 25;
         if (localStorage.getItem('order_sun_monolith_completed') === 'true') return 24;
-        if (localStorage.getItem('order_oasis_clepsydra_completed') === 'true') return 23;
+        if (localStorage.getItem('order_gates_scene_completed') === 'true') return 23;
+        if (localStorage.getItem('order_oasis_clepsydra_completed') === 'true') return 27;
         if (localStorage.getItem('order_desert_lexicon_completed') === 'true') return 12;
         return localStorage.getItem('order_salt_playa_completed') === 'true' ? 11 : 21;
       }
@@ -277,6 +303,10 @@
           } else {
             showDesertToast('Station 13: The Oasis Clepsydra · Open its page in your journal.');
           }
+        } else if (targetId === 27) {
+          window.selectMapNode(27, true);
+          if (window.openGatesTowerIIModal) window.openGatesTowerIIModal();
+          else showDesertToast('At the Gates of Tower II · The Sandstone Sanctuary of the Oracle · Sheet 13A.');
         } else if (targetId === 23) {
           window.selectMapNode(23, true);
           if (window.openSunMonolithModal) window.openSunMonolithModal();
@@ -344,6 +374,18 @@
       if (tabStage) tabStage.addEventListener('click', () => {
         if (sfx) sfx.playMechanicalClick();
         switchMapPath('stage', true);
+      });
+
+      document.querySelectorAll('.footer-lore-crest .crest-star').forEach((star) => {
+        star.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetPath = star.getAttribute('data-path');
+          if (targetPath) {
+            if (targetPath === 'stage' && localStorage.getItem('order_oracle_horizon_completed') !== 'true') return;
+            if (sfx) sfx.playMechanicalClick();
+            switchMapPath(targetPath, true);
+          }
+        });
       });
 
       window.switchMapPath = switchMapPath;

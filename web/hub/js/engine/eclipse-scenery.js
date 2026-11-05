@@ -343,6 +343,7 @@
       var SKY_VERT = 'varying vec3 vDir;\nvoid main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
       var SKY_FRAG = [
         'uniform vec3 uSun; uniform float uTime; uniform vec3 uZenith; uniform vec3 uMid; uniform vec3 uHorizon; uniform vec3 uGlow;',
+        'uniform vec3 uCloudA; uniform vec3 uCloudB; uniform float uCloudK; uniform vec3 uDisc;',
         'varying vec3 vDir;',
         'float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
         'float n2(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(h21(i), h21(i + vec2(1.0, 0.0)), f.x), mix(h21(i + vec2(0.0, 1.0)), h21(i + vec2(1.0, 1.0)), f.x), f.y); }',
@@ -353,12 +354,12 @@
         '  col = mix(col, uZenith, smoothstep(0.14, 0.95, y));',
         '  float s = max(dot(d, normalize(uSun)), 0.0);',
         '  col += uGlow * (pow(s, 5.0) * 0.28 + pow(s, 48.0) * 0.55);',
-        '  col = mix(col, vec3(1.0, 0.97, 0.88), smoothstep(0.9993, 0.9997, s));',
+        '  col = mix(col, uDisc, smoothstep(0.9993, 0.9997, s));',
         '  vec2 p = d.xz / (d.y + 0.2); p *= vec2(0.9, 1.9);',
         '  float c = fbm(p * 1.25 + vec2(uTime * 0.006, 0.0));',
         '  c = smoothstep(0.5, 0.82, c) * smoothstep(0.03, 0.28, y);',
-        '  vec3 cc = mix(vec3(1.0, 0.86, 0.72), vec3(1.0, 0.97, 0.9), smoothstep(0.1, 0.7, fbm(p * 3.1)));',
-        '  col = mix(col, cc, c * 0.6);',
+        '  vec3 cc = mix(uCloudA, uCloudB, smoothstep(0.1, 0.7, fbm(p * 3.1)));',
+        '  col = mix(col, cc, c * uCloudK);',
         '  col = mix(col, uHorizon, (1.0 - smoothstep(0.0, 0.085, y)) * 0.8);',
         '  gl_FragColor = vec4(pow(col, vec3(2.2)), 1.0);',
         '  #include <encodings_fragment>',
@@ -374,7 +375,12 @@
             uZenith: { value: new T.Color(o.zenith == null ? 0x86aecc : o.zenith) },
             uMid: { value: new T.Color(o.mid == null ? 0xe6d4b6 : o.mid) },
             uHorizon: { value: new T.Color(o.horizon == null ? 0xe8cfa8 : o.horizon) },
-            uGlow: { value: new T.Color(o.glow == null ? 0xffd9a0 : o.glow) }
+            uGlow: { value: new T.Color(o.glow == null ? 0xffd9a0 : o.glow) },
+            // night skies dim the clouds and cool the disc (defaults are the day look, unchanged)
+            uCloudA: { value: o.cloudA == null ? new T.Color(1.0, 0.86, 0.72) : new T.Color(o.cloudA) },
+            uCloudB: { value: o.cloudB == null ? new T.Color(1.0, 0.97, 0.9) : new T.Color(o.cloudB) },
+            uCloudK: { value: o.cloudK == null ? 0.6 : o.cloudK },
+            uDisc: { value: o.disc == null ? new T.Color(1.0, 0.97, 0.88) : new T.Color(o.disc) }
           },
           vertexShader: SKY_VERT,
           fragmentShader: SKY_FRAG
@@ -931,9 +937,528 @@
         };
       }
 
+
+      // =====================================================================
+      // Second shelf: people, fire, cloth, cliffs, light and a camera you can move.
+      // Used first by "At the Gates of Tower II"; any walk or scene can ask for them.
+      // =====================================================================
+
+      // A lathe with a fold function: fold(theta, t) -> { r: radius factor, y: height offset }. For robes, urns, skirts.
+      function foldedLathe(profile, segs, fold) {
+        var pos = [], uv = [], idx = [], n = profile.length;
+        for (var i = 0; i < n; i++) {
+          for (var j = 0; j <= segs; j++) {
+            var th = j / segs * Math.PI * 2, t = i / (n - 1), f = fold ? fold(th, t) : { r: 1, y: 0 };
+            var r = profile[i][0] * f.r;
+            pos.push(Math.sin(th) * r, profile[i][1] + (f.y || 0), Math.cos(th) * r);
+            uv.push(j / segs, t);
+          }
+        }
+        for (var a = 0; a < n - 1; a++) {
+          for (var b = 0; b < segs; b++) {
+            var i0 = a * (segs + 1) + b, i1 = i0 + segs + 1;
+            idx.push(i0, i1, i0 + 1, i1, i1 + 1, i0 + 1);
+          }
+        }
+        var g = new T.BufferGeometry();
+        g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+        g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+        g.setIndex(idx);
+        g.computeVertexNormals();
+        return g;
+      }
+
+      // Cloth of a robe: pleats down its length, a stitched hem band, fine weave. u around, v along (0 at the hem).
+      tex.robe = function (base, trim, seed) {
+        var key = 'robe' + base + '_' + trim + '_' + (seed || 1);
+        if (cache[key]) return cache[key];
+        var c = document.createElement('canvas');
+        c.width = 512; c.height = 512;
+        var g = c.getContext('2d'), r = rng(seed || 1), B = hex(base), D = hex(trim);
+        var gr = g.createLinearGradient(0, 512, 0, 0);
+        gr.addColorStop(0, 'rgb(' + Math.floor(B[0] * 0.7) + ',' + Math.floor(B[1] * 0.7) + ',' + Math.floor(B[2] * 0.7) + ')');
+        gr.addColorStop(1, 'rgb(' + B.join(',') + ')');
+        g.fillStyle = gr; g.fillRect(0, 0, 512, 512);
+        for (var x = 0; x < 512; x += 16) {
+          g.fillStyle = ((x / 16) % 2) ? 'rgba(0,0,0,0.13)' : 'rgba(255,230,200,0.07)';
+          g.fillRect(x, 0, 8, 512);
+        }
+        for (var i = 0; i < 1400; i++) {
+          g.fillStyle = r() < 0.5 ? 'rgba(255,235,210,0.06)' : 'rgba(0,0,0,0.08)';
+          g.fillRect(r() * 512, r() * 512, 1 + r() * 2, 6 + r() * 20);
+        }
+        // hem band (near v = 0, which is the bottom of the canvas)
+        g.fillStyle = 'rgb(' + D.join(',') + ')'; g.fillRect(0, 462, 512, 34);
+        g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(0, 462, 512, 3); g.fillRect(0, 493, 512, 3);
+        g.fillStyle = 'rgba(255,240,190,0.7)';
+        for (var k = 0; k < 512; k += 32) {
+          g.beginPath(); g.moveTo(k, 479); g.lineTo(k + 8, 470); g.lineTo(k + 16, 479); g.lineTo(k + 8, 488); g.closePath(); g.fill();
+        }
+        // a little worn at the very hem
+        var wear = g.createLinearGradient(0, 512, 0, 440);
+        wear.addColorStop(0, 'rgba(120,80,40,0.45)'); wear.addColorStop(1, 'rgba(120,80,40,0)');
+        g.fillStyle = wear; g.fillRect(0, 440, 512, 72);
+        var t = new T.CanvasTexture(c);
+        t.wrapS = T.RepeatWrapping; t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+        cache[key] = t;
+        return t;
+      };
+
+      // Strands of white hair, for beards and brows
+      tex.hair = function (tone) {
+        var key = 'hair' + (tone || 'w');
+        if (cache[key]) return cache[key];
+        var c = document.createElement('canvas');
+        c.width = c.height = 256;
+        var g = c.getContext('2d'), r = rng(5);
+        g.fillStyle = tone === 'grey' ? '#cfcdc6' : '#efede8'; g.fillRect(0, 0, 256, 256);
+        for (var i = 0; i < 640; i++) {
+          var x = r() * 256, y = r() * 256, l = 24 + r() * 70;
+          g.strokeStyle = r() < 0.5 ? 'rgba(140,146,160,0.38)' : 'rgba(255,255,255,0.75)';
+          g.lineWidth = 1 + r() * 1.6;
+          g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + (r() - 0.5) * 10, y + l / 2, x + (r() - 0.5) * 14, y + l); g.stroke();
+        }
+        var t = new T.CanvasTexture(c);
+        t.wrapS = t.wrapT = T.RepeatWrapping; t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+        cache[key] = t;
+        return t;
+      };
+
+      // The Order's sign: a disc half in light, half in shade
+      tex.eclipse = function (light, dark) {
+        var key = 'ecl' + light + '_' + dark;
+        if (cache[key]) return cache[key];
+        var c = document.createElement('canvas');
+        c.width = c.height = 256;
+        var g = c.getContext('2d'), L = hex(light), D = hex(dark);
+        g.fillStyle = 'rgb(' + D.join(',') + ')'; g.beginPath(); g.arc(128, 128, 122, 0, Math.PI * 2); g.fill();
+        var gl = g.createRadialGradient(100, 100, 10, 128, 128, 122);
+        gl.addColorStop(0, 'rgb(' + Math.min(255, L[0] + 40) + ',' + Math.min(255, L[1] + 40) + ',' + Math.min(255, L[2] + 30) + ')');
+        gl.addColorStop(1, 'rgb(' + L.join(',') + ')');
+        g.fillStyle = gl; g.beginPath(); g.arc(128, 128, 122, Math.PI / 2, Math.PI * 1.5); g.closePath(); g.fill();
+        g.strokeStyle = 'rgba(40,24,8,0.8)'; g.lineWidth = 8; g.beginPath(); g.arc(128, 128, 118, 0, Math.PI * 2); g.stroke();
+        g.strokeStyle = 'rgba(255,236,170,0.65)'; g.lineWidth = 3; g.beginPath(); g.arc(128, 128, 104, 0, Math.PI * 2); g.stroke();
+        var t = new T.CanvasTexture(c);
+        t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+        cache[key] = t;
+        return t;
+      };
+
+      tex.flame = function () {
+        if (cache.flame) return cache.flame;
+        var c = document.createElement('canvas');
+        c.width = 64; c.height = 128;
+        var g = c.getContext('2d');
+        var gr = g.createRadialGradient(32, 92, 2, 32, 82, 56);
+        gr.addColorStop(0, 'rgba(255,250,214,1)');
+        gr.addColorStop(0.28, 'rgba(255,196,84,0.95)');
+        gr.addColorStop(0.62, 'rgba(240,110,28,0.5)');
+        gr.addColorStop(1, 'rgba(180,50,10,0)');
+        g.fillStyle = gr;
+        g.beginPath(); g.moveTo(32, 2); g.bezierCurveTo(60, 60, 64, 96, 32, 126); g.bezierCurveTo(0, 96, 4, 60, 32, 2); g.fill();
+        cache.flame = new T.CanvasTexture(c);
+        return cache.flame;
+      };
+
+      // A person with a long beard, a hood, a heavy robe and a staff crowned by a star-sight.
+      // Faces -z (turn it with rotation.y). o: robe, trim, mantle (hex), stone (a statue in sandstone), scale.
+      function elder(paint, o) {
+        o = o || {};
+        var g = new T.Group(), stone = !!o.stone;
+        var soft = tex.soft();
+        var stoneMat = stone ? paint({ map: tex.strata(7), color: 0xe6c0a0, flatShading: false }, 0xffe0b8, 0.22) : null;
+        function M(opts, rc, rk) { return stone ? stoneMat : paint(opts, rc, rk); }
+        var robeMat = M({ map: tex.robe(o.robe == null ? 0x5a2e1c : o.robe, o.trim == null ? 0xd4a345 : o.trim, 3), side: T.DoubleSide }, 0xffb878, 0.3);
+        var mantleMat = M({ color: o.mantle == null ? 0x2e1a10 : o.mantle, side: T.DoubleSide }, 0xffb878, 0.28);
+        var skin = M({ color: 0xb4805c }, 0xffc890, 0.3);
+        var hairM = M({ map: tex.hair(), color: 0xffffff }, 0xffffff, 0.35);
+        var brass = M({ color: 0xd9aa4a, emissive: 0x3a2404 }, 0xfff0b0, 0.6);
+        var iron = M({ color: 0x34322f }, 0xffb878, 0.3);
+        var leather = M({ color: 0x5a3418 }, 0xffc890, 0.25);
+        var ink = new T.MeshBasicMaterial({ color: 0x1c120c });
+
+        function put(mesh, x, y, z, parent) { mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; (parent || g).add(mesh); return mesh; }
+        function ell(geo, mat, sx, sy, sz) { var m = new T.Mesh(geo, mat); m.scale.set(sx, sy, sz); return m; }
+        function limb(a, b, rTop, rBot, mat) {
+          var A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b[0], b[1], b[2]);
+          var len = A.distanceTo(B), m = new T.Mesh(new T.CylinderGeometry(rTop, rBot, len, 14, 1, true), mat);
+          m.position.copy(A.clone().add(B).multiplyScalar(0.5));
+          m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), A.clone().sub(B).normalize());
+          m.castShadow = true; g.add(m);
+          return m;
+        }
+
+        // robe: pleats all round and a scalloped hem
+        var pleat = function (th, t) { return { r: 1 + 0.05 * Math.sin(th * 10 + t * 2) * (1 - t * 0.6) + 0.02 * Math.sin(th * 5 + 1), y: t < 0.05 ? 0.03 * Math.sin(th * 10) : 0 }; };
+        var robeProf = [[0.54, 0.02], [0.5, 0.2], [0.43, 0.45], [0.37, 0.75], [0.31, 1.05], [0.28, 1.28], [0.3, 1.42], [0.23, 1.52], [0.13, 1.58], [0.1, 1.62]];
+        put(new T.Mesh(foldedLathe(robeProf, 64, pleat), robeMat), 0, 0, 0);
+        // mantle over the shoulders with a heavy fall behind
+        var mfold = function (th, t) { return { r: 1 + 0.035 * Math.sin(th * 8), y: t > 0.8 ? -0.04 * (0.5 + 0.5 * Math.cos(th * 12)) : 0 }; };
+        put(new T.Mesh(foldedLathe([[0.14, 1.6], [0.24, 1.58], [0.33, 1.5], [0.385, 1.4], [0.4, 1.31]], 56, mfold), mantleMat), 0, 0, 0);
+        var trim = put(new T.Mesh(new T.TorusGeometry(0.4, 0.012, 8, 56), brass), 0, 1.31, 0);
+        trim.rotation.x = Math.PI / 2;
+        // belt, buckle, pouch and a ring of keys
+        var belt = put(new T.Mesh(new T.TorusGeometry(0.31, 0.035, 10, 48), leather), 0, 0.98, 0);
+        belt.rotation.x = Math.PI / 2;
+        put(new T.Mesh(new T.BoxGeometry(0.09, 0.08, 0.03), brass), 0, 0.98, -0.318);
+        put(new T.Mesh(new T.BoxGeometry(0.14, 0.15, 0.08), leather), 0.26, 0.9, -0.2);
+        var ring = put(new T.Mesh(new T.TorusGeometry(0.05, 0.007, 6, 16), brass), -0.2, 0.84, -0.26);
+        for (var k = 0; k < 3; k++) {
+          var key = put(new T.Mesh(new T.CylinderGeometry(0.006, 0.006, 0.09 + k * 0.015, 5), brass), -0.2 + (k - 1) * 0.012, 0.77 - k * 0.012, -0.265);
+          key.rotation.z = (k - 1) * 0.15;
+        }
+        // the Order's medallion on a chain
+        var chain = put(new T.Mesh(new T.TorusGeometry(0.2, 0.006, 6, 36, Math.PI), brass), 0, 1.5, -0.04);
+        chain.rotation.set(Math.PI / 2 + 0.55, 0, Math.PI);
+        var medal = put(new T.Mesh(new T.CircleGeometry(0.06, 24), stone ? stoneMat : new T.MeshBasicMaterial({ map: tex.eclipse(0xf2c25a, 0x2a1810) })), 0, 1.24, -0.285);
+        medal.rotation.y = Math.PI;
+
+        // hood lying round the head, open at the front
+        var hoodMat = mantleMat;
+        var hood = put(ell(new T.SphereGeometry(0.205, 30, 20, Math.PI * 1.5 + 0.75, Math.PI * 2 - 1.5, 0, 2.5), hoodMat, 1.28, 1.4, 1.34), 0, 1.72, 0.03);
+        hood.rotation.x = -0.1;
+        var hoodTail = put(new T.Mesh(new T.ConeGeometry(0.1, 0.34, 14), mantleMat), 0, 1.4, 0.2);
+        hoodTail.rotation.x = 0.18;
+
+        // head: a long weathered face, deep-set eyes under heavy white brows, a big moustache, a long beard
+        var head = new T.Group();
+        head.position.set(0, 1.72, 0);
+        head.scale.setScalar(1.28);
+        g.add(head);
+        function hput(mesh, x, y, z) { mesh.position.set(x, y, z); mesh.castShadow = true; head.add(mesh); return mesh; }
+        hput(ell(new T.SphereGeometry(0.14, 28, 20), skin, 0.9, 1.12, 0.96), 0, 0, 0);
+        hput(ell(new T.SphereGeometry(0.032, 12, 10), skin, 0.95, 1.5, 1.2), 0, -0.01, -0.14);
+        hput(ell(new T.SphereGeometry(0.02, 10, 8), skin, 1.3, 1, 1), 0, -0.046, -0.153);
+        [-1, 1].forEach(function (sd) {
+          if (!stone) {
+            hput(ell(new T.SphereGeometry(0.022, 12, 10), new T.MeshBasicMaterial({ color: 0xe9dfce }), 1.2, 0.7, 0.5), sd * 0.05, 0.022, -0.125);
+            hput(new T.Mesh(new T.SphereGeometry(0.0105, 10, 8), ink), sd * 0.05, 0.02, -0.132);
+          }
+          var lid = hput(ell(new T.SphereGeometry(0.03, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, 1.2, 0.7, 0.6), sd * 0.05, 0.03, -0.122);
+          lid.rotation.x = 0.1;
+          var brow = hput(ell(new T.CapsuleGeometry(0.014, 0.06, 4, 8), hairM, 1, 1, 1.1), sd * 0.054, 0.064, -0.128);
+          brow.rotation.z = Math.PI / 2 + sd * 0.28;
+          hput(ell(new T.SphereGeometry(0.03, 12, 10), skin, 1.2, 0.7, 0.5), sd * 0.085, -0.03, -0.1);
+          hput(ell(new T.SphereGeometry(0.028, 10, 8), skin, 0.6, 1.3, 0.8), sd * 0.126, 0.0, 0.0);
+        });
+        [-1, 1].forEach(function (sd) {
+          var m = hput(ell(new T.SphereGeometry(0.036, 14, 10), hairM, 1.7, 0.75, 0.9), sd * 0.034, -0.062, -0.14);
+          m.rotation.z = sd * -0.4;
+          var lock = hput(ell(new T.SphereGeometry(0.06, 12, 10), hairM, 0.8, 1.8, 1), sd * 0.105, -0.07, 0.04);
+          lock.rotation.z = sd * 0.22;
+        });
+        // the beard hangs over the mantle in layered tufts, so it shows in front of the cloth
+        [[0, 1.4, -0.245, 0.125, 0.5, 0], [-0.06, 1.44, -0.23, 0.085, 0.4, 0.22], [0.06, 1.44, -0.23, 0.085, 0.4, -0.22], [0, 1.22, -0.285, 0.09, 0.36, 0], [-0.04, 1.26, -0.27, 0.06, 0.3, 0.16], [0.04, 1.26, -0.27, 0.06, 0.3, -0.16]].forEach(function (tf) {
+          var c = put(new T.Mesh(new T.ConeGeometry(tf[3], tf[4], 16), hairM), tf[0], tf[1], tf[2]);
+          c.rotation.set(Math.PI + 0.22, 0, tf[5]);
+        });
+        put(ell(new T.SphereGeometry(0.1, 16, 12), hairM, 1.15, 0.8, 0.8), 0, 1.52, -0.2);
+
+        // arms: wide sleeves; the right hand grips the staff, the left rests on the belt
+        var cuffAt = function (pt, from) {
+          var c = new T.Mesh(new T.TorusGeometry(0.138, 0.013, 8, 24), brass);
+          c.position.set(pt[0], pt[1], pt[2]);
+          c.quaternion.setFromUnitVectors(new T.Vector3(0, 0, 1), new T.Vector3(pt[0] - from[0], pt[1] - from[1], pt[2] - from[2]).normalize());
+          g.add(c);
+        };
+        var shR = [0.3, 1.46, 0.0], wrR = [0.38, 1.12, -0.4], shL = [-0.3, 1.46, 0.0], wrL = [-0.26, 0.96, -0.34];
+        limb(shR, wrR, 0.085, 0.135, robeMat); limb(shL, wrL, 0.085, 0.135, robeMat);
+        cuffAt(wrR, shR); cuffAt(wrL, shL);
+        [shR, shL].forEach(function (s) { put(new T.Mesh(new T.SphereGeometry(0.085, 14, 10), robeMat), s[0], s[1], s[2]); });
+        function hand(pos, grip) {
+          var h = new T.Group();
+          h.position.set(pos[0], pos[1] - 0.06, pos[2]);
+          g.add(h);
+          var palm = new T.Mesh(new T.SphereGeometry(0.052, 14, 10), skin);
+          palm.scale.set(1, 0.9, 0.8); palm.castShadow = true; h.add(palm);
+          for (var f = 0; f < 4; f++) {
+            var fin = new T.Mesh(new T.CapsuleGeometry(0.0125, 0.05, 3, 6), skin);
+            fin.position.set(-0.03 + f * 0.02, -0.03, grip ? -0.04 : -0.02); fin.rotation.x = grip ? 1.2 : 0.5; fin.castShadow = true; h.add(fin);
+          }
+          var th = new T.Mesh(new T.CapsuleGeometry(0.014, 0.04, 3, 6), skin);
+          th.position.set(0.04, -0.01, -0.03); th.rotation.z = 0.9; h.add(th);
+          return h;
+        }
+        hand(wrR, true); hand(wrL, false);
+
+        // the staff: dark iron, rings, a star-sight crowned with eight points and a warm jewel
+        var staff = new T.Group();
+        staff.position.set(0.38, 0, -0.4);
+        g.add(staff);
+        var pole = new T.Mesh(new T.CylinderGeometry(0.022, 0.03, 2.5, 12), iron);
+        pole.position.y = 1.15; pole.castShadow = true; staff.add(pole);
+        [0.5, 1.2, 1.9].forEach(function (y) {
+          var rg = new T.Mesh(new T.TorusGeometry(0.03, 0.008, 6, 14), brass);
+          rg.rotation.x = Math.PI / 2; rg.position.y = y; staff.add(rg);
+        });
+        var foot = new T.Mesh(new T.ConeGeometry(0.03, 0.12, 10), iron);
+        foot.position.y = -0.14; foot.rotation.x = Math.PI; staff.add(foot);
+        var sight = new T.Group();
+        sight.position.y = 2.55;
+        staff.add(sight);
+        var sRing = new T.Mesh(new T.TorusGeometry(0.15, 0.018, 10, 36), brass); sRing.castShadow = true; sight.add(sRing);
+        var sIn = new T.Mesh(new T.TorusGeometry(0.095, 0.01, 8, 28), brass); sight.add(sIn);
+        for (var a = 0; a < 8; a++) {
+          var ang = a * Math.PI / 4, spike = new T.Mesh(new T.ConeGeometry(0.014, a % 2 ? 0.07 : 0.12, 6), brass);
+          spike.position.set(Math.cos(ang) * 0.2, Math.sin(ang) * 0.2, 0);
+          spike.rotation.z = ang - Math.PI / 2;
+          sight.add(spike);
+        }
+        [0, Math.PI / 2].forEach(function (rz) {
+          var cross = new T.Mesh(new T.CylinderGeometry(0.005, 0.005, 0.3, 5), brass);
+          cross.rotation.z = rz; sight.add(cross);
+        });
+        var jewel = new T.Mesh(new T.SphereGeometry(0.03, 14, 10), new T.MeshBasicMaterial({ color: 0xffd890, toneMapped: false }));
+        sight.add(jewel);
+        var halo = new T.Sprite(new T.SpriteMaterial({ map: soft, color: 0xffb860, transparent: true, opacity: 0.55, depthWrite: false, blending: T.AdditiveBlending }));
+        halo.scale.set(0.9, 0.9, 1);
+        sight.add(halo);
+        if (stone) { jewel.visible = false; halo.visible = false; }
+
+        g.scale.setScalar(o.scale || 1);
+        g.userData = {
+          head: head, staff: staff, sight: sight, halo: halo,
+          update: function (t) {
+            head.rotation.y = Math.sin(t * 0.4) * 0.07;
+            head.rotation.x = Math.sin(t * 0.3) * 0.02;
+            sight.rotation.z = t * 0.12;
+            halo.material.opacity = 0.45 + 0.15 * Math.sin(t * 2.3);
+            staff.rotation.z = Math.sin(t * 0.5) * 0.004;
+          }
+        };
+        return g;
+      }
+
+      // A bronze tripod brazier with a live fire (flame sprites and a flickering light)
+      function brazier(paint, o) {
+        o = o || {};
+        var g = new T.Group(), h = o.height || 1.5;
+        var bronze = paint({ color: 0x6a4a28, emissive: 0x1a0e04 }, 0xffb870, 0.5);
+        var bowlProf = [[0.001, 0], [0.12, 0.02], [0.3, 0.12], [0.38, 0.28], [0.4, 0.34], [0.36, 0.36]].map(function (q) { return new T.Vector2(q[0], q[1]); });
+        var bowl = new T.Mesh(new T.LatheGeometry(bowlProf, 24), bronze);
+        bowl.position.y = h; bowl.castShadow = true; g.add(bowl);
+        var rimT = new T.Mesh(new T.TorusGeometry(0.385, 0.025, 8, 28), bronze);
+        rimT.rotation.x = Math.PI / 2; rimT.position.y = h + 0.35; g.add(rimT);
+        for (var i = 0; i < 3; i++) {
+          var a = i * Math.PI * 2 / 3 + 0.4;
+          var leg = new T.Mesh(new T.CylinderGeometry(0.024, 0.036, h + 0.05, 8), bronze);
+          leg.position.set(Math.cos(a) * 0.2, (h + 0.05) / 2, Math.sin(a) * 0.2);
+          leg.rotation.set(Math.sin(a) * 0.14, 0, -Math.cos(a) * 0.14);
+          leg.castShadow = true; g.add(leg);
+        }
+        var ringMid = new T.Mesh(new T.TorusGeometry(0.15, 0.014, 6, 20), bronze);
+        ringMid.rotation.x = Math.PI / 2; ringMid.position.y = h * 0.45; g.add(ringMid);
+        var coals = new T.Mesh(new T.CircleGeometry(0.33, 18), new T.MeshBasicMaterial({ color: 0xff7a22, toneMapped: false }));
+        coals.rotation.x = -Math.PI / 2; coals.position.y = h + 0.3; g.add(coals);
+        var flames = [];
+        for (var f = 0; f < 4; f++) {
+          var sp = new T.Sprite(new T.SpriteMaterial({ map: tex.flame(), color: 0xff9a48, opacity: 0.85, transparent: true, depthWrite: false, blending: T.AdditiveBlending, fog: false }));
+          sp.position.set((f - 1.5) * 0.09, h + 0.62, (f % 2 - 0.5) * 0.12);
+          sp.scale.set(0.46, 0.8, 1);
+          sp.userData = { ph: f * 1.7, base: sp.position.y };
+          g.add(sp); flames.push(sp);
+        }
+        var glow = new T.Sprite(new T.SpriteMaterial({ map: tex.soft(), color: 0xff9a40, transparent: true, opacity: 0.5, depthWrite: false, blending: T.AdditiveBlending, fog: false }));
+        glow.position.y = h + 0.7; glow.scale.set(2.6, 2.6, 1);
+        g.add(glow);
+        var light = new T.PointLight(0xff9040, o.intensity == null ? 1.7 : o.intensity, o.range || 11, 1.6);
+        light.position.y = h + 0.8;
+        g.add(light);
+        // lvl: how high the fire burns (1 = normal, 0.35 = nearly out, above 1 = a roaring flare)
+        g.userData.update = function (t, ph, lvl) {
+          var k = (ph || 0), L = lvl == null ? 1 : lvl, sz = 0.4 + 0.6 * Math.min(L, 1.6);
+          flames.forEach(function (sp) {
+            var u = sp.userData, w = 0.5 + 0.5 * Math.sin(t * 9 + u.ph + k);
+            sp.scale.set((0.4 + 0.12 * w) * sz, (0.72 + 0.28 * Math.sin(t * 7 + u.ph * 2 + k)) * sz * (0.8 + 0.2 * L), 1);
+            sp.position.y = u.base + 0.05 * Math.sin(t * 6 + u.ph);
+            sp.material.opacity = 0.85 * Math.min(1, 0.45 + 0.55 * L);
+          });
+          light.intensity = (o.intensity == null ? 1.7 : o.intensity) * L * (0.85 + 0.15 * Math.sin(t * 11 + k) + 0.08 * Math.sin(t * 23 + k * 2));
+          glow.material.opacity = (0.42 + 0.1 * Math.sin(t * 8 + k)) * Math.min(1.5, L);
+          glow.scale.setScalar(1.3 + 1.3 * Math.min(L, 1.6));
+        };
+        return g;
+      }
+
+      // A hanging banner of heavy cloth with the Order's sign; it breathes in the wind
+      function banner(paint, o) {
+        o = o || {};
+        var w = o.width || 0.9, h = o.height || 2.6, g = new T.Group();
+        var cloth = tex.cloth(o.color == null ? 0x8e2f26 : o.color, o.color2 == null ? 0x6e2018 : o.color2, 2, 8);
+        var geo = new T.PlaneGeometry(w, h, 8, 16);
+        var mat = paint({ map: cloth, side: T.DoubleSide }, 0xffb080, 0.14);
+        var mesh = new T.Mesh(geo, mat);
+        mesh.position.y = -h / 2;
+        mesh.castShadow = true;
+        g.add(mesh);
+        var emb = new T.Mesh(new T.CircleGeometry(w * 0.3, 28), new T.MeshBasicMaterial({ map: tex.eclipse(0xf2c25a, 0x241410), transparent: true, side: T.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 }));
+        emb.position.set(0, -h * 0.4, 0.012);
+        g.add(emb);
+        var pole = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, w + 0.3, 10), paint({ color: 0x5a3a1c }, 0xffd0a0, 0.2));
+        pole.rotation.z = Math.PI / 2; g.add(pole);
+        [-1, 1].forEach(function (sd) { var cap = new T.Mesh(new T.SphereGeometry(0.05, 10, 8), paint({ color: 0xd9aa4a }, 0xfff0b0, 0.5)); cap.position.x = sd * (w / 2 + 0.15); g.add(cap); });
+        var tail = new T.Mesh(new T.ConeGeometry(w / 2, 0.3, 4), paint({ map: cloth, side: T.DoubleSide }));
+        tail.rotation.z = Math.PI; tail.position.y = -h - 0.1; tail.scale.set(1, 1, 0.05);
+        g.add(tail);
+        var base = geo.attributes.position.array.slice();
+        g.userData.update = function (t, ph) {
+          var p = geo.attributes.position;
+          for (var i = 0; i < p.count; i++) {
+            var y = base[i * 3 + 1], depth = (h / 2 - y) / h;
+            p.setZ(i, Math.sin(t * 1.6 + depth * 4 + (ph || 0)) * 0.07 * depth + Math.sin(base[i * 3] * 5 + t) * 0.015 * depth);
+          }
+          p.needsUpdate = true;
+          geo.computeVertexNormals();
+          tail.rotation.x = Math.sin(t * 1.6 + 4 + (ph || 0)) * 0.1;
+        };
+        return g;
+      }
+
+      // A full cliff wall for a backdrop: ragged mesa top, ledges that step back, strata, crevices.
+      // Flat in the middle (|x| < flat) so a built front can stand against it.
+      function cliffWall(paint, o) {
+        o = o || {};
+        var W = o.width || 90, H = o.height || 30, seed = o.seed || 13, cols = o.cols || 170, rows = o.rows || 64;
+        var zBase = o.z == null ? -1.5 : o.z, flat = o.flat || 6, curve = o.curve == null ? 0.011 : o.curve;
+        var topAt = function (x) {
+          var n = fbm(x * 0.05 + seed, 0.5, seed, 4, 0, 0) * 4.2;
+          var q = Math.floor(n) + smooth(0.3, 0.7, n - Math.floor(n));
+          var top = Math.max(o.minTop || 15, H * (0.5 + 0.5 * q / 4.2));
+          if (o.dip) top = lerp(o.dip.h, top, smooth(o.dip.x * 0.35, o.dip.x, Math.abs(x)));
+          return top;
+        };
+        var pos = [], uv = [], colr = [], idx = [];
+        for (var i = 0; i <= cols; i++) {
+          var x = -W / 2 + W * i / cols, top = topAt(x), k = smooth(flat, flat + 7, Math.abs(x));
+          for (var j = 0; j <= rows; j++) {
+            var v = j / rows, y = top * v;
+            var d = fbm(x * 0.13, y * 0.13, seed + 3, 4, 0, 0) * 2.4 + fbm(x * 0.5, y * 0.09, seed + 9, 3, 0, 0) * 0.7;
+            var ledge = (Math.floor(y / 3.1) + smooth(0.72, 1, (y / 3.1) % 1)) * 0.5;
+            var z = zBase - curve * x * x - (d * 0.9 + ledge) * k - 0.12 * d * (1 - k);
+            pos.push(x, y, z);
+            uv.push(x / 9, y / 9);
+            var band = 0.8 + 0.2 * Math.sin(y * 1.9 + fbm(x * 0.2, y * 0.2, seed + 5, 3, 0, 0) * 5);
+            var ao = clamp(0.78 + d * 0.2 + (1 - k) * 0.1 - (y > top * 0.93 ? 0.12 : 0), 0.5, 1.15);
+            var cc = clamp(band * ao, 0.5, 1.12);
+            colr.push(cc, cc * 0.96, cc * 0.92);
+          }
+        }
+        for (var a = 0; a < cols; a++) {
+          for (var b = 0; b < rows; b++) {
+            var i0 = a * (rows + 1) + b, i1 = (a + 1) * (rows + 1) + b;
+            idx.push(i0, i0 + 1, i1, i1, i0 + 1, i1 + 1);
+          }
+        }
+        var geo = new T.BufferGeometry();
+        geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+        geo.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+        geo.setAttribute('color', new T.Float32BufferAttribute(colr, 3));
+        geo.setIndex(idx);
+        geo.computeVertexNormals();
+        var st = tex.strata(o.strataSeed || 7);
+        st.repeat.set(1, 1);
+        var mesh = new T.Mesh(geo, paint({ map: st, vertexColors: true, color: o.tint == null ? 0xffffff : o.tint, side: T.DoubleSide }, o.rim == null ? 0xffc890 : o.rim, 0.22));
+        mesh.receiveShadow = true;
+        mesh.castShadow = false;
+        return mesh;
+      }
+
+      // Slanting shafts of low sun, soft and additive
+      function beams(scene, o) {
+        o = o || {};
+        var c = document.createElement('canvas');
+        c.width = 64; c.height = 256;
+        var g = c.getContext('2d'), im = g.createImageData(64, 256), d = im.data;
+        for (var y = 0; y < 256; y++) {
+          for (var x = 0; x < 64; x++) {
+            var u = Math.abs(x / 63 - 0.5) * 2, a = Math.pow(1 - u, 2) * smooth(0, 0.18, y / 255) * (1 - smooth(0.6, 1, y / 255));
+            var q = (y * 64 + x) * 4;
+            d[q] = 255; d[q + 1] = 214; d[q + 2] = 150; d[q + 3] = a * 255;
+          }
+        }
+        g.putImageData(im, 0, 0);
+        var tx = new T.CanvasTexture(c);
+        var out = [], n = o.count || 4, r = rng(o.seed || 9);
+        for (var i = 0; i < n; i++) {
+          var m = new T.Mesh(new T.PlaneGeometry(1.4 + r() * 1.6, 26), new T.MeshBasicMaterial({ map: tx, transparent: true, opacity: o.opacity == null ? 0.16 : o.opacity, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide, fog: false }));
+          m.position.set((o.x0 == null ? -9 : o.x0) + i * (o.dx || 4.2) + r() * 1.5, (o.y == null ? 6 : o.y), (o.z == null ? 2 : o.z) - r() * 2);
+          m.rotation.z = o.tilt == null ? -0.62 : o.tilt;
+          m.rotation.y = 0.25;
+          m.userData = { ph: r() * 6, base: m.material.opacity };
+          scene.add(m);
+          out.push(m);
+        }
+        return { meshes: out, update: function (t) { out.forEach(function (m) { m.material.opacity = m.userData.base * (0.75 + 0.25 * Math.sin(t * 0.45 + m.userData.ph)); }); } };
+      }
+
+      // Move the camera round a target: drag to turn and tilt, wheel or pinch to zoom, double-tap to reset.
+      // Touch and pen work the same. Returns { update(dt), setTarget(x, y, z), reset(), state }.
+      function orbit(canvas, camera, o) {
+        o = o || {};
+        var cfg = {
+          dist: o.dist || 10, pitch: o.pitch == null ? 0.14 : o.pitch, yaw: o.yaw || 0,
+          minDist: o.minDist || 3.5, maxDist: o.maxDist || 17, minPitch: o.minPitch == null ? -0.04 : o.minPitch, maxPitch: o.maxPitch == null ? 1.0 : o.maxPitch,
+          yawLimit: o.yawLimit == null ? Math.PI : o.yawLimit, groundY: o.groundY == null ? 0.35 : o.groundY
+        };
+        var tgt = new T.Vector3(o.x || 0, o.y || 2, o.z || 0), cur = tgt.clone();
+        var st = { yaw: cfg.yaw, pitch: cfg.pitch, dist: cfg.dist, tYaw: cfg.yaw, tPitch: cfg.pitch, tDist: cfg.dist, idle: 0 };
+        var ptrs = {}, pinch = 0, lx = 0, ly = 0;
+        canvas.style.touchAction = 'none';
+        canvas.style.cursor = 'grab';
+        function count() { return Object.keys(ptrs).length; }
+        function span() { var k = Object.keys(ptrs); if (k.length < 2) return 0; var a = ptrs[k[0]], b = ptrs[k[1]]; return Math.hypot(a.x - b.x, a.y - b.y); }
+        canvas.addEventListener('pointerdown', function (e) {
+          ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+          lx = e.clientX; ly = e.clientY; pinch = span(); st.idle = 0;
+          canvas.style.cursor = 'grabbing';
+          try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+        });
+        canvas.addEventListener('pointermove', function (e) {
+          if (!ptrs[e.pointerId]) return;
+          ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+          st.idle = 0;
+          if (count() >= 2) {
+            var sp = span();
+            if (pinch > 0 && sp > 0) st.tDist = clamp(st.tDist * pinch / sp, cfg.minDist, cfg.maxDist);
+            pinch = sp;
+            return;
+          }
+          st.tYaw = clamp(st.tYaw - (e.clientX - lx) * 0.006, -cfg.yawLimit, cfg.yawLimit);
+          st.tPitch = clamp(st.tPitch + (e.clientY - ly) * 0.004, cfg.minPitch, cfg.maxPitch);
+          lx = e.clientX; ly = e.clientY;
+        });
+        function up(e) { delete ptrs[e.pointerId]; pinch = span(); if (!count()) canvas.style.cursor = 'grab'; }
+        canvas.addEventListener('pointerup', up);
+        canvas.addEventListener('pointercancel', up);
+        canvas.addEventListener('wheel', function (e) {
+          e.preventDefault();
+          st.tDist = clamp(st.tDist * Math.exp(e.deltaY * 0.0012), cfg.minDist, cfg.maxDist);
+          st.idle = 0;
+        }, { passive: false });
+        canvas.addEventListener('dblclick', function () { st.tYaw = cfg.yaw; st.tPitch = cfg.pitch; st.tDist = cfg.dist; });
+        return {
+          state: st,
+          setTarget: function (x, y, z) { tgt.set(x, y, z); },
+          reset: function () { st.tYaw = cfg.yaw; st.tPitch = cfg.pitch; st.tDist = cfg.dist; },
+          update: function (dt, sway) {
+            var k = Math.min(1, dt * 7);
+            st.yaw += (st.tYaw - st.yaw) * k;
+            st.pitch += (st.tPitch - st.pitch) * k;
+            st.dist += (st.tDist - st.dist) * k;
+            cur.lerp(tgt, Math.min(1, dt * 2.2));
+            st.idle += dt;
+            var sw = sway ? Math.sin(performance.now() * 0.00035) * 0.012 : 0;
+            var y = st.yaw + sw, el = st.pitch;
+            var cx = cur.x + Math.sin(y) * st.dist * Math.cos(el), cz = cur.z + Math.cos(y) * st.dist * Math.cos(el), cy = cur.y + Math.sin(el) * st.dist;
+            camera.position.set(cx, Math.max(cy, cfg.groundY), cz);
+            camera.lookAt(cur);
+          }
+        };
+      }
+
       window.EclipseScenery = {
-        tex: tex, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
-        props: { palm: palm, awning: awning, amphora: amphora, crate: crate, sack: sack, firepit: firepit, column: column, rocks: rocks, tracks: tracks },
+        tex: tex, preTone: preTone, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
+        props: { brazier: brazier, banner: banner, palm: palm, awning: awning, amphora: amphora, crate: crate, sack: sack, firepit: firepit, column: column, rocks: rocks, tracks: tracks },
         paint: paintFor, shadowy: shadowy, noise: { vnoise: vnoise, fbm: fbm, hash2: hash2, rng: rng }
       };
     })();

@@ -666,6 +666,13 @@
         return typeof window.isSteleMarchOver === 'function' ? window.isSteleMarchOver() : false;
       }
       let returnFocusTo = null;
+      // The Servant's coin (Silvia caught his lie at the gates): he scratched the first line of the proverb on its rim
+      function coinNote() {
+        const f = window.GatesRoad ? window.GatesRoad.flags() : {};
+        if (!f.coin) return '';
+        if (hints && hints.grant) hints.grant('s18-proverb', 1);
+        return " I almost forgot: the coin the Servant gave me has letters on its rim. He told me to read the stele the way I read a coin: by the pairs.";
+      }
       function openSteleModal() {
         if (!canOpen()) {
           const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
@@ -686,7 +693,7 @@
         if (fireOpen() && !run) run = newRun();
         drawFloor();
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am inside. I came in by a side door the raiders never found: they are out by the wagons, waiting for the fire to do their work for them. The library of the atrium is burning, the roof is full of smoke, and in the middle of it all the stele stands untouched. The Servant is nowhere. Open the page “The Polybius Stele”, please: what does the stele say?");
+        else if (!isAwake()) say("Silvia, I am inside. I came in by a side door the raiders never found: they are out by the wagons, waiting for the fire to do their work for them. The library of the atrium is burning, the roof is full of smoke, and in the middle of it all the stele stands untouched. The Servant is nowhere. Open the page “The Polybius Stele”, please: what does the stele say?" + coinNote());
         else if (!fireOpen()) say("He is still under the floor, Silvia, waiting for us. Listen to him again whenever you need to, and read him with the page “The Polybius Stele”.");
         else say("The fire is still spreading. The hatch of the well is in the far corner. Guide me, one flagstone at a time.");
         renderTape(el.tape, heard, false);

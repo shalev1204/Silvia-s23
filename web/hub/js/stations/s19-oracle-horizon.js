@@ -408,6 +408,13 @@
         if (get('order_polybius_stele_completed') !== 'true' || !fiveSeals()) return false;
         return typeof window.isOracleStairOver === 'function' ? window.isOracleStairOver() : false;
       }
+      // The Servant's coin (a caught lie at the gates) has the half-lit disc on one face: the Oracle's sign. Hermes holds it up to the slab.
+      function coinNote() {
+        const f = window.GatesRoad ? window.GatesRoad.flags() : {};
+        if (!f.coin) return '';
+        if (hints && hints.grant) hints.grant('s19-sigil', 1);
+        return " The Servant's coin has the half-lit disc on one face, and the slab has the same disc over the sockets. The Servant's last word about it: “do not read a beacon where it stands”.";
+      }
       let returnFocusTo = null;
       function openOracleModal() {
         if (!canOpen()) {
@@ -422,12 +429,17 @@
           else toast('Hermes is waiting for dawn by the inner stair. Open the Cliffside Workshop: he will wire you before he goes down.');
           return;
         }
+        // With five seals home, the bronze doors of the gates open first (once), and the welcome depends on the road taken
+        if (!isDone() && fiveSeals() && window.GatesRoad && window.GatesRoad.needsReturn() && typeof window.openGatesTowerIIModal === 'function') {
+          window.openGatesTowerIIModal({ mode: 'return', onDone: openOracleModal });
+          return;
+        }
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');
         returnFocusTo = document.activeElement;
         if (isDone()) { applyVictory(); say("She is grinding lapis by the altar, Silvia, and humming. Every now and then she looks up at me as if to check that I am still here. I am."); }
-        else if (!isAwake()) say("Silvia, I am at the bottom of the inner stair, with the Servant's key in my hand. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. The Servant says it opens only for the sigil of the Oracle. Open the page “The Oracle's Horizon”, please. I can hear someone humming behind it.");
+        else if (!isAwake()) say("Silvia, I am at the bottom of the inner stair, with the Servant's key in my hand. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. The Servant says it opens only for the sigil of the Oracle. Open the page “The Oracle's Horizon”, please. I can hear someone humming behind it." + coinNote());
         else if (!whenRead()) say("She is still holding the disc up for us, Silvia, patient as stone. Set the rings by the sky.");
         else say("She is waiting, Silvia, with her lips moving on words she cannot quite find. Give them back to her.");
         render();

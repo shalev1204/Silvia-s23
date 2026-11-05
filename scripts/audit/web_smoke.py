@@ -326,8 +326,19 @@ def test_sun_monolith(browser):
     check(not modal_open(), "monolith sealed during the crossing")
 
     js("localStorage.setItem('order_monolith_march_start', String(Date.now() - 13 * 3600 * 1000))")
-    js("window.openSunMonolithModal()"); page.wait_for_timeout(500)
-    check(modal_open() and "Sealed in stone" in js("document.getElementById('monolith-inscription').innerText"),
+    js("window.openSunMonolithModal()"); page.wait_for_timeout(900)
+    night_open = lambda: js("getComputedStyle(document.getElementById('modal-night-erg')).display") != "none"
+    check(night_open() and not modal_open(), "arrival: Hermes tells the night on the Erg before the stone")
+    for _ in range(80):   # the hurry only lasts the scene in flight, so ask for it on every look
+        if js("getComputedStyle(document.getElementById('night-finish-card')).display") != "none":
+            break
+        js("window.__nightErg.fast()")
+        js("(document.querySelector('#night-choices button')||{click(){}}).click()")
+        page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('night-finish-card')).display") != "none"
+          and "done" in (get("order_night_erg") or ""), "the night ends with a finish card and is saved")
+    js("document.getElementById('btn-night-finish').click()"); page.wait_for_timeout(900)
+    check(modal_open() and not night_open() and "Sealed in stone" in js("document.getElementById('monolith-inscription').innerText"),
           "after 12 h it opens, inscription still sealed")
     check(js("document.querySelector('#monolith-game .monolith-game-inner').inert") is True, "sun controls inert while the stone sleeps")
     for word in ["SUNDAY", "DIALSUN", "SUN DIAL X"]:
@@ -1058,8 +1069,19 @@ def test_oracle_horizon(browser):
     bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
     check(get("order_field_wire_step") == "30" and "DOWN THE INNER STAIR" in wire_text() and "Station 19 Awaits" in bar,
           "the answer sends Hermes down the stair: Station 19 awaits", bar)
-    js("window.openOracleModal()"); page.wait_for_timeout(500)
-    check(modal_open() and js("document.querySelector('#oracle-disc-game .monolith-game-inner').inert") is True
+    js("window.openOracleModal()"); page.wait_for_timeout(1500)
+    gates_open = lambda: js("getComputedStyle(document.getElementById('modal-gates-tower-ii')).display") != "none"
+    check(gates_open() and not modal_open(), "five seals home: the bronze doors open first, before the inner stair")
+    for _ in range(100):
+        if js("getComputedStyle(document.getElementById('gates-decree-card')).display") != "none":
+            break
+        js("window.__gates.fast()")
+        js("(document.querySelector('#gates-choices button')||{click(){}}).click()")
+        page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('gates-decree-card')).display") != "none"
+          and '"done":true' in (get("order_gates_return") or ""), "the welcome ends with the doors open, and is saved")
+    js("document.getElementById('btn-gates-depart').click()"); page.wait_for_timeout(800)
+    check(modal_open() and not gates_open() and js("document.querySelector('#oracle-disc-game .monolith-game-inner').inert") is True
           and js("document.querySelector('#oracle-vow-game .monolith-game-inner').inert") is True,
           "the chamber opens, the disc and the vow locked until the sigil")
     for word in ["OVERTURN", "OVERTUREE", "ORACLE"]:
@@ -1226,7 +1248,9 @@ def test_tester_play(browser):
         page.wait_for_load_state("load")
         page.wait_for_timeout(3200)
         st = page.evaluate(WORLD_JS)
-        opened = modals[gid] in st["open"] if gid in modals else bool(st["open"])
+        # Station 14 opens on the night on the Erg and Station 19 on the bronze doors: the game follows when they end
+        prelude = {"s14": "modal-night-erg", "s19": "modal-gates-tower-ii"}.get(gid)
+        opened = (modals[gid] in st["open"] or prelude in st["open"]) if gid in modals else bool(st["open"])
         clean = (gid in ("s20", "s21", "s22") or "gilded_star" not in st["relics"]) and (gid in ("s19", "s20", "s21", "s22") or "servant_key" not in st["relics"]) and (gid in ("s17", "s18", "s19", "s20", "s21", "s22") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
         check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
               f"seals {st['seals']}, open {st['open']}, relics {st['relics']}")
@@ -1692,7 +1716,7 @@ def test_ambience(browser):
     js("window.openOasisClepsydraModal()"); page.wait_for_timeout(1500)
     st = state()
     check(st["bed"] == "four wells" and st["running"] and not st["muted"], "the Four Wells play their own bed", str(st))
-    js("window.closeOasisClepsydraModal()"); page.wait_for_timeout(1500)
+    js("window.closeOasisVisions()"); page.wait_for_timeout(1500)
     js("window.openSaltPlayaModal()"); page.wait_for_timeout(1500)
     # (the Playa builds a rich 3D scene on the main thread: under software GL the bed's 600 ms poll can wait a few seconds)
     try: page.wait_for_function("EclipseAmbience.state().bed === 'salt flat'", timeout=9000)
@@ -1950,7 +1974,7 @@ def test_seals(browser):
 # ---- 27. Accessibility (#20) ----
 A11Y_MODALS = [("openWhisperingChasmModal", "modal-whispering-chasm"), ("openCairnOneModal", "modal-cairn-one"),
                ("openSaltPlayaModal", "modal-salt-playa"), ("openDesertLexiconModal", "modal-desert-lexicon"),
-               ("openOasisClepsydraModal", "modal-oasis-clepsydra"), ("openSunMonolithModal", "modal-sun-monolith"),
+               ("openOasisClepsydraModal", "modal-oasis-visions"), ("openSunMonolithModal", "modal-sun-monolith"),
                ("openLabyrinthModal", "modal-sandstone-labyrinth"), ("openCairnFourModal", "modal-cairn-four"),
                ("openSolsticeModal", "modal-solstice-arch"), ("openSteleModal", "modal-polybius-stele"),
                ("openOracleModal", "modal-oracle-horizon"), ("selectStageStation(40); void", "modal-masks-gate"), ("openCameraObscuraModal", "modal-camera-obscura"),
@@ -2924,8 +2948,17 @@ def test_veiled_stations(browser):
        f"localStorage.setItem('order_oasis_clepsydra_completed', 'true'); localStorage.setItem('order_monolith_march_start', String(Date.now() - {hour}))")
     js("window.selectMapNode(23, false)"); page.wait_for_timeout(300)
     c = card()
-    check(title() == "Station 14 · [ Sealed ]" and "Monolith" not in c and "Cairn II" not in c and bar_on(),
-          "Station 14 on the road: sealed, with its countdown", c[:240])
+    check(title() == "The Sun Monolith" and "Cairn II" not in c and "noon" not in c.lower() and "TIME LEFT" in c.upper() and bar_on(),
+          "Station 14 on the road: the place the gates already named, and the time left", c[:240])
+    js("localStorage.setItem('order_gates_scene_completed','true'); localStorage.setItem('order_gates_flags','{}')")
+    owned = js("window.syncLampOil(); JSON.parse(localStorage.getItem('order_inventory_relics')||'[]')")
+    check("lamp_oil" not in owned, "before Hermes tells her of the flask (step 7), it is not in the satchel", owned)
+    js("localStorage.setItem('order_field_wire_step','8')")
+    owned = js("window.syncLampOil(); JSON.parse(localStorage.getItem('order_inventory_relics')||'[]')")
+    check("lamp_oil" in owned, "once he has told her, Hermes carries his lamp oil", owned)
+    js("localStorage.setItem('order_gates_flags', '%s')" % json.dumps({"gaveOil": True}))
+    owned = js("window.syncLampOil(); JSON.parse(localStorage.getItem('order_inventory_relics')||'[]')")
+    check("lamp_oil" not in owned, "once the oil is spent, the flask leaves the satchel", owned)
     check(not errors, "no JS errors on the sealed cards", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
@@ -3960,8 +3993,9 @@ def test_clepsydra_visions(browser):
         page.wait_for_timeout(300)
     js("document.querySelector('#wire-choices-grid button').click()")
     page.wait_for_timeout(2500)
-    check(js("getComputedStyle(document.getElementById('modal-item-acquired')).display") == "none",
-          "answering Hermes does not open the item cards on its own")
+    check(js("getComputedStyle(document.getElementById('modal-item-acquired')).display") == "none"
+          or "lamp oil" in js("document.getElementById('iac-title').textContent").lower(),
+          "answering Hermes opens no item card on its own, except the Lamp Oil he hands over at step 7")
     js("window.__visions.open()")
     page.wait_for_timeout(600)
     titles = []

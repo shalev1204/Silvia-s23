@@ -372,7 +372,7 @@
   align-items: center;
   padding: 7px 8px;
   border-radius: 8px;
-  background: rgba(255, 248, 230, 0.55);
+  background: #fff6e4;
   border: 1px solid rgba(122, 74, 24, 0.35);
   font-family: 'Cinzel', Georgia, serif;
   font-size: 0.72rem;
@@ -390,8 +390,24 @@
   background: #fde68a;
   color: #7c2d12;
 }
-#modal-oasis-visions .chasm3d-reward.is-on .clep-line {
-  animation: chasm-rise 0.45s ease var(--t) both;
+/* The solved card is readable at once. The shared reward animations hold their text at opacity 0
+   for several seconds (fill-mode both), which fails contrast for anyone who looks, and for the audit. */
+#modal-oasis-visions .chasm3d-reward.is-on,
+#modal-oasis-visions .chasm3d-reward.is-on :not(.rw-rays):not(.rw-sparks):not(.rw-sparks *) {
+  animation: none;
+  opacity: 1;
+}
+#modal-oasis-visions .rw-map .rw-label,
+#modal-oasis-visions .rw-flawless { color: #4a2c12; }
+#modal-oasis-visions .rw-ledger .rw-ledger-kicker { color: #5c3412; }
+#modal-oasis-visions .rw-rays {
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
 }
 #modal-oasis-visions .clep-key {
   margin-top: 4px;

@@ -99,6 +99,19 @@
   // to the Sun Monolith. Segment 7 starts with exactly this sub-path, so its length marks the gates.
   var GATES_SUBPATH = 'M 1580 2420 C 1450 2440 1320 2360 1340 2260 C 1360 2160 1380 2060 1440 1960 C 1500 1860 1520 1760 1560 1660';
 
+  // The three roads across the Great Erg, drawn by the Operator on the map (gates -> Sun Monolith):
+  // fast = the dry channel under the red dune (9-10 h), mid = the steady road (11-12 h), long = round the storm wall (13-14 h).
+  var ERG_PATHS = {
+    fast: ' C 1559 1651 1556 1625 1554 1608 C 1553 1590 1551 1573 1549 1555 C 1547 1538 1545 1521 1543 1503 C 1542 1486 1541 1468 1538 1451 C 1535 1434 1532 1417 1528 1400 C 1524 1383 1515 1367 1512 1351 C 1509 1335 1505 1318 1507 1303 C 1510 1287 1517 1272 1526 1257 C 1534 1242 1546 1229 1557 1215 C 1567 1201 1579 1187 1589 1173 C 1599 1159 1610 1145 1618 1130 C 1626 1115 1634 1099 1639 1083 C 1643 1067 1646 1049 1645 1033 C 1645 1016 1642 998 1636 983 C 1631 967 1622 951 1613 937 C 1604 923 1591 910 1580 897 C 1569 884 1556 872 1547 857 C 1539 843 1532 827 1529 812 C 1527 796 1528 779 1531 762 C 1534 746 1543 730 1548 714 C 1554 699 1562 683 1563 669 C 1564 655 1560 641 1552 629 C 1545 617 1530 607 1517 597 C 1504 586 1489 577 1474 567 C 1459 558 1445 549 1429 541 C 1414 534 1397 529 1381 522 C 1366 516 1349 511 1335 502 C 1321 493 1308 482 1296 470 C 1284 458 1268 437 1262 430',
+    mid: ' C 1558 1651 1552 1626 1548 1609 C 1544 1592 1540 1575 1536 1558 C 1532 1541 1528 1524 1524 1507 C 1520 1490 1516 1473 1511 1456 C 1506 1439 1501 1423 1496 1406 C 1491 1390 1484 1373 1481 1356 C 1478 1340 1476 1323 1477 1306 C 1478 1289 1483 1272 1486 1255 C 1490 1238 1497 1221 1499 1204 C 1502 1188 1504 1170 1502 1155 C 1499 1139 1493 1123 1484 1111 C 1474 1100 1460 1090 1446 1083 C 1431 1077 1414 1074 1397 1072 C 1380 1070 1362 1071 1345 1071 C 1327 1071 1310 1073 1292 1072 C 1275 1071 1258 1070 1241 1066 C 1224 1062 1207 1057 1192 1049 C 1177 1042 1162 1032 1149 1021 C 1137 1010 1125 996 1116 981 C 1108 967 1100 951 1096 935 C 1091 918 1088 901 1088 884 C 1089 868 1092 850 1098 835 C 1104 820 1113 806 1125 794 C 1136 782 1151 772 1166 764 C 1180 756 1197 751 1214 746 C 1230 741 1248 739 1265 736 C 1282 734 1300 733 1317 731 C 1334 729 1352 727 1369 725 C 1387 722 1404 720 1421 717 C 1438 713 1455 710 1472 705 C 1489 700 1507 696 1521 688 C 1535 681 1549 671 1554 661 C 1559 651 1557 638 1551 628 C 1545 617 1530 606 1517 596 C 1504 586 1489 576 1474 567 C 1459 558 1445 549 1429 541 C 1414 534 1397 528 1382 522 C 1366 515 1350 510 1336 501 C 1322 493 1309 481 1297 469 C 1284 458 1268 437 1262 430',
+    long: ' C 1557 1652 1547 1628 1540 1613 C 1533 1597 1527 1581 1520 1565 C 1513 1549 1507 1533 1500 1518 C 1493 1502 1487 1486 1478 1474 C 1468 1462 1458 1452 1445 1446 C 1432 1440 1415 1440 1399 1440 C 1383 1439 1365 1442 1348 1444 C 1331 1446 1314 1448 1297 1450 C 1280 1452 1263 1454 1246 1456 C 1229 1458 1212 1462 1195 1462 C 1178 1463 1161 1463 1145 1461 C 1128 1459 1112 1454 1095 1449 C 1079 1445 1062 1441 1046 1435 C 1029 1430 1013 1425 998 1418 C 982 1410 967 1402 955 1391 C 942 1381 931 1368 922 1354 C 914 1340 908 1324 903 1308 C 899 1292 897 1274 896 1257 C 896 1241 897 1223 900 1207 C 903 1190 907 1174 913 1157 C 918 1141 925 1125 932 1110 C 938 1094 945 1078 950 1062 C 956 1045 961 1029 965 1012 C 969 996 971 979 972 962 C 973 945 972 928 973 911 C 974 894 973 877 977 861 C 981 846 987 830 996 817 C 1005 804 1017 792 1030 782 C 1044 773 1060 766 1075 760 C 1091 754 1108 750 1125 745 C 1141 741 1158 737 1175 734 C 1191 731 1208 729 1225 727 C 1243 725 1260 725 1277 724 C 1294 722 1311 721 1328 719 C 1345 718 1362 717 1379 716 C 1396 714 1413 713 1430 710 C 1446 707 1463 704 1480 699 C 1496 694 1514 689 1527 682 C 1540 675 1553 665 1557 656 C 1560 646 1557 634 1550 624 C 1543 614 1528 604 1515 595 C 1502 585 1486 575 1472 566 C 1458 557 1443 548 1428 541 C 1413 533 1397 527 1382 520 C 1366 513 1350 508 1336 499 C 1321 490 1308 480 1296 468 C 1283 457 1268 436 1262 430'
+  };
+  function ergVariant() {
+    var h = 12;
+    try { if (window.GatesRoad) h = window.GatesRoad.marchHours(); } catch (e) {}
+    return h <= 10 ? 'fast' : (h >= 13 ? 'long' : 'mid');
+  }
+
   var WP = WP_NORMAL;
   var SEG = SEG_NORMAL;
   var WHERE = WHERE_NORMAL;
@@ -113,6 +126,10 @@
       say: '“A riverbed wider than a street, with a floor of smooth gray stones. Something pulls me south along it.” · Hermes, Wadi al-Hajar' },
     { key: 'western_shelf', x: 215, y: 1420, lvl: 2, landmark: true, icon: '🧗', label: 'THE WESTERN SHELF',
       say: '“The hard rock shelf avoids the soft sand of the wash. A grueling climb, but solid underfoot.” · Hermes' },
+    { key: 'dry_channel', x: 1645, y: 1033, lvl: 7, landmark: true, erg: 'fast', icon: '🏜️', label: 'THE DRY CHANNEL · RED DUNE',
+      say: '“A dry channel runs under the red dune, hard-packed and out of the wind. Nobody told me it was here. It saves hours.” · Hermes, on the Erg' },
+    { key: 'storm_wall', x: 896, y: 1257, lvl: 7, landmark: true, erg: 'long', icon: '🌪️', label: 'THE STORM WALL',
+      say: '“The edge of the storm still stands over the west dunes like a brown wall. I have to go round it, and that costs me half a day.” · Hermes, on the Erg' },
     { key: 'cairn1', x: 538, y: 1203, lvl: 2, id: 22, icon: '🪨', label: 'CAIRN I', done: 'cairn1', revealWhen: 'cairnFound' },
     { key: 'portal', x: 400, y: 2052, lvl: 3, landmark: true, icon: '🚪', label: 'NORTH PORTAL',
       say: '“The rock splits open into a narrow gate, and the wind is already murmuring inside.” · Hermes, at the Whispering Chasm' },
@@ -120,7 +137,8 @@
     { key: 'playa', x: 1196, y: 2460, lvl: 4, id: 21, icon: '🧂', label: '11 · THE SALT PLAYA', done: 'playa', doneLabel: '11 · THE SALT PLAYA (CROSSED)' },
     { key: 'lexicon', x: 1180, y: 2367, lvl: 5, id: 11, icon: '📜', label: '12 · NOMAD RUINS (LEXICON)', done: 'lex', doneLabel: '12 · NOMAD RUINS (SOLVED)' },
     { key: 'oasis', x: 1580, y: 2420, lvl: 6, id: 12, icon: '💧', label: '13 · THE OASIS CLEPSYDRA', done: 'clep', doneLabel: '13 · THE OASIS CLEPSYDRA (SOLVED)' },
-    { key: 'monolith', x: 1262, y: 430, lvl: 7, id: 23, icon: '☀️', label: '14 · THE SUN MONOLITH', done: 'monolith', doneLabel: '14 · THE SUN MONOLITH (CAIRN II)', revealWhen: 'clep' },
+    { key: 'gates', x: 1560, y: 1660, lvl: 6, id: 27, icon: '🏛️', label: 'TOWER II · THE GATES', done: 'gates', doneLabel: 'TOWER II · THE GATES (THE FIVE SEALS)', revealWhen: 'clep' },
+    { key: 'monolith', x: 1262, y: 430, lvl: 7, id: 23, icon: '☀️', label: '14 · THE SUN MONOLITH', done: 'monolith', doneLabel: '14 · THE SUN MONOLITH (CAIRN II)', revealWhen: 'gates' },
     { key: 'labyrinth', x: 1640, y: 770, lvl: 8, id: 24, icon: '🌀', label: '15 · THE SANDSTONE LABYRINTH', done: 'labyrinth', doneLabel: '15 · THE SANDSTONE LABYRINTH (CAIRN III)', revealWhen: 'monolith' },
     { key: 'cairn4', x: 130, y: 2150, lvl: 9, id: 25, icon: '🗿', label: '16 · CAIRN IV · SENTRY OF THE CANYON', done: 'cairn4', doneLabel: '16 · CAIRN IV (THE PILLARS SANG)', revealWhen: 'labyrinth' },
     { key: 'arch', x: 1480, y: 2040, lvl: 10, id: 26, icon: '🌓', label: '17 · ARCH OF THE SOLSTICE', done: 'arch', doneLabel: '17 · ARCH OF THE SOLSTICE (CAIRN V)', revealWhen: 'cairn4' },
@@ -149,6 +167,7 @@
       playa: flag('order_salt_playa_completed'),
       lex: flag('order_desert_lexicon_completed'),
       clep: flag('order_oasis_clepsydra_completed'),
+      gates: flag('order_gates_scene_completed'),
       monolith: flag('order_sun_monolith_completed'),
       labyrinth: flag('order_sandstone_labyrinth_completed'),
       cairn4: flag('order_cairn_iv_completed'),
@@ -207,9 +226,11 @@
       if (s.isBypassed) return false;
       return s.lvl >= 2;
     }
+    if (st.erg) return true;   // the road scenery: shown by renderMarkers once Hermes has walked past it
     if (st.key === 'wt6') return !!(s.done.cairn1 || s.isBypassed);
     if (st.revealWhen === 'cairnFound') return s.dawn >= 2 || s.done.cairn1;
     if (st.revealWhen === 'clep') return !!s.done.clep;
+    if (st.revealWhen === 'gates') return !!s.done.gates || !!s.done.monolith || !!ls('order_monolith_march_start');
     if (st.revealWhen === 'monolith') return !!s.done.monolith;
     if (st.revealWhen === 'labyrinth') return !!s.done.labyrinth;
     if (st.revealWhen === 'cairn4') return !!s.done.cairn4;
@@ -229,6 +250,7 @@
     SEG.forEach(function (d, i) {
       if (!d) { pts.push({ x: WP[0].x, y: WP[0].y, d: 0 }); return; }
       var p = document.createElementNS(SVGNS, 'path');
+      if (i === 7) d = GATES_SUBPATH + ERG_PATHS[ergVariant()];
       p.setAttribute('d', d);
       holder.appendChild(p);
       var len = p.getTotalLength();
@@ -465,6 +487,10 @@
     var markers = [];
     var camDist = 3;
     var pauseTimer = 0;
+    var legMid = false;      // Hermes is part-way along a timed walk: he glides, with no chime or pause
+    var legClock = 0;
+    var ergBuilt = ergVariant();
+    var ergSeen = 0;
     var WALK_SPEED = 210; // ~250% slower journey pace (was 650 px/s)
     var TRAIL_STEP = 22;  // distance interval for cartographic dotted line
 
@@ -720,6 +746,8 @@
       var key = null;
       STATIONS.forEach(function (st) {
         if (st.landmark || !stationRevealed(st, state)) return;
+        if (st.key === 'stele' && !stationRevealed(st, state)) return;
+        if (st.key === 'gates' && state.done.arch) return;
         if (st.done && state.done[st.done]) return;
         if (st.key === 'cairn1' && state.dawn < 2) return;   // still a "?" until Hermes finds it
         key = st.key;
@@ -742,7 +770,43 @@
     // · after Station 15: hiding at the Western Cleft, then the 18-hour crossing to Cairn IV (segment 9);
     // · after Station 16: waiting for dusk at Cairn IV, then the 18-hour walk to the Arch of the Solstice (segment 10);
     // · after Station 17: resting under the Arch, then the 6-hour walk to the burning Tower II (segment 11).
+    // distance along the route at which a road landmark lies (nearest sampled point of the Erg leg)
+    function landmarkD(st) {
+      if (st.d === undefined || st.dRoute !== route) {
+        var best = 1e18, bd = 0;
+        for (var i = 0; i < route.pts.length; i++) {
+          var q = route.pts[i];
+          if (route.gates !== null && (q.d < route.gates || q.d > route.cum[7])) continue;
+          var dd = (q.x - st.x) * (q.x - st.x) + (q.y - st.y) * (q.y - st.y);
+          if (dd < best) { best = dd; bd = q.d; }
+        }
+        st.d = bd; st.dRoute = route;
+      }
+      return st.d;
+    }
+    function landmarkSeen(st) {
+      if (!st.erg) return true;
+      if (ergVariant() !== st.erg) return false;
+      return shownD >= landmarkD(st) - 10 || !!state.done.monolith;
+    }
+    function ergSeenCount() {
+      var n = 0;
+      STATIONS.forEach(function (st) { if (st.erg && landmarkSeen(st)) n++; });
+      return n;
+    }
+    function marchOf(key) { return window.EclipseMarches && window.EclipseMarches[key]; }
     function currentCrossing() {
+      var lexM = marchOf('lexicon'), clepM = marchOf('clepsydra');
+      if (state.done.playa && !state.done.lex && lexM && lexM.progress() < 1) {
+        var etaX = lexM.eta();
+        return { progress: lexM.progress(), from: route.cum[4], to: route.cum[5],
+                 text: etaX ? '🚶 THROUGH THE DUNES TO THE NOMAD RUINS · ETA: ' + etaX : 'On the south shore of the salt' };
+      }
+      if (state.done.lex && !state.done.clep && clepM && clepM.progress() < 1) {
+        var etaC = clepM.eta();
+        return { progress: clepM.progress(), from: route.cum[5], to: route.cum[6],
+                 text: etaC ? '🚶 ACROSS THE HEAT TO THE OASIS · ETA: ' + etaC : 'Resting at the Nomad Ruins' };
+      }
       if (state.done.chasm && !state.done.playa && playaProgress() < 1) {
         var etaP = hub('getPlayaMarchEta', '');
         return { progress: 0, from: route.cum[3], to: route.cum[4],
@@ -777,13 +841,32 @@
       return null;
     }
 
+    // The timed walk under way, if any (the Chasm march or a crossing), as {progress, from, to, text}
+    function liveLeg() {
+      var chasmOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
+      if (state.lvl === 3 && !state.done.chasm && !chasmOver) {
+        var prog = typeof window.getChasmMarchProgress === 'function' ? window.getChasmMarchProgress() : 1;
+        var st0 = parseInt(ls('order_chasm_march_start') || '0', 10);
+        var remMs = Math.max(0, (26 * 3600 * 1000) - (st0 ? Date.now() - st0 : 0));
+        return { progress: prog, from: route.cum[2], to: route.cum[3],
+                 text: remMs > 0 ? '🚶 EN ROUTE TO NORTH PORTAL · ETA: ' + Math.floor(remMs / 3600000) + 'h ' + Math.floor((remMs % 3600000) / 60000) + 'm' : '⛺ CAMPED BY THE NORTH PORTAL' };
+      }
+      return currentCrossing();
+    }
+
     function renderMarkers() {
       markersEl.textContent = '';
       markers = [];
       var active = activeStationKey();
       STATIONS.forEach(function (st) {
         var revealed = stationRevealed(st, state);
-        if (st.landmark && (!revealed || !state.done.cairn1)) return;                 // scenery only appears once Hermes passes it after Cairn I
+        if (st.landmark && (!revealed || (!st.erg && !state.done.cairn1))) return;
+        if (st.erg && !landmarkSeen(st)) return;                 // scenery only appears once Hermes passes it after Cairn I
+        // Station 18 (stele) and Gates (Node 27) share the exact same coordinates (1560, 1660) at Tower II.
+        // Before Station 18 is unlocked, Tower II is represented exclusively by 'gates' (no duplicate '?' pin).
+        // Once Station 18 is unlocked ('arch' done), 'stele' takes over Tower II on the map.
+        if (st.key === 'stele' && !revealed) return;
+        if (st.key === 'gates' && state.done.arch) return;
         var isDone = !!(st.done && state.done[st.done]);
         var el = document.createElement('div');
         el.className = 'd3-marker' + (revealed ? '' : ' is-unknown') + (st.landmark ? ' is-landmark' : '') + (isDone ? ' is-done' : '') + (st.key === active ? ' is-active' : '');
@@ -799,7 +882,7 @@
           tip.setAttribute('role', 'status');
           tip.setAttribute('aria-live', 'polite');
           pin.addEventListener('click', function () {
-            if (st.key === 'cairn1' && state.lvl >= 2 && typeof window.selectDesertStation === 'function') { window.selectDesertStation(st.id); return; }
+            if (st.key === 'cairn1' && state.lvl >= 2 && typeof window.selectMapNode === 'function') { window.selectMapNode(st.id, true); return; }
             pin.classList.remove('is-nudged'); void pin.offsetWidth; pin.classList.add('is-nudged');
             // Small tip next to this marker (not the page-level desert toast)
             markersEl.querySelectorAll('.d3-unknown-tip.is-visible').forEach(function (t) {
@@ -825,23 +908,13 @@
           else if (isDone) text = '✓ ' + (st.doneLabel || st.label);
           else text = '✦ ' + st.label + ' ➔';
           label.textContent = text;
-          pin.textContent = isDone && !st.landmark ? '✓' : st.icon;
+          pin.textContent = (isDone && !st.landmark) ? '✓' : st.icon;
           pin.setAttribute('aria-label', st.label);
           pin.addEventListener('click', function () {
+            // Same as the Constellation Path: the pin shows this station's card. The card's button opens the game.
+            if (st.id && typeof window.selectMapNode === 'function') { window.selectMapNode(st.id, true); return; }
             if (window.sfx && window.sfx.playMechanicalClick) window.sfx.playMechanicalClick();
-            var marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
-            if (st.key === 'chasm' && !state.done.chasm && !marchOver) {
-              var start = parseInt(ls('order_chasm_march_start') || '0', 10);
-              var remMs = Math.max(0, (26 * 3600 * 1000) - (start ? Date.now() - start : 0));
-              var hrs = Math.floor(remMs / 3600000);
-              var mins = Math.floor((remMs % 3600000) / 60000);
-              toast(remMs > 0
-                ? 'Hermes is trekking across the scree slopes to the North Portal. Reaching the Whispering Chasm in ' + hrs + ' hours and ' + mins + ' minutes.'
-                : 'Hermes has made camp in sight of the North Portal. He is resting before the descent and will call you on the Field Wire when he is ready.');
-              return;
-            }
             if (st.say) toast(st.say);
-            else if (st.id && typeof window.selectDesertStation === 'function') window.selectDesertStation(st.id);
             else if (st.soon) toast(st.soon);
           });
           el.appendChild(pin);
@@ -903,31 +976,31 @@
       var activeWp = isBypassed ? WP_BYPASS : WP_NORMAL;
       var activeSeg = isBypassed ? SEG_BYPASS : SEG_NORMAL;
       var activeWhere = isBypassed ? WHERE_BYPASS : WHERE_NORMAL;
-      if (WP !== activeWp || SEG !== activeSeg) {
+      if (WP !== activeWp || SEG !== activeSeg || ergBuilt !== ergVariant()) {
         WP = activeWp;
         SEG = activeSeg;
         WHERE = activeWhere;
         route = buildRoute();
+        ergBuilt = ergVariant();
+        if (trailMesh) { buildTrailGeometry(); }
       }
 
       var marchOver = typeof window.isChasmMarchOver === 'function' ? window.isChasmMarchOver() : true;
       var marchProgress = typeof window.getChasmMarchProgress === 'function' ? window.getChasmMarchProgress() : 1.0;
 
-      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), Math.floor(monolithProgress() * 200), Math.floor(labyrinthProgress() * 200), Math.floor(cairnFourProgress() * 200), Math.floor(solsticeProgress() * 200), JSON.stringify(next.done)].join('|');
+      var nextSig = [next.lvl, next.dawn >= 2 ? 1 : 0, next.waiting ? 1 : 0, isBypassed ? 1 : 0, marchOver ? 1 : 0, Math.floor(marchProgress * 100), Math.floor(monolithProgress() * 200), Math.floor(labyrinthProgress() * 200), Math.floor(cairnFourProgress() * 200), Math.floor(solsticeProgress() * 200), ergVariant(), ergSeenCount(), JSON.stringify(next.done)].join('|');
       if (!force && nextSig === sig) return;
       var advanced = next.lvl > state.lvl;
       state = next;
       sig = nextSig;
 
-      if (state.lvl === 3 && !state.done.chasm && !marchOver) {
-        var dStart = route.cum[2];
-        var dEnd = route.cum[3];
-        targetD = dStart + (dEnd - dStart) * marchProgress;
-      } else if (currentCrossing()) {
-        var leg = currentCrossing();
-        targetD = leg.from + (leg.to - leg.from) * leg.progress;
+      var lg0 = liveLeg();
+      if (lg0) {
+        targetD = lg0.from + (lg0.to - lg0.from) * lg0.progress;
+        legMid = lg0.progress > 0 && lg0.progress < 1;
       } else {
         targetD = route.cum[state.lvl];
+        legMid = false;
       }
 
       if (targetD < shownD) {
@@ -986,6 +1059,15 @@
             }
           }
         }
+      } else if (legMid) {
+        var gap = targetD - shownD;
+        if (gap >= 0.35) {
+          shownD += gap > 60 ? Math.min(gap, WALK_SPEED * dt) : gap * Math.min(1, dt * 3);
+          hermesPos = pointAt(route, shownD);
+          applyHermes();
+          updateTrailDrawRange();
+          maskDirty = true;
+        }
       } else if (shownD < targetD) {
         var nextD = shownD + WALK_SPEED * dt;
         var hitWp = -1;
@@ -1011,6 +1093,20 @@
         applyHermes();
         updateTrailDrawRange();
         maskDirty = true;
+      }
+      legClock += dt;
+      if (legClock >= 0.5) {
+        legClock = 0;
+        var lg = liveLeg();
+        if (lg && lg.progress < 1) {
+          targetD = lg.from + (lg.to - lg.from) * lg.progress;
+          legMid = lg.progress > 0;
+          if (hudText && pauseTimer <= 0) hudText.textContent = lg.text;
+        } else if (legMid) {
+          legMid = false; sync(true);       // the walk is over: let the normal arrival take over
+        }
+        var seenNow = ergSeenCount();
+        if (seenNow !== ergSeen) { ergSeen = seenNow; renderMarkers(); }
       }
       if (maskDirty) { paintMask(); maskDirty = false; }
 
@@ -1127,6 +1223,12 @@
       if (api.replay) api.replay(fromLvl);
     };
     api.debug = function () { return { state: state, shownD: shownD, targetD: targetD, camDist: camDist, hermes: hermesPos }; };
+    // map point (journal coordinates) -> pixel on the stage, relief included
+    api.project = function (mx, my) {
+      world.updateMatrixWorld(true);
+      var v = localPos(mx, my, 0).applyMatrix4(world.matrixWorld).project(camera);
+      return { x: (v.x * 0.5 + 0.5) * stage.clientWidth, y: (-v.y * 0.5 + 0.5) * stage.clientHeight };
+    };
   }
 
   var api = {

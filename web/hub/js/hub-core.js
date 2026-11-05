@@ -705,7 +705,7 @@
             id: 'clepsydra', tag: 'Station 13', label: 'The Oasis Clepsydra', flag: 'order_oasis_clepsydra_completed', built: true,
             complete() { set('order_oasis_clepsydra_completed', 'true'); },
             reset() {
-              dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections', 'order_clepsydra_act1', 'order_clepsydra_visions', 'order_clepsydra_howto', 'order_clepsydra_march_start', 'order_clepsydra_march_bypassed']);
+              dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections', 'order_clepsydra_act1', 'order_clepsydra_visions', 'order_clepsydra_howto', 'order_clepsydra_march_start', 'order_clepsydra_march_bypassed', 'order_lamp_oil_found']); dropRelic('lamp_oil');
               let w = null;
               try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
               if (w && typeof w === 'object') { ['seen5', 'reply5'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
@@ -714,7 +714,7 @@
           {
             id: 's14', tag: 'Station 14', label: 'The Sun Monolith · Cairn II', flag: 'order_sun_monolith_completed', built: true,
             complete() { set('order_monolith_march_start', '1'); set('order_sun_monolith_awake', 'true'); set('order_sun_monolith_marks', '4'); set('order_sun_monolith_completed', 'true'); set('order_seal_cairn_2', 'true'); },
-            reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_monolith_gate_seal1', 'order_five_seals_celebrated']); }
+            reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_monolith_gate_seal1', 'order_gates_scene_completed', 'order_five_seals_celebrated', 'order_gates_path', 'order_gates_flags', 'order_monolith_march_hours', 'order_night_erg', 'order_gates_return']); ['red_cord', 'servant_coin', 'ibis_figure', 'statue_seal', 'lamp_oil'].forEach(dropRelic); }
           },
           {
             id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', flag: 'order_sandstone_labyrinth_completed', built: true,
@@ -739,7 +739,7 @@
           {
             id: 's19', tag: 'Station 19', label: "The Oracle's Horizon · Aurelia", flag: 'order_oracle_horizon_completed', built: true,
             complete() { set('order_oracle_stair_start', '1'); set('order_oracle_awake', 'true'); set('order_oracle_disc', '000'); set('order_oracle_when_read', 'true'); set('order_oracle_horizon_completed', 'true'); },
-            reset() { dels(['order_oracle_horizon_completed', 'order_oracle_awake', 'order_oracle_key_fails', 'order_oracle_hint', 'order_oracle_disc', 'order_oracle_disc_turns', 'order_oracle_disc_hint', 'order_oracle_when_read', 'order_oracle_read_fails', 'order_oracle_vow_fails', 'order_oracle_vow_hint', 'order_oracle_stair_start', 'order_oracle_stair_bypassed', 'order_stage_passage_seen']); dropRelic('gilded_star'); }
+            reset() { dels(['order_oracle_horizon_completed', 'order_oracle_awake', 'order_oracle_key_fails', 'order_oracle_hint', 'order_oracle_disc', 'order_oracle_disc_turns', 'order_oracle_disc_hint', 'order_oracle_when_read', 'order_oracle_read_fails', 'order_oracle_vow_fails', 'order_oracle_vow_hint', 'order_oracle_stair_start', 'order_oracle_stair_bypassed', 'order_stage_passage_seen', 'order_gates_return']); dropRelic('gilded_star'); dropRelic('statue_seal'); }
           },
           {
             id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
@@ -1072,27 +1072,29 @@
       // so that all views, wire stream elements, and map controllers are fully initialized.
 
       // 3. Star Map Node Definitions & Click Inspection
-      // A station Hermes has not reached yet (Station 11 and Stations 14–18): no name, no rewards, a veiled picture and
+      // A station Hermes has not reached yet (Station 11 and Stations 15–18): no name, no rewards, a veiled picture and
       // a live countdown to his arrival. At zero the card is drawn again, whole (selectMapNode).
+      // Station 14 is named already: the gates said “the Sun Monolith”, so that card shows only the place and the time left.
       function veiledStation(o) {
         const march = window.EclipseMarches && window.EclipseMarches[o.march];
         const started = !!march && march.started();
         const at = started ? march.arrivesAt() : 0;
         const tester = typeof window.isAdminTester === 'function' && window.isAdminTester();
+        const named = !!o.place;
         return {
           badge: 'STATION ' + o.station + ' // DESERT PATH',
-          status: started ? 'HERMES ON HIS WAY ⏳' : 'HERMES IS CALLING 📻',
+          status: started ? (named ? 'ON THE ROAD ⏳' : 'HERMES ON HIS WAY ⏳') : 'HERMES IS CALLING 📻',
           statusClass: 'status-live-badge',
-          title: 'Station ' + o.station + ' · [ Sealed ]',
+          title: named ? o.place : ('Station ' + o.station + ' · [ Sealed ]'),
           thumb: o.thumb,
           veiled: true,
-          lore: started ? o.walking : (o.waiting || 'Hermes is waiting for your answer on the Field Wire before he sets out on the next stretch of the road.'),
-          rewards: [{ icon: '🔒', label: 'Sealed until Hermes arrives', desc: 'The name of the place, its page and what it keeps' }],
+          lore: started ? (named ? (o.walking || 'Hermes is on the road.') : o.walking) : (o.waiting || 'Hermes is waiting for your answer on the Field Wire before he sets out on the next stretch of the road.'),
+          rewards: named ? [] : [{ icon: '🔒', label: 'Sealed until Hermes arrives', desc: 'The name of the place, its page and what it keeps' }],
           countdown: at ? {
-            title: o.etaLabel || 'HERMES ARRIVES IN',
-            ref: 'STATION ' + o.station + ' · [ SEALED ]',
+            title: named ? 'TIME LEFT' : (o.etaLabel || 'HERMES ARRIVES IN'),
+            ref: named ? String(o.place).toUpperCase() : ('STATION ' + o.station + ' · [ SEALED ]'),
             arrivesAt: at,
-            footer: '✦ The name of the place, its page in your journal and what it keeps open the moment Hermes arrives. ✦',
+            footer: named ? '' : '✦ The name of the place, its page in your journal and what it keeps open the moment Hermes arrives. ✦',
             skip: tester ? march.skip : null
           } : null,
           cinematic: o.cinematic || null,
@@ -1628,6 +1630,47 @@
             action: openVisions
           };
         },
+        // Station 13B · At the Gates of Tower II (The Sanctuary Servant · Sheet 13A)
+        27: () => {
+          const thumb = './assets/thumbnails/tower2_gates_preview.webp';
+          const open = () => (window.openGatesTowerIIModal ? window.openGatesTowerIIModal() : null);
+          const gatesDone = localStorage.getItem('order_gates_scene_completed') === 'true';
+          if (gatesDone) {
+            return {
+              badge: 'TOWER II // THE THRESHOLD',
+              status: 'THE FIVE SEALS DEMANDED 🏛️',
+              statusClass: 'status-live-badge',
+              title: 'At the Gates of Tower II',
+              thumb,
+              lore: 'Standing on the sandstone steps of Tower II, Hermes presented the carved stone seal of Cairn I to the Sanctuary Servant. The elder placed the first seal into the arch and pointed north-north-east across the Great Erg: four seals still sleep in stone. Complete the great meridian survey or the gates remain closed forever.',
+              rewards: [
+                { icon: '🏛️', label: 'Threshold of Tower II', desc: 'The Bronze Gates await the five seals' },
+                { icon: '🪨', label: 'Seal of Cairn I Fitted', desc: 'First socket in the arch is illuminated' },
+                { icon: '🧭', label: 'Course 14° NNE Decreed', desc: 'Heading toward the Sun Monolith' }
+              ],
+              btnText: '✦ Revisit the Gates of Tower II ➔',
+              action: open
+            };
+          }
+          const clepDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+          return {
+            badge: 'TOWER II // AT THE GATES',
+            status: clepDone ? 'HERMES AT THE GATES ✦' : 'SANCTUARY VEILED ✦',
+            statusClass: 'status-live-badge',
+            title: 'At the Gates of Tower II',
+            thumb,
+            lore: clepDone
+              ? 'Hermes has reached the monumental ramparts of Tower II at last light. An old man in a cowl, leaning on an iron staff crowned with a star-sight, is waiting under the portico. Stand with Hermes on the steps.'
+              : 'The colossal ramparts of Tower II rise at the western margin of the salt playa. Cross the sands of Camp VIII first.',
+            rewards: [
+              { icon: '🏛️', label: 'The Sandstone Sanctuary', desc: 'Tower II of the three ancient towers' },
+              { icon: '📜', label: 'The Demand of the Five Seals', desc: 'Sheet 13A in your journal' }
+            ],
+            btnText: clepDone ? '✦ STAND AT THE GATES OF TOWER II ➔' : 'The gates are sealed',
+            btnDisabled: !clepDone,
+            action: clepDone ? open : null
+          };
+        },
         // Station 14 · The Sun Monolith & Cairn II (node id 23: 15–17 are aliases)
         23: () => {
           const thumb = './assets/thumbnails/sun_monolith_preview.webp';
@@ -1650,8 +1693,8 @@
             };
           }
           if (!marchOver('monolith')) {
-            return veiledStation({ station: 14, march: 'monolith', thumb,
-              walking: 'Hermes is walking by night across open sand, with the stars for a compass. Where he is going stays sealed until he gets there.' });
+            return veiledStation({ station: 14, march: 'monolith', thumb, place: 'The Sun Monolith',
+              walking: 'Hermes is on the road.' });
           }
           const eta = typeof window.getMonolithMarchEta === 'function' ? window.getMonolithMarchEta() : '';
           const arrived = (typeof window.isMonolithMarchOver === 'function' && window.isMonolithMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
@@ -2259,7 +2302,7 @@
         if (inspBtnReset) {
           const isMidnightDone = getSeekerMidnightCompleted();
           // On the Desert Path the active quest is Hermes's next station; before it, Station 08 or 09
-          const desertNo = { 10: '10', 21: '11', 11: '12', 12: '13', 23: '14', 24: '15', 25: '16', 26: '17', 13: '18', 14: '19', 22: 'Cairn I' };
+          const desertNo = { 10: '10', 21: '11', 11: '12', 12: '13', 27: 'Gates', 23: '14', 24: '15', 25: '16', 26: '17', 13: '18', 14: '19', 22: 'Cairn I' };
           const desertTarget = desertNo[id] && typeof window.getNextDesertNodeId === 'function' ? window.getNextDesertNodeId() : null;
           const targetStation = desertTarget || (isMidnightDone ? 9 : 8);
           if (id == targetStation || data.hideReturnBtn || (+id >= 40 && +id <= 48)) {   // the Stage rooms keep their own ribbon
@@ -4500,32 +4543,32 @@
         },
         {
           step: 7,
-          hermesInitial: "Silvia, my hands are wet, and the sand under me is real.\n\nThe four basins went out like a lamp the moment the cylinder took the sum. There was never any water in them. The heat had built them out of the plate and the thirst. What is left is one falcon, cut in the rock, and a cleft under its beak that breathes cold. I drank, and I filled the four skins.\n\nIn the cleft, with the old cache, there was a brass weight shaped like a falcon. The nomads buried their clock when the water left, and the fever invented the rest. Beside the carving, scratched deep: [P] − [A] = 14. Under it, smaller: [Q] + [Z] = 19. Two checks for your Cipher Ledger. Neither one is a new letter.\n\nAnd the camel tracks do not stop at the cleft. Whoever passed here did not find the water. The prints keep on, north-northeast, toward a red cliff I can just see when the heat thins.",
+          hermesInitial: "Silvia, my hands are wet, and the sand under me is real.\n\nThe four basins went out like a lamp the moment the cylinder took the sum. There was never any water in them. The heat had built them out of the plate and the thirst. What is left is one falcon, cut in the rock, and a cleft under its beak that breathes cold. I drank, and I filled the four skins.\n\nIn the cleft, with the old cache, there was a brass weight shaped like a falcon. Beside it, wrapped in oilcloth, a small flask stoppered with wax: lamp oil, nearly full. The nomads buried their clock when the water left, and the fever invented the rest. Beside the carving, scratched deep: [P] − [A] = 14. Under it, smaller: [Q] + [Z] = 19. Two checks for your Cipher Ledger. Neither one is a new letter.\n\nAnd the camel tracks do not stop at the cleft. Whoever passed here did not find the water. The prints keep on, north-northeast, toward a red cliff I can just see when the heat thins.",
           choices: [
             {
               id: "choice-7-ledger",
               text: "Both lines are in my Cipher Ledger. Drink, and sit in the shade.",
-              silviaMsg: "Both lines are in my Cipher Ledger: [P] − [A] = 14 and [Q] + [Z] = 19. Drink, Hermes, and sit in the shade.",
-              hermesReply: "Drunk, and sitting, with my back against the falcon. The skins are heavy and that is the best weight I have carried all week.\n\nThe brass falcon is in the satchel, wrapped in the spare shirt, next to the seal."
+              silviaMsg: "Both lines are in my Cipher Ledger: [P] − [A] = 14 and [Q] + [Z] = 19. Drink, Hermes, and sit in the shade. And bring that flask of oil: you will want some light on the night roads.",
+              hermesReply: "Drunk, and sitting, with my back against the falcon. The skins are heavy and that is the best weight I have carried all week.\n\nThe brass falcon is in the satchel, wrapped in the spare shirt, next to the seal. And the flask, as you say. It is all the light I will have once the sun goes down, so I will not waste a drop. Look what I found along the way, Silvia."
             },
             {
               id: "choice-7-tracks",
               text: "The tracks keep going. Do not walk in them.",
-              silviaMsg: "The tracks keep going, Hermes. Do not walk in them. Stay off to one side until you can see who made them.",
-              hermesReply: "Off to the side, on the hard pan, where a boot leaves less of a story. The prints are a day old, maybe two. Camels, and a wagon that bites deep. The same wagon, I think.\n\nThey did not stop for water. Either they did not see the falcon, or they were too hurried to care."
+              silviaMsg: "The tracks keep going, Hermes. Do not walk in them. Stay off to one side until you can see who made them. And take the flask of oil: a night walk with no lamp is a walk in their favour.",
+              hermesReply: "Off to the side, on the hard pan, where a boot leaves less of a story. The prints are a day old, maybe two. Camels, and a wagon that bites deep. The same wagon, I think.\n\nThey did not stop for water. Either they did not see the falcon, or they were too hurried to care. They left the cache and its oil alone, too. I have the flask now, Silvia. Look what I found along the way."
             },
             {
               id: "choice-7-weight",
               text: "Keep the falcon weight hidden. It is the only solid thing the heat did not invent.",
-              silviaMsg: "Keep the falcon weight hidden, Hermes. It is the only solid thing the heat did not invent.",
-              hermesReply: "Hidden, at the bottom of the satchel. It is small enough to close my hand around, and it is cool, which the basins never were.\n\nI will not hold it up in the open. Not with those tracks still fresh."
+              silviaMsg: "Keep the falcon weight hidden, Hermes. It is the only solid thing the heat did not invent. Keep the flask of oil with it.",
+              hermesReply: "Hidden, at the bottom of the satchel. It is small enough to close my hand around, and it is cool, which the basins never were.\n\nI will not hold it up in the open. Not with those tracks still fresh. The flask of oil rides beside it, wrapped in the same cloth. Look what I found along the way, Silvia."
             }
           ]
         },
         {
           step: 8,
           completed: true,
-          hermesFinal: "The four skins are full, the falcon weight is in the satchel, and both lines are yours to check: [P] − [A] = 14 and [Q] + [Z] = 19.\n\nI am walking on, north-northeast, off the camel tracks, toward the red cliff. At last light I should see the gates of Tower II. Keep the page “At the Gates of Tower II” close. I will call you when I am on the steps."
+          hermesFinal: "The four skins are full, the falcon weight and the flask of lamp oil are in the satchel, and both lines are yours to check: [P] − [A] = 14 and [Q] + [Z] = 19.\n\nI am walking on, north-northeast, off the camel tracks, toward the red cliff. At last light I should see the gates of Tower II. Keep the page “At the Gates of Tower II” close. I will call you when I am on the steps."
         },
         {
           // Tower II · the gates (Sheet 13A). Hermes recognises the Servant he watched from a ridge in 1998 (Sheet 17B).
@@ -4561,7 +4604,7 @@
           step: 10,
           completed: true,
           get hermesFinal() {
-            return "I am setting out now, Silvia: north-north-east across the Great Erg, by night, with the stars for a compass. Twelve hours on foot to the Ridge of the Sun. Keep the page “The Sun Monolith & Cairn II” close; when I reach the Monolith, its seven noons will be your work.\n\nThe Servant watched me go from the top step until the dark took him. " + sealsPhrase(5 - sealsAtGates()) + " to find. One is waiting under the Sun.";
+            return "I am setting out now, Silvia: north-north-east across the Great Erg, by night, with the stars for a compass. " + (window.GatesRoad ? window.GatesRoad.hoursWord() : 'Twelve') + " hours on foot to the Ridge of the Sun. Keep the page “The Sun Monolith & Cairn II” close; when I reach the Monolith, its seven noons will be your work.\n\nThe Servant watched me go from the top step until the dark took him. " + sealsPhrase(5 - sealsAtGates()) + " to find. One is waiting under the Sun.";
           }
         },
         {
@@ -6195,6 +6238,79 @@
           origin: "The cache in the cleft · Camp VIII · Oct 2026",
           summary: "A heavy cast-brass clepsydra counterweight with chased feathers and deep verdigris patina.",
           lore: "The sole surviving bronze artifact of the ancient nomadic water-clock buried in the cleft when the aquifer dropped centuries ago. Sculpted in the likeness of a watchful desert falcon with folded wings and an eclipse notch upon its crown, its calibrated mass once marked the passage of the night hours as the water sank from well to well. Hermes keeps it in the satchel beside the water skins as an enduring anchor of clarity."
+        },
+        red_cord: {
+          id: "red_cord",
+          name: "The Servant's Red Cord",
+          category: "Road Gift",
+          image: "assets/items/item_red_cord.png",
+          origin: "The Gates of Tower II · Oct 2026",
+          summary: "A faded crimson cord of braided wool, knotted twelve times and threaded with engraved brass beads.",
+          lore: "Untied from the Servant's iron staff and knotted round Hermes's wrist as a blessing for the road. Red for the road, the old man said: it will not stop the sun, it will remind you who waits. The twelve knots are spaced a staff apart, which makes it the best measuring line in the satchel."
+        },
+        servant_coin: {
+          id: "servant_coin",
+          name: "The Servant's Coin",
+          category: "Secret of the Order",
+          image: "assets/items/item_servant_coin.png",
+          origin: "The Gates of Tower II · Oct 2026",
+          summary: "A heavy struck-bronze coin cut with the half-lit eclipse emblem and a central keyhole aperture.",
+          lore: "Given only to the one who checked the old man's word. The Oracle's keepers must lie once to every visitor, and almost nobody notices. Show this coin to whoever finds the Servant if fire ever rises over his tower."
+        },
+        ibis_figure: {
+          id: "ibis_figure",
+          name: "The Brass Ibis",
+          category: "Nomad Relic",
+          image: "assets/items/item_ibis_figure.png",
+          origin: "Under the Ibis slab · Sun Monolith · Oct 2026",
+          summary: "A miniature cast-brass ibis with pen-nib beak on a stepped dark plinth engraved with water ripples.",
+          lore: "The Ibis slab at the Monolith put the marks to sleep because it was never a trap: it was a lock, and this was the key. The ibis writes the hour at the river's edge. Its twin, the falcon, already rides in the satchel."
+        },
+        statue_seal: {
+          id: "statue_seal",
+          name: "The Seal of the Two Keepers",
+          category: "Sacred Seal",
+          image: "assets/items/item_statue_seal.png",
+          origin: "The statues of Tower II · The Sandstone Sanctuary",
+          summary: "A carved sandstone disc medallion with bas-relief falcon and ibis facing under a radiant sun glyph.",
+          lore: "A sixth seal, owed to the two stone keepers of the gates and paid with a falcon of brass and an ibis of the same metal. It opens nothing the five cairns have not opened. It only makes the bronze doors open for the ones who also paid attention."
+        },
+        get lamp_oil() {
+          const isHalf = (function() {
+            try {
+              if (window.GatesRoad && window.GatesRoad.flags) {
+                return window.GatesRoad.flags().nightOil === 'shared';
+              }
+              const raw = localStorage.getItem('order_gates_flags');
+              if (raw) {
+                const f = JSON.parse(raw);
+                return f && f.nightOil === 'shared';
+              }
+            } catch (e) {}
+            return false;
+          })();
+
+          if (isHalf) {
+            return {
+              id: "lamp_oil",
+              name: "The Lamp Oil",
+              category: "Expedition Supply",
+              image: "assets/items/item_lamp_oil_half.png",
+              origin: "The Erg dunes · shared with the night traveller",
+              summary: "An unstoppered brass ampulla of lamp oil, opened and poured to half its measure.",
+              lore: "Hermes uncorked the wax seal on the Erg dunes to share his supply with a night traveller walking blind to the well. Only half the oil remains in the vessel now, but the nomad repaid the gift with the secret of the morning shadow at the Sun Monolith."
+            };
+          }
+
+          return {
+            id: "lamp_oil",
+            name: "The Lamp Oil",
+            category: "Expedition Supply",
+            image: "assets/items/item_lamp_oil.png",
+            origin: "The nomads' cache · Camp VIII · Oct 2026",
+            summary: "A hammered brass ampulla of refined lamp oil, wrapped in crimson cord and sealed with dripping wax.",
+            lore: "Buried in the cleft beside the falcon weight when the nomads left their water clock. Nearly full, and still good. It is the only light Hermes will have on the night roads: he can feed a dying fire with it, wager it, or pour it for a traveller in the dark. Empty the flask, and the night walk is black."
+          };
         }
       };
 
@@ -6252,7 +6368,34 @@
           if (!list.includes('water_skins')) list.push('water_skins');
           if (!list.includes('falcon_weight')) list.push('falcon_weight');
         }
+        // The night on the Erg spends this flask. It is in the satchel only while Hermes still has oil.
+        syncLampOil(list);
         return list;
+      }
+
+      // Hermes finds the flask in the nomads' cache at Camp VIII and says so on the Field Wire (step 7). A save that is
+      // already past that step has it too. It stays until the oil is spent on the road (the fire, the duel, the night).
+      const LAMP_OIL_KEY = 'order_lamp_oil_found';
+      function syncLampOil(list) {
+        const wireStep = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
+        const found = localStorage.getItem(LAMP_OIL_KEY) === 'true' || wireStep >= 8;
+        const own = found && !!(window.GatesRoad && window.GatesRoad.hasLantern());
+        ['order_inventory_relics', 'seeker_silvia_inventory_relics', 'seeker_carles_inventory_relics'].forEach((key) => {
+          const raw = localStorage.getItem(key);
+          if (raw === null && key !== 'order_inventory_relics') return;
+          let cur = [];
+          try { cur = JSON.parse(raw || '[]'); } catch (e) { return; }
+          if (!Array.isArray(cur)) return;
+          const has = cur.indexOf('lamp_oil') >= 0;
+          if (own === has) return;
+          try {
+            localStorage.setItem(key, JSON.stringify(own ? cur.concat('lamp_oil') : cur.filter((id) => id !== 'lamp_oil')));
+          } catch (e) {}
+        });
+        if (!list) return;
+        const at = list.indexOf('lamp_oil');
+        if (own && at < 0) list.push('lamp_oil');
+        if (!own && at >= 0) list.splice(at, 1);
       }
 
       function addRelicToInventory(relicId) {
@@ -6267,12 +6410,32 @@
         updateInventoryBadge();
       }
 
+      function removeRelicFromInventory(relicId) {
+        if (!relicId) return;
+        ['order_inventory_relics', 'seeker_silvia_inventory_relics', 'seeker_carles_inventory_relics'].forEach((key) => {
+          let list = null;
+          try { list = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { list = null; }
+          if (Array.isArray(list) && list.includes(relicId)) {
+            try {
+              localStorage.setItem(key, JSON.stringify(list.filter((x) => x !== relicId)));
+            } catch (e) {}
+          }
+        });
+        updateInventoryBadge();
+      }
+      window.dropRelic = removeRelicFromInventory;
+      window.removeRelicFromInventory = removeRelicFromInventory;
+
       function updateInventoryBadge() {
         const badge = document.getElementById('bsi-badge');
         if (!badge) return;
         const list = getOwnedRelicIds();
         badge.textContent = list.length.toString();
       }
+      window.syncLampOil = function () {
+        updateInventoryBadge();
+        if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
+      };
 
       let activeItemAcquiredCallback = null;
 
@@ -6309,6 +6472,63 @@
           cb();
         }
       }
+
+      function showItemRelinquishedAnimation(opts, onDone) {
+        opts = opts || {};
+        const modal = document.getElementById('modal-item-relinquished');
+        const relicId = opts.id || 'lamp_oil';
+        const relic = SATCHEL_RELICS[relicId] || opts;
+
+        // Drop from inventory immediately so satchel reflects it in real time
+        if (typeof dropRelic === 'function') dropRelic(relicId);
+        if (typeof syncLampOil === 'function') syncLampOil();
+        updateInventoryBadge();
+        if (typeof renderSatchelInventory === 'function') renderSatchelInventory();
+
+        if (!modal) {
+          if (typeof onDone === 'function') onDone();
+          return;
+        }
+
+        const img = document.getElementById('ir-art-img');
+        const tag = document.getElementById('ir-header-label');
+        const cat = document.getElementById('ir-category');
+        const title = document.getElementById('ir-title');
+        const origin = document.getElementById('ir-origin');
+        const lore = document.getElementById('ir-lore');
+        const btn = document.getElementById('ir-btn-continue');
+
+        if (img) {
+          img.src = opts.image || relic.image || ('assets/items/item_' + relicId + '.png');
+          img.classList.remove('dissolving');
+          void img.offsetWidth;
+          img.classList.add('dissolving');
+        }
+        if (tag) tag.textContent = opts.tag || 'SUPPLY RELINQUISHED';
+        if (cat) cat.textContent = opts.category || relic.category || 'EXPEDITION SUPPLY';
+        if (title) title.textContent = opts.name || opts.title || relic.name;
+        if (origin) origin.textContent = opts.origin || relic.origin || 'The Erg Dunes · 02:40 Deep Night';
+        if (lore) lore.textContent = opts.desc || opts.lore || 'Hermes poured every drop into the nomad’s lamp. The flask is empty, and the satchel holds no more oil.';
+
+        modal.style.display = 'flex';
+        modal.classList.add('show');
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+
+        let closed = false;
+        const close = () => {
+          if (closed) return;
+          closed = true;
+          modal.classList.remove('show');
+          setTimeout(() => { modal.style.display = 'none'; }, 350);
+          if (typeof onDone === 'function') onDone();
+        };
+
+        if (btn) btn.onclick = close;
+        modal.onclick = (e) => { if (e.target === modal) close(); };
+
+        setTimeout(close, 4200);
+      }
+      window.showItemRelinquishedAnimation = showItemRelinquishedAnimation;
 
       let selectedInventoryItemId = 'gilded_feather';
 
@@ -6408,6 +6628,7 @@
       window.addRelicToInventory = addRelicToInventory;
       window.getOwnedRelicIds = getOwnedRelicIds;
       window.updateInventoryBadge = updateInventoryBadge;
+      window.SATCHEL_RELICS = SATCHEL_RELICS;
 
       function getHermesFinalForWatchtower() {
         const item = getSatchelExpeditionItem();
@@ -6622,7 +6843,7 @@
       // Closing message + telemetry of the "completed" steps that end each conversation
       const WIRE_FINAL_TELEMETRY = {
         8: () => '✦ MIRAGE DISPELLED · REAL SPRING FOUND · 4 WATER SKINS FILLED · KEY XXX · [P] - [A] = 14 RECORDED ✦',
-        10: () => '✦ TOWER II SEALED · SEALS ' + sealsAtGates() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (12 H) ✦',
+        10: () => '✦ TOWER II SEALED · SEALS ' + sealsAtGates() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (' + (window.GatesRoad ? window.GatesRoad.marchHours() : 12) + ' H) ✦',
         12: () => '✦ SEAL OF CAIRN II SECURED · SEALS ' + (sealsAtGates() + 1) + ' / 5 · [D] + [F] = 24 · [C] − [T] = 8 RECORDED ✦',
         14: () => '✦ SEALS ' + (sealsAtGates() + 1) + ' / 5 · DOWN TO THE SANDSTONE LABYRINTH (6 H) · BEARING 168° SSE ✦',
         16: () => '✦ SEAL OF CAIRN III SECURED · SEALS ' + (sealsAtGates() + 2) + ' / 5 · [W] + [A] = 26 · [N] − [E] = 9 RECORDED ✦',
@@ -7110,9 +7331,12 @@
 
       // Timed walks between stations: they start when Silvia answers Hermes on the wire, and end when
       // the hours have passed, the station is solved, or a tester skips them.
+      // `hours` is a number, or a function when the road Silvia took changes the walk (Station 14: GatesRoad).
+      // keys.onStart runs once, when Hermes sets out (the crossing freezes its hours there).
       function makeMarch(hours, keys) {
-        const ms = hours * 3600 * 1000;
+        const msNow = () => (typeof hours === 'function' ? hours() : hours) * 3600 * 1000;
         const progress = () => {
+          const ms = msNow();
           if (localStorage.getItem(keys.bypassed) === 'true') return 1.0;
           if (localStorage.getItem(keys.done) === 'true') return 1.0;
           const start = parseInt(localStorage.getItem(keys.start) || '0', 10);
@@ -7127,17 +7351,21 @@
         // "5 h 12 min" while Hermes walks; '' before he sets out or once he has arrived
         const eta = () => {
           if (!started() || progress() >= 1.0) return '';
-          const remMs = Math.max(0, ms * (1 - progress()));
+          const remMs = Math.max(0, msNow() * (1 - progress()));
           return Math.floor(remMs / 3600000) + ' h ' + String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0') + ' min';
         };
-        const start = () => { if (!localStorage.getItem(keys.start)) { try { localStorage.setItem(keys.start, String(Date.now())); } catch (e) {} } };
+        const start = () => {
+          if (localStorage.getItem(keys.start)) return;
+          if (keys.onStart) { try { keys.onStart(); } catch (e) {} }
+          try { localStorage.setItem(keys.start, String(Date.now())); } catch (e) {}
+        };
         const skip = () => {
           localStorage.setItem(keys.bypassed, 'true');
           if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
           renderWireExpedition();
         };
         // When Hermes arrives (ms since epoch), 0 before he sets out
-        const arrivesAt = () => { const t = parseInt(localStorage.getItem(keys.start) || '0', 10); return t > 1 ? t + ms : 0; };
+        const arrivesAt = () => { const t = parseInt(localStorage.getItem(keys.start) || '0', 10); return t > 1 ? t + msNow() : 0; };
         return { progress, started, over, camped, eta, start, skip, arrivesAt };
       }
 
@@ -7178,7 +7406,9 @@
       window.skipClepsydraMarch = clepsydraMarch.skip;
 
       // Station 14: the 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (wire step 9 starts it)
-      const monolithMarch = makeMarch(12, { start: 'order_monolith_march_start', bypassed: 'order_monolith_march_bypassed', done: 'order_sun_monolith_completed' });
+      const monolithMarch = makeMarch(() => (window.GatesRoad ? window.GatesRoad.marchHours() : 12), {
+        onStart: () => { if (window.GatesRoad) window.GatesRoad.freezeMarchHours(); },
+        start: 'order_monolith_march_start', bypassed: 'order_monolith_march_bypassed', done: 'order_sun_monolith_completed' });
       const getMonolithMarchProgress = monolithMarch.progress;
       const isMonolithMarchStarted = monolithMarch.started;
       const isMonolithMarchOver = monolithMarch.over;

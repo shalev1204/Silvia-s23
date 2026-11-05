@@ -17,6 +17,8 @@
         'modal-salt-playa': { name: 'salt flat', wind: [0.4, 1800, 0.6, 0.1], crackle: [0.12, 0.5] },
         'modal-desert-lexicon': { name: 'nomad camp', wind: [0.4, 700, 0.8, 0.06], drone: [0.08, 110, 165] },
         'modal-oasis-clepsydra': { name: 'four wells', wind: [0.15, 420, 0.8, 0.05], drips: [0.32, 1.2], rumble: [0.1, 800] },
+        'modal-oasis-visions': { name: 'four wells', wind: [0.15, 420, 0.8, 0.05], drips: [0.32, 1.2], rumble: [0.1, 800] },
+        'modal-night-erg': { name: 'night on the erg', wind: [0.3, 380, 0.7, 0.05], drone: [0.06, 98, 147] },
         'modal-sun-monolith': { name: 'noon on the ridge', wind: [0.45, 900, 0.5, 0.04], drone: [0.1, 73.4, 110] },
         'modal-sandstone-labyrinth': { name: 'labyrinth', wind: [0.35, 450, 1.2, 0.05, true], crackle: [0.1, 0.8] },
         'modal-cairn-four': { name: 'singing canyon', wind: [0.4, 300, 1.5, 0.08, true] },
