@@ -286,7 +286,9 @@
         const paint = SC.paint();
         const hex = SC.util.hex;
         const horizon0 = 0xe8cfa8;
-        scene.fog = new T.Fog(SC.preTone(horizon0, 1.08), 150, 340);
+        // the fog is laid after the tone curve and the encoding, so it takes the sky's own horizon colour as it shows: the sand melts into the sky with no seam
+        const skyFog = (h) => new T.Color(h);
+        scene.fog = new T.Fog(skyFog(horizon0), 150, 340);
         const sky = SC.sky(scene, { horizon: horizon0 });
         sky.mesh.scale.setScalar(3.2);
         const ground = SC.terrain(scene, paint, { size: 1000, segments: 170, flatRadius: 105, seed: 14 });
@@ -442,7 +444,22 @@
           }
         } catch (e) { H = null; }
         mono.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-        return { T, renderer, scene, camera, sky, lights, mono, slabs, marks, tipGroup, tipRing, tipBeam, cairn, lid, niche, nicheMat, seal, sealHalo, H, hermes: H && H.hermes, goldMat, ground };
+
+        // the feel: a lens that lets the sun and the gold bloom, a body for Hermes, a camera that breathes, sand that falls
+        const FX = window.EclipseFX;
+        let post = null, gait = null, dust = null, sparks = null, prints = null, shake = null;
+        if (FX) {
+          try { post = FX.post(renderer, { bloom: 0.5, threshold: 0.95, knee: 0.12, vignette: 0.3, grain: 0.026, ca: 0.18, sat: 1.04, contrast: 1.03 }); } catch (e) { post = null; }
+          shake = FX.shaker({ idle: 0.0022 });
+          dust = FX.particles(scene, { max: 360, wind: [0.9, 0, 0.25] });
+          sparks = FX.particles(scene, { max: 260, additive: true });
+          prints = FX.footprints(scene, { max: 64, life: 18 });
+          if (H) gait = FX.gait(H, { onStep: (st) => {
+            prints.stamp(st.pos.x, 0.07, st.pos.z, H.hermes.rotation.y, st.side, 2.5);
+            dust.emit(st.pos, 3, { size: [0.45, 0.8], speed: [0.2, 0.7], up: [0.25, 0.7], life: [0.6, 1.1], alpha: 0.3, gravity: -0.7, color: 0xdcbb8c });
+          } });
+        }
+        return { skyFog, T, renderer, scene, camera, sky, lights, mono, slabs, marks, tipGroup, tipRing, tipBeam, cairn, lid, niche, nicheMat, seal, sealHalo, H, hermes: H && H.hermes, goldMat, ground, post, gait, dust, sparks, prints, shake, windT: 0, ringsShown: 0, lidWas: 0 };
       }
 
       // The sun: its light, its sky and the colour of the haze follow the minute of the day
@@ -464,7 +481,13 @@
         u.uHorizon.value.setHex(WARM.horizon).lerp(new T.Color(NOON.horizon), k);
         u.uMid.value.setHex(WARM.mid).lerp(new T.Color(NOON.mid), k);
         u.uZenith.value.setHex(WARM.zenith).lerp(new T.Color(NOON.zenith), k);
-        G.scene.fog.color.copy(SC.preTone(u.uHorizon.value.getHex(), 1.08));
+        G.scene.fog.color.copy(G.skyFog(u.uHorizon.value.getHex()));
+        if (G.post) {
+          const pp = G.post.params;
+          pp.gain = [1.05 - 0.035 * k, 1.0, 0.93 + 0.05 * k];   // gold in the morning and evening, clean at noon
+          pp.haze = 0.25 + 0.75 * k;                              // the air trembles over the sand as the day heats
+          pp.bloom = 0.55 - 0.1 * k;
+        }
         const tip = shadowTip(minute);
         G.tipGroup.position.set(tip.x, 0, -tip.y);
         G.lastSun = minute;
@@ -486,7 +509,7 @@
         if (d < 0.05) { if (then) then(); return; }
         const dirx = (x - fx) / d, dirz = (z - fz) / d;
         const face = opts && opts.face ? faceYaw(x, z, opts.face.x, opts.face.z) : faceYaw(fx, fz, x, z);
-        walk = { t: 0, dur: Math.max(0.9, Math.min(2.8, d / 15)), fx, fz, tx: x, tz: z, ry0: h.rotation.y, ry1: faceYaw(fx, fz, x, z), face, dir: { x: dirx, z: dirz }, then: then || null, turned: false };
+        walk = { t: 0, dur: Math.max(1.1, Math.min(3.4, d / 11)), fx, fz, tx: x, tz: z, ry0: h.rotation.y, ry1: faceYaw(fx, fz, x, z), face, dir: { x: dirx, z: dirz }, then: then || null, turned: false };
       }
       function finishWalk() {
         if (!walk) return;
@@ -571,11 +594,16 @@
           const turn = Math.min(1, walk.t / 0.35);
           let dy = walk.ry1 - walk.ry0; while (dy > Math.PI) dy -= Math.PI * 2; while (dy < -Math.PI) dy += Math.PI * 2;
           G.hermes.rotation.y = u >= 1 ? walk.face : walk.ry0 + dy * turn;
-          const swing = Math.sin(t * 9.5);
-          if (G.H) { G.H.legL.position.z = swing * 0.17; G.H.legR.position.z = -swing * 0.17; G.H.legL.position.y = Math.max(0, swing) * 0.05; G.H.legR.position.y = Math.max(0, -swing) * 0.05; }
+          if (!G.gait && G.H) { const swing = Math.sin(t * 9.5); G.H.legL.position.z = swing * 0.17; G.H.legR.position.z = -swing * 0.17; G.H.legL.position.y = Math.max(0, swing) * 0.05; G.H.legR.position.y = Math.max(0, -swing) * 0.05; }
           if (u >= 1) finishWalk();
-        } else if (G.H) {
+        } else if (G.H && !G.gait) {
           G.H.legL.position.z = 0; G.H.legR.position.z = 0; G.H.legL.position.y = 0; G.H.legR.position.y = 0;
+        }
+        if (G.gait) {
+          // he watches what matters: the tip of the shadow while the sun walks, the cairn when it opens
+          const ph0 = phase();
+          G.gait.look(walk ? null : ph0 === 'sun' ? G.tipGroup.position : ph0 === 'sigil' ? { x: 0, y: 6, z: 0 } : { x: CAIRN.x, y: 1.8, z: CAIRN.z });
+          G.gait.update(dt);
         }
         if (G.lastSun !== minute) applySun();
         const found = marksFound(), near = phase() === 'sun' ? markUnderShadow(minute) : null, pulse = reduced() ? 0.5 : 0.5 + 0.5 * Math.sin(t * 4);
@@ -597,19 +625,48 @@
           s.userData.mat.emissiveIntensity = i < nRings ? 0.28 + 0.6 * Math.max(0, Math.min(1, fresh)) : 0;
         });
         if (view.ringsT0 && now - view.ringsT0 > 7 * 450 + 1500) view.ringsT0 = 0;
+        if (view.ringsT0 && nRings > G.ringsShown && G.dust) {
+          for (let i = Math.max(0, G.ringsShown); i < Math.min(nRings, G.slabs.length); i++) {
+            const sp = G.slabs[i].position;
+            G.dust.emit({ x: sp.x, y: 0.2, z: sp.z }, 14, { size: [0.8, 1.4], speed: [0.8, 2.0], up: [0.4, 1.2], life: [0.9, 1.6], alpha: 0.35, spread: 2.4 });
+            G.sparks.emit({ x: sp.x, y: 0.4, z: sp.z }, 18, { color: 0xffcf7a, size: [0.2, 0.35], grow: 0.3, speed: [0.3, 1.2], up: [1.5, 3.5], life: [0.7, 1.3], alpha: 0.9, gravity: -2.5, drag: 0.6, spread: 2 });
+          }
+          if (G.shake) G.shake.add(0.12);
+        }
+        G.ringsShown = Math.max(0, nRings);
         // the lid slides, the Seal rises (only in the ending; a finished station shows its niche open)
         let lidK = view.ending ? 0 : (isDone() ? 1 : 0), sealK = 0;
         if (view.ending && view.lidT0) lidK = Math.max(0, Math.min(1, (now - view.lidT0) / 3600));
         if (view.ending && view.sealT0) sealK = Math.max(0, Math.min(1, (now - view.sealT0) / 3200));
         G.lid.position.x = lidK * 1.7; G.lid.position.y = 1.62 + Math.sin(lidK * Math.PI) * 0.18;
+        if (G.dust && lidK > G.lidWas && lidK < 1) {
+          // stone on stone: grit spills from the edge of the lid and the ground hums
+          if (Math.random() < 0.6) G.dust.emit({ x: CAIRN.x + 0.9 + lidK * 1.7, y: 1.6, z: CAIRN.z + (Math.random() - 0.5) * 1.2 }, 2, { size: [0.25, 0.5], speed: [0.1, 0.4], up: [0, 0.3], life: [0.8, 1.4], alpha: 0.45, gravity: -4, drag: 0.4, bounce: 0.2, color: 0xc9a274 });
+          if (G.shake) G.shake.add(dt * 0.35);
+        }
+        G.lidWas = lidK;
         G.nicheMat.opacity = lidK * 0.8;
         G.seal.visible = sealK > 0 && sealK < 1.01 && !view.sealGone;
         G.seal.position.y = 1.6 + sealK * 1.5; G.seal.rotation.y = t * 2.4;
         G.sealHalo.material.opacity = G.seal.visible ? Math.min(1, sealK * 1.4) * 0.8 : 0;
         G.sealHalo.position.y = G.seal.position.y + 0.1;
+        if (G.sparks && G.seal.visible && Math.random() < 0.5) G.sparks.emit({ x: CAIRN.x, y: G.seal.position.y, z: CAIRN.z }, 1, { color: 0xffe08a, size: [0.12, 0.22], grow: 0.2, speed: [0.1, 0.4], up: [0.2, 0.8], life: [0.8, 1.4], alpha: 0.9, gravity: 0.15, drag: 0.5, spread: 0.9 });
+        // a little sand always moves on the wind
+        if (G.dust) {
+          G.windT -= dt;
+          if (G.windT <= 0 && camNow.l) {
+            G.windT = 0.11;
+            G.dust.emit({ x: camNow.l[0] + (Math.random() - 0.5) * 60, y: 0.15, z: camNow.l[2] + (Math.random() - 0.5) * 46 }, 1, { size: [1.4, 2.6], grow: 1.5, speed: [0.1, 0.3], up: [0.05, 0.25], life: [2.6, 4.2], alpha: 0.1, gravity: 0, drag: 0.25, fadeIn: 0.35 });
+          }
+          G.dust.update(dt, G.camera, G.renderer);
+          G.sparks.update(dt, G.camera, G.renderer);
+        }
+        if (G.prints) G.prints.update(dt);
         placeCamera(dt, false);
+        if (G.shake) G.shake.apply(G.camera, dt);
         if (G.adapt) G.adapt(dt); else if (P.fitSpeed) G.adapt = P.fitSpeed(G.renderer);
-        G.renderer.render(G.scene, G.camera);
+        if (G.post) { G.post.horizonFrom(G.camera); G.post.render(G.scene, G.camera, dt); }
+        else G.renderer.render(G.scene, G.camera);
       }
       function frame(t) {
         if (!G || modal.style.display === 'none') return;
@@ -655,6 +712,11 @@
       function strike(touched, base) {
         S.hearts = Math.max(0, S.hearts - 1);
         S.wrong += 1;
+        if (G) {
+          if (G.shake) G.shake.add(S.hearts <= 0 ? 0.8 : 0.5);
+          if (G.post) G.post.flash(0x3d1206, S.hearts <= 0 ? 0.42 : 0.26, S.hearts <= 0 ? 1.6 : 0.9);
+          if (G.dust) G.dust.emit({ x: touched.x, y: 0.3, z: -touched.y }, 26, { size: [0.9, 1.6], speed: [1, 2.6], up: [0.6, 1.6], life: [1, 1.8], alpha: 0.4, spread: touched.radius || 2, color: 0xb98e5e });
+        }
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         let note = base;
         if (S.hearts <= 0) {
@@ -716,6 +778,11 @@
         }
         set(KEYS.marks, String(found + 1));
         if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        if (G && G.sparks) {
+          G.sparks.emit({ x: touched.x, y: 0.5, z: -touched.y }, 70, { color: 0xffd27a, size: [0.18, 0.34], grow: 0.4, speed: [0.5, 2.4], up: [2.2, 5.2], life: [0.9, 1.9], alpha: 0.95, gravity: -3.2, drag: 0.7, bounce: 0.45, spread: touched.radius || 2 });
+          if (G.post) G.post.pulse(0.7, 1.4);
+          if (G.shake) G.shake.add(0.16);
+        }
         feedback(el.markFeedback, touched.name.charAt(0).toUpperCase() + touched.name.slice(1) + ' answers.', 'ok');
         say(MARK_DISPATCH[found]);
         if (found + 1 === MARKS.length) completeStation();
@@ -724,6 +791,7 @@
 
       function completeStation() {
         set(KEYS.done, 'true');
+        if (G && G.post) { G.post.flash(0xfff3d0, 0.32, 1.4); G.post.pulse(1.0, 2.2); }
         if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(2);
         else set('order_seal_cairn_2', 'true');
@@ -1039,6 +1107,7 @@
         again: () => { beginAgain(); return window.__sunMonolith.state(); },
         cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
         gfx: () => G,
+        fx: () => ({ post: !!(G && G.post), gait: !!(G && G.gait), dust: G && G.dust ? G.dust.count() : 0, sparks: G && G.sparks ? G.sparks.count() : 0, bodyY: G && G.gait ? G.gait.body.position.y : 0, legL: G && G.H ? G.H.legL.position.z : 0 }),
         frames: (n, dt) => { const d = dt || 1 / 30; for (let i = 0; i < (n || 1); i++) { if (dt) { window.__vclock = (window.__vclock || performance.now()) + d * 1000; tick(window.__vclock, d); } else tick(performance.now() + i * 33, 1 / 30); } }
       };
 

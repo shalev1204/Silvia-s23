@@ -1205,8 +1205,16 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         const H = P.buildHermes(T, glowTex);
         H.flame.visible = false;
         scene.add(H.hermes);
+        // the shared feel (EclipseFX): a lens for the glare of the salt, a body for Hermes, salt dust at his feet and on the wind
+        let fx = null;
+        try {
+          if (window.EclipseFX) fx = window.EclipseFX.kit(renderer, scene, H, {
+            look: { bloom: 0.42, threshold: 0.96, knee: 0.1, vignette: 0.24, grain: 0.022, ca: 0.14, sat: 1.02, contrast: 1.03, gain: [1.0, 0.995, 1.01] },
+            printsOn: false, sandColor: 0xf2e9e2, ambient: () => H.hermes.position, ambientRadius: 22, ambientAlpha: 0.07, wind: [1.1, 0, 0.3], scale: 1
+          });
+        } catch (e) { fx = null; }
 
-        return { T, renderer, scene, camera, sky, sunDisc, qPlate, hemi, sun, uTime, slabs, crackTex, crackGeo, poolMat, makeCrystal, post, postRings, beam, sumpPlates,
+        return { fx, T, renderer, scene, camera, sky, sunDisc, qPlate, hemi, sun, uTime, slabs, crackTex, crackGeo, poolMat, makeCrystal, post, postRings, beam, sumpPlates,
                  hazeMat, mirage, mirageMat, ringGeo, markers, prints, motes, motesBase, motesN, burst, burstN, rag, glowTex,
                  uCloud, steam, hazards, makeHazard, dropHazard, birds, devils, devilN, wisps, spot, ember, cirrus, sumpCasters, caravan, camels, glint,
                  hermes: H.hermes, legL: H.legL, legR: H.legR, staff: H.staff, lamp: H.lamp, cloak: H.cloak, lowPower };
@@ -1597,6 +1605,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
       // A false step on the salt: one heart less. True when it was the last one
       function loseHeart() {
         S.hearts = Math.max(0, S.hearts - 1);
+        if (G && G.fx) G.fx.blow(G.hermes.position.clone(), S.hearts > 0 ? 0.45 : 0.75);
         paintHearts(true);
         if (soundOn()) tone(S.hearts > 0 ? 220 : 110, 0.15, S.hearts > 0 ? 0.5 : 0.9, { to: S.hearts > 0 ? 150 : 60, gain: S.hearts > 0 ? 0.08 : 0.1, type: 'triangle' });
         return S.hearts <= 0;
@@ -1958,6 +1967,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         replay(fxEl.flash, 'is-on');
         showCrystal(r, c, !G || reducedMotion());
         burstAt(X(c), SLAB_TOP + 0.2, Z(r), 0xfff6ff);
+        if (G && G.fx) G.fx.triumph({ x: X(c), y: SLAB_TOP + 0.3, z: Z(r) }, 0.8);
         paintPrints();
         paintHud();
         const box = el.log && el.log.children[r];
@@ -2315,7 +2325,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         say("Sand! Real sand under my boots, Silvia. I stepped off the last plate of the Sump onto the south shore and my knees nearly gave way. You asked, I knelt and looked, and six times the Study told the truth. Behind me the salt is a white sea in the noon glare, and the stones and the Order's post are lost in the haze. And in front of me stands a squat stone marker of the Order, with a niche in its side. There is something in it, wrapped in oiled cloth. And low on its foot, a glyph I have never seen: a circle with a dot in the middle and three little rays, and a line beside it. I will tell you everything on the Field Wire.");
         where('Across the Salt Playa, on the south shore.');
         if (el.victory) el.victory.style.display = 'block';
-        const fanfare = () => { if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime(); };
+        const fanfare = () => { if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime(); if (G && G.fx && G.fx.post) { G.fx.post.flash(0xfff6ea, 0.3, 1.4); G.fx.post.pulse(0.9, 2); } };
         if (!live) fanfare();
         const first = !isDone();
         put('order_salt_playa_completed', 'true');
@@ -2480,19 +2490,23 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         H.position.set(view.x, floor + hop, view.z);
         H.rotation.set(0, view.yaw, 0);
         H.scale.setScalar(view.sky ? 1.5 : 1);
-        if (!moving && !rm) H.scale.y *= 1 + Math.sin(now / 640) * 0.012;   // he breathes
+        if (!moving && !rm && !(G.fx && G.fx.gait)) H.scale.y *= 1 + Math.sin(now / 640) * 0.012;   // he breathes (EclipseFX breathes for him when it is there)
         if (view.kneel && !rm) {   // he crouches to look at the plates, then rises
           const kt = (now - view.kneel) / 1300;
           if (kt >= 1) view.kneel = 0; else H.scale.y *= 1 - 0.22 * Math.sin(Math.PI * Math.min(1, kt));
         }
-        const swing = moving && !rm ? Math.sin(now / 120) : 0;
-        G.legL.position.z = swing * 0.17; G.legR.position.z = -swing * 0.17;
-        G.legL.position.y = Math.max(0, swing) * 0.05; G.legR.position.y = Math.max(0, -swing) * 0.05;
-        G.cloak.rotation.z = swing * 0.025;
+        const gaitOn = !!(G.fx && G.fx.gait);
+        const swing = moving && !rm && !gaitOn ? Math.sin(now / 120) : 0;
+        if (gaitOn) G.fx.frame(dt, G.camera);
+        else {
+          G.legL.position.z = swing * 0.17; G.legR.position.z = -swing * 0.17;
+          G.legL.position.y = Math.max(0, swing) * 0.05; G.legR.position.y = Math.max(0, -swing) * 0.05;
+          G.cloak.rotation.z = swing * 0.025;
+          G.lamp.rotation.z = rm ? 0 : Math.sin(now / 260) * 0.07 + swing * 0.08;
+        }
         // leaning: he tips forward over his staff, which reaches out to the slab he tests
         H.rotation.x = -view.lean * 0.18;
-        G.staff.rotation.x = -view.lean * 1.1 + swing * 0.2;
-        G.lamp.rotation.z = rm ? 0 : Math.sin(now / 260) * 0.07 + swing * 0.08;
+        G.staff.rotation.x = (gaitOn ? G.staff.rotation.x : swing * 0.2) - view.lean * 1.1;
         G.rag.rotation.y = Math.sin(now / 300) * 0.4;
 
         const test = view.phase === 'test' || view.phase === 'heavy';
@@ -2625,7 +2639,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         G.sun.position.set(sx, 0, sz).addScaledVector(G.sunDir, 60);
         G.sun.target.position.set(sx, 0, sz);
         paintFacing();
-        G.renderer.render(G.scene, G.camera);
+        if (G.fx) G.fx.render(G.scene, G.camera, dt); else G.renderer.render(G.scene, G.camera);
       }
       function fit() {
         if (!G || !el.stage) return;

@@ -259,7 +259,7 @@
 
     scene = new T.Scene();
     var HORIZON = 0xd8946a;
-    scene.fog = new T.Fog(SC.preTone(HORIZON, 1.06), 30, 105);
+    scene.fog = new T.Fog(HORIZON, 30, 105);   // the sky's horizon as it shows: the sand melts into it
     var aspect = Math.max(0.4, canvas.clientWidth / Math.max(1, canvas.clientHeight));
     camera = new T.PerspectiveCamera(46, aspect, 0.1, 320);
 
@@ -458,6 +458,14 @@
     hermes.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     scene.add(hermes);
     servantRef = servant; hermesRef = hermes;
+    // the shared feel (EclipseFX): fire, gold and the Seal bloom; Hermes breathes and looks at whoever speaks
+    gfx = null;
+    try {
+      if (window.EclipseFX) gfx = window.EclipseFX.kit(renderer, scene, H, {
+        look: { bloom: 0.55, threshold: 0.92, knee: 0.14, vignette: 0.3, grain: 0.026, ca: 0.15, sat: 1.04, contrast: 1.03, gain: [1.03, 1.0, 0.96] },
+        printsOn: false, scale: 1.15, idle: 0.0018
+      });
+    } catch (e) { gfx = null; }
     var ringMat = function (c) { return new T.MeshBasicMaterial({ color: c, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide, fog: false }); };
     ringServant = new T.Mesh(new T.RingGeometry(0.62, 0.78, 48), ringMat(0xffc060));
     ringServant.rotation.x = -Math.PI / 2; ringServant.position.set(servant.position.x, PLAT + 0.03, servant.position.z);
@@ -501,8 +509,10 @@
         if (spS) { servant.userData.head.rotation.x += 0.05 * Math.abs(Math.sin(t * 9)); servant.userData.sight.rotation.z += 0.01; }
         hermes.position.y = treads[3] + (spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0);
         H.flame.scale.set(1 + 0.08 * Math.sin(t * 9), 1.35 + 0.12 * Math.sin(t * 13 + 1), 1);
-        H.lamp.rotation.z = Math.sin(t * 1.3) * 0.04;
-        H.cloak.scale.y = 1 + Math.sin(t * 1.1) * 0.004;
+        if (gfx) {
+          if (gfx.gait) gfx.gait.look(spS || speaking !== 'hermes' ? { x: servant.position.x, y: PLAT + 1.9, z: servant.position.z } : null);
+          gfx.frame(dt, camera);
+        } else { H.lamp.rotation.z = Math.sin(t * 1.3) * 0.04; H.cloak.scale.y = 1 + Math.sin(t * 1.1) * 0.004; }
         fireFlash *= Math.pow(0.4, dt);
         fireLevel += ((ds.flags && (ds.flags.gaveOil || ds.flags.lostOil) ? 1 : 0.38) - fireLevel) * Math.min(1, dt * 1.5);
         braziers.forEach(function (b, bi) { b.g.userData.update(t, b.ph, bi === 0 ? fireLevel + fireFlash : 1); });
@@ -563,11 +573,11 @@
     clock.t += dt;
     for (var i = 0; i < updaters.length; i++) updaters[i](clock.t, dt);
     if (orbitCtl) orbitCtl.update(dt, !reducedMotion);
-    renderer.render(scene, camera);
+    if (gfx) gfx.render(scene, camera, dt); else renderer.render(scene, camera);
     placeBubble();
   }
 
-  var tmpV = null;
+  var tmpV = null, gfx = null;
   // keep the speech bubble over whoever is talking (Silvia's radio bubble floats beside Hermes)
   function placeBubble() {
     if (!bubbleEl || !ds.speaker || !servantRef || !hermesRef) return;
@@ -815,7 +825,10 @@
     if (!id || typeof window.openItemAcquiredModal !== 'function') { ds.relics = []; return; }
     window.openItemAcquiredModal({ id: id }, showQueuedRelics);
   }
-  function fireBurst(k) { fireFlash = k; if (sfx.playCelestialChime) sfx.playCelestialChime(); }
+  function fireBurst(k) {
+    fireFlash = k; if (sfx.playCelestialChime) sfx.playCelestialChime();
+    if (gfx && gfx.post) gfx.post.pulse(0.35 * k, 1.2);
+  }
 
   var CHOICES = {
     // ---- how to meet him (the first choice shapes the whole encounter) ----

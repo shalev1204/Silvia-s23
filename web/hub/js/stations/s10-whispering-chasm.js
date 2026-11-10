@@ -662,7 +662,10 @@
         sparks.visible = false;
         scene.add(sparks);
 
-        return { T, renderer, scene, camera, sky, sunDisc, hemi, sun, lantern, prints, hermes: H.hermes, legL: H.legL, legR: H.legR, flame: H.flame,
+        // the shared feel (EclipseFX): a lens, a body for Hermes, dust at his feet; the gorge keeps its own trail of prints
+        let fx = null;
+        try { if (window.EclipseFX) fx = window.EclipseFX.kit(renderer, scene, H, { look: { bloom: 0.45, threshold: 0.95, knee: 0.12, vignette: 0.26, grain: 0.024, ca: 0.15, sat: 1.03, contrast: 1.03 }, printsOn: false, sandColor: 0xd29a6c, scale: 1 }); } catch (e) { fx = null; }
+        return { fx, T, renderer, scene, camera, sky, sunDisc, hemi, sun, lantern, prints, hermes: H.hermes, legL: H.legL, legR: H.legR, flame: H.flame,
                  staff: H.staff, lamp: H.lamp, cloak: H.cloak, arrows, arrowGeo, dust, dustN, motes, motesBase, motesN, relicLight, relicGlow, sparks, sparksN, relic: null, lowPower, stoneAt, shafts };
       }
 
@@ -956,7 +959,7 @@
           cuffB.rotation.x = Math.PI / 2; cuffB.position.y = 0.16; g.add(cuffB);
           g.position.x = x; hermes.add(g);
         });
-        return { hermes, legL, legR, flame, staff, lamp, cloak };
+        return { hermes, legL, legR, flame, staff, lamp, cloak, head, armL, armR };
       }
 
       // ---- Relics: each one carries its rune cut into its own surface ----
@@ -1589,6 +1592,7 @@
         S.water = Math.max(0, S.water - 1);
         S.fails++;
         view.shake = 1;
+        if (G && G.fx) G.fx.blow(G.hermes.position.clone(), 0.2);
         const restNeeded = S.water <= 0.001;
         const cost = restNeeded ? "And that was my last drop of water." : `It cost us a skin of water: ${skinsWord(S.water)} left.`;
         say(`${text} ${cost}`);
@@ -1711,6 +1715,7 @@
           }
           view.burst = { t: 0, o: G.relic.position.clone(), v };
         }
+        if (G && G.fx && G.relic) G.fx.triumph(G.relic.position, 0.8);
         S.runes = i + 1;
         S.water = 3;
         S.wh = 1;
@@ -1800,13 +1805,16 @@
         const H = G.hermes;
         H.position.set(view.x, 0, view.z);
         H.rotation.y = view.yaw;
-        const swing = moving && !rm ? Math.sin(now / 130) : 0;
-        G.legL.position.z = swing * 0.17; G.legR.position.z = -swing * 0.17;
-        G.legL.position.y = Math.max(0, swing) * 0.05; G.legR.position.y = Math.max(0, -swing) * 0.05;
-        G.staff.rotation.x = swing * 0.22;
-        G.cloak.rotation.z = swing * 0.025;
-        G.lamp.rotation.z = rm ? 0 : Math.sin(now / 260) * 0.07 + swing * 0.08;
-        H.position.y = moving && !rm ? Math.abs(Math.sin(now / 130)) * 0.035 : 0;
+        if (G.fx && G.fx.gait) G.fx.frame(dt, G.camera);   // feet that plant, a body that bobs, a lamp that swings on its own
+        else {
+          const swing = moving && !rm ? Math.sin(now / 130) : 0;
+          G.legL.position.z = swing * 0.17; G.legR.position.z = -swing * 0.17;
+          G.legL.position.y = Math.max(0, swing) * 0.05; G.legR.position.y = Math.max(0, -swing) * 0.05;
+          G.staff.rotation.x = swing * 0.22;
+          G.cloak.rotation.z = swing * 0.025;
+          G.lamp.rotation.z = rm ? 0 : Math.sin(now / 260) * 0.07 + swing * 0.08;
+          H.position.y = moving && !rm ? Math.abs(Math.sin(now / 130)) * 0.035 : 0;
+        }
         const flick = 1.25 + Math.sin(now / 90) * 0.08 + Math.sin(now / 37) * 0.05;
         G.lantern.intensity = flick;
         G.lantern.position.copy(G.flame.getWorldPosition(new T.Vector3()));
@@ -1925,7 +1933,7 @@
         G.sun.target.position.set(view.x, 0, view.z);
         paintFacing();
         if (audio && G) setListener();
-        G.renderer.render(G.scene, G.camera);
+        if (G.fx) G.fx.render(G.scene, G.camera, dt); else G.renderer.render(G.scene, G.camera);
       }
       function fit() {
         if (!G || !el.stage) return;

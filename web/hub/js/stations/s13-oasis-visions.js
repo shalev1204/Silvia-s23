@@ -492,6 +492,7 @@
 
       function miss(base, who) {
         S.hearts -= 1;
+        if (G && G.fx && G.hermes) G.fx.blow(G.hermes.position.clone(), S.hearts > 0 ? 0.4 : 0.7);
         S.wrong += 1;
         S.min += who === 'key' ? 15 : who === 'cleft' ? 12 : 20;
         heatWobble = 1;
@@ -526,6 +527,7 @@
         S.weights = S.well;
         S.min += 4;
         drinkPulse = 1;
+        if (G && G.fx) { const bw = BASIN_XZ[Math.min(S.well - 1, 3)]; G.fx.triumph({ x: bw[0], y: 0.8, z: bw[1] }, 0.6); }
         let note = 'Yes. That matches the page. I drink, and I set a counterweight.';
         if (S.well >= WELLS.length) {
           S.phase = 'key';
@@ -602,6 +604,7 @@
         }
         S.phase = 'won';
         put(DONE_KEY, 'true');
+        if (G && G.fx && G.fx.post) { G.fx.post.flash(0xfff3d6, 0.3, 1.4); G.fx.post.pulse(0.9, 2); }
         if (!get('order_clepsydra_done_at')) put('order_clepsydra_done_at', String(Date.now()));
         if (typeof window.ensureGatesMarch === 'function') window.ensureGatesMarch();
         if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
@@ -652,7 +655,7 @@
         const p = standOf(n);
         G.hermes.position.set(p.x, 0, p.z);
         const b = BASIN_XZ[Math.min(n, 3)];
-        G.hermes.rotation.y = Math.atan2(b[0] - p.x, b[1] - p.z);
+        G.hermes.rotation.y = Math.atan2(p.x - b[0], p.z - b[1]);   // his front is -z: he faces the basin
         walk = null;
       }
       function startWalk(toWell, then) {
@@ -663,9 +666,11 @@
         }
         const to = standOf(toWell);
         const b = BASIN_XZ[toWell];
-        const ry1 = Math.atan2(b[0] - to.x, b[1] - to.z);
+        const ry1 = Math.atan2(to.x - b[0], to.z - b[1]);   // his front is -z: at the end he faces the basin
+        const fx0 = G.hermes.position.x, fz0 = G.hermes.position.z, dd = Math.hypot(to.x - fx0, to.z - fz0);
         walk = {
-          t: 0, dur: 0.95,
+          t: 0, dur: Math.max(0.95, dd / 1.7),
+          ryGo: dd > 0.05 ? Math.atan2(fx0 - to.x, fz0 - to.z) : ry1,   // on the way he looks where he walks
           fx: G.hermes.position.x, fz: G.hermes.position.z,
           tx: to.x, tz: to.z,
           ry0: G.hermes.rotation.y, ry1,
@@ -804,7 +809,7 @@
         cylinder.visible = false;
         scene.add(cylinder);
 
-        let hermes = null;
+        let hermes = null, Hrig = null;
         try {
           const glow = P.canvasTex(64, 64, (g, w) => {
             const gr = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
@@ -814,6 +819,7 @@
             g.fillRect(0, 0, w, w);
           });
           const H = P.buildHermes(T, glow);
+          Hrig = H;
           hermes = H && H.hermes;
           if (hermes) {
             hermes.scale.setScalar(1.18);
@@ -834,7 +840,15 @@
         [basins, [cylinder], hermes ? [hermes] : []].forEach((list) => list.forEach((o) => {
           o.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
         }));
-        return { renderer, scene, camera, basins, hermes, cylinder, dialCanvas, dialTex, camp, T };
+        // the shared feel (EclipseFX): warm light that blooms on the water, a body for Hermes, prints on the sand of the camp
+        let fx = null;
+        try {
+          if (window.EclipseFX && hermes) fx = window.EclipseFX.kit(renderer, scene, Hrig, {
+            look: { bloom: 0.45, threshold: 0.95, knee: 0.12, vignette: 0.28, grain: 0.024, ca: 0.15, sat: 1.04, contrast: 1.03, gain: [1.03, 1.0, 0.95] },
+            heightAt: () => 0, printY: 0.035, scale: 1.18, ambient: () => hermes.position, ambientRadius: 14, ambientAlpha: 0.07
+          });
+        } catch (e) { fx = null; }
+        return { fx, renderer, scene, camera, basins, hermes, cylinder, dialCanvas, dialTex, camp, T };
       }
 
       function paintDialStone() {
@@ -918,11 +932,15 @@
           const e = u * u * (3 - 2 * u);
           G.hermes.position.x = walk.fx + (walk.tx - walk.fx) * e;
           G.hermes.position.z = walk.fz + (walk.tz - walk.fz) * e;
-          G.hermes.position.y = Math.sin(u * Math.PI) * 0.08;
-          let dy = walk.ry1 - walk.ry0;
-          while (dy > Math.PI) dy -= Math.PI * 2;
-          while (dy < -Math.PI) dy += Math.PI * 2;
-          G.hermes.rotation.y = walk.ry0 + dy * e;
+          const turnTo = (a, b2, k) => { let d = b2 - a; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; return a + d * k; };
+          if (G.fx && G.fx.gait) {
+            // he turns into the walk, walks, and turns to the basin as he arrives
+            const k1 = Math.min(1, u / 0.22), k2 = Math.max(0, (u - 0.75) / 0.25);
+            G.hermes.rotation.y = turnTo(turnTo(walk.ry0, walk.ryGo, k1 * k1 * (3 - 2 * k1)), walk.ry1, k2 * k2 * (3 - 2 * k2));
+          } else {
+            G.hermes.position.y = Math.sin(u * Math.PI) * 0.08;
+            G.hermes.rotation.y = turnTo(walk.ry0, walk.ry1, e);
+          }
           if (u >= 1) {
             const then = walk.then;
             walk = null;
@@ -966,7 +984,11 @@
         if (G.cylinder && key) G.cylinder.rotation.y = (t || 0) / 1800;
 
         syncWorld();
-        G.renderer.render(G.scene, G.camera);
+        if (G.fx) {
+          G.fx.gait && G.fx.gait.look(walk ? null : { x: (BASIN_XZ[Math.min(S ? S.well : 0, 3)] || BASIN_XZ[0])[0], y: 0.7, z: (BASIN_XZ[Math.min(S ? S.well : 0, 3)] || BASIN_XZ[0])[1] });
+          G.fx.frame(dt, G.camera);
+          G.fx.render(G.scene, G.camera, dt);
+        } else G.renderer.render(G.scene, G.camera);
         raf = requestAnimationFrame(frame);
       }
 

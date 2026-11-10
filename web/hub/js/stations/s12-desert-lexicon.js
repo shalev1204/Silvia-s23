@@ -702,6 +702,14 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const H = P.buildHermes(T, glowTex);
         H.flame.visible = false;
         scene.add(H.hermes);
+        // the shared feel (EclipseFX): torchlight that blooms, a cold moonlit grade, a body for Hermes, prints he leaves in the sand
+        let fx = null;
+        try {
+          if (window.EclipseFX) fx = window.EclipseFX.kit(renderer, scene, H, {
+            look: { bloom: 0.62, threshold: 0.9, knee: 0.15, vignette: 0.36, grain: 0.03, ca: 0.16, sat: 1.0, contrast: 1.04, gain: [0.98, 1.0, 1.05] },
+            heightAt: dune, sandColor: 0x8d8aa0, printColor: 0x23243a, printLife: 22, blowColor: 0x0a0d24, scale: 1, wind: [0.5, 0, 0.15]
+          });
+        } catch (e) { fx = null; }
 
         // Rings on what she can choose, motes of sand drifting in the moonlight
         const ringGeo = new T.RingGeometry(0.55, 0.72, 40); ringGeo.rotateX(-Math.PI / 2);
@@ -716,7 +724,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const burst = new T.Points(bG, new T.PointsMaterial({ color: 0xffe2a0, size: 0.12, map: glowTex, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
         burst.visible = false; scene.add(burst);
 
-        return { T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv, sandTime,
+        return { fx, T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv, sandTime,
                  steleI, faceCv, glowCv, baseCv, faceTex, glowTexS, GRID_X0, GRID_Y0, CS, CV_W, CV_H, SW, SH,
                  curbLine, zLine, curbGlow, dialCv, dialTex, needle, needleMat, dialGlow, bezel, DIAL_Y, POINTS16,
                  watcher, torch, tFlame, sleeper, torch2, camels, banner, lance, hearth, fleeRows, pursuers, chaseLight,
@@ -983,6 +991,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
       // A mistake that counts: one heart less. True when it was the last one
       function loseHeart() {
         S.hearts = Math.max(0, S.hearts - 1);
+        if (G && G.fx) G.fx.blow(G.hermes.position.clone(), S.hearts > 0 ? 0.45 : 0.75);
         paintHearts(true);
         if (soundOn()) tone(S.hearts > 0 ? 220 : 110, 0, S.hearts > 0 ? 0.5 : 0.9, { to: S.hearts > 0 ? 150 : 60, gain: S.hearts > 0 ? 0.08 : 0.1, type: 'triangle' });
         return S.hearts <= 0;
@@ -1130,6 +1139,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         if (!WATCH[S.watch].safe) { heard('brush'); return; }
         if (soundOn()) sounds.brush();
         view.kneel = performance.now();
+        if (G && G.fx) { const hp = G.hermes.position, yw = G.hermes.rotation.y; G.fx.puff({ x: hp.x - Math.sin(yw) * 0.7, y: 0.5, z: hp.z - Math.cos(yw) * 0.7 }, 10, { size: [0.15, 0.3], speed: [0.2, 0.6], up: [0.1, 0.5], alpha: 0.3 }); }
         S.min += COST.brush;
         const next = (S.watch + 1) % WATCH.length;
         if (word !== w.answer) {
@@ -1410,6 +1420,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         clearControls();
         view.lock = performance.now();
         if (soundOn()) sounds.bronze();
+        if (G && G.fx) G.fx.triumph({ x: G.hermes.position.x, y: 1.2, z: G.hermes.position.z }, 0.7);
         replay(fxEl.flash, 'is-on');
         subtitle('194° SSW ⇄ 14° NNE · Al-Qibla is locked', 5);
         paintHud();
@@ -1516,6 +1527,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         if (door && door.heap) { door.heap.visible = true; door.heap.userData.pop = performance.now(); }
         if (soundOn()) sounds.rubble();
         view.shake = 0.7;
+        if (G && G.fx) G.fx.puff(door && door.heap ? door.heap.getWorldPosition(new G.T.Vector3()) : G.hermes.position.clone(), 26, { size: [0.4, 0.9], speed: [0.6, 1.8], up: [0.6, 1.6], alpha: 0.45, color: 0x9a8f86 });
         burn();
         view.chase = performance.now();
         const L = FLEE[i][d + 1];
@@ -1583,7 +1595,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         where('At the hearth of the BC Ashes, Camp VII. Al-Qibla is locked: 194° SSW for the raiders, 14° NNE for Tower II.');
         if (el.victory) el.victory.style.display = 'block';
         if (window.EclipseCinematic) window.EclipseCinematic.attach(el.victory, 'night_of_steles');
-        const fanfare = () => { if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime(); };
+        const fanfare = () => { if (soundOn()) sounds.win(); else if (sfx && sfx.playCelestialChime) sfx.playCelestialChime(); if (G && G.fx && G.fx.post) { G.fx.post.flash(0xe8ecff, 0.25, 1.5); G.fx.post.pulse(0.9, 2); } };
         if (!live) fanfare();
         const first = !isDone();
         put('order_desert_lexicon_completed', 'true');
@@ -1665,15 +1677,19 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const crouchTo = view.phase === 'hide' ? 0.62 : stage() === 'stele' && view.phase !== 'walk' ? 0.8 : 1;
         view.cy = (view.cy || 1) + (crouchTo - (view.cy || 1)) * Math.min(1, dt * 6);
         H.scale.set(1, view.cy, 1);
-        if (!moving && !rm) H.scale.y *= 1 + Math.sin(now / 640) * 0.012;
+        const gaitOn = !!(G.fx && G.fx.gait);
+        if (!moving && !rm && !gaitOn) H.scale.y *= 1 + Math.sin(now / 640) * 0.012;
         if (view.kneel && !rm) { const kt = (now - view.kneel) / 1100; if (kt >= 1) view.kneel = 0; else H.scale.y *= 1 - 0.12 * Math.sin(Math.PI * Math.min(1, kt)); }
-        const swing = moving && !rm ? Math.sin(now / (w && w.run ? 80 : 120)) : 0;
-        G.legL.position.z = swing * 0.2; G.legR.position.z = -swing * 0.2;
-        G.legL.position.y = Math.max(0, swing) * 0.06; G.legR.position.y = Math.max(0, -swing) * 0.06;
-        G.cloak.rotation.z = swing * 0.03;
+        const swing = moving && !rm && !gaitOn ? Math.sin(now / (w && w.run ? 80 : 120)) : 0;
+        if (gaitOn) G.fx.frame(dt, G.camera);
+        else {
+          G.legL.position.z = swing * 0.2; G.legR.position.z = -swing * 0.2;
+          G.legL.position.y = Math.max(0, swing) * 0.06; G.legR.position.y = Math.max(0, -swing) * 0.06;
+          G.cloak.rotation.z = swing * 0.03;
+          G.lamp.rotation.z = rm ? 0 : swing * 0.1;
+        }
         H.rotation.x = w && w.run ? 0.12 : 0;
-        G.staff.rotation.x = view.kneel ? -0.6 : swing * 0.25;
-        G.lamp.rotation.z = rm ? 0 : swing * 0.1;
+        if (view.kneel) G.staff.rotation.x = -0.6; else if (!gaitOn) G.staff.rotation.x = swing * 0.25;
 
         // The watcher walks his round; when he hears something he stops and lifts his torch toward the stones
         const ww = view.wwalk;
@@ -1841,7 +1857,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         G.moonLight.position.set(view.x + 16, 26, view.z + 22);
         G.moonLight.target.position.set(view.x, 0, view.z);
         paintFacing();
-        G.renderer.render(G.scene, G.camera);
+        if (G.fx) G.fx.render(G.scene, G.camera, dt); else G.renderer.render(G.scene, G.camera);
       }
       function fit() {
         if (!G || !el.stage) return;

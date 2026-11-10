@@ -860,7 +860,8 @@
         o = o || {};
         var paint = o.paint || paintFor();
         var horizon = o.horizon == null ? 0xe8cfa8 : o.horizon;
-        scene.fog = new T.Fog(preTone(horizon, o.exposure), o.fogNear || 22, o.fogFar || 72);
+        // three lays the fog after the tone curve and the encoding: the sky's horizon colour as it shows is the seamless one
+        scene.fog = new T.Fog(horizon, o.fogNear || 22, o.fogFar || 72);
         var skyObj = sky(scene, { horizon: horizon, zenith: o.zenith, mid: o.mid, glow: o.glow, sun: o.sun });
         var ground = terrain(scene, paint, { seed: o.seed || 21, flatRadius: o.flatRadius || 13 });
         var far = ridges(scene, { horizon: horizon });

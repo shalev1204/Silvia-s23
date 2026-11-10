@@ -407,7 +407,7 @@
 
     scene = new T.Scene();
     var HORIZON = 0x1c2a52;
-    scene.fog = new T.Fog(SC.preTone(HORIZON, 1.15), 26, 95);
+    scene.fog = new T.Fog(HORIZON, 26, 95);   // the sky's horizon as it shows: the dunes melt into it
     var aspect = Math.max(0.4, canvas.clientWidth / Math.max(1, canvas.clientHeight));
     camera = new T.PerspectiveCamera(46, aspect, 0.1, 320);
     var paint = SC.paint();
@@ -542,6 +542,14 @@
     };
 
     var tmp = new T.Vector3();
+    // the shared feel (EclipseFX): the lamp, the fire and the stars bloom in a cold night grade; Hermes breathes and looks
+    efx = null;
+    try {
+      if (window.EclipseFX) efx = window.EclipseFX.kit(renderer, scene, Hh, {
+        look: { bloom: 0.7, threshold: 0.86, knee: 0.16, vignette: 0.38, grain: 0.032, ca: 0.16, sat: 1.0, contrast: 1.04, gain: [0.97, 1.0, 1.06] },
+        printsOn: false, sandColor: 0x6d6a86, blowColor: 0x08091c, scale: 1.15, idle: 0.0016
+      });
+    } catch (e) { efx = null; }
     var updaters = [function (t, dt) {
       skyObj.uniforms.uTime.value = t;
       stars.material.opacity = 0.88 + 0.07 * Math.sin(t * 1.7);
@@ -552,8 +560,7 @@
       lampLight.position.copy(tmp);
       lampLight.intensity = flameOn ? (1.5 + 0.2 * Math.sin(t * 11) + 0.1 * Math.sin(t * 23)) * (1 + lampBoost) : 0;
       Hh.flame.scale.set(1 + 0.08 * Math.sin(t * 9), 1.35 + 0.12 * Math.sin(t * 13 + 1) + lampBoost * 0.5, 1);
-      Hh.lamp.rotation.z = Math.sin(t * 1.3) * 0.04;
-      Hh.cloak.scale.y = 1 + Math.sin(t * 1.1) * 0.004;
+      if (!(efx && efx.gait)) { Hh.lamp.rotation.z = Math.sin(t * 1.3) * 0.04; Hh.cloak.scale.y = 1 + Math.sin(t * 1.1) * 0.004; }
       if (camp.visible) camp.userData.update(t, 0.7, 1);
       nomad.userData.update && nomad.visible && nomad.userData.update(t);
       var spH = speaking === 'hermes' || speaking === 'silvia', spN = speaking === 'nomad', pulse = 0.55 + 0.35 * Math.sin(t * 5);
@@ -561,6 +568,11 @@
       ringN.material.opacity += ((spN && nomad.visible ? pulse : 0) - ringN.material.opacity) * Math.min(1, dt * 8);
       ringN.position.set(nomad.position.x, 0.03, nomad.position.z);
       hermes.position.y = spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0;
+      if (efx) {
+        // he looks at the traveller while he is there, and at the fire otherwise
+        if (efx.gait) efx.gait.look(nomad.visible ? { x: nomad.position.x, y: 2.2, z: nomad.position.z } : { x: camp.position.x, y: 0.6, z: camp.position.z });
+        efx.frame(dt, camera);
+      }
       nomadLamp.position.set(nomad.position.x - 0.4, 1.4, nomad.position.z + 0.3);
       // walkers: the nomad slides on, the camel strides and leaves prints
       var m = mover.target;
@@ -600,7 +612,7 @@
     startLoop();
   }
 
-  var tmpV = null;
+  var tmpV = null, efx = null;
   // keep the speech bubble over whoever talks (Silvia's radio bubble floats beside Hermes)
   function placeBubble() {
     if (!bubbleEl || !bubbleWho || !S3 || !camera) return;
@@ -626,7 +638,7 @@
     clock.last = now; clock.t += dt;
     scene.userData.updaters.forEach(function (u) { u(clock.t, dt); });
     if (orbitCtl) orbitCtl.update(dt, !reducedMotion);
-    renderer.render(scene, camera);
+    if (efx) efx.render(scene, camera, dt); else renderer.render(scene, camera);
     placeBubble();
   }
   function handleResize() {
