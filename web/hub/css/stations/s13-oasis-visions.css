@@ -402,6 +402,7 @@
 #modal-oasis-visions .rw-ledger .rw-ledger-kicker { color: #5c3412; }
 #modal-oasis-visions .rw-rays {
   left: 0;
+  animation: none;
   top: 0;
   right: 0;
   bottom: 0;

@@ -300,7 +300,6 @@
       opacity: 0.45;
       color: var(--brass-base);
       transition: color 0.3s ease, opacity 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
-      cursor: pointer;
     }
 
     .footer-lore-crest .crest-star.active {

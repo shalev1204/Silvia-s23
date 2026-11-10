@@ -85,7 +85,7 @@ VIEWS = ["view-trail", "view-transmissions", "view-archives", "view-chronicles",
 SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
 SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done", "order_silvia_live_v3": "done",
           "order_silvia_north_portal_v1": "done"}
-DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true"}
+DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true"}
 DESERT_BASE = dict(SILVIA, order_dawn_step="3", order_cairn1_completed="true", order_seal_cairn_1="true",
                    order_chasm_march_start="1", order_whispering_chasm_completed="true",
                    order_salt_playa_completed="true", order_field_wire_step="4")
@@ -213,9 +213,9 @@ def test_wire_gating(browser):
     info, errors = wire_state(browser, {"order_desert_lexicon_completed": "true"})
     check(len(info["choices"]) == 3, "Lexicon done: Camp VII debrief opens")
     info, errors = wire_state(browser, {"order_desert_lexicon_completed": "true", "order_field_wire_step": "6"})
-    check(not info["choices"] and "XXX" not in info["text"], "Clepsydra not done: no well grid, no key")
+    check("XXX" not in info["text"], "Clepsydra not done: Hermes is already at Camp VIII, but the chat never gives the key")
     info, errors = wire_state(browser, {"order_desert_lexicon_completed": "true", "order_field_wire_step": "6",
-                                        "order_oasis_clepsydra_completed": "true"})
+                                        "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true"})
     check(len(info["choices"]) == 3 and not errors, "Clepsydra done: Camp VIII debrief opens", "; ".join(errors[:2]))
 
     # The Operator's hold (CHASM_HOLD in hub-core.js): the 26 hours are over, but Hermes stays at his camp for Silvia
@@ -1706,7 +1706,7 @@ def test_stage_pause(browser):
 
 def test_ambience(browser):
     print("\n21. Ambient sound: each station game has its own bed, it stops on close, and the speaker mutes it")
-    ctx, page, errors = new_page(browser, dict(DESERT_BASE, **DESERT_DONE))
+    ctx, page, errors = new_page(browser, dict(DESERT_BASE, **DESERT_DONE, order_clepsydra_march_start="1", order_clepsydra_march_bypassed="true"))
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
     js = page.evaluate
@@ -2102,6 +2102,18 @@ def low_contrast(page, root=None):
         ratio = (max(lum(fg), lum(bg)) + 0.05) / (min(lum(fg), lum(bg)) + 0.05)
         if ratio < (3 if t["size"] >= 24 or (t["bold"] and t["size"] >= 18.66) else 4.5):
             bad.append("%s «%s» %.2f:1" % (t["el"], t["text"], ratio))
+    return bad
+
+
+_low_contrast_once = low_contrast
+
+
+def low_contrast(page, root=None):
+    # buttons and cards fade in: only what is still too pale after a second look counts
+    bad = _low_contrast_once(page, root)
+    if bad:
+        page.wait_for_timeout(1800)
+        bad = _low_contrast_once(page, root)
     return bad
 
 
@@ -2945,7 +2957,7 @@ def test_veiled_stations(browser):
 
     # Station 14 while Hermes crosses the Great Erg
     js("localStorage.setItem('order_salt_playa_completed', 'true'); localStorage.setItem('order_desert_lexicon_completed', 'true');"
-       f"localStorage.setItem('order_oasis_clepsydra_completed', 'true'); localStorage.setItem('order_monolith_march_start', String(Date.now() - {hour}))")
+       f"localStorage.setItem('order_oasis_clepsydra_completed', 'true'); localStorage.setItem('order_gates_march_bypassed', 'true'); localStorage.setItem('order_monolith_march_start', String(Date.now() - {hour}))")
     js("window.selectMapNode(23, false)"); page.wait_for_timeout(300)
     c = card()
     check(title() == "The Sun Monolith" and "Cairn II" not in c and "noon" not in c.lower() and "TIME LEFT" in c.upper() and bar_on(),
@@ -3828,6 +3840,38 @@ def test_desert_road(browser):
     ctx.close()
 
 
+def test_gates_march(browser):
+    print("\n43. Camp VIII to the gates of Tower II: six hours on foot, counted from the minute the Clepsydra was solved")
+    hour = 3600 * 1000
+    now = int(time.time() * 1000)
+    base = dict(DESERT_BASE, order_desert_lexicon_completed="true", order_oasis_clepsydra_completed="true", order_clepsydra_march_bypassed="true",
+                order_clepsydra_done_at=str(now - hour))
+    ctx, page, errors = new_page(browser, base)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    start = int(js("localStorage.getItem('order_gates_march_start') || '0'"))
+    check(abs(start - (now - hour)) < 5000, "the walk starts at the minute the station was solved, not when the page opens", str(start - (now - hour)))
+    check(js("window.isGatesMarchOver()") is False and js("window.getGatesMarchEta()").startswith("4 h 5"), "after one hour of six, five are left", js("window.getGatesMarchEta()"))
+    js("window.selectMapNode(27, false)"); page.wait_for_timeout(500)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("TIME LEFT" in card.upper() and "STAND AT THE GATES" not in card.upper(), "the gates card shows the countdown and does not open", card[:150].replace("\n", " "))
+    js("window.openGatesTowerIIModal()"); page.wait_for_timeout(400)
+    check(js("getComputedStyle(document.getElementById('modal-gates-tower-ii')).display") == "none", "and the scene refuses to open while he walks")
+    js("localStorage.setItem('order_gates_march_start', String(Date.now() - 7 * 3600 * 1000))")
+    js("window.selectMapNode(27, false)"); page.wait_for_timeout(500)
+    card = js("document.getElementById('star-inspector').innerText")
+    check("STAND AT THE GATES" in card.upper(), "after six hours Hermes is on the steps and the scene opens", card[:150].replace("\n", " "))
+    check(not errors, "no JS errors on the walk to the gates", "; ".join(errors[:2]))
+    ctx.close()
+
+    legacy = dict(DESERT_BASE, order_desert_lexicon_completed="true", order_oasis_clepsydra_completed="true", order_clepsydra_march_bypassed="true")
+    ctx, page, errors = new_page(browser, legacy)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    start = int(page.evaluate("localStorage.getItem('order_gates_march_start') || '0'"))
+    check(start == 1794312900000, "a save that solved the station before the walk existed takes the hour Silvia solved it", str(start))
+    ctx.close()
+
+
 def test_game_cinematics(browser):
     print("\n41. The openings and endings of Stations 11 and 12 play in the engine: bars, titles, subtitles, a Skip button, and a camera that ends where the game begins")
     hour = 3600 * 1000
@@ -4018,7 +4062,7 @@ def test_clepsydra_visions(browser):
     page.evaluate("window.selectMapNode(12, false)")
     page.wait_for_timeout(400)
     card = js("document.getElementById('star-inspector').innerText")
-    check("[ Sealed ]" in card and "XXX" not in card, "before noon the station stays sealed and does not give the key", card[:160].replace("\n", " "))
+    check("HERMES IS CALLING" in card.upper() and "XXX" not in card, "Hermes is already at Camp VIII: the station is ready and does not give the key", card[:160].replace("\n", " "))
     js("window.openOasisVisions && window.openOasisVisions()")
     page.wait_for_timeout(300)
     check(js("getComputedStyle(document.getElementById('modal-oasis-visions')).display") == "none", "and the registry will not open until Hermes calls")
@@ -4044,7 +4088,7 @@ SECTIONS = {
     "cinematic": test_cinematic,
     "road": test_desert_road,
     "gamecine": test_game_cinematics,
-    "visions": test_clepsydra_visions,
+    "visions": test_clepsydra_visions, "gatesmarch": test_gates_march,
     "balance": test_balance,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list

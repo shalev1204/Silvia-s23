@@ -1515,6 +1515,10 @@
   // openGatesModal({ mode: 'return', onDone }) is the welcome at the bronze doors (Station 19); with no options it is the first meeting
   function openGatesModal(opts) {
     var ret = !!(opts && opts.mode === 'return');
+    if (!ret && typeof window.isGatesMarchOver === 'function' && !window.isGatesMarchOver() && !(window.isAdminTester && window.isAdminTester()) && localStorage.getItem('order_gates_scene_completed') !== 'true') {
+      if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ ON THE ROAD ✦ Hermes is still walking to the gates of Tower II. He will call you from the steps at last light.');
+      return;
+    }
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     var begin = function () { if (ret) startReturn(opts.onDone); else startConversation(isCompleted()); };

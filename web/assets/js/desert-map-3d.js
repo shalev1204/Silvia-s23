@@ -813,6 +813,12 @@
                  text: etaP ? '🌙 NIGHT AT THE OASIS GATE · FIRST LIGHT IN: ' + etaP
                    : (hub('isPlayaCamped', false) ? '⛺ CAMPED AT THE EDGE OF THE SALT' : 'Out of the canyon, at the Oasis Gate') };
       }
+      var gatesM = marchOf('gates');
+      if (state.done.clep && !state.done.gates && gatesM && route.gates !== null && gatesM.progress() < 1) {
+        var etaG = gatesM.eta();
+        return { progress: gatesM.progress(), from: route.cum[6], to: route.gates,
+                 text: etaG ? '🚶 OFF THE CAMEL TRACKS TO THE GATES OF TOWER II · ETA: ' + etaG : 'At Camp VIII, the four skins full' };
+      }
       if (state.done.clep && !state.done.monolith && monolithProgress() < 1 && route.gates !== null) {
         var etaM = hub('getMonolithMarchEta', '');
         return { progress: monolithProgress(), from: route.gates, to: route.cum[7],

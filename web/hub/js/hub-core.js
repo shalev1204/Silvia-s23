@@ -705,7 +705,7 @@
             id: 'clepsydra', tag: 'Station 13', label: 'The Oasis Clepsydra', flag: 'order_oasis_clepsydra_completed', built: true,
             complete() { set('order_oasis_clepsydra_completed', 'true'); },
             reset() {
-              dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections', 'order_clepsydra_act1', 'order_clepsydra_visions', 'order_clepsydra_howto', 'order_clepsydra_march_start', 'order_clepsydra_march_bypassed', 'order_lamp_oil_found']); dropRelic('lamp_oil');
+              dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections', 'order_clepsydra_act1', 'order_clepsydra_visions', 'order_clepsydra_howto', 'order_clepsydra_march_start', 'order_clepsydra_march_bypassed', 'order_clepsydra_done_at', 'order_gates_march_start', 'order_gates_march_bypassed', 'order_lamp_oil_found']); dropRelic('lamp_oil');
               let w = null;
               try { w = JSON.parse(get('order_chasm_wire') || 'null'); } catch (e) { w = null; }
               if (w && typeof w === 'object') { ['seen5', 'reply5'].forEach((k) => delete w[k]); set('order_chasm_wire', JSON.stringify(w)); }
@@ -1653,6 +1653,13 @@
             };
           }
           const clepDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+          if (clepDone && !(window.isAdminTester && window.isAdminTester())) {
+            if (window.ensureGatesMarch) window.ensureGatesMarch();
+            if (!marchOver('gates')) {
+              return veiledStation({ station: '13B', march: 'gates', thumb, place: 'The Gates of Tower II',
+                walking: 'Hermes left Camp VIII with the four skins full and is walking north-north-east, off the camel tracks, toward the red cliff of Tower II. He will stand on the steps at last light.' });
+            }
+          }
           return {
             badge: 'TOWER II // AT THE GATES',
             status: clepDone ? 'HERMES AT THE GATES ✦' : 'SANCTUARY VEILED ✦',
@@ -7399,11 +7406,30 @@
 
       // Station 13: eight hours of heat from the cold hearth of Camp VII to Camp VIII, on the tail of the needle.
       // The Operator's hold keeps Silvia at the hearth. A tester walks.
-      const clepsydraMarch = makeMarch(8, { start: 'order_clepsydra_march_start', bypassed: 'order_clepsydra_march_bypassed', done: 'order_oasis_clepsydra_completed' });
+      const clepsydraMarch = makeMarch(0, { start: 'order_clepsydra_march_start', bypassed: 'order_clepsydra_march_bypassed', done: 'order_oasis_clepsydra_completed' });
       window.isClepsydraMarchStarted = clepsydraMarch.started;
       window.isClepsydraMarchOver = clepsydraMarch.over;
       window.getClepsydraMarchEta = clepsydraMarch.eta;
       window.skipClepsydraMarch = clepsydraMarch.skip;
+
+      // The walk from Camp VIII to the gates of Tower II (SIX hours: he sets out the moment the Clepsydra is solved
+      // and reaches the steps at last light). It starts at the time the station was solved, never at the time Silvia
+      // next opens the page. Saves that finished the station before this walk existed take the hour Silvia solved it.
+      const GATES_MARCH_HOURS = 6;
+      const LEGACY_CLEPSYDRA_SOLVED_AT = Date.UTC(2026, 10, 10, 12, 15);   // 10-11-2026 13:15 in Spain
+      const gatesMarch = makeMarch(GATES_MARCH_HOURS, { start: 'order_gates_march_start', bypassed: 'order_gates_march_bypassed', done: 'order_gates_scene_completed' });
+      window.ensureGatesMarch = () => {
+        try {
+          if (localStorage.getItem('order_oasis_clepsydra_completed') !== 'true' || localStorage.getItem('order_gates_march_start')) return;
+          if (localStorage.getItem('order_gates_scene_completed') === 'true') return;
+          const solvedAt = parseInt(localStorage.getItem('order_clepsydra_done_at') || '0', 10) || LEGACY_CLEPSYDRA_SOLVED_AT;
+          localStorage.setItem('order_gates_march_start', String(solvedAt));
+        } catch (e) {}
+      };
+      window.ensureGatesMarch();
+      window.isGatesMarchOver = gatesMarch.over;
+      window.getGatesMarchEta = gatesMarch.eta;
+      window.skipGatesMarch = gatesMarch.skip;
 
       // Station 14: the 12-hour crossing of the Great Erg, from the gates of Tower II to the Sun Monolith (wire step 9 starts it)
       const monolithMarch = makeMarch(() => (window.GatesRoad ? window.GatesRoad.marchHours() : 12), {
@@ -7544,7 +7570,7 @@
       }, 15000);
 
       // Every walk by its station, for the sealed cards of the Quest Map (the countdown reads arrivesAt)
-      window.EclipseMarches = { playa: playaMarch, lexicon: lexiconMarch, clepsydra: clepsydraMarch, monolith: monolithMarch, labyrinth: labyrinthMarch, cairnFour: cairnFourMarch, solstice: solsticeMarch, stele: steleMarch };
+      window.EclipseMarches = { playa: playaMarch, lexicon: lexiconMarch, clepsydra: clepsydraMarch, gates: gatesMarch, monolith: monolithMarch, labyrinth: labyrinthMarch, cairnFour: cairnFourMarch, solstice: solsticeMarch, stele: steleMarch };
       const PLAYA_LEG = {
         step: 4, march: playaMarch, doneKey: 'order_salt_playa_completed',
         walkingTitle: '✦ Night at the Oasis Gate · The Salt Waits for First Light ✦',
@@ -7571,6 +7597,14 @@
         etaLabel: 'CAMP VIII AT NOON',
         arrivedTitle: 'Noon at Camp VIII · Hermes Is Calling',
         arrivedDesc: 'Hermes is in the shade of a ring of stone at Camp VIII, and he is calling you on the Field Wire. Answer him before you believe what the heat is showing him.'
+      };
+      const GATES_LEG = {
+        step: 8, march: gatesMarch, doneKey: 'order_gates_scene_completed',
+        walkingTitle: '✦ Off the Camel Tracks · North-North-East to the Gates of Tower II ✦',
+        walkingDesc: 'Hermes left Camp VIII the moment the clepsydra gave up its water, with the four skins full and the falcon weight at the bottom of his satchel. He is walking north-north-east toward the red cliff of Tower II. Keep the page “At the Gates of Tower II” close: he will call you from the steps at last light.',
+        etaLabel: 'THE GATES OF TOWER II AT LAST LIGHT',
+        arrivedTitle: 'At the Gates of Tower II · Hermes Is Calling',
+        arrivedDesc: 'Hermes is standing on the steps of Tower II. Answer him on the Field Wire.'
       };
       const MARCH_STARTED_BY_ANSWER = { 9: monolithMarch, 13: labyrinthMarch, 17: cairnFourMarch, 21: solsticeMarch, 25: steleMarch, 29: oracleStair, 33: masksMarch };
 
@@ -8406,6 +8440,7 @@
         }
         if (wireCurrentStep === 8) {
           // The Four Wells are behind him: Hermes reaches the gates of Tower II (Sheet 13A)
+          if (!isCarlesTester() && !gatesMarch.over()) { window.ensureGatesMarch(); showMarchLeg(GATES_LEG); return; }
           rememberGateSeal();
           advanceTo(9);
         }

@@ -602,6 +602,8 @@
         }
         S.phase = 'won';
         put(DONE_KEY, 'true');
+        if (!get('order_clepsydra_done_at')) put('order_clepsydra_done_at', String(Date.now()));
+        if (typeof window.ensureGatesMarch === 'function') window.ensureGatesMarch();
         if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
         document.dispatchEvent(new CustomEvent('visions:cleared'));
         save();
