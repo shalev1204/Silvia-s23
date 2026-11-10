@@ -165,6 +165,7 @@
       const SKY_N = EDGE_Z - 1.5, SKY_S = POST_Z + 1.0, GRID_Z = (SKY_N + SKY_S) / 2;
       const SKY_HALF_H = (SKY_S - SKY_N) / 2, SKY_HALF_W = X(ROWS - 1) + CELL * 0.6;
       let G = null;
+      let floorY = FACE;   // the height of the salt under his feet this frame: where boot prints and dust meet the ground
       const P = window.EclipsePaint;   // the painted look of the Whispering Chasm (s10-whispering-chasm.js)
 
       // The salt's polygons and its drifting cloud shadows are looked up in two small textures (made in makeNoise below), not
@@ -1210,7 +1211,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         try {
           if (window.EclipseFX) fx = window.EclipseFX.kit(renderer, scene, H, {
             look: { bloom: 0.42, threshold: 0.96, knee: 0.1, vignette: 0.24, grain: 0.022, ca: 0.14, sat: 1.02, contrast: 1.03, gain: [1.0, 0.995, 1.01] },
-            printsOn: false, sandColor: 0xf2e9e2, ambient: () => H.hermes.position, ambientRadius: 22, ambientAlpha: 0.07, wind: [1.1, 0, 0.3], scale: 1
+            heightAt: () => floorY, printY: 0.012, printColor: 0x6a5880, printLife: 45, sandColor: 0xf2e9e2, ambient: () => H.hermes.position, ambientRadius: 22, ambientAlpha: 0.07, wind: [1.1, 0, 0.3], scale: 1
           });
         } catch (e) { fx = null; }
 
@@ -2487,6 +2488,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         const H = G.hermes;
         const hop = w && w.hop ? Math.sin(Math.min(1, w.t) * Math.PI) * 0.35 : 0;
         const floor = view.z > SHORE_Z ? 0.3 : view.z > Z(ROWS - 1) + CELL * 0.6 ? SUMP_TOP : view.z > EDGE_Z + 0.5 ? FACE : SLAB_TOP;
+        floorY = floor;
         H.position.set(view.x, floor + hop, view.z);
         H.rotation.set(0, view.yaw, 0);
         H.scale.setScalar(view.sky ? 1.5 : 1);
@@ -3022,6 +3024,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         beginAgain("Back on the North Edge, by the tripod, for one more crossing. The wind has smoothed the salt again, and every slab looks the same.");
       }
       function beginAgain(line) {
+        if (G && G.fx && G.fx.prints) G.fx.prints.clear();   // a new crossing: the salt is smooth again
         if (el.victory) el.victory.style.display = 'none';
         view.mirageAt = -1; view.sky = true; view.look = 0; view.rings = 0; camPos.ok = false;
         placeHermes();

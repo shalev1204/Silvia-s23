@@ -507,12 +507,16 @@
 
       // ---------------------------------------------------------------- footprints
       function bootTex() {
+        // a boot sole seen from above: the broad sole with its toe, a gap, the heel, and a few ridges cut across the tread
         var c = document.createElement('canvas'); c.width = 64; c.height = 128;
         var g = c.getContext('2d');
-        g.fillStyle = 'rgba(255,255,255,1)';
-        g.beginPath(); g.ellipse(32, 40, 20, 34, 0, 0, TAU); g.fill();
-        g.beginPath(); g.ellipse(32, 100, 15, 20, 0, 0, TAU); g.fill();
+        g.fillStyle = '#fff';
+        g.beginPath(); g.moveTo(32, 6); g.bezierCurveTo(52, 8, 56, 34, 52, 64); g.bezierCurveTo(48, 76, 16, 76, 12, 64); g.bezierCurveTo(8, 34, 12, 8, 32, 6); g.fill();
+        g.beginPath(); g.ellipse(32, 102, 17, 19, 0, 0, TAU); g.fill();
+        g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,0.55)';
+        for (var y = 22; y < 62; y += 9) g.fillRect(16, y, 32, 3);
         var tx = new T.CanvasTexture(c);
+        tx.anisotropy = 4;
         return tx;
       }
       function footprints(scene, o) {

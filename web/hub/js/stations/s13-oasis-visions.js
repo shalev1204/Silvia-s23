@@ -527,6 +527,7 @@
         S.weights = S.well;
         S.min += 4;
         drinkPulse = 1;
+        if (G && G.basins[Math.min(S.well - 1, 3)]) G.basins[Math.min(S.well - 1, 3)].userData.water.material.uniforms.uT0.value = performance.now() / 1000;   // the water answers with rings
         if (G && G.fx) { const bw = BASIN_XZ[Math.min(S.well - 1, 3)]; G.fx.triumph({ x: bw[0], y: 0.8, z: bw[1] }, 0.6); }
         let note = 'Yes. That matches the page. I drink, and I set a counterweight.';
         if (S.well >= WELLS.length) {
@@ -678,6 +679,44 @@
         };
       }
 
+      // Living water: the sky and the low sun on its surface (more mirror at a grazing angle), ripples that run out from the
+      // middle when Hermes drinks, light lines that dance on the bottom of the basin. It rises from nothing when a well answers.
+      const WATER_VERT = 'varying vec2 vUv; varying vec3 vW; void main(){ vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }';
+      const WATER_FRAG = [
+        'uniform float uTime, uLevel, uT0; uniform vec3 uSun;',
+        'varying vec2 vUv; varying vec3 vW;',
+        'void main(){',
+        '  vec2 p = (vUv - 0.5) * 2.0; float d = length(p);',
+        '  if (d > 1.0) discard;',
+        '  float age = max(0.0, uTime - uT0), live = exp(-age * 0.9) * step(0.0, uT0);',
+        '  float ring = sin((d - age * 0.55) * 34.0) * live * smoothstep(age * 0.55 + 0.34, age * 0.55 - 0.02, d) * smoothstep(0.0, 0.1, age * 0.55 - d + 0.1);',
+        '  vec2 g = vec2(sin(p.x * 9.0 + uTime * 1.3) + sin(p.y * 7.0 - uTime * 1.1) * 0.8 + sin((p.x + p.y) * 14.0 + uTime * 2.1) * 0.35,',
+        '                sin(p.y * 10.0 + uTime * 1.2) + sin(p.x * 6.0 + uTime * 0.9) * 0.8 + sin((p.x - p.y) * 13.0 - uTime * 1.9) * 0.35);',
+        '  vec2 slope = g * 0.028 + normalize(p + 1e-4) * ring * 0.2;',
+        '  vec3 N = normalize(vec3(slope.x, 1.0, slope.y));',
+        '  vec3 V = normalize(cameraPosition - vW);',
+        '  float fres = 0.04 + 0.96 * pow(1.0 - max(dot(N, V), 0.0), 5.0);',
+        '  vec3 R = reflect(-V, N);',
+        '  vec3 sky = mix(vec3(0.91, 0.82, 0.66), vec3(0.45, 0.66, 0.82), smoothstep(0.0, 0.7, R.y));',
+        '  float glint = pow(max(dot(R, normalize(uSun)), 0.0), 140.0);',
+        '  float caustic = pow(max(0.0, sin(p.x * 12.0 + g.x * 1.6 + uTime) * sin(p.y * 12.0 + g.y * 1.6 - uTime * 0.8)), 3.0);',
+        '  vec3 deep = mix(vec3(0.03, 0.2, 0.26), vec3(0.1, 0.42, 0.46), (1.0 - d) * 0.8);',
+        '  deep += vec3(0.4, 0.75, 0.7) * caustic * 0.22;',
+        '  vec3 col = mix(deep, sky, clamp(fres * 1.15 + 0.07, 0.0, 1.0)) + vec3(1.0, 0.93, 0.78) * glint * 3.2 + vec3(0.7, 0.9, 1.0) * max(ring, 0.0) * 0.18;',
+        '  col = mix(col, vec3(0.9, 0.84, 0.7), smoothstep(0.9, 1.0, d) * 0.5);',
+        '  gl_FragColor = vec4(pow(max(col, vec3(0.0)), vec3(2.2)), uLevel * smoothstep(1.0, 0.93, d));',
+        '  #include <tonemapping_fragment>',
+        '  #include <encodings_fragment>',
+        '}'
+      ].join('\n');
+      function waterMaterial() {
+        const T = window.THREE;
+        return new T.ShaderMaterial({
+          transparent: true, depthWrite: false, vertexShader: WATER_VERT, fragmentShader: WATER_FRAG,
+          uniforms: { uTime: { value: 0 }, uLevel: { value: 0 }, uT0: { value: -1 }, uSun: { value: new T.Vector3(0.3, 0.9, -0.35) } }
+        });
+      }
+
       function buildWorld() {
         const T = window.THREE;
         const P = window.EclipsePaint;
@@ -777,12 +816,9 @@
           weight.position.set(0.95, 0.12, 0.15);
           weight.visible = false;
           group.add(weight);
-          const water = new T.Mesh(
-            new T.CircleGeometry(0.55, 16),
-            new T.MeshBasicMaterial({ color: 0x6ec8e8, transparent: true, opacity: 0 })
-          );
+          const water = new T.Mesh(new T.CircleGeometry(0.61, 40), waterMaterial());
           water.rotation.x = -Math.PI / 2;
-          water.position.y = 1.0;
+          water.position.y = 1.03;   // just above the top of the bowl (1.02), inside the gilded rim
           group.add(water);
           group.position.set(BASIN_XZ[i][0], 0, BASIN_XZ[i][1]);
           group.userData = { rim, weight, water, rimMat };
@@ -951,8 +987,17 @@
 
         if (drinkPulse > 0 && S && S.well > 0) {
           drinkPulse = Math.max(0, drinkPulse - dt * 1.2);
-          const b = G.basins[Math.min(S.weights - 1, G.basins.length - 1)];
-          if (b) b.userData.water.material.opacity = drinkPulse * 0.55;
+        }
+        {
+          // each basin holds water once its well has answered (and the last one at the falcon): it rises and falls softly
+          const nowS = performance.now() / 1000, cleft0 = S && (S.phase === 'cleft' || S.phase === 'won');
+          G.basins.forEach((b, n) => {
+            const u = b.userData.water.material.uniforms, held = !!S && !S.lost && (n < (S.weights | 0) || (cleft0 && n === 2));
+            u.uTime.value = nowS;
+            u.uLevel.value += ((held ? 0.96 : 0) - u.uLevel.value) * Math.min(1, dt * 2.2);
+            b.userData.water.visible = u.uLevel.value > 0.01;
+            b.userData.water.position.y = 1.03 + 0.015 * Math.min(1, u.uLevel.value);
+          });
         }
         if (heatWobble > 0) heatWobble = Math.max(0, heatWobble - dt * 0.8);
         if (G.camp) G.camp.update((t || 0) / 1000, dt, reduced());
