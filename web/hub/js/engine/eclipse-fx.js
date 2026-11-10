@@ -191,10 +191,14 @@
         var size = new T.Vector2(), w = 0, h = 0, time = 0;
         var flash = { k: 0, decay: 1 }, pulse = { k: 0, decay: 1 };
         var slow = 0, seen = 0, degraded = false;
+        // the governor: a device that cannot hold its frame rate draws the scene a little smaller (the lens stretches it
+        // back, soft but whole) and refreshes its shadows every other frame; it climbs back when there is room again
+        var scale = 1, lastScale = 1, quick = 0, shadowTick = 0, fullW = 0, fullH = 0, lastNow = 0;
         function resize() {
           renderer.getDrawingBufferSize(size);
-          if (size.x === w && size.y === h) return;
-          w = size.x; h = size.y;
+          if (size.x === fullW && size.y === fullH && scale === lastScale) return;
+          fullW = size.x; fullH = size.y; lastScale = scale;
+          w = Math.max(2, Math.round(fullW * scale)); h = Math.max(2, Math.round(fullH * scale));
           sceneRT.setSize(w, h);
           shaftA.setSize(Math.max(1, w >> 2), Math.max(1, h >> 2)); shaftB.setSize(Math.max(1, w >> 2), Math.max(1, h >> 2));
           var lw = Math.max(1, w >> 1), lh = Math.max(1, h >> 1);
@@ -205,12 +209,24 @@
         var api = {
           params: p,
           enabled: true,
+          scale: function () { return scale; },
           render: function (scene, camera, dt) {
             dt = dt || 0.016;
             if (!api.enabled) { renderer.setRenderTarget(null); renderer.render(scene, camera); return; }
             resize();
             // a slow GPU loses the bloom's finest level and the colour fringe before it loses its frame rate
-            if (!degraded && dt > 0 && dt < 0.09 && ++seen > 150) { if (dt > 0.03) slow++; if (seen > 330) { if (slow > 90) { degraded = true; p.ca = 0; p.haze = 0; } seen = 150; slow = 0; } }
+            // (measured on the clock, not on the game's own step: a paused or stepped game says nothing about the device)
+            var now = performance.now(), real = (now - lastNow) / 1000; lastNow = now;
+            if (real > 0.004 && real < 0.09 && ++seen > 90) {
+              if (real > 0.024) slow++; else if (real < 0.0185) quick++;
+              if (seen > 210) {
+                if (slow > 60) { if (!degraded) { degraded = true; p.ca = 0; p.haze = 0; } scale = Math.max(0.6, scale * 0.86); }
+                else if (quick > 110 && slow < 4 && scale < 1) scale = Math.min(1, scale * 1.06);
+                seen = 90; slow = 0; quick = 0;
+              }
+            }
+            if (scale < 0.999) { shadowTick ^= 1; renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = shadowTick === 0; }
+            else if (!renderer.shadowMap.autoUpdate) renderer.shadowMap.autoUpdate = true;
             time += reduced() ? 0 : dt;
             flash.k = Math.max(0, flash.k - dt * flash.decay);
             pulse.k = Math.max(0, pulse.k - dt * pulse.decay);
@@ -325,7 +341,7 @@
         var armR = H.armR || arms.filter(function (a) { return a.position.x > 0; })[0] || null;
         var armL = H.armL || arms.filter(function (a) { return a.position.x < 0; })[0] || null;
         var head = H.head || null;
-        var handL = findHand(armL);
+        var handL = H.handL || findHand(armL);
         var base = {
           armR: armR ? armR.rotation.clone() : null, armL: armL ? armL.rotation.clone() : null,
           staff: H.staff ? H.staff.rotation.clone() : null, lamp: H.lamp ? H.lamp.rotation.clone() : null,
@@ -347,6 +363,14 @@
         var cloak = { x: 0, z: 0 };
         var look = { target: null, yaw: 0, pitch: 0 };
         var lookV = new T.Vector3();
+        // the face, what he does when something happens to him, and what he does when nothing does
+        var SC = window.EclipseScenery;
+        var face = H.face || (SC && SC.faceLife && H.eyes ? SC.faceLife(H.eyes) : null);
+        var foreR = H.foreR || null, foreL = H.foreL || null, foreR0 = foreR ? foreR.rotation.x : 0, foreL0 = foreL ? foreL.rotation.x : 0;
+        var talking = false, sp = 0;
+        var rx = null, fid = { t: 5 + Math.random() * 5, k: 0, dur: 1, kind: 0, yaw: 0 };
+        // one mesh per material and limb instead of ninety loose pieces: the same man for a fifth of the draw calls
+        if (SC && SC.bake && o.bake !== false) { try { SC.bake(root, { skip: H.flame ? [H.flame] : [] }); } catch (e) {} }
 
         function foot(leg, ph, side) {
           var z, y = 0, pitch = 0;
@@ -366,6 +390,14 @@
         return {
           body: body,
           look: function (v) { look.target = v ? (v.clone ? v.clone() : new T.Vector3(v.x, v.y, v.z)) : null; },
+          face: face,
+          // while he talks his head marks the words and his free hand moves with them
+          speak: function (on) { talking = !!on; if (face && face.talk) face.talk(talking); },
+          // 'flinch' (a blow, a wrong step), 'cheer' (he lifts his staff), 'nod', 'wonder' (he looks up, eyes wide)
+          react: function (kind) {
+            rx = { kind: kind, t: 0, dur: kind === 'cheer' ? 1.7 : kind === 'wonder' ? 2.2 : kind === 'nod' ? 0.9 : 0.8 };
+            if (face) { if (kind === 'flinch') { face.mood(0.2, 1); face.blink(); } else if (kind === 'nod') { face.blink(); face.mood(0, 0, 0.7); } else if (kind === 'cheer') face.mood(0.5, 0, 1); else face.mood(1, 0); }
+          },
           update: function (dt) {
             if (!(dt > 0)) return;
             t += dt;
@@ -409,8 +441,32 @@
             body.rotation.z = 0.035 * Math.sin(TAU * phase) * wgt - clamp(yawRate, -3, 3) * 0.035;
             body.scale.y = 1 + 0.006 * breathe;
 
-            if (armR && base.armR) armR.rotation.x = base.armR.x + 0.2 * c2 * wgt + 0.02 * breathe;
-            if (armL && base.armL) armL.rotation.x = base.armL.x - 0.1 * c2 * wgt;
+            // what just happened to him: an envelope that rises fast and lets go slowly
+            var e = 0, kind = null;
+            if (rx) {
+              rx.t += dt; var u = rx.t / rx.dur;
+              if (u >= 1) rx = null;
+              else { kind = rx.kind; e = u < 0.18 ? u / 0.18 : 1 - (u - 0.18) / 0.82; e = e * e * (3 - 2 * e); }
+            }
+            var flinch = kind === 'flinch' ? e : 0, cheer = kind === 'cheer' ? e : 0, wonder = kind === 'wonder' ? e : 0;
+            var nod = kind === 'nod' ? e * Math.sin(rx.t / rx.dur * TAU * 2) : 0;
+            // and when nothing happens: he glances aside, or lifts the lamp to see better
+            var idle = wgt < 0.05 && !rx && !reduced();
+            if (idle) { fid.t -= dt; if (fid.t <= 0) { fid.t = 6 + Math.random() * 8; fid.dur = 1.6 + Math.random(); fid.k = fid.dur; fid.kind = Math.random() < 0.65 ? 0 : 1; fid.yaw = (Math.random() < 0.5 ? -1 : 1) * (0.3 + Math.random() * 0.25); } }
+            else if (!idle) fid.k = Math.min(fid.k, 0.2);
+            var fe = 0;
+            if (fid.k > 0) { fid.k -= dt; var fu = 1 - Math.max(0, fid.k) / fid.dur; fe = Math.sin(Math.PI * clamp(fu, 0, 1)); fe = fe * fe; }
+            var lift = fid.kind === 1 ? fe : 0, glance = fid.kind === 0 ? fe * fid.yaw : 0;
+            sp += ((talking ? 1 : 0) - sp) * Math.min(1, dt * 6);
+            var beat = sp * (0.6 + 0.4 * Math.sin(t * 3.1)) * (0.5 + 0.5 * Math.sin(t * 7.3));
+            body.rotation.x += 0.09 * flinch - 0.03 * cheer - 0.02 * sp;
+            body.position.y += -0.035 * flinch + 0.02 * cheer;
+
+            if (armR && base.armR) { armR.rotation.x = base.armR.x + 0.2 * c2 * wgt + 0.02 * breathe + 0.4 * flinch + 0.3 * lift + 0.2 * wonder + 0.14 * beat; armR.rotation.z = base.armR.z + 0.12 * flinch; }
+            if (armL && base.armL) { armL.rotation.x = base.armL.x - 0.1 * c2 * wgt + 1.15 * cheer + 0.15 * flinch; armL.rotation.z = base.armL.z - 0.22 * cheer; }
+            // the elbows: they give with each step, fold to lift the lamp to his face, straighten to raise the staff
+            if (foreR) foreR.rotation.x = foreR0 + 0.1 * c2 * wgt + 0.75 * lift + 0.5 * flinch + 0.35 * wonder + 0.1 * beat;
+            if (foreL) foreL.rotation.x = foreL0 - 0.06 * c2 * wgt - 0.1 * cheer + 0.25 * flinch;
             if (staffOff && H.staff) {
               H.staff.position.copy(handInBody()).add(staffOff);
               H.staff.rotation.x = base.staff.x - 0.16 * c2 * wgt;
@@ -448,12 +504,15 @@
                 lookV.copy(look.target); head.parent.worldToLocal(lookV); lookV.sub(head.position);
                 ty = clamp(Math.atan2(-lookV.x, -lookV.z), -0.75, 0.75);
                 tp = clamp(Math.atan2(lookV.y, Math.hypot(lookV.x, lookV.z)), -0.35, 0.3);
-              } else ty = 0.06 * Math.sin(t * 0.31) * (1 - wgt);
+              } else ty = 0.06 * Math.sin(t * 0.31) * (1 - wgt) + glance;
               look.yaw += (ty - look.yaw) * Math.min(1, dt * 4);
               look.pitch += (tp - look.pitch) * Math.min(1, dt * 4);
               head.rotation.y = base.head.y + look.yaw;
-              head.rotation.x = base.head.x + look.pitch + 0.06 * wgt;
+              head.rotation.x = base.head.x + look.pitch + 0.06 * wgt - 0.24 * flinch + 0.2 * cheer + 0.3 * wonder + 0.12 * nod + sp * 0.04 * Math.sin(t * 7.3) * Math.sin(t * 2.1);
+              // the eyes get there before the head does
+              if (face) face.gaze(clamp((ty - look.yaw) * 3, -1, 1), clamp((tp - look.pitch) * 3 + wonder, -1, 1));
             }
+            if (face) face.update(dt);
           },
           moving: function () { return wgt > 0.05; }
         };
@@ -690,6 +749,7 @@
         k.blow = function (at, strength) {
           var s2 = strength == null ? 0.5 : strength;
           k.shake.add(s2);
+          if (k.gait) k.gait.react('flinch');
           if (k.post) k.post.flash(o.blowColor == null ? 0x3d1206 : o.blowColor, 0.2 + 0.25 * s2, 0.7 + s2);
           if (at) k.dust.emit(at, 22, { size: [0.3, 0.6].map(function (v) { return v * (o.scale || 1); }), speed: [0.6, 1.8], up: [0.5, 1.4], life: [0.9, 1.6], alpha: 0.4, spread: o.scale || 1, color: sand });
         };
@@ -698,6 +758,7 @@
           var s2 = strength == null ? 1 : strength, sc2 = o.scale || 1;
           if (at) k.sparks.emit(at, Math.round(60 * s2), { color: o.sparkColor == null ? 0xffd27a : o.sparkColor, size: [0.07, 0.14].map(function (v) { return v * sc2; }), grow: 0.4, speed: [0.2 * sc2, 1.0 * sc2], up: [0.9 * sc2, 2.2 * sc2], life: [0.9, 1.8], alpha: 0.95, gravity: -1.3 * sc2, drag: 0.7, bounce: 0.45, spread: 0.8 * sc2 });
           if (k.post) k.post.pulse(0.5 * s2, 1.3);
+          if (k.gait) k.gait.react(s2 >= 1 ? 'cheer' : 'nod');
           k.shake.add(0.12 * s2);
         };
         k.puff = function (at, n, extra) {

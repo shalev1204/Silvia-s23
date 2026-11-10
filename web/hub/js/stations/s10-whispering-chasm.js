@@ -778,20 +778,6 @@
           put(0); put(w);
         }));
         const deep = rim(toon({ map: mantleTex, emissive: 0xffd27a, emissiveMap: mantleGlow, emissiveIntensity: 0.8, side: T.DoubleSide }), 0x9cc4ff, 0.4);
-        const skin = rim(toon({ color: 0xf0b48c }), warm, 0.3);
-        const blush = rim(toon({ color: 0xe8957a }), warm, 0.2);
-        // silver hair and beard: fine strands painted in, so a close look still shows hair and not a smooth shell
-        const hairTex = aniso(canvasTex(256, 256, (g, w, h) => {
-          g.fillStyle = '#f2f0ec'; g.fillRect(0, 0, w, h);
-          const rr = rng(5);
-          for (let i = 0; i < 520; i++) {
-            const x = rr() * w, y = rr() * h, l = 24 + rr() * 60, dark = rr() < 0.5;
-            g.strokeStyle = dark ? 'rgba(150,158,176,0.35)' : 'rgba(255,255,255,0.7)'; g.lineWidth = 1 + rr() * 1.6;
-            g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + (rr() - 0.5) * 10, y + l / 2, x + (rr() - 0.5) * 14, y + l); g.stroke();
-          }
-        }));
-        const silver = rim(toon({ color: 0xffffff, map: hairTex }), 0xffffff, 0.35);
-        const grey = rim(toon({ color: 0xcfd2da }), 0xffffff, 0.3);
         const leather = rim(toon({ color: 0x7a4a26 }), warm, 0.3);
         const leatherDk = rim(toon({ color: 0x4e2e16 }), warm, 0.25);
         const boot = rim(toon({ color: 0x5e3418 }), warm, 0.25);
@@ -799,8 +785,6 @@
         const woodDk = rim(toon({ color: 0x5c3a1c }), warm, 0.25);
         const brass = rim(toon({ color: 0xf0c060 }), 0xfff0b0, 0.6);
         const gold = rim(toon({ color: 0xf2c25a, emissive: 0x3a2404 }), 0xfff0b0, 0.5);
-        const ink = new T.MeshBasicMaterial({ color: 0x2a1a12 });
-        const eyeWhite = new T.MeshBasicMaterial({ color: 0xfffaf0 });
         const add = (mesh, x, y, z, parent) => { mesh.position.set(x, y, z); mesh.castShadow = true; (parent || hermes).add(mesh); return mesh; };
         const ell = (geo, mat, sx, sy, sz) => { const m = new T.Mesh(geo, mat); m.scale.set(sx, sy, sz); return m; };
 
@@ -821,85 +805,68 @@
         add(new T.Mesh(new T.BoxGeometry(0.075, 0.07, 0.025), brass), 0, 0.98, -0.268, cloak);
         add(new T.Mesh(new T.CylinderGeometry(0.008, 0.008, 0.28, 6), gold), 0.07, 0.84, -0.26, cloak);
         // ---- The hood lies down on his shoulders: a pool of cloth behind the neck, a soft ring in front
-        const cowl = add(new T.Mesh(new T.TorusGeometry(0.15, 0.06, 10, 28), blue), 0, 1.47, 0.0);
+        const cowl = add(new T.Mesh(new T.TorusGeometry(0.15, 0.048, 10, 28), blue), 0, 1.455, 0.035);
         cowl.rotation.x = Math.PI / 2;
         const drape = add(ell(new T.SphereGeometry(0.17, 20, 14), blue, 1.15, 0.7, 0.95), 0, 1.44, 0.12);
         drape.rotation.x = -0.35;
         const tip = add(new T.Mesh(new T.ConeGeometry(0.075, 0.26, 14), blue), 0, 1.24, 0.2);
         tip.rotation.x = 0.12;
         add(new T.Mesh(new T.TorusGeometry(0.095, 0.012, 8, 20), gold), 0, 1.31, 0.17).rotation.x = 0.4;
-        // ---- Head: a long kind face, tired eyes under heavy lids, silver brows, a white moustache over a full beard
+        // ---- Head (EclipseFigure): a sculpted skull with a painted face, a long kind one: tired grey-blue eyes under
+        // heavy white brows, a strong nose reddened by the sun, silver hair combed back from a high brow, a full beard
+        // down to his chest and a moustache in two wings. The eyes look, the lids blink, the jaw works when he talks.
         const head = new T.Group();
-        head.position.set(0, 1.64, 0);
+        head.position.set(0, 1.66, -0.01);
         hermes.add(head);
-        const hadd = (mesh, x, y, z) => { mesh.position.set(x, y, z); mesh.castShadow = true; head.add(mesh); return mesh; };
-        hadd(ell(new T.SphereGeometry(0.145, 28, 20), skin, 0.92, 1.08, 0.98), 0, 0, 0);
-        hadd(ell(new T.SphereGeometry(0.03, 12, 10), skin, 1, 1.2, 1.05), 0, -0.012, -0.145);                 // the nose
-        hadd(ell(new T.SphereGeometry(0.018, 10, 8), skin, 1.2, 1, 1), 0, -0.04, -0.152);                       // its tip
-        [-1, 1].forEach((sd) => {
-          hadd(ell(new T.SphereGeometry(0.026, 14, 10), eyeWhite, 1.15, 0.8, 0.5), sd * 0.052, 0.022, -0.13);
-          hadd(new T.Mesh(new T.SphereGeometry(0.0125, 10, 8), ink), sd * 0.052, 0.02, -0.1385);
-          hadd(new T.Mesh(new T.SphereGeometry(0.0042, 6, 6), new T.MeshBasicMaterial({ color: 0xfff8ee })), sd * 0.056, 0.024, -0.147);
-          hadd(ell(new T.SphereGeometry(0.03, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, 1.2, 0.75, 0.6), sd * 0.052, 0.028, -0.128);      // the heavy lid
-          const brow = hadd(ell(new T.CapsuleGeometry(0.012, 0.05, 4, 8), silver, 1, 1, 1), sd * 0.055, 0.058, -0.132);
-          brow.rotation.z = Math.PI / 2 + sd * 0.18;
-          hadd(ell(new T.SphereGeometry(0.03, 12, 10), blush, 1.2, 0.8, 0.6), sd * 0.085, -0.025, -0.11);                                    // ruddy cheeks
-          hadd(ell(new T.SphereGeometry(0.03, 10, 8), skin, 0.6, 1.3, 0.8), sd * 0.133, 0.0, 0.0);                                         // ears
+        const F = window.EclipseFigure;
+        const rig = F.head({ size: 0.166, skin: 0xd08a62, age: 0.85, iris: 0x5f86b4, brow: { color: 0xe8e6e2, thick: 1.25 }, nose: 1.1, jaw: 0.55, seed: 43 });
+        head.add(rig.group);
+        const silverHair = F.mat({ map: F.hairTex(0xeceae6, { dark: 0x7c86a0, light: 0xffffff }), side: T.DoubleSide }, 0xffffff, 0.35);
+        F.hair(rig, { mat: silverHair, front: 0.74 });
+        F.beard(rig, { mat: silverHair, length: 1.75, moustache: 1.1, drape: 0.72, forward: 0.1, drop: 0.14 });
+        // the hair falls behind his ears to the collar, in three locks
+        [[-0.55, 0.1], [0, 0.0], [0.55, 0.1]].forEach(([x, dz], i) => {
+          const lock = new T.Mesh(F.strands(F.tube([[x, 0.1, 0.78 - dz], [x * 1.05, -0.5, 0.86 - dz], [x * 0.95, -1.05, 0.72 - dz], [x * 0.8, -1.5, 0.6 - dz]], (u) => 0.3 - 0.2 * u, { segments: 12, radial: 12, flat: 0.5 }), { count: 4, depth: 0.03, seed: i }), silverHair);
+          lock.castShadow = true; rig.group.add(lock);
         });
-        // silver hair swept back from the brow, falling behind the ears
-        const hair = hadd(ell(new T.SphereGeometry(0.152, 28, 18, 0, Math.PI * 2, 0, 1.95), silver, 0.97, 1.08, 1.02), 0, 0.012, 0.018);
-        hair.rotation.x = -0.28;
-        [-1, 1].forEach((sd) => {
-          const lock = hadd(ell(new T.SphereGeometry(0.06, 12, 10), silver, 0.8, 1.7, 1), sd * 0.1, -0.075, 0.07);
-          lock.rotation.z = sd * 0.25;
-        });
-        const nape = hadd(ell(new T.SphereGeometry(0.085, 14, 10), silver, 1.1, 0.7, 0.7), 0, -0.095, 0.095);
-        nape.rotation.x = 0.4;
-        // moustache and beard in tufts
-        [-1, 1].forEach((sd) => {
-          const m = hadd(ell(new T.SphereGeometry(0.03, 12, 8), silver, 1.6, 0.7, 0.8), sd * 0.03, -0.062, -0.135);
-          m.rotation.z = sd * -0.35;
-        });
-        const beard = hadd(new T.Mesh(new T.ConeGeometry(0.105, 0.28, 20), silver), 0, -0.19, -0.075);
-        beard.rotation.x = Math.PI + 0.32;
-        [-1, 1].forEach((sd) => {
-          const tuft = hadd(new T.Mesh(new T.ConeGeometry(0.05, 0.17, 12), silver), sd * 0.065, -0.115, -0.09);
-          tuft.rotation.set(Math.PI + 0.25, 0, sd * 0.35);
-          hadd(ell(new T.SphereGeometry(0.052, 12, 10), silver, 1, 1.2, 0.9), sd * 0.075, -0.07, -0.07);
-        });
-        const chin = hadd(ell(new T.SphereGeometry(0.075, 16, 12), silver, 1, 0.9, 0.9), 0, -0.09, -0.1);
-        chin.rotation.x = 0.2;
-        // ---- Arms in wide sleeves with a gold cuff; leather gloves with their fingers
-        function arm(side, ax, az) {
+        const face = F.face(rig);
+        // ---- Arms in wide sleeves, with an elbow: the upper sleeve, the bell of the cuff with its gold band, a gloved
+        // hand with real fingers closed on what it carries
+        const leatherHand = rim(toon({ color: 0x7a4a26 }), warm, 0.3);
+        function arm(side, ax, az, bend) {
           const a = new T.Group();
           a.position.set(side * 0.27, 1.34, 0);
           a.rotation.set(ax, 0, az);
-          const sleeve = new T.Mesh(new T.CylinderGeometry(0.058, 0.115, 0.5, 18, 3, true), blue);
-          sleeve.position.y = -0.25; sleeve.castShadow = true; a.add(sleeve);
-          const shoulder = new T.Mesh(new T.SphereGeometry(0.075, 14, 10), blue);
+          const upper = new T.Mesh(new T.CylinderGeometry(0.066, 0.088, 0.3, 18, 2, true), blue);
+          upper.position.y = -0.14; upper.castShadow = true; a.add(upper);
+          const shoulder = new T.Mesh(new T.SphereGeometry(0.078, 14, 10), blue);
           shoulder.castShadow = true; a.add(shoulder);
-          const cuff = new T.Mesh(new T.TorusGeometry(0.116, 0.014, 8, 20), gold);
-          cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.5; a.add(cuff);
-          const hand = new T.Group();
-          hand.position.y = -0.55;
-          a.add(hand);
-          const palm = new T.Mesh(new T.SphereGeometry(0.055, 14, 10), leather);
-          palm.scale.set(1, 0.9, 0.8); palm.castShadow = true; hand.add(palm);
-          for (let f = 0; f < 4; f++) {
-            const fin = new T.Mesh(new T.CapsuleGeometry(0.0125, 0.045, 3, 6), leather);
-            fin.position.set(-0.03 + f * 0.02, -0.062, -0.012); fin.rotation.x = 0.35; hand.add(fin);
-          }
-          const thumb = new T.Mesh(new T.CapsuleGeometry(0.014, 0.04, 3, 6), leather);
-          thumb.position.set(side * 0.05, -0.02, -0.02); thumb.rotation.z = side * 0.9; hand.add(thumb);
+          const fore = new T.Group();
+          fore.position.y = -0.27; fore.rotation.x = bend;
+          a.add(fore);
+          const elbow = new T.Mesh(new T.SphereGeometry(0.086, 12, 10), blue); elbow.castShadow = true; fore.add(elbow);
+          const bell = new T.Mesh(new T.CylinderGeometry(0.082, 0.128, 0.27, 20, 3, true), blue);
+          bell.position.y = -0.135; bell.castShadow = true; fore.add(bell);
+          const lining = new T.Mesh(new T.CylinderGeometry(0.076, 0.12, 0.262, 20, 1, true), rim(toon({ color: 0x16285c, side: T.BackSide }), 0x9cc4ff, 0.2));
+          lining.position.y = -0.135; fore.add(lining);
+          const cuff = new T.Mesh(new T.TorusGeometry(0.128, 0.015, 8, 24), gold);
+          cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.27; fore.add(cuff);
+          const band = new T.Mesh(new T.CylinderGeometry(0.1235, 0.1295, 0.03, 20, 1, true), gold);
+          band.position.y = -0.235; fore.add(band);
+          const wrist = new T.Mesh(new T.CylinderGeometry(0.036, 0.04, 0.07, 10), leatherDk); wrist.position.y = -0.265; fore.add(wrist);
+          const hand = F.hand({ mat: leatherHand, size: 1.12, curl: 0.92, side });
+          hand.position.y = -0.29;
+          fore.add(hand);
           hermes.add(a);
-          return a;
+          return { a, fore, hand };
         }
-        const armR = arm(1, 0.55, 0.12), armL = arm(-1, 0.35, -0.15);
+        const AR = arm(1, 0.5, 0.12, 0.22), AL = arm(-1, 0.3, -0.15, 0.2);
+        const armR = AR.a, armL = AL.a;
         // ---- The lantern hangs from his right hand, upright whatever the arm does
         const lamp = new T.Group();
-        lamp.position.set(0, -0.62, 0);
-        lamp.rotation.x = -0.55;
-        armR.add(lamp);
+        lamp.position.set(0, -0.37, 0);
+        lamp.rotation.x = -0.72;
+        AR.fore.add(lamp);
         const lampBody = new T.Group();
         lampBody.position.y = -0.08;
         lamp.add(lampBody);
@@ -959,7 +926,7 @@
           cuffB.rotation.x = Math.PI / 2; cuffB.position.y = 0.16; g.add(cuffB);
           g.position.x = x; hermes.add(g);
         });
-        return { hermes, legL, legR, flame, staff, lamp, cloak, head, armL, armR };
+        return { hermes, legL, legR, flame, staff, lamp, cloak, head, armL, armR, foreL: AL.fore, foreR: AR.fore, handL: AL.hand, handR: AR.hand, face, rig };
       }
 
       // ---- Relics: each one carries its rune cut into its own surface ----

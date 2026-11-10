@@ -724,6 +724,11 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const burst = new T.Points(bG, new T.PointsMaterial({ color: 0xffe2a0, size: 0.12, map: glowTex, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
         burst.visible = false; scene.add(burst);
 
+        // the bricks of the walls never move again: one mesh per kind of brick instead of several hundred boxes
+        try {
+          const SCb = window.EclipseScenery;
+          if (SCb && SCb.bake) SCb.bake(scene, { shallow: true, only: casters.filter((m) => m !== plinthI && m !== steleII && m !== steleIII && m !== curb) });
+        } catch (e) { /* the loose bricks stay as they were */ }
         return { fx, T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv, sandTime,
                  steleI, faceCv, glowCv, baseCv, faceTex, glowTexS, GRID_X0, GRID_Y0, CS, CV_W, CV_H, SW, SH,
                  curbLine, zLine, curbGlow, dialCv, dialTex, needle, needleMat, dialGlow, bezel, DIAL_Y, POINTS16,

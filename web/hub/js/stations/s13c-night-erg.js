@@ -567,7 +567,9 @@
       ringH.material.opacity += ((spH ? pulse : 0) - ringH.material.opacity) * Math.min(1, dt * 8);
       ringN.material.opacity += ((spN && nomad.visible ? pulse : 0) - ringN.material.opacity) * Math.min(1, dt * 8);
       ringN.position.set(nomad.position.x, 0.03, nomad.position.z);
-      hermes.position.y = spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0;
+      if (nomad.userData.speak) { nomad.userData.speak(spN && nomad.visible); nomad.userData.look(mover.target && mover.target.obj === nomad && mover.target.hideAtEnd ? null : { x: hermes.position.x, y: 2.1, z: hermes.position.z }); }
+      if (efx && efx.gait && efx.gait.speak) { efx.gait.speak(speaking === 'hermes'); hermes.position.y = 0; }
+      else hermes.position.y = spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0;
       if (efx) {
         // he looks at the traveller while he is there, and at the fire otherwise
         if (efx.gait) efx.gait.look(nomad.visible ? { x: nomad.position.x, y: 2.2, z: nomad.position.z } : { x: camp.position.x, y: 0.6, z: camp.position.z });
@@ -586,7 +588,7 @@
           if (o === camel) {
             camel.userData.legs.forEach(function (l) { var a = Math.sin(t * 5.5 + l.ph); l.leg.rotation.x = a * 0.5; l.lo.rotation.x = Math.max(0, -a) * 0.7; });
             camel.position.y = Math.abs(Math.sin(t * 5.5)) * 0.04;
-          } else o.position.y = Math.abs(Math.sin(t * 6)) * 0.03;
+          } else if (!o.userData.life) o.position.y = Math.abs(Math.sin(t * 6)) * 0.03;   // the nomad walks on his own legs now
           mover.stride += step;
           if (m.prints && mover.stride > 1.0) { mover.stride = 0; mover.side *= -1; dropPrint(camel.position.x, camel.position.z, camel.rotation.y, mover.side); }
         } else {

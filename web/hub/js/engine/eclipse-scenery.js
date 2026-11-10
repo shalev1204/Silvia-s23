@@ -349,6 +349,7 @@
         o = o || {};
         var geo = mesh.geometry, P = geo.attributes.position, N = P.count;
         var ws = o.ws, hs = o.hs, cols = ws + 1;
+        mesh.userData.live = true;
         var pos = new Float32Array(P.array), prev = new Float32Array(P.array), rest = new Float32Array(P.array);
         var pinned = new Uint8Array(N);
         var pin = o.pin || function (ix, iy) { return iy === 0; };
@@ -492,6 +493,188 @@
           draw();
         };
         return mesh;
+      }
+
+      // ---- one draw instead of eighty: sibling meshes that share a material (and how they take shadows) become a single
+      // mesh in their parent's space. Groups are never touched, so whatever a game moves keeps moving; a mesh is left alone
+      // if it has children, carries userData (somebody owns it), is hidden, see-through, or listed in opts.skip.
+      function bake(root, o) {
+        o = o || {};
+        var skip = o.skip || [], parents = [], saved = 0;
+        var v = new T.Vector3(), nm = new T.Matrix3();
+        // opts.shallow: only the root's own children; opts.only: nothing but these meshes
+        if (o.shallow) parents.push(root); else root.traverse(function (n) { if (n.children.length > 1) parents.push(n); });
+        var only = o.only ? new Set(o.only) : null;
+        parents.forEach(function (p) {
+          var buckets = {};
+          p.children.forEach(function (m) {
+            if (!m.isMesh || m.isInstancedMesh || m.isSkinnedMesh || m.children.length || !m.visible || skip.indexOf(m) >= 0 || (only && !only.has(m))) return;
+            var mat = m.material, geo = m.geometry;
+            if (!mat || Array.isArray(mat) || mat.vertexColors || mat.transparent || !geo || !geo.attributes.position || !geo.attributes.normal) return;
+            if (geo.morphAttributes && geo.morphAttributes.position) return;
+            for (var k in m.userData) return;
+            m.updateMatrix();
+            if (m.matrix.determinant() < 0) return;
+            var key = mat.uuid + (m.castShadow ? 'c' : '-') + (m.receiveShadow ? 'r' : '-') + m.renderOrder + (m.frustumCulled ? 'f' : '-');
+            (buckets[key] = buckets[key] || []).push(m);
+          });
+          Object.keys(buckets).forEach(function (key) {
+            var list = buckets[key];
+            if (list.length < 2) return;
+            var nV = 0, nI = 0;
+            list.forEach(function (m) { var g = m.geometry; nV += g.attributes.position.count; nI += g.index ? g.index.count : g.attributes.position.count; });
+            var pos = new Float32Array(nV * 3), nor = new Float32Array(nV * 3), uv = new Float32Array(nV * 2);
+            var idx = nV > 65535 ? new Uint32Array(nI) : new Uint16Array(nI), vo = 0, io = 0;
+            list.forEach(function (m) {
+              var g = m.geometry, P = g.attributes.position, N = g.attributes.normal, U = g.attributes.uv, n = P.count;
+              nm.getNormalMatrix(m.matrix);
+              for (var i = 0; i < n; i++) {
+                v.fromBufferAttribute(P, i).applyMatrix4(m.matrix); pos[(vo + i) * 3] = v.x; pos[(vo + i) * 3 + 1] = v.y; pos[(vo + i) * 3 + 2] = v.z;
+                v.fromBufferAttribute(N, i).applyMatrix3(nm).normalize(); nor[(vo + i) * 3] = v.x; nor[(vo + i) * 3 + 1] = v.y; nor[(vo + i) * 3 + 2] = v.z;
+                if (U) { uv[(vo + i) * 2] = U.getX(i); uv[(vo + i) * 2 + 1] = U.getY(i); }
+              }
+              if (g.index) for (var j = 0; j < g.index.count; j++) idx[io++] = g.index.getX(j) + vo;
+              else for (var j2 = 0; j2 < n; j2++) idx[io++] = vo + j2;
+              vo += n;
+            });
+            var geo = new T.BufferGeometry();
+            geo.setAttribute('position', new T.BufferAttribute(pos, 3));
+            geo.setAttribute('normal', new T.BufferAttribute(nor, 3));
+            geo.setAttribute('uv', new T.BufferAttribute(uv, 2));
+            geo.setIndex(new T.BufferAttribute(idx, 1));
+            var first = list[0], mesh = new T.Mesh(geo, first.material);
+            mesh.castShadow = first.castShadow; mesh.receiveShadow = first.receiveShadow; mesh.renderOrder = first.renderOrder; mesh.frustumCulled = first.frustumCulled;
+            mesh.name = 'baked';
+            list.forEach(function (m) { p.remove(m); });
+            p.add(mesh);
+            saved += list.length - 1;
+          });
+        });
+        return saved;
+      }
+
+      // ---- a face that lives: eyes that blink (now and then twice), pupils that never quite rest, brows that rise with
+      // surprise and knit with worry. eyes: [{ sd, white, pupil, glint, lid, brow }] (any may be missing).
+      function faceLife(eyes) {
+        eyes = (eyes || []).filter(function (e) { return e && e.pupil; });
+        eyes.forEach(function (e) {
+          ['white', 'pupil', 'glint', 'lid', 'brow', 'iris'].forEach(function (k) { if (e[k]) e[k].userData.live = true; });
+          e.b = {
+            wy: e.white ? e.white.scale.y : 1, py: e.pupil.scale.y, px: e.pupil.position.x, pY: e.pupil.position.y,
+            ix: e.iris ? e.iris.position.x : 0, iY: e.iris ? e.iris.position.y : 0, iy: e.iris ? e.iris.scale.y : 1,
+            lx: e.lid ? e.lid.rotation.x : 0, by: e.brow ? e.brow.position.y : 0, bz: e.brow ? e.brow.rotation.z : 0
+          };
+        });
+        var next = 1 + Math.random() * 3, b = 0, ph = 0, dbl = false, sur = 0, wor = 0;
+        var gx = 0, gy = 0, tx = 0, ty = 0, sx = 0, sy = 0, sacT = 0;
+        var calm = clothReduced();
+        return {
+          blink: function () { if (!ph) ph = 1; },
+          mood: function (surprise, worry) { sur = Math.max(sur, surprise || 0); wor = Math.max(wor, worry || 0); },
+          gaze: function (x, y) { tx = x || 0; ty = y || 0; },
+          update: function (dt) {
+            if (!(dt > 0) || !eyes.length) return;
+            next -= dt;
+            if (next <= 0 && !ph) { ph = 1; next = 2.4 + Math.random() * 4.2; dbl = Math.random() < 0.18; }
+            if (ph === 1) { b += dt / 0.06; if (b >= 1) { b = 1; ph = 2; } }
+            else if (ph === 2) { b -= dt / 0.11; if (b <= 0) { b = 0; ph = 0; if (dbl) { dbl = false; next = 0.1; } } }
+            sacT -= dt;
+            if (sacT <= 0) { sacT = 0.7 + Math.random() * 2.6; sx = calm ? 0 : (Math.random() - 0.5) * 0.5; sy = calm ? 0 : (Math.random() - 0.5) * 0.3; }
+            gx += (Math.max(-1, Math.min(1, tx + sx)) - gx) * Math.min(1, dt * 16);
+            gy += (Math.max(-1, Math.min(1, ty + sy)) - gy) * Math.min(1, dt * 16);
+            var fade = Math.exp(-dt * 1.1); sur *= fade; wor *= fade;
+            for (var i = 0; i < eyes.length; i++) {
+              var e = eyes[i], B = e.b, r = e.white ? e.white.geometry.parameters.radius * e.white.scale.x : 0.02;
+              if (e.white) e.white.scale.y = B.wy * (1 - 0.92 * b) * (1 + 0.16 * sur);
+              e.pupil.scale.y = B.py * (1 - b);
+              e.pupil.position.x = B.px + gx * r * 0.3; e.pupil.position.y = B.pY + gy * r * 0.16;
+              if (e.iris) { e.iris.scale.y = B.iy * (1 - b); e.iris.position.x = B.ix + gx * r * 0.3; e.iris.position.y = B.iY + gy * r * 0.16; }
+              if (e.glint) e.glint.visible = b < 0.5;
+              if (e.lid) e.lid.rotation.x = B.lx - 0.95 * b + 0.14 * sur - 0.12 * wor;
+              if (e.brow) { e.brow.position.y = B.by + r * (0.45 * sur - 0.22 * wor - 0.12 * b); e.brow.rotation.z = B.bz + e.sd * (0.24 * wor - 0.12 * sur); }
+            }
+          }
+        };
+      }
+
+      // ---- a body that lives, for the people of the scenery (the old man of the gates, the young nomad). The game only
+      // moves the figure and says who is speaking; this reads how far it went and does the rest: legs that step, a body
+      // that bobs and leans, a stick that plants, a head that turns to whoever it listens to and nods as it talks, an arm
+      // that marks the words, a face that blinks. persona(g, parts) → { update(t), speak(on), look(v), react(kind) }
+      //   parts: head, face (faceLife), legs [L, R], arm (a pivot group for the free arm), stick, lantern, stride
+      function persona(g, c) {
+        c = c || {};
+        var body = new T.Group(), legs = c.legs || [];
+        g.children.slice().forEach(function (ch) { if (legs.indexOf(ch) < 0) { g.remove(ch); body.add(ch); } });
+        g.add(body);
+        var head = c.head, hb = head ? head.rotation.clone() : null, ab = c.arm ? c.arm.rotation.clone() : null;
+        var sb = c.stick ? c.stick.rotation.clone() : null, lb = c.lantern ? c.lantern.rotation.clone() : null;
+        var lastT = null, last = null, wp = new T.Vector3(), lv = new T.Vector3();
+        var phase = 0, wgt = 0, sp = 0, speaking = false, target = null, yaw = 0, pitch = 0, rx = null, glance = { t: 4 + Math.random() * 5, k: 0, yaw: 0 };
+        var STR = c.stride || 0.5, calm = clothReduced();
+        var api = {
+          body: body,
+          speak: function (on) { speaking = !!on; if (c.face && c.face.talk) c.face.talk(speaking); },
+          look: function (v) { target = v ? (target || new T.Vector3()).set(v.x, v.y, v.z) : null; },
+          react: function (kind) { rx = { kind: kind, t: 0, dur: kind === 'bow' ? 1.8 : 0.9 }; if (c.face) { if (kind === 'startle') { c.face.mood(1, 0); } else c.face.blink(); } },
+          moving: function () { return wgt > 0.05; },
+          update: function (t) {
+            if (lastT == null) { lastT = t; return; }
+            var dt = Math.min(0.066, Math.max(0, t - lastT)); lastT = t;
+            if (!(dt > 0)) return;
+            var s = g.scale.x || 1, dist = 0;
+            g.getWorldPosition(wp);
+            if (last) { dist = Math.hypot(wp.x - last.x, wp.z - last.z) / s; if (dist > 0.6) dist = 0; }
+            last = (last || new T.Vector3()).copy(wp);
+            var speed = dist / dt;
+            wgt += ((speed > 0.05 ? Math.min(1, 0.4 + speed / 2) : 0) - wgt) * Math.min(1, dt * (speed > 0.05 ? 9 : 5));
+            if (speed > 0.05) phase = (phase + dist / (2 * STR)) % 1; else if (wgt < 0.02) phase = 0;
+            var a = Math.PI * 2 * phase, sw = Math.sin(a), br = Math.sin(t * 1.5);
+            if (legs.length === 2) {
+              legs[0].rotation.x = 0.5 * sw * wgt; legs[1].rotation.x = -0.5 * sw * wgt;
+              legs[0].position.y = (legs[0].userData.y0 == null ? (legs[0].userData.y0 = legs[0].position.y) : legs[0].userData.y0) + Math.max(0, Math.cos(a)) * 0.03 * wgt;
+              legs[1].position.y = (legs[1].userData.y0 == null ? (legs[1].userData.y0 = legs[1].position.y) : legs[1].userData.y0) + Math.max(0, -Math.cos(a)) * 0.03 * wgt;
+            }
+            sp += ((speaking ? 1 : 0) - sp) * Math.min(1, dt * 6);
+            var e = 0;
+            if (rx) { rx.t += dt; var u = rx.t / rx.dur; if (u >= 1) rx = null; else { e = u < 0.25 ? u / 0.25 : 1 - (u - 0.25) / 0.75; e = e * e * (3 - 2 * e); } }
+            var bow = rx && rx.kind === 'bow' ? e : 0, start = rx && rx.kind === 'startle' ? e : 0;
+            body.position.y = -0.025 * (0.5 - 0.5 * Math.cos(2 * a)) * wgt + 0.004 * br * (1 - wgt);
+            body.position.x = 0.012 * sw * wgt + (calm ? 0 : 0.006 * Math.sin(t * 0.41) * (1 - wgt));
+            body.rotation.x = -0.05 * wgt - 0.22 * bow + 0.07 * start;
+            body.rotation.z = 0.03 * sw * wgt + (calm ? 0 : 0.008 * Math.sin(t * 0.33) * (1 - wgt));
+            body.scale.y = 1 + 0.005 * br;
+            if (c.stick && sb) c.stick.rotation.x = sb.x + 0.16 * sw * wgt;
+            if (c.lantern && lb) c.lantern.rotation.x = lb.x + 0.14 * Math.sin(a + 1.1) * wgt;
+            if (c.arm && ab) {
+              // the free hand marks the words: it rises as he speaks and beats with them
+              c.arm.rotation.x = ab.x + sp * (0.32 + 0.1 * Math.sin(t * 3.3) + 0.05 * Math.sin(t * 7.1)) + 0.5 * start - 0.12 * sw * wgt;
+              c.arm.rotation.z = ab.z - sp * 0.1 * Math.sin(t * 2.2);
+            }
+            if (head && hb) {
+              var ty = 0, tp = 0;
+              if (target) {
+                head.updateWorldMatrix(true, false);
+                lv.copy(target); head.parent.worldToLocal(lv); lv.sub(head.position);
+                ty = Math.max(-0.8, Math.min(0.8, Math.atan2(-lv.x, -lv.z)));
+                tp = Math.max(-0.3, Math.min(0.3, Math.atan2(lv.y, Math.hypot(lv.x, lv.z))));
+              } else if (!calm) {
+                // nobody to look at: now and then he glances aside
+                glance.t -= dt;
+                if (glance.t <= 0) { glance.t = 5 + Math.random() * 7; glance.k = 1.6; glance.yaw = (Math.random() < 0.5 ? -1 : 1) * (0.25 + Math.random() * 0.25); }
+                if (glance.k > 0) { glance.k -= dt; ty = glance.yaw * Math.min(1, glance.k * 2); }
+                ty += 0.05 * Math.sin(t * 0.4);
+              }
+              yaw += (ty - yaw) * Math.min(1, dt * 3.5); pitch += (tp - pitch) * Math.min(1, dt * 3.5);
+              head.rotation.y = hb.y + yaw;
+              head.rotation.x = hb.x + pitch + sp * (0.035 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + 0.02) - 0.3 * bow + 0.16 * start + 0.015 * Math.sin(t * 0.3);
+              head.rotation.z = hb.z + sp * 0.03 * Math.sin(t * 1.9);
+              if (c.face) c.face.gaze(Math.max(-1, Math.min(1, (ty - yaw) * 3)), 0);
+            }
+            if (c.face) { if (speaking) c.face.mood(0.25, 0); c.face.update(dt); }
+          }
+        };
+        return api;
       }
 
       // ---- the sky: a shader dome, tone-mapped and encoded like everything else so the horizon meets the haze ----
@@ -1295,33 +1478,15 @@
         head.scale.setScalar(1.28);
         g.add(head);
         function hput(mesh, x, y, z) { mesh.position.set(x, y, z); mesh.castShadow = true; head.add(mesh); return mesh; }
-        hput(ell(new T.SphereGeometry(0.14, 28, 20), skin, 0.9, 1.12, 0.96), 0, 0, 0);
-        hput(ell(new T.SphereGeometry(0.032, 12, 10), skin, 0.95, 1.5, 1.2), 0, -0.01, -0.14);
-        hput(ell(new T.SphereGeometry(0.02, 10, 8), skin, 1.3, 1, 1), 0, -0.046, -0.153);
-        [-1, 1].forEach(function (sd) {
-          if (!stone) {
-            hput(ell(new T.SphereGeometry(0.022, 12, 10), new T.MeshBasicMaterial({ color: 0xe9dfce }), 1.2, 0.7, 0.5), sd * 0.05, 0.022, -0.125);
-            hput(new T.Mesh(new T.SphereGeometry(0.0105, 10, 8), ink), sd * 0.05, 0.02, -0.132);
-          }
-          var lid = hput(ell(new T.SphereGeometry(0.03, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, 1.2, 0.7, 0.6), sd * 0.05, 0.03, -0.122);
-          lid.rotation.x = 0.1;
-          var brow = hput(ell(new T.CapsuleGeometry(0.014, 0.06, 4, 8), hairM, 1, 1, 1.1), sd * 0.054, 0.064, -0.128);
-          brow.rotation.z = Math.PI / 2 + sd * 0.28;
-          hput(ell(new T.SphereGeometry(0.03, 12, 10), skin, 1.2, 0.7, 0.5), sd * 0.085, -0.03, -0.1);
-          hput(ell(new T.SphereGeometry(0.028, 10, 8), skin, 0.6, 1.3, 0.8), sd * 0.126, 0.0, 0.0);
-        });
-        [-1, 1].forEach(function (sd) {
-          var m = hput(ell(new T.SphereGeometry(0.036, 14, 10), hairM, 1.7, 0.75, 0.9), sd * 0.034, -0.062, -0.14);
-          m.rotation.z = sd * -0.4;
-          var lock = hput(ell(new T.SphereGeometry(0.06, 12, 10), hairM, 0.8, 1.8, 1), sd * 0.105, -0.07, 0.04);
-          lock.rotation.z = sd * 0.22;
-        });
-        // the beard hangs over the mantle in layered tufts, so it shows in front of the cloth
-        [[0, 1.4, -0.245, 0.125, 0.5, 0], [-0.06, 1.44, -0.23, 0.085, 0.4, 0.22], [0.06, 1.44, -0.23, 0.085, 0.4, -0.22], [0, 1.22, -0.285, 0.09, 0.36, 0], [-0.04, 1.26, -0.27, 0.06, 0.3, 0.16], [0.04, 1.26, -0.27, 0.06, 0.3, -0.16]].forEach(function (tf) {
-          var c = put(new T.Mesh(new T.ConeGeometry(tf[3], tf[4], 16), hairM), tf[0], tf[1], tf[2]);
-          c.rotation.set(Math.PI + 0.22, 0, tf[5]);
-        });
-        put(ell(new T.SphereGeometry(0.1, 16, 12), hairM, 1.15, 0.8, 0.8), 0, 1.52, -0.2);
+        // (EclipseFigure) a sculpted skull and a painted face: hollow cheeks, a great hooked nose, dark eyes that miss
+        // nothing, brows like snow, a moustache that hides his mouth and a beard forked in two that lies on his chest.
+        // In stone it is the same man with his eyes half shut, and nothing in him moves.
+        var F = window.EclipseFigure;
+        var rig = F.head({ size: 0.14, skin: 0xa8734c, age: 1, iris: 0x6a4a2a, brow: { color: 0xe6e2da, thick: 1.5 }, nose: 1.4, jaw: 0.4, cheek: 1.25, ridge: 1.25, material: stoneMat, seed: 9 });
+        head.add(rig.group);
+        var beardMat = stone ? stoneMat : F.mat({ map: F.hairTex(0xe4dfd4, { dark: 0x857e70, light: 0xffffff }), side: T.DoubleSide }, 0xffffff, 0.35);
+        F.beard(rig, { mat: beardMat, length: 2.1, width: 0.85, fork: true, moustache: 1.4, drape: 1.12, forward: 0.52, drop: 0.1, cheek: -0.12 });
+        var face = F.face(rig);
 
         // arms: wide sleeves; the right hand grips the staff, the left rests on the belt
         var cuffAt = function (pt, from) {
@@ -1329,26 +1494,24 @@
           c.position.set(pt[0], pt[1], pt[2]);
           c.quaternion.setFromUnitVectors(new T.Vector3(0, 0, 1), new T.Vector3(pt[0] - from[0], pt[1] - from[1], pt[2] - from[2]).normalize());
           g.add(c);
+          return c;
         };
         var shR = [0.3, 1.46, 0.0], wrR = [0.38, 1.12, -0.4], shL = [-0.3, 1.46, 0.0], wrL = [-0.26, 0.96, -0.34];
-        limb(shR, wrR, 0.085, 0.135, robeMat); limb(shL, wrL, 0.085, 0.135, robeMat);
-        cuffAt(wrR, shR); cuffAt(wrL, shL);
-        [shR, shL].forEach(function (s) { put(new T.Mesh(new T.SphereGeometry(0.085, 14, 10), robeMat), s[0], s[1], s[2]); });
+        limb(shR, wrR, 0.085, 0.135, robeMat);
+        cuffAt(wrR, shR);
+        put(new T.Mesh(new T.SphereGeometry(0.085, 14, 10), robeMat), shR[0], shR[1], shR[2]);
+        // the left arm hangs from its own shoulder, so the free hand can mark his words
+        var armL = new T.Group(); armL.position.set(shL[0], shL[1], shL[2]); g.add(armL);
+        var freeArm = [limb(shL, wrL, 0.085, 0.135, robeMat), cuffAt(wrL, shL), put(new T.Mesh(new T.SphereGeometry(0.085, 14, 10), robeMat), shL[0], shL[1], shL[2])];
         function hand(pos, grip) {
-          var h = new T.Group();
-          h.position.set(pos[0], pos[1] - 0.06, pos[2]);
+          // (EclipseFigure) a palm, four fingers of three joints and a thumb, closed on what it holds
+          var h = window.EclipseFigure.hand({ mat: skin, size: 1.08, curl: grip ? 0.95 : 0.3, side: pos[0] < 0 ? -1 : 1 });
+          h.position.set(pos[0], pos[1] - 0.01, pos[2]);
           g.add(h);
-          var palm = new T.Mesh(new T.SphereGeometry(0.052, 14, 10), skin);
-          palm.scale.set(1, 0.9, 0.8); palm.castShadow = true; h.add(palm);
-          for (var f = 0; f < 4; f++) {
-            var fin = new T.Mesh(new T.CapsuleGeometry(0.0125, 0.05, 3, 6), skin);
-            fin.position.set(-0.03 + f * 0.02, -0.03, grip ? -0.04 : -0.02); fin.rotation.x = grip ? 1.2 : 0.5; fin.castShadow = true; h.add(fin);
-          }
-          var th = new T.Mesh(new T.CapsuleGeometry(0.014, 0.04, 3, 6), skin);
-          th.position.set(0.04, -0.01, -0.03); th.rotation.z = 0.9; h.add(th);
           return h;
         }
-        hand(wrR, true); hand(wrL, false);
+        hand(wrR, true); freeArm.push(hand(wrL, false));
+        freeArm.forEach(function (m) { g.remove(m); m.position.sub(armL.position); armL.add(m); });
 
         // the staff: dark iron, rings, a star-sight crowned with eight points and a warm jewel
         var staff = new T.Group();
@@ -1385,11 +1548,14 @@
         if (stone) { jewel.visible = false; halo.visible = false; }
 
         g.scale.setScalar(o.scale || 1);
+        // a statue stays a statue; a living man blinks, breathes, listens and talks with his free hand
+        var life = stone ? null : persona(g, { head: head, face: face, arm: armL });
+        bake(g);
         g.userData = {
-          head: head, staff: staff, sight: sight, halo: halo,
+          head: head, staff: staff, sight: sight, halo: halo, life: life,
+          speak: function (on) { if (life) life.speak(on); }, look: function (v) { if (life) life.look(v); }, react: function (k) { if (life) life.react(k); },
           update: function (t) {
-            head.rotation.y = Math.sin(t * 0.4) * 0.07;
-            head.rotation.x = Math.sin(t * 0.3) * 0.02;
+            if (life) life.update(t);
             sight.rotation.z = t * 0.12;
             halo.material.opacity = 0.45 + 0.15 * Math.sin(t * 2.3);
             staff.rotation.z = Math.sin(t * 0.5) * 0.004;
@@ -1466,27 +1632,22 @@
         // head: a lean, sun-browned face, straight brows, a short dark beard and moustache, a headcloth held by a cord
         var head = new T.Group(); head.position.set(0, 1.68, 0); head.scale.setScalar(1.3); g.add(head);
         function hput(mesh, x, y, z) { mesh.position.set(x, y, z); mesh.castShadow = true; head.add(mesh); return mesh; }
-        hput(ell(new T.SphereGeometry(0.13, 28, 20), skin, 0.88, 1.1, 0.96), 0, 0, 0);
-        hput(ell(new T.SphereGeometry(0.03, 12, 10), skin, 0.9, 1.4, 1.2), 0, -0.012, -0.13);
-        hput(ell(new T.SphereGeometry(0.019, 10, 8), skin, 1.25, 0.9, 1), 0, -0.04, -0.143);
-        [-1, 1].forEach(function (sd) {
-          hput(ell(new T.SphereGeometry(0.02, 12, 10), new T.MeshBasicMaterial({ color: 0xece3d2 }), 1.2, 0.62, 0.5), sd * 0.047, 0.018, -0.118);
-          hput(new T.Mesh(new T.SphereGeometry(0.0095, 10, 8), ink), sd * 0.047, 0.017, -0.124);
-          var lid = hput(ell(new T.SphereGeometry(0.027, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, 1.2, 0.6, 0.6), sd * 0.047, 0.026, -0.115); lid.rotation.x = 0.1;
-          var brow = hput(ell(new T.CapsuleGeometry(0.009, 0.05, 4, 8), hairM, 1, 1, 1), sd * 0.05, 0.052, -0.121); brow.rotation.z = Math.PI / 2 + sd * 0.12;
-          hput(ell(new T.SphereGeometry(0.026, 12, 10), skin, 1.2, 0.7, 0.5), sd * 0.078, -0.03, -0.09);
-          hput(ell(new T.SphereGeometry(0.026, 10, 8), skinDark, 0.55, 1.2, 0.8), sd * 0.115, 0.0, 0.0);
-        });
-        // the short beard: a close dark cap along the jaw and chin, and a moustache
-        var beard = hput(ell(new T.SphereGeometry(0.128, 24, 16, 0, Math.PI * 2, Math.PI * 0.66, Math.PI * 0.3), hairM, 0.9, 1.12, 0.98), 0, 0.0, 0);
-        beard.rotation.x = 0.0;
-        [-1, 1].forEach(function (sd) {
-          var m = hput(ell(new T.SphereGeometry(0.026, 12, 8), hairM, 1.7, 0.5, 0.75), sd * 0.027, -0.058, -0.138); m.rotation.z = sd * -0.28;
-        });
+        // (EclipseFigure) a lean sun-browned face of thirty-five: straight dark brows, eyes lined with kohl against the
+        // glare, a short black beard close to the jaw and a moustache; his mouth shows, and moves when he speaks
+        var F = window.EclipseFigure;
+        var rig = F.head({ size: 0.13, skin: 0x9c6a44, age: 0.3, iris: 0x4a3018, brow: { color: 0x1c120c, thick: 1.05 }, nose: 1.05, jaw: 0.7, cheek: 1.1, kohl: true, lip: 0x8a4a3a, seed: 23 });
+        head.add(rig.group);
+        var darkHair = F.mat({ map: F.hairTex(0x241812, { dark: 0x0c0806, light: 0x5a4030 }), side: T.DoubleSide }, 0xffb878, 0.2);
+        F.beard(rig, { mat: darkHair, length: 0.32, width: 0.42, moustache: 0.7, thick: 0.05, cheek: -0.32, drape: 0.0, drop: 0.16, forward: -0.05 });
+        var face = F.face(rig);
         // the headcloth: cream with terracotta stripes, over the crown and down behind, a dark cord round the brow
-        var cloth = hput(ell(new T.SphereGeometry(0.15, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.46), headcloth, 0.98, 1.0, 1.04), 0, 0.03, 0.02);
-        cloth.rotation.x = -0.2;
-        var cord = hput(new T.Mesh(new T.TorusGeometry(0.138, 0.016, 8, 32), paint({ color: 0x1e1612 })), 0, 0.075, 0.01); cord.rotation.x = Math.PI / 2 - 0.12; cord.scale.set(1, 1.05, 1);
+        // it is wound over the very shape of his skull: low on the brow, behind the ears, down to the nape
+        var cloth = new T.Mesh(F.shell(rig, function (nx, ny, nz) {
+          var back = Math.max(0, Math.min(1, (nz + 0.2) / 0.5));
+          return Math.max(0, Math.min(1, (ny - (0.5 * (1 - back) - 0.45 * back)) / 0.1));
+        }, { thick: 0.11, segs: [80, 48], ridges: { count: 9, depth: 0.012, swirl: 5 }, uvRepeat: 1 }), headcloth);
+        cloth.castShadow = true; cloth.userData.live = true; rig.group.add(cloth);
+        var cord = hput(new T.Mesh(new T.TorusGeometry(0.108, 0.013, 8, 32), paint({ color: 0x1e1612 })), 0, 0.078, 0.012); cord.rotation.x = Math.PI / 2 - 0.1; cord.scale.set(1, 1.14, 1);
         var drape = hput(new T.Mesh(new T.PlaneGeometry(0.27, 0.34, 4, 6), headcloth), 0, -0.15, 0.1); drape.rotation.set(0.12, 0, 0);
         var drapeSide = [-1, 1].map(function (sd) { var d = hput(new T.Mesh(new T.PlaneGeometry(0.09, 0.2, 2, 4), headcloth), sd * 0.12, -0.08, 0.09); d.rotation.set(0.05, sd * 0.9, sd * 0.05); return d; });
         // the night wind and his own steps move them; they never pass into his neck or his chest
@@ -1507,12 +1668,10 @@
         limb(elR, wrR, 0.058, 0.044, skin); limb(elL, wrL, 0.058, 0.044, skin);
         [wrR, wrL].forEach(function (w) { var b = put(new T.Mesh(new T.TorusGeometry(0.047, 0.012, 8, 16), leather), w[0], w[1], w[2]); b.rotation.x = Math.PI / 2 - 0.3; });
         function hand(pos, grip) {
-          var h = new T.Group(); h.position.set(pos[0], pos[1] - 0.05, pos[2]); g.add(h);
-          var palm = new T.Mesh(new T.SphereGeometry(0.045, 14, 10), skin); palm.scale.set(1, 0.9, 0.8); palm.castShadow = true; h.add(palm);
-          for (var f = 0; f < 4; f++) {
-            var fin = new T.Mesh(new T.CapsuleGeometry(0.011, 0.045, 3, 6), skin);
-            fin.position.set(-0.027 + f * 0.018, -0.028, grip ? -0.035 : -0.02); fin.rotation.x = grip ? 1.2 : 0.5; fin.castShadow = true; h.add(fin);
-          }
+          // (EclipseFigure) a palm, four fingers of three joints and a thumb, closed on what it holds
+          var h = window.EclipseFigure.hand({ mat: skin, size: 1.08, curl: grip ? 0.95 : 0.3, side: pos[0] < 0 ? -1 : 1 });
+          h.position.set(pos[0], pos[1] - 0.01, pos[2]);
+          g.add(h);
           return h;
         }
         hand(wrR, true); hand(wrL, true);
@@ -1535,13 +1694,16 @@
         var lit = 0;
 
         g.scale.setScalar(o.scale || 1);
+        tunic.userData.live = true;
+        // he walks on his own legs, plants his stick, turns his head to whoever speaks and blinks at the fire
+        var life = persona(g, { head: head, face: face, legs: legs, stick: stick, lantern: lantern, stride: 0.52 });
+        bake(g);
         g.userData = {
-          head: head, lantern: lantern,
+          head: head, lantern: lantern, life: life,
+          speak: function (on) { life.speak(on); }, look: function (v) { life.look(v); }, react: function (k) { life.react(k); },
           setLamp: function (on) { lit = on ? 1 : 0; glassMat.color.setHex(on ? 0xffd890 : 0x3a2a1c); glassMat.opacity = on ? 0.95 : 0.8; },
           update: function (t) {
-            head.rotation.y = Math.sin(t * 0.5) * 0.09;
-            head.rotation.x = Math.sin(t * 0.35) * 0.03;
-            tunic.scale.y = 1 + Math.sin(t * 1.6) * 0.004;
+            life.update(t);
             cloths.forEach(function (c) { c.update(t); });
             lantern.rotation.z = Math.sin(t * 1.1) * 0.04;
             lFlame.material.opacity = lit ? 0.5 + 0.12 * Math.sin(t * 9) : 0;
@@ -1786,7 +1948,7 @@
       }
 
       window.EclipseScenery = {
-        tex: tex, preTone: preTone, clothSim: clothSim, rope: rope, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
+        tex: tex, preTone: preTone, clothSim: clothSim, rope: rope, bake: bake, faceLife: faceLife, persona: persona, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
         props: { brazier: brazier, banner: banner, palm: palm, awning: awning, amphora: amphora, crate: crate, sack: sack, firepit: firepit, column: column, rocks: rocks, tracks: tracks },
         paint: paintFor, shadowy: shadowy, noise: { vnoise: vnoise, fbm: fbm, hash2: hash2, rng: rng }
       };

@@ -506,8 +506,11 @@
         ringServant.material.opacity += ((spS ? pulse : 0) - ringServant.material.opacity) * Math.min(1, dt * 8);
         ringHermes.material.opacity += ((spH ? pulse : 0) - ringHermes.material.opacity) * Math.min(1, dt * 8);
         ringHermes.material.color.setHex(speaking === 'silvia' ? 0x9fe8ff : 0x7fb4ff);
-        if (spS) { servant.userData.head.rotation.x += 0.05 * Math.abs(Math.sin(t * 9)); servant.userData.sight.rotation.z += 0.01; }
-        hermes.position.y = treads[3] + (spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0);
+        // the old man talks with his head and his free hand, and keeps his eyes on Hermes; Hermes does the same
+        if (servant.userData.speak) { servant.userData.speak(spS); servant.userData.look({ x: hermes.position.x, y: hermes.position.y + 1.7, z: hermes.position.z }); }
+        if (spS) servant.userData.sight.rotation.z += 0.01;
+        if (gfx && gfx.gait && gfx.gait.speak) { gfx.gait.speak(speaking === 'hermes'); hermes.position.y = treads[3]; }
+        else hermes.position.y = treads[3] + (spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0);
         H.flame.scale.set(1 + 0.08 * Math.sin(t * 9), 1.35 + 0.12 * Math.sin(t * 13 + 1), 1);
         if (gfx) {
           if (gfx.gait) gfx.gait.look(spS || speaking !== 'hermes' ? { x: servant.position.x, y: PLAT + 1.9, z: servant.position.z } : null);

@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = 'e75c8d9c8cb4';  // 183 files, 47.1 MB
+var VERSION = 'a22f0b4384d9';  // 184 files, 47.1 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -153,6 +153,7 @@ var PRECACHE = [
   "./hub/js/cloud-config.js",
   "./hub/js/cloud-save.js",
   "./hub/js/dawn-map-layer.js",
+  "./hub/js/engine/eclipse-figure.js",
   "./hub/js/engine/eclipse-fx.js",
   "./hub/js/engine/eclipse-scenery.js",
   "./hub/js/engine/story-chat.js",

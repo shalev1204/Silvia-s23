@@ -714,6 +714,7 @@
         S.wrong += 1;
         if (G) {
           if (G.shake) G.shake.add(S.hearts <= 0 ? 0.8 : 0.5);
+          if (G.gait && G.gait.react) G.gait.react('flinch');
           if (G.post) G.post.flash(0x3d1206, S.hearts <= 0 ? 0.42 : 0.26, S.hearts <= 0 ? 1.6 : 0.9);
           if (G.dust) G.dust.emit({ x: touched.x, y: 0.3, z: -touched.y }, 26, { size: [0.9, 1.6], speed: [1, 2.6], up: [0.6, 1.6], life: [1, 1.8], alpha: 0.4, spread: touched.radius || 2, color: 0xb98e5e });
         }
@@ -782,6 +783,7 @@
           G.sparks.emit({ x: touched.x, y: 0.5, z: -touched.y }, 70, { color: 0xffd27a, size: [0.18, 0.34], grow: 0.4, speed: [0.5, 2.4], up: [2.2, 5.2], life: [0.9, 1.9], alpha: 0.95, gravity: -3.2, drag: 0.7, bounce: 0.45, spread: touched.radius || 2 });
           if (G.post) G.post.pulse(0.7, 1.4);
           if (G.shake) G.shake.add(0.16);
+          if (G.gait && G.gait.react) G.gait.react('cheer');
         }
         feedback(el.markFeedback, touched.name.charAt(0).toUpperCase() + touched.name.slice(1) + ' answers.', 'ok');
         say(MARK_DISPATCH[found]);
