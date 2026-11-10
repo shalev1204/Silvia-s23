@@ -29,6 +29,17 @@
         setTimeout(() => window.location.reload(), 450);
       }
 
+      // Where the world stands right now, in one line, so every button can be checked against it
+      const statusEl = document.getElementById('tester-status');
+      if (statusEl) {
+        const ls = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+        const seals = [1, 2, 3, 4, 5].filter((i) => ls('order_seal_cairn_' + i) === 'true').length;
+        const built = T.games.filter((g) => g.built), doneN = built.filter((g) => T.isDone(g.id)).length;
+        const next = built.find((g) => !T.isDone(g.id));
+        statusEl.textContent = 'Field Wire step ' + (ls('order_field_wire_step') || 0) + ' · Seals ' + seals + ' / 5 · ' + doneN + ' of ' + built.length
+          + ' games done · next: ' + (next ? next.tag + ' ' + next.label : 'none, everything is done');
+      }
+
       T.games.forEach((g) => {
         const done = T.isDone(g.id);
         const row = document.createElement('div');

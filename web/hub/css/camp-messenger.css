@@ -139,6 +139,7 @@
     .tester-panel-hint { font-size: 0.85rem; font-style: italic; color: var(--parchment-muted); }
     .tester-panel[open] > summary { border-bottom: 1px solid rgba(212, 168, 83, 0.25); }
     .tester-panel-body { padding: 10px 14px 14px; }
+    .tester-status { margin: 0 0 8px; padding: 7px 10px; border-radius: 8px; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.35); color: #fde68a; font-size: 0.82rem; line-height: 1.35; }
     .tester-row {
       display: grid;
       grid-template-columns: 92px 1fr auto auto;

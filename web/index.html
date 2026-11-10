@@ -68,6 +68,7 @@
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-visions.css">
   <link rel="stylesheet" href="./hub/css/stations/s13b-gates-tower-ii.css">
   <link rel="stylesheet" href="./hub/css/stations/s14-sun-monolith.css">
+  <link rel="stylesheet" href="./hub/css/stations/s14b-sun-monolith-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s15-sandstone-labyrinth.css">
   <link rel="stylesheet" href="./hub/css/stations/s16-cairn-iv.css">
   <link rel="stylesheet" href="./hub/css/stations/s17-solstice-arch.css">
@@ -381,6 +382,7 @@
           <span class="tester-panel-hint">Desert Path · only visible to Carles</span>
         </summary>
         <div class="tester-panel-body">
+          <div class="tester-status" id="tester-status" role="status"></div>
           <div class="tester-rows" id="tester-rows"></div>
           <div class="tester-actions">
             <button type="button" class="tester-btn" id="tester-skip-walks">⏭ Skip every walk</button>
@@ -4358,86 +4360,120 @@
        Part I is the journal (Sheet 13B: the seven-letter sigil). Part II only exists here:
        move the sun until the Monolith's shadow touches the carved marks named by the inscription.
        =================================================================== -->
-  <div class="monolith-modal-backdrop" id="modal-sun-monolith" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="monolith-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">☀️</span>
+  <div class="chasm-modal-backdrop" id="modal-sun-monolith" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="monolith-modal-title">
+    <div class="chasm-workbench-window chasm3d-window mon3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">☀️</span>
           <div>
-            <h2 class="monolith-title" id="monolith-modal-title">THE SUN MONOLITH &amp; CAIRN II</h2>
-            <div class="monolith-subtitle">Station 14 · The Walking Sun</div>
+            <div class="chasm-header-title" id="monolith-modal-title">The Sun Monolith &amp; Cairn II · Station 14</div>
+            <div class="chasm-header-subtitle">The Walking Sun · the Ridge of the Sun · page “The Sun Monolith &amp; Cairn II”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-monolith" aria-label="Close The Sun Monolith">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-monolith" title="Close" aria-label="Close The Sun Monolith">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>CAIRN II // THE RIDGE OF THE SUN</strong></div>
-        <div>SIGIL:<strong id="monolith-telem-sigil">[ 7 LETTERS ]</strong></div>
-        <div>SUN:<strong id="monolith-telem-sun">07:00</strong></div>
-        <div>SHADOW MARKS:<strong id="monolith-telem-marks">0 / 4</strong></div>
-        <div>SEAL:<strong id="monolith-telem-seal">[ SEALED ]</strong></div>
-      </div>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="mon3d-stage">
+          <canvas id="mon3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/sun_monolith_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="mon3d-marks" id="mon3d-marks" role="img" aria-label="No shadow marks awake"></div>
+            <svg class="mon3d-sky" id="monolith-sky" viewBox="0 0 200 64" role="img" aria-label="The sun's path across the sky. Drag the sun to change the hour."></svg>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="mon3d-clock">☀ 07:00</div>
+              <div class="chasm3d-hearts" id="mon3d-hearts" role="img" aria-label="3 of 3 hearts left"></div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="mon3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="mon3d-fade"></div>
+        </div>
 
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card" id="monolith-sigil-card">
-            <div class="monolith-card-title">I · The Sigil of Cairn II</div>
-            <p>Solve the page <strong>“The Sun Monolith &amp; Cairn II”</strong> of your journal: seven noons, seven shadows, seven rings of the dial. Speak the seven-letter sigil to wake the Monolith.</p>
-            <div class="monolith-key-row">
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="monolith-dispatch-text" role="status" aria-live="polite"></div>
+          <div class="chasm3d-where" id="mon3d-where"></div>
+
+          <div class="chasm3d-controls mon3d-controls" id="mon3d-controls" role="group" aria-label="Guide Hermes on the Ridge of the Sun">
+            <div class="mon3d-sigil-row" id="mon3d-sigil-row">
               <label class="monolith-sr-only" for="monolith-key-input">The seven-letter sigil of Cairn II</label>
-              <input type="text" class="monolith-key-input" id="monolith-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-monolith-speak">✦ Speak the Sigil</button>
+              <input type="text" class="mon3d-input" id="monolith-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
+              <button type="button" class="chasm3d-btn is-way" id="btn-monolith-speak">✦ Speak the Sigil</button>
+              <div class="monolith-feedback" id="monolith-key-feedback" role="status" aria-live="polite"></div>
             </div>
-            <div class="monolith-feedback" id="monolith-key-feedback" role="status" aria-live="polite"></div>
-          </div>
-
-          <div class="monolith-card monolith-game is-locked" id="monolith-game">
-            <div class="monolith-card-title">II · The Walking Sun</div>
-            <div class="monolith-game-inner">
-              <svg class="monolith-sky" id="monolith-sky" viewBox="0 0 200 64" role="img" aria-label="The sun's path across the sky. Drag the sun to change the hour."></svg>
-              <div class="monolith-time-row">
-                <button type="button" class="monolith-btn monolith-step-btn" id="btn-monolith-later" aria-label="Five minutes later (the sun moves west)">+5′</button>
+            <div class="mon3d-sun-row" id="mon3d-sun-row" hidden>
+              <div class="mon3d-time-row">
+                <button type="button" class="chasm3d-btn mon3d-step" id="btn-monolith-earlier" aria-label="Five minutes earlier (the sun moves east)">−5′</button>
                 <input type="range" id="monolith-time-slider" min="420" max="1020" step="1" value="420" aria-label="Hour of the day">
-                <button type="button" class="monolith-btn monolith-step-btn" id="btn-monolith-earlier" aria-label="Five minutes earlier (the sun moves east)">−5′</button>
-                <span class="monolith-time-label" id="monolith-time-label">07:00</span>
+                <button type="button" class="chasm3d-btn mon3d-step" id="btn-monolith-later" aria-label="Five minutes later (the sun moves west)">+5′</button>
+                <span class="mon3d-time-label" id="monolith-time-label">07:00</span>
               </div>
-              <div class="monolith-mark-row">
-                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-monolith-mark">✦ Mark this shadow</button>
-                <span class="monolith-feedback" id="monolith-mark-feedback" role="status" aria-live="polite"></span>
-              </div>
-              <svg class="monolith-pavement" id="monolith-pavement" viewBox="-62 -64 124 90" role="img" aria-label="Cairn II seen from above: the Monolith, the rings of the dial, the carved marks and the shadow."></svg>
+              <button type="button" class="chasm3d-btn is-way" id="btn-monolith-mark">✦ Mark this shadow</button>
+              <div class="monolith-feedback" id="monolith-mark-feedback" role="status" aria-live="polite"></div>
             </div>
-            <div class="monolith-lock-note">Speak the sigil of Cairn II to wake the Monolith.</div>
           </div>
-        </div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Inscription under Cairn II</div>
+          <div id="mon3d-lost" hidden>
+            <p class="chasm3d-voice">The sun went down on us, Silvia, and the marks went back to sleep. Give me the night and we begin again at sunrise.</p>
+            <button type="button" class="chasm3d-btn" id="btn-monolith-again">↺ Begin a new day</button>
+          </div>
+          <div class="chasm-victory-card" id="monolith-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>☀️</span><span>The Niche of Cairn II Opens</span></div>
+            <div class="chasm-victory-text" id="monolith-victory-text"></div>
+            <button type="button" class="btn-chasm-finish" id="btn-monolith-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-monolith-reward">🏆 See your reward</button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-monolith-replay">↺ Walk the sun again</button>
+          </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-monolith-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
+
+          <details class="chasm3d-laws">
+            <summary>The Inscription under Cairn II</summary>
             <ol class="monolith-inscription" id="monolith-inscription"></ol>
-          </div>
-
-          <div class="monolith-card">
-            <div class="monolith-card-title">What the Stones Remember</div>
+            <p>Hermes has <strong>three hearts</strong>. A carved mark the inscription never names costs one; so does a true mark struck out of order. When the third is gone the sun sets and the day begins again at sunrise.</p>
+          </details>
+          <details class="chasm3d-laws">
+            <summary>What the Stones Remember</summary>
             <div class="monolith-fragments" id="monolith-fragments"></div>
-          </div>
+          </details>
+        </div>
+      </div>
 
-          <div class="monolith-card monolith-victory" id="monolith-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Niche of Cairn II Opens</div>
-            <p id="monolith-victory-text"></p>
-            <div>
-              <span class="monolith-equation">[D] + [F] = 24</span>
-              <span class="monolith-equation">[C] − [T] = 8</span>
-            </div>
-            <p style="font-size: 0.78rem; color: #b8a07a;">Carved inside the lid of the niche. Record both in your Cipher Ledger.</p>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-monolith-finish">🗺️ Return to the Grand Desert Map ➔</button>
+      <div class="chasm3d-howto" id="mon3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="mon3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="mon3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>The Ridge of the Sun. The Monolith is <strong>24 paces</strong> tall, and at its feet sits Cairn II, the second of the five seals. The founders locked it with the sun itself.</p>
+            <p>You have the page <strong>“The Sun Monolith &amp; Cairn II”</strong>: seven noons, seven shadows and the seven rings of the dial. Part I wakes the stone. Part II walks the sun across the sky.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>I · The sigil</h3>
+            <p>Solve the seven noons on your page. The shadow of the Monolith is always <strong>twelve times</strong> the shadow of Hermes's staff. Each length belongs to one ring of the dial, and each ring carries a letter. Read the seven letters in the order of the noons and speak them to the stone.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>II · The walking sun</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Move the sun with the slider, the −5′ and +5′ buttons, or by dragging the little sun in the top corner. Watch the real shadow of the Monolith sweep the ground like the hand of a clock.</li>
+              <li>The inscription names <strong>four moments</strong>. Each tells you where the shadow must fall, not what time it is. When the glowing tip of the shadow rests on the carved mark you want, press <em>✦ Mark this shadow</em>.</li>
+              <li>The marks must be awakened <strong>in the order the inscription gives</strong>.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>Hearts, traps and hints</h3>
+            <p>Two marks lie on the shadow's path but the inscription never names them, and two more cannot be reached at all. Strike one of the first two, or a true mark in the wrong order, and Hermes loses a <strong>heart</strong>. A trap also puts the awakened marks back to sleep. Sand under the shadow costs nothing.</p>
+            <p>Lose the third heart and the sun sets: the day begins again at sunrise. Hints wait under <em>Ask Hermes</em> and in the notes below the controls.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-monolith-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-monolith-howto-next">Next →</button>
           </div>
-
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE RIDGE OF THE SUN</div>
-            <div class="monolith-dispatch" id="monolith-dispatch-text" role="status" aria-live="polite"></div>
-          </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-monolith-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>

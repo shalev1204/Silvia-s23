@@ -61,7 +61,7 @@
       open: function () { return [
         nar('The wind drops. Far ahead, a light the size of a seed is moving across the dunes.', { fx: fx('travellerComes') }),
         H('Silvia... a lantern, coming my way. Someone is walking toward my fire.'),
-        nar('A nomad in an indigo mantle stops at the edge of the firelight. His own lantern is dark.'),
+        nar('A young nomad in a striped headcloth stops at the edge of the firelight. His own lantern is dark.'),
         N('Peace, traveller. My lamp died two dunes ago.'),
         N('I have walked blind since moonrise. A little oil would carry me to the well by dawn.'),
         H('I still have my oil, Silvia. Not much. What do we do?')
@@ -469,9 +469,9 @@
     var camp = SC.props.brazier(paint, { height: 0.8, intensity: 1.3, range: 11 });
     camp.position.set(-0.2, 0, 0.9); scene.add(camp);
 
-    // ---- the traveller (an elder in an indigo mantle) ----
-    var nomad = SC.chars.elder(paint, { robe: 0x24406e, trim: 0xe0b050, mantle: 0x172640 });
-    nomad.position.set(9, 0, -4); nomad.rotation.y = 1.95; nomad.scale.setScalar(1.05); nomad.visible = false;
+    // ---- the traveller (a man of thirty-five in a striped headcloth, linen and a sash) ----
+    var nomad = SC.chars.nomad ? SC.chars.nomad(paint, {}) : SC.chars.elder(paint, { robe: 0x24406e, trim: 0xe0b050, mantle: 0x172640 });
+    nomad.position.set(9, 0, -4); nomad.rotation.y = 1.95; nomad.scale.setScalar(1.3); nomad.visible = false;
     scene.add(nomad);
     var nomadLamp = new T.PointLight(0xffc070, 0, 8, 1.8); scene.add(nomadLamp);
     var ringN = new T.Mesh(new T.RingGeometry(0.62, 0.78, 48), new T.MeshBasicMaterial({ color: 0x8fe0d0, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide, fog: false }));
@@ -515,7 +515,7 @@
       var lantern = Road ? Road.hasLantern(fl) : true;
       flameOn = lantern; Hh.flame.visible = lantern; lampK = lantern ? 1 : 0;
       camp.visible = (k === 'traveller'); camp.userData.on = camp.visible;
-      nomad.visible = false; camel.visible = false; nomadLamp.intensity = 0;
+      nomad.visible = false; camel.visible = false; nomadLamp.intensity = 0; if (nomad.userData.setLamp) nomad.userData.setLamp(false);
       prints.forEach(function (p) { p.visible = false; });
       mover.target = null;
       var storm = Road && Road.marchKind() === 'storm';
@@ -531,7 +531,7 @@
       setKind: setKind, nomadObj: nomad,
       fx: {
         travellerComes: function () { nomad.visible = true; nomad.position.set(9, 0, -4); mover.target = { obj: nomad, x: 1.5, z: -0.3, face: Math.PI + 0.9, speed: 2.6, lamp: false }; frame(0.2, 1.6, -0.2, 8.5); },
-        travellerLeaves: function () { nomadLamp.intensity = 1.1; mover.target = { obj: nomad, x: -15, z: -22, face: null, speed: 2.2, lamp: true, hideAtEnd: true }; },
+        travellerLeaves: function () { nomadLamp.intensity = 1.1; if (nomad.userData.setLamp) nomad.userData.setLamp(true); mover.target = { obj: nomad, x: -15, z: -22, face: null, speed: 2.2, lamp: true, hideAtEnd: true }; },
         pour: function () { lampBoost = 1.4; if (sfx.playCelestialChime) sfx.playCelestialChime(); },
         camelComes: function () { camel.visible = true; camel.position.set(10, 0, -7); mover.target = { obj: camel, x: 2.6, z: -2.0, face: null, speed: 2.4, prints: true }; frame(0.6, 1.6, -0.8, 9.5); },
         camelLeads: function () { mover.target = { obj: camel, x: 7, z: -34, face: null, speed: 2.4, prints: true }; },
@@ -579,7 +579,7 @@
           if (m.prints && mover.stride > 1.0) { mover.stride = 0; mover.side *= -1; dropPrint(camel.position.x, camel.position.z, camel.rotation.y, mover.side); }
         } else {
           if (o === camel) camel.userData.legs.forEach(function (l) { l.leg.rotation.x *= 0.9; l.lo.rotation.x *= 0.9; });
-          if (m.hideAtEnd) { o.visible = false; m.hideAtEnd = false; nomadLamp.intensity = 0; }
+          if (m.hideAtEnd) { o.visible = false; m.hideAtEnd = false; nomadLamp.intensity = 0; if (nomad.userData.setLamp) nomad.userData.setLamp(false); }
         }
       }
       if (mover.fade) {

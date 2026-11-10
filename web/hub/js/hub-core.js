@@ -703,7 +703,11 @@
           },
           {
             id: 'clepsydra', tag: 'Station 13', label: 'The Oasis Clepsydra', flag: 'order_oasis_clepsydra_completed', built: true,
-            complete() { set('order_oasis_clepsydra_completed', 'true'); },
+            complete() {
+              set('order_oasis_clepsydra_completed', 'true'); set('order_clepsydra_march_bypassed', 'true');
+              if (!get('order_clepsydra_done_at')) set('order_clepsydra_done_at', String(Date.now()));
+              if (typeof window.addRelicToInventory === 'function') { window.addRelicToInventory('water_skins'); window.addRelicToInventory('falcon_weight'); }
+            },
             reset() {
               dels(['order_oasis_clepsydra_completed', 'order_clepsydra_matrix_state', 'order_clepsydra_clues_state', 'order_clepsydra_registry_selections', 'order_clepsydra_act1', 'order_clepsydra_visions', 'order_clepsydra_howto', 'order_clepsydra_march_start', 'order_clepsydra_march_bypassed', 'order_clepsydra_done_at', 'order_gates_march_start', 'order_gates_march_bypassed', 'order_lamp_oil_found']); dropRelic('lamp_oil');
               let w = null;
@@ -712,9 +716,30 @@
             }
           },
           {
+            id: 'gates', tag: 'Station 13B', label: 'At the Gates of Tower II', flag: 'order_gates_scene_completed', built: true,
+            complete() {
+              set('order_gates_scene_completed', 'true'); set('order_gates_march_bypassed', 'true');
+              set('order_monolith_gate_seal1', String(get('order_seal_cairn_1') === 'true'));
+            },
+            reset() {   // the six hours from Camp VIII, the scene, the road it chose and the night on the Erg all go with it
+              dels(['order_gates_scene_completed', 'order_gates_path', 'order_gates_flags', 'order_gates_return', 'order_gates_march_start', 'order_gates_march_bypassed',
+                'order_monolith_gate_seal1', 'order_monolith_march_hours', 'order_night_erg', 'order_monolith_march_start', 'order_monolith_march_bypassed']);
+              ['red_cord', 'servant_coin', 'statue_seal'].forEach(dropRelic);
+            }
+          },
+          {
             id: 's14', tag: 'Station 14', label: 'The Sun Monolith · Cairn II', flag: 'order_sun_monolith_completed', built: true,
-            complete() { set('order_monolith_march_start', '1'); set('order_sun_monolith_awake', 'true'); set('order_sun_monolith_marks', '4'); set('order_sun_monolith_completed', 'true'); set('order_seal_cairn_2', 'true'); },
-            reset() { dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute', 'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_monolith_gate_seal1', 'order_gates_scene_completed', 'order_five_seals_celebrated', 'order_gates_path', 'order_gates_flags', 'order_monolith_march_hours', 'order_night_erg', 'order_gates_return']); ['red_cord', 'servant_coin', 'ibis_figure', 'statue_seal', 'lamp_oil'].forEach(dropRelic); }
+            complete() {
+              set('order_monolith_march_start', '1'); set('order_monolith_march_bypassed', 'true'); set('order_sun_monolith_awake', 'true'); set('order_sun_monolith_marks', '4');
+              set('order_sun_monolith_completed', 'true'); set('order_seal_cairn_2', 'true');
+              if (!get('order_night_erg')) set('order_night_erg', JSON.stringify({ done: true, choice: 'skipped' }));
+            },
+            reset() {
+              dels(['order_sun_monolith_completed', 'order_sun_monolith_awake', 'order_sun_monolith_marks', 'order_monolith_key_fails', 'order_monolith_hint', 'order_monolith_sun_minute',
+                'order_seal_cairn_2', 'order_monolith_march_start', 'order_monolith_march_bypassed', 'order_five_seals_celebrated', 'order_night_erg', 'order_monolith_walk',
+                'order_monolith_howto', 'order_monolith_cine_intro', 'order_monolith_cine_outro']);
+              dropRelic('ibis_figure');
+            }
           },
           {
             id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', flag: 'order_sandstone_labyrinth_completed', built: true,
@@ -772,9 +797,9 @@
 
         // Where the Hermes chat should stand for the games that are done
         function syncWire(direction) {
-          const a22 = isDone('s22'), a21 = isDone('s21'), a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
-          const floor = a22 ? 43 : a21 ? 39 : a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : c ? 8 : l ? 6 : (ch || k || p) ? 4 : 0;
-          const cap = a22 ? 44 : a21 ? 42 : a20 ? 38 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : c ? 10 : l ? 6 : 4;   // until the Lexicon is read, the chat stays on the road of the Chasm and the salt (step 4)
+          const a22 = isDone('s22'), a21 = isDone('s21'), a20 = isDone('s20'), a19 = isDone('s19'), a18 = isDone('s18'), a17 = isDone('s17'), c4 = isDone('s16'), lab = isDone('s15'), m = isDone('s14'), g = isDone('gates'), c = isDone('clepsydra'), l = isDone('lexicon'), ch = isDone('chasm'), p = isDone('playa'), k = isDone('cairn1');
+          const floor = a22 ? 43 : a21 ? 39 : a20 ? 35 : a19 ? 31 : a18 ? 27 : a17 ? 23 : c4 ? 19 : lab ? 15 : m ? 11 : g ? 10 : c ? 8 : l ? 6 : (ch || k || p) ? 4 : 0;
+          const cap = a22 ? 44 : a21 ? 42 : a20 ? 38 : a19 ? 32 : a18 ? 30 : a17 ? 26 : c4 ? 22 : lab ? 18 : m ? 14 : g ? 10 : c ? 9 : l ? 6 : 4;   // until the Lexicon is read, the chat stays on the road of the Chasm and the salt (step 4)
           let step = parseInt(get('order_field_wire_step') || '0', 10) || 0;
           step = direction === 'complete' ? Math.max(step, floor) : Math.min(step, cap);
           set('order_field_wire_step', String(step));
@@ -791,6 +816,7 @@
           playa: { wire: 4, node: 21, walk: 'order_playa_march_bypassed' },
           lexicon: { wire: 4, node: 11, walk: 'order_lexicon_march_bypassed' },
           clepsydra: { wire: 6, node: 12 },
+          gates: { wire: 8, node: 27, walk: 'order_gates_march_bypassed' },
           s14: { wire: 10, node: 23, walk: 'order_monolith_march_bypassed' },
           s15: { wire: 14, node: 24, walk: 'order_labyrinth_march_bypassed' },
           s16: { wire: 18, node: 25, walk: 'order_cairn4_march_bypassed' },
@@ -801,7 +827,7 @@
           s21: { wire: 38, node: 41 },
           s22: { wire: 42, node: 42 }
         };
-        const WALKS = ['order_chasm_march_bypassed', 'order_playa_march_bypassed', 'order_lexicon_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
+        const WALKS = ['order_clepsydra_march_bypassed', 'order_gates_march_bypassed', 'order_chasm_march_bypassed', 'order_playa_march_bypassed', 'order_lexicon_march_bypassed', 'order_monolith_march_bypassed', 'order_labyrinth_march_bypassed', 'order_cairn4_march_bypassed', 'order_cairn5_march_bypassed', 'order_stele_march_bypassed', 'order_oracle_stair_bypassed', 'order_masks_march_bypassed'];
 
         // Puts the Hermes chat exactly at `step`: the replies before it are kept (first reply if none was saved)
         function setWire(step) {
@@ -861,6 +887,7 @@
             setWire(arrival.wire);
             return arrival.node;
           },
+          arrival: (id) => ARRIVAL[id] || null,
           skipWalks() { WALKS.forEach((k) => set(k, 'true')); },
           replayAll() {
             GAMES.forEach((g) => { if (g.reset) g.reset(); });

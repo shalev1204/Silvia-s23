@@ -1229,6 +1229,152 @@
         return g;
       }
 
+      // A young man of the desert (about thirty-five): linen tunic, loose trousers, a striped sash, a headcloth, a short
+      // beard, a waterskin, a dark lantern and a plain walking stick. Faces -z like the elder. No Order jewellery on him.
+      function youngNomad(paint, o) {
+        o = o || {};
+        var g = new T.Group();
+        var soft = tex.soft();
+        var linen = paint({ map: tex.cloth(o.tunic == null ? 0xcdb98c : o.tunic, 0xe6d8b4, 3, 21), side: T.DoubleSide }, 0xffd8a8, 0.18);
+        var trousers = paint({ map: tex.cloth(o.trousers == null ? 0x7d6a4c : o.trousers, 0x9b8764, 5, 22), side: T.DoubleSide }, 0xffd8a8, 0.16);
+        var vestMat = paint({ color: o.vest == null ? 0x5a3a24 : o.vest, side: T.DoubleSide }, 0xffb878, 0.22);
+        var skin = paint({ color: 0xb98a63 }, 0xffc890, 0.28);
+        var skinDark = paint({ color: 0xa57852 }, 0xffc890, 0.2);
+        var hairM = paint({ color: 0x2c1d14 }, 0xffb878, 0.2);
+        var leather = paint({ color: 0x5a3418 }, 0xffc890, 0.22);
+        var brass = paint({ color: 0xc79a46, emissive: 0x2a1804 }, 0xfff0b0, 0.4);
+        var sash = paint({ map: tex.cloth(0x9b3f2b, 0xe0b878, 6, 23), side: T.DoubleSide }, 0xffb878, 0.2);
+        var headcloth = paint({ map: tex.cloth(0xe9ddc0, 0x9c4a30, 10, 24), side: T.DoubleSide }, 0xffe0b8, 0.2);
+        var wood = paint({ map: tex.wood(0x7a5230, 25) }, 0xffd8a8, 0.12);
+        var ink = new T.MeshBasicMaterial({ color: 0x1c120c });
+        function put(mesh, x, y, z, parent) { mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; (parent || g).add(mesh); return mesh; }
+        function ell(geo, mat, sx, sy, sz) { var m = new T.Mesh(geo, mat); m.scale.set(sx, sy, sz); return m; }
+        function limb(a, b, rTop, rBot, mat) {
+          var A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b[0], b[1], b[2]);
+          var len = A.distanceTo(B), m = new T.Mesh(new T.CylinderGeometry(rTop, rBot, len, 14, 1, false), mat);
+          m.position.copy(A.clone().add(B).multiplyScalar(0.5));
+          m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), A.clone().sub(B).normalize());
+          m.castShadow = true; g.add(m);
+          return m;
+        }
+
+        // legs: loose trousers gathered at the ankle, low leather boots with a turned toe
+        var legs = [-1, 1].map(function (sd) {
+          var leg = new T.Group(); leg.position.set(sd * 0.1, 0.96, 0); g.add(leg);
+          var up = new T.Mesh(new T.CylinderGeometry(0.115, 0.085, 0.5, 14), trousers); up.position.y = -0.25; up.castShadow = true; leg.add(up);
+          var lo = new T.Mesh(new T.CylinderGeometry(0.085, 0.07, 0.42, 14), trousers); lo.position.y = -0.69; lo.castShadow = true; leg.add(lo);
+          var cuff = new T.Mesh(new T.TorusGeometry(0.072, 0.014, 8, 18), leather); cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.83; leg.add(cuff);
+          var boot = ell(new T.SphereGeometry(0.1, 16, 12), leather, 0.85, 0.7, 1.55); boot.position.set(0, -0.9, -0.05); boot.castShadow = true; leg.add(boot);
+          var toe = ell(new T.SphereGeometry(0.05, 10, 8), leather, 0.9, 0.7, 1.0); toe.position.set(0, -0.89, -0.2); toe.rotation.x = 0.3; leg.add(toe);
+          return leg;
+        });
+
+        // tunic: a long linen shirt over the hips, open at the throat, with a dark leather vest over it
+        var tunicProf = [[0.3, 0.52], [0.285, 0.7], [0.255, 0.95], [0.235, 1.2], [0.22, 1.4], [0.15, 1.5], [0.075, 1.54]];
+        var tunic = new T.Mesh(new T.LatheGeometry(tunicProf.map(function (p) { return new T.Vector2(p[0], p[1]); }), 40), linen);
+        tunic.scale.set(0.84, 1, 0.74); tunic.castShadow = true; g.add(tunic);
+        var hem = put(new T.Mesh(new T.TorusGeometry(0.3, 0.012, 8, 40), leather), 0, 0.53, 0); hem.rotation.x = Math.PI / 2; hem.scale.set(0.84, 0.74, 1);
+        var vestProf = [[0.275, 0.86], [0.255, 1.0], [0.245, 1.2], [0.235, 1.4], [0.17, 1.49]];
+        var vest = new T.Mesh(new T.LatheGeometry(vestProf.map(function (p) { return new T.Vector2(p[0], p[1]); }), 40, Math.PI * 0.12, Math.PI * 1.76), vestMat);
+        vest.scale.set(0.84, 1, 0.78); vest.rotation.y = Math.PI; vest.castShadow = true; g.add(vest);
+        // a broad striped sash at the waist, a knotted end hanging at the hip
+        var waist = put(new T.Mesh(new T.TorusGeometry(0.27, 0.06, 10, 40), sash), 0, 0.95, 0); waist.rotation.x = Math.PI / 2; waist.scale.set(0.84, 0.76, 1);
+        var knot = put(ell(new T.SphereGeometry(0.06, 12, 10), sash, 1, 0.9, 0.9), 0.2, 0.93, -0.22);
+        var tail1 = put(new T.Mesh(new T.PlaneGeometry(0.1, 0.34), sash), 0.22, 0.74, -0.24); tail1.rotation.set(0.12, 0.3, 0.1);
+        var tail2 = put(new T.Mesh(new T.PlaneGeometry(0.09, 0.28), sash), 0.16, 0.76, -0.25); tail2.rotation.set(0.1, -0.2, -0.12);
+        // a knife on the sash, a leather satchel on the other hip, a cross strap over the shoulder for the waterskin
+        put(new T.Mesh(new T.BoxGeometry(0.03, 0.2, 0.025), leather), -0.12, 0.88, -0.28).rotation.z = 0.25;
+        put(new T.Mesh(new T.BoxGeometry(0.18, 0.16, 0.09), leather), -0.25, 0.78, -0.02);
+        var strap = limb([0.17, 1.48, -0.02], [-0.22, 0.86, -0.06], 0.014, 0.014, leather);
+        var skinBag = put(ell(new T.SphereGeometry(0.12, 16, 12), paint({ color: 0x7a4a26 }, 0xffc890, 0.22), 0.85, 1.35, 0.75), -0.22, 0.74, 0.1);
+        put(new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.06, 10), leather), -0.22, 0.92, 0.1);
+
+        // neck and the loose scarf round it
+        put(new T.Mesh(new T.CylinderGeometry(0.058, 0.07, 0.12, 12), skinDark), 0, 1.56, 0);
+        var scarf = put(new T.Mesh(new T.TorusGeometry(0.115, 0.04, 10, 28), headcloth), 0, 1.5, -0.005); scarf.rotation.x = Math.PI / 2;
+        var scarfEnd = put(new T.Mesh(new T.PlaneGeometry(0.12, 0.42), headcloth), -0.1, 1.28, -0.12); scarfEnd.rotation.set(0.1, 0.25, 0.12);
+
+        // head: a lean, sun-browned face, straight brows, a short dark beard and moustache, a headcloth held by a cord
+        var head = new T.Group(); head.position.set(0, 1.68, 0); head.scale.setScalar(1.3); g.add(head);
+        function hput(mesh, x, y, z) { mesh.position.set(x, y, z); mesh.castShadow = true; head.add(mesh); return mesh; }
+        hput(ell(new T.SphereGeometry(0.13, 28, 20), skin, 0.88, 1.1, 0.96), 0, 0, 0);
+        hput(ell(new T.SphereGeometry(0.03, 12, 10), skin, 0.9, 1.4, 1.2), 0, -0.012, -0.13);
+        hput(ell(new T.SphereGeometry(0.019, 10, 8), skin, 1.25, 0.9, 1), 0, -0.04, -0.143);
+        [-1, 1].forEach(function (sd) {
+          hput(ell(new T.SphereGeometry(0.02, 12, 10), new T.MeshBasicMaterial({ color: 0xece3d2 }), 1.2, 0.62, 0.5), sd * 0.047, 0.018, -0.118);
+          hput(new T.Mesh(new T.SphereGeometry(0.0095, 10, 8), ink), sd * 0.047, 0.017, -0.124);
+          var lid = hput(ell(new T.SphereGeometry(0.027, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), skin, 1.2, 0.6, 0.6), sd * 0.047, 0.026, -0.115); lid.rotation.x = 0.1;
+          var brow = hput(ell(new T.CapsuleGeometry(0.009, 0.05, 4, 8), hairM, 1, 1, 1), sd * 0.05, 0.052, -0.121); brow.rotation.z = Math.PI / 2 + sd * 0.12;
+          hput(ell(new T.SphereGeometry(0.026, 12, 10), skin, 1.2, 0.7, 0.5), sd * 0.078, -0.03, -0.09);
+          hput(ell(new T.SphereGeometry(0.026, 10, 8), skinDark, 0.55, 1.2, 0.8), sd * 0.115, 0.0, 0.0);
+        });
+        // the short beard: a close dark cap along the jaw and chin, and a moustache
+        var beard = hput(ell(new T.SphereGeometry(0.128, 24, 16, 0, Math.PI * 2, Math.PI * 0.66, Math.PI * 0.3), hairM, 0.9, 1.12, 0.98), 0, 0.0, 0);
+        beard.rotation.x = 0.0;
+        [-1, 1].forEach(function (sd) {
+          var m = hput(ell(new T.SphereGeometry(0.026, 12, 8), hairM, 1.7, 0.5, 0.75), sd * 0.027, -0.058, -0.138); m.rotation.z = sd * -0.28;
+        });
+        // the headcloth: cream with terracotta stripes, over the crown and down behind, a dark cord round the brow
+        var cloth = hput(ell(new T.SphereGeometry(0.15, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.46), headcloth, 0.98, 1.0, 1.04), 0, 0.03, 0.02);
+        cloth.rotation.x = -0.2;
+        var cord = hput(new T.Mesh(new T.TorusGeometry(0.138, 0.016, 8, 32), paint({ color: 0x1e1612 })), 0, 0.075, 0.01); cord.rotation.x = Math.PI / 2 - 0.12; cord.scale.set(1, 1.05, 1);
+        var drape = hput(new T.Mesh(new T.PlaneGeometry(0.27, 0.34), headcloth), 0, -0.15, 0.1); drape.rotation.set(0.12, 0, 0);
+        var drapeSide = [-1, 1].map(function (sd) { var d = hput(new T.Mesh(new T.PlaneGeometry(0.09, 0.2), headcloth), sd * 0.12, -0.08, 0.09); d.rotation.set(0.05, sd * 0.9, sd * 0.05); return d; });
+
+        // arms: sleeves rolled to the elbow, forearms bare, a leather band on the wrist; the right hand holds the stick,
+        // the left one the dark lantern
+        var shR = [0.225, 1.45, -0.01], elR = [0.29, 1.18, -0.1], wrR = [0.31, 0.96, -0.32];
+        var shL = [-0.225, 1.45, -0.01], elL = [-0.27, 1.18, -0.09], wrL = [-0.26, 1.02, -0.28];
+        [shR, shL].forEach(function (s) { put(new T.Mesh(new T.SphereGeometry(0.062, 14, 10), linen), s[0], s[1], s[2]); });
+        limb(shR, elR, 0.058, 0.064, linen); limb(shL, elL, 0.058, 0.064, linen);
+        [elR, elL].forEach(function (e) { var r = put(new T.Mesh(new T.TorusGeometry(0.066, 0.014, 8, 18), linen), e[0], e[1], e[2]); r.rotation.x = Math.PI / 2 - 0.2; });
+        limb(elR, wrR, 0.058, 0.044, skin); limb(elL, wrL, 0.058, 0.044, skin);
+        [wrR, wrL].forEach(function (w) { var b = put(new T.Mesh(new T.TorusGeometry(0.047, 0.012, 8, 16), leather), w[0], w[1], w[2]); b.rotation.x = Math.PI / 2 - 0.3; });
+        function hand(pos, grip) {
+          var h = new T.Group(); h.position.set(pos[0], pos[1] - 0.05, pos[2]); g.add(h);
+          var palm = new T.Mesh(new T.SphereGeometry(0.045, 14, 10), skin); palm.scale.set(1, 0.9, 0.8); palm.castShadow = true; h.add(palm);
+          for (var f = 0; f < 4; f++) {
+            var fin = new T.Mesh(new T.CapsuleGeometry(0.011, 0.045, 3, 6), skin);
+            fin.position.set(-0.027 + f * 0.018, -0.028, grip ? -0.035 : -0.02); fin.rotation.x = grip ? 1.2 : 0.5; fin.castShadow = true; h.add(fin);
+          }
+          return h;
+        }
+        hand(wrR, true); hand(wrL, true);
+
+        // the walking stick: plain wood, a leather grip, a forked top
+        var stick = new T.Group(); stick.position.set(wrR[0] + 0.01, 0, wrR[2]); g.add(stick);
+        var pole = new T.Mesh(new T.CylinderGeometry(0.02, 0.027, 1.78, 10), wood); pole.position.y = 0.88; pole.castShadow = true; stick.add(pole);
+        var grip = new T.Mesh(new T.CylinderGeometry(0.028, 0.028, 0.16, 10), leather); grip.position.y = 0.96; stick.add(grip);
+        [-1, 1].forEach(function (sd) { var fk = new T.Mesh(new T.CylinderGeometry(0.012, 0.018, 0.14, 6), wood); fk.position.set(sd * 0.03, 1.8, 0); fk.rotation.z = sd * -0.35; stick.add(fk); });
+
+        // the lantern in his left hand: brass, a glass belly, a ring to carry it. Dark until the lamp is lit.
+        var lantern = new T.Group(); lantern.position.set(wrL[0] - 0.02, wrL[1] - 0.2, wrL[2] - 0.02); g.add(lantern);
+        var lRing = new T.Mesh(new T.TorusGeometry(0.03, 0.006, 6, 14), brass); lRing.position.y = 0.13; lantern.add(lRing);
+        var lTop = new T.Mesh(new T.ConeGeometry(0.06, 0.05, 8), brass); lTop.position.y = 0.09; lantern.add(lTop);
+        var glassMat = new T.MeshBasicMaterial({ color: 0x3a2a1c, transparent: true, opacity: 0.8 });
+        var lGlass = new T.Mesh(new T.CylinderGeometry(0.055, 0.045, 0.14, 10), glassMat); lGlass.position.y = 0; lantern.add(lGlass);
+        var lBase = new T.Mesh(new T.CylinderGeometry(0.05, 0.05, 0.03, 10), brass); lBase.position.y = -0.085; lantern.add(lBase);
+        var lFlame = new T.Sprite(new T.SpriteMaterial({ map: soft, color: 0xffb860, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
+        lFlame.scale.set(0.5, 0.5, 1); lantern.add(lFlame);
+        var lit = 0;
+
+        g.scale.setScalar(o.scale || 1);
+        g.userData = {
+          head: head, lantern: lantern,
+          setLamp: function (on) { lit = on ? 1 : 0; glassMat.color.setHex(on ? 0xffd890 : 0x3a2a1c); glassMat.opacity = on ? 0.95 : 0.8; },
+          update: function (t) {
+            head.rotation.y = Math.sin(t * 0.5) * 0.09;
+            head.rotation.x = Math.sin(t * 0.35) * 0.03;
+            tunic.scale.y = 1 + Math.sin(t * 1.6) * 0.004;
+            scarfEnd.rotation.z = 0.12 + Math.sin(t * 1.3) * 0.05;
+            tail1.rotation.z = 0.1 + Math.sin(t * 1.7 + 1) * 0.06; tail2.rotation.z = -0.12 + Math.sin(t * 1.5) * 0.06;
+            lantern.rotation.z = Math.sin(t * 1.1) * 0.04;
+            lFlame.material.opacity = lit ? 0.5 + 0.12 * Math.sin(t * 9) : 0;
+          }
+        };
+        return g;
+      }
+
       // A bronze tripod brazier with a live fire (flame sprites and a flickering light)
       function brazier(paint, o) {
         o = o || {};
@@ -1457,7 +1603,7 @@
       }
 
       window.EclipseScenery = {
-        tex: tex, preTone: preTone, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
+        tex: tex, preTone: preTone, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
         props: { brazier: brazier, banner: banner, palm: palm, awning: awning, amphora: amphora, crate: crate, sack: sack, firepit: firepit, column: column, rocks: rocks, tracks: tracks },
         paint: paintFor, shadowy: shadowy, noise: { vnoise: vnoise, fbm: fbm, hash2: hash2, rng: rng }
       };

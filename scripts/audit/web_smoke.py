@@ -297,7 +297,8 @@ def test_ledger_gating(browser):
 
 def test_sun_monolith(browser):
     print("\n5. Station 14 · The Sun Monolith, end to end")
-    seed = dict(DESERT_BASE, **DESERT_DONE, order_field_wire_step="8", order_field_wire_choices="[2,0,1,0,0,0,1,0]")
+    seed = dict(DESERT_BASE, **DESERT_DONE, order_field_wire_step="8", order_field_wire_choices="[2,0,1,0,0,0,1,0]",
+                order_monolith_howto="seen", order_monolith_cine_intro="seen", order_monolith_cine_outro="seen")
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -337,10 +338,14 @@ def test_sun_monolith(browser):
         page.wait_for_timeout(400)
     check(js("getComputedStyle(document.getElementById('night-finish-card')).display") != "none"
           and "done" in (get("order_night_erg") or ""), "the night ends with a finish card and is saved")
-    js("document.getElementById('btn-night-finish').click()"); page.wait_for_timeout(900)
-    check(modal_open() and not night_open() and "Sealed in stone" in js("document.getElementById('monolith-inscription').innerText"),
+    js("document.getElementById('btn-night-finish').click()")
+    for _ in range(40):
+        if modal_open(): break
+        page.wait_for_timeout(200)
+    page.wait_for_timeout(300)
+    check(modal_open() and not night_open() and "Sealed in stone" in js("document.getElementById('monolith-inscription').textContent"),
           "after 12 h it opens, inscription still sealed")
-    check(js("document.querySelector('#monolith-game .monolith-game-inner').inert") is True, "sun controls inert while the stone sleeps")
+    check(js("document.getElementById('mon3d-sun-row').hidden") is True and js("window.__sunMonolith.state().gl") is True, "the 3D ridge is drawn and the sun controls stay hidden while the stone sleeps")
     for word in ["SUNDAY", "DIALSUN", "SUN DIAL X"]:
         page.fill("#monolith-key-input", word); page.click("#btn-monolith-speak"); page.wait_for_timeout(120)
     check(get("order_hint_s14-sigil_level") == "1" and get("order_monolith_hint") is None
@@ -353,20 +358,31 @@ def test_sun_monolith(browser):
     check(get("order_sun_monolith_awake") == "true", "forgiving sigil 'sun-dial' wakes the stone")
 
     feedback = lambda: js("document.getElementById('monolith-mark-feedback').innerText")
-    js("window.__sunMonolith.setMinute(660)"); page.click("#btn-monolith-mark")
-    check("sand" in feedback(), "11:00 shadow touches only sand")
-    js("window.__sunMonolith.setMinute(480)"); page.click("#btn-monolith-mark")
-    js("window.__sunMonolith.setMinute(600)"); page.click("#btn-monolith-mark")
-    check(get("order_sun_monolith_marks") == "0" and "never names" in feedback(), "an unnamed mark (10:00) puts the marks back to sleep")
-    js("window.__sunMonolith.setMinute(720)"); page.click("#btn-monolith-mark")
-    check(get("order_sun_monolith_marks") in (None, "0"), "noon before the morning mark is rejected")
-    js("window.__sunMonolith.setMinute(720)"); page.click("#btn-monolith-mark")
+    state = lambda: js("window.__sunMonolith.state()")
+
+    def mark(minute):
+        js(f"window.__sunMonolith.setMinute({minute})"); page.click("#btn-monolith-mark")
+        js("window.__sunMonolith.settle()"); page.wait_for_timeout(60)
+    mark(660)
+    check("sand" in feedback() and state()["hearts"] == 3, "11:00 shadow touches only sand, and it costs no heart")
+    mark(480)
+    check(state()["found"] == 1 and state()["hearts"] == 3, "the morning shadow wakes the Jackal")
+    mark(600)
+    check(get("order_sun_monolith_marks") == "0" and "never names" in feedback() and state()["hearts"] == 2, "an unnamed mark (10:00) puts the marks back to sleep and costs a heart")
+    mark(720)
+    check(get("order_sun_monolith_marks") in (None, "0") and state()["hearts"] == 1, "noon before the morning mark is rejected and costs a heart")
+    mark(720)
     check(get("order_hint_s14-shadow_level") == "1" and get("order_hint_s14-shadow_fails") == "3"
           and "note 1 of 3" in js("document.querySelector('#monolith-mark-feedback + .hint-ladder').textContent"),
           "3 wrong marks (sand does not count): Hermes's first note under the dial")
+    check(state()["phase"] == "lost" and js("document.getElementById('mon3d-lost').hidden") is False, "the third heart is the sun setting: the day must begin again")
+    page.click("#btn-monolith-again"); page.wait_for_timeout(200)
+    check(state()["hearts"] == 3 and state()["tries"] == 2 and state()["minute"] == 420 and state()["found"] == 0, "a new day: three hearts, sunrise, marks asleep")
     for minute in [480, 720, 900, 990]:
-        js(f"window.__sunMonolith.setMinute({minute})"); page.click("#btn-monolith-mark"); page.wait_for_timeout(120)
+        mark(minute)
     check(get("order_sun_monolith_completed") == "true" and get("order_seal_cairn_2") == "true", "four marks in order: Seal of Cairn II granted")
+    check(js("(r => !!r && !r.hidden)(document.querySelector('#modal-sun-monolith .mon3d-reward'))") and "D" in js("document.querySelector('#modal-sun-monolith .mon3d-reward').innerText"),
+          "the reward card shows the second Seal and the two Ledger lines")
     page.click("#btn-close-monolith"); page.wait_for_timeout(300)
 
     open_wire()
@@ -381,8 +397,23 @@ def test_sun_monolith(browser):
           and text.count("First light, Silvia") == 1, "reload replays steps 9-13 once each")
     check("Four seals to find" in text and "SEALS 1 / 5 · CROSSING" in text, "replayed crossing keeps the seal count Hermes had at the gates")
     js("window.openSunMonolithModal()"); page.wait_for_timeout(400)
-    check(js("document.getElementById('monolith-telem-marks').innerText") == "4 / 4", "monolith restores its solved state")
+    check("4 of 4" in js("document.getElementById('mon3d-marks').getAttribute('aria-label')"), "monolith restores its solved state")
     check(not errors, "no JS errors during Station 14", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # the opening and the ending are in-engine films, played once; Escape and Skip end them
+    fresh = dict(DESERT_BASE, **DESERT_DONE, order_monolith_march_start="1", order_monolith_march_bypassed="true", order_monolith_howto="seen", order_night_erg='{"done":true}')
+    ctx, page, errors = new_page(browser, fresh)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("window.openSunMonolithModal()"); page.wait_for_timeout(900)
+    check(js("window.__sunMonolith.cine()") is True and js("localStorage.getItem('order_monolith_cine_intro')") == "seen", "the first time, the Ridge opens with its film")
+    page.keyboard.press("Escape"); page.wait_for_timeout(400)
+    check(js("window.__sunMonolith.cine()") is False and js("getComputedStyle(document.getElementById('modal-sun-monolith')).display") != "none", "Escape skips the film and leaves the window open")
+    js("window.closeSunMonolithModal()"); page.wait_for_timeout(400)
+    js("window.openSunMonolithModal()"); page.wait_for_timeout(700)
+    check(js("window.__sunMonolith.cine()") is False, "and it does not play again")
+    check(not errors, "no JS errors in the opening film", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
 
@@ -1234,14 +1265,14 @@ WORLD_JS = """() => ({
 
 def test_tester_play(browser):
     print("\n12. Carles's tester: Play any game, forward and back")
-    modals = {"cairn1": "modal-cairn-one", "s14": "modal-sun-monolith", "s15": "modal-sandstone-labyrinth",
+    modals = {"cairn1": "modal-cairn-one", "gates": "modal-gates-tower-ii", "s14": "modal-sun-monolith", "s15": "modal-sandstone-labyrinth",
               "s16": "modal-cairn-four", "s17": "modal-solstice-arch", "s18": "modal-polybius-stele", "s19": "modal-oracle-horizon",
               "s20": "modal-masks-gate", "s21": "modal-camera-obscura", "s22": "modal-whispering-gallery"}
-    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5, "s19": 5, "s20": 5, "s21": 5, "s22": 5}
+    seals_before = {"cairn1": 0, "chasm": 1, "playa": 1, "lexicon": 1, "clepsydra": 1, "gates": 1, "s14": 1, "s15": 2, "s16": 3, "s17": 4, "s18": 5, "s19": 5, "s20": 5, "s21": 5, "s22": 5}
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
-    for gid in ["s22", "s21", "s20", "s19", "s18", "s17", "s14", "cairn1", "s16", "clepsydra"]:
+    for gid in ["s22", "s21", "s20", "s19", "s18", "s17", "s14", "gates", "cairn1", "s16", "clepsydra"]:
         page.evaluate("document.getElementById('tester-panel').open = true")
         page.evaluate(PLAY_JS, gid)
         page.wait_for_timeout(600)
@@ -1255,6 +1286,52 @@ def test_tester_play(browser):
         check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
               f"seals {st['seals']}, open {st['open']}, relics {st['relics']}")
     check(not errors, "no JS errors while jumping between games", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+def test_tester_world(browser):
+    print("\n44. Carles's tester: every button leaves the card, the map, the chat and the walks telling the same story")
+    ids = ["chasm", "playa", "lexicon", "clepsydra", "gates", "s14", "s15", "s16", "s17", "s18", "s19"]
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    order = js("window.TesterDesert.games.map(g => g.id)")
+    check("gates" in order and order.index("clepsydra") < order.index("gates") < order.index("s14"), "the gates of Tower II are a game of their own, between the Wells and the Monolith")
+    seen = []
+    for gid in ids:
+        js("window.TesterDesert.replayAll()")
+        js(f"window.TesterDesert.completeUpTo('{gid}')")
+        page.reload(); page.wait_for_timeout(2600)
+        upto = order[:order.index(gid) + 1]
+        flags = js("ids => ids.map(i => window.TesterDesert.isDone(i))", order)
+        want = [i in upto for i in order if i not in ("cairn1",)] if False else None
+        done_ok = all(js("i => window.TesterDesert.isDone(i)", i) for i in upto if i != "cairn1" or True)
+        after_ok = not any(js("i => window.TesterDesert.isDone(i)", i) for i in order[order.index(gid) + 1:])
+        node = js("id => window.TesterDesert.arrival(id) && window.TesterDesert.arrival(id).node", gid)
+        step = int(js("localStorage.getItem('order_field_wire_step') || '0'"))
+        card = js("n => { window.selectMapNode(n, false); return document.getElementById('star-inspector').innerText; }", node) if node else ""
+        sealed = "[ SEALED ]" in card.upper() and "HERMES IS CALLING" in card.upper()
+        status = js("(document.getElementById('tester-status') || {}).textContent || ''")
+        if not (done_ok and after_ok and step >= 4 and not sealed and "Field Wire step" in status):
+            seen.append(f"{gid}: done {done_ok} after {after_ok} step {step} sealed {sealed} status {status[:60]}")
+    check(not seen, "Complete up to each game: it and everything before it done, nothing after, no sealed card, the status line says where we are", "; ".join(seen[:3]))
+    bad = []
+    for gid in ids:
+        js(f"window.TesterDesert.replayAll()")
+        node = js(f"window.TesterDesert.jumpTo('{gid}')")
+        page.reload(); page.wait_for_timeout(2600)
+        marches = js("(() => { const M = window.EclipseMarches || {}; return Object.keys(M).filter(k => { try { return M[k].started() && !M[k].over(); } catch (e) { return false; } }); })()")
+        card = js("n => { window.selectMapNode(n, false); return document.getElementById('star-inspector').innerText; }", node)
+        btn_off = js("(b => !b || b.disabled)(document.getElementById('insp-btn-primary'))")
+        if marches or btn_off:
+            bad.append(f"{gid}: walking {marches}, button off {btn_off}")
+    check(not bad, "Play each game: nothing is still walking and its card offers it at once", "; ".join(bad[:3]))
+    js("window.TesterDesert.completeUpTo('s14')"); js("window.TesterDesert.replayFrom('gates')")
+    page.reload(); page.wait_for_timeout(2600)
+    check(not js("window.TesterDesert.isDone('gates')") and not js("window.TesterDesert.isDone('s14')") and js("window.TesterDesert.isDone('clepsydra')")
+          and js("localStorage.getItem('order_night_erg')") is None and int(js("localStorage.getItem('order_field_wire_step')")) <= 9,
+          "Start over at the gates takes back the gates, the night on the Erg and the Monolith, and the chat goes back with them")
+    check(not errors, "no JS errors while the tester moves through the desert", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
 
@@ -1714,6 +1791,8 @@ def test_ambience(browser):
     check(state()["bed"] is None and js("document.getElementById('ambience-toggle').getClientRects().length > 0"), "on the map: no bed, the speaker is on screen")
     page.mouse.click(5, 5)   # the first gesture lets the browser play sound
     js("window.openOasisClepsydraModal()"); page.wait_for_timeout(1500)
+    try: page.wait_for_function("EclipseAmbience.state().bed === 'four wells'", timeout=9000)
+    except Exception: pass
     st = state()
     check(st["bed"] == "four wells" and st["running"] and not st["muted"], "the Four Wells play their own bed", str(st))
     js("window.closeOasisVisions()"); page.wait_for_timeout(1500)
@@ -4088,7 +4167,7 @@ SECTIONS = {
     "cinematic": test_cinematic,
     "road": test_desert_road,
     "gamecine": test_game_cinematics,
-    "visions": test_clepsydra_visions, "gatesmarch": test_gates_march,
+    "visions": test_clepsydra_visions, "gatesmarch": test_gates_march, "testerworld": test_tester_world,
     "balance": test_balance,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list

@@ -1,0 +1,49 @@
+/* Station 14 · The Sun Monolith & Cairn II as a 3D scene (the shared look lives in s10-chasm-walk.css) */
+#modal-sun-monolith .chasm3d-hud { z-index: 3; }
+#modal-sun-monolith .mon3d-marks { position: absolute; top: 12px; left: 12px; display: flex; gap: 6px; pointer-events: none; }
+#modal-sun-monolith .mon3d-mark {
+  width: 34px; height: 40px; display: flex; align-items: center; justify-content: center; position: relative;
+  border: 1px dashed rgba(253, 230, 138, 0.55); border-radius: 6px; background: rgba(16, 9, 5, 0.6);
+  font-size: 1.15rem; filter: grayscale(1) brightness(0.65); transition: filter 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+}
+#modal-sun-monolith .mon3d-mark.is-found {
+  filter: none; border-style: solid; border-color: #fde68a; background: rgba(120, 72, 20, 0.7); box-shadow: 0 0 12px rgba(253, 230, 138, 0.35);
+}
+#modal-sun-monolith .mon3d-sky {
+  position: absolute; top: 10px; right: 12px; width: min(34%, 240px); height: auto; pointer-events: auto; touch-action: none; cursor: ew-resize;
+  background: rgba(16, 9, 5, 0.9); border: 1px solid rgba(253, 230, 138, 0.3); border-radius: 10px; padding: 4px 6px;
+}
+#modal-sun-monolith .mon3d-sky[data-locked="true"] { cursor: default; }
+#modal-sun-monolith .mon3d-controls { display: flex; flex-direction: column; gap: 10px; }
+#modal-sun-monolith .mon3d-sigil-row, #modal-sun-monolith .mon3d-sun-row { display: flex; flex-direction: column; gap: 8px; }
+#modal-sun-monolith [hidden] { display: none !important; }
+#modal-sun-monolith .mon3d-input {
+  width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(253, 230, 138, 0.5);
+  background: rgba(16, 9, 5, 0.75); color: #fde68a; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 1.2rem; letter-spacing: 0.32em; text-align: center; text-transform: uppercase;
+}
+#modal-sun-monolith .mon3d-input:disabled { opacity: 0.7; }
+#modal-sun-monolith .mon3d-time-row { display: flex; align-items: center; gap: 8px; }
+#modal-sun-monolith .mon3d-time-row input[type="range"] { flex: 1; min-width: 0; accent-color: #f59e0b; }
+#modal-sun-monolith .mon3d-step { padding: 6px 10px; min-width: 52px; }
+#modal-sun-monolith .mon3d-time-label { font-family: 'Cinzel', Georgia, serif; font-weight: 700; color: #fde68a; min-width: 3.4em; text-align: right; }
+#modal-sun-monolith .monolith-feedback { min-height: 1.2em; font-size: 0.88rem; color: #d6c3a0; }
+#modal-sun-monolith .monolith-feedback.is-ok { color: #bbf7d0; }
+#modal-sun-monolith .monolith-feedback.is-error { color: #fecaca; }
+#modal-sun-monolith .monolith-inscription { margin: 6px 0 8px 18px; padding: 0; color: #e8d8b8; }
+#modal-sun-monolith .monolith-inscription li { margin-bottom: 6px; }
+#modal-sun-monolith .monolith-inscription li.is-found { color: #fde68a; }
+#modal-sun-monolith .monolith-fragment { margin: 6px 0; font-style: italic; color: #e8d8b8; }
+#modal-sun-monolith .monolith-fragment.is-sealed { color: #8e7b5c; }
+#modal-sun-monolith .chasm3d-stage.is-flat .mon3d-sky { display: none; }
+
+/* the reward */
+#modal-sun-monolith .mon3d-seal { width: 74px; height: 74px; margin: 0 auto 8px; display: block; }
+#modal-sun-monolith .mon3d-rw-eqs { display: grid; gap: 8px; }
+#modal-sun-monolith .mon3d-rw-frags { list-style: none; margin: 10px 0 0; padding: 0; font-style: italic; font-size: 0.9rem; color: #5c3412; }
+#modal-sun-monolith .mon3d-rw-frags li { margin: 3px 0; }
+#modal-sun-monolith .chasm3d-reward.is-on :not(.rw-rays):not(.rw-sparks):not(.rw-sparks *) { animation: none; opacity: 1; }
+#modal-sun-monolith .rw-rays { left: 0; top: 0; right: 0; bottom: 0; width: auto; height: auto; margin: 0; animation: none; }
+@media (max-width: 760px) {
+  #modal-sun-monolith .mon3d-sky { width: 44%; }
+  #modal-sun-monolith .mon3d-mark { width: 28px; height: 34px; }
+}
