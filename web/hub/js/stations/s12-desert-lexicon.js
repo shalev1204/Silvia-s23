@@ -706,7 +706,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         let fx = null;
         try {
           if (window.EclipseFX) fx = window.EclipseFX.kit(renderer, scene, H, {
-            look: { bloom: 0.62, threshold: 0.9, knee: 0.15, vignette: 0.36, grain: 0.03, ca: 0.16, sat: 1.0, contrast: 1.04, gain: [0.98, 1.0, 1.05] },
+            look: { bloom: 0.62, threshold: 0.9, knee: 0.15, vignette: 0.36, grain: 0.03, ca: 0.16, sat: 1.0, contrast: 1.04, gain: [0.98, 1.0, 1.05], shade: 0.22, shadeColor: [0.5, 0.58, 0.95] },
             heightAt: dune, sandColor: 0x8d8aa0, printColor: 0x23243a, printLife: 22, blowColor: 0x0a0d24, scale: 1, wind: [0.5, 0, 0.15]
           });
         } catch (e) { fx = null; }

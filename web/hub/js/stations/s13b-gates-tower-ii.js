@@ -462,7 +462,7 @@
     gfx = null;
     try {
       if (window.EclipseFX) gfx = window.EclipseFX.kit(renderer, scene, H, {
-        look: { bloom: 0.55, threshold: 0.92, knee: 0.14, vignette: 0.3, grain: 0.026, ca: 0.15, sat: 1.04, contrast: 1.03, gain: [1.03, 1.0, 0.96] },
+        look: { bloom: 0.55, threshold: 0.92, knee: 0.14, vignette: 0.3, grain: 0.026, ca: 0.15, sat: 1.04, contrast: 1.03, gain: [1.03, 1.0, 0.96], shafts: 0.55, shaftThreshold: 0.7, shaftColor: [1.0, 0.72, 0.46], shade: 0.3, shadeColor: [0.72, 0.6, 0.92] },
         printsOn: false, scale: 1.15, idle: 0.0018
       });
     } catch (e) { gfx = null; }

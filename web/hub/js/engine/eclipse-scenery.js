@@ -339,6 +339,161 @@
         return obj;
       }
 
+      // ---- cloth that hangs and flies: a Verlet grid over a PlaneGeometry (rows top to bottom), with gravity and wind
+      // taken from the world, and the jolt of whatever carries it (a man who walks, a head that turns). Pinned points keep
+      // their shape; the rest swing. clothSim(mesh, opts) → { update(t), point(fx, fy, out), normal(fx, fy, out) }
+      //   opts: ws, hs (segments), pin(ix, iy) (default the top row), wind [x, y, z] (world), gust, gravity, damp,
+      //   iters, minZ / maxZ (keep it off a body behind or in front of it, in the mesh's own space), stiff (bend 0…1)
+      var clothReduced = function () { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); };
+      function clothSim(mesh, o) {
+        o = o || {};
+        var geo = mesh.geometry, P = geo.attributes.position, N = P.count;
+        var ws = o.ws, hs = o.hs, cols = ws + 1;
+        var pos = new Float32Array(P.array), prev = new Float32Array(P.array), rest = new Float32Array(P.array);
+        var pinned = new Uint8Array(N);
+        var pin = o.pin || function (ix, iy) { return iy === 0; };
+        for (var i = 0; i < N; i++) pinned[i] = pin(i % cols, Math.floor(i / cols)) ? 1 : 0;
+        var links = [];
+        function link(a, b) { var dx = rest[a * 3] - rest[b * 3], dy = rest[a * 3 + 1] - rest[b * 3 + 1], dz = rest[a * 3 + 2] - rest[b * 3 + 2]; links.push(a, b, Math.sqrt(dx * dx + dy * dy + dz * dz)); }
+        for (var iy = 0; iy <= hs; iy++) for (var ix = 0; ix <= ws; ix++) {
+          var a = iy * cols + ix;
+          if (ix < ws) link(a, a + 1);
+          if (iy < hs) link(a, a + cols);
+          if (ix < ws && iy < hs) { link(a, a + cols + 1); link(a + 1, a + cols); }
+          if (o.stiff !== 0) { if (ix < ws - 1) link(a, a + 2); if (iy < hs - 1) link(a, a + 2 * cols); }
+        }
+        var nL = links.length / 3, iters = o.iters || 4, damp = o.damp == null ? 0.982 : o.damp;
+        var wind = o.wind || [1.1, 0, 0.45], gust = o.gust == null ? 1 : o.gust, grav = o.gravity == null ? 9.8 : o.gravity;
+        var q = new T.Quaternion(), sc = new T.Vector3(), wp = new T.Vector3(), lastWp = null, vel = new T.Vector3(), lastVel = new T.Vector3();
+        var fG = new T.Vector3(), fW = new T.Vector3(), fA = new T.Vector3(), lastT = null, acc = 0, ph = Math.random() * 10;
+        function step(h, t) {
+          var h2 = h * h;
+          for (var i = 0; i < N; i++) {
+            if (pinned[i]) continue;
+            var k = i * 3, x = pos[k], y = pos[k + 1], z = pos[k + 2];
+            // gusts roll across the cloth: stronger at the free end, never quite the same twice
+            var g = 1 + gust * (0.55 * Math.sin(t * 2.3 + rest[k] * 3.1 + ph) + 0.35 * Math.sin(t * 5.7 - rest[k + 1] * 4.3 + ph * 1.7));
+            var fx = fG.x + fW.x * g + fA.x, fy = fG.y + fW.y * g + fA.y, fz = fG.z + fW.z * g + fA.z;
+            var nx = x + (x - prev[k]) * damp + fx * h2, ny = y + (y - prev[k + 1]) * damp + fy * h2, nz = z + (z - prev[k + 2]) * damp + fz * h2;
+            prev[k] = x; prev[k + 1] = y; prev[k + 2] = z;
+            pos[k] = nx; pos[k + 1] = ny; pos[k + 2] = nz;
+          }
+          for (var it = 0; it < iters; it++) {
+            for (var l = 0; l < nL; l++) {
+              var a = links[l * 3] * 3, b = links[l * 3 + 1] * 3, r = links[l * 3 + 2];
+              var dx = pos[b] - pos[a], dy = pos[b + 1] - pos[a + 1], dz = pos[b + 2] - pos[a + 2];
+              var d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1e-6, c = (d - r) / d;
+              var pa = pinned[a / 3], pb = pinned[b / 3];
+              if (pa && pb) continue;
+              var wa = pa ? 0 : (pb ? 1 : 0.5), wb = pb ? 0 : (pa ? 1 : 0.5);
+              pos[a] += dx * c * wa; pos[a + 1] += dy * c * wa; pos[a + 2] += dz * c * wa;
+              pos[b] -= dx * c * wb; pos[b + 1] -= dy * c * wb; pos[b + 2] -= dz * c * wb;
+            }
+            if (o.minZ != null || o.maxZ != null) for (var j = 0; j < N; j++) {
+              if (pinned[j]) continue;
+              if (o.minZ != null && pos[j * 3 + 2] < o.minZ) pos[j * 3 + 2] = o.minZ;
+              if (o.maxZ != null && pos[j * 3 + 2] > o.maxZ) pos[j * 3 + 2] = o.maxZ;
+            }
+          }
+        }
+        function lerpGrid(arr, fx, fy, out) {
+          fx = Math.max(0, Math.min(ws, fx)); fy = Math.max(0, Math.min(hs, fy));
+          var x0 = Math.min(ws - 1, Math.floor(fx)), y0 = Math.min(hs - 1, Math.floor(fy)), u = fx - x0, v = fy - y0;
+          var i00 = (y0 * cols + x0) * 3, i10 = i00 + 3, i01 = i00 + cols * 3, i11 = i01 + 3;
+          for (var c = 0; c < 3; c++) out.setComponent(c, (arr[i00 + c] * (1 - u) + arr[i10 + c] * u) * (1 - v) + (arr[i01 + c] * (1 - u) + arr[i11 + c] * u) * v);
+          return out;
+        }
+        var api = {
+          // t in seconds; the cloth keeps its own fixed step (1/60) and never runs more than four of them a frame
+          update: function (t) {
+            if (lastT == null) { lastT = t; return; }
+            var dt = Math.min(0.066, Math.max(0, t - lastT)); lastT = t;
+            if (!(dt > 0)) return;
+            mesh.updateWorldMatrix(true, false);
+            mesh.matrixWorld.decompose(wp, q, sc);
+            q.invert();
+            var s = Math.max(1e-3, sc.x);
+            var calm = clothReduced() ? 0.35 : 1;
+            fG.set(0, -grav, 0).applyQuaternion(q).divideScalar(s);
+            fW.set(wind[0], wind[1], wind[2]).multiplyScalar(calm).applyQuaternion(q).divideScalar(s);
+            // whatever carries the cloth pulls it the other way when it starts, stops or turns
+            if (lastWp) {
+              var nv = wp.clone().sub(lastWp).divideScalar(dt);
+              fA.copy(nv).sub(lastVel).divideScalar(dt);
+              if (fA.length() > 40) fA.setLength(40);
+              fA.multiplyScalar(-1).applyQuaternion(q).divideScalar(s);
+              lastVel.copy(nv);
+            }
+            lastWp = (lastWp || new T.Vector3()).copy(wp);
+            acc += dt;
+            var n = 0;
+            while (acc >= 1 / 60 && n < 4) { step(1 / 60, t); acc -= 1 / 60; n++; }
+            if (n === 4) acc = 0;
+            fA.set(0, 0, 0);
+            P.array.set(pos); P.needsUpdate = true;
+            geo.computeVertexNormals();
+            geo.computeBoundingSphere();
+          },
+          point: function (fx, fy, out) { return lerpGrid(pos, fx, fy, out || new T.Vector3()); },
+          normal: function (fx, fy, out) { return lerpGrid(geo.attributes.normal.array, fx, fy, out || new T.Vector3()).normalize(); },
+          reset: function () { pos.set(rest); prev.set(rest); P.array.set(rest); P.needsUpdate = true; lastT = null; lastWp = null; }
+        };
+        return api;
+      }
+      // ---- a rope between two points, with weight: a Verlet chain drawn as a thin tube. ends are local points (arrays or
+      // functions returning arrays), so a rope can hang from something that moves. rope(mat, a, b, opts) → mesh with
+      // userData.update(t)
+      function rope(mat, a, b, o) {
+        o = o || {};
+        var n = o.segments || 10, rad = o.radius || 0.014, slack = o.slack == null ? 1.04 : o.slack, R = 5;
+        var end = function (e) { return typeof e === 'function' ? e() : e; };
+        var A = end(a), B = end(b), pts = [], prv = [];
+        for (var i = 0; i <= n; i++) { var u = i / n; pts.push([A[0] + (B[0] - A[0]) * u, A[1] + (B[1] - A[1]) * u - Math.sin(u * Math.PI) * 0.05, A[2] + (B[2] - A[2]) * u]); prv.push(pts[i].slice()); }
+        var len = Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) * slack / n;
+        var geo = new T.BufferGeometry(), V = new Float32Array((n + 1) * R * 3), idx = [];
+        for (var s2 = 0; s2 < n; s2++) for (var r = 0; r < R; r++) {
+          var r2 = (r + 1) % R, p0 = s2 * R + r, p1 = s2 * R + r2, p2 = (s2 + 1) * R + r, p3 = (s2 + 1) * R + r2;
+          idx.push(p0, p2, p1, p1, p2, p3);
+        }
+        geo.setIndex(idx); geo.setAttribute('position', new T.BufferAttribute(V, 3));
+        var mesh = new T.Mesh(geo, mat); mesh.castShadow = true; mesh.frustumCulled = false;
+        var lastT = null, ph = Math.random() * 6, tan = new T.Vector3(), nA = new T.Vector3(), nB = new T.Vector3(), up = new T.Vector3(0, 1, 0);
+        function draw() {
+          for (var i = 0; i <= n; i++) {
+            var p = pts[i], q2 = pts[Math.min(n, i + 1)], q0 = pts[Math.max(0, i - 1)];
+            tan.set(q2[0] - q0[0], q2[1] - q0[1], q2[2] - q0[2]).normalize();
+            nA.crossVectors(tan, Math.abs(tan.y) > 0.9 ? nB.set(1, 0, 0) : up).normalize(); nB.crossVectors(tan, nA);
+            for (var r = 0; r < R; r++) {
+              var an = r / R * Math.PI * 2, c = Math.cos(an) * rad, sn = Math.sin(an) * rad, k = (i * R + r) * 3;
+              V[k] = p[0] + nA.x * c + nB.x * sn; V[k + 1] = p[1] + nA.y * c + nB.y * sn; V[k + 2] = p[2] + nA.z * c + nB.z * sn;
+            }
+          }
+          geo.attributes.position.needsUpdate = true; geo.computeVertexNormals();
+        }
+        draw();
+        mesh.userData.update = function (t) {
+          if (lastT == null) { lastT = t; return; }
+          var dt = Math.min(0.05, Math.max(0, t - lastT)); lastT = t;
+          if (!(dt > 0)) return;
+          var h2 = dt * dt, A2 = end(a), B2 = end(b), w = clothReduced() ? 0 : 0.6 * Math.sin(t * 1.7 + ph) + 0.3 * Math.sin(t * 4.1 + ph * 2);
+          pts[0] = A2.slice(); pts[n] = B2.slice();
+          for (var i = 1; i < n; i++) {
+            var p = pts[i], q2 = prv[i], x = p[0], y = p[1], z = p[2];
+            p[0] += (x - q2[0]) * 0.98 + w * h2; p[1] += (y - q2[1]) * 0.98 - 9.8 * h2; p[2] += (z - q2[2]) * 0.98 + w * 0.4 * h2;
+            q2[0] = x; q2[1] = y; q2[2] = z;
+          }
+          for (var it = 0; it < 6; it++) for (var j = 0; j < n; j++) {
+            var p0 = pts[j], p1 = pts[j + 1], dx = p1[0] - p0[0], dy = p1[1] - p0[1], dz = p1[2] - p0[2];
+            var d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1e-6, c = (d - len) / d;
+            var wa = j === 0 ? 0 : (j + 1 === n ? 1 : 0.5), wb = j + 1 === n ? 0 : (j === 0 ? 1 : 0.5);
+            p0[0] += dx * c * wa; p0[1] += dy * c * wa; p0[2] += dz * c * wa;
+            p1[0] -= dx * c * wb; p1[1] -= dy * c * wb; p1[2] -= dz * c * wb;
+          }
+          draw();
+        };
+        return mesh;
+      }
+
       // ---- the sky: a shader dome, tone-mapped and encoded like everything else so the horizon meets the haze ----
       var SKY_VERT = 'varying vec3 vDir;\nvoid main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
       var SKY_FRAG = [
@@ -530,9 +685,12 @@
         geo.computeVertexNormals();
         var roof = new T.Mesh(geo, paint({ map: cloth, side: T.DoubleSide }, 0xffe0c0, 0.16));
         g.add(roof);
-        var valance = new T.Mesh(new T.PlaneGeometry(w, 0.3, 16, 1), paint({ map: cloth, side: T.DoubleSide }));
+        var valance = new T.Mesh(new T.PlaneGeometry(w, 0.3, 16, 4), paint({ map: cloth, side: T.DoubleSide }));
         valance.position.set(0, hi - 0.43, d / 2);
         g.add(valance);
+        // the roof is tied at its edges and its belly lifts and falls with the wind; the valance flies from the front edge
+        var roofSim = clothSim(roof, { ws: 18, hs: 10, pin: function (ix, iy) { return ix === 0 || ix === 18 || iy === 0 || iy === 10; }, wind: [0, 2.2, 0], gust: 1.4, gravity: 3.5, damp: 0.97, iters: 3, stiff: 0 });
+        var valSim = clothSim(valance, { ws: 16, hs: 4, wind: [0.6, 0, 2.4], gust: 1.2 });
         var pole = paint({ map: tex.wood(0x7a5230, 5) }, 0xffd8a8, 0.12);
         [[-w / 2, -d / 2, 0.28], [w / 2, -d / 2, 0.28], [-w / 2, d / 2, -0.27], [w / 2, d / 2, -0.27]].forEach(function (c) {
           var pl = new T.Mesh(new T.CylinderGeometry(0.04, 0.05, hi + c[2] + 0.05, 8), pole);
@@ -542,6 +700,15 @@
           cap.position.set(c[0], hi + c[2] + 0.05, c[1]);
           g.add(cap);
         });
+        var ropeMat = paint({ color: 0x8a6a42 });
+        var ropes = [-1, 1].map(function (sd) {
+          var r = rope(ropeMat, [sd * w / 2, hi - 0.27 + 0.05, d / 2], [sd * (w / 2 + 0.7), 0.04, d / 2 + 1.0], { segments: 9, radius: 0.012, slack: 1.05 });
+          g.add(r);
+          var stake = new T.Mesh(new T.CylinderGeometry(0.025, 0.012, 0.22, 6), pole);
+          stake.position.set(sd * (w / 2 + 0.7), 0.06, d / 2 + 1.0); stake.rotation.x = -0.35; g.add(stake);
+          return r;
+        });
+        g.userData.update = function (t) { roofSim.update(t); valSim.update(t); ropes.forEach(function (r) { r.userData.update(t); }); };
         var rug = new T.Mesh(new T.PlaneGeometry(w * 0.8, d * 0.75), paint({ map: tex.cloth(0x7a2e2a, 0xd9b26a, 6, 6), polygonOffset: true, polygonOffsetFactor: -3 }));
         rug.rotation.x = -Math.PI / 2;
         rug.position.y = 0.025;
@@ -898,7 +1065,7 @@
         fallen.rotation.set(0, 0.9, Math.PI / 2 - 0.06);
         fallen.position.set(8.6, 0.62, -6.6);
         scene.add(fallen);
-        place(awning(paint, { width: 2.9, depth: 2.2, height: 2.0 }), -5.2, -2.8, 0.38);
+        var tent = place(awning(paint, { width: 2.9, depth: 2.2, height: 2.0 }), -5.2, -2.8, 0.38);
         place(firepit(paint), 4.7, -2.7, 0.5);
         place(crate(paint), -3.6, -3.4, 0.5);
         place(crate(paint, { w: 0.5, h: 0.4, d: 0.5 }), -3.55, -3.45, 0.2).position.y += 0.46;
@@ -927,6 +1094,7 @@
           update: function (t, dt, reduced) {
             skyObj.uniforms.uTime.value = t;
             airObj.update(t, dt || 0.016, reduced);
+            if (tent && tent.userData.update) tent.userData.update(t);
             if (!reduced) {
               palms.forEach(function (pm, n) {
                 (pm.userData.fronds || []).forEach(function (pv) {
@@ -1281,8 +1449,8 @@
         // a broad striped sash at the waist, a knotted end hanging at the hip
         var waist = put(new T.Mesh(new T.TorusGeometry(0.27, 0.06, 10, 40), sash), 0, 0.95, 0); waist.rotation.x = Math.PI / 2; waist.scale.set(0.84, 0.76, 1);
         var knot = put(ell(new T.SphereGeometry(0.06, 12, 10), sash, 1, 0.9, 0.9), 0.2, 0.93, -0.22);
-        var tail1 = put(new T.Mesh(new T.PlaneGeometry(0.1, 0.34), sash), 0.22, 0.74, -0.24); tail1.rotation.set(0.12, 0.3, 0.1);
-        var tail2 = put(new T.Mesh(new T.PlaneGeometry(0.09, 0.28), sash), 0.16, 0.76, -0.25); tail2.rotation.set(0.1, -0.2, -0.12);
+        var tail1 = put(new T.Mesh(new T.PlaneGeometry(0.1, 0.34, 2, 6), sash), 0.22, 0.74, -0.24); tail1.rotation.set(0.12, 0.3, 0.1);
+        var tail2 = put(new T.Mesh(new T.PlaneGeometry(0.09, 0.28, 2, 6), sash), 0.16, 0.76, -0.25); tail2.rotation.set(0.1, -0.2, -0.12);
         // a knife on the sash, a leather satchel on the other hip, a cross strap over the shoulder for the waterskin
         put(new T.Mesh(new T.BoxGeometry(0.03, 0.2, 0.025), leather), -0.12, 0.88, -0.28).rotation.z = 0.25;
         put(new T.Mesh(new T.BoxGeometry(0.18, 0.16, 0.09), leather), -0.25, 0.78, -0.02);
@@ -1293,7 +1461,7 @@
         // neck and the loose scarf round it
         put(new T.Mesh(new T.CylinderGeometry(0.058, 0.07, 0.12, 12), skinDark), 0, 1.56, 0);
         var scarf = put(new T.Mesh(new T.TorusGeometry(0.115, 0.04, 10, 28), headcloth), 0, 1.5, -0.005); scarf.rotation.x = Math.PI / 2;
-        var scarfEnd = put(new T.Mesh(new T.PlaneGeometry(0.12, 0.42), headcloth), -0.1, 1.28, -0.12); scarfEnd.rotation.set(0.1, 0.25, 0.12);
+        var scarfEnd = put(new T.Mesh(new T.PlaneGeometry(0.12, 0.42, 2, 8), headcloth), -0.1, 1.28, -0.12); scarfEnd.rotation.set(0.1, 0.25, 0.12);
 
         // head: a lean, sun-browned face, straight brows, a short dark beard and moustache, a headcloth held by a cord
         var head = new T.Group(); head.position.set(0, 1.68, 0); head.scale.setScalar(1.3); g.add(head);
@@ -1319,8 +1487,15 @@
         var cloth = hput(ell(new T.SphereGeometry(0.15, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.46), headcloth, 0.98, 1.0, 1.04), 0, 0.03, 0.02);
         cloth.rotation.x = -0.2;
         var cord = hput(new T.Mesh(new T.TorusGeometry(0.138, 0.016, 8, 32), paint({ color: 0x1e1612 })), 0, 0.075, 0.01); cord.rotation.x = Math.PI / 2 - 0.12; cord.scale.set(1, 1.05, 1);
-        var drape = hput(new T.Mesh(new T.PlaneGeometry(0.27, 0.34), headcloth), 0, -0.15, 0.1); drape.rotation.set(0.12, 0, 0);
-        var drapeSide = [-1, 1].map(function (sd) { var d = hput(new T.Mesh(new T.PlaneGeometry(0.09, 0.2), headcloth), sd * 0.12, -0.08, 0.09); d.rotation.set(0.05, sd * 0.9, sd * 0.05); return d; });
+        var drape = hput(new T.Mesh(new T.PlaneGeometry(0.27, 0.34, 4, 6), headcloth), 0, -0.15, 0.1); drape.rotation.set(0.12, 0, 0);
+        var drapeSide = [-1, 1].map(function (sd) { var d = hput(new T.Mesh(new T.PlaneGeometry(0.09, 0.2, 2, 4), headcloth), sd * 0.12, -0.08, 0.09); d.rotation.set(0.05, sd * 0.9, sd * 0.05); return d; });
+        // the night wind and his own steps move them; they never pass into his neck or his chest
+        var cloths = [
+          clothSim(drape, { ws: 4, hs: 6, minZ: -0.004, wind: [0.5, 0, 0.9], gust: 0.9, damp: 0.975 }),
+          clothSim(scarfEnd, { ws: 2, hs: 8, maxZ: 0.01, wind: [0.4, 0, 0.6], gust: 0.8, damp: 0.975 }),
+          clothSim(tail1, { ws: 2, hs: 6, maxZ: 0.01, wind: [0.5, 0, 0.5], gust: 0.9, damp: 0.975 }),
+          clothSim(tail2, { ws: 2, hs: 6, maxZ: 0.01, wind: [0.5, 0, 0.5], gust: 0.9, damp: 0.975 })
+        ].concat(drapeSide.map(function (d) { return clothSim(d, { ws: 2, hs: 4, wind: [0.4, 0, 0.6], gust: 0.8, damp: 0.975 }); }));
 
         // arms: sleeves rolled to the elbow, forearms bare, a leather band on the wrist; the right hand holds the stick,
         // the left one the dark lantern
@@ -1367,8 +1542,7 @@
             head.rotation.y = Math.sin(t * 0.5) * 0.09;
             head.rotation.x = Math.sin(t * 0.35) * 0.03;
             tunic.scale.y = 1 + Math.sin(t * 1.6) * 0.004;
-            scarfEnd.rotation.z = 0.12 + Math.sin(t * 1.3) * 0.05;
-            tail1.rotation.z = 0.1 + Math.sin(t * 1.7 + 1) * 0.06; tail2.rotation.z = -0.12 + Math.sin(t * 1.5) * 0.06;
+            cloths.forEach(function (c) { c.update(t); });
             lantern.rotation.z = Math.sin(t * 1.1) * 0.04;
             lFlame.material.opacity = lit ? 0.5 + 0.12 * Math.sin(t * 9) : 0;
           }
@@ -1447,16 +1621,24 @@
         var tail = new T.Mesh(new T.ConeGeometry(w / 2, 0.3, 4), paint({ map: cloth, side: T.DoubleSide }));
         tail.rotation.z = Math.PI; tail.position.y = -h - 0.1; tail.scale.set(1, 1, 0.05);
         g.add(tail);
-        var base = geo.attributes.position.array.slice();
-        g.userData.update = function (t, ph) {
-          var p = geo.attributes.position;
-          for (var i = 0; i < p.count; i++) {
-            var y = base[i * 3 + 1], depth = (h / 2 - y) / h;
-            p.setZ(i, Math.sin(t * 1.6 + depth * 4 + (ph || 0)) * 0.07 * depth + Math.sin(base[i * 3] * 5 + t) * 0.015 * depth);
+        // the cloth hangs from the pole and the wind takes it; the emblem is sewn on (its points ride the cloth) and the
+        // pointed tail hangs from the hem
+        var sim = clothSim(mesh, { ws: 8, hs: 16, wind: o.wind || [0.9, 0, 1.6], gust: 1.1, damp: 0.985 });
+        var eg = emb.geometry, eUV = [], eP = eg.attributes.position;
+        for (var i = 0; i < eP.count; i++) eUV.push([(eP.getX(i) + w / 2) / w * 8, (h * 0.4 + -eP.getY(i)) / h * 16]);
+        emb.position.set(0, -h / 2, 0); emb.material.polygonOffsetFactor = -4;
+        var tp = new T.Vector3(), tn = new T.Vector3(), tq = new T.Vector3();
+        g.userData.cloth = sim;
+        g.userData.update = function (t) {
+          sim.update(t);
+          for (var i = 0; i < eUV.length; i++) {
+            sim.point(eUV[i][0], eUV[i][1], tp); sim.normal(eUV[i][0], eUV[i][1], tn);
+            eP.setXYZ(i, tp.x + tn.x * 0.012, tp.y + tn.y * 0.012, tp.z + tn.z * 0.012);
           }
-          p.needsUpdate = true;
-          geo.computeVertexNormals();
-          tail.rotation.x = Math.sin(t * 1.6 + 4 + (ph || 0)) * 0.1;
+          eP.needsUpdate = true; eg.computeBoundingSphere();
+          sim.point(4, 16, tp); sim.point(4, 14, tq);
+          tail.position.set(tp.x, tp.y - h / 2 - 0.12, tp.z);
+          tail.rotation.x = Math.atan2(tp.z - tq.z, tq.y - tp.y);
         };
         return g;
       }
@@ -1604,7 +1786,7 @@
       }
 
       window.EclipseScenery = {
-        tex: tex, preTone: preTone, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
+        tex: tex, preTone: preTone, clothSim: clothSim, rope: rope, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
         props: { brazier: brazier, banner: banner, palm: palm, awning: awning, amphora: amphora, crate: crate, sack: sack, firepit: firepit, column: column, rocks: rocks, tracks: tracks },
         paint: paintFor, shadowy: shadowy, noise: { vnoise: vnoise, fbm: fbm, hash2: hash2, rng: rng }
       };

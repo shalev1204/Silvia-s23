@@ -664,7 +664,7 @@
 
         // the shared feel (EclipseFX): a lens, a body for Hermes, dust at his feet; the gorge keeps its own trail of prints
         let fx = null;
-        try { if (window.EclipseFX) fx = window.EclipseFX.kit(renderer, scene, H, { look: { bloom: 0.45, threshold: 0.95, knee: 0.12, vignette: 0.26, grain: 0.024, ca: 0.15, sat: 1.03, contrast: 1.03 }, printsOn: false, sandColor: 0xd29a6c, scale: 1 }); } catch (e) { fx = null; }
+        try { if (window.EclipseFX) fx = window.EclipseFX.kit(renderer, scene, H, { look: { bloom: 0.45, threshold: 0.95, knee: 0.12, vignette: 0.26, grain: 0.024, ca: 0.15, sat: 1.03, contrast: 1.03, shafts: 0.42, shaftThreshold: 0.8, shade: 0.3, shadeColor: [0.7, 0.62, 0.9] }, sun: () => G && G.sunDir, printsOn: false, sandColor: 0xd29a6c, scale: 1 }); } catch (e) { fx = null; }
         return { fx, T, renderer, scene, camera, sky, sunDisc, hemi, sun, lantern, prints, hermes: H.hermes, legL: H.legL, legR: H.legR, flame: H.flame,
                  staff: H.staff, lamp: H.lamp, cloak: H.cloak, arrows, arrowGeo, dust, dustN, motes, motesBase, motesN, relicLight, relicGlow, sparks, sparksN, relic: null, lowPower, stoneAt, shafts };
       }

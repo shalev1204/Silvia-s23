@@ -880,7 +880,7 @@
         let fx = null;
         try {
           if (window.EclipseFX && hermes) fx = window.EclipseFX.kit(renderer, scene, Hrig, {
-            look: { bloom: 0.45, threshold: 0.95, knee: 0.12, vignette: 0.28, grain: 0.024, ca: 0.15, sat: 1.04, contrast: 1.03, gain: [1.03, 1.0, 0.95] },
+            look: { bloom: 0.45, threshold: 0.95, knee: 0.12, vignette: 0.28, grain: 0.024, ca: 0.15, sat: 1.04, contrast: 1.03, gain: [1.03, 1.0, 0.95], shafts: 0.4, shaftThreshold: 0.78, shade: 0.3 },
             heightAt: () => 0, printY: 0.035, scale: 1.18, ambient: () => hermes.position, ambientRadius: 14, ambientAlpha: 0.07
           });
         } catch (e) { fx = null; }

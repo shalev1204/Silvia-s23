@@ -449,7 +449,7 @@
         const FX = window.EclipseFX;
         let post = null, gait = null, dust = null, sparks = null, prints = null, shake = null;
         if (FX) {
-          try { post = FX.post(renderer, { bloom: 0.5, threshold: 0.95, knee: 0.12, vignette: 0.3, grain: 0.026, ca: 0.18, sat: 1.04, contrast: 1.03 }); } catch (e) { post = null; }
+          try { post = FX.post(renderer, { bloom: 0.5, threshold: 0.95, knee: 0.12, vignette: 0.3, grain: 0.026, ca: 0.18, sat: 1.04, contrast: 1.03, shafts: 0.4, shaftThreshold: 0.8, shade: 0.32 }); } catch (e) { post = null; }
           shake = FX.shaker({ idle: 0.0022 });
           dust = FX.particles(scene, { max: 360, wind: [0.9, 0, 0.25] });
           sparks = FX.particles(scene, { max: 260, additive: true });

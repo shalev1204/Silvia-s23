@@ -53,6 +53,34 @@
         '  gl_FragColor = vec4(c / 12.0, 1.0);',
         '}'
       ].join('\n');
+      // light through the gaps: what is bright near the sun (sky between clouds, the rim of a rock) is smeared toward it,
+      // so dark shapes cut long shadows through the air (two radial passes at quarter size)
+      var SHAFT_SRC_FRAG = [
+        'uniform sampler2D tMap; uniform vec2 uSun; uniform float uAspect; uniform float uThreshold; uniform float uTime;',
+        'varying vec2 vUv;',
+        'void main(){',
+        '  vec3 c = texture2D(tMap, vUv).rgb;',
+        '  float l = dot(c, vec3(0.2126, 0.7152, 0.0722));',
+        '  float m = smoothstep(uThreshold, uThreshold + 0.45, l);',
+        '  vec2 d = (vUv - uSun) * vec2(uAspect, 1.0);',
+        '  m *= 1.0 - smoothstep(0.0, 0.85, length(d));',
+        // gaps in a high veil of cloud: the open sky is cut into slow beams that turn very little
+        '  float a = atan(d.y, d.x);',
+        '  float gap = 0.5 + 0.3 * sin(a * 11.0 + uTime * 0.07) + 0.2 * sin(a * 23.0 - uTime * 0.05 + 1.7);',
+        '  m *= mix(1.0, smoothstep(0.25, 0.85, gap), smoothstep(0.03, 0.12, length(d)));',
+        '  gl_FragColor = vec4(min(c, vec3(3.0)) * m, 1.0);',
+        '}'
+      ].join('\n');
+      var SHAFT_BLUR_FRAG = [
+        'uniform sampler2D tMap; uniform vec2 uSun; uniform float uStep; uniform float uDecay;',
+        'varying vec2 vUv;',
+        'void main(){',
+        '  vec2 dv = (uSun - vUv) * uStep;',
+        '  vec2 uv = vUv; float w = 1.0, sw = 0.0; vec3 c = vec3(0.0);',
+        '  for (int i = 0; i < 28; i++) { c += texture2D(tMap, uv).rgb * w; sw += w; w *= uDecay; uv += dv; }',
+        '  gl_FragColor = vec4(c / sw, 1.0);',
+        '}'
+      ].join('\n');
       var COMPOSITE_FRAG = [
         'uniform sampler2D tScene; uniform sampler2D tBloom;',
         'uniform float uBloom; uniform float uTime; uniform float uAspect;',
@@ -60,6 +88,7 @@
         'uniform float uVig; uniform float uGrain; uniform float uCA;',
         'uniform float uHaze; uniform float uHazeY;',
         'uniform vec3 uFlash; uniform float uFlashK;',
+        'uniform sampler2D tShafts; uniform vec3 uShafts; uniform vec3 uShade; uniform float uShadeK;',
         'varying vec2 vUv;',
         'float h12(vec2 p){ vec3 q = fract(vec3(p.xyx) * 0.1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }',
         'vec3 toSRGB(vec3 c){ c = max(c, vec3(0.0)); return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(vec3(0.0031308), c)); }',
@@ -75,8 +104,11 @@
         '  if (uCA > 0.001) { vec2 off = d * uCA * 0.008; c = vec3(texture2D(tScene, uv + off).r, texture2D(tScene, uv).g, texture2D(tScene, uv - off).b); }',
         '  else c = texture2D(tScene, uv).rgb;',
         '  c += texture2D(tBloom, uv).rgb * uBloom;',
+        '  c += texture2D(tShafts, uv).rgb * uShafts;',
         '  vec3 s = toSRGB(c);',
         '  float l = dot(s, vec3(0.2126, 0.7152, 0.0722));',
+        // the sky lights what the sun cannot reach: shadows take its colour instead of going grey
+        '  s = mix(s, s * uShade * 1.7 + uShade * 0.04, uShadeK * (1.0 - smoothstep(0.08, 0.55, l)));',
         '  s = mix(vec3(l), s, uSat);',
         '  s = (s - 0.5) * uContrast + 0.5;',
         '  s = s * uGain + uLift * (1.0 - s);',
@@ -105,7 +137,11 @@
       var LOOK = {
         sat: 1, contrast: 1, gain: [1, 1, 1], lift: [0, 0, 0],
         bloom: 0.6, threshold: 0.78, knee: 0.22, spread: 1.0,
-        vignette: 0.28, grain: 0.03, ca: 0.25, haze: 0, hazeY: 0.5
+        vignette: 0.28, grain: 0.03, ca: 0.25, haze: 0, hazeY: 0.5,
+        // shafts: strength (0 = none), the light's colour, how bright a pixel must be to shine through
+        shafts: 0, shaftColor: [1, 0.9, 0.72], shaftThreshold: 0.75,
+        // shade: how much the shadows take the sky's colour, and that colour
+        shade: 0, shadeColor: [0.62, 0.7, 0.92]
       };
 
       // `post` returns null where it cannot run (WebGL 1): the game then keeps drawing straight to the screen.
@@ -123,6 +159,9 @@
         var levels = [];
         for (var i = 0; i < LEVELS; i++) levels.push(new T.WebGLRenderTarget(2, 2, { type: type, depthBuffer: false, minFilter: T.LinearFilter, magFilter: T.LinearFilter }));
 
+        var shaftA = new T.WebGLRenderTarget(2, 2, { type: type, depthBuffer: false, minFilter: T.LinearFilter, magFilter: T.LinearFilter });
+        var shaftB = shaftA.clone();
+        var black = new T.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1); black.needsUpdate = true;
         var fsScene = new T.Scene(), fsCam = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1);
         var quad = new T.Mesh(fsTriangle(), null); quad.frustumCulled = false; fsScene.add(quad);
         var down = shaderMat(DOWN_FRAG, { tMap: { value: null }, uTexel: { value: new T.Vector2() }, uThreshold: { value: p.threshold }, uKnee: { value: p.knee }, uBright: { value: 0 } });
@@ -132,8 +171,22 @@
           uBloom: { value: 0 }, uTime: { value: 0 }, uAspect: { value: 1 },
           uSat: { value: 1 }, uContrast: { value: 1 }, uGain: { value: new T.Vector3(1, 1, 1) }, uLift: { value: new T.Vector3() },
           uVig: { value: 0 }, uGrain: { value: 0 }, uCA: { value: 0 }, uHaze: { value: 0 }, uHazeY: { value: 0.5 },
-          uFlash: { value: new T.Color() }, uFlashK: { value: 0 }
+          uFlash: { value: new T.Color() }, uFlashK: { value: 0 },
+          tShafts: { value: black }, uShafts: { value: new T.Vector3() }, uShade: { value: new T.Vector3(1, 1, 1) }, uShadeK: { value: 0 }
         });
+        var shSrc = shaderMat(SHAFT_SRC_FRAG, { tMap: { value: sceneRT.texture }, uSun: { value: new T.Vector2() }, uAspect: { value: 1 }, uThreshold: { value: 0.75 }, uTime: { value: 0 } });
+        var shBlur = shaderMat(SHAFT_BLUR_FRAG, { tMap: { value: null }, uSun: { value: new T.Vector2() }, uStep: { value: 0.03 }, uDecay: { value: 0.95 } });
+        // where the sun is: a direction given by the game (p.sun, a Vector3 or a function), or the scene's sky dome
+        var sunV = new T.Vector3(), camF = new T.Vector3(), skyU = null, skySeek = 0;
+        function sunDir(scene) {
+          var s = typeof p.sun === 'function' ? p.sun() : p.sun;
+          if (s) return sunV.copy(s);
+          if (!skyU && skySeek-- <= 0) {
+            skySeek = 120;
+            scene.traverse(function (o) { var u = o.material && o.material.uniforms; if (!skyU && u && u.uSun && u.uZenith) skyU = u; });
+          }
+          return skyU ? sunV.copy(skyU.uSun.value) : null;
+        }
 
         var size = new T.Vector2(), w = 0, h = 0, time = 0;
         var flash = { k: 0, decay: 1 }, pulse = { k: 0, decay: 1 };
@@ -143,6 +196,7 @@
           if (size.x === w && size.y === h) return;
           w = size.x; h = size.y;
           sceneRT.setSize(w, h);
+          shaftA.setSize(Math.max(1, w >> 2), Math.max(1, h >> 2)); shaftB.setSize(Math.max(1, w >> 2), Math.max(1, h >> 2));
           var lw = Math.max(1, w >> 1), lh = Math.max(1, h >> 1);
           for (var i = 0; i < levels.length; i++) { levels[i].setSize(lw, lh); lw = Math.max(1, lw >> 1); lh = Math.max(1, lh >> 1); }
         }
@@ -190,6 +244,30 @@
               }
             }
             var u = comp.uniforms;
+            u.tShafts.value = black; u.uShafts.value.set(0, 0, 0);
+            var sd = p.shafts > 0.001 ? sunDir(scene) : null;
+            if (sd && sd.lengthSq() > 1e-6) {
+              sd.normalize(); camera.getWorldDirection(camF);
+              var facing = camF.dot(sd);
+              // only when the camera looks toward the sun; they fade as it slips off the screen
+              var sv = sunV.copy(camera.position).addScaledVector(sd, 500).project(camera);
+              var sx = sv.x * 0.5 + 0.5, sy = sv.y * 0.5 + 0.5;
+              var off = Math.max(0, Math.max(Math.abs(sx - 0.5), Math.abs(sy - 0.5)) - 0.5);
+              var vis = clamp((facing - 0.05) / 0.3, 0, 1) * clamp(1 - off / 0.6, 0, 1) * p.shafts;
+              if (vis > 0.002) {
+                renderer.autoClear = true;
+                shSrc.uniforms.uSun.value.set(sx, sy); shSrc.uniforms.uAspect.value = w / Math.max(1, h); shSrc.uniforms.uThreshold.value = p.shaftThreshold; shSrc.uniforms.uTime.value = time;
+                pass(shSrc, shaftA);
+                shBlur.uniforms.uSun.value.set(sx, sy);
+                shBlur.uniforms.tMap.value = shaftA.texture; shBlur.uniforms.uStep.value = 0.036; shBlur.uniforms.uDecay.value = 0.965;
+                pass(shBlur, shaftB);
+                shBlur.uniforms.tMap.value = shaftB.texture; shBlur.uniforms.uStep.value = 0.011; shBlur.uniforms.uDecay.value = 0.985;
+                pass(shBlur, shaftA);
+                u.tShafts.value = shaftA.texture;
+                u.uShafts.value.set(p.shaftColor[0] * vis, p.shaftColor[1] * vis, p.shaftColor[2] * vis);
+              }
+            }
+            u.uShade.value.set(p.shadeColor[0], p.shadeColor[1], p.shadeColor[2]); u.uShadeK.value = p.shade;
             u.uBloom.value = bloom; u.uTime.value = time; u.uAspect.value = w / Math.max(1, h);
             u.uSat.value = p.sat; u.uContrast.value = p.contrast;
             u.uGain.value.set(p.gain[0], p.gain[1], p.gain[2]); u.uLift.value.set(p.lift[0], p.lift[1], p.lift[2]);
@@ -219,8 +297,8 @@
             p.hazeY = clamp(v.y * 0.5 + 0.5, -0.2, 1.2);
           },
           dispose: function () {
-            sceneRT.dispose(); levels.forEach(function (l) { l.dispose(); });
-            down.dispose(); up.dispose(); comp.dispose(); quad.geometry.dispose();
+            sceneRT.dispose(); levels.forEach(function (l) { l.dispose(); }); shaftA.dispose(); shaftB.dispose(); black.dispose();
+            down.dispose(); up.dispose(); comp.dispose(); shSrc.dispose(); shBlur.dispose(); quad.geometry.dispose();
           }
         };
         flash.max = 0;
@@ -573,6 +651,7 @@
         var hAt = o.heightAt || function () { return 0; };
         var k = { post: null, gait: null, dust: null, sparks: null, prints: null, shake: null };
         if (!o.noPost) { try { k.post = post(renderer, o.look || {}); } catch (e) { k.post = null; } }
+        if (k.post && o.sun) k.post.params.sun = o.sun;
         k.shake = shaker({ idle: o.idle == null ? 0.002 : o.idle });
         k.dust = particles(scene, { max: o.maxDust || 320, wind: o.wind || [0.8, 0, 0.2], heightAt: hAt });
         k.sparks = particles(scene, { max: o.maxSparks || 240, additive: true, heightAt: hAt });

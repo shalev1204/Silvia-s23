@@ -546,7 +546,7 @@
     efx = null;
     try {
       if (window.EclipseFX) efx = window.EclipseFX.kit(renderer, scene, Hh, {
-        look: { bloom: 0.7, threshold: 0.86, knee: 0.16, vignette: 0.38, grain: 0.032, ca: 0.16, sat: 1.0, contrast: 1.04, gain: [0.97, 1.0, 1.06] },
+        look: { bloom: 0.7, threshold: 0.86, knee: 0.16, vignette: 0.38, grain: 0.032, ca: 0.16, sat: 1.0, contrast: 1.04, gain: [0.97, 1.0, 1.06], shafts: 0.18, shaftThreshold: 0.45, shaftColor: [0.72, 0.82, 1.0], shade: 0.22, shadeColor: [0.48, 0.56, 0.95] },
         printsOn: false, sandColor: 0x6d6a86, blowColor: 0x08091c, scale: 1.15, idle: 0.0016
       });
     } catch (e) { efx = null; }
