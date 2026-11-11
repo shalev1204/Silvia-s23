@@ -14,6 +14,9 @@
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
+      let lastScratch = 0;   // the pen's whisper on the glass, at most every 160 ms
+      const scratch = () => { const t = performance.now(); if (t - lastScratch >= 160) { lastScratch = t; cue('step'); } };
       const KEYS = {
         awake: 'order_masks_gate_awake',
         done: 'order_masks_gate_completed',
@@ -237,12 +240,13 @@
           activePointer = e.pointerId;
           try { el.canvas.setPointerCapture(e.pointerId); } catch (err) {}
           current = [pointAt(e)];
+          cue('tick', { f: 3400, v: 0.05 });
           draw();
         });
         el.canvas.addEventListener('pointermove', (e) => {
           if (!current || e.pointerId !== activePointer) return;
           const p = pointAt(e), last = current[current.length - 1];
-          if (Math.hypot(p[0] - last[0], p[1] - last[1]) >= 1.5) { current.push(p); draw(); }
+          if (Math.hypot(p[0] - last[0], p[1] - last[1]) >= 1.5) { current.push(p); scratch(); draw(); }
         });
         const end = (e) => {
           if (!current || (e && e.pointerId !== activePointer)) return;
@@ -269,7 +273,7 @@
             let dx = 0, dy = 0;
             held.forEach((k) => { dx += MOVES[k][0]; dy += MOVES[k][1]; });
             pen = [Math.max(0, Math.min(W, pen[0] + dx * step)), Math.max(0, Math.min(H, pen[1] + dy * step))];
-            if (activePointer === 'keys') current.push(pen);
+            if (activePointer === 'keys') { current.push(pen); scratch(); }
             draw();
           } else if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) {
             e.preventDefault();
@@ -279,6 +283,7 @@
             if (!pen) pen = [AX + 6, 30];
             activePointer = 'keys';
             current = [pen];
+            cue('tick', { f: 3400, v: 0.05 });
             draw();
           }
         });
@@ -293,7 +298,7 @@
         const res = judge(mask);
         if (res.ok) { carveTrue(); return; }
         set(KEYS.drawFails, String(drawFails() + 1));
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         let msg;
         if (res.empty) msg = 'The mirror shows nothing yet. Draw the missing half on the glass, to the right of the dotted line.';
         else if (res.precise < NEED_PRECISE) msg = 'The mirror shows lines the carved half does not have. Rub them out and follow the gold more closely.';
@@ -308,7 +313,9 @@
         revealed = true;
         revealIdx = i;
         set(KEYS.drawFails, '0');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        // the mask turns on its nail; the last one also opens the niche (its victory bells come from completeStation)
+        cue('groan', { dur: 0.9 });
+        if (!(n >= MASKS.length ? cue('thud') : cue('shimmer', { deg: 10 + 3 * i })) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         feedback(el.drawFeedback, 'The mirror closes the face: ' + MASKS[i].name + ' is whole.', 'ok');
         if (n >= MASKS.length) {
           completeStation();   // saved at once: a reload during the reveal must not strand the station
@@ -341,7 +348,7 @@
       function completeStation() {
         set(KEYS.done, 'true');
         set(KEYS.carved, String(MASKS.length));
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         applyVictory();
         render();
         if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
@@ -391,13 +398,14 @@
         if (!typed) { feedback(el.keyFeedback, 'Type the six letters from the page “The Gate of a Thousand Masks”.', 'error'); return; }
         if (typed !== WORD) {
           set(KEYS.fails, String((parseInt(get(KEYS.fails) || '0', 10) || 0) + 1));
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.keyFeedback, 'The masks stay still. Look again at the two halves of each mask on the page “The Gate of a Thousand Masks”.', 'error');
           wordHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('whoosh', { dur: 1.6 });   // the wall of masks opening like a curtain
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (el.keyInput) { el.keyInput.value = WORD; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'SILVER. The wall of masks opens like a curtain.', 'ok');
@@ -435,13 +443,19 @@
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
         draw();
+        mood();
+      }
+      // the stage music fills with each mask made whole
+      function mood() {
+        const amb = window.EclipseAmbience;
+        if (amb && amb.intensity) amb.intensity(isDone() ? 0.6 : isAwake() ? 0.35 + 0.08 * carved() : 0.3);
       }
 
       // ---- Controls ----
       if (el.speak) el.speak.addEventListener('click', speakWord);
       if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakWord(); });
-      if (el.undo) el.undo.addEventListener('click', () => { strokes.pop(); feedback(el.drawFeedback, '', null); render(); });
-      if (el.clear) el.clear.addEventListener('click', () => { strokes = []; feedback(el.drawFeedback, '', null); render(); });
+      if (el.undo) el.undo.addEventListener('click', () => { strokes.pop(); cue('tick', { f: 1800, v: 0.06 }); feedback(el.drawFeedback, '', null); render(); });
+      if (el.clear) el.clear.addEventListener('click', () => { strokes = []; cue('paper'); feedback(el.drawFeedback, '', null); render(); });
       if (el.hold) el.hold.addEventListener('click', holdToMirror);
       if (el.finish) el.finish.addEventListener('click', letSpeakerCarve);
 
@@ -472,6 +486,7 @@
         else say("The three masks are waiting, Silvia, each carved on one side only. Give each its other half. Aurelia is holding the lamp.");
         sizeCanvas();
         render();
+        setTimeout(mood, 700);   // the bed starts on its next poll (600 ms) and resets the intensity to 0.5
         const focusTarget = isDone() ? el.done : (!isAwake() ? el.keyInput : el.hold);
         if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
       }

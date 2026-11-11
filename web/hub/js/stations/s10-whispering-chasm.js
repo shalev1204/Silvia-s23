@@ -21,6 +21,7 @@
       const put = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
       const isDone = () => get('order_whispering_chasm_completed') === 'true';
       const soundOn = () => !(window.EclipseAmbience && window.EclipseAmbience.state().muted);
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const WALK_KEY = 'order_chasm_walk';
       const HOWTO_KEY = 'order_chasm_howto';   // 'seen' once she has read (or skipped) How to play
@@ -1278,6 +1279,17 @@
           ['C5', 'E5', 'G5', 'C6'].forEach((n) => tone(NOTE[n], 0.8, 2.2, { gain: 0.06, type: 'triangle', attack: 0.08 }));
         }
       };
+      // How full the canyon's music is: sparse at the portal, fuller with each rune, thin after a wrong turn or while he rests
+      const moodOf = () => (view.phase === 'setback' ? 0.2 : view.phase === 'rest' ? 0.15 : view.phase === 'done' ? 0.65 : 0.3 + 0.05 * (S ? S.runes : 0));
+      let moodAt = 0;
+      function mood() { const a = window.EclipseAmbience; if (a && a.intensity) a.intensity(moodOf()); }
+      let turnAt = 0;
+      function turnTick(gap) {
+        const n = performance.now();
+        if (n - turnAt < gap) return;
+        turnAt = n;
+        cue('tick', { f: 1200, v: 0.06 });
+      }
 
       // ---- Little moments on the screen: a flash of light, a red pulse, a shower of confetti ----
       const fxEl = {};
@@ -1349,6 +1361,7 @@
       }
       function turnSmooth(ax, ang) {
         if (view.phase !== 'relic') return;
+        turnTick(90);
         view.spin = null;
         view.turnQ.push({ ax, left: ang });
       }
@@ -1431,6 +1444,7 @@
         }
         if (el.clock) el.clock.textContent = '☀ ' + clock(S.min);
         paintFacing();
+        mood();
       }
       function paintFacing() {
         const yaw = view.yaw + view.look;
@@ -1503,7 +1517,7 @@
         if (view.phase !== 'choose') return;
         const o = options().find((x) => x.d === d);
         if (!o || o.blocked) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('tick', { f: 1600 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         ensureAudio();
         const p = plan(d);
         paintArrows([]);
@@ -1545,6 +1559,7 @@
         S.heard++;
         const d = whisperDir();
         const words = WHISPERS[(S.runes + S.forks) % WHISPERS.length];
+        cue('echo', d < 0 ? { deg: 3, n: 2, v: 0.05 } : { deg: 7, n: 3, v: 0.05 });
         if (d < 0) {
           subtitle('A whisper comes from behind you, from the way you came: “…back… go back…”', 6);
           say("I heard it, Silvia: the whisper came from behind me. I think the gorge is telling us this stretch went wrong.");
@@ -1579,6 +1594,14 @@
         S.water = Math.max(0, S.water - 1);
         S.fails++;
         view.shake = 1;
+        cue('wrong');
+        if (PLACES[k] && !['decoy', 'early', 'exit-early', 'tracks', 'stuck'].includes(stop)) {
+          const kind = PLACES[k].kind;
+          if (kind === 'well') cue('echo', { deg: 0, n: 2, v: 0.04 });
+          else if (kind === 'pit') cue('whoosh', { dur: 1.4 });
+          else if (kind === 'salt') cue('crack', { v: 0.2 });
+          else cue('stone', { dur: 1.0 });
+        }
         if (G && G.fx) G.fx.blow(G.hermes.position.clone(), 0.2);
         const restNeeded = S.water <= 0.001;
         const cost = restNeeded ? "And that was my last drop of water." : `It cost us a skin of water: ${skinsWord(S.water)} left.`;
@@ -1615,7 +1638,8 @@
           paintPrints();
           if (el.fade) el.fade.classList.remove('is-on');
           subtitle('The wind fills in the footprints of the wrong turn.', 4);
-          if (S.rest) rest();
+          cue('whoosh', { dur: 1.2 });
+          if (S.rest) { cue('dusk'); rest(); }
           else showChoice(S.runes ? `Back at the cairn of the ${CAIRNS[S.runes - 1].relic}. Let us try again.` : 'Back at the North Portal. Let us try again.');
         };
         if (G && !reducedMotion() && instant !== true) setTimeout(done, 700); else done();
@@ -1624,6 +1648,7 @@
       // ---- Out of water: he rests in the shade until the sun has moved ----
       function rest() {
         view.phase = 'rest';
+        mood();
         paintArrows([]);
         clearControls();
         say("My last skin is empty, Silvia. I cannot walk on in this heat without water. I will sit in the shade by the wall and wait for the sun to move. Give me a little while.");
@@ -1644,6 +1669,7 @@
         S.rest = 0;
         S.water = 1;
         S.min += 90;
+        cue('water', { dur: 1.4 });
         save();
         paintHud();
         showChoice("The shade has crossed to the far wall. And look: a thin line of water is seeping out of a crack in the rock. I filled one skin, slowly, drop by drop. Let us try again.");
@@ -1657,6 +1683,7 @@
         const ca = CAIRNS[i];
         say(ca.arrive);
         where(`At the ${ordinal(i)} cairn. Turn the ${ca.relic} until its carved letter faces you: drag it, or use the arrow buttons or the arrow keys.`);
+        if (!view.quiet) cue('stone', { dur: 1.2 });
         if (G) {
           dropRelic();
           G.relic = makeRelic(ca.relic, ca.letter);
@@ -1687,12 +1714,18 @@
         const p = plate.getWorldPosition(new G.T.Vector3());
         return n.dot(G.camera.position.clone().sub(p).normalize());
       }
+      // Each relic answers in its own voice as its rune is read
+      const RELIC_CUE = {
+        bell: ['bell', { f: 587.33, v: 0.08, len: 2.6 }], lamp: ['flame', { dur: 1.0 }], comb: ['whoosh', { dur: 1.2 }],
+        horn: ['echo', { deg: 0, n: 3, v: 0.07 }], key: ['thud'], shell: ['water', { dur: 1.2 }]
+      };
       function relicFound() {
         if (view.phase !== 'relic') return;
         const i = S.runes, ca = CAIRNS[i];
         view.phase = 'found';
         view.spin = null; view.turnQ.length = 0;
         if (soundOn()) sounds.rune(); else if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        if (RELIC_CUE[ca.relic]) cue(RELIC_CUE[ca.relic][0], RELIC_CUE[ca.relic][1]);
         replay(fxEl.flash, 'is-on');
         if (G && G.relic && !reducedMotion()) {   // a burst of golden sparks out of the relic
           const v = new Float32Array(G.sparksN * 3);
@@ -1915,6 +1948,7 @@
         }
 
         // Sun and shadows follow Hermes
+        if (now - moodAt > 1000) { moodAt = now; mood(); }   // the Ambience resets its level when the window first shows
         paintSky();
         G.sun.position.set(view.x, 0, view.z).addScaledVector(G.sunDir, 40);
         G.sun.target.position.set(view.x, 0, view.z);
@@ -1948,6 +1982,7 @@
         if (Math.abs(e.clientX - downAt.x) + Math.abs(e.clientY - downAt.y) > 6) downAt.moved = true;
         if (view.phase === 'relic') {
           rotateRelic('y', dx * 0.012); rotateRelic('x', dy * 0.012);
+          if (Math.abs(dx) + Math.abs(dy) > 3) turnTick(140);
           const vx = Math.max(-8, Math.min(8, dy * 0.72)), vy = Math.max(-8, Math.min(8, dx * 0.72));   // radians a second, at ~60 moves a second
           view.spin = view.spin ? { x: view.spin.x * 0.5 + vx * 0.5, y: view.spin.y * 0.5 + vy * 0.5 } : { x: vx, y: vy };
         }
@@ -2022,7 +2057,7 @@
       let returnFocusTo = null;
       function openChasm() {
         if (!canOpen()) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('whoosh', { dur: 1.6 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');
         // The speaker of the ambient sound sits in the header, next to the ✕, while the canyon is open
@@ -2267,7 +2302,7 @@
       }
       function closeChasm() {
         if (modal.style.display === 'none') return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('click') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (view.walk) finishWalk();
         clearTimeout(rest.t);
         if (howto.box) howto.box.hidden = true;

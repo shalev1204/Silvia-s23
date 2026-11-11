@@ -18,6 +18,10 @@
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
+      // a drag can cross several half-varas in one frame: one footstep per 120 ms, one held breath per 700 ms
+      let lastStep = 0, lastBreath = 0;
+      const every = (last, ms) => performance.now() - last >= ms;
       const KEYS = {
         done: 'order_whispering_gallery_completed',
         focus: 'order_whispering_gallery_focus'
@@ -133,11 +137,16 @@
         x = snap(x); y = snap(y);
         if (!inside(x, y) || (x === pos[0] && y === pos[1])) return false;
         if (dist([x, y], raidersAt) <= ASH) {
+          if (every(lastBreath, 700)) { lastBreath = performance.now(); cue('heart'); }
           focusFeedback('Ash, very close, and someone breathing in the dark just ahead. Hermes holds his breath and steps back.', 'error');
           return false;
         }
+        const wasClear = clear();
         pos = [x, y];
         if (el.focusFeedback && el.focusFeedback.classList.contains('is-error')) focusFeedback('', '');
+        // stepping into the clear zone, the whisper comes round the walls; otherwise a footstep
+        if (!wasClear && clear()) cue('echo', { deg: 9, n: 2, v: 0.05 });
+        else if (every(lastStep, 120)) { lastStep = performance.now(); cue('step'); }
         paintHermes();
         hearing();
         return true;
@@ -182,6 +191,12 @@
         }
         whisperSound(atFocus() ? 0 : c);
         paintWaves(atFocus() ? 1 : c);
+        mood();
+      }
+      // the stage music leans in as the whisper clears, and steps back while the bells must be heard
+      function mood() {
+        const amb = window.EclipseAmbience;
+        if (amb && amb.intensity) amb.intensity(isDone() ? 0.6 : atFocus() ? 0.15 : 0.3 + 0.15 * clarity());
       }
       function paintHermes() {
         if (hermes) hermes.setAttribute('transform', 'translate(' + X(pos[0]) + ' ' + Y(pos[1]) + ')');
@@ -287,14 +302,15 @@
           set(KEYS.focus, 'true');
           pos = listenAt.slice();
           paintHermes();
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          // pitchless on purpose: the niche's tune follows in 1.4 s and must be heard alone
+          if (!cue('whoosh', { dur: 0.9 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           focusFeedback('Here: where the west pin stood. Every word from the east pin arrives at once, from all the walls together.', 'ok');
           say("Silvia, I can hear them as if they were at my shoulder. Two of the Ashes, at the far end of the gallery, and they have no idea that the walls carry every word to me. Listen. And under my feet a bronze plate rings hollow: there is a frame of five little bells beside it, and a niche in the wall behind them, shut tight.");
           render();
           setTimeout(playTune, 1400);
           return;
         }
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         focusFeedback(clarity() > 0 ? 'Words, almost, but they slip away. Not quite where the pin stood.' : 'Hermes holds still and listens. Nothing reaches him here.', 'error');
         focusHints.fail();
         render();
@@ -334,6 +350,7 @@
         entered = [];
         if (got === MIRROR.join(',')) { setTimeout(completeStation, 500); return; }
         setTimeout(paintEntered, 700);
+        setTimeout(() => cue('wrong'), 400);   // after the sixth bell has spoken
         echoFeedback(got === TUNE.join(',') ? 'Note for note, exactly as the raiders played it. The niche stays shut, as it did for them.' : 'The bells answer, but the niche stays shut.', 'error');
         echoHints.fail();
         render();
@@ -351,7 +368,8 @@
 
       function completeStation() {
         set(KEYS.done, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('stone', { dur: 1.6 });   // the bronze plate sinks and the niche swings open
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         echoFeedback('The tune, mirrored. The bronze plate sinks a finger’s width and the niche in the wall swings open.', 'ok');
         hush();
         applyVictory();
@@ -431,7 +449,7 @@
       }
       if (el.listen) el.listen.addEventListener('click', listenHere);
       if (el.again) el.again.addEventListener('click', playTune);
-      if (el.restart) el.restart.addEventListener('click', () => { entered = []; paintEntered(); echoFeedback('Start again from the first bell of your answer.', ''); render(); });
+      if (el.restart) el.restart.addEventListener('click', () => { entered = []; cue('tick', { f: 1800, v: 0.06 }); paintEntered(); echoFeedback('Start again from the first bell of your answer.', ''); render(); });
 
       // ---- Open / close ----
       const pause = () => (window.EclipseStagePause ? window.EclipseStagePause.remaining(NODE) : 0);
@@ -467,6 +485,7 @@
         else if (atFocus()) say("I am still standing on the west pin, Silvia, and the bells are still waiting. The raiders played the tune note for note and the niche stayed shut. Ring them for me.");
         else say("Silvia, the second stair ended in a hall with no corners at all: a long oval of columns, cold as a church. Somewhere in the dark at the far end two of the Ashes are whispering, and I cannot hear a word. Aurelia says the Order laid this gallery out with two pins and a string, and that a whisper at one pin is heard at the other. Open the page “The Whispering Gallery”, please. Tell me where to stand.");
         render();
+        setTimeout(mood, 700);   // the bed starts on its next poll (600 ms) and resets the intensity to 0.5
         const target = isDone() ? el.done : atFocus() ? (el.bells && el.bells.children[0]) : el.plan;
         if (target) setTimeout(() => target.focus(), 60);
       }

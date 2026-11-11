@@ -16,6 +16,7 @@
       const telemCanteens = document.getElementById('clepsydra-telem-canteens');
       const telemKey = document.getElementById('clepsydra-telem-key');
       const weirBox = document.getElementById('clepsydra-weir-box');
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
 
       const BASINS = {
         Falcon: {
@@ -138,9 +139,10 @@
             }
 
             btn.addEventListener('click', () => {
-              if (sfx) sfx.playMechanicalClick();
               let curState = savedMatrix[key] || 0;
               curState = (curState + 1) % 3;
+              // a cross, a tick, or the mark rubbed out: three different notches
+              if (!cue('tick', { f: [1500, 2200, 3000][curState] }) && sfx) sfx.playMechanicalClick();
               savedMatrix[key] = curState;
               try {
                 localStorage.setItem('order_clepsydra_matrix_state', JSON.stringify(savedMatrix));
@@ -178,7 +180,7 @@
             card.classList.add('analyzed');
           }
           card.addEventListener('click', () => {
-            if (sfx) sfx.playChimeHover();
+            if (!cue('paper') && sfx) sfx.playChimeHover();
             card.classList.toggle('analyzed');
             savedClues[idx] = card.classList.contains('analyzed');
             try {
@@ -262,6 +264,9 @@
           telemWells.textContent = isFullySolved ? '4 / 4 BALANCED' : `${activeWells} / 4 BALANCED`;
           telemWells.style.color = isFullySolved ? '#34d399' : (activeWells > 0 ? '#60a5fa' : '#94a3b8');
         }
+        // the music of the wells fills as the siphons are primed
+        const amb = window.EclipseAmbience;
+        if (amb && amb.intensity && modal.style.display === 'flex') amb.intensity(isFullySolved ? 0.6 : 0.3 + 0.06 * activeWells);
 
         if (isFullySolved) {
           if (BASINS.Falcon && BASINS.Falcon.seeker) BASINS.Falcon.seeker.textContent = 'Nomad';
@@ -315,7 +320,7 @@
         const isKeyCorrect = keyClean === 'XXX' || keyClean === '30';
 
         if (!isKeyCorrect) {
-          if (sfx) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx) sfx.playMechanicalClick();
           if (keyInput) {
             keyInput.classList.add('decoy-hit');
             setTimeout(() => keyInput.classList.remove('decoy-hit'), 800);
@@ -343,7 +348,8 @@
         });
 
         if (!allCorrect) {
-          if (sfx) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx) sfx.playMechanicalClick();
+          cue('groan', { dur: 1.2 });   // the siphons rattle
           if (btnEngage) {
             btnEngage.classList.add('decoy-hit');
             setTimeout(() => btnEngage.classList.remove('decoy-hit'), 800);
@@ -356,7 +362,8 @@
         }
 
         // Success!
-        if (sfx) sfx.playCelestialChime();
+        if (!cue('win') && sfx) sfx.playCelestialChime();
+        cue('water', { dur: 2.6 });
         try {
           localStorage.setItem('order_oasis_clepsydra_completed', 'true');
         } catch(e) {}
@@ -469,7 +476,7 @@
       if (btnSolveAll) btnSolveAll.addEventListener('click', solveAllClepsydra);
       if (btnResetGrid) {
         btnResetGrid.addEventListener('click', () => {
-          if (sfx) sfx.playMechanicalClick();
+          if (!cue('paper') && sfx) sfx.playMechanicalClick();
           localStorage.removeItem('order_clepsydra_matrix_state');
           renderMatrix();
         });
@@ -499,7 +506,10 @@
           const el = row[field];
           if (el) {
             el.addEventListener('change', () => {
-              if (sfx) sfx.playMechanicalClick();
+              // a well takes a drop of water (each its own pitch), an hour or a relic turns a notch
+              const wellNo = Object.keys(BASINS).indexOf(el.value);
+              const heard = field === 'well' && wellNo >= 0 ? cue('drop', { f: 900 + wellNo * 180 }) : cue('tick', { f: field === 'hour' ? 2600 : 1900 });
+              if (!heard && sfx) sfx.playMechanicalClick();
               saveSelections();
               const isDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
               updateBasinVisuals(isDone);

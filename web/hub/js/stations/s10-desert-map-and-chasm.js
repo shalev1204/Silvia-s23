@@ -4,6 +4,7 @@
     // =========================================================================
     (function initGrandDesertMapAndChasm() {
       const sfx = window.sfx || null;
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       // 1. Navigation & Path Switcher
       const tabConstellation = document.getElementById('btn-tab-path-constellation');
       const tabDesert = document.getElementById('btn-tab-path-desert');
@@ -237,7 +238,7 @@
       window.showDesertToast = showDesertToast;
 
       function selectDesertStation(id) {
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('tick') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
 
         let targetId = id;
         if (id === 15) targetId = 10;
@@ -361,18 +362,18 @@
       window.updatePathTabsUI = updatePathTabsUI;
 
       if (tabConstellation) tabConstellation.addEventListener('click', () => {
-        if (sfx) sfx.playMechanicalClick();
+        if (!cue('paper') && sfx) sfx.playMechanicalClick();
         switchMapPath('constellation', true);
       });
 
       if (tabDesert) tabDesert.addEventListener('click', () => {
-        if (sfx) sfx.playMechanicalClick();
+        if (!cue('paper') && sfx) sfx.playMechanicalClick();
         switchMapPath('desert', true);
       });
 
       const tabStage = document.getElementById('btn-tab-path-stage');
       if (tabStage) tabStage.addEventListener('click', () => {
-        if (sfx) sfx.playMechanicalClick();
+        if (!cue('paper') && sfx) sfx.playMechanicalClick();
         switchMapPath('stage', true);
       });
 
@@ -382,7 +383,7 @@
           const targetPath = star.getAttribute('data-path');
           if (targetPath) {
             if (targetPath === 'stage' && localStorage.getItem('order_oracle_horizon_completed') !== 'true') return;
-            if (sfx) sfx.playMechanicalClick();
+            if (!cue('paper') && sfx) sfx.playMechanicalClick();
             switchMapPath(targetPath, true);
           }
         });

@@ -15,6 +15,10 @@
       const modal = document.getElementById('modal-solstice-arch');
       if (!modal) return;
       const sfx = window.sfx || null;
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
+      // A held key turns mirrors faster than the ticks should sound
+      let lastTurnCue = 0;
+      const turnCue = () => { const n = Date.now(); if (n - lastTurnCue < 80) return true; lastTurnCue = n; return cue('tick', { f: 1700, v: 0.08 }); };
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -212,7 +216,7 @@
         if (!isAwake() || dawnDone() || i < 0 || i >= mirrors.length) return;
         mirrors[i] = mirrors[i] === 'f' ? 'b' : 'f';
         set(KEYS.mirrors, mirrors.join(''));
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!turnCue() && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         const hadFocus = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-i') === String(i);
         checkRay();
         drawCourt();
@@ -225,6 +229,7 @@
         if (!isAwake() || dawnDone() || dawn.running) return;
         dawn.running = true; dawn.step = 0; dawn.locks = 0;
         dawn.deadline = performance.now() + stepMs();
+        cue('whoosh', { dur: 1.4 });
         feedback(el.dawnFeedback, 'The first ray slips under the arch.', '');
         say("Dawn, Silvia. There it is: the first ray, coming under the arch at an angle the founders never planned for. Turn the mirrors before the sun climbs.");
         checkRay();
@@ -259,7 +264,11 @@
         if (!dawn.running) return;
         if (trace(COURT.entries[dawn.step]).end !== 'altar') return;
         dawn.locks++;
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        const last = dawn.locks >= COURT.entries.length;
+        // each lock rings a step higher; the last one opens the altar
+        if (last) cue('stone', { dur: 2 });
+        if (!cue(last ? 'reveal' : 'shimmer', { deg: 12 + dawn.locks * 2 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        setMood();
         if (dawn.locks >= COURT.entries.length) {
           stopDawn();
           set(KEYS.dawnDone, 'true');
@@ -279,6 +288,7 @@
         const fails = (parseInt(get(KEYS.dawnFails) || '0', 10) || 0) + 1;
         set(KEYS.dawnFails, String(fails));
         dawnHints.fail();
+        cue('dusk');
         dawn.locks = 0; dawn.step = 0;
         feedback(el.dawnFeedback, 'The sun climbed past the arch. The dawn is spent; the ring only takes a dawn ray.', 'error');
         say("Too high, Silvia. The courtyard is in plain daylight and the ring has let go of its locks. Tomorrow the sun will rise again, and the mirrors will still be where you left them." + (get(KEYS.dawnHint) === 'true' ? " I have counted my breaths: tomorrow each ray will wait longer for us." : ''));
@@ -323,7 +333,8 @@
         let t = 400;
         pattern.split('').forEach((p, i) => {
           if (pattern === ROUNDS[3] && i === 3) t += PAUSE_MS - GAP_MS;
-          playing.push(setTimeout(() => lightOn(true), t));
+          // a high bell rings with each flash of the far light, longer for a long flash
+          playing.push(setTimeout(() => { lightOn(true); cue('bell', { f: 1318.5, v: 0.04, len: p === 'L' ? 1.4 : 0.45 }); }, t));
           t += FLASH_MS[p];
           playing.push(setTimeout(() => lightOn(false), t));
           t += GAP_MS;
@@ -369,6 +380,7 @@
         const own = el.night && el.night.querySelector('.solstice-own');
         if (own) { own.setAttribute('fill', '#b8a07a'); own.setAttribute('r', '2'); }
         if (pulses.length >= 8) return;
+        cue('bell', { f: 880, v: 0.04, len: held >= LONG_PRESS_MS ? 1.4 : 0.45 });
         pulses.push(held >= LONG_PRESS_MS ? 'L' : 'S');
         renderPulses();
       }
@@ -379,6 +391,7 @@
           const fails = (parseInt(get(KEYS.signalFails) || '0', 10) || 0) + 1;
           set(KEYS.signalFails, String(fails));
           signalHints.fail();
+          cue('wrong');
           feedback(el.signalFeedback, 'The light on Tower II waits, then asks again.', 'error');
           pulses = []; renderPulses();
           render();
@@ -386,7 +399,7 @@
         }
         pulses = []; renderPulses();
         set(KEYS.round, String(r + 1));
-        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        if (!cue('shimmer', { deg: 10 + r * 2 }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
         if (r + 1 >= ROUNDS.length) { runFinale(); return; }
         feedback(el.signalFeedback, 'The light answers.', 'ok');
         say(ROUND_DISPATCH[r]);
@@ -409,6 +422,8 @@
         playPattern(burst, () => {
           if (el.message) el.message.textContent = lines.join('   ·   ');
           drawNight(true);
+          cue('thud');
+          cue('flame', { dur: 2.4 });
           say("And then the light went out. Not slowly, Silvia: all at once. There is a red glow at the foot of Tower II now, and the wind smells of smoke. The wagons. They have reached the Sanctuary.");
           setTimeout(completeStation, 1800);
         });
@@ -421,7 +436,7 @@
       function completeStation() {
         set(KEYS.done, 'true');
         finale = false;
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('signal_mirror');
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(5);
         else set('order_seal_cairn_5', 'true');
@@ -447,13 +462,14 @@
         if (typed !== SIGIL) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.keyFeedback, 'The altar stays closed. Follow the midsummer ray across the page “Arch of the Solstice & The Solar Altar” again.', 'error');
           sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('tick', { f: 2600, v: 0.08 });
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'DAYBREAK. The brass ring of the altar wakes, waiting for its light.', 'ok');
@@ -494,7 +510,19 @@
           el.hint.style.display = 'none';
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        setMood();
         sigilHints.refresh(); dawnHints.refresh(); signalHints.refresh();
+      }
+      // The courtyard's music fills with each lock at dawn and each answered signal at night
+      function setMood() {
+        const amb = window.EclipseAmbience;
+        if (!amb || !amb.intensity) return;
+        let k;
+        if (isDone() || finale) k = 0.6;
+        else if (dawnDone()) k = 0.4 + 0.05 * roundsDone();
+        else if (dawn.running) k = 0.42 + 0.04 * dawn.locks;
+        else k = isAwake() ? 0.35 : 0.3;
+        amb.intensity(k);
       }
 
       // ---- Controls ----
@@ -518,7 +546,7 @@
         el.flash.addEventListener('click', (e) => e.preventDefault());
         el.flash.addEventListener('blur', cancelPress);
       }
-      if (el.clear) el.clear.addEventListener('click', () => { pulses = []; renderPulses(); });
+      if (el.clear) el.clear.addEventListener('click', () => { if (pulses.length) cue('tick', { f: 1300, v: 0.06 }); pulses = []; renderPulses(); });
       if (el.send) el.send.addEventListener('click', sendSignal);
       if (el.speak) el.speak.addEventListener('click', speakSigil);
       if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });
@@ -553,6 +581,8 @@
         else if (!dawnDone()) say("The mirrors are where you left them. Set them as you think best, and call the dawn when you are ready.");
         else say("Night again. Watch the light on Tower II, and answer it with my mirror.");
         render();
+        // The bed starts at its own level when the modal appears; set ours once it has
+        setTimeout(setMood, 700);
         const focusTarget = isDone() ? el.finish : (!isAwake() ? el.keyInput : (dawnDone() ? el.watch : el.dawnBtn));
         if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
       }
@@ -605,7 +635,7 @@
         });
         ceremonyReturnFocus = document.activeElement;
         overlay.style.display = 'flex';
-        if (sfx && sfx.playCelestialChime) setTimeout(() => sfx.playCelestialChime(), 2100);
+        setTimeout(() => { if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime(); }, 2100);
         const btn = $('btn-five-seals-close');
         if (btn) setTimeout(() => btn.focus(), 80);
       };

@@ -18,6 +18,7 @@
       const modal = document.getElementById('modal-desert-lexicon');
       if (!modal) return;
       const sfx = window.sfx || null;
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       const $ = (id) => document.getElementById(id);
       const el = {
         stage: $('lex3d-stage'), canvas: $('lex3d-canvas'), fade: $('lex3d-fade'), subtitle: $('lex3d-subtitle'),
@@ -945,6 +946,15 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         paintHearts();
         paintWatch();
         paintFacing();
+        mood();
+      }
+      // The camp music swells as the circles come clean, runs hot in the walls and holds its breath in the niche
+      function mood() {
+        const amb = window.EclipseAmbience;
+        if (!amb || !amb.intensity) return;
+        const st = stage(), ph = view.phase;
+        amb.intensity(ph === 'hide' ? 0.2 : ph === 'hearth' ? 0.45 : ph === 'locked' ? 0.6 : st === 'stele' ? 0.3 + 0.25 * circleWords.filter((id) => S.carved.includes(id)).length / circleWords.length
+          : st === 'sigil' || st === 'bearing' ? 0.55 : st === 'flee' ? 0.85 : 0.6);
       }
       // The watcher on the HUD: where he is and whether he would hear a scrape now
       function paintWatch() {
@@ -1097,7 +1107,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
       }
       function selectWord(id) {
         if (view.phase !== 'stele' || !WORD[id]) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('paper') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         ensureAudio();
         view.sel = id;
         showStele(null);
@@ -1113,6 +1123,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const form = el.controls.querySelector('.lex3d-carve');
         if (word.length !== w.len) {
           if (form) replay(form, 'is-short');
+          cue('wrong');
           say(word.length ? `I count ${word.length} letter${word.length === 1 ? '' : 's'}, Silvia, and ${w.label} has ${w.len} squares on the stone.` : `Tell me the word for ${w.label} first, Silvia: ${w.len} letters, from your page.`);
           return;
         }
@@ -1145,7 +1156,8 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         view.sel = null;
         if (soundOn()) sounds.word(S.carved.length % 4);
         const circ = CIRCLES.map((o, i) => (o.word === w.id ? i + 1 : 0)).filter(Boolean);
-        if (circ.length && soundOn()) sounds.circle();
+        // each circle that comes clean rings one degree higher up the mode
+        if (circ.length && !cue('shimmer', { deg: 7 + circleWords.filter((id) => S.carved.includes(id)).length }) && soundOn()) sounds.circle();
         replay(fxEl.flash, 'is-on');
         subtitle(`${w.answer} · ${w.label}${circ.length ? ` · circle ${circ.join(', ')}` : ''}`, 4);
         save();
@@ -1295,6 +1307,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
             inp.addEventListener('input', () => {
               const v = inp.value.toUpperCase().replace(/[^A-Z]/g, '').slice(-1);
               inp.value = v;
+              if (v) cue('tick', { f: 1800 + i * 160 });
               boxEl.classList.remove('is-wrong');
               if (v && inputs[i + 1]) inputs[i + 1].focus();
             });
@@ -1335,6 +1348,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const boxEl = el.controls.querySelector('.lex3d-console');
         if (word.length < 7) {
           if (boxEl) replay(boxEl, 'is-short');
+          cue('wrong');
           say(`I count ${word.length} letter${word.length === 1 ? '' : 's'}, Silvia. Seven windows: one for every circle on your page.`);
           return;
         }
@@ -1371,8 +1385,13 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         if (r) r.textContent = `${String(view.bear).padStart(3, '0')}°`;
         if (p) p.textContent = pointOf(view.bear);
         if (range && !fromRange) range.value = view.bear;
-        if (soundOn() && audio && !(fromRange && view.bear % 5)) sounds.click();
+        const now = performance.now();
+        if (!(fromRange && view.bear % 5) && now - needleTickAt >= 80) {
+          needleTickAt = now;
+          if (!cue('tick', { f: 2600 }) && soundOn() && audio) sounds.click();
+        }
       }
+      let needleTickAt = 0;
       function lockNeedle() {
         if (view.phase !== 'bearing') return;
         ensureAudio();
@@ -1421,6 +1440,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         S.watch = 4;
         moveWatcher(3);
         if (soundOn()) { sounds.shout(); setTimeout(() => { if (audio) sounds.shout(); }, 500); sounds.heart(); }
+        mood();
         view.shake = 0.6;
         replay(fxEl.hurt, 'is-on');
         clearControls();
@@ -1460,7 +1480,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         if (view.phase !== 'flee') return;
         const i = S.flee.length;
         if ((S.tried[i] || []).includes(d)) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('whoosh', { dur: 0.5 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         ensureAudio();
         view.phase = 'walk';
         clearControls();
@@ -1507,6 +1527,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         const door = G && G.fleeRows[i] && G.fleeRows[i][d + 1];
         if (door && door.heap) { door.heap.visible = true; door.heap.userData.pop = performance.now(); }
         if (soundOn()) sounds.rubble();
+        cue('crack', { v: 0.25 });
         view.shake = 0.7;
         if (G && G.fx) G.fx.puff(door && door.heap ? door.heap.getWorldPosition(new G.T.Vector3()) : G.hermes.position.clone(), 26, { size: [0.4, 0.9], speed: [0.6, 1.8], up: [0.6, 1.6], alpha: 0.45, color: 0x9a8f86 });
         burn();
@@ -1553,6 +1574,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
           view.ride = performance.now();
           camPos.ok = false;
           if (el.fade) el.fade.classList.remove('is-on');
+          cue('flame', { dur: 1.8 });
           subtitle('Near midnight · the hearth of the raiders', 4);
           say('They went back, Silvia. I heard them run to their camels, and then the beasts groaning up off their knees, and hoofbeats going away south, fast, the way the needle points. I waited until the sound was gone, and then I came back to the fire. It is only red eyes now. And here on the hearth stone is what the raider scratched with his knife at dusk… Come closer to the light with me.');
           where('At the cold fire, near midnight. The rearguard has ridden south.');

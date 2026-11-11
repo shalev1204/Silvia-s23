@@ -17,6 +17,11 @@
       const modal = document.getElementById('modal-polybius-stele');
       if (!modal) return;
       const sfx = window.sfx || null;
+      // The game's own Sound switch silences these too (the old generic sounds then play as before)
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(soundOn() && a && a.sfx && a.sfx(kind, o)); };
+      // A held arrow key takes turns faster than their sounds should play
+      let lastTurnCue = 0;
+      const turnCueOk = () => { const n = Date.now(); if (n - lastTurnCue < 80) return false; lastTurnCue = n; return true; };
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -334,7 +339,7 @@
         const fails = (parseInt(get(KEYS.knockFails) || '0', 10) || 0) + 1;
         set(KEYS.knockFails, String(fails));
         knockHints.fail();
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
       }
       function readWord() {
         const i = knocksDone();
@@ -395,7 +400,7 @@
         stopKnocks();   // a word read before its knocks end: the next stanza starts clean
         lastAdvanceAt = performance.now();
         set(KEYS.knocks, String(i + 1));
-        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        if (!cue('shimmer', { deg: 10 + i * 2 }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
         if (el.wordInput) el.wordInput.value = '';
         say(STANZA_DISPATCH[i]);
         feedback(el.knockFeedback, i === 0 ? 'WHO. Now it is your stanza.' : (i === 1 ? 'He understood your answer.' : STANZAS[i].word + '.'), 'ok');
@@ -506,13 +511,22 @@
         const nx = run.x + dx, ny = run.y + dy;
         if (dx || dy) {
           const c = cellAt(nx, ny);
+          if (!c || c === '#') { if (turnCueOk()) cue('thud'); }
+          else if (c === 'L' || (burningAt(nx, ny, run.t) && burningAt(nx, ny, run.t + 1))) { if (turnCueOk()) cue('flame', { dur: 0.6 }); }
           if (!c) { feedback(el.moveFeedback, 'The wall of the atrium.', 'error'); return; }
           if (c === '#') { feedback(el.moveFeedback, nx === ATRIUM.stele[0] && ny === ATRIUM.stele[1] ? 'The stele stands in the way.' : 'A column stands in the way.', 'error'); return; }
           if (c === 'L') { feedback(el.moveFeedback, 'The library is a wall of fire.', 'error'); return; }
           if (burningAt(nx, ny, run.t) && burningAt(nx, ny, run.t + 1)) { feedback(el.moveFeedback, 'That flagstone is burning. Wait for its ash, or go round.', 'error'); return; }
         }
         run.x = nx; run.y = ny; run.t++;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (turnCueOk()) {
+          if (!cue(dx || dy ? 'step' : 'tick', { f: 900, v: 0.05 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          // the fire takes its turn too: flagstones catching, and burnt-out beams giving way to ash
+          let caught = 0, spent = 0;
+          IGNITE.forEach((ig) => { if (ig === run.t) caught++; else if (ig + ATRIUM.burn === run.t) spent++; });
+          if (caught) cue('flame', { dur: 0.6 + Math.min(caught, 4) * 0.15 });
+          if (spent) cue('crack', { v: 0.12 });
+        }
         if (run.x === ATRIUM.hatch[0] && run.y === ATRIUM.hatch[1]) { reachHatch(); return; }
         if (burningAt(run.x, run.y, run.t)) { lose('fire'); return; }
         if (run.t >= ATRIUM.breath) { lose('breath'); return; }
@@ -526,6 +540,7 @@
         fireHints.fail();
         const hinted = before < 2 && fireHints.level() >= 2;
         run = newRun();
+        cue(why === 'fire' ? 'crack' : 'dusk', { v: 0.28 });
         if (el.fireInner) { el.fireInner.classList.remove('laby-flash'); void el.fireInner.offsetWidth; el.fireInner.classList.add('laby-flash'); }
         feedback(el.moveFeedback, why === 'fire'
           ? 'The fire reached Hermes\'s flagstone. He fell back to the side door, coughing, his sleeve smouldering.'
@@ -541,7 +556,8 @@
       function completeStation() {
         set(KEYS.done, 'true');
         stopKnocks();
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('groan', { dur: 1.2 });
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('servant_key');
         applyVictory();
         render();
@@ -564,13 +580,14 @@
         if (typed !== PROVERB_LETTERS) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.keyFeedback, 'The stele does not move. Read the six stanzas on the page “The Polybius Stele” again, and mind the mirage.', 'error');
           proverbHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('stone', { dur: 1.6 });
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (el.keyInput) { el.keyInput.value = PROVERB; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'STARS GUIDE THOSE WHO SEEK TRUTH. The stele turns on its base. On its back: 348° NNW.', 'ok');
@@ -615,7 +632,18 @@
           el.hint.textContent = hint;
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        setMood();
         proverbHints.refresh(); knockHints.refresh(); fireHints.refresh();
+      }
+      // The flames bed has no music, so this only nudges it; it rises with the stanzas and the crossing
+      function setMood() {
+        const amb = window.EclipseAmbience;
+        if (!amb || !amb.intensity) return;
+        let k;
+        if (isDone()) k = 0.6;
+        else if (fireOpen()) k = 0.45 + 0.15 * Math.min(1, (run ? run.t : 0) / ATRIUM.breath);
+        else k = isAwake() ? 0.32 + 0.03 * knocksDone() : 0.3;
+        amb.intensity(k);
       }
 
       // ---- Controls ----
@@ -699,6 +727,8 @@
         renderTape(el.tape, heard, false);
         renderTape(el.replyTape, reply, replyOpen);
         render();
+        // The bed starts at its own level when the modal appears; set ours once it has
+        setTimeout(setMood, 700);
         const k = knocksDone();
         const focusTarget = isDone() ? el.finish : (!isAwake() ? el.keyInput : (fireOpen() ? el.pad.up : (STANZAS[k].by === 'silvia' ? el.knock : el.listen)));
         if (focusTarget) setTimeout(() => focusTarget.focus(), 60);

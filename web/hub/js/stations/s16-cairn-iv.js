@@ -13,6 +13,8 @@
       const modal = document.getElementById('modal-cairn-four');
       if (!modal) return;
       const sfx = window.sfx || null;
+      // The game's own Sound switch silences these too (the old generic sounds then play as before)
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(soundOn() && a && a.sfx && a.sfx(kind, o)); };
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -260,6 +262,7 @@
           tape = record;   // what was never heard is not on the tape
           if (el.tapeStatus) el.tapeStatus.textContent = record ? record.label + ' · recorded' : 'Stopped';
           drawTape(Infinity);
+          setMood();
         }
       }
       function playCalls(calls, beatMs, label, isTest) {
@@ -292,6 +295,7 @@
           if (beat < tape.beats) { tape.raf = requestAnimationFrame(frame); return; }
           tape.raf = null;
           drawTape(Infinity);
+          setMood();
           if (el.tapeStatus) el.tapeStatus.textContent = label + ' · recorded';
           if (!tape.isTest) { record = tape; return; }
           // a test call stays on the tape for a moment, then the verse's record comes back
@@ -305,6 +309,7 @@
         };
         if (el.tapeWrap) el.tapeWrap.scrollLeft = 0;
         tape.raf = requestAnimationFrame(frame);
+        setMood();
       }
       function playVerse() {
         if (!isAwake()) return;
@@ -367,7 +372,9 @@
         const need = VERSES[verseIdx].answer.length;
         if (slots.length >= need) { feedback(el.songFeedback, 'This verse has ' + need + ' echoes. Remove one (⌫) or sing it back.', 'error'); return; }
         slots.push(id);
-        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        // A short echo on the fissure's ring; only a tick while a verse plays, so the real echoes stay clear
+        const marked = tape && tape.raf ? cue('tick', { f: 1600, v: 0.06 }) : cue('echo', { deg: RINGS.indexOf(d) + (side === 'L' ? 3 : 7), n: 1, v: 0.05 });
+        if (!marked && sfx && sfx.playChimeHover) sfx.playChimeHover();
         feedback(el.songFeedback, '', '');
         renderSlots();
       }
@@ -395,7 +402,7 @@
           const fails = (parseInt(get(KEYS.songFails) || '0', 10) || 0) + 1;
           set(KEYS.songFails, String(fails));
           songHints.fail();
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.songFeedback, 'The pillars fall silent. ' + right + ' of ' + v.answer.length + ' echoes rang true.', 'error');
           render();
           return;
@@ -406,7 +413,7 @@
         tape = null; record = null;
         drawTape(Infinity);
         if (el.tapeStatus) el.tapeStatus.textContent = '';
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (!cue('shimmer', { deg: 14 + verseIdx * 2 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         feedback(el.songFeedback, v.word + '. The verse rings true.', 'ok');
         if (verseIdx + 1 >= VERSES.length) { completeStation(); return; }
         say(VERSE_DISPATCH[verseIdx]);
@@ -416,7 +423,8 @@
 
       function completeStation() {
         set(KEYS.done, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('stone', { dur: 2.2 });
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(4);
         else set('order_seal_cairn_4', 'true');
         if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('tuning_pebble');
@@ -443,13 +451,14 @@
         if (typed !== SIGIL) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.keyFeedback, 'The pillars stay mute. Count the seven echoes on the page “Cairn IV: Sentry of the Canyon” again.', 'error');
           sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('whoosh', { dur: 1.6 });
+        if (!cue('echo', { deg: 7, n: 3, v: 0.08 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'RESOUND. The wind finds its way into the pillars.', 'ok');
@@ -515,7 +524,15 @@
         if (el.play) el.play.textContent = '▶ Let the wind play verse ' + ['I', 'II', 'III'][verseIdx];
         if (el.hint) el.hint.style.display = countHintOn() && !done ? '' : 'none';
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        setMood();
         sigilHints.refresh(); songHints.refresh();
+      }
+      // The canyon music fills verse by verse, and thins right down while a verse plays so the echoes can be counted
+      function setMood() {
+        const amb = window.EclipseAmbience;
+        if (!amb || !amb.intensity) return;
+        if (tape && tape.raf) { amb.intensity(0.1); return; }
+        amb.intensity(isDone() ? 0.6 : !isAwake() ? 0.3 : 0.35 + 0.08 * versesSung());
       }
 
       // ---- Controls ----
@@ -531,7 +548,7 @@
       if (el.sound) el.sound.addEventListener('click', () => { set(KEYS.sound, soundOn() ? 'off' : 'on'); if (!soundOn()) silence(); render(); });
       if (el.modeMark) el.modeMark.addEventListener('click', () => { mode = 'mark'; render(); });
       if (el.modeCall) el.modeCall.addEventListener('click', () => { mode = 'call'; render(); });
-      if (el.undo) el.undo.addEventListener('click', () => { slots.pop(); renderSlots(); });
+      if (el.undo) el.undo.addEventListener('click', () => { if (slots.length) cue('tick', { f: 1300, v: 0.06 }); slots.pop(); renderSlots(); });
       if (el.sing) el.sing.addEventListener('click', singBack);
       if (el.speak) el.speak.addEventListener('click', speakSigil);
       if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });
@@ -565,6 +582,8 @@
         else if (!isAwake()) say("Silvia, I am at the southern mouth of the gorge. Two hollow pillars, taller than three men, and the wind already hums inside them. The bronze plate between them asks for the sigil of the seven echoes, the ones on the page “Cairn IV: Sentry of the Canyon” of your journal.");
         else say("The pillars are still singing. Let the wind play, count the echoes, and sing the verse back.");
         render();
+        // The bed starts at its own level when the modal appears; set ours once it has
+        setTimeout(setMood, 700);
         const focusTarget = isDone() ? el.finish : isAwake() ? el.play : el.keyInput;
         if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
       }

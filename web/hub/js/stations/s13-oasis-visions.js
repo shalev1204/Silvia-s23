@@ -23,6 +23,8 @@
       const drop = (k) => { try { localStorage.removeItem(k); } catch (e) {} };
       const toast = (msg) => { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); };
       const reduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
+      const legacy = (name) => { const s = window.sfx; if (s && s[name]) s[name](); };
       const WALK_KEY = 'order_clepsydra_visions';
       const ACT_KEY = 'order_clepsydra_act1';
       const DONE_KEY = 'order_oasis_clepsydra_completed';
@@ -208,6 +210,9 @@
         if (el.controls) el.controls.style.display = (S.lost || won) ? 'none' : '';
         const help = $('btn-visions-howto');
         if (help) help.style.display = (S.lost || won) ? 'none' : '';
+        // the wells' music fills with each weight set, steadies at the dial, hushes at the falcon stone
+        const amb = window.EclipseAmbience;
+        if (amb && amb.intensity) amb.intensity(S.lost ? 0.2 : won ? 0.6 : S.phase === 'key' ? 0.6 : S.phase === 'cleft' ? 0.45 : 0.3 + 0.075 * (S.weights | 0));
       }
       function say(text) { if (el.voice) el.voice.textContent = text; }
       function clearControls() { if (el.controls) el.controls.innerHTML = ''; }
@@ -240,7 +245,7 @@
           c.className = 'visions-reg-chip' + (v === current ? ' is-on' : '');
           c.textContent = v;
           c.setAttribute('aria-pressed', v === current ? 'true' : 'false');
-          c.addEventListener('click', () => onPick(v));
+          c.addEventListener('click', () => { if (!cue('tick', { f: opts && opts.hours ? 2600 : 2000 })) legacy('playMechanicalClick'); onPick(v); });
           chips.appendChild(c);
         });
         wrap.appendChild(chips);
@@ -270,6 +275,13 @@
       }
 
       // ---- Act II · cylinder dial ----
+      let dialTickAt = 0;
+      function dialTick() {
+        const now = performance.now();
+        if (now - dialTickAt < 80) return;
+        dialTickAt = now;
+        if (!cue('tick', { f: 1500, v: 0.11 })) legacy('playMechanicalClick');
+      }
       function renderKey(note) {
         clearControls();
         say(note || 'Four weights are set. The stone shows one mark at a time. Add the four hours on your page, write that sum the Roman way, and turn the stone until it shows it. I will not read the hours back to you.');
@@ -295,13 +307,13 @@
         prev.className = 'chasm3d-btn visions-dial-turn';
         prev.setAttribute('aria-label', 'Turn the stone back one mark');
         prev.textContent = '↺ Turn back';
-        prev.addEventListener('click', () => { dialIdx = (dialIdx + DIAL_MARKS.length - 1) % DIAL_MARKS.length; syncDial(); });
+        prev.addEventListener('click', () => { dialIdx = (dialIdx + DIAL_MARKS.length - 1) % DIAL_MARKS.length; syncDial(); dialTick(); });
         const next = document.createElement('button');
         next.type = 'button';
         next.className = 'chasm3d-btn visions-dial-turn';
         next.setAttribute('aria-label', 'Turn the stone on one mark');
         next.textContent = 'Turn on ↻';
-        next.addEventListener('click', () => { dialIdx = (dialIdx + 1) % DIAL_MARKS.length; syncDial(); });
+        next.addEventListener('click', () => { dialIdx = (dialIdx + 1) % DIAL_MARKS.length; syncDial(); dialTick(); });
         row.appendChild(prev);
         row.appendChild(face);
         row.appendChild(next);
@@ -511,6 +523,7 @@
           note = base;
           if (who !== 'cleft' && S.hearts === 1) note += ' One heart left, Silvia. One more and the fever wins.';
         }
+        cue(S.lost ? 'dusk' : 'wrong');
         save();
         render(note);
       }
@@ -527,6 +540,9 @@
         S.weights = S.well;
         S.min += 4;
         drinkPulse = 1;
+        // he drinks, and a counterweight goes down (the fourth wakes the stone cylinder instead)
+        if (!cue('water', { dur: 1.3 })) legacy('playCelestialChime');
+        cue(S.well >= WELLS.length ? 'stone' : 'thud', { dur: 1.8 });
         if (G && G.basins[Math.min(S.well - 1, 3)]) G.basins[Math.min(S.well - 1, 3)].userData.water.material.uniforms.uT0.value = performance.now() / 1000;   // the water answers with rings
         if (G && G.fx) { const bw = BASIN_XZ[Math.min(S.well - 1, 3)]; G.fx.triumph({ x: bw[0], y: 0.8, z: bw[1] }, 0.6); }
         let note = 'Yes. That matches the page. I drink, and I set a counterweight.';
@@ -561,6 +577,9 @@
         if (!S || S.lost || S.phase !== 'key') return;
         const clean = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (clean === 'XXX' || clean === '30') {
+          // the visions go out like a lamp, and the real stone shows
+          cue('whoosh', { dur: 1.2 });
+          if (!cue('reveal')) legacy('playCelestialChime');
           S.phase = 'cleft';
           S.hearts = HEARTS;
           S.min += 6;
@@ -581,6 +600,7 @@
         if (!S || S.lost || S.phase !== 'cleft' || askedCrack[kind]) return;
         askedCrack[kind] = CRACKS.map((c) => c.ask[kind]);
         S.min += 3;
+        if (!(kind === 'breath' ? cue('whoosh', { dur: 0.6 }) : kind === 'sand' ? cue('step') : cue('tick', { f: 1200 }))) legacy('playMechanicalClick');
         const lead = {
           edges: 'I crouch and sight along each crack.',
           breath: 'I hold my hand over each opening.',
@@ -604,6 +624,8 @@
           window.addRelicToInventory('falcon_weight');
         }
         S.phase = 'won';
+        cue('water', { dur: 2.6 });
+        if (!cue('win')) legacy('playCelestialChime');
         put(DONE_KEY, 'true');
         if (G && G.fx && G.fx.post) { G.fx.post.flash(0xfff3d6, 0.3, 1.4); G.fx.post.pulse(0.9, 2); }
         if (!get('order_clepsydra_done_at')) put('order_clepsydra_done_at', String(Date.now()));

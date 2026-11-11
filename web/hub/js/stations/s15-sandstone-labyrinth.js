@@ -13,6 +13,10 @@
       const modal = document.getElementById('modal-sandstone-labyrinth');
       if (!modal) return;
       const sfx = window.sfx || null;
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
+      // Footsteps follow each turn, but a held arrow key repeats faster than they should sound
+      let lastStepCue = 0;
+      const stepCue = (kind, o) => { const n = Date.now(); if (n - lastStepCue < 80) return; lastStepCue = n; cue(kind, o); };
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -260,7 +264,15 @@
         Object.values(el.pad).forEach((btn) => { if (btn) btn.disabled = !awake || done; });
         if (el.hint) el.hint.style.display = torchHintOn() && !done ? '' : 'none';
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        setMood();
         sigilHints.refresh(); torchHints.refresh();
+      }
+      // The music fills as Hermes passes the star and the camp on his way to the cleft
+      function setMood() {
+        const amb = window.EclipseAmbience;
+        if (!amb || !amb.intensity) return;
+        const marks = (get(KEYS.star) === 'true' ? 1 : 0) + (get(KEYS.camp) === 'true' ? 1 : 0);
+        amb.intensity(isDone() ? 0.6 : !isAwake() ? 0.3 : 0.38 + 0.08 * marks + (run && run.lives < LIVES ? 0.04 : 0));
       }
 
       // ---- Part I: the sigil from Sheet 14B ----
@@ -271,13 +283,14 @@
         if (typed !== SIGIL) {
           const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
           set(KEYS.fails, String(fails));
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.keyFeedback, 'The copper plate does not move. Walk the one true road of the page “The Sandstone Labyrinth & Cairn III” again.', 'error');
           sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('stone', { dur: 1.6 });
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'WINDROSE. The copper plate turns, and the seal is in Hermes\'s hand.', 'ok');
@@ -292,11 +305,13 @@
         if (dx || dy) {
           const dir = dirOf(dx, dy);
           if (!dir || !canStep(run.x, run.y, dir)) {
+            stepCue('thud');
             feedback(el.moveFeedback, 'Solid rock to the ' + (dir ? dir.name : 'side') + '.', 'error');
             return;
           }
         }
         run.trail.push([run.x, run.y]);
+        stepCue(dx || dy ? 'step' : 'tick', { f: 900, v: 0.05 });
         run.x += dx; run.y += dy;
         run.moves++;
         const here = cellKey(run.x, run.y);
@@ -313,15 +328,17 @@
       function landmarks() {
         if (run.x === LEVEL.star[0] && run.y === LEVEL.star[1] && get(KEYS.star) !== 'true') {
           set(KEYS.star, 'true');
+          cue('shimmer', { deg: 14 });
           say("Silvia... on the wall of this fissure there is a star, painted in gold leaf. Eight points, laid over a ground of blue. The gold is bright: it has not been here long. I know only one hand that gilded stars like this. I cannot stop now.");
         } else if (run.x === LEVEL.camp[0] && run.y === LEVEL.camp[1] && get(KEYS.camp) !== 'true') {
           set(KEYS.camp, 'true');
+          cue('crack', { v: 0.16 });
           say("Their camp. Cold ashes, a broken wagon wheel, and the charred circle of the BC Ashes scratched on the rock. They have been sleeping in this labyrinth for days, waiting for someone to open the cairn for them.");
         }
       }
 
       function caught(how) {
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue(run.lives <= 1 ? 'dusk' : 'heart') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         const captures = (parseInt(get(KEYS.captures) || '0', 10) || 0) + 1;
         set(KEYS.captures, String(captures));
         torchHints.fail();
@@ -352,7 +369,8 @@
 
       function completeStation() {
         set(KEYS.done, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('whoosh', { dur: 1.4 });
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(3);
         else set('order_seal_cairn_3', 'true');
         feedback(el.moveFeedback, 'The Western Cleft. Hermes is out.', 'ok');
@@ -436,6 +454,8 @@
         else if (!isAwake()) say("Silvia, I am inside the labyrinth, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road, the one on the page “The Sandstone Labyrinth & Cairn III” of your journal.");
         else say("The torches are still out there. Watch their rounds, Silvia, and take me to the Western Cleft.");
         render();
+        // The bed starts at its own level when the modal appears; set ours once it has
+        setTimeout(setMood, 700);
         const focusTarget = isDone() ? el.finish : isAwake() ? el.pad.wait : el.keyInput;
         if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
       }

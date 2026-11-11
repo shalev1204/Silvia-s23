@@ -18,6 +18,7 @@
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       const KEYS = {
         awake: 'order_oracle_awake',
         done: 'order_oracle_horizon_completed',
@@ -198,7 +199,10 @@
         const turns = (parseInt(get(KEYS.turns) || '0', 10) || 0) + 1;
         set(KEYS.turns, String(turns));
         if (turns % TURNS_PER_MISS === 0) discHints.fail();
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        // a notch per turn; a ring whose star points true chimes higher the more rings are true
+        const trueRings = rot.filter((r) => r === 0).length;
+        const played = trueRings === 3 ? cue('reveal') : rot[ring] === 0 ? cue('shimmer', { deg: 10 + 2 * trueRings }) : cue('tick', { f: 2600 - 400 * ring });
+        if (!played && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (rot.every((r) => r === 0)) {
           feedback(el.discFeedback, 'The three stars point true. The jewel of the disc wakes.', 'ok');
           say("Silvia... the jewel. Three short flashes, a pause, two long ones: the code I engraved in it, more than fifty years ago. And every sighting is lit. Read it the way I made it to be read: from the north, clockwise, each spoke from the rim to the heart.");
@@ -242,13 +246,14 @@
         if (!asWords && !asDate) {
           set(KEYS.readFails, String((parseInt(get(KEYS.readFails) || '0', 10) || 0) + 1));
           discHints.fail();
+          cue('wrong');
           feedback(el.discFeedback, 'Hermes frowns: that is not what the disc says. Start at the north spoke, read rim, middle, heart, then go clockwise.', 'error');
           render();
           return;
         }
         set(KEYS.when, 'true');
         stopPulse();
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         feedback(el.discFeedback, 'DECEMBER EIGHTEEN TO TWENTY. The first truth: the WHEN.', 'ok');
         say("December, the eighteenth to the twentieth. The hour and the season, Silvia: the first truth, written on a disc I made with my own hands, and I never knew what it would say. She is holding it out to you. And now she is looking at me through her veil, and she is saying words, very softly, as if she were trying to remember a song. Help me, Silvia. I think I know which words they are.");
         render();
@@ -284,7 +289,8 @@
       function sayWord(i) {
         if (!whenRead() || isDone() || said.includes(i) || said.length >= TILES.length) return;
         said.push(i);
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        // each word sung a step higher, like the song she is trying to remember
+        if (!cue('echo', { deg: 5 + said.length, n: 1, v: 0.05 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         render();
         const next = el.tiles && el.tiles.querySelector('button:not([disabled])');
         if (next) next.focus();
@@ -292,6 +298,7 @@
       function unsay() {
         if (isDone() || !said.length) return;
         said.pop();
+        cue('tick', { f: 1600, v: 0.06 });
         render();
       }
       function speakVow() {
@@ -301,6 +308,7 @@
         if (words.join(' ') !== VOW.join(' ')) {
           set(KEYS.vowFails, String((parseInt(get(KEYS.vowFails) || '0', 10) || 0) + 1));
           vowHints.fail();
+          cue('wrong');
           const full = words.join(' ') === 'YOU WERE NEVER ONLY THE SEEKER';
           feedback(el.vowFeedback, full
             ? 'She tilts her head: those words are true, but they are only the first half. They were never the words he said to her.'
@@ -317,7 +325,7 @@
         set(KEYS.done, 'true');
         set(KEYS.when, 'true');
         stopPulse();
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('gilded_star');
         applyVictory();
         render();
@@ -340,13 +348,14 @@
         if (!typed) { feedback(el.keyFeedback, 'Type the eight letters from the page “The Oracle\'s Horizon”.', 'error'); return; }
         if (typed !== SIGIL) {
           set(KEYS.fails, String((parseInt(get(KEYS.fails) || '0', 10) || 0) + 1));
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           feedback(el.keyFeedback, 'The door stays shut. Send the eight beacons across the mirrors on the page “The Oracle\'s Horizon” again.', 'error');
           sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('stone', { dur: 2.6 });   // the sandstone door of the inner chamber
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'OVERTURE. The horizon is sealed, and the door of the inner chamber opens.', 'ok');
@@ -386,6 +395,14 @@
           el.hint.textContent = hint;
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        mood();
+      }
+      // the sanctum music fills as the disc comes true and the vow is found
+      function mood() {
+        const amb = window.EclipseAmbience;
+        if (!amb || !amb.intensity) return;
+        const awake = isAwake(), wRead = whenRead();
+        amb.intensity(isDone() ? 0.6 : wRead ? 0.5 + 0.02 * said.length : awake ? 0.35 + 0.04 * rot.filter((r) => r === 0).length : 0.3);
       }
 
       // ---- Controls ----
@@ -443,6 +460,7 @@
         else if (!whenRead()) say("She is still holding the disc up for us, Silvia, patient as stone. Set the rings by the sky.");
         else say("She is waiting, Silvia, with her lips moving on words she cannot quite find. Give them back to her.");
         render();
+        setTimeout(mood, 700);   // the bed starts on its next poll (600 ms) and resets the intensity to 0.5
         const focusTarget = isDone() ? el.finish : (!isAwake() ? el.keyInput : (!whenRead() ? (discTrue() ? el.whenInput : el.ringBtns[0][1]) : el.tiles && el.tiles.querySelector('button:not([disabled])')));
         if (focusTarget) setTimeout(() => focusTarget.focus(), 60);
       }
@@ -468,7 +486,7 @@
         passageReturnFocus = document.activeElement;
         el.passage.style.display = 'flex';
         set(KEYS.passage, 'true');
-        if (sfx && sfx.playCelestialChime) setTimeout(() => sfx.playCelestialChime(), 1600);
+        setTimeout(() => { if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime(); }, 1600);
         if (el.passageClose) setTimeout(() => el.passageClose.focus(), 80);
       }
       function closeStagePassage() {

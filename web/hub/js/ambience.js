@@ -368,7 +368,71 @@
           [4, 3, 1, 0].forEach(function (d, i) { bell(t + i * 0.22, hz(7 + d), 0.1, 2.0); });
           [0, 2, 4, 7].forEach(function (d) { bell(t + 0.95, hz(7 + d), 0.07, 4.2); });
           swish(t + 0.9, 1.6, 0.06, 900, 4200);
-        }
+        },
+        // a dry crust snapping (salt, old wood, a seal broken); o.v loudness
+        crack: function (t, o) {
+          var v = o.v || 0.3;
+          [0, 0.03, 0.07].forEach(function (d, i) {
+            var n = noiseSource(), hp = ctx.createBiquadFilter(), g = env(t + d, v * (1 - i * 0.3), 0.001, 0.05 + i * 0.03);
+            hp.type = 'highpass'; hp.frequency.value = 1800 - i * 500;
+            n.connect(hp); hp.connect(g); g.connect(fxBus); n.start(t + d); n.stop(t + d + 0.2);
+          });
+          swish(t, 0.25, v * 0.25, 260, 520);
+        },
+        // a crust or a beam taking weight: a low wavering creak
+        groan: function (t, o) {
+          var len = o.dur || 1.4, n = noiseSource(), bp = ctx.createBiquadFilter(), g = env(t, 0.2, len * 0.35, len * 0.65);
+          bp.type = 'bandpass'; bp.Q.value = 9; bp.frequency.setValueAtTime(140, t);
+          bp.frequency.linearRampToValueAtTime(95, t + len * 0.5); bp.frequency.linearRampToValueAtTime(120, t + len);
+          var wob = ctx.createOscillator(), wg = ctx.createGain(); wob.frequency.value = 6; wg.gain.value = 18; wob.connect(wg); wg.connect(bp.frequency);
+          n.connect(bp); bp.connect(g); g.connect(fxBus); n.start(t); n.stop(t + len + 0.1); wob.start(t); wob.stop(t + len + 0.1);
+        },
+        // water poured or running; o.dur seconds
+        water: function (t, o) {
+          var len = o.dur || 1.6;
+          swish(t, len, 0.09, 700, 2600);
+          for (var i = 0; i < Math.round(len * 9); i++) {
+            var d = t + Math.random() * len, f = 500 + Math.random() * 900, b = ctx.createOscillator(), g = env(d, 0.025, 0.002, 0.06);
+            b.frequency.setValueAtTime(f, d); b.frequency.exponentialRampToValueAtTime(f * 1.8, d + 0.05);
+            b.connect(g); g.connect(fxBus); b.start(d); b.stop(d + 0.1);
+          }
+        },
+        // one drop into still water
+        drop: function (t, o) {
+          var f = o.f || 1100, b = ctx.createOscillator(), g = env(t, o.v || 0.07, 0.002, 0.18);
+          b.frequency.setValueAtTime(f * 0.6, t); b.frequency.exponentialRampToValueAtTime(f, t + 0.06);
+          b.connect(g); g.connect(fxBus); b.start(t); b.stop(t + 0.3);
+        },
+        // not that one: two soft low notes a half step apart, never harsh
+        wrong: function (t) {
+          var hz = scaleOf();
+          [0, 0.16].forEach(function (d, i) {
+            var o = ctx.createOscillator(), g = env(t + d, 0.09, 0.01, 0.35); o.type = 'triangle';
+            o.frequency.value = hz(i ? -1 : 0) / 2; o.connect(g); g.connect(fxBus); o.start(t + d); o.stop(t + d + 0.5);
+          });
+        },
+        // a dial or a ring turned one notch: a small wooden tick
+        tick: function (t, o) {
+          var n = noiseSource(), bp = ctx.createBiquadFilter(), g = env(t, o.v || 0.09, 0.001, 0.035);
+          bp.type = 'bandpass'; bp.frequency.value = o.f || 2200; bp.Q.value = 4;
+          n.connect(bp); bp.connect(g); g.connect(fxBus); n.start(t); n.stop(t + 0.08);
+        },
+        // fire catching or flaring
+        flame: function (t, o) {
+          var len = o.dur || 1.2, n = noiseSource(), lp = ctx.createBiquadFilter(), g = env(t, 0.22, len * 0.3, len * 0.7);
+          lp.type = 'lowpass'; lp.frequency.setValueAtTime(300, t); lp.frequency.exponentialRampToValueAtTime(1400, t + len * 0.3); lp.frequency.exponentialRampToValueAtTime(400, t + len);
+          n.connect(lp); lp.connect(g); g.connect(fxBus); n.start(t); n.stop(t + len + 0.1);
+          for (var i = 0; i < 6; i++) { var d = t + Math.random() * len, c = noiseSource(), hp = ctx.createBiquadFilter(), cg = env(d, 0.06, 0.001, 0.03); hp.type = 'highpass'; hp.frequency.value = 2500; c.connect(hp); hp.connect(cg); cg.connect(fxBus); c.start(d); c.stop(d + 0.06); }
+        },
+        // a note sung into the canyon and its echoes coming back; o.deg a degree of the mode, o.n echoes
+        echo: function (t, o) {
+          var hz = scaleOf(), f = o.f || hz(o.deg == null ? 7 : o.deg), n = o.n || 3;
+          for (var i = 0; i <= n; i++) bell(t + i * 0.42, f, (o.v || 0.07) * Math.pow(0.5, i), 1.6);
+        },
+        // a page turned, a scrap of cloth or paper
+        paper: function (t) { swish(t, 0.28, 0.06, 1500, 5200); swish(t + 0.12, 0.2, 0.04, 2400, 6000); },
+        // a lens or a shutter: a soft click and the slide of brass
+        lens: function (t) { SFX.tick(t, { f: 3200, v: 0.08 }); swish(t + 0.03, 0.35, 0.05, 900, 2200); SFX.tick(t + 0.36, { f: 1800, v: 0.06 }); }
       };
       function sfx(kind, o) {
         if (muted || !SFX[kind] || !audio()) return false;
@@ -391,7 +455,8 @@
         if (id === current) return;
         if (bed) { fadeOut(bed); bed = null; }
         current = id;
-        intensity = 0.5;
+        // back to neutral only when the game closes: a game that set its level as it opened keeps it
+        if (!id) intensity = 0.5;
         if (!id || !audio()) return;
         bed = build(BEDS[id]);
         bed.out.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_S);

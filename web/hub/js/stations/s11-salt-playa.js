@@ -28,6 +28,7 @@
       const soundOn = () => !(window.EclipseAmbience && window.EclipseAmbience.state().muted);
       const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const toast = (msg) => { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); };
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       const WALK_KEY = 'order_playa_walk';
       // The opening and the ending that the engine plays itself (EclipsePaint.cinema): seen once, then skipped
       const CINE_INTRO = 'order_playa_cine_intro', CINE_OUTRO = 'order_playa_cine_outro';
@@ -1479,6 +1480,18 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
           ['C5', 'E5', 'G5', 'C6'].forEach((n) => tone(NOTE[n], 0.8, 2.2, { gain: 0.06, type: 'triangle', attack: 0.08 }));
         }
       };
+      // How full the music of the salt is: it grows row by row and plate by plate, holds its breath while he leans or after a false step
+      function moodOf() {
+        if (view.phase === 'setback') return 0.2;
+        if (view.phase === 'test') return 0.28;
+        if (view.phase === 'done') return 0.65;
+        const st = stage();
+        if (st === 'sump') return 0.45 + 0.025 * S.sump.length;
+        if (st === 'console') return 0.45;
+        return st === 'shore' ? 0.65 : 0.3 + 0.025 * row();
+      }
+      let moodAt = 0;
+      function mood() { const a = window.EclipseAmbience; if (a && a.intensity && S) a.intensity(moodOf()); }
 
       // ---- Little moments on the screen: a flash, a red pulse, confetti, the balance gauge, the alert card ----
       const fxEl = {};
@@ -1594,6 +1607,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         paintHearts();
         if (fxEl.heat) fxEl.heat.style.opacity = (heat() * 0.4).toFixed(2);
         paintFacing();
+        mood();
       }
       function paintHearts(breaking) {
         if (!el.hearts) return;
@@ -1696,7 +1710,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         if (view.phase !== 'edge') return;
         const to = S.edge + d;
         if (to < 0 || to >= ROWS) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('step') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         ensureAudio();
         S.edge = to;
         S.min += 1;
@@ -1750,7 +1764,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         if (view.phase !== 'choose' && view.phase !== 'edge') return;
         const r = row();
         if (S.revealed[kOf(r, c)]) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('tick', { f: 1500 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         ensureAudio();
         if (r === 0 && c !== START_COL) { setback('start', 0, c); return; }
         startTest({ r, c });
@@ -1942,6 +1956,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         burn();
         view.shake = 0.6;
         if (soundOn()) sounds.groan();
+        cue('groan', { dur: 1.1 });
         if (view.target.sump) sumpHints.fail(); else hints.fail();
         save();
         paintHud();
@@ -2013,6 +2028,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
           showSink(r, c, !G || reducedMotion());
           burstAt(X(c), SLAB_TOP, Z(r), 0x3a7a88);
           if (soundOn()) sounds.sink();
+          cue('water', { dur: 0.9 });
           title = mirage ? 'It was the mirage' : 'A brine sinkhole';
           why = mirage ? 'The water was the sky, shining on a lid of salt over deep brine.' : 'The crust was only a lid over deep brine. Only your page shows the sinkholes.';
           text = mirage
@@ -2031,6 +2047,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
           text = 'Crack! The slab split under my staff like a sheet of ice, from the middle to the edges. It is not hollow, but it will not carry me: it does not keep the Law of the Basin with the slab I am standing on. One facet more or one less, Silvia, the page says. I jumped back.';
         } else {
           if (soundOn()) sounds.groan();
+          cue('wrong');
           title = 'Not where we begin';
           why = 'The page names the first slab: Row I, Column D, marked 3 and [C].';
           text = `Wait. I counted the slabs from the tripod, and this is the ${ORD[c]} from the west. Your page says exactly where the crossing begins, Silvia, and it is not here. I stepped back onto the edge, and the sun did not wait for me.`;
@@ -2106,6 +2123,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
             const v = inp.value.toUpperCase().replace(/[^A-Z]/g, '').slice(-1);
             inp.value = v;
             box.classList.remove('is-wrong');
+            if (v) cue('tick', { f: 2600, v: 0.05 });
             if (v && inputs[i + 1]) inputs[i + 1].focus();
           });
           inp.addEventListener('keydown', (e) => {
@@ -2139,6 +2157,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
           paintHud();
           if (box) replay(box, 'is-wrong');
           if (soundOn()) sounds.groan();
+          cue('wrong');
           view.shake = 0.5;
           say('The rings turned, but the post stayed silent and the plate on its side did not move. Read the letters of our seven slabs again on your page, Silvia, in order, from Row I to Row VII.');
           return;
@@ -2149,6 +2168,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         view.phase = 'sent';
         clearControls();
         if (soundOn()) KEYWORD.split('').forEach((l, i) => tone(NOTE[['C5', 'D5', 'E5', 'G5', 'A5', 'C6', 'E6'][i]], i * 0.16, 0.7, { gain: 0.07, type: 'triangle' }));
+        setTimeout(() => { if (view.phase === 'sent') cue('lens'); }, 1200);   // the brass plate swings open after the last ring
         view.rings = 0.001;
         replay(fxEl.flash, 'is-on');
         paintHud();
@@ -2169,6 +2189,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         if (el.fade) el.fade.classList.add('is-on');
         clearControls();
         view.phase = 'walk';
+        cue('whoosh', { dur: 1.4 });
         setTimeout(() => {
           placeHermes();
           view.sky = false; view.look = 0;
@@ -2233,7 +2254,8 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         asked.push(kind);
         S.asks = (S.asks || 0) + 1;
         S.min += COST.ask;
-        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        const kneel = { ridge: ['step'], wet: ['drop', { f: 900, v: 0.05 }], crack: ['paper'] }[kind];
+        if (!cue(kneel[0], kneel[1]) && sfx && sfx.playChimeHover) sfx.playChimeHover();
         if (soundOn()) tone(NOTE[['E5', 'G5', 'A5'][SIGNS.indexOf(kind)]], 0, 0.5, { gain: 0.05, type: 'sine' });
         view.kneel = performance.now();
         const open = [1, 0, -1].filter((d) => !S.sRevealed[sKey(k, d)]);
@@ -2246,7 +2268,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         if (view.phase !== 'schoose') return;
         const k = S.sump.length;
         if (S.sRevealed[sKey(k, d)]) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('tick', { f: 1500 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         ensureAudio();
         startTest({ sump: true, k, d });
       }
@@ -2292,6 +2314,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
         if (p) burstAt(p.base.x, SUMP_TOP, p.base.z, kind === 'split' ? 0xffffff : 0x3a7a88);
         view.shake = kind === 'split' ? 0.8 : 1.1;
         if (soundOn()) (kind === 'split' ? sounds.crack : sounds.sink)();
+        if (kind !== 'split') cue('water', { dur: 0.9 });
         const T2 = {
           wet: ['Brine beneath', 'That dark seam was brine drawn up through the fissures: under the crust lies saturated silt.',
             'My staff went in up to the second notch and came out grey and dripping: saturated brine silt, the second layer of the Architect\'s cutaway. That dark seam was the brine climbing up through the cracks to meet the sun. I jumped back.'],
@@ -2481,6 +2504,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
           paintGauge();
           if (view.weight >= 1.05) leanEnd(null, 1.05);
         }
+        if (now - moodAt > 1000) { moodAt = now; mood(); }   // the Ambience resets its level when the window first shows
         const leanTo = view.phase === 'test' ? 0.25 + view.weight * 0.55 : 0;
         view.lean += (leanTo - view.lean) * Math.min(1, dt * 8);
         if (!dragging) view.look *= Math.pow(0.15, dt);
@@ -2754,7 +2778,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
       let returnFocusTo = null;
       function openPlaya() {
         if (!canOpen()) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('whoosh', { dur: 1.4 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');
         const speaker = document.getElementById('ambience-toggle');
@@ -3002,7 +3026,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
       function closePlaya() {
         if (modal.style.display === 'none') return;
         if (cine && cine.active) cine.skip();
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('click') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (view.walk) finishWalk();
         if (view.phase === 'test') { endGauge(); showChoice(); }
         if (howto.box) howto.box.hidden = true;

@@ -17,6 +17,7 @@
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       const KEYS = {
         done: 'order_camera_obscura_completed',
         fails: 'order_camera_obscura_fails',
@@ -137,7 +138,15 @@
         const before = sharp();
         angle = ((deg % 360) + 360) % 360;
         applyAngle();
-        if (sharp() && !before && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (sharp() && !before && !cue('lens') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+      }
+      // Silvia's hand on the ring: a tick for every 15-degree notch it passes (higher as the picture nears upright), at most one every 80 ms
+      let lastNotch = Math.floor(START_DEG / 15), lastTick = 0;
+      function turnTo(deg) {
+        setAngle(deg);
+        const notch = Math.floor(angle / 15), t = performance.now();
+        if (notch !== lastNotch && !sharp() && t - lastTick >= 80) { lastTick = t; cue('tick', { f: 3400 - 8 * deviation(), v: 0.07 }); }
+        lastNotch = notch;
       }
       if (el.ring) {
         let dragging = null;
@@ -151,9 +160,9 @@
           dragging = e.pointerId;
           try { el.ring.setPointerCapture(e.pointerId); } catch (err) {}
           el.ring.focus();
-          setAngle(fromPointer(e));
+          turnTo(fromPointer(e));
         });
-        el.ring.addEventListener('pointermove', (e) => { if (dragging === e.pointerId) setAngle(fromPointer(e)); });
+        el.ring.addEventListener('pointermove', (e) => { if (dragging === e.pointerId) turnTo(fromPointer(e)); });
         const end = (e) => { if (dragging === e.pointerId) dragging = null; };
         el.ring.addEventListener('pointerup', end);
         el.ring.addEventListener('pointercancel', end);
@@ -162,9 +171,9 @@
           if (isDone()) return;
           const step = e.shiftKey ? 1 : 5;
           const moves = { ArrowRight: step, ArrowUp: step, ArrowLeft: -step, ArrowDown: -step, PageUp: 45, PageDown: -45 };
-          if (moves[e.key] !== undefined) { e.preventDefault(); setAngle(angle + moves[e.key]); }
-          else if (e.key === 'Home') { e.preventDefault(); setAngle(0); }
-          else if (e.key === 'End') { e.preventDefault(); setAngle(180); }
+          if (moves[e.key] !== undefined) { e.preventDefault(); turnTo(angle + moves[e.key]); }
+          else if (e.key === 'Home') { e.preventDefault(); turnTo(0); }
+          else if (e.key === 'End') { e.preventDefault(); turnTo(180); }
         });
       }
 
@@ -182,11 +191,14 @@
         const place = placeById[id];
         if (!place) return;
         if (!sharp()) {
+          cue('wrong');
           feedback('The picture is still blurred. Turn the ring until the city stands upright and sharp, then point.', 'error');
           return;
         }
         if (id === CITY.target) { completeStation(); return; }
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        // a change not seen before rings softly, a step higher with each one; anything else is a gentle no
+        const fresh = place.change && place.change !== 'smoke' && found().indexOf(place.change) < 0;
+        if (!(fresh ? cue('bell', { f: 659.25 * Math.pow(2, 2 * found().length / 12), v: 0.07, len: 1.8 }) : cue('wrong')) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (place.change && place.change !== 'smoke') {
           remember(place.change);
           feedback(CHANGES[place.change].text, 'error');
@@ -201,7 +213,8 @@
       function completeStation() {
         remember('smoke');
         set(KEYS.done, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('flame', { dur: 1.4 });   // the raiders' fire, still warm
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         feedback('The chimney of the narrow house was cold on the sheet, and it smokes now. The raiders hide there.', 'ok');
         applyVictory();
         render();
@@ -265,6 +278,9 @@
         if (el.victory) el.victory.style.display = done ? '' : 'none';
         if (el.ring) el.ring.setAttribute('aria-disabled', done ? 'true' : 'false');
         if (done && angle !== 0) setAngle(0);
+        // the dark room has no music, but its bed follows the hunt like the others
+        const amb = window.EclipseAmbience;
+        if (amb && amb.intensity) amb.intensity(done ? 0.6 : 0.3 + 0.07 * list.length);
       }
 
       // ---- Open / close ----
