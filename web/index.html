@@ -70,12 +70,19 @@
   <link rel="stylesheet" href="./hub/css/stations/s14-sun-monolith.css">
   <link rel="stylesheet" href="./hub/css/stations/s14b-sun-monolith-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s15-sandstone-labyrinth.css">
+  <link rel="stylesheet" href="./hub/css/stations/s15b-labyrinth-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s16-cairn-iv.css">
+  <link rel="stylesheet" href="./hub/css/stations/s16b-pillars-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s17-solstice-arch.css">
+  <link rel="stylesheet" href="./hub/css/stations/s17b-solstice-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s18-polybius-stele.css">
+  <link rel="stylesheet" href="./hub/css/stations/s18b-stele-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s19-oracle-horizon.css">
+  <link rel="stylesheet" href="./hub/css/stations/s19b-oracle-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s20-masks-gate.css">
+  <link rel="stylesheet" href="./hub/css/stations/s20b-masks-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s21-camera-obscura.css">
+  <link rel="stylesheet" href="./hub/css/stations/s21b-camera-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s22-whispering-gallery.css">
   <link rel="stylesheet" href="./hub/css/hint-ladder.css">
   <link rel="stylesheet" href="./hub/css/previously.css">
@@ -3511,103 +3518,147 @@
        Part II only exists here: in October the ray misses the altar, and Silvia re-aims the bronze
        mirrors for an autumn dawn as the sun climbs. Part III: that night, a light answers from Tower II.
        =================================================================== -->
-  <div class="monolith-modal-backdrop" id="modal-solstice-arch" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="solstice-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">🌓</span>
+  <div class="chasm-modal-backdrop" id="modal-solstice-arch" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="solstice-modal-title">
+    <div class="chasm-workbench-window chasm3d-window solstice3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🌓</span>
           <div>
-            <h2 class="monolith-title" id="solstice-modal-title">THE ARCH OF THE SOLSTICE &amp; CAIRN V</h2>
-            <div class="monolith-subtitle">Station 17 · The Autumn Dawn · The Night Signal</div>
+            <div class="chasm-header-title" id="solstice-modal-title">The Arch of the Solstice &amp; Cairn V · Station 17</div>
+            <div class="chasm-header-subtitle">The Autumn Dawn · The Night Signal · page “Arch of the Solstice &amp; The Solar Altar”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-solstice" aria-label="Close The Arch of the Solstice">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-solstice" title="Close" aria-label="Close The Arch of the Solstice">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>CAIRN V // THE COURTYARD OF RAYS</strong></div>
-        <div>SIGIL:<strong id="solstice-telem-sigil">[ 8 LETTERS ]</strong></div>
-        <div>DAWN:<strong id="solstice-telem-dawn">[ NIGHT ]</strong></div>
-        <div>SIGNAL:<strong id="solstice-telem-signal">[ DARK ]</strong></div>
-        <div>SEAL:<strong id="solstice-telem-seal">[ SEALED ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card" id="solstice-sigil-card">
-            <div class="monolith-card-title">I · The Sigil of Cairn V</div>
-            <p>Solve the page <strong>“Arch of the Solstice &amp; The Solar Altar”</strong> of your journal: follow the midsummer ray from the arch through the bronze mirrors to the Solar Altar, and read the sun-stones it crosses. Speak the eight-letter sigil to open the altar.</p>
-            <div class="monolith-key-row">
-              <label class="monolith-sr-only" for="solstice-key-input">The eight-letter sigil of Cairn V</label>
-              <input type="text" class="monolith-key-input" id="solstice-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-solstice-speak">✦ Speak the Sigil</button>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="solstice3d-stage">
+          <canvas id="solstice3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/solstice_arch_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="solstice3d-sun" id="solstice3d-sun" aria-hidden="true">
+              <span class="solstice3d-sun-label" id="solstice3d-sun-label">☀ Ray 1 of 4</span>
+              <div class="solstice-clock"><span id="solstice-clock-bar"></span></div>
             </div>
+            <div class="solstice3d-aim" id="solstice3d-aim" aria-hidden="true"></div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="solstice3d-status">The altar sleeps</div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="solstice3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="solstice3d-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="solstice-dispatch-text" role="status" aria-live="polite"></div>
+
+          <div class="laby3d-sigil" id="solstice-sigil-card">
+            <div class="chasm3d-where">I · The sigil of Cairn V: follow the midsummer ray through the bronze mirrors and read the sun-stones it crosses</div>
+            <label class="monolith-sr-only" for="solstice-key-input">The eight-letter sigil of Cairn V</label>
+            <input type="text" class="mon3d-input laby3d-input" id="solstice-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+            <button type="button" class="chasm3d-btn is-way" id="btn-solstice-speak">✦ Speak the Sigil</button>
             <div class="monolith-feedback" id="solstice-key-feedback" role="status" aria-live="polite"></div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="solstice-dawn-game">
-            <div class="monolith-card-title">II · The Autumn Dawn</div>
+          <div class="laby3d-game is-locked" id="solstice-dawn-game">
             <div class="monolith-game-inner">
-              <svg class="solstice-court" id="solstice-court" viewBox="-2 -22 94 116" role="group" aria-label="The Courtyard of Rays seen from above: the arch at the top, the bronze mirrors, the fallen pillars and the Solar Altar. Choose a mirror to turn it."></svg>
-              <div class="solstice-clock" aria-hidden="true"><span id="solstice-clock-bar"></span></div>
-              <div class="pillars-row">
-                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-solstice-dawn">☀ Await the dawn</button>
+              <div class="chasm3d-where">II · The autumn dawn: turn the bronze mirrors so each ray reaches the brass ring of the altar</div>
+              <div class="pillars-row solstice3d-dawn-row">
+                <button type="button" class="chasm3d-btn is-way" id="btn-solstice-dawn">☀ Await the dawn</button>
                 <div class="solstice-locks" aria-label="Locks of the brass ring"><span>Ring</span><b></b><b></b><b></b><b></b></div>
               </div>
               <div class="monolith-feedback" id="solstice-dawn-feedback" role="status" aria-live="polite"></div>
+              <details class="chasm3d-laws solstice3d-court-box">
+                <summary>The courtyard from above</summary>
+                <svg class="solstice-court" id="solstice-court" viewBox="-2 -22 94 116" role="group" aria-label="The Courtyard of Rays seen from above: the arch at the top, the bronze mirrors, the fallen pillars and the Solar Altar. Choose a mirror to turn it."></svg>
+              </details>
             </div>
             <div class="monolith-lock-note">Speak the sigil of Cairn V to open the courtyard.</div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="solstice-night-game">
-            <div class="monolith-card-title">III · The Night Signal</div>
+          <div class="laby3d-game is-locked" id="solstice-night-game">
             <div class="monolith-game-inner">
+              <div class="chasm3d-where">III · The night signal: watch the light on Tower II, then answer it with Hermes's mirror</div>
               <svg class="solstice-night" id="solstice-night" viewBox="0 0 200 90" role="img" aria-label="The night desert. On the horizon, the dark shape of Tower II, and a small light."></svg>
               <div class="pillars-row">
-                <button type="button" class="monolith-btn" id="btn-solstice-watch">👁 Watch the light</button>
+                <button type="button" class="chasm3d-btn" id="btn-solstice-watch">👁 Watch the light</button>
                 <span class="monolith-feedback" id="solstice-round-label" style="margin: 0;"></span>
               </div>
-              <button type="button" class="monolith-btn monolith-btn-primary solstice-flash-btn" id="btn-solstice-flash">🪞 Hold to flash the mirror</button>
+              <button type="button" class="chasm3d-btn is-way solstice-flash-btn" id="btn-solstice-flash">🪞 Hold to flash the mirror</button>
               <div class="pillars-row">
                 <div class="solstice-pulses" id="solstice-pulses" aria-live="polite"></div>
-                <button type="button" class="monolith-btn" id="btn-solstice-clear" aria-label="Clear your flashes">⌫</button>
-                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-solstice-send">✦ Send</button>
+                <button type="button" class="chasm3d-btn" id="btn-solstice-clear" aria-label="Clear your flashes">⌫</button>
+                <button type="button" class="chasm3d-btn is-way" id="btn-solstice-send">✦ Send</button>
               </div>
               <div class="solstice-message" id="solstice-message" role="status" aria-live="polite"></div>
               <div class="monolith-feedback" id="solstice-signal-feedback" role="status" aria-live="polite"></div>
             </div>
             <div class="monolith-lock-note">Light the altar at dawn first.</div>
           </div>
-        </div>
+          <div class="laby-hint" id="solstice-hint" style="display: none;"></div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Courtyard in October</div>
-            <ul class="laby-rules">
-              <li>The founders aimed this courtyard at the midsummer sun. In October the sun rises further south, and its ray slips through the arch at another place.</li>
-              <li>Turn the bronze mirrors (choose one to turn it a quarter) so the ray reaches the brass ring of the altar. Fallen pillars stop the light.</li>
-              <li>As the sun climbs, the ray enters the arch further west, four times. Each time the ring takes the light, one of its four locks closes. If the sun climbs before you are ready, the dawn is spent, and you wait for the next one.</li>
-              <li>At night, answer the light with Hermes's mirror: a quick touch is a short flash, a long press a long one. Repeat what you saw, then send it.</li>
-            </ul>
-            <div class="laby-hint" id="solstice-hint" style="display: none;"></div>
-          </div>
-
-          <div class="monolith-card monolith-victory" id="solstice-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Last Seal</div>
-            <p id="solstice-victory-text"></p>
-            <div>
+          <div class="chasm-victory-card" id="solstice-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>🌓</span><span>The Last Seal</span></div>
+            <div class="chasm-victory-text" id="solstice-victory-text"></div>
+            <div class="laby3d-eqs">
               <span class="monolith-equation">[Y] − [O] = 2</span>
               <span class="monolith-equation">[L] + [G] = 23</span>
             </div>
-            <p style="font-size: 0.78rem; color: #b8a07a;">Spelled out in light from Tower II. Record both in your Cipher Ledger.</p>
-            <p style="font-size: 0.82rem;">🪞 <strong>The Signal Mirror</strong> is in Hermes's satchel.</p>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-solstice-finish">🗺️ Return to the Grand Desert Map ➔</button>
+            <p class="laby3d-eq-note">Spelled out in light from Tower II. Write both in your Cipher Ledger.</p>
+            <p class="laby3d-eq-note">🪞 <strong>The Signal Mirror</strong> is in Hermes's satchel.</p>
+            <button type="button" class="btn-chasm-finish" id="btn-solstice-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
           </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-solstice-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE ARCH OF THE SOLSTICE</div>
-            <div class="monolith-dispatch" id="solstice-dispatch-text" role="status" aria-live="polite"></div>
+          <details class="chasm3d-laws">
+            <summary>The Courtyard in October</summary>
+            <ul class="laby-rules">
+              <li>The founders aimed this courtyard at the midsummer sun. In October the sun rises further south, and its ray slips through the arch at another place.</li>
+              <li>Turn the bronze mirrors (click one to turn it a quarter) so the ray reaches the brass ring of the altar. Fallen pillars stop the light.</li>
+              <li>As the sun climbs, the ray enters the arch further west, four times. Each time the ring takes the light, one of its four locks closes. If the sun climbs before you are ready, the dawn is spent, and you wait for the next one.</li>
+              <li>At night, answer the light with Hermes's mirror: a quick touch is a short flash, a long press a long one. Repeat what you saw, then send it.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
+      <div class="chasm3d-howto" id="solstice3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="solstice3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="solstice3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes has reached the <strong>Arch of the Solstice</strong>: a courtyard paved with bronze mirrors and fallen pillars, and the Solar Altar with its brass ring. Inside it waits the <strong>Seal of Cairn V</strong>, the last of the five.</p>
+            <p>Part I opens the altar with a word from your journal. Part II catches the autumn dawn. Part III answers a light in the night.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>I · The sigil</h3>
+            <p>Open the page <strong>“Arch of the Solstice &amp; The Solar Altar”</strong>. Follow the midsummer ray from the arrow under the arch, mirror by mirror, and read the sun-stones it crosses, in order. Type the eight letters and press <em>✦ Speak the Sigil</em>.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>II · The autumn dawn</h3>
+            <ol class="chasm3d-howto-steps">
+              <li><strong>Click a mirror</strong> to turn it a quarter. You can set them all in the dark before the sun comes up.</li>
+              <li>Press <strong>☀ Await the dawn</strong>. A ray comes under the arch at one of the four bronze notches and bounces from mirror to mirror. Fallen pillars stop it.</li>
+              <li>When the ray reaches the brass ring, a lock closes and the sun climbs: the next ray enters further west. Four rays, four locks, before the bar at the top runs out.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>III · The night signal</h3>
+            <p>A light on Tower II will flash at you through the arch. Press <strong>👁 Watch the light</strong>, then copy it with Hermes's mirror: <strong>hold to flash</strong> (a quick touch is short, a long press is long), check the dots and dashes, and press <strong>✦ Send</strong>.</p>
+            <p>Drag to look around, scroll to come closer. Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-solstice-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-solstice-howto-next">Next →</button>
           </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-solstice-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
@@ -3620,66 +3671,82 @@
        and Silvia reads and answers him by the same Law of the Inverted Mirage.
        Part III: Hermes crosses the burning atrium to the well where the Servant is hiding.
        =================================================================== -->
-  <div class="monolith-modal-backdrop" id="modal-polybius-stele" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="stele-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">🔥</span>
+  <div class="chasm-modal-backdrop" id="modal-polybius-stele" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="stele-modal-title">
+    <div class="chasm-workbench-window chasm3d-window stele3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🔥</span>
           <div>
-            <h2 class="monolith-title" id="stele-modal-title">THE POLYBIUS STELE</h2>
-            <div class="monolith-subtitle">Station 18 · Tower II in Flames · The Knocks in the Stone</div>
+            <div class="chasm-header-title" id="stele-modal-title">The Polybius Stele · Station 18</div>
+            <div class="chasm-header-subtitle">Tower II in Flames · The Knocks in the Stone · page “The Polybius Stele”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-stele" aria-label="Close The Polybius Stele">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-stele" title="Close" aria-label="Close The Polybius Stele">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>TOWER II // THE ATRIUM</strong></div>
-        <div>PROVERB:<strong id="stele-telem-proverb">[ 6 WORDS ]</strong></div>
-        <div>KNOCKS:<strong id="stele-telem-knocks">[ SILENCE ]</strong></div>
-        <div>FIRE:<strong id="stele-telem-fire">[ BURNING ]</strong></div>
-        <div>SERVANT:<strong id="stele-telem-servant">[ MISSING ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card" id="stele-proverb-card">
-            <div class="monolith-card-title">I · The Proverb of the Stele</div>
-            <p>Solve the page <strong>“The Polybius Stele”</strong> of your journal: read the six stanzas through the founders' grid, keeping the Law of the Inverted Mirage. Speak the proverb they make, all six words, at the stele.</p>
-            <div class="monolith-key-row">
-              <label class="monolith-sr-only" for="stele-key-input">The proverb of the stele, six words</label>
-              <input type="text" class="monolith-key-input stele-text-input" id="stele-key-input" maxlength="48" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Six words, as the stele says them">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-stele-speak">✦ Speak the Proverb</button>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="stele3d-stage">
+          <canvas id="stele3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/polybius_stele_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="stele3d-breath" id="stele3d-breath">
+              <span class="stele-breath" id="stele-breath"></span>
+              <div class="stele3d-breath-bar" aria-hidden="true"><span id="stele3d-breath-bar"></span></div>
             </div>
+            <div class="stele3d-map-wrap" id="stele3d-map-wrap">
+              <svg class="stele-atrium" id="stele-atrium" viewBox="-6 -8 102 106" role="img" aria-label="The atrium of Tower II seen from above. The library on the west wall is burning, and the fire spreads across the mats and scrolls. Hermes starts at the side door, at the bottom. The hatch of the well is at the top right."></svg>
+            </div>
+            <div class="stele3d-aim" id="stele3d-aim" aria-hidden="true"></div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="stele-turn-label">The stele sleeps</div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="stele3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="stele3d-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="stele-dispatch-text" role="status" aria-live="polite"></div>
+
+          <div class="laby3d-sigil" id="stele-proverb-card">
+            <div class="chasm3d-where">I · The proverb of the stele: read the six stanzas through the founders' grid, and mind the mirage</div>
+            <label class="monolith-sr-only" for="stele-key-input">The proverb of the stele, six words</label>
+            <input type="text" class="mon3d-input laby3d-input stele-text-input" id="stele-key-input" maxlength="48" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Six words, as the stele says them">
+            <button type="button" class="chasm3d-btn is-way" id="btn-stele-speak">✦ Speak the Proverb</button>
             <div class="monolith-feedback" id="stele-key-feedback" role="status" aria-live="polite"></div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="stele-knock-game">
-            <div class="monolith-card-title">II · The Knocks in the Stone</div>
+          <div class="laby3d-game is-locked" id="stele-knock-game">
             <div class="monolith-game-inner">
-              <svg class="stele-floor" id="stele-floor" viewBox="0 0 200 80" role="img" aria-label="The floor of the atrium around the stele. Someone is knocking under the stones."></svg>
+              <div class="chasm3d-where">II · The knocks in the stone: read the Servant's knocks, and answer him in the same grid</div>
               <p class="stele-stanza" id="stele-stanza-label"></p>
               <div class="stele-tape" id="stele-tape" data-empty="Listen: Hermes chalks every knock on the floor." aria-live="polite"></div>
               <div class="pillars-row">
-                <button type="button" class="monolith-btn" id="btn-stele-listen">👂 Listen to the knocks</button>
-                <button type="button" class="monolith-btn" id="btn-stele-sound" aria-pressed="true">🔊 Sound</button>
+                <button type="button" class="chasm3d-btn" id="btn-stele-listen">👂 Listen to the knocks</button>
+                <button type="button" class="chasm3d-btn" id="btn-stele-sound" aria-pressed="true">🔊 Sound</button>
               </div>
               <div id="stele-read-panel">
                 <div class="stele-answer-row">
                   <label class="monolith-sr-only" for="stele-word-input">The word the Servant knocked</label>
-                  <input type="text" class="monolith-key-input stele-text-input" id="stele-word-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="What does he say?">
-                  <button type="button" class="monolith-btn monolith-btn-primary" id="btn-stele-read">✦ Understood</button>
+                  <input type="text" class="mon3d-input stele-text-input" id="stele-word-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="What does he say?">
+                  <button type="button" class="chasm3d-btn is-way" id="btn-stele-read">✦ Understood</button>
                 </div>
               </div>
               <div id="stele-reply-panel" style="display: none;">
                 <div class="stele-tape" id="stele-reply-tape" data-empty="Your knocks will appear here." aria-live="polite"></div>
                 <div class="stele-knock-row">
-                  <button type="button" class="monolith-btn monolith-btn-primary stele-knock-btn" id="btn-stele-knock">🪨 Knock</button>
-                  <button type="button" class="monolith-btn stele-knock-btn" id="btn-stele-pause">⏸ Pause</button>
+                  <button type="button" class="chasm3d-btn is-way stele-knock-btn" id="btn-stele-knock">🪨 Knock</button>
+                  <button type="button" class="chasm3d-btn stele-knock-btn" id="btn-stele-pause">⏸ Pause</button>
                 </div>
                 <div class="stele-knock-row">
-                  <button type="button" class="monolith-btn" id="btn-stele-clear" aria-label="Clear your knocks">⌫ Start again</button>
-                  <button type="button" class="monolith-btn monolith-btn-primary" id="btn-stele-send">✦ Knock it to him</button>
+                  <button type="button" class="chasm3d-btn" id="btn-stele-clear" aria-label="Clear your knocks">⌫ Start again</button>
+                  <button type="button" class="chasm3d-btn is-way" id="btn-stele-send">✦ Knock it to him</button>
                 </div>
               </div>
               <div class="monolith-feedback" id="stele-knock-feedback" role="status" aria-live="polite"></div>
@@ -3687,56 +3754,79 @@
             <div class="monolith-lock-note">Speak the proverb of the stele first.</div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="stele-fire-game">
-            <div class="monolith-card-title">III · The Burning Atrium</div>
+          <div class="laby3d-game is-locked" id="stele-fire-game">
             <div class="monolith-game-inner">
-              <svg class="stele-atrium" id="stele-atrium" viewBox="-6 -8 102 106" role="img" aria-label="The atrium of Tower II seen from above. The library on the west wall is burning, and the fire spreads across the mats and scrolls. Hermes starts at the side door, at the bottom. The hatch of the well is at the top right."></svg>
-              <div class="laby-status-row">
-                <span class="stele-breath" id="stele-breath"></span>
-                <span class="laby-turn" id="stele-turn-label">Turn 0</span>
-              </div>
+              <div class="chasm3d-where">III · The burning atrium: guide Hermes to the hatch of the well, in the far corner</div>
               <div class="laby-pad" role="group" aria-label="Move Hermes">
-                <button type="button" class="monolith-btn laby-up" id="btn-stele-up" aria-label="Move north">▲</button>
-                <button type="button" class="monolith-btn laby-left" id="btn-stele-left" aria-label="Move west">◀</button>
-                <button type="button" class="monolith-btn laby-wait" id="btn-stele-wait" aria-label="Hold still for one turn">HOLD</button>
-                <button type="button" class="monolith-btn laby-right" id="btn-stele-right" aria-label="Move east">▶</button>
-                <button type="button" class="monolith-btn laby-down" id="btn-stele-down" aria-label="Move south">▼</button>
+                <button type="button" class="chasm3d-btn laby-up" id="btn-stele-up" aria-label="Move north">▲</button>
+                <button type="button" class="chasm3d-btn laby-left" id="btn-stele-left" aria-label="Move west">◀</button>
+                <button type="button" class="chasm3d-btn laby-wait" id="btn-stele-wait" aria-label="Hold still for one turn">HOLD</button>
+                <button type="button" class="chasm3d-btn laby-right" id="btn-stele-right" aria-label="Move east">▶</button>
+                <button type="button" class="chasm3d-btn laby-down" id="btn-stele-down" aria-label="Move south">▼</button>
               </div>
               <div class="monolith-feedback" id="stele-move-feedback" role="status" aria-live="polite"></div>
             </div>
             <div class="monolith-lock-note">Understand the Servant's four stanzas first.</div>
           </div>
-        </div>
+          <div class="laby-hint" id="stele-hint" style="display: none;"></div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Law of the Stele</div>
+          <div class="chasm-victory-card" id="stele-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>🗝️</span><span>The Servant Lives</span></div>
+            <div class="chasm-victory-text" id="stele-victory-text"></div>
+            <div class="laby3d-eqs">
+              <span class="monolith-equation">[H] − [U] = 16</span>
+              <span class="monolith-equation">[M] + [T] = 25</span>
+            </div>
+            <p class="laby3d-eq-note">Cut by the founders under the hatch of the well. Write both in your Cipher Ledger.</p>
+            <p class="laby3d-eq-note">🗝️ <strong>The Servant's Key</strong> is in Hermes's satchel. On the back of the stele: <strong>348° NNW</strong>.</p>
+            <button type="button" class="btn-chasm-finish" id="btn-stele-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+          </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-stele-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
+
+          <details class="chasm3d-laws">
+            <summary>The Law of the Stele</summary>
             <ul class="laby-rules">
               <li>The Servant knocks in the grid of the stele: a group of knocks for the row, a pause, a group for the column. A longer pause ends each letter.</li>
               <li>He knocks by the Law of the Inverted Mirage. Count the messages as the stanzas of the page “The Polybius Stele”, his and yours together: in the even stanzas the mirage swaps the two groups.</li>
               <li>To answer, knock a group, press Pause, knock the next group, and so on. Then knock it to him.</li>
               <li>In the atrium the fire spreads one flagstone a turn across the mats, scrolls and fallen beams. Bare stone never burns. A burning flagstone turns to ash after three turns, and ash cannot burn again.</li>
-              <li>Every time Hermes takes a step or holds still, the fire takes a turn too. Glowing flagstones catch fire on the next turn. Arrows, WASD or tapping a flagstone next to Hermes move him; the space bar holds still.</li>
+              <li>Every time Hermes takes a step or holds still, the fire takes a turn too. Glowing flagstones catch fire on the next turn. Click a flagstone next to Hermes (or his own, to hold still), or use the arrows, the arrow keys or W A S D; the space bar holds still.</li>
             </ul>
-            <div class="laby-hint" id="stele-hint" style="display: none;"></div>
-          </div>
+          </details>
+        </div>
+      </div>
 
-          <div class="monolith-card monolith-victory" id="stele-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Servant Lives</div>
-            <p id="stele-victory-text"></p>
-            <div>
-              <span class="monolith-equation">[H] − [U] = 16</span>
-              <span class="monolith-equation">[M] + [T] = 25</span>
-            </div>
-            <p style="font-size: 0.78rem; color: #b8a07a;">Cut by the founders under the hatch of the well. Record both in your Cipher Ledger.</p>
-            <p style="font-size: 0.82rem;">🗝️ <strong>The Servant's Key</strong> is in Hermes's satchel. On the back of the stele: <strong>348° NNW</strong>.</p>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-stele-finish">🗺️ Return to the Grand Desert Map ➔</button>
+      <div class="chasm3d-howto" id="stele3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="stele3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="stele3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Tower II is burning. Hermes slipped in by a side door, into the atrium where the <strong>stele of the founders</strong> stands. The Servant of the Oracle is nowhere to be seen.</p>
+            <p>Part I turns the stele with a proverb from your journal. Part II talks with someone knocking under the floor. Part III takes Hermes across the fire.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>I · The proverb</h3>
+            <p>Open the page <strong>“The Polybius Stele”</strong>. Read its six stanzas through the founders' grid: each pair of numbers is one square, one letter. Mind the mirage, which swaps some pairs. Type the six words and press <em>✦ Speak the Proverb</em>.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>II · The knocks in the stone</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Someone knocks under the floor, in the same grid: a <strong>group of knocks for the row</strong>, a pause, a group for the column. Hermes chalks every knock on the floor.</li>
+              <li>Type the word he knocked and press <strong>✦ Understood</strong>. Press <strong>👂 Listen</strong> to hear him again.</li>
+              <li>When the stanza is yours, knock your answer with <strong>🪨 Knock</strong> and <strong>⏸ Pause</strong>, then <strong>✦ Knock it to him</strong>. Count the stanzas: the even ones swap the groups.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>III · The burning atrium</h3>
+            <p>Every step Hermes takes, or every turn he holds still, the fire takes a turn too. <strong>Glowing</strong> flagstones catch next turn, <strong>bare stone</strong> never burns, and <strong>ash</strong> cannot burn again. The rings around Hermes show where he can go: gold is safe, amber is about to catch, red is burning.</p>
+            <p>Reach the hatch of the well, in the far corner, before the Servant runs out of breath. Drag to look around, scroll to come closer. Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-stele-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-stele-howto-next">Next →</button>
           </div>
-
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // TOWER II</div>
-            <div class="monolith-dispatch" id="stele-dispatch-text" role="status" aria-live="polite"></div>
-          </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-stele-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
@@ -3749,60 +3839,70 @@
        the sky over the Sanctuary and reads the WHEN from its spokes.
        Part III: the Oracle half-remembers some words; Silvia puts the vow back together, and Hermes says it.
        =================================================================== -->
-  <div class="monolith-modal-backdrop" id="modal-oracle-horizon" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="oracle-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">🏛️</span>
+  <div class="chasm-modal-backdrop" id="modal-oracle-horizon" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="oracle-modal-title">
+    <div class="chasm-workbench-window chasm3d-window oracle3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🏛️</span>
           <div>
-            <h2 class="monolith-title" id="oracle-modal-title">THE ORACLE'S HORIZON</h2>
-            <div class="monolith-subtitle">Station 19 · Tower II · The Disc of 24 Sightings · The Vow</div>
+            <div class="chasm-header-title" id="oracle-modal-title">The Oracle's Horizon · Station 19</div>
+            <div class="chasm-header-subtitle">Tower II · The Disc of 24 Sightings · The Vow · page “The Oracle's Horizon”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-oracle" aria-label="Close The Oracle's Horizon">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-oracle" title="Close" aria-label="Close The Oracle's Horizon">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>TOWER II // THE INNER CHAMBER</strong></div>
-        <div>SIGIL:<strong id="oracle-telem-sigil">[ 8 LETTERS ]</strong></div>
-        <div>DISC:<strong id="oracle-telem-disc">[ DARK ]</strong></div>
-        <div>WHEN:<strong id="oracle-telem-when">[ SEALED ]</strong></div>
-        <div>THE ORACLE:<strong id="oracle-telem-oracle">[ VEILED ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card" id="oracle-sigil-card">
-            <div class="monolith-card-title">I · The Sigil of the Oracle</div>
-            <p>Solve the page <strong>“The Oracle's Horizon”</strong> of your journal: send the eight beacons east across the three mirrors of the horizon, and read the letters where they land, in order. Speak the eight-letter sigil at the door of the inner chamber.</p>
-            <div class="monolith-key-row">
-              <label class="monolith-sr-only" for="oracle-key-input">The eight-letter sigil of the Oracle</label>
-              <input type="text" class="monolith-key-input" id="oracle-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-speak">✦ Speak the Sigil</button>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="oracle3d-stage">
+          <canvas id="oracle3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/oracle_horizon_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="oracle3d-sky-wrap" id="oracle3d-sky-wrap">
+              <svg class="oracle-sky" id="oracle-sky" viewBox="-60 -60 120 120" role="img" aria-label="The sky over Tower II before dawn, drawn like a compass with north at the top: Aldebaran to the west, Capella to the north-west and Polaris to the north."></svg>
+              <p class="oracle-sky-cap">The sky before dawn, as Hermes drew it on the sand</p>
             </div>
+            <div class="oracle3d-disc-wrap" id="oracle3d-disc-wrap">
+              <svg class="oracle-disc" id="oracle-disc" viewBox="-60 -60 120 120" role="img" aria-label="The brass disc of 24 sightings: three rings of eight letters around a central jewel, each ring with one star engraved on it. North is at the top."></svg>
+            </div>
+            <div class="oracle3d-aim" id="oracle3d-aim" aria-hidden="true"></div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="oracle3d-status">The door is shut</div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="oracle3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="oracle3d-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="oracle-dispatch-text" role="status" aria-live="polite"></div>
+
+          <div class="laby3d-sigil" id="oracle-sigil-card">
+            <div class="chasm3d-where">I · The sigil of the Oracle: send the eight beacons across the three mirrors of the page “The Oracle's Horizon”</div>
+            <label class="monolith-sr-only" for="oracle-key-input">The eight-letter sigil of the Oracle</label>
+            <input type="text" class="mon3d-input laby3d-input" id="oracle-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+            <button type="button" class="chasm3d-btn is-way" id="btn-oracle-speak">✦ Speak the Sigil</button>
             <div class="monolith-feedback" id="oracle-key-feedback" role="status" aria-live="polite"></div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="oracle-disc-game">
-            <div class="monolith-card-title">II · The Disc of 24 Sightings</div>
+          <div class="laby3d-game is-locked" id="oracle-disc-game">
             <div class="monolith-game-inner">
-              <div class="oracle-disc-row">
-                <svg class="oracle-disc" id="oracle-disc" viewBox="-60 -60 120 120" role="img" aria-label="The brass disc of 24 sightings: three rings of eight letters around a central jewel, each ring with one star engraved on it. North is at the top."></svg>
-                <div>
-                  <svg class="oracle-sky" id="oracle-sky" viewBox="-60 -60 120 120" role="img" aria-label="The sky over Tower II before dawn, drawn like a compass with north at the top: Aldebaran to the west, Capella to the north-west and Polaris to the north."></svg>
-                  <p class="oracle-sky-cap">The sky over Tower II before dawn, as Hermes drew it on the sand</p>
-                </div>
-              </div>
+              <div class="chasm3d-where">II · The disc of 24 sightings: turn each ring until its star points where that star stands in the sky</div>
               <div class="oracle-ring-ctrls" role="group" aria-label="Turn the rings of the disc">
-                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r0-l" aria-label="Turn the outer ring counter-clockwise">⟲</button><span id="oracle-r0-label">Outer ring · Aldebaran</span><button type="button" class="monolith-btn" id="btn-oracle-r0-r" aria-label="Turn the outer ring clockwise">⟳</button></div>
-                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r1-l" aria-label="Turn the middle ring counter-clockwise">⟲</button><span id="oracle-r1-label">Middle ring · Capella</span><button type="button" class="monolith-btn" id="btn-oracle-r1-r" aria-label="Turn the middle ring clockwise">⟳</button></div>
-                <div class="oracle-ring-ctrl"><button type="button" class="monolith-btn" id="btn-oracle-r2-l" aria-label="Turn the inner ring counter-clockwise">⟲</button><span id="oracle-r2-label">Inner ring · Polaris</span><button type="button" class="monolith-btn" id="btn-oracle-r2-r" aria-label="Turn the inner ring clockwise">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="chasm3d-btn" id="btn-oracle-r0-l" aria-label="Turn the outer ring counter-clockwise">⟲</button><span id="oracle-r0-label">Outer ring · Aldebaran</span><button type="button" class="chasm3d-btn" id="btn-oracle-r0-r" aria-label="Turn the outer ring clockwise">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="chasm3d-btn" id="btn-oracle-r1-l" aria-label="Turn the middle ring counter-clockwise">⟲</button><span id="oracle-r1-label">Middle ring · Capella</span><button type="button" class="chasm3d-btn" id="btn-oracle-r1-r" aria-label="Turn the middle ring clockwise">⟳</button></div>
+                <div class="oracle-ring-ctrl"><button type="button" class="chasm3d-btn" id="btn-oracle-r2-l" aria-label="Turn the inner ring counter-clockwise">⟲</button><span id="oracle-r2-label">Inner ring · Polaris</span><button type="button" class="chasm3d-btn" id="btn-oracle-r2-r" aria-label="Turn the inner ring clockwise">⟳</button></div>
               </div>
               <div id="oracle-read-panel" style="display: none;">
-                <div class="monolith-key-row" style="margin-top: 10px;">
+                <div class="stele-answer-row oracle-read-row">
                   <label class="monolith-sr-only" for="oracle-when-input">What the disc says</label>
-                  <input type="text" class="monolith-key-input oracle-text-input" id="oracle-when-input" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Read the 24 sightings">
-                  <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-read">✦ Read it aloud</button>
+                  <input type="text" class="mon3d-input oracle-text-input" id="oracle-when-input" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Read the 24 sightings">
+                  <button type="button" class="chasm3d-btn is-way" id="btn-oracle-read">✦ Read it aloud</button>
                 </div>
               </div>
               <div class="oracle-when" id="oracle-when" style="display: none;">The First Truth · the WHEN<strong>18 – 20 December</strong></div>
@@ -3811,126 +3911,153 @@
             <div class="monolith-lock-note">Speak the sigil of the Oracle first.</div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="oracle-vow-game">
-            <div class="monolith-card-title">III · The Vow</div>
+          <div class="laby3d-game is-locked" id="oracle-vow-game">
             <div class="monolith-game-inner">
-              <p style="margin: 0; font-size: 0.84rem;">She remembers some words, and not their order. Choose the words Hermes should say to her, in the right order.</p>
+              <div class="chasm3d-where">III · The vow: she remembers some words, and not their order</div>
               <div class="oracle-said" id="oracle-said" data-empty="Hermes's words will appear here." aria-live="polite"></div>
               <div class="oracle-tiles" id="oracle-tiles" role="group" aria-label="The words she remembers"></div>
               <div class="pillars-row">
-                <button type="button" class="monolith-btn" id="btn-oracle-unsay" aria-label="Take back the last word">⌫ Take back</button>
-                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-vow">✦ Let Hermes say it</button>
+                <button type="button" class="chasm3d-btn" id="btn-oracle-unsay" aria-label="Take back the last word">⌫ Take back</button>
+                <button type="button" class="chasm3d-btn is-way" id="btn-oracle-vow">✦ Let Hermes say it</button>
               </div>
               <div class="monolith-feedback" id="oracle-vow-feedback" role="status" aria-live="polite"></div>
             </div>
             <div class="monolith-lock-note">Read the WHEN on the disc first.</div>
           </div>
-        </div>
+          <div class="laby-hint" id="oracle-hint" style="display: none;"></div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Disc of Aurelia</div>
-            <ul class="laby-rules">
-              <li>The disc has three rings of eight sightings, one letter each, around a jewel. Each ring carries one star, engraved beside one of its letters.</li>
-              <li>Turn each ring until its star points where that star stands in the sky over Tower II. North is at the top of the disc, as on the sky Hermes drew.</li>
-              <li>When all three point true, the disc answers. Hermes engraved it to be read from the north, clockwise: each spoke from the rim to the heart, three letters a spoke.</li>
-              <li>Then, the vow: choose the words she half remembers, in the right order, and let Hermes say them.</li>
-            </ul>
-            <div class="laby-hint" id="oracle-hint" style="display: none;"></div>
-          </div>
-
-          <div class="monolith-card monolith-victory" id="oracle-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Oracle Remembers</div>
-            <p id="oracle-victory-text"></p>
+          <div class="chasm-victory-card" id="oracle-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>⭐</span><span>The Oracle Remembers</span></div>
+            <div class="chasm-victory-text" id="oracle-victory-text"></div>
             <div class="oracle-when">The First Truth · the WHEN<strong>18 – 20 December</strong></div>
-            <div style="margin-top: 10px;">
+            <div class="laby3d-eqs">
               <span class="monolith-equation">[Z] + [D] = 23</span>
               <span class="monolith-equation">[I] + [E] = 12</span>
             </div>
-            <p style="font-size: 0.78rem; color: #b8a07a;">Scratched on the back of the disc, in a hand Hermes knows. Record both in your Cipher Ledger.</p>
-            <p style="font-size: 0.82rem;">⭐ <strong>The Gilded Star</strong> is in your satchel: she painted it for you.</p>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-oracle-finish">✦ From the Desert to the Stage ➔</button>
+            <p class="laby3d-eq-note">Scratched on the back of the disc, in a hand Hermes knows. Write both in your Cipher Ledger.</p>
+            <p class="laby3d-eq-note">⭐ <strong>The Gilded Star</strong> is in your satchel: she painted it for you.</p>
+            <button type="button" class="btn-chasm-finish" id="btn-oracle-finish"><span>✦ From the Desert to the Stage ➔</span></button>
           </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-oracle-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE INNER CHAMBER</div>
-            <div class="monolith-dispatch" id="oracle-dispatch-text" role="status" aria-live="polite"></div>
+          <details class="chasm3d-laws">
+            <summary>The Disc of Aurelia</summary>
+            <ul class="laby-rules">
+              <li>The disc has three rings of eight sightings, one letter each, around a jewel. Each ring carries one gold star, engraved beside one of its letters.</li>
+              <li>Turn each ring until its star points where that star stands in the sky over Tower II. North is at the top of the disc, as on the sky Hermes drew.</li>
+              <li>Click a ring on the disc to turn it clockwise; right-click, or hold Shift, to turn it the other way. The buttons do the same.</li>
+              <li>When all three point true, the disc answers. Hermes engraved it to be read from the north, clockwise: each spoke from the rim to the heart, three letters a spoke.</li>
+              <li>Then, the vow: choose the words she half remembers, in the right order, and let Hermes say them.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
+      <div class="chasm3d-howto" id="oracle3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="oracle3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="oracle3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes is at the bottom of the inner stair of Tower II, with the Servant's key. Behind a carved door, someone is humming: <strong>the Oracle</strong>, who receives no one.</p>
+            <p>Part I opens the door with a sigil from your journal. Part II reads a brass disc she holds up. Part III gives her back some words she has lost.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>I · The sigil</h3>
+            <p>Open the page <strong>“The Oracle's Horizon”</strong>. Send each of the eight beacons east across the three mirrors, and read the letter in the square where it lands. Type the eight letters and press <em>✦ Speak the Sigil</em>.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>II · The disc of 24 sightings</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Each ring of the disc carries one <strong>gold star</strong>. The card in the corner shows where those three stars stand in the sky, north at the top.</li>
+              <li><strong>Click a ring</strong> to turn it clockwise, right-click (or Shift) to turn it back, or use the buttons. Make every star point where it stands in the sky.</li>
+              <li>When all three are true, the jewel wakes. Read from the north, clockwise, each spoke from the rim to the heart, and type what it says.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>III · The vow</h3>
+            <p>She remembers some words, and not their order. Press the words in the order Hermes should say them, then <strong>✦ Let Hermes say it</strong>. <em>⌫ Take back</em> removes the last word.</p>
+            <p>Drag on the scene to look around, scroll to come closer. Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-oracle-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-oracle-howto-next">Next →</button>
           </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-oracle-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Station 20 · The Gate of a Thousand Masks (Tower III, Stage Path) -->
-  <div class="monolith-modal-backdrop is-stage-room" id="modal-masks-gate" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="masks-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">🎭</span>
+  <div class="chasm-modal-backdrop" id="modal-masks-gate" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="masks-modal-title">
+    <div class="chasm-workbench-window chasm3d-window masks3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🎭</span>
           <div>
-            <h2 class="monolith-title" id="masks-modal-title">THE GATE OF A THOUSAND MASKS</h2>
-            <div class="monolith-subtitle">Station 20 · Tower III · The Word of the Gate · The Missing Halves</div>
+            <div class="chasm-header-title" id="masks-modal-title">The Gate of a Thousand Masks · Station 20</div>
+            <div class="chasm-header-subtitle">Tower III · The Word of the Gate · The Missing Halves · page “The Gate of a Thousand Masks”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-masks" aria-label="Close The Gate of a Thousand Masks">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-masks" title="Close" aria-label="Close The Gate of a Thousand Masks">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>TOWER III // THE GATE</strong></div>
-        <div>WORD:<strong id="masks-telem-word">[ 6 LETTERS ]</strong></div>
-        <div>MASKS:<strong id="masks-telem-masks">[ 0 / 3 ]</strong></div>
-        <div>FRAGMENT I:<strong id="masks-telem-fragment">[ MISSING ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card" id="masks-word-card">
-            <div class="monolith-card-title">I · The Word of the Gate</div>
-            <p>Solve the page <strong>“The Gate of a Thousand Masks”</strong> of your journal: find the six masks that lie, whose two halves are not equal, and read the letters on their foreheads from left to right, row by row. Speak the word at the gate.</p>
-            <div class="monolith-key-row">
-              <label class="monolith-sr-only" for="masks-key-input">The six-letter word of the gate</label>
-              <input type="text" class="monolith-key-input" id="masks-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · ·">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-masks-speak">✦ Speak the Word</button>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="masks3d-stage">
+          <canvas id="masks3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/masks_gate_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="masks3d-glass" id="masks3d-glass" hidden>
+              <canvas class="masks-canvas" id="masks-canvas" width="300" height="380" tabindex="0" role="application" aria-label="A mask carved only on its left half, beside a mirror. Draw its right half."></canvas>
+              <p class="masks3d-glass-cap">Draw the missing half on the glass, right of the dotted line</p>
             </div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="masks3d-status">The gate is shut</div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="masks3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="masks3d-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="masks-dispatch-text" role="status" aria-live="polite"></div>
+
+          <div class="laby3d-sigil" id="masks-word-card">
+            <div class="chasm3d-where">I · The word of the gate: find the six masks that lie on the page “The Gate of a Thousand Masks”, and read their foreheads</div>
+            <label class="monolith-sr-only" for="masks-key-input">The six-letter word of the gate</label>
+            <input type="text" class="mon3d-input laby3d-input" id="masks-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · ·">
+            <button type="button" class="chasm3d-btn is-way" id="btn-masks-speak">✦ Speak the Word</button>
             <div class="monolith-feedback" id="masks-key-feedback" role="status" aria-live="polite"></div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="masks-draw-game">
-            <div class="monolith-card-title">II · The Missing Halves · <span id="masks-draw-count">Mask 1 of 3</span></div>
+          <div class="laby3d-game is-locked" id="masks-draw-game">
             <div class="monolith-game-inner">
-              <p class="masks-draw-lead" id="masks-draw-lead">Behind the gate hang masks carved only on one side. Draw the other half, the way a mirror would show it, with your finger, the mouse or the arrow keys (Space puts the pen down and lifts it).</p>
-              <div class="masks-stage">
-                <canvas class="masks-canvas" id="masks-canvas" width="300" height="380" tabindex="0" role="application" aria-label="A mask carved only on its left half, beside a mirror. Draw its right half."></canvas>
-              </div>
+              <div class="chasm3d-where">II · The missing halves · <span id="masks-draw-count">Mask 1 of 3</span></div>
+              <p class="masks-draw-lead" id="masks-draw-lead">Each mask is carved on one side only. Draw the other half on the glass, the way a mirror would show it: with your finger, the mouse, or the arrow keys (Space puts the pen down and lifts it).</p>
               <div class="pillars-row">
-                <button type="button" class="monolith-btn" id="btn-masks-undo" aria-label="Rub out the last line">⌫ Rub out</button>
-                <button type="button" class="monolith-btn" id="btn-masks-clear" aria-label="Rub out the whole half">✕ Start again</button>
-                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-masks-hold">✦ Hold it to the mirror</button>
+                <button type="button" class="chasm3d-btn" id="btn-masks-undo" aria-label="Rub out the last line">⌫ Rub out</button>
+                <button type="button" class="chasm3d-btn" id="btn-masks-clear" aria-label="Rub out the whole half">✕ Start again</button>
               </div>
+              <button type="button" class="chasm3d-btn is-way" id="btn-masks-hold">✦ Hold it to the mirror</button>
               <div class="pillars-row" id="masks-help-row" style="display: none;">
-                <button type="button" class="monolith-btn" id="btn-masks-finish" aria-label="Let the Mirror Speaker carve this half for you">✦ Let the Mirror Speaker carve it</button>
+                <button type="button" class="chasm3d-btn" id="btn-masks-finish" aria-label="Let the Mirror Speaker carve this half for you">✦ Let the Mirror Speaker carve it</button>
               </div>
               <div class="monolith-feedback" id="masks-draw-feedback" role="status" aria-live="polite"></div>
             </div>
             <div class="monolith-lock-note">Speak the word of the gate first.</div>
           </div>
-        </div>
+          <div class="laby-hint" id="masks-hint" style="display: none;"></div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The House of the Mirror</div>
-            <ul class="laby-rules">
-              <li>A true face is the same on both sides. On the page “The Gate of a Thousand Masks”, six of the twelve masks lie: one of their halves is different.</li>
-              <li>Their forehead letters, read in order, make the word that opens the gate.</li>
-              <li>Inside, three masks wait with one half missing. Draw the missing half on the mirror side, as if the carved half were reflected in the glass.</li>
-              <li>The mirror forgives a shaking hand, but not a missing eye.</li>
-            </ul>
-            <div class="laby-hint" id="masks-hint" style="display: none;"></div>
-          </div>
-
-          <div class="monolith-card monolith-victory" id="masks-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Gate Is Open</div>
-            <p id="masks-victory-text"></p>
+          <div class="chasm-victory-card" id="masks-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>🪞</span><span>The Gate Is Open</span></div>
+            <div class="chasm-victory-text" id="masks-victory-text"></div>
             <div class="masks-fragment-row">
               <svg class="masks-fragment" id="masks-fragment-svg" viewBox="0 0 100 100" role="img" aria-label="Fragment I of the mirror of Tower III, with a small moon in it."></svg>
               <div>
@@ -3939,82 +4066,120 @@
               </div>
             </div>
             <p class="masks-speaker-line" id="masks-speaker-line">"You saw what was not equal. Come in, and be patient with this house."<span class="masks-speaker-sign" aria-label="signed with a horizontal line"></span></p>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-masks-finish-station">✦ Set Fragment I in the Mirror ➔</button>
+            <button type="button" class="btn-chasm-finish" id="btn-masks-finish-station"><span>✦ Set Fragment I in the Mirror ➔</span></button>
           </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-masks-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE GATE OF TOWER III</div>
-            <div class="monolith-dispatch" id="masks-dispatch-text" role="status" aria-live="polite"></div>
+          <details class="chasm3d-laws">
+            <summary>The House of the Mirror</summary>
+            <ul class="laby-rules">
+              <li>A true face is the same on both sides. On the page “The Gate of a Thousand Masks”, six of the twelve masks lie: one of their halves is different.</li>
+              <li>Their forehead letters, read in order, make the word that opens the gate.</li>
+              <li>Inside, three masks wait with one half missing. Draw the missing half on the mirror side, as if the carved half were reflected in the glass.</li>
+              <li>The mirror forgives a shaking hand, but not a missing eye.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
+      <div class="chasm3d-howto" id="masks3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="masks3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="masks3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes and Aurelia have reached <strong>Tower III</strong>. Its gate is not a door: it is a wall of white masks, from the ground to the top of the arch.</p>
+            <p>Part I opens the wall with a word from your journal. Part II gives three half-carved masks their missing halves.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>I · The word of the gate</h3>
+            <p>Open the page <strong>“The Gate of a Thousand Masks”</strong>. A true face is the same on both sides. Find the six masks that lie, read their forehead letters in order, type the word and press <em>✦ Speak the Word</em>.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>II · The missing halves</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Behind the gate, a mask hangs before each mirror, carved in gold on its <strong>left half</strong> only.</li>
+              <li>On the pane of glass, draw its <strong>right half</strong> as a mirror would show it: every curve turned round, every eye at the same height.</li>
+              <li>Press <strong>✦ Hold it to the mirror</strong>. A shaking hand is forgiven; a missing line is not.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>Pen and glass</h3>
+            <p>Draw with a finger or the mouse. With the keyboard: the arrows move the pen (Shift for small steps) and Space puts it down and lifts it. <em>⌫ Rub out</em> takes back the last line.</p>
+            <p>After a few tries the Mirror Speaker breathes on the glass and shows a guide. Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-masks-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-masks-howto-next">Next →</button>
           </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-masks-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Station 21 · The Camera Obscura (Tower III, Stage Path) -->
-  <div class="monolith-modal-backdrop is-stage-room" id="modal-camera-obscura" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="camera-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">🕳️</span>
+  <div class="chasm-modal-backdrop" id="modal-camera-obscura" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="camera-modal-title">
+    <div class="chasm-workbench-window chasm3d-window camera3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🕳️</span>
           <div>
-            <h2 class="monolith-title" id="camera-modal-title">THE CAMERA OBSCURA</h2>
-            <div class="monolith-subtitle">Station 21 · Tower III · The City on the Wall</div>
+            <div class="chasm-header-title" id="camera-modal-title">The Camera Obscura · Station 21</div>
+            <div class="chasm-header-subtitle">Tower III · The City on the Wall · page “The Camera Obscura”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-camera" aria-label="Close The Camera Obscura">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-camera" title="Close" aria-label="Close The Camera Obscura">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>TOWER III // THE DARK ROOM</strong></div>
-        <div>CHANGES SEEN:<strong id="camera-telem-found">[ 0 / 4 ]</strong></div>
-        <div>HIDEOUT:<strong id="camera-telem-hideout">[ UNKNOWN ]</strong></div>
-        <div>FRAGMENT II:<strong id="camera-telem-fragment">[ MISSING ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The City on the Wall</div>
-            <div class="camera-speaker" id="camera-speaker"></div>
-            <p class="camera-lead">Hold the page <strong>“The Camera Obscura”</strong> against the wall. The city is upside down on both. Four things have changed since the page was drawn: turn the ring until the picture stands upright and sharp, then point at where the raiders hide.</p>
-            <div class="camera-wall">
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="camera3d-stage">
+          <canvas id="camera3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/camera_obscura_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="camera3d-picture" id="camera3d-picture">
               <svg class="camera-city" id="camera-city" viewBox="-40 0 1280 640" role="group" aria-label="The city of the third tower, projected on the wall of the dark room. Eleven places can be pointed at."></svg>
             </div>
-            <div class="camera-controls">
-              <div class="camera-ring" id="camera-ring" role="slider" tabindex="0" aria-label="Lens ring: turn the picture" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="359" aria-valuenow="180" aria-valuetext="upside down and blurred" aria-describedby="camera-ring-help">
-                <svg viewBox="0 0 112 112" aria-hidden="true">
-                  <circle cx="56" cy="56" r="46" class="camera-ring-track"></circle>
-                  <circle cx="56" cy="56" r="34" class="camera-ring-lens"></circle>
-                  <path d="M56 4 L52 14 L60 14 Z" class="camera-ring-mark"></path>
-                  <circle cx="56" cy="102" r="9" class="camera-ring-knob" id="camera-ring-knob"></circle>
-                </svg>
-              </div>
-              <div class="camera-ring-text">
-                <div id="camera-ring-help">Blurred. Turn the ring until the city stands upright.</div>
-                <div class="camera-ring-keys">Drag the ring, or use the arrow keys (Home: upright).</div>
-              </div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="camera3d-status">Upside down · blurred</div>
             </div>
-            <div class="monolith-feedback" id="camera-feedback" role="status" aria-live="polite"></div>
           </div>
+          <div class="chasm3d-subtitle" id="camera3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="camera3d-fade"></div>
         </div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Dark Room</div>
-            <ul class="laby-rules">
-              <li>A camera obscura is a dark room with a small hole in its wall. The light of the outside draws the whole city on the opposite wall, upside down.</li>
-              <li>The page “The Camera Obscura” shows the city as it stood the day before, drawn upside down the way this wall shows it. Compare them: four things are different.</li>
-              <li>The picture can be pointed at only when it is upright and sharp.</li>
-              <li>The raiders carry their fire wherever they go.</li>
-            </ul>
-            <ul class="camera-changes" id="camera-changes" aria-label="The four changes"></ul>
-            <div class="laby-hint" id="camera-hint" style="display: none;"></div>
-          </div>
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="camera-dispatch-text" role="status" aria-live="polite"></div>
+          <div class="camera-speaker" id="camera-speaker"></div>
 
-          <div class="monolith-card monolith-victory" id="camera-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Hideout Is Found</div>
-            <p id="camera-victory-text"></p>
+          <div class="chasm3d-where">The city on the wall: hold the page “The Camera Obscura” beside the picture. Four things have changed since it was drawn. Turn the lens until the city stands upright and sharp, then point at where the raiders hide.</div>
+          <div class="camera-controls">
+            <div class="camera-ring" id="camera-ring" role="slider" tabindex="0" aria-label="Lens ring: turn the picture" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="359" aria-valuenow="180" aria-valuetext="upside down and blurred" aria-describedby="camera-ring-help">
+              <svg viewBox="0 0 112 112" aria-hidden="true">
+                <circle cx="56" cy="56" r="46" class="camera-ring-track"></circle>
+                <circle cx="56" cy="56" r="34" class="camera-ring-lens"></circle>
+                <path d="M56 4 L52 14 L60 14 Z" class="camera-ring-mark"></path>
+                <circle cx="56" cy="102" r="9" class="camera-ring-knob" id="camera-ring-knob"></circle>
+              </svg>
+            </div>
+            <div class="camera-ring-text">
+              <div id="camera-ring-help">Blurred. Turn the ring until the city stands upright.</div>
+              <div class="camera-ring-keys">Drag the ring, or use the arrow keys (Home: upright).</div>
+            </div>
+          </div>
+          <div class="monolith-feedback" id="camera-feedback" role="status" aria-live="polite"></div>
+          <ul class="camera-changes" id="camera-changes" aria-label="The four changes"></ul>
+          <div class="laby-hint" id="camera-hint" style="display: none;"></div>
+
+          <div class="chasm-victory-card" id="camera-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>🪞</span><span>The Hideout Is Found</span></div>
+            <div class="chasm-victory-text" id="camera-victory-text"></div>
             <div class="masks-fragment-row">
               <svg class="masks-fragment" id="camera-fragment-svg" viewBox="0 0 100 100" role="img" aria-label="Fragment II of the mirror of Tower III, with a window and a candle in it."></svg>
               <div>
@@ -4022,13 +4187,53 @@
                 <span>Two ninths of the mirror of Tower III. Seven pieces are still hidden in the house.</span>
               </div>
             </div>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-camera-finish-station">✦ Set Fragment II in the Mirror ➔</button>
+            <button type="button" class="btn-chasm-finish" id="btn-camera-finish-station"><span>✦ Set Fragment II in the Mirror ➔</span></button>
           </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-camera-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE DARK ROOM</div>
-            <div class="monolith-dispatch" id="camera-dispatch-text" role="status" aria-live="polite"></div>
+          <details class="chasm3d-laws">
+            <summary>The Dark Room</summary>
+            <ul class="laby-rules">
+              <li>A camera obscura is a dark room with a small hole in its wall. The light of the outside draws the whole city on the opposite wall, upside down.</li>
+              <li>The page “The Camera Obscura” shows the city as it stood the day before, drawn upside down the way this wall shows it. Compare them: four things are different.</li>
+              <li>The picture can be pointed at only when it is upright and sharp.</li>
+              <li>The raiders carry their fire wherever they go.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
+      <div class="chasm3d-howto" id="camera3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="camera3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="camera3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes and Aurelia are in a <strong>camera obscura</strong>: a black room with one tiny hole. The light of the city outside falls through it and paints the whole city on the far wall, upside down.</p>
+            <p>The raiders are hiding somewhere in that city. The picture will tell you where.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>Turn the lens</h3>
+            <p>Drag the brass <strong>lens ring</strong> in the panel (or use the arrow keys, Home stands it upright). The picture turns with it. It is blurred until the city stands upright; then it snaps sharp.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>Compare with your journal</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Open the page <strong>“The Camera Obscura”</strong>: the city as it stood yesterday, drawn upside down.</li>
+              <li>Four things have changed since: something in the sky, something in the street, a shutter, and something on a roof.</li>
+              <li>Only one of the four is a fire. The raiders carry their fire wherever they go.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>Point</h3>
+            <p>When the picture is sharp, click or tap a place in it (or move to it with Tab and press Enter). A change you find is ticked in the panel; the hideout ends the search.</p>
+            <p>Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-camera-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-camera-howto-next">Next →</button>
           </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-camera-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
@@ -4160,103 +4365,147 @@
        the wind plays the pillars, and Silvia must tell, by ear or by the chronograph, which fissure
        each echo came from, verse after verse.
        =================================================================== -->
-  <div class="monolith-modal-backdrop" id="modal-cairn-four" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pillars-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">🗿</span>
+  <div class="chasm-modal-backdrop" id="modal-cairn-four" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="pillars-modal-title">
+    <div class="chasm-workbench-window chasm3d-window pillars3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🗿</span>
           <div>
-            <h2 class="monolith-title" id="pillars-modal-title">CAIRN IV · SENTRY OF THE CANYON</h2>
-            <div class="monolith-subtitle">Station 16 · The Song of the Pillars</div>
+            <div class="chasm-header-title" id="pillars-modal-title">Cairn IV · Sentry of the Canyon · Station 16</div>
+            <div class="chasm-header-subtitle">The Song of the Pillars · page “Cairn IV: Sentry of the Canyon”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-pillars" aria-label="Close Cairn IV">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-pillars" title="Close" aria-label="Close Cairn IV">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>CAIRN IV // THE SOUTHERN MOUTH OF THE GORGE</strong></div>
-        <div>SIGIL:<strong id="pillars-telem-sigil">[ 7 LETTERS ]</strong></div>
-        <div>VERSES:<strong id="pillars-telem-verses">0 / 3</strong></div>
-        <div>SEAL:<strong id="pillars-telem-seal">[ SEALED ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card" id="pillars-sigil-card">
-            <div class="monolith-card-title">I · The Sigil of the Sentry</div>
-            <p>Solve the page <strong>“Cairn IV: Sentry of the Canyon”</strong> of your journal: turn each of the seven echoes of the survey log into a distance, find its fissure on the plan, and read the carved letters in order. Speak the seven-letter sigil to wake the pillars.</p>
-            <div class="monolith-key-row">
-              <label class="monolith-sr-only" for="pillars-key-input">The seven-letter sigil of Cairn IV</label>
-              <input type="text" class="monolith-key-input" id="pillars-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-speak">✦ Speak the Sigil</button>
-            </div>
-            <div class="monolith-feedback" id="pillars-key-feedback" role="status" aria-live="polite"></div>
-          </div>
-
-          <div class="monolith-card monolith-game is-locked" id="pillars-game">
-            <div class="monolith-card-title">II · The Song of the Pillars</div>
-            <div class="monolith-game-inner">
-              <div class="pillars-row" style="margin-top: 0;">
-                <div class="pillars-verse-tabs" id="pillars-verse-tabs" role="group" aria-label="Verses of the song"></div>
-                <button type="button" class="monolith-btn" id="btn-pillars-sound" aria-pressed="true">🔊 Sound</button>
-              </div>
-              <svg class="pillars-plan" id="pillars-plan" viewBox="0 0 120 146" role="group" aria-label="Cairn IV seen from above: the two pillars, the rings of paces and the sixteen fissures of the cliffs. Choose a fissure to mark an echo."></svg>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="pillars3d-stage">
+          <canvas id="pillars3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/cairn_iv_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="pillars3d-tape-box">
               <div class="pillars-tape-wrap" id="pillars-tape-wrap">
                 <svg class="pillars-tape" id="pillars-tape" role="img" aria-label="The chronograph tape: one tick per beat, the calls of the pillars and their echoes."></svg>
               </div>
               <div class="pillars-tape-caption"><span>▲ Left pillar · ▼ Right pillar · ■ call · ▢ echo</span><span id="pillars-tape-status"></span></div>
+            </div>
+            <div class="pillars3d-aim" id="pillars3d-aim" aria-hidden="true"></div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="pillars3d-verses">Verses 0 / 3</div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="pillars3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="pillars3d-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="pillars-dispatch-text" role="status" aria-live="polite"></div>
+
+          <div class="laby3d-sigil" id="pillars-sigil-card">
+            <div class="chasm3d-where">I · The sigil of the Sentry: the seven echoes of the survey log, read as carved letters</div>
+            <label class="monolith-sr-only" for="pillars-key-input">The seven-letter sigil of Cairn IV</label>
+            <input type="text" class="mon3d-input laby3d-input" id="pillars-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
+            <button type="button" class="chasm3d-btn is-way" id="btn-pillars-speak">✦ Speak the Sigil</button>
+            <div class="monolith-feedback" id="pillars-key-feedback" role="status" aria-live="polite"></div>
+          </div>
+
+          <div class="laby3d-game is-locked" id="pillars-game">
+            <div class="monolith-game-inner">
+              <div class="chasm3d-where">II · Let the wind play, count each echo, and name the fissure that answered</div>
               <div class="pillars-row">
-                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-play">▶ Let the wind play</button>
-                <div class="pillars-mode" role="group" aria-label="What a fissure does when you choose it">
-                  <button type="button" class="monolith-btn" id="btn-pillars-mode-mark" aria-pressed="true">✎ Mark</button>
-                  <button type="button" class="monolith-btn" id="btn-pillars-mode-call" aria-pressed="false">📣 Test call</button>
-                </div>
+                <div class="pillars-verse-tabs" id="pillars-verse-tabs" role="group" aria-label="Verses of the song"></div>
+                <button type="button" class="chasm3d-btn pillars3d-sound" id="btn-pillars-sound" aria-pressed="true">🔊 Sound</button>
+              </div>
+              <button type="button" class="chasm3d-btn is-way pillars3d-play" id="btn-pillars-play">▶ Let the wind play</button>
+              <div class="pillars-mode" role="group" aria-label="What a fissure does when you choose it">
+                <button type="button" class="chasm3d-btn" id="btn-pillars-mode-mark" aria-pressed="true">✎ Mark</button>
+                <button type="button" class="chasm3d-btn" id="btn-pillars-mode-call" aria-pressed="false">📣 Test call</button>
               </div>
               <div class="pillars-row">
                 <div class="pillars-slots" id="pillars-slots" aria-live="polite"></div>
-                <button type="button" class="monolith-btn" id="btn-pillars-undo" aria-label="Remove the last marked echo">⌫</button>
-                <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-sing">✦ Sing it back</button>
+              </div>
+              <div class="pillars-row pillars3d-sing-row">
+                <button type="button" class="chasm3d-btn" id="btn-pillars-undo" aria-label="Remove the last marked echo">⌫</button>
+                <button type="button" class="chasm3d-btn is-way" id="btn-pillars-sing">✦ Sing it back</button>
               </div>
               <div class="monolith-feedback" id="pillars-song-feedback" role="status" aria-live="polite"></div>
+              <div class="laby-hint" id="pillars-hint" style="display: none;">✦ Hermes has numbered the beats on the tape for you.</div>
+              <details class="chasm3d-laws pillars3d-plan-box">
+                <summary>The gorge from above</summary>
+                <svg class="pillars-plan" id="pillars-plan" viewBox="0 0 120 146" role="group" aria-label="Cairn IV seen from above: the two pillars, the rings of paces and the sixteen fissures of the cliffs. Choose a fissure to mark an echo."></svg>
+              </details>
             </div>
             <div class="monolith-lock-note">Speak the sigil of Cairn IV to wake the pillars.</div>
           </div>
-        </div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Laws of the Echo</div>
+          <div class="pillars3d-song">
+            <div class="chasm3d-where">The Song of the Sentry</div>
+            <div class="pillars-words" id="pillars-words"></div>
+            <div class="monolith-fragments" id="pillars-fragments"></div>
+          </div>
+
+          <div class="chasm-victory-card" id="pillars-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>🗿</span><span>The Chamber of Cairn IV Opens</span></div>
+            <div class="chasm-victory-text" id="pillars-victory-text"></div>
+            <div class="laby3d-eqs">
+              <span class="monolith-equation">[S] + [U] = 17</span>
+              <span class="monolith-equation">[S] − [U] = 9</span>
+            </div>
+            <p class="laby3d-eq-note">Engraved on the bronze reed of the Left pillar. Write both in your Cipher Ledger.</p>
+            <p class="laby3d-eq-note">🪨 <strong>The Tuning Pebble</strong> is in Hermes's satchel.</p>
+            <button type="button" class="btn-chasm-finish" id="btn-pillars-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+          </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-pillars-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
+
+          <details class="chasm3d-laws">
+            <summary>The Laws of the Echo</summary>
             <ul class="laby-rules">
               <li>The wind plays one pillar at a time. The Left pillar sings only to the left cliff, the Right pillar only to the right one, each in its own voice.</li>
               <li>Count the beats of the chronometer from the start of a call to the start of its echo: every beat is 5 paces to the fissure that answered.</li>
               <li>A long call comes back as a long echo. Listen with headphones if you can; the tape records everything you hear.</li>
               <li>Take the calls in the order the wind played them (they are numbered on the tape) and mark, for each one, the fissure that answered it. Then sing the verse back. <strong>Test call</strong> lets Hermes shout at a fissure to hear how it answers.</li>
             </ul>
-            <div class="laby-hint" id="pillars-hint" style="display: none;">✦ Hermes has numbered the beats on the tape for you.</div>
-          </div>
+          </details>
+        </div>
+      </div>
 
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Song of the Sentry</div>
-            <div class="pillars-words" id="pillars-words"></div>
-            <div class="monolith-fragments" id="pillars-fragments"></div>
+      <div class="chasm3d-howto" id="pillars3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="pillars3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="pillars3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes has reached <strong>Cairn IV</strong>, the fourth of the five seals: two hollow pillars at the mouth of a gorge. When the night wind blows, they sing, and the cliffs sing back.</p>
+            <p>Part I wakes the pillars with a word from your journal. Part II sings their song back to them.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>I · The sigil</h3>
+            <p>Open the page <strong>“Cairn IV: Sentry of the Canyon”</strong>. Each of the seven echoes of the survey log gives one carved letter: its pillar tells you the cliff, its beats tell you how far (one beat is 5 paces). Type the seven letters and press <em>✦ Speak the Sigil</em>.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>II · The song</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Press <strong>▶ Let the wind play</strong>. A pillar calls (its mouth flares and a ring runs over the sand) and, a few beats later, <strong>its echo comes home</strong> (a softer glow).</li>
+              <li>Count the beats between the call and its echo, by ear or on the <strong>tape</strong> at the top. Every beat is 5 paces: the paces are written on the stones across the gorge and under each fissure.</li>
+              <li>Click the fissure that answered, on its own cliff. Do it for every call, in the order they were played.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>Singing it back</h3>
+            <p>When every call has its fissure, press <strong>✦ Sing it back</strong>. Three verses, three words. Not sure of a fissure? Switch to <strong>📣 Test call</strong> and click it: Hermes shouts at it so you can hear how long it takes to answer.</p>
+            <p>Drag to look around, scroll to come closer. Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-pillars-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-pillars-howto-next">Next →</button>
           </div>
-
-          <div class="monolith-card monolith-victory" id="pillars-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Chamber of Cairn IV Opens</div>
-            <p id="pillars-victory-text"></p>
-            <div>
-              <span class="monolith-equation">[S] + [U] = 17</span>
-              <span class="monolith-equation">[S] − [U] = 9</span>
-            </div>
-            <p style="font-size: 0.78rem; color: #b8a07a;">Engraved on the bronze reed of the Left pillar. Record both in your Cipher Ledger.</p>
-            <p style="font-size: 0.82rem;">🪨 <strong>The Tuning Pebble</strong> is in Hermes's satchel.</p>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-pillars-finish">🗺️ Return to the Grand Desert Map ➔</button>
-          </div>
-
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // CAIRN IV</div>
-            <div class="monolith-dispatch" id="pillars-dispatch-text" role="status" aria-live="polite"></div>
-          </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-pillars-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
@@ -4267,89 +4516,126 @@
        Part I is the journal (Sheet 14B: the eight arches of the true road). Part II only exists here:
        a turn-based escape through a dark labyrinth patrolled by the raiders' torches.
        =================================================================== -->
-  <div class="monolith-modal-backdrop" id="modal-sandstone-labyrinth" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="laby-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">🌀</span>
+  <div class="chasm-modal-backdrop" id="modal-sandstone-labyrinth" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="laby-modal-title">
+    <div class="chasm-workbench-window chasm3d-window laby3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🌀</span>
           <div>
-            <h2 class="monolith-title" id="laby-modal-title">THE SANDSTONE LABYRINTH &amp; CAIRN III</h2>
-            <div class="monolith-subtitle">Station 15 · Escape from the BC Ashes</div>
+            <div class="chasm-header-title" id="laby-modal-title">The Sandstone Labyrinth &amp; Cairn III · Station 15</div>
+            <div class="chasm-header-subtitle">Escape from the BC Ashes · page “The Sandstone Labyrinth &amp; Cairn III”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-labyrinth" aria-label="Close The Sandstone Labyrinth">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-labyrinth" title="Close" aria-label="Close The Sandstone Labyrinth">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>CAIRN III // THE ARCHES OF THE WEST WIND</strong></div>
-        <div>SIGIL:<strong id="laby-telem-sigil">[ 8 LETTERS ]</strong></div>
-        <div>TURN:<strong id="laby-telem-turn">0</strong></div>
-        <div>CLOSE CALLS LEFT:<strong id="laby-telem-lives">3</strong></div>
-        <div>SEAL:<strong id="laby-telem-seal">[ SEALED ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card" id="laby-sigil-card">
-            <div class="monolith-card-title">I · The Sigil of Cairn III</div>
-            <p>Solve the page <strong>“The Sandstone Labyrinth &amp; Cairn III”</strong> of your journal: trace the one true road from the Southern Mouth to Cairn III and read its eight arches in the order Hermes passes beneath them. Speak the eight-letter sigil to unlock the copper plate.</p>
-            <div class="monolith-key-row">
-              <label class="monolith-sr-only" for="laby-key-input">The eight-letter sigil of Cairn III</label>
-              <input type="text" class="monolith-key-input" id="laby-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-laby-speak">✦ Speak the Sigil</button>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="laby3d-stage">
+          <canvas id="laby3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/sandstone_labyrinth_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="laby3d-map-wrap">
+              <svg class="laby-board" id="laby-board" viewBox="-4 -12 138 136" role="img" aria-label="Hermes's map of the labyrinth, seen from above: only the squares he has seen are drawn. The raiders' torches are orange; the Western Cleft is the exit at the bottom left."></svg>
             </div>
+            <div class="laby3d-danger" id="laby3d-danger" aria-hidden="true"></div>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="laby-turn-label">Turn 0</div>
+              <div class="laby-lives" id="laby-lives" role="img" aria-label="3 of 3 close calls left"></div>
+            </div>
+          </div>
+          <div class="chasm3d-subtitle" id="laby3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="laby3d-fade"></div>
+        </div>
+
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="laby-dispatch-text" role="status" aria-live="polite"></div>
+
+          <div class="laby3d-sigil" id="laby-sigil-card">
+            <div class="chasm3d-where">I · The sigil of Cairn III: the eight arches of the true road, from the Southern Mouth up to the cairn</div>
+            <label class="monolith-sr-only" for="laby-key-input">The eight-letter sigil of Cairn III</label>
+            <input type="text" class="mon3d-input laby3d-input" id="laby-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+            <button type="button" class="chasm3d-btn is-way" id="btn-laby-speak">✦ Speak the Sigil</button>
             <div class="monolith-feedback" id="laby-key-feedback" role="status" aria-live="polite"></div>
           </div>
 
-          <div class="monolith-card monolith-game is-locked" id="laby-game">
-            <div class="monolith-card-title">II · Escape from the BC Ashes</div>
+          <div class="laby3d-game is-locked" id="laby-game">
             <div class="monolith-game-inner">
-              <svg class="laby-board" id="laby-board" viewBox="-4 -12 138 136" role="img" aria-label="The labyrinth seen from above, lit only around Hermes's lamp. Raiders' torches patrol the corridors. The Western Cleft is the exit at the bottom left."></svg>
-              <div class="laby-status-row">
-                <span class="laby-lives" id="laby-lives" aria-hidden="true"></span>
-                <span class="laby-turn" id="laby-turn-label">Turn 0</span>
-              </div>
+              <div class="chasm3d-where">II · Guide Hermes to the Western Cleft, down at the bottom left</div>
               <div class="laby-pad" role="group" aria-label="Move Hermes">
-                <button type="button" class="monolith-btn laby-up" id="btn-laby-up" aria-label="Move north">▲</button>
-                <button type="button" class="monolith-btn laby-left" id="btn-laby-left" aria-label="Move west">◀</button>
-                <button type="button" class="monolith-btn laby-wait" id="btn-laby-wait" aria-label="Hold still for one turn">HOLD</button>
-                <button type="button" class="monolith-btn laby-right" id="btn-laby-right" aria-label="Move east">▶</button>
-                <button type="button" class="monolith-btn laby-down" id="btn-laby-down" aria-label="Move south">▼</button>
+                <button type="button" class="chasm3d-btn laby-up" id="btn-laby-up" aria-label="Move north">▲</button>
+                <button type="button" class="chasm3d-btn laby-left" id="btn-laby-left" aria-label="Move west">◀</button>
+                <button type="button" class="chasm3d-btn laby-wait" id="btn-laby-wait" aria-label="Hold still for one turn">HOLD</button>
+                <button type="button" class="chasm3d-btn laby-right" id="btn-laby-right" aria-label="Move east">▶</button>
+                <button type="button" class="chasm3d-btn laby-down" id="btn-laby-down" aria-label="Move south">▼</button>
               </div>
               <div class="monolith-feedback" id="laby-move-feedback" role="status" aria-live="polite"></div>
+              <div class="laby-hint" id="laby-hint" style="display: none;">✦ Hermes has been watching the torches: their rounds are now drawn on the ground and on his map.</div>
             </div>
             <div class="monolith-lock-note">Speak the sigil of Cairn III to open the copper plate.</div>
           </div>
-        </div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Rules of the Dark</div>
-            <ul class="laby-rules">
-              <li>Every time Hermes takes a step or holds still, every torch takes one step too.</li>
-              <li>A torch lights its own square and the two squares ahead of it, in the direction it walks. Walls stop the light.</li>
-              <li>Hermes's lamp shows only the rock right around him. The squares he has seen stay on his map.</li>
-              <li>Caught in the light, Hermes uses up a close call. With none left, he runs back to the shadow of Cairn III.</li>
-              <li>Reach the Western Cleft, at the bottom left. Arrows, WASD or tapping a square next to Hermes also move him; the space bar holds still.</li>
-            </ul>
-            <div class="laby-hint" id="laby-hint" style="display: none;">✦ Hermes has been watching the torches: their rounds are now drawn on the board.</div>
-          </div>
-
-          <div class="monolith-card monolith-victory" id="laby-victory" style="display: none;">
-            <div class="monolith-card-title">✦ Out through the Western Cleft</div>
-            <p id="laby-victory-text"></p>
-            <div>
+          <div class="chasm-victory-card" id="laby-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>🌀</span><span>Out through the Western Cleft</span></div>
+            <div class="chasm-victory-text" id="laby-victory-text"></div>
+            <div class="laby3d-eqs">
               <span class="monolith-equation">[W] + [A] = 26</span>
               <span class="monolith-equation">[N] − [E] = 9</span>
             </div>
-            <p style="font-size: 0.78rem; color: #b8a07a;">Carved on the founders' stone under the copper plate. Record both in your Cipher Ledger.</p>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-laby-finish">🗺️ Return to the Grand Desert Map ➔</button>
+            <p class="laby3d-eq-note">Carved on the founders' stone under the copper plate. Write both in your Cipher Ledger.</p>
+            <button type="button" class="btn-chasm-finish" id="btn-laby-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
           </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-laby-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE SANDSTONE LABYRINTH</div>
-            <div class="monolith-dispatch" id="laby-dispatch-text" role="status" aria-live="polite"></div>
+          <details class="chasm3d-laws">
+            <summary>The Rules of the Dark</summary>
+            <ul class="laby-rules">
+              <li>Every time Hermes takes a step or holds still, every torch takes one step too.</li>
+              <li>A torch lights its own square and the two squares ahead of it, in the direction it walks. Walls stop the light. Those squares glow orange on the ground.</li>
+              <li>Hermes's lamp shows only the rock right around him. The squares he has seen stay on his map, in the corner.</li>
+              <li>Caught in the light, Hermes uses up a close call (🏮). With none left, he runs back to the shadow of Cairn III.</li>
+              <li>Move him with the arrows below, the arrow keys or W A S D, or click a square next to him. The space bar holds still.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
+      <div class="chasm3d-howto" id="laby3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="laby3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="laby3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes is deep inside the Sandstone Labyrinth, at the foot of <strong>Cairn III</strong>, the third of the five seals. It is night, and the raiders of the BC Ashes have followed his tracks in.</p>
+            <p>Part I opens the cairn with a word from your journal. Part II brings Hermes out alive.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>I · The sigil</h3>
+            <p>Open the page <strong>“The Sandstone Labyrinth &amp; Cairn III”</strong>. Trace the one true road from the Southern Mouth up to the cairn, and read the letters of the arches you pass under, in order. Eight letters. Type them and press <em>✦ Speak the Sigil</em>.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>II · The escape</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>The labyrinth is dark. Hermes's lamp shows only the rock around him, and the walls he has seen stay drawn on his <strong>map</strong>, in the top corner.</li>
+              <li>Each time he takes a step, or holds still, <strong>every torch takes one step too</strong>. Each raider walks the same round again and again.</li>
+              <li>A torch lights its own square and the two in front of it. Those squares <strong>glow orange on the ground</strong>: never end a step inside them.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>Close calls and the way out</h3>
+            <p>If a torch finds him, Hermes presses into a crack in the rock and spends a <strong>close call</strong> (🏮). When all three are gone he runs back to Cairn III and you start the escape again.</p>
+            <p>The way out is the <strong>Western Cleft</strong>, at the bottom left. Move him with the arrows, the keyboard, or by clicking a square next to him. Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-laby-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-laby-howto-next">Next →</button>
           </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-laby-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>

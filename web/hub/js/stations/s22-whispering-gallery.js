@@ -193,10 +193,11 @@
         paintWaves(atFocus() ? 1 : c);
         mood();
       }
-      // the stage music leans in as the whisper clears, and steps back while the bells must be heard
+      // the stage music leans in as the whisper clears, and falls silent while the bells must be heard
       function mood() {
         const amb = window.EclipseAmbience;
         if (amb && amb.intensity) amb.intensity(isDone() ? 0.6 : atFocus() ? 0.15 : 0.3 + 0.15 * clarity());
+        if (amb && amb.hush) amb.hush(atFocus() && !isDone());
       }
       function paintHermes() {
         if (hermes) hermes.setAttribute('transform', 'translate(' + X(pos[0]) + ' ' + Y(pos[1]) + ')');

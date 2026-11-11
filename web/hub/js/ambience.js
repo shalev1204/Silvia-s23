@@ -62,7 +62,7 @@
       };
 
       var ctx = null, master = null, noise = null, verb = null, fxBus = null, current = null, bed = null;
-      var muted = false, intensity = 0.5, notes = 0;
+      var muted = false, intensity = 0.5, notes = 0, hushed = false;
       try { muted = localStorage.getItem(MUTE_KEY) === 'true'; } catch (e) {}
 
       function audio() {
@@ -215,6 +215,7 @@
         }
         return {
           mix: mix,
+          level: def.level,
           tick: function () {
             if (!ctx || ctx.state !== 'running') { next = ctx ? ctx.currentTime + 0.1 : next; return; }
             if (next < ctx.currentTime) next = ctx.currentTime + 0.05;
@@ -275,7 +276,7 @@
         if (def.drips) timers.push(every(def.drips[1], function () { drip(out, def.drips[0]); }));
         if (def.crackle) timers.push(every(def.crackle[1], function () { crackle(out, def.crackle[0]); }));
         var song = def.music && MUSIC[def.music] ? composer(MUSIC[def.music], out) : null;
-        if (song) { song.tick(); timers.push(setInterval(song.tick, 100)); }
+        if (song) { if (hushed) song.mix.gain.value = 0.0001; song.tick(); timers.push(setInterval(song.tick, 100)); }
         return { out: out, stops: stops, timers: timers, song: song, mood: def.music || null };
       }
       // Random events, on average `perSecond` times a second
@@ -456,7 +457,7 @@
         if (bed) { fadeOut(bed); bed = null; }
         current = id;
         // back to neutral only when the game closes: a game that set its level as it opened keeps it
-        if (!id) intensity = 0.5;
+        if (!id) { intensity = 0.5; hushed = false; }
         if (!id || !audio()) return;
         bed = build(BEDS[id]);
         bed.out.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_S);
@@ -504,8 +505,18 @@
         sfx: sfx,
         // how much is happening in the game (0 calm … 1 the last steps): the drum and the string answer it
         intensity: function (k) { intensity = Math.max(0, Math.min(1, +k || 0)); },
+        // the music steps out (the wind and the room stay) while a game needs every ear, and comes back after
+        hush: function (on) {
+          on = !!on;
+          if (on === hushed) return;
+          hushed = on;
+          if (!ctx || !bed || !bed.song) return;
+          var g = bed.song.mix.gain, t = ctx.currentTime;
+          g.cancelScheduledValues(t); g.setValueAtTime(Math.max(0.0001, g.value), t);
+          g.linearRampToValueAtTime(on ? 0.0001 : bed.song.level, t + (on ? 0.6 : 2.5));
+        },
         state: function () {
-          return { bed: current ? BEDS[current].name : null, muted: muted, running: !!(ctx && ctx.state === 'running'), music: bed && bed.mood || null, notes: notes, intensity: intensity };
+          return { bed: current ? BEDS[current].name : null, muted: muted, running: !!(ctx && ctx.state === 'running'), music: bed && bed.mood || null, notes: notes, intensity: intensity, hushed: hushed };
         }
       };
     })();

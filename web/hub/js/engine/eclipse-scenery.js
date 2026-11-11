@@ -616,8 +616,8 @@
           body: body,
           speak: function (on) { speaking = !!on; if (c.face && c.face.talk) c.face.talk(speaking); },
           look: function (v) { target = v ? (target || new T.Vector3()).set(v.x, v.y, v.z) : null; },
-          // 'bow', 'startle', 'nod', 'offer' (the free hand held out: a coin, a cord, a flask)
-          react: function (kind) { rx = { kind: kind, t: 0, dur: { bow: 2.0, nod: 1.0, offer: 2.4 }[kind] || 0.9 }; if (c.face) { if (kind === 'startle') { c.face.mood(1, 0); } else c.face.blink(); } },
+          // 'bow', 'startle', 'nod', 'shake' (no, slowly), 'offer' (the free hand held out: a coin, a cord, a flask)
+          react: function (kind) { rx = { kind: kind, t: 0, dur: { bow: 2.0, nod: 1.0, offer: 2.4, shake: 1.3 }[kind] || 0.9 }; if (c.face) { if (kind === 'startle') { c.face.mood(1, 0); } else c.face.blink(); } },
           moving: function () { return wgt > 0.05; },
           update: function (t) {
             if (lastT == null) { lastT = t; return; }
@@ -641,7 +641,7 @@
             }
             sp += ((speaking ? 1 : 0) - sp) * Math.min(1, dt * 6);
             var e = 0;
-            var nodK = 0;
+            var nodK = 0, shakeK = 0;
             if (rx) {
               rx.t += dt; var u = rx.t / rx.dur;
               if (u >= 1) rx = null;
@@ -651,6 +651,7 @@
                 else e = u < 0.25 ? u / 0.25 : 1 - (u - 0.25) / 0.75;
                 e = e * e * (3 - 2 * e);
                 if (rx.kind === 'nod') nodK = e * Math.sin(u * Math.PI * 4);
+                if (rx.kind === 'shake') shakeK = e * Math.sin(u * Math.PI * 4);
               }
             }
             var bow = rx && rx.kind === 'bow' ? e : 0, start = rx && rx.kind === 'startle' ? e : 0, offer = rx && rx.kind === 'offer' ? e : 0;
@@ -681,7 +682,7 @@
                 ty += 0.05 * Math.sin(t * 0.4);
               }
               yaw += (ty - yaw) * Math.min(1, dt * 3.5); pitch += (tp - pitch) * Math.min(1, dt * 3.5);
-              head.rotation.y = hb.y + yaw;
+              head.rotation.y = hb.y + yaw + 0.3 * shakeK;
               head.rotation.x = hb.x + pitch + sp * (0.035 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + 0.02) - 0.36 * bow + 0.16 * start + 0.14 * nodK + 0.015 * Math.sin(t * 0.3);
               head.rotation.z = hb.z + sp * 0.03 * Math.sin(t * 1.9);
               if (c.face) c.face.gaze(Math.max(-1, Math.min(1, (ty - yaw) * 3)), 0);
@@ -1922,6 +1923,89 @@
       // neck that carries the head high, heavy lids and long lashes, a jaw that chews sideways, knees that fold when
       // it couches. Faces -z. userData: kneel(k 0…1), walk(on), update(t), head, parts
       //   o: coat, blanket, blanket2 (hex), seed, scale
+      // The Oracle of Tower II: a woman past seventy in a worn hooded robe of dusty indigo, a dark gauze veil hanging from
+      // the hood over her face, both hands held out at the chest (whatever she holds hangs on userData.hold). Under the veil,
+      // a calm face, grey hair with one white streak over the brow. Faces -z like the elder.
+      // userData: lift(k) folds the veil back over the hood (0 hanging … 1 lifted), hold (a group between her hands).
+      function oracle(paint, o) {
+        o = o || {};
+        var g = new T.Group(), F = window.EclipseFigure;
+        var robeMat = paint({ map: tex.robe(o.robe == null ? 0x2e3552 : o.robe, o.trim == null ? 0xb08a4a : o.trim, 5), side: T.DoubleSide }, 0xb8c8ff, 0.26);
+        var mantleMat = paint({ color: o.mantle == null ? 0x1c2034 : o.mantle, side: T.DoubleSide }, 0xb8c8ff, 0.24);
+        var skin = paint({ color: tone(0xb07a58) }, 0xffd0a8, 0.28);
+        var brass = paint({ color: 0xc9a050, emissive: 0x2a1a04 }, 0xfff0b0, 0.5);
+        function put(mesh, x, y, z, parent) { mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; (parent || g).add(mesh); return mesh; }
+        function ell(geo, mat, sx, sy, sz) { var m = new T.Mesh(geo, mat); m.scale.set(sx, sy, sz); return m; }
+        function sleeve(a, b, rTop, rBot) {
+          var A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b[0], b[1], b[2]), len = A.distanceTo(B), mid = (rTop + rBot) / 2;
+          var m = new T.Mesh(loft([[0, 0.03, 0, rTop, rTop], [0, -len * 0.45, 0, mid * 1.1, mid * 1.14], [0, -len * 0.85, 0, rBot * 0.96, rBot], [0, -len, 0, rBot, rBot * 1.04]], { radial: 18, caps: false, bump: function (a2, u) { return 1 + 0.06 * Math.sin(a2 * 6 + u * 8) * Math.sin(u * Math.PI); } }), robeMat);
+          m.position.copy(A); m.quaternion.setFromUnitVectors(new T.Vector3(0, -1, 0), B.clone().sub(A).normalize()); m.castShadow = true; g.add(m);
+          return m;
+        }
+        // the robe falls straight to the floor in soft pleats; a cord at the waist, a mantle over the shoulders
+        var pleat = function (th, t) { return { r: 1 + 0.04 * Math.sin(th * 12 + t * 2) * (1 - t * 0.6) + 0.015 * Math.sin(th * 5 + 1), y: t < 0.05 ? 0.02 * Math.sin(th * 12) : 0 }; };
+        put(new T.Mesh(foldedLathe([[0.46, 0.02], [0.42, 0.22], [0.35, 0.5], [0.29, 0.8], [0.25, 1.02], [0.24, 1.2], [0.27, 1.34], [0.2, 1.44], [0.11, 1.5], [0.085, 1.54]], 64, pleat), robeMat), 0, 0, 0);
+        var mfold = function (th, t) { return { r: 1 + 0.03 * Math.sin(th * 9), y: t > 0.8 ? -0.03 * (0.5 + 0.5 * Math.cos(th * 12)) : 0 }; };
+        put(new T.Mesh(foldedLathe([[0.12, 1.53], [0.21, 1.5], [0.29, 1.42], [0.34, 1.32], [0.355, 1.2]], 56, mfold), mantleMat), 0, 0, 0);
+        var cord = put(new T.Mesh(new T.TorusGeometry(0.255, 0.014, 8, 44), brass), 0, 1.0, 0); cord.rotation.x = Math.PI / 2;
+        [-0.05, 0.05].forEach(function (x, i) { put(new T.Mesh(new T.CylinderGeometry(0.008, 0.008, 0.36 - i * 0.06, 6), brass), x, 0.82 + i * 0.03, -0.24); });
+        put(new T.Mesh(new T.CylinderGeometry(0.05, 0.06, 0.1, 12), skin), 0, 1.53, 0);
+        // the hood, open at the front, and its fall behind
+        var hood = put(ell(new T.SphereGeometry(0.19, 30, 20, Math.PI * 1.5 + 0.8, Math.PI * 2 - 1.6, 0, 2.45), mantleMat, 1.22, 1.36, 1.3), 0, 1.66, 0.025);
+        hood.rotation.x = -0.08;
+        put(new T.Mesh(new T.ConeGeometry(0.11, 0.42, 14), mantleMat), 0, 1.36, 0.18).rotation.x = 0.16;
+
+        // (EclipseFigure) a face of seventy-five: fine lines, high cheekbones, grey brows, dark eyes that have waited a long time
+        var head = new T.Group(); head.position.set(0, 1.66, 0); head.scale.setScalar(1.22); g.add(head);
+        var rig = F.head({ size: 0.125, skin: 0xb07a58, age: 0.8, iris: 0x2e2216, brow: { color: 0x8a847c, thick: 0.75 }, nose: 0.95, jaw: 0.5, cheek: 1.2, ridge: 0.9, lip: 0x9a5a50, seed: 31 });
+        head.add(rig.group);
+        var hairMat = F.mat({ map: F.hairTex(0x4a4642, { dark: 0x1e1a18, light: 0x8e8a84 }), side: T.DoubleSide }, 0xc8d0ff, 0.2);
+        F.hair(rig, { mat: hairMat, front: 0.62, temples: 0.08, side: 0.32, nape: -0.95, thick: 0.12 });
+        var white = F.mat({ map: F.hairTex(0xeeeae2, { dark: 0xb0aca4, light: 0xffffff }), side: T.DoubleSide }, 0xffffff, 0.3);
+        var streak = new T.Mesh(F.tube([[-0.035, 0.118, -0.085], [-0.07, 0.128, 0.0], [-0.098, 0.09, 0.075], [-0.108, 0.0, 0.11], [-0.1, -0.1, 0.12]], 0.014, { segments: 18, radial: 8, flat: 0.5 }), white);
+        streak.castShadow = true; rig.group.add(streak);
+        var face = F.face(rig);
+        // the veil hangs from the front of the hood; lifting it folds it back over the crown
+        var veilPivot = new T.Group(); veilPivot.position.set(0, 0.125, -0.12); head.add(veilPivot);
+        var veilMat = new T.MeshStandardMaterial({ color: 0x161a28, roughness: 0.9, transparent: true, opacity: 0.9, side: T.DoubleSide });
+        // a sheet of gauze that curves round the face, not a flat card
+        var veilGeo = new T.PlaneGeometry(0.32, 0.44, 4, 8), vp = veilGeo.attributes.position;
+        for (var vi = 0; vi < vp.count; vi++) vp.setZ(vi, vp.getZ(vi) + vp.getX(vi) * vp.getX(vi) * 3.6);
+        veilGeo.computeVertexNormals();
+        var veil = new T.Mesh(veilGeo, veilMat); veil.position.set(0, -0.22, -0.045); veil.castShadow = true; veil.userData.live = true; veilPivot.add(veil);
+        var veilCloth = clothSim(veil, { ws: 4, hs: 8, maxZ: 0.012, wind: [0.1, 0, -0.2], gust: 0.3, damp: 0.98 });
+
+        // arms in wide sleeves, both hands held out at the chest
+        var shR = [0.22, 1.4, 0.0], wrR = [0.2, 1.17, -0.36], shL = [-0.22, 1.4, 0.0], wrL = [-0.2, 1.17, -0.36];
+        [shR, shL].forEach(function (s) { put(new T.Mesh(new T.SphereGeometry(0.075, 14, 10), robeMat), s[0], s[1], s[2]); });
+        sleeve(shR, wrR, 0.075, 0.12); sleeve(shL, wrL, 0.075, 0.12);
+        [wrR, wrL].forEach(function (w) {
+          var h = F.hand({ mat: skin, size: 0.95, curl: 0.55, side: w[0] < 0 ? -1 : 1 });
+          h.position.set(w[0], w[1] - 0.02, w[2] - 0.02); h.rotation.set(-0.9, 0, w[0] < 0 ? 0.5 : -0.5); g.add(h);
+        });
+        var hold = new T.Group(); hold.position.set(0, 1.24, -0.46); g.add(hold);
+
+        g.scale.setScalar(o.scale || 1);
+        var life = persona(g, { head: head, face: face });
+        bake(g);
+        var lifted = 0;
+        g.userData = {
+          head: head, hold: hold, life: life, veil: veil,
+          speak: function (on) { life.speak(on); }, look: function (v) { life.look(v); }, react: function (k) { life.react(k); },
+          lift: function (k) { lifted = Math.max(0, Math.min(1, k)); },
+          update: function (t) {
+            life.update(t);
+            var e = lifted * lifted * (3 - 2 * lifted);
+            // she lifts it up over the hood and lets it fall behind, out of sight
+            veilPivot.rotation.x = e * 2.5;
+            veilMat.opacity = 0.9 * (1 - e * e);
+            veil.visible = e < 0.98;
+            if (lifted < 0.02) veilCloth.update(t);
+          }
+        };
+        return g;
+      }
+
       function camel(paint, o) {
         o = o || {};
         var g = new T.Group(), parts = new T.Group(), F = window.EclipseFigure, seed = o.seed || 41; g.add(parts);
@@ -2304,7 +2388,7 @@
       }
 
       window.EclipseScenery = {
-        tex: tex, preTone: preTone, clothSim: clothSim, rope: rope, bake: bake, faceLife: faceLife, persona: persona, foldedLathe: foldedLathe, loft: loft, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad, raider: raider, camel: camel }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
+        tex: tex, preTone: preTone, clothSim: clothSim, rope: rope, bake: bake, faceLife: faceLife, persona: persona, foldedLathe: foldedLathe, loft: loft, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad, raider: raider, camel: camel, oracle: oracle }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
         props: { brazier: brazier, banner: banner, palm: palm, awning: awning, amphora: amphora, crate: crate, sack: sack, firepit: firepit, column: column, rocks: rocks, tracks: tracks },
         paint: paintFor, shadowy: shadowy, noise: { vnoise: vnoise, fbm: fbm, hash2: hash2, rng: rng }
       };

@@ -1,0 +1,67 @@
+/* Station 15 · The Sandstone Labyrinth & Cairn III as a 3D night escape (the shared look lives in s10-chasm-walk.css) */
+#modal-sandstone-labyrinth [hidden] { display: none !important; }
+#modal-sandstone-labyrinth .chasm3d-hud { z-index: 3; }
+#modal-sandstone-labyrinth .chasm3d-fade { background: #05060f; }
+
+/* Hermes's map: the squares he has seen, in the top corner of the scene */
+#modal-sandstone-labyrinth .laby3d-map-wrap {
+  position: absolute; top: 10px; right: 12px; width: min(30%, 250px); padding: 6px;
+  background: rgba(8, 6, 14, 0.82); border: 1px solid rgba(253, 230, 138, 0.3); border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45); pointer-events: auto;
+}
+#modal-sandstone-labyrinth .laby-board { max-height: none; border-radius: 6px; }
+
+/* the warning when a torch is about to reach the square next to Hermes */
+#modal-sandstone-labyrinth .laby3d-danger {
+  position: absolute; top: 12px; left: 12px; padding: 6px 12px; border-radius: 999px;
+  font-family: 'Cinzel', Georgia, serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+  color: #fff1d6; background: rgba(124, 45, 18, 0.85); border: 1px solid rgba(251, 146, 60, 0.8);
+  box-shadow: 0 0 18px rgba(251, 146, 60, 0.45); opacity: 0; transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+#modal-sandstone-labyrinth .laby3d-danger.is-on { opacity: 1; transform: none; animation: laby3d-pulse 1.1s ease-in-out infinite; }
+#modal-sandstone-labyrinth .laby3d-danger.is-safe { background: rgba(20, 40, 30, 0.82); border-color: rgba(134, 239, 172, 0.7); box-shadow: 0 0 14px rgba(134, 239, 172, 0.3); animation: none; }
+@keyframes laby3d-pulse { 50% { box-shadow: 0 0 26px rgba(251, 146, 60, 0.85); } }
+
+#modal-sandstone-labyrinth .laby-lives { font-size: 1.1rem; letter-spacing: 0.12em; }
+#modal-sandstone-labyrinth .laby-lives span { display: inline-block; transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease; }
+#modal-sandstone-labyrinth .laby-lives .is-spent { filter: grayscale(1); opacity: 0.3; transform: scale(0.8); }
+#modal-sandstone-labyrinth .laby-lives .is-lost { animation: laby3d-lost 0.7s ease both; }
+@keyframes laby3d-lost { 0% { transform: scale(1.5); filter: none; opacity: 1; } 100% { transform: scale(0.8); filter: grayscale(1); opacity: 0.3; } }
+
+/* the panel: the sigil, then the escape */
+#modal-sandstone-labyrinth .laby3d-sigil { display: flex; flex-direction: column; gap: 8px; }
+#modal-sandstone-labyrinth .laby3d-sigil.is-collapsed .laby3d-input,
+#modal-sandstone-labyrinth .laby3d-sigil.is-collapsed #btn-laby-speak { display: none; }
+#modal-sandstone-labyrinth .monolith-feedback { min-height: 1.2em; font-size: 0.88rem; color: #d6c3a0; }
+#modal-sandstone-labyrinth .monolith-feedback.is-ok { color: #bbf7d0; }
+#modal-sandstone-labyrinth .monolith-feedback.is-error { color: #fecaca; }
+#modal-sandstone-labyrinth .laby3d-game { position: relative; display: flex; flex-direction: column; gap: 8px; }
+#modal-sandstone-labyrinth .laby3d-game.is-locked .monolith-game-inner { filter: grayscale(0.9) brightness(0.45); pointer-events: none; }
+#modal-sandstone-labyrinth .laby3d-game:not(.is-locked) .monolith-lock-note { display: none; }
+#modal-sandstone-labyrinth .monolith-game-inner { display: flex; flex-direction: column; gap: 8px; }
+#modal-sandstone-labyrinth .laby-pad { grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(3, 46px); margin-top: 2px; }
+#modal-sandstone-labyrinth .laby-pad .chasm3d-btn { padding: 0; font-size: 1.1rem; }
+#modal-sandstone-labyrinth .laby-pad .laby-wait { font-size: 0.7rem; font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
+#modal-sandstone-labyrinth .laby-pad .chasm3d-btn.is-pressed { transform: scale(0.92); box-shadow: 0 0 14px rgba(253, 230, 138, 0.5); }
+#modal-sandstone-labyrinth .laby3d-eqs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0; }
+#modal-sandstone-labyrinth .laby3d-eq-note { font-size: 0.78rem; color: #b8a07a; margin: 0; text-align: center; }
+
+/* the red of a close call washes over the scene */
+#modal-sandstone-labyrinth .chasm3d-stage.laby-flash::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 4;
+  animation: laby3d-caught 0.8s ease-out both;
+}
+@keyframes laby3d-caught { 0% { box-shadow: inset 0 0 0 999px rgba(185, 28, 28, 0.38); } 100% { box-shadow: inset 0 0 0 999px rgba(185, 28, 28, 0); } }
+
+/* without WebGL the map is the game: it fills the scene */
+#modal-sandstone-labyrinth .chasm3d-stage.is-flat .laby3d-map-wrap {
+  top: 50%; left: 50%; right: auto; transform: translate(-50%, -54%); width: min(86%, 560px);
+}
+@media (max-width: 760px) {
+  #modal-sandstone-labyrinth .laby3d-map-wrap { width: 40%; }
+  #modal-sandstone-labyrinth .laby3d-danger { font-size: 0.7rem; padding: 4px 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #modal-sandstone-labyrinth .laby3d-danger.is-on, #modal-sandstone-labyrinth .laby-lives .is-lost, #modal-sandstone-labyrinth .chasm3d-stage.laby-flash::after { animation: none; }
+}

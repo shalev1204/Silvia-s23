@@ -1,0 +1,62 @@
+/* Station 17 · the Courtyard of Rays in 3D (the shared look lives in s10-chasm-walk.css; the court, the clock and the ceremony in s17-solstice-arch.css) */
+#modal-solstice-arch [hidden] { display: none !important; }
+#modal-solstice-arch .chasm3d-hud { z-index: 3; }
+#modal-solstice-arch .chasm3d-fade { background: #05060f; }
+
+/* the clock of the sun, over the scene while the dawn runs */
+#modal-solstice-arch .solstice3d-sun {
+  position: absolute; top: 12px; left: 50%; width: min(380px, 70%); transform: translate(-50%, -6px); padding: 6px 12px 8px;
+  background: rgba(24, 14, 8, 0.72); border: 1px solid rgba(253, 230, 138, 0.4); border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); opacity: 0; transition: opacity 0.35s ease, transform 0.35s ease; pointer-events: none;
+}
+#modal-solstice-arch .solstice3d-sun.is-on { opacity: 1; transform: translate(-50%, 0); }
+#modal-solstice-arch .solstice3d-sun-label { display: block; text-align: center; font-family: 'Cinzel', Georgia, serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; color: #fde68a; }
+#modal-solstice-arch .solstice3d-sun .solstice-clock { margin-top: 5px; }
+#modal-solstice-arch .solstice3d-sun.is-late .solstice3d-sun-label { color: #fecaca; animation: solstice3d-late 0.8s ease-in-out infinite alternate; }
+#modal-solstice-arch .solstice3d-sun.is-late .solstice-clock span { background: linear-gradient(90deg, #ef4444, #f59e0b); }
+@keyframes solstice3d-late { from { opacity: 1; } to { opacity: 0.55; } }
+
+/* what a click on the scene would do */
+#modal-solstice-arch .solstice3d-aim {
+  position: absolute; top: 74px; left: 50%; transform: translate(-50%, -4px); padding: 5px 12px; border-radius: 999px;
+  font-family: 'Cinzel', Georgia, serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap;
+  color: #fff7d6; background: rgba(20, 24, 50, 0.85); border: 1px solid rgba(253, 230, 138, 0.55);
+  opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; pointer-events: none;
+}
+#modal-solstice-arch .solstice3d-aim.is-on { opacity: 1; transform: translate(-50%, 0); }
+#modal-solstice-arch .chasm3d-stage.is-night .solstice3d-aim { top: auto; bottom: 64px; }
+
+/* the panel: the sigil, then the part she is in */
+#modal-solstice-arch .laby3d-sigil { display: flex; flex-direction: column; gap: 8px; }
+#modal-solstice-arch .laby3d-sigil.is-collapsed .laby3d-input,
+#modal-solstice-arch .laby3d-sigil.is-collapsed #btn-solstice-speak { display: none; }
+#modal-solstice-arch .monolith-feedback { min-height: 1.2em; font-size: 0.88rem; color: #d6c3a0; }
+#modal-solstice-arch .monolith-feedback.is-ok { color: #bbf7d0; }
+#modal-solstice-arch .monolith-feedback.is-error { color: #fecaca; }
+#modal-solstice-arch .laby3d-game { position: relative; display: flex; flex-direction: column; gap: 8px; }
+#modal-solstice-arch .laby3d-game.is-locked .monolith-game-inner { filter: grayscale(0.9) brightness(0.45); pointer-events: none; }
+#modal-solstice-arch .laby3d-game:not(.is-locked) .monolith-lock-note { display: none; }
+#modal-solstice-arch .monolith-game-inner { display: flex; flex-direction: column; gap: 8px; }
+#modal-solstice-arch .pillars-row { margin-top: 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#modal-solstice-arch .solstice3d-dawn-row .is-way { flex: 1; }
+#modal-solstice-arch .solstice-court { max-height: 300px; margin-top: 6px; }
+#modal-solstice-arch .solstice-flash-btn { margin-top: 0; min-height: 58px; }
+#modal-solstice-arch .solstice-pulses { flex: 1; }
+#modal-solstice-arch .laby3d-eqs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0; }
+#modal-solstice-arch .laby3d-eq-note { font-size: 0.78rem; color: #b8a07a; margin: 0; text-align: center; }
+#modal-solstice-arch .solstice-locks b { transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(.2, .9, .3, 1.4); }
+#modal-solstice-arch .solstice-locks b.is-on { transform: scale(1.12); }
+
+/* the night horizon is the scene itself; it is drawn in the panel only without WebGL */
+#modal-solstice-arch .chasm3d-stage:not(.is-flat) ~ .chasm3d-panel .solstice-night { display: none; }
+#modal-solstice-arch .chasm3d-stage.is-flat .solstice3d-aim { display: none; }
+
+@media (max-width: 760px) {
+  #modal-solstice-arch .solstice3d-sun { width: 82%; top: 8px; padding: 4px 8px 6px; }
+  #modal-solstice-arch .solstice3d-sun-label { font-size: 0.72rem; }
+  #modal-solstice-arch .solstice3d-aim { top: 60px; font-size: 0.7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #modal-solstice-arch .solstice3d-sun.is-late .solstice3d-sun-label { animation: none; }
+  #modal-solstice-arch .solstice-locks b { transition: none; }
+}

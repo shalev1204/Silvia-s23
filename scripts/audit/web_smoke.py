@@ -157,7 +157,14 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
     if seed:
         # the openings and endings of the Salt Playa and the Desert Lexicon play once: the tests that are not about them find them seen
         if cine_seen:
-            seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen"}, **seed)
+            seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen",
+                         "order_labyrinth_cine_intro": "seen", "order_labyrinth_howto": "seen",
+                         "order_cairn4_cine_intro": "seen", "order_cairn4_howto": "seen",
+                         "order_cairn5_cine_intro": "seen", "order_cairn5_howto": "seen",
+                         "order_stele_cine_intro": "seen", "order_stele_howto": "seen",
+                         "order_oracle_cine_intro": "seen", "order_oracle_howto": "seen",
+                         "order_masks_cine_intro": "seen", "order_masks_howto": "seen",
+                         "order_camera_cine_intro": "seen", "order_camera_howto": "seen"}, **seed)
         page.add_init_script(SEED_JS % json.dumps(seed))
     return ctx, page, errors
 
@@ -524,6 +531,13 @@ def test_sandstone_labyrinth(browser):
         js("window.__labyrinth.step(0, 0)")
     st = js("window.__labyrinth.state()")
     check(st["lives"] == 3 and st["moves"] == 12, "holding still at the cairn is safe", str(st))
+    js("window.__labyrinth.settle()")
+    w = js("window.__labyrinth.world()")
+    guards_now = [r[st["t"] % len(r)] for r in level["guards"]]
+    check(w["gl"] and 0 < w["walls"] < w["wallsTotal"] and w["tiles"] == 15 and w["lit"] > 0 and w["hermes"] == [6, 0]
+          and w["raiders"] == guards_now and w["rings"] >= 1 and w["post"],
+          "3D: the lamp has raised only the walls near the cairn, the torches stand on their squares and light the ground",
+          f"walls {w['walls']}/{w['wallsTotal']}, tiles {w['tiles']}, lit {w['lit']}, raiders {w['raiders']} vs {guards_now}")
 
     # The shortest road that ignores the torches gets Hermes caught
     page.reload(); page.wait_for_timeout(2500)
@@ -544,6 +558,11 @@ def test_sandstone_labyrinth(browser):
           "the verified route escapes: Seal of Cairn III granted")
     check(get("order_labyrinth_star_seen") == "true" and get("order_labyrinth_camp_seen") == "true", "the route passes the gold star and the camp")
     check(js("window.__labyrinth.state().lives") == 3, "the verified route takes no close calls")
+    page.wait_for_timeout(5600)
+    js("window.__labyrinth.settle()")
+    w = js("window.__labyrinth.world()")
+    check(w["walls"] == w["wallsTotal"] and w["lit"] == 0 and w["star"] and w["camp"] and w["rings"] == 0,
+          "3D: out through the cleft, the whole labyrinth stands up and the torchlight goes", str({k: w[k] for k in ("walls", "wallsTotal", "lit", "rings")}))
     page.click("#btn-close-labyrinth"); page.wait_for_timeout(300)
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
@@ -622,6 +641,15 @@ def test_cairn_four(browser):
     check(words == ["SUN", "ECHO", "STONE"], "the verses spell the founders' words", str(words))
     js("window.__cairn4.play()"); page.wait_for_timeout(1500)
     check("playing" in js("document.getElementById('pillars-tape-status').innerText"), "the wind plays verse I on the tape")
+    w = js("window.__cairn4.world()")
+    check(w["gl"] and w["fissures"] == 16 and w["known"] == [] and w["post"], "3D: the gorge stands with its sixteen fissures, none read yet", str(w))
+    # she can name a fissure by clicking it on the cliff, like the plan
+    js("window.__cairn4.gfx().cam.p = null"); page.wait_for_timeout(300)
+    aim = js("window.__cairn4.aimAt('L35')")
+    page.mouse.click(aim["x"], aim["y"]); page.wait_for_timeout(200)
+    check(js("document.getElementById('pillars-slots').innerText").startswith("L · 35") and js("window.__cairn4.world()").get("markers") == 1,
+          "3D: clicking a fissure on the cliff marks it, with its token at its foot")
+    js("document.getElementById('btn-pillars-undo').click()")
     # A wrong verse is refused and counted
     for fid in ["L35", "L45", "R25"]:
         js(f"window.__cairn4.mark('{fid}')")
@@ -641,6 +669,10 @@ def test_cairn_four(browser):
         if i < 2:
             check(get("order_cairn4_verses") == str(i + 1), f"verse {i + 1} rings true")
     check(get("order_cairn_iv_completed") == "true" and get("order_seal_cairn_4") == "true", "three verses sung: Seal of Cairn IV granted")
+    page.wait_for_timeout(1500)
+    js("window.__cairn4.frames(90)")   # a busy machine draws few frames: step the scene the 3 s the chamber takes to open
+    w = js("window.__cairn4.world()")
+    check(len(w["known"]) == 8 and w["opened"] == 1 and w["markers"] == 0, "3D: the answering fissures show their letters and the chamber opens", str(w))
     check("tuning_pebble" in js("window.getOwnedRelicIds()"), "the Tuning Pebble is in the satchel")
     page.click("#btn-close-pillars"); page.wait_for_timeout(300)
 
@@ -742,6 +774,16 @@ def test_solstice_arch(browser):
     check(get("order_cairn5_hint") == "true" and get("order_cairn5_awake") is None, "6 wrong sigils unlock the older hint, the altar stays closed")
     page.fill("#solstice-key-input", " day-break "); page.click("#btn-solstice-speak"); page.wait_for_timeout(250)
     check(get("order_cairn5_awake") == "true", "forgiving sigil 'day-break' wakes the altar")
+    w = js("window.__cairn5.world()")
+    check(w["gl"] and w["mirrors"] == 12 and w["beam"] == 0 and w["post"], "3D: the courtyard stands with its twelve mirrors, no ray before the dawn", str(w))
+    # she can turn a mirror by clicking it in the courtyard, like the plan
+    js("window.__cairn5.gfx().cam.p = null"); js("window.__cairn5.frames(2)"); page.wait_for_timeout(300)
+    before = js("window.__cairn5.mirrors()")
+    aim17 = js("window.__cairn5.aimAt(4)")
+    page.mouse.click(aim17["x"], aim17["y"]); page.wait_for_timeout(200)
+    after = js("window.__cairn5.mirrors()")
+    check(after[4] != before[4] and after[:4] + after[5:] == before[:4] + before[5:], "3D: clicking a mirror in the courtyard turns it", before + " -> " + after)
+    js("window.__cairn5.turn(4)")
 
     court = js("window.__cairn5.court")
     routes = [dawn_routes(court, col) for col in court["entries"]]
@@ -769,11 +811,20 @@ def test_solstice_arch(browser):
     check(get("order_cairn5_dawn_hint") == "true" and "45 seconds" in js("document.getElementById('solstice-hint').textContent"),
           "6 spent dawns: each ray waits 45 seconds")
     js("window.__cairn5.startDawn()")
+    js("window.__cairn5.frames(30)")
+    w = js("window.__cairn5.world()")
+    check(w["beam"] >= 1 and w["sky"] > 0, "3D: at dawn the ray comes under the arch and the sky warms", str(w))
     for k, r in enumerate(routes):
         aim(r[0])
         page.wait_for_timeout(150)
     st = js("window.__cairn5.state()")
     check(st["dawnDone"] and get("order_cairn5_dawn_done") == "true", "four rays reach the altar: the ring closes its four locks", str(st))
+    js("window.__cairn5.frames(90)")
+    w = js("window.__cairn5.world()")
+    check(w["locks"] == 4 and w["ending"] == 1 and w["rayEnd"] == "altar" and w["seal"] > 0.9, "3D: the last ray holds on the ring, its four locks lit, and the seal rises", str(w))
+    js("window.__cairn5.toNight()"); page.wait_for_timeout(1000); js("window.__cairn5.frames(5)")
+    w = js("window.__cairn5.world()")
+    check(w["night"] and w["beam"] == 0 and w["sky"] < 0.05, "3D: then night falls under the arch, Tower II on the horizon", str(w))
 
     rounds = js("window.__cairn5.rounds")
     js("window.__cairn5.flash('L')"); js("window.__cairn5.send()")
@@ -792,6 +843,9 @@ def test_solstice_arch(browser):
     check(js("getComputedStyle(document.getElementById('five-seals-overlay')).display") != "none" and get("order_five_seals_celebrated") == "true",
           "the five seals come home (ceremony)")
     check("signal_mirror" in js("window.getOwnedRelicIds()"), "the Signal Mirror is in the satchel")
+    js("window.__cairn5.frames(200)")
+    w = js("window.__cairn5.world()")
+    check(w["night"] and w["fire"] > 0.9, "3D: a red glow rises at the foot of Tower II", str(w))
     page.click("#btn-five-seals-close"); page.click("#btn-close-solstice"); page.wait_for_timeout(300)
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
@@ -933,8 +987,11 @@ def test_polybius_stele(browser):
         page.fill("#stele-key-input", words); page.click("#btn-stele-speak"); page.wait_for_timeout(120)
     check(get("order_stele_hint") == "true" and get("order_stele_awake") is None, "6 wrong proverbs unlock the older hint, the stele stays still")
     page.fill("#stele-key-input", "stars, guide those who seek truth!"); page.click("#btn-stele-speak"); page.wait_for_timeout(300)
-    check(get("order_stele_awake") == "true" and "348" in js("document.getElementById('stele-telem-proverb').innerText"),
+    check(get("order_stele_awake") == "true" and "348" in js("document.getElementById('stele-key-feedback').innerText"),
           "the proverb (any case and punctuation) turns the stele: 348° NNW")
+    w = js("window.__stele.world()")
+    check(w["gl"] and w["post"] and w["phase"] == "stele" and w["fire"] == 0 and w["ash"] == 0 and not w["servant"],
+          "3D: the burning atrium stands, the camera on the stele, the mats not yet alight", str(w))
 
     # The knocks, decoded here from the grid of Sheet 17A and the Law of the Inverted Mirage
     grid = js("window.__stele.grid")
@@ -1003,6 +1060,11 @@ def test_polybius_stele(browser):
     st = js("window.__stele.state()")
     check(st["knocks"] == 4 and st["run"] == {"x": 4, "y": 8, "t": 0} and js("document.querySelector('#stele-fire-game .monolith-game-inner').inert") is False,
           "ASH: the burning atrium opens, Hermes at the side door")
+    page.wait_for_timeout(600)
+    w = js("window.__stele.world()")
+    check(w["stele"] == 3.14 and w["phase"] == "fire" and w["glow"] > 0 and sorted(w["rings"]) == ["gold", "gold", "gold", "gold"]
+          and js("document.getElementById('stele3d-breath').classList.contains('is-on')") and not js("document.getElementById('stele3d-map-wrap').hidden"),
+          "3D: the stele has turned, the fire spreads from the library, rings round Hermes, the breath bar and the plan show", str(w))
 
     # The burning atrium, solved by its own search
     atrium = js("window.__stele.atrium")
@@ -1017,7 +1079,12 @@ def test_polybius_stele(browser):
     check(run() == {"x": 4, "y": 8, "t": 0} and get("order_stele_fire_fails") == "1" and "Too slow" in js("document.getElementById('stele-move-feedback').innerText"),
           "holding still for 15 turns: too slow, back to the side door")
     # three steps north and a pause: the flagstone to the west is burning now and next turn, so it is refused
-    for d in ((0, -1), (0, -1), (0, -1), (0, 0)):
+    # the first step by clicking the flagstone in the scene, as she would
+    js("window.__stele.settle()"); js("window.__stele.gfx().cam.p = null"); js("window.__stele.frames(2)"); page.wait_for_timeout(300)
+    aim18 = js("window.__stele.aimAt(0, -1)")
+    page.mouse.click(aim18["x"], aim18["y"]); page.wait_for_timeout(200)
+    check(run() == {"x": 4, "y": 7, "t": 1}, "3D: clicking the flagstone north of Hermes takes the step", str(run()))
+    for d in ((0, -1), (0, -1), (0, 0)):
         js(f"window.__stele.move({d[0]}, {d[1]})")
     js("window.__stele.move(-1, 0)")
     check(run() == {"x": 4, "y": 5, "t": 4} and "burning" in js("document.getElementById('stele-move-feedback').innerText"),
@@ -1035,10 +1102,16 @@ def test_polybius_stele(browser):
         caught()
     check(get("order_stele_fire_fails") == "6" and get("order_stele_fire_hint") == "true" and js("[...document.querySelectorAll('#stele-atrium text')].length") > 10,
           "six failed crossings: every flagstone shows when it catches")
+    js("window.__stele.settle()")
+    check(js("window.__stele.world()")["numbers"] > 10, "3D: the numbers of the fire stand over the flagstones too")
     for dx, dy in moves:
         js(f"window.__stele.move({dx}, {dy})")
     page.wait_for_timeout(500)
     check(get("order_polybius_stele_completed") == "true", "the searched route reaches the hatch: the Servant is alive")
+    page.wait_for_timeout(5500)
+    w = js("window.__stele.world()")
+    check(w["lid"] == 1 and w["servant"] and w["rise"] == 1 and w["phase"] == "end" and w["rings"] == [],
+          "3D: the bronze hatch lifts and the Servant climbs out of the well", str(w))
     check("servant_key" in js("window.getOwnedRelicIds()"), "the Servant's Key is in the satchel")
     check(js("getComputedStyle(document.getElementById('stele-victory')).display") != "none", "the victory card shows")
     page.click("#btn-close-stele"); page.wait_for_timeout(300)
@@ -1115,6 +1188,10 @@ def test_oracle_horizon(browser):
     check(modal_open() and not gates_open() and js("document.querySelector('#oracle-disc-game .monolith-game-inner').inert") is True
           and js("document.querySelector('#oracle-vow-game .monolith-game-inner').inert") is True,
           "the chamber opens, the disc and the vow locked until the sigil")
+    w = js("window.__oracle.world()")
+    check(w.get("gl") and w.get("phase") == "door" and w.get("door") == 0 and w.get("sockets") == 0 and w.get("post"),
+          "3D: Hermes waits outside the shut door of the inner chamber, its eight sockets dark", w)
+    check(js("document.getElementById('oracle3d-status').innerText") == "The door is shut", "the status over the scene: the door is shut")
     for word in ["OVERTURN", "OVERTUREE", "ORACLE"]:
         page.fill("#oracle-key-input", word); page.click("#btn-oracle-speak"); page.wait_for_timeout(120)
     check(get("order_hint_s19-sigil_level") == "1" and get("order_oracle_hint") is None, "3 wrong sigils bring Hermes's first note")
@@ -1123,6 +1200,24 @@ def test_oracle_horizon(browser):
     check(get("order_oracle_hint") == "true" and get("order_oracle_awake") is None, "6 wrong sigils open the Ask Hermes hint, the door stays shut")
     page.fill("#oracle-key-input", " over-ture "); page.click("#btn-oracle-speak"); page.wait_for_timeout(250)
     check(get("order_oracle_awake") == "true", "forgiving sigil 'over-ture' opens the inner chamber")
+    page.wait_for_timeout(2600)
+    w = js("window.__oracle.world()")
+    check(w.get("sockets") == 8 and 0 < w.get("door", 0), "3D: the eight sockets glow and the slab starts to sink", w)
+    page.wait_for_timeout(5200)
+    for _ in range(24):   # a slow headless GPU walks him slower: wait for him, up to 12 s more
+        w = js("window.__oracle.world()")
+        if w.get("phase") == "disc" and w.get("door", 0) > 3 and w.get("hermes") and w["hermes"][1] < 3:
+            break
+        page.wait_for_timeout(500)
+    check(w.get("phase") == "disc" and w.get("door", 0) > 3 and w.get("hermes") and w["hermes"][1] < 3,
+          "3D: the door is down, Hermes stands before the Oracle and the camera comes close to the disc", w)
+    rot0 = js("window.__oracle.rot()")
+    pt = js("window.__oracle.aimRing(2)")
+    page.mouse.click(pt["x"], pt["y"]); page.wait_for_timeout(250)
+    check(js("window.__oracle.rot()")[2] == (rot0[2] + 1) % 8, "a click on the inner ring of the 3D disc turns it clockwise", [rot0, js("window.__oracle.rot()")])
+    pt = js("window.__oracle.aimRing(0)")
+    page.mouse.click(pt["x"], pt["y"], button="right"); page.wait_for_timeout(250)
+    check(js("window.__oracle.rot()")[0] == (rot0[0] + 7) % 8, "a right-click on the outer ring turns it back", js("window.__oracle.rot()"))
 
     # The disc, set by the sky the page draws: before dawn on 20 October at 30° N, Aldebaran stands in the west
     # (azimuth about 264°), Capella in the north-west (about 310°) and Polaris in the north
@@ -1139,13 +1234,17 @@ def test_oracle_horizon(browser):
     check(js("window.__oracle.rot()") == [0, 0, 0] and reading == "DECEMBEREIGHTEENTOTWENTY",
           "three stars set to the sky: read from the north, rim to heart, the disc says DECEMBER EIGHTEEN TO TWENTY")
     check(js("getComputedStyle(document.getElementById('oracle-read-panel')).display") != "none", "the shining disc can be read")
+    page.wait_for_timeout(600)
+    w = js("window.__oracle.world()")
+    check(w.get("jewel", 0) > 0.5 and all(abs(a) < 0.05 or abs(abs(a) - 6.28) < 0.05 for a in w.get("rings", [1])),
+          "3D: the three rings turned true and the jewel at the heart wakes", w)
     js("window.__oracle.read('DECEMBER EIGHTEEN')")
     check(get("order_oracle_when_read") is None and get("order_oracle_read_fails") == "1", "half the reading is refused")
     for wrong in ["december 2018 2020", "18 december 2020"]:
         js(f"window.__oracle.read('{wrong}')")
     check(get("order_oracle_when_read") is None, "years are not days: 2018 / 2020 are refused")
     js("window.__oracle.read('the eighteenth to the twentieth of December')")
-    check(get("order_oracle_when_read") == "true" and "18 – 20 DECEMBER" in js("document.getElementById('oracle-telem-when').innerText"),
+    check(get("order_oracle_when_read") == "true" and "18 – 20 December" in js("document.getElementById('oracle-when').innerText"),
           "the WHEN read in Hermes's own words is accepted: 18 – 20 December")
 
     # The vow, from the words she half remembers
@@ -1161,6 +1260,9 @@ def test_oracle_horizon(browser):
     page.wait_for_timeout(400)
     check(get("order_oracle_horizon_completed") == "true" and "Aurelia" in feedback("oracle-dispatch-text"),
           "the vow is said: the veil comes off")
+    page.wait_for_timeout(2400)
+    w = js("window.__oracle.world()")
+    check(w.get("phase") == "end" and w.get("onAltar"), "3D: she lays the disc on the altar and the camera steps back", w)
     check("gilded_star" in js("window.getOwnedRelicIds()"), "the Gilded Star is in the satchel")
     page.click("#btn-oracle-finish"); page.wait_for_timeout(1200)
     check(js("getComputedStyle(document.getElementById('stage-passage-overlay')).display") != "none" and get("order_stage_passage_seen") == "true",
@@ -1437,6 +1539,18 @@ def test_masks_gate(browser):
     js("window.selectStageStation(40)"); page.wait_for_timeout(500)
     check(modal_open() and js("document.querySelector('#masks-draw-game .monolith-game-inner').inert") is True,
           "they arrive: the gate opens its modal, the drawing locked until the word")
+    world = lambda: js("window.__masks.world()")
+
+    def wait_world(ok, secs):
+        for _ in range(int(secs * 2)):
+            w = world()
+            if ok(w):
+                return w
+            page.wait_for_timeout(500)
+        return world()
+    w = world()
+    check(w.get("gl") and w.get("phase") == "gate" and w.get("gate") == 0 and w.get("glass") is False and w.get("post"),
+          "3D: a wall of masks shuts the gate, and no glass stands in the scene yet", w)
     notes = lambda anchor: js(f"(() => {{ const b = document.getElementById('{anchor}').nextElementSibling; return b && b.classList.contains('hint-ladder') && b.offsetParent ? b.querySelectorAll('.hint-ladder-note').length : 0; }})()")
 
     def wrong_words(n):
@@ -1452,6 +1566,9 @@ def test_masks_gate(browser):
           "9 wrong words: the third note does the first two masks with her, never the word")
     page.fill("#masks-key-input", " sil-ver "); page.click("#btn-masks-speak"); page.wait_for_timeout(250)
     check(get("order_masks_gate_awake") == "true" and notes("masks-key-feedback") == 0, "the word SILVER, typed loosely, opens the gate and the notes go")
+    w = wait_world(lambda w: w.get("gate") == 1 and w.get("phase") == "mask" and w.get("glass") and (w.get("hermes") or [0, 9])[1] < 0, 20)
+    check(w.get("gate") == 1 and w.get("phase") == "mask" and w.get("glass") and w.get("hermes") and w["hermes"][1] < 0,
+          "3D: the wall parts like a curtain, Hermes walks in, and the glass stands beside the first mask", w)
 
     js("window.__masks.drawHalf()"); page.click("#btn-masks-hold"); page.wait_for_timeout(150)
     check("missing" in feedback("masks-draw-feedback") and js("window.__masks.carved()") == 0, "an outline without its eye is refused")
@@ -1477,6 +1594,8 @@ def test_masks_gate(browser):
         page.mouse.up()
     page.click("#btn-masks-hold"); page.wait_for_timeout(1700)
     check(js("window.__masks.carved()") == 1 and get("order_masks_draw_fails") == "0", "a shaking hand, drawn with the mouse, makes the first mask whole")
+    w = wait_world(lambda w: w.get("open", [0])[0] > 0.9 and w.get("whole", 0) >= 1, 8)
+    check(w.get("open", [0])[0] > 0.9 and w.get("whole", 0) >= 1, "3D: the first mask is whole on both sides and its mirror swings open", w)
     # The second mask drawn with the keyboard alone: the arrows walk the pen along each line, Space puts it down and lifts it
     page.focus("#masks-canvas")
     page.keyboard.press("ArrowRight")   # the pen appears
@@ -1521,6 +1640,9 @@ def test_masks_gate(browser):
     check(get("order_masks_gate_completed") == "true" and js("getComputedStyle(document.getElementById('masks-victory')).display") != "none"
           and js("document.querySelectorAll('#masks-fragment-svg path').length") > 3,
           "three masks whole: the gate is open and Fragment I is drawn")
+    w = wait_world(lambda w: w.get("phase") == "end" and w.get("whole") == 3 and w.get("shard", 0) > 0.5 and w.get("glass") is False, 12)
+    check(w.get("phase") == "end" and w.get("whole") == 3 and w.get("shard", 0) > 0.5 and w.get("glass") is False,
+          "3D: the last mirror opens on the niche and Fragment I shines in it", w)
     page.click("#btn-masks-finish-station"); page.wait_for_timeout(900)
     st = js("""() => ({ path: document.documentElement.dataset.mapPath, set: document.querySelectorAll('.sm-shard.is-set').length,
         fresh: document.querySelectorAll('.sm-shard.is-new').length })""")
@@ -1549,7 +1671,10 @@ def test_hint_ladder(browser):
     get = lambda key: js("k => localStorage.getItem(k)", key)
     notes = lambda: js("(() => { const b = document.getElementById('masks-key-feedback').nextElementSibling; return b && b.classList.contains('hint-ladder') && b.offsetParent ? b.querySelectorAll('.hint-ladder-note').length : 0; })()")
     js("window.openMasksModal()")
-    page.wait_for_timeout(6500)
+    # building the 3D gate holds the page for a moment, so the 5 s tick that crosses ten minutes can land late
+    for _ in range(28):
+        page.wait_for_timeout(500)
+        if notes() == 1: break
     check(notes() == 1 and get("order_hint_s20-word_level") == "1", "ten minutes stuck on the word bring Hermes's first note")
     js("window.closeMasksModal()")
     # 20 min = 1200 s. At most one 5 s tick lands while the modal fades out; 20 s more on screen would cross it
@@ -2584,6 +2709,11 @@ def test_camera_obscura(browser):
     js("window.selectStageStation(41)"); page.wait_for_timeout(500)
     check(modal_open() and js("window.__camera.angle()") == 180 and not js("window.__camera.sharp()")
           and js("document.getElementById('camera-city').style.filter").startswith("blur"), "the dark room opens with the city upside down and blurred")
+    page.wait_for_timeout(1500)
+    w, wall = js("window.__camera.world()"), js("window.__camera.wallRect()")
+    check(w.get("gl") and w.get("phase") == "wall" and w.get("picture") and w.get("post") and w.get("sharpK", 1) < 0.3 and wall
+          and all(abs(a - b) <= 3 for a, b in zip(w["rect"], wall)),
+          "3D: the drawing of the city lies exactly on the picture of the far wall, dim while it is blurred", str((w, wall)))
     check(js("document.querySelectorAll('#camera-city .camera-spot').length") == 11 and js("document.querySelectorAll('#camera-city .camera-smoke').length") == 9,
           "eleven places can be pointed at and three chimneys smoke on the wall")
     js("window.__camera.pick('house_d')"); page.wait_for_timeout(200)
@@ -2595,6 +2725,12 @@ def test_camera_obscura(browser):
     page.keyboard.press("Home")
     check(js("window.__camera.angle()") == 0 and js("window.__camera.sharp()") and js("document.getElementById('camera-ring').getAttribute('aria-valuetext')") == "upright and sharp",
           "Home stands the picture upright and sharp")
+    for _ in range(12):
+        w = js("window.__camera.world()")
+        if w.get("sharpK", 0) > 0.8:
+            break
+        page.wait_for_timeout(250)
+    check(w.get("sharpK", 0) > 0.8 and abs(w.get("lens", 1)) < 0.01, "3D: the beam brightens on the wall as the lens comes true", w)
     page.keyboard.press("End"); page.keyboard.press("PageDown"); page.keyboard.press("ArrowLeft")
     check(js("window.__camera.angle()") == 130, "End, Page Down and the left arrow turn the ring by 45 and 5 degrees", str(js("window.__camera.angle()")))
     box = page.locator("#camera-ring").bounding_box()
@@ -2609,17 +2745,23 @@ def test_camera_obscura(browser):
     check("new flag" in js("document.getElementById('camera-feedback').innerText") and js("window.__camera.found()") == ["flag"],
           "a place that changed but hides nobody is named as one of the four changes")
     js("window.__camera.pick('market')"); page.wait_for_timeout(300)
-    check(js("document.getElementById('camera-telem-found').innerText") == "[ 2 / 4 ]" and notes() == 1 and get("order_camera_obscura_completed") is None,
+    check(js("document.querySelectorAll('#camera-changes .is-found').length") == 2 and notes() == 1 and get("order_camera_obscura_completed") is None,
           "three misses: two changes seen and Hermes's first note appears under the wall")
     js("window.__camera.pick('house_c'); window.__camera.pick('gate'); window.__camera.pick('bridge')"); page.wait_for_timeout(300)
     check(notes() == 2 and js("window.__camera.fails()") == 6, "six misses: the second note")
     page.focus("#camera-city .camera-spot[data-place='house_d']")
     page.keyboard.press("Enter"); page.wait_for_timeout(500)
-    check(get("order_camera_obscura_completed") == "true" and js("document.getElementById('camera-telem-found').innerText") == "4 / 4 ✓"
+    check(get("order_camera_obscura_completed") == "true" and js("document.querySelectorAll('#camera-changes .is-found').length") == 4
           and js("document.getElementById('camera-victory').style.display") != "none" and js("window.__camera.angle()") == 0,
           "the keyboard points at the narrow house: the hideout is found, four changes seen")
     check(js("document.getElementById('camera-fragment-svg').childNodes.length") > 3 and "Fragment II" in js("document.getElementById('camera-victory').innerText"),
           "Fragment II is drawn in the victory card")
+    for _ in range(28):
+        w = js("window.__camera.world()")
+        if w.get("phase") == "end" and w.get("ghost"):
+            break
+        page.wait_for_timeout(500)
+    check(w.get("phase") == "end" and w.get("ghost") and not w.get("picture"), "3D: the camera turns to the dark glass, where the Mirror Speaker shows for a moment", w)
     page.click("#btn-camera-finish-station"); page.wait_for_timeout(1200)
     st = js(MIRROR_JS)
     check(not modal_open() and st["set"] == 2 and st["next"] == "42", "closing the room sets Fragment II and the mirror points at the Whispering Gallery", str(st)[:160])
@@ -2739,6 +2881,7 @@ def test_whispering_gallery(browser):
           "at the west pin every word arrives, and the bells of the niche appear")
     page.wait_for_timeout(1600); wait_tune()
     check(not js("window.__gallery.playing()") and js("document.querySelectorAll('#gallery-bells .gallery-bell').length") == 5, "the tune has played: five bells wait")
+    check(js("window.EclipseAmbience.state().hushed") is True, "the music falls silent while the bells must be heard")
 
     # the tune note for note is what the raiders did; a wrong one is refused; the mirror opens the niche
     js("window.__gallery.tune.forEach(b => window.__gallery.strike(b))"); page.wait_for_timeout(300)
@@ -2753,6 +2896,7 @@ def test_whispering_gallery(browser):
     page.wait_for_timeout(900)
     check(get("order_whispering_gallery_completed") == "true" and shown("gallery-victory") and "OPEN" in text("gallery-telem-niche"),
           "the tune played back from its last bell to its first opens the niche")
+    check(js("window.EclipseAmbience.state().hushed") is False, "with the niche open the music comes back")
     check(js("document.getElementById('gallery-fragment-svg').childNodes.length") > 3 and "[J] × 2 = [T]" in text("gallery-victory"),
           "Fragment III and the line of the niche are in the victory card")
     page.click("#btn-gallery-finish-station"); page.wait_for_timeout(1200)

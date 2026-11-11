@@ -1,0 +1,45 @@
+/* Station 20 · the gate of Tower III in 3D (the shared look lives in s10-chasm-walk.css; the drawing and the fragment in s20-masks-gate.css) */
+#modal-masks-gate [hidden] { display: none !important; }
+#modal-masks-gate .chasm3d-hud { z-index: 3; }
+#modal-masks-gate .chasm3d-fade { background: #07030a; }
+
+/* the pane of glass she draws on, standing in the corridor beside the mask it answers */
+#modal-masks-gate .masks3d-glass {
+  position: absolute; top: 50%; right: 5%; transform: translateY(-52%);
+  height: min(82%, 560px); aspect-ratio: 300 / 410; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px; border-radius: 16px; pointer-events: auto;
+  background: linear-gradient(160deg, rgba(60, 30, 70, 0.55), rgba(10, 4, 14, 0.72));
+  border: 1.5px solid rgba(247, 220, 140, 0.6);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(216, 180, 254, 0.12);
+  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+}
+#modal-masks-gate .masks3d-glass .masks-canvas { max-width: none; width: auto; height: calc(100% - 26px); background: radial-gradient(ellipse at 30% 40%, rgba(42, 11, 36, 0.86) 0%, rgba(18, 4, 14, 0.92) 75%); }
+#modal-masks-gate .masks3d-glass .masks-canvas:focus-visible { outline: 2px solid #e9d5ff; outline-offset: 2px; }
+#modal-masks-gate .masks3d-glass-cap { margin: 0; font-size: 0.68rem; color: #e9d5ff; text-align: center; letter-spacing: 0.03em; }
+
+/* the panel */
+#modal-masks-gate .laby3d-sigil { display: flex; flex-direction: column; gap: 8px; }
+#modal-masks-gate .laby3d-sigil.is-collapsed .laby3d-input,
+#modal-masks-gate .laby3d-sigil.is-collapsed #btn-masks-speak { display: none; }
+#modal-masks-gate .monolith-feedback { min-height: 1.2em; font-size: 0.88rem; color: #d6c3a0; }
+#modal-masks-gate .monolith-feedback.is-ok { color: #bbf7d0; }
+#modal-masks-gate .monolith-feedback.is-error { color: #fecaca; }
+#modal-masks-gate .laby3d-game { position: relative; display: flex; flex-direction: column; gap: 8px; }
+#modal-masks-gate .laby3d-game.is-locked .monolith-game-inner { filter: grayscale(0.9) brightness(0.45); pointer-events: none; }
+#modal-masks-gate .laby3d-game:not(.is-locked) .monolith-lock-note { display: none; }
+#modal-masks-gate .monolith-game-inner { display: flex; flex-direction: column; gap: 8px; }
+#modal-masks-gate .masks-draw-lead { margin: 0; font-size: 0.84rem; color: #e7dcc8; }
+#modal-masks-gate .pillars-row { margin-top: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+#modal-masks-gate .pillars-row .chasm3d-btn { flex: 1 1 auto; }
+#modal-masks-gate .masks-fragment-row { grid-template-columns: 96px minmax(0, 1fr); }
+#modal-masks-gate .masks-fragment { width: 96px; height: 96px; }
+
+@media (max-width: 760px) {
+  #modal-masks-gate .masks3d-glass { right: 50%; transform: translate(50%, -52%); height: 86%; }
+  #modal-masks-gate .masks3d-glass-cap { display: none; }
+}
+
+/* the glass appears once the wall of masks has parted */
+#modal-masks-gate .masks3d-glass.is-arriving { animation: masks3d-arrive 1.2s ease 4.4s both; }
+@keyframes masks3d-arrive { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #modal-masks-gate .masks3d-glass.is-arriving { animation: none; } }

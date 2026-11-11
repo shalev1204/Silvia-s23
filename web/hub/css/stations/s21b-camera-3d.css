@@ -1,0 +1,37 @@
+/* Station 21 · the dark room in 3D (the shared look lives in s10-chasm-walk.css; the city and the ring in s21-camera-obscura.css) */
+#modal-camera-obscura [hidden] { display: none !important; }
+#modal-camera-obscura .chasm3d-hud { z-index: 3; }
+#modal-camera-obscura .chasm3d-fade { background: #020103; }
+
+/* the city is light falling on plaster: it is laid exactly over the picture on the 3D wall, and adds to it */
+#modal-camera-obscura .camera3d-picture {
+  position: absolute; left: 10%; top: 12%; width: 80%; aspect-ratio: 2 / 1;
+  pointer-events: auto; mix-blend-mode: screen; line-height: 0; transition: opacity 0.5s ease;
+}
+#modal-camera-obscura .camera3d-picture.is-away { opacity: 0; pointer-events: none; }
+#modal-camera-obscura .camera3d-picture .camera-city { width: 100%; height: 100%; }
+#modal-camera-obscura .camera-wall-bg, #modal-camera-obscura .camera-sky { fill: transparent; }
+#modal-camera-obscura .camera-wall-edge { stroke: none; }
+#modal-camera-obscura .camera-line { stroke: #fff1cc; }
+#modal-camera-obscura .camera3d-picture.is-tremble { animation: camera3d-tremble 1.4s ease-out both; }
+@keyframes camera3d-tremble {
+  0%, 100% { transform: none; }
+  10% { transform: translate(3px, -1px); } 22% { transform: translate(-3px, 2px); } 34% { transform: translate(2px, 1px); }
+  48% { transform: translate(-2px, -1px); } 62% { transform: translate(1px, 1px); } 80% { transform: translate(-1px, 0); }
+}
+/* without WebGL the picture keeps its own dark wall */
+#modal-camera-obscura .chasm3d-stage.is-flat .camera3d-picture { mix-blend-mode: normal; background: #070506; border: 1px solid rgba(201, 154, 59, 0.45); border-radius: 10px; top: 50%; transform: translateY(-50%); }
+
+/* the panel */
+#modal-camera-obscura .monolith-feedback { min-height: 1.2em; font-size: 0.88rem; color: #d6c3a0; }
+#modal-camera-obscura .monolith-feedback.is-ok { color: #bbf7d0; }
+#modal-camera-obscura .monolith-feedback.is-error { color: #fecaca; }
+#modal-camera-obscura .camera-controls { margin-top: 0; }
+#modal-camera-obscura .camera-changes { margin-top: 0; }
+#modal-camera-obscura .masks-fragment-row { grid-template-columns: 96px minmax(0, 1fr); }
+#modal-camera-obscura .masks-fragment { width: 96px; height: 96px; }
+
+@media (prefers-reduced-motion: reduce) {
+  #modal-camera-obscura .camera3d-picture { transition: none; }
+  #modal-camera-obscura .camera3d-picture.is-tremble { animation: none; }
+}

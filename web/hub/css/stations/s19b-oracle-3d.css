@@ -1,0 +1,61 @@
+/* Station 19 · the inner chamber of Tower II in 3D (the shared look lives in s10-chasm-walk.css; the disc, the sky and the tiles in s19-oracle-horizon.css) */
+#modal-oracle-horizon [hidden] { display: none !important; }
+#modal-oracle-horizon .chasm3d-hud { z-index: 3; }
+#modal-oracle-horizon .chasm3d-fade { background: #04050a; }
+
+/* the sky Hermes drew on the sand, in the corner while she sets the disc */
+#modal-oracle-horizon .oracle3d-sky-wrap {
+  position: absolute; top: 10px; right: 12px; width: min(22%, 190px); padding: 6px 6px 4px;
+  background: rgba(6, 9, 20, 0.84); border: 1px solid rgba(147, 197, 253, 0.3); border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45); pointer-events: auto;
+}
+#modal-oracle-horizon .oracle3d-sky-wrap .oracle-sky-cap { font-size: 0.62rem; line-height: 1.25; }
+
+/* the flat disc: read by screen readers always, seen only when there is no 3D */
+#modal-oracle-horizon .oracle3d-disc-wrap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
+#modal-oracle-horizon .chasm3d-stage.is-flat .oracle3d-disc-wrap {
+  clip: auto; clip-path: none; overflow: visible; width: min(54%, 380px); height: auto; top: 50%; left: 38%; transform: translate(-50%, -50%);
+}
+#modal-oracle-horizon .chasm3d-stage.is-flat .oracle3d-sky-wrap { top: 50%; transform: translateY(-50%); width: min(30%, 220px); }
+
+/* what a click on the disc would do */
+#modal-oracle-horizon .oracle3d-aim {
+  position: absolute; bottom: 64px; left: 50%; transform: translate(-50%, 4px); padding: 5px 12px; border-radius: 999px;
+  font-family: 'Cinzel', Georgia, serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap;
+  color: #fff7d6; background: rgba(10, 12, 24, 0.86); border: 1px solid rgba(253, 230, 138, 0.55);
+  opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; pointer-events: none;
+}
+#modal-oracle-horizon .oracle3d-aim.is-on { opacity: 1; transform: translate(-50%, 0); }
+#modal-oracle-horizon .oracle3d-aim.is-true { border-color: rgba(134, 239, 172, 0.8); color: #dcfce7; }
+
+/* the panel */
+#modal-oracle-horizon .laby3d-sigil { display: flex; flex-direction: column; gap: 8px; }
+#modal-oracle-horizon .laby3d-sigil.is-collapsed .laby3d-input,
+#modal-oracle-horizon .laby3d-sigil.is-collapsed #btn-oracle-speak { display: none; }
+#modal-oracle-horizon .monolith-feedback { min-height: 1.2em; font-size: 0.88rem; color: #d6c3a0; }
+#modal-oracle-horizon .monolith-feedback.is-ok { color: #bbf7d0; }
+#modal-oracle-horizon .monolith-feedback.is-error { color: #fecaca; }
+#modal-oracle-horizon .laby3d-game { position: relative; display: flex; flex-direction: column; gap: 8px; }
+#modal-oracle-horizon .laby3d-game.is-locked .monolith-game-inner { filter: grayscale(0.9) brightness(0.45); pointer-events: none; }
+#modal-oracle-horizon .laby3d-game:not(.is-locked) .monolith-lock-note { display: none; }
+#modal-oracle-horizon .monolith-game-inner { display: flex; flex-direction: column; gap: 8px; }
+#modal-oracle-horizon .oracle-ring-ctrls { margin-top: 0; }
+#modal-oracle-horizon .oracle-ring-ctrl .chasm3d-btn { padding: 6px 0; font-size: 1.1rem; }
+#modal-oracle-horizon .oracle-ring-ctrl span.is-true { color: #bbf7d0; }
+#modal-oracle-horizon .oracle-read-row { display: flex; gap: 8px; flex-wrap: wrap; }
+#modal-oracle-horizon .oracle-read-row .mon3d-input { flex: 1 1 160px; min-width: 0; }
+#modal-oracle-horizon .oracle-text-input { letter-spacing: 0.08em; }
+#modal-oracle-horizon .oracle-when { margin-top: 0; }
+#modal-oracle-horizon .oracle-tiles, #modal-oracle-horizon .oracle-said { margin-top: 0; }
+#modal-oracle-horizon .oracle-tile { padding: 8px 12px; }
+#modal-oracle-horizon .oracle-tile:disabled { opacity: 0.35; }
+#modal-oracle-horizon .pillars-row { margin-top: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+#modal-oracle-horizon .pillars-row .chasm3d-btn { flex: 1 1 auto; }
+#modal-oracle-horizon .laby3d-eqs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0; }
+#modal-oracle-horizon .laby3d-eq-note { font-size: 0.78rem; color: #b8a07a; margin: 0; text-align: center; }
+
+@media (max-width: 760px) {
+  #modal-oracle-horizon .oracle3d-sky-wrap { width: 30%; padding: 4px; }
+  #modal-oracle-horizon .oracle3d-sky-wrap .oracle-sky-cap { display: none; }
+  #modal-oracle-horizon .oracle3d-aim { font-size: 0.7rem; bottom: 54px; }
+}
