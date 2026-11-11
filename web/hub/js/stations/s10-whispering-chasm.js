@@ -804,6 +804,26 @@
         sash.rotation.x = Math.PI / 2;
         add(new T.Mesh(new T.BoxGeometry(0.075, 0.07, 0.025), brass), 0, 0.98, -0.268, cloak);
         add(new T.Mesh(new T.CylinderGeometry(0.008, 0.008, 0.28, 6), gold), 0.07, 0.84, -0.26, cloak);
+        // what a cartographer carries: a case of maps slung at his hip with two rolled charts in it, a pouch, a ring of
+        // keys, and two star brooches on the mantle joined by a chain
+        const mapCase = new T.Group(); mapCase.position.set(-0.27, 0.86, 0.06); mapCase.rotation.set(0.5, 0, 0.12); cloak.add(mapCase);
+        add(new T.Mesh(new T.CylinderGeometry(0.05, 0.05, 0.42, 14), leatherDk), 0, 0, 0, mapCase);
+        [-0.2, 0.2].forEach((y) => { add(new T.Mesh(new T.TorusGeometry(0.052, 0.009, 6, 16), gold), 0, y, 0, mapCase).rotation.x = Math.PI / 2; });
+        add(new T.Mesh(new T.CylinderGeometry(0.054, 0.054, 0.03, 14), leather), 0, -0.215, 0, mapCase);
+        const parchment = rim(toon({ color: 0xcbb486 }), warm, 0.25);
+        [[-0.014, 0.012, 0.1], [0.016, -0.01, 0.07]].forEach(([x, z, up]) => { add(new T.Mesh(new T.CylinderGeometry(0.019, 0.019, 0.2, 10), parchment), x, 0.2 + up, z, mapCase); });
+        add(new T.Mesh(new T.CylinderGeometry(0.006, 0.006, 0.62, 5), leather), -0.215, 1.12, 0.02, cloak).rotation.set(0.1, 0, 0.12);
+        add(ell(new T.SphereGeometry(0.07, 14, 10), leather, 1, 1.05, 0.6), 0.2, 0.86, -0.19, cloak);
+        add(new T.Mesh(new T.BoxGeometry(0.1, 0.05, 0.02), leatherDk), 0.2, 0.9, -0.228, cloak).rotation.y = -0.75;
+        add(new T.Mesh(new T.SphereGeometry(0.011, 8, 6), gold), 0.215, 0.87, -0.238, cloak);
+        const keyRing = add(new T.Mesh(new T.TorusGeometry(0.035, 0.005, 5, 14), brass), -0.12, 0.87, -0.245, cloak); keyRing.rotation.y = 0.45;
+        [0, 1, 2].forEach((q) => { add(new T.Mesh(new T.CylinderGeometry(0.005, 0.005, 0.075 + q * 0.012, 5), brass), -0.12 + (q - 1) * 0.012, 0.805 - q * 0.008, -0.25, cloak).rotation.z = (q - 1) * 0.16; });
+        [-1, 1].forEach((sd) => {
+          const br = new T.Group(); br.position.set(sd * 0.215, 1.375, -0.215); br.rotation.set(0.55, sd * -0.75, 0); cloak.add(br);
+          add(new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.01, 16), gold), 0, 0, 0, br).rotation.x = Math.PI / 2;
+          for (let q = 0; q < 8; q++) { const sp = add(new T.Mesh(new T.ConeGeometry(0.008, q % 2 ? 0.02 : 0.034, 4), gold), Math.cos(q * Math.PI / 4) * 0.036, Math.sin(q * Math.PI / 4) * 0.036, 0, br); sp.rotation.z = q * Math.PI / 4 - Math.PI / 2; }
+          add(new T.Mesh(new T.SphereGeometry(0.012, 8, 6), brass), 0, 0, -0.008, br);
+        });
         // ---- The hood lies down on his shoulders: a pool of cloth behind the neck, a soft ring in front
         const cowl = add(new T.Mesh(new T.TorusGeometry(0.15, 0.048, 10, 28), blue), 0, 1.455, 0.035);
         cowl.rotation.x = Math.PI / 2;

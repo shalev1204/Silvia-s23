@@ -600,53 +600,29 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         }
         scene.add(blades);
 
-        const robeMat = P.toon({ color: 0x4a4250 }), robeMat2 = P.toon({ color: 0x5c4436 }), skinMat = P.toon({ color: 0x6e4b38 }), wrapMat = P.toon({ color: 0x24202c });
-        function raider(robe) {
-          const g = new T.Group();
-          const body = new T.Mesh(new T.CylinderGeometry(0.17, 0.33, 1.3, 8), robe); body.position.y = 0.65; body.castShadow = true; g.add(body);
-          const sh = new T.Mesh(new T.SphereGeometry(0.22, 10, 8), robe); sh.scale.set(1.2, 0.6, 1); sh.position.y = 1.28; g.add(sh);
-          const head = new T.Mesh(new T.SphereGeometry(0.16, 10, 8), skinMat); head.position.y = 1.52; g.add(head);
-          const wrap = new T.Mesh(new T.SphereGeometry(0.19, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), wrapMat); wrap.position.y = 1.55; g.add(wrap);
-          const scarf = new T.Mesh(new T.CylinderGeometry(0.17, 0.18, 0.13, 10), wrapMat); scarf.position.y = 1.44; g.add(scarf);
-          const arm = new T.Group(); arm.position.set(0.22, 1.25, 0);
-          const a = new T.Mesh(new T.CylinderGeometry(0.06, 0.07, 0.6, 6), robe); a.position.y = -0.25; arm.add(a);
-          g.add(arm);
-          g.userData = { arm, body };
-          return g;
-        }
-        const watcher = raider(robeMat);
+        // (EclipseScenery) the raiders: veiled men with eyes, a sword and a cloak; and their camels, saddled and couched
+        const SCc = window.EclipseScenery, paintC = SCc.paint();
+        const raider = (k) => SCc.chars.raider(paintC, k ? { robe: 0x4a3428, wrap: 0x2a1c16, sash: 0x7a3a1c, seed: 37, iris: 0x4a3018 } : { seed: 31 });
+        const watcher = raider(0);
         const torch = new T.Group();
         const stick = new T.Mesh(new T.CylinderGeometry(0.03, 0.04, 0.8, 6), logMat); stick.position.y = 0.2; torch.add(stick);
         const tFlame = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffb35a, transparent: true, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
         tFlame.scale.set(0.6, 0.9, 1); tFlame.position.y = 0.72; torch.add(tFlame);
-        torch.position.set(0, -0.55, 0.1); torch.rotation.x = -0.6;
-        watcher.userData.arm.add(torch);
+        watcher.userData.hold.add(torch);
         watcher.position.set(WATCH_AT[0][0], 0, WATCH_AT[0][1]);
         scene.add(watcher);
-        const sleeper = raider(robeMat2);
-        sleeper.userData.lying = 1;
+        const sleeper = raider(1);
+        sleeper.rotation.order = 'YXZ';   // he lies on his back along his blanket, and sits up from it
         const blanket = new T.Mesh(new T.BoxGeometry(0.9, 0.05, 2.0), P.toon({ color: 0x7a3a2c })); blanket.position.set(FIRE.x - 2.0, 0.03, FIRE.z + 1.4); blanket.rotation.y = 0.4; scene.add(blanket);
-        sleeper.position.set(FIRE.x - 2.0, 0.18, FIRE.z + 1.4);
+        sleeper.position.set(FIRE.x - 2.0 - Math.sin(0.4) * 0.9, 0.24, FIRE.z + 1.4 - Math.cos(0.4) * 0.9);
         scene.add(sleeper);
-        const torch2 = torch.clone(); torch2.visible = false; sleeper.userData.arm.add(torch2);
-        const camelMat = P.toon({ color: 0x7a5c50 }), saddleMat = P.toon({ color: 0x6a2a24 });
-        function camel() {
-          const c = new T.Group(), parts = new T.Group();
-          const body = new T.Mesh(new T.SphereGeometry(0.5, 10, 8), camelMat); body.scale.set(0.65, 0.5, 1.05); body.position.y = 1.05; parts.add(body);
-          const hump = new T.Mesh(new T.SphereGeometry(0.3, 8, 6), camelMat); hump.position.set(0, 1.38, -0.05); parts.add(hump);
-          const sad = new T.Mesh(new T.BoxGeometry(0.55, 0.12, 0.6), saddleMat); sad.position.set(0, 1.55, -0.05); parts.add(sad);
-          const neck = new T.Mesh(new T.CylinderGeometry(0.08, 0.12, 0.75, 6), camelMat); neck.position.set(0, 1.3, 0.55); neck.rotation.x = 0.7; parts.add(neck);
-          const head = new T.Mesh(new T.BoxGeometry(0.17, 0.15, 0.36), camelMat); head.position.set(0, 1.62, 0.8); parts.add(head);
-          const legs = [[-0.17, 0.32], [0.17, 0.32], [-0.17, -0.32], [0.17, -0.32]].map(([x, z]) => { const l = new T.Mesh(new T.CylinderGeometry(0.055, 0.045, 0.9, 5), camelMat); l.position.set(x, 0.45, z); parts.add(l); return l; });
-          parts.traverse((m) => { m.castShadow = true; });
-          c.add(parts);
-          c.userData = { parts, legs, head, ph: rand() * 6 };
+        const torch2 = torch.clone(); torch2.visible = false; sleeper.userData.hold.add(torch2);
+        const CAMEL_AT = [[-12.6, -10.2, 0.9], [-15.1, -7.9, 1.5]];
+        const camels = CAMEL_AT.map(([x, z, ry], n) => {
+          const c = SCc.chars.camel(paintC, n ? { coat: 0x6e523c, blanket: 0x2c3a5a, blanket2: 0x1c2640, seed: 43, scale: 0.86 } : { coat: 0x80624a, seed: 41, scale: 0.92 });
+          c.position.set(x, 0, z); c.rotation.y = ry; c.userData.kneel(true, true); scene.add(c);
           return c;
-        }
-        const camels = [camel(), camel()];
-        camels[0].position.set(-12.6, 0, -10.2); camels[0].rotation.y = 0.9;
-        camels[1].position.set(-14.2, 0, -8.6); camels[1].rotation.y = 1.4;
-        camels.forEach((c) => { c.userData.parts.position.y = -0.55; c.userData.legs.forEach((l) => { l.scale.y = 0.3; }); scene.add(c); });   // kneeling
+        });
         // the lance with the furled banner, planted by the fire
         const lance = new T.Group();
         const pole = new T.Mesh(new T.CylinderGeometry(0.035, 0.045, 3.6, 6), logMat); pole.position.y = 1.8; lance.add(pole);
@@ -693,8 +669,8 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         block(NICHE.x, 2.2, NICHE.z + 0.9, 3.0, 0.5, 1.8, brickDark, 0.04);
         block(NICHE.x, 0, NICHE.z + 1.75, 3.0, 2.2, 0.3, brickDark);
         // two torches running after him through the walls
-        const pursuers = [raider(robeMat), raider(robeMat2)];
-        pursuers.forEach((p) => { const t = torch.clone(); p.userData.arm.add(t); p.userData.torch = t; p.visible = false; scene.add(p); });
+        const pursuers = [raider(0), raider(1)];
+        pursuers.forEach((p) => { const t = torch.clone(); p.userData.hold.add(t); p.userData.torch = t; p.visible = false; scene.add(p); });
         const chaseLight = new T.PointLight(0xffa64a, 0, 14, 1.6);
         scene.add(chaseLight);
 
@@ -732,7 +708,7 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         return { fx, T, renderer, scene, camera, sky, stars, moon, hemi, moonLight, fireLight, torchLight, flames, embers, emberSeed, embersN, hearthMat, hearthPlain, hearthCv, sandTime,
                  steleI, faceCv, glowCv, baseCv, faceTex, glowTexS, GRID_X0, GRID_Y0, CS, CV_W, CV_H, SW, SH,
                  curbLine, zLine, curbGlow, dialCv, dialTex, needle, needleMat, dialGlow, bezel, DIAL_Y, POINTS16,
-                 watcher, torch, tFlame, sleeper, torch2, camels, banner, lance, hearth, fleeRows, pursuers, chaseLight,
+                 watcher, torch, tFlame, sleeper, torch2, camels, CAMEL_AT, banner, lance, hearth, fleeRows, pursuers, chaseLight,
                  hermes: H.hermes, legL: H.legL, legR: H.legR, staff: H.staff, lamp: H.lamp, cloak: H.cloak,
                  ringGeo, markers, motes, motesBase, motesN, burst, burstN, glowTex, lowPower, casters, plinthI, steleII, steleIII };
       }
@@ -1711,16 +1687,20 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         wat.position.set(view.wx, 0, view.wz);
         wat.rotation.y += ((view.wyaw - wat.rotation.y + Math.PI * 3) % (Math.PI * 2) - Math.PI) * Math.min(1, dt * 6);
         const wmove = !!view.wwalk && !rm;
-        wat.userData.body.rotation.z = wmove ? Math.sin(now / 160) * 0.05 : 0;
         const raised = view.raise ? Math.min(1, (now - view.raise) / 500) : 0;
-        wat.userData.arm.rotation.x = -0.4 - raised * 1.6 + (wmove ? Math.sin(now / 160) * 0.15 : 0);
+        wat.userData.arm.rotation.x = 0.4 + raised * 1.6 + (wmove ? Math.sin(now / 160) * 0.08 : 0);
+        // he hears something: his eyes go to the stones where Hermes lies
+        wat.userData.look(raised > 0 ? { x: view.x, y: 0.6, z: view.z } : null);
+        if (wat.visible) wat.userData.update(tt);
         // the sleeper wakes at the chime and gets up with a second torch
         const up = view.sleeperUp ? Math.min(1, (now - view.sleeperUp) / 900) : (S.locked && st !== 'done' ? 1 : 0);
         G.sleeper.visible = !inWalls && !['hearth', 'done'].includes(view.phase);
-        G.sleeper.rotation.set(-Math.PI / 2 * (1 - ease(up)), 0.4, 0);
-        G.sleeper.position.y = 0.18 * (1 - up);
+        G.sleeper.rotation.set(Math.PI / 2 * (1 - ease(up)), 0.4, 0);
+        G.sleeper.position.y = 0.24 * (1 - up);
         G.torch2.visible = up > 0.5;
-        if (!rm && up < 0.01) G.sleeper.scale.y = 1 + Math.sin(now / 900) * 0.03;
+        G.sleeper.userData.sleep(up < 0.3);
+        G.sleeper.userData.arm.rotation.x = up > 0.5 ? 0.4 + (up - 0.5) * 2.4 : 0.05;
+        if (G.sleeper.visible) G.sleeper.userData.update(tt);
         // their torches light the sand round them; in the walls, the torches of the chase follow behind Hermes
         const tp = new T.Vector3();
         G.tFlame.getWorldPosition(tp);
@@ -1738,8 +1718,8 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
           const px = p.position.x, pz = p.position.z;
           p.position.x += (tx - p.position.x) * Math.min(1, dt * 2.4); p.position.z += (tz - p.position.z) * Math.min(1, dt * 2.4);
           if (Math.hypot(p.position.x - px, p.position.z - pz) > 0.002) p.rotation.y = Math.atan2(-(p.position.x - px), -(p.position.z - pz));
-          p.userData.arm.rotation.x = -1.7 + (rm ? 0 : Math.sin(now / 110 + n) * 0.15);
-          p.userData.body.rotation.z = rm ? 0 : Math.sin(now / 100 + n * 2) * 0.06;
+          p.userData.arm.rotation.x = 1.7 + (rm ? 0 : Math.sin(now / 110 + n) * 0.12);
+          p.userData.update(tt);
         });
         if (chasing) {
           const pp = new T.Vector3(); G.pursuers[0].userData.torch.children[1].getWorldPosition(pp);
@@ -1763,15 +1743,17 @@ float sNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
         // after the chase the riders mount and ride south with the banner flying
         const ride = view.ride ? Math.min(1, (now - view.ride) / 9000) : (st === 'done' ? 1 : 0);
         G.camels.forEach((c, n) => {
-          const kneel = ride > 0 ? 0 : 1, ud = c.userData;
-          ud.parts.position.y = -0.55 * kneel;
-          ud.legs.forEach((l, j) => { l.scale.y = kneel ? 0.3 : 1; l.rotation.x = ride > 0 && ride < 1 && !rm ? Math.sin(now / 130 + j * 1.6) * 0.5 : 0; });
+          const ud = c.userData, at = G.CAMEL_AT[n];
+          // they groan up off their knees, then pace away south
+          ud.kneel(ride <= 0, rm);
+          ud.walk(ride > 0.14 && ride < 1 && !rm);
           if (ride > 0) {
-            const k = ease(Math.min(1, ride * 1.2));
-            c.position.set((n ? -14.2 : -12.6) + k * (-6 - n * 2), 0, (n ? -8.6 : -10.2) + k * (70 + n * 3));
-            c.rotation.y = Math.PI - 0.15;
+            const k = ease(Math.max(0, Math.min(1, (ride - 0.14) * 1.4)));
+            c.position.set(at[0] + k * (-6 - n * 2), 0, at[1] + k * (70 + n * 3));
+            c.rotation.y = at[2] + (Math.PI - 0.15 - at[2]) * Math.min(1, k * 14);
             c.visible = ride < 0.98;
-          } else if (!rm) ud.head.rotation.x = Math.sin(now / 1100 + ud.ph) * 0.15;
+          } else { c.position.set(at[0], 0, at[1]); c.rotation.y = at[2]; c.visible = true; }
+          if (c.visible) ud.update(tt);
         });
         G.banner.scale.x = ride > 0 ? 1 : 0.12;
         const readIt = view.phase === 'done';

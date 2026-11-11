@@ -634,6 +634,9 @@
               legs[0].rotation.x = 0.5 * sw * wgt; legs[1].rotation.x = -0.5 * sw * wgt;
               legs[0].position.y = (legs[0].userData.y0 == null ? (legs[0].userData.y0 = legs[0].position.y) : legs[0].userData.y0) + Math.max(0, Math.cos(a)) * 0.03 * wgt;
               legs[1].position.y = (legs[1].userData.y0 == null ? (legs[1].userData.y0 = legs[1].position.y) : legs[1].userData.y0) + Math.max(0, -Math.cos(a)) * 0.03 * wgt;
+              // a knee, where the leg has one: it bends as the foot comes through
+              if (legs[0].userData.knee) legs[0].userData.knee.rotation.x = -0.95 * Math.max(0, Math.cos(a)) * wgt;
+              if (legs[1].userData.knee) legs[1].userData.knee.rotation.x = -0.95 * Math.max(0, -Math.cos(a)) * wgt;
             }
             sp += ((speaking ? 1 : 0) - sp) * Math.min(1, dt * 6);
             var e = 0;
@@ -1416,13 +1419,13 @@
       // Faces -z (turn it with rotation.y). o: robe, trim, mantle (hex), stone (a statue in sandstone), scale.
       function elder(paint, o) {
         o = o || {};
-        var g = new T.Group(), stone = !!o.stone;
+        var g = new T.Group(), stone = !!o.stone, F0 = window.EclipseFigure;
         var soft = tex.soft();
         var stoneMat = stone ? paint({ map: tex.strata(7), color: 0xe6c0a0, flatShading: false }, 0xffe0b8, 0.22) : null;
         function M(opts, rc, rk) { return stone ? stoneMat : paint(opts, rc, rk); }
         var robeMat = M({ map: tex.robe(o.robe == null ? 0x5a2e1c : o.robe, o.trim == null ? 0xd4a345 : o.trim, 3), side: T.DoubleSide }, 0xffb878, 0.3);
         var mantleMat = M({ color: o.mantle == null ? 0x2e1a10 : o.mantle, side: T.DoubleSide }, 0xffb878, 0.28);
-        var skin = M({ color: 0xb4805c }, 0xffc890, 0.3);
+        var skin = M({ color: tone(0xa8734c) }, 0xffc890, 0.3);
         var hairM = M({ map: tex.hair(), color: 0xffffff }, 0xffffff, 0.35);
         var brass = M({ color: 0xd9aa4a, emissive: 0x3a2404 }, 0xfff0b0, 0.6);
         var iron = M({ color: 0x34322f }, 0xffb878, 0.3);
@@ -1433,9 +1436,11 @@
         function ell(geo, mat, sx, sy, sz) { var m = new T.Mesh(geo, mat); m.scale.set(sx, sy, sz); return m; }
         function limb(a, b, rTop, rBot, mat) {
           var A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b[0], b[1], b[2]);
-          var len = A.distanceTo(B), m = new T.Mesh(new T.CylinderGeometry(rTop, rBot, len, 14, 1, true), mat);
-          m.position.copy(A.clone().add(B).multiplyScalar(0.5));
-          m.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), A.clone().sub(B).normalize());
+          // a wide sleeve: it swells at the elbow, opens at the cuff and keeps its folds
+          var len = A.distanceTo(B), mid = (rTop + rBot) / 2;
+          var m = new T.Mesh(loft([[0, 0.03, 0, rTop, rTop], [0, -len * 0.45, 0, mid * 1.12, mid * 1.16], [0, -len * 0.8, 0, rBot * 0.96, rBot], [0, -len, 0, rBot, rBot * 1.04]], { radial: 18, caps: false, bump: function (a2, u) { return 1 + 0.07 * Math.sin(a2 * 6 + u * 8) * Math.sin(u * Math.PI); } }), mat);
+          m.position.copy(A);
+          m.quaternion.setFromUnitVectors(new T.Vector3(0, -1, 0), B.clone().sub(A).normalize());
           m.castShadow = true; g.add(m);
           return m;
         }
@@ -1459,6 +1464,14 @@
           var key = put(new T.Mesh(new T.CylinderGeometry(0.006, 0.006, 0.09 + k * 0.015, 5), brass), -0.2 + (k - 1) * 0.012, 0.77 - k * 0.012, -0.265);
           key.rotation.z = (k - 1) * 0.15;
         }
+        // a keeper's stole: two embroidered bands from the shoulders to the knee, weighted with brass
+        var stoleMat = M({ map: tex.cloth(0x7a2c1c, F0.mixHex(o.trim == null ? 0xd4a345 : o.trim, 0x7a4a1c, 0.35), 1, 31), side: T.DoubleSide }, 0xffe0a0, 0.3);
+        [-1, 1].forEach(function (sd) {
+          var x = sd * 0.15;
+          put(new T.Mesh(F0.tube([[x * 0.8, 1.56, 0.02], [x, 1.5, -0.16], [x, 1.3, -0.262], [x, 1.05, -0.3], [x, 0.78, -0.355], [x, 0.56, -0.405]], 0.05, { segments: 22, radial: 8, flat: 0.16 }), stoleMat), 0, 0, 0);
+          put(new T.Mesh(new T.BoxGeometry(0.1, 0.022, 0.02), brass), x, 0.555, -0.408);
+          for (var q = 0; q < 3; q++) put(new T.Mesh(new T.ConeGeometry(0.01, 0.06, 5), brass), x + (q - 1) * 0.032, 0.515, -0.41).rotation.z = Math.PI;
+        });
         // the Order's medallion on a chain
         var chain = put(new T.Mesh(new T.TorusGeometry(0.2, 0.006, 6, 36, Math.PI), brass), 0, 1.5, -0.04);
         chain.rotation.set(Math.PI / 2 + 0.55, 0, Math.PI);
@@ -1572,12 +1585,12 @@
         var soft = tex.soft();
         var linen = paint({ map: tex.cloth(o.tunic == null ? 0xcdb98c : o.tunic, 0xe6d8b4, 3, 21), side: T.DoubleSide }, 0xffd8a8, 0.18);
         var trousers = paint({ map: tex.cloth(o.trousers == null ? 0x7d6a4c : o.trousers, 0x9b8764, 5, 22), side: T.DoubleSide }, 0xffd8a8, 0.16);
-        var vestMat = paint({ color: o.vest == null ? 0x5a3a24 : o.vest, side: T.DoubleSide }, 0xffb878, 0.22);
-        var skin = paint({ color: 0xb98a63 }, 0xffc890, 0.28);
-        var skinDark = paint({ color: 0xa57852 }, 0xffc890, 0.2);
+        var vestMat = paint({ color: tone(o.vest == null ? 0x5a3a24 : o.vest), side: T.DoubleSide }, 0xffb878, 0.22);
+        var skin = paint({ color: tone(0x9c6a44) }, 0xffc890, 0.28);
+        var skinDark = paint({ color: tone(0x8a5c3a) }, 0xffc890, 0.2);
         var hairM = paint({ color: 0x2c1d14 }, 0xffb878, 0.2);
-        var leather = paint({ color: 0x5a3418 }, 0xffc890, 0.22);
-        var brass = paint({ color: 0xc79a46, emissive: 0x2a1804 }, 0xfff0b0, 0.4);
+        var leather = paint({ color: tone(0x6a4022) }, 0xffc890, 0.22);
+        var brass = paint({ color: tone(0xc79a46), emissive: 0x1a0e02 }, 0xfff0b0, 0.4);
         var sash = paint({ map: tex.cloth(0x9b3f2b, 0xe0b878, 6, 23), side: T.DoubleSide }, 0xffb878, 0.2);
         var headcloth = paint({ map: tex.cloth(0xe9ddc0, 0x9c4a30, 10, 24), side: T.DoubleSide }, 0xffe0b8, 0.2);
         var wood = paint({ map: tex.wood(0x7a5230, 25) }, 0xffd8a8, 0.12);
@@ -1594,19 +1607,22 @@
         }
 
         // legs: loose trousers gathered at the ankle, low leather boots with a turned toe
+        var fold = function (k, d) { return function (a2, u) { return 1 + d * Math.sin(a2 * k + u * 9) * Math.sin(u * Math.PI); }; };
         var legs = [-1, 1].map(function (sd) {
           var leg = new T.Group(); leg.position.set(sd * 0.1, 0.96, 0); g.add(leg);
-          var up = new T.Mesh(new T.CylinderGeometry(0.115, 0.085, 0.5, 14), trousers); up.position.y = -0.25; up.castShadow = true; leg.add(up);
-          var lo = new T.Mesh(new T.CylinderGeometry(0.085, 0.07, 0.42, 14), trousers); lo.position.y = -0.69; lo.castShadow = true; leg.add(lo);
-          var cuff = new T.Mesh(new T.TorusGeometry(0.072, 0.014, 8, 18), leather); cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.83; leg.add(cuff);
-          var boot = ell(new T.SphereGeometry(0.1, 16, 12), leather, 0.85, 0.7, 1.55); boot.position.set(0, -0.9, -0.05); boot.castShadow = true; leg.add(boot);
-          var toe = ell(new T.SphereGeometry(0.05, 10, 8), leather, 0.9, 0.7, 1.0); toe.position.set(0, -0.89, -0.2); toe.rotation.x = 0.3; leg.add(toe);
+          var up = new T.Mesh(loft([[0, 0.04, 0, 0.1, 0.11], [0, -0.2, -0.012, 0.118, 0.125], [0, -0.46, 0, 0.092, 0.098]], { bump: fold(5, 0.06) }), trousers); up.castShadow = true; leg.add(up);
+          var knee = new T.Group(); knee.position.y = -0.46; leg.add(knee);
+          var lo = new T.Mesh(loft([[0, 0.03, 0, 0.09, 0.096], [0, -0.14, 0.008, 0.102, 0.108], [0, -0.3, 0.01, 0.085, 0.09], [0, -0.38, 0.008, 0.06, 0.064]], { bump: fold(6, 0.08) }), trousers); lo.castShadow = true; knee.add(lo);
+          var cuff = new T.Mesh(new T.TorusGeometry(0.064, 0.013, 8, 18), leather); cuff.rotation.x = Math.PI / 2; cuff.position.set(0, -0.375, 0.008); knee.add(cuff);
+          var boot = new T.Mesh(loft([[0, -0.36, 0.01, 0.058, 0.062], [0, -0.44, 0.012, 0.056, 0.066]], { radial: 10 }), leather); boot.castShadow = true; knee.add(boot);
+          var foot = new T.Mesh(loft([[0, -0.455, 0.08, 0.04, 0.034], [0, -0.455, 0.0, 0.056, 0.046], [0, -0.462, -0.1, 0.054, 0.036], [0, -0.455, -0.19, 0.032, 0.022], [0, -0.425, -0.225, 0.01, 0.01]]), leather); foot.castShadow = true; knee.add(foot);
+          leg.userData.knee = knee;
           return leg;
         });
 
         // tunic: a long linen shirt over the hips, open at the throat, with a dark leather vest over it
         var tunicProf = [[0.3, 0.52], [0.285, 0.7], [0.255, 0.95], [0.235, 1.2], [0.22, 1.4], [0.15, 1.5], [0.075, 1.54]];
-        var tunic = new T.Mesh(new T.LatheGeometry(tunicProf.map(function (p) { return new T.Vector2(p[0], p[1]); }), 40), linen);
+        var tunic = new T.Mesh(foldedLathe(tunicProf, 48, function (th, t) { return { r: 1 + 0.05 * Math.sin(th * 9 + t * 2) * (1 - t) * (1 - t) + 0.015 * Math.sin(th * 4 + 1), y: t < 0.05 ? 0.018 * Math.sin(th * 9) : 0 }; }), linen);
         tunic.scale.set(0.84, 1, 0.74); tunic.castShadow = true; g.add(tunic);
         var hem = put(new T.Mesh(new T.TorusGeometry(0.3, 0.012, 8, 40), leather), 0, 0.53, 0); hem.rotation.x = Math.PI / 2; hem.scale.set(0.84, 0.74, 1);
         var vestProf = [[0.275, 0.86], [0.255, 1.0], [0.245, 1.2], [0.235, 1.4], [0.17, 1.49]];
@@ -1621,7 +1637,7 @@
         put(new T.Mesh(new T.BoxGeometry(0.03, 0.2, 0.025), leather), -0.12, 0.88, -0.28).rotation.z = 0.25;
         put(new T.Mesh(new T.BoxGeometry(0.18, 0.16, 0.09), leather), -0.25, 0.78, -0.02);
         var strap = limb([0.17, 1.48, -0.02], [-0.22, 0.86, -0.06], 0.014, 0.014, leather);
-        var skinBag = put(ell(new T.SphereGeometry(0.12, 16, 12), paint({ color: 0x7a4a26 }, 0xffc890, 0.22), 0.85, 1.35, 0.75), -0.22, 0.74, 0.1);
+        var skinBag = put(ell(new T.SphereGeometry(0.12, 16, 12), paint({ color: tone(0x7a4a26) }, 0xffc890, 0.22), 0.85, 1.35, 0.75), -0.22, 0.74, 0.1);
         put(new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.06, 10), leather), -0.22, 0.92, 0.1);
 
         // neck and the loose scarf round it
@@ -1663,9 +1679,16 @@
         var shR = [0.225, 1.45, -0.01], elR = [0.29, 1.18, -0.1], wrR = [0.31, 0.96, -0.32];
         var shL = [-0.225, 1.45, -0.01], elL = [-0.27, 1.18, -0.09], wrL = [-0.26, 1.02, -0.28];
         [shR, shL].forEach(function (s) { put(new T.Mesh(new T.SphereGeometry(0.062, 14, 10), linen), s[0], s[1], s[2]); });
-        limb(shR, elR, 0.058, 0.064, linen); limb(shL, elL, 0.058, 0.064, linen);
+        function span(a, b, secs, mat, bump) {
+          // a shaped limb from a to b: secs are [along 0…1, rx, rz]
+          var A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b[0], b[1], b[2]), len = A.distanceTo(B);
+          var m = new T.Mesh(loft(secs.map(function (q) { return [0, -q[0] * len, 0, q[1], q[2]]; }), { radial: 12, bump: bump }), mat);
+          m.position.copy(A); m.quaternion.setFromUnitVectors(new T.Vector3(0, -1, 0), B.clone().sub(A).normalize()); m.castShadow = true; g.add(m);
+          return m;
+        }
+        [[shR, elR], [shL, elL]].forEach(function (q) { span(q[0], q[1], [[-0.05, 0.06, 0.062], [0.4, 0.07, 0.074], [1.04, 0.062, 0.066]], linen, fold(5, 0.07)); });
         [elR, elL].forEach(function (e) { var r = put(new T.Mesh(new T.TorusGeometry(0.066, 0.014, 8, 18), linen), e[0], e[1], e[2]); r.rotation.x = Math.PI / 2 - 0.2; });
-        limb(elR, wrR, 0.058, 0.044, skin); limb(elL, wrL, 0.058, 0.044, skin);
+        [[elR, wrR], [elL, wrL]].forEach(function (q) { span(q[0], q[1], [[-0.04, 0.046, 0.05], [0.28, 0.054, 0.058], [0.7, 0.042, 0.044], [1.0, 0.034, 0.03]], skin); });
         [wrR, wrL].forEach(function (w) { var b = put(new T.Mesh(new T.TorusGeometry(0.047, 0.012, 8, 16), leather), w[0], w[1], w[2]); b.rotation.x = Math.PI / 2 - 0.3; });
         function hand(pos, grip) {
           // (EclipseFigure) a palm, four fingers of three joints and a thumb, closed on what it holds
@@ -1707,6 +1730,327 @@
             cloths.forEach(function (c) { c.update(t); });
             lantern.rotation.z = Math.sin(t * 1.1) * 0.04;
             lFlame.material.opacity = lit ? 0.5 + 0.12 * Math.sin(t * 9) : 0;
+          }
+        };
+        return g;
+      }
+
+      // ---- a skin drawn through rings: loft([[x, y, z, rx, rz], …], opts) → geometry. The rings follow a smooth curve
+      // through the centres and swell and narrow between the radii given, so a thigh, a forearm, a camel's neck or a
+      // boot is one surface with flesh on it and not a pipe. rx is the width across (x), rz the other way.
+      //   opts: radial, steps (rings between two sections), caps (default true), arc [from, to] (an open sheet),
+      //   bump(angle, u) → a factor on the radius (folds, muscles)
+      function loft(secs, o) {
+        o = o || {};
+        var rad = o.radial || 14, n = (secs.length - 1) * (o.steps || 4), a0 = o.arc ? o.arc[0] : 0, a1 = o.arc ? o.arc[1] : Math.PI * 2;
+        var cc = new T.CatmullRomCurve3(secs.map(function (s) { return new T.Vector3(s[0], s[1], s[2]); }), false, 'centripetal');
+        var rc = new T.CatmullRomCurve3(secs.map(function (s, i) { return new T.Vector3(s[3], s[4] == null ? s[3] : s[4], i); }), false, 'centripetal');
+        var X = new T.Vector3(1, 0, 0), tan = new T.Vector3(), nr = new T.Vector3(), sd = new T.Vector3(), c = new T.Vector3(), r = new T.Vector3();
+        var pos = [], uv = [], idx = [], cols = rad + 1;
+        for (var i = 0; i <= n; i++) {
+          var u = i / n;
+          cc.getPoint(u, c); cc.getTangent(u, tan); rc.getPoint(u, r);
+          nr.crossVectors(X, tan).normalize(); sd.crossVectors(tan, nr).normalize();
+          for (var j = 0; j <= rad; j++) {
+            var a = a0 + (a1 - a0) * j / rad, k = o.bump ? o.bump(a, u) : 1, cx = Math.cos(a) * Math.max(0.0005, r.x) * k, cz = Math.sin(a) * Math.max(0.0005, r.y) * k;
+            pos.push(c.x + sd.x * cx + nr.x * cz, c.y + sd.y * cx + nr.y * cz, c.z + sd.z * cx + nr.z * cz);
+            uv.push(j / rad * (o.uv ? o.uv[0] : 1), u * (o.uv ? o.uv[1] : 1));
+          }
+        }
+        for (var p = 0; p < n; p++) for (var q = 0; q < rad; q++) { var i0 = p * cols + q, i1 = i0 + cols; idx.push(i0, i1, i0 + 1, i0 + 1, i1, i1 + 1); }
+        if (o.caps !== false && !o.arc) {
+          [0, n].forEach(function (row) {
+            cc.getPoint(row / n, c); var ci = pos.length / 3; pos.push(c.x, c.y, c.z); uv.push(0.5, row / n);
+            for (var q2 = 0; q2 < rad; q2++) { var b = row * cols + q2; if (row) idx.push(ci, b + 1, b); else idx.push(ci, b, b + 1); }
+          });
+        }
+        var g = new T.BufferGeometry();
+        g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+        g.computeVertexNormals();
+        return g;
+      }
+
+      // A raider of the desert, of those who ride under the phoenix: a dark turban wound low over the brow and a veil
+      // over nose and mouth, so that all his face is two hard eyes lined with kohl; a tunic to the knee over loose
+      // trousers and tall boots, a red sash, crossed belts, a curved sword at his hip and a cloak that the wind takes.
+      // Faces -z. userData: arm (the right arm: the game turns it at the shoulder), hold (his right fist: hang a torch
+      // there, it stays upright), body, update(t), look(v), react(kind), sleep(on), life
+      //   o: robe, wrap, sash (hex), seed, scale
+      // a plain colour as the eye reads it (the painted cloths are sRGB; a bare hex would come out washed)
+      function tone(h) { return new T.Color(h).convertSRGBToLinear(); }
+      function raider(paint, o) {
+        o = o || {};
+        var g = new T.Group(), F = window.EclipseFigure, seed = o.seed || 31;
+        var robeC = o.robe == null ? 0x3c3848 : o.robe, wrapC = o.wrap == null ? 0x1e1b26 : o.wrap;
+        var robeMat = paint({ map: tex.robe(robeC, 0x8a3a2c, seed), side: T.DoubleSide }, 0xffb878, 0.26);
+        var clothMat = paint({ map: tex.cloth(robeC, F.mixHex(robeC, 0x000000, 0.25), 9, seed), side: T.DoubleSide }, 0xffb878, 0.22);
+        var trouser = paint({ map: tex.cloth(F.mixHex(robeC, 0x000000, 0.35), F.mixHex(robeC, 0x000000, 0.5), 7, seed + 1) }, 0xffb878, 0.18);
+        var wrap = paint({ map: tex.cloth(wrapC, F.mixHex(wrapC, 0x6a6480, 0.22), 1, seed + 2), side: T.DoubleSide }, 0xc8d0ff, 0.34);
+        var sashMat = paint({ map: tex.cloth(o.sash == null ? 0x8a2c22 : o.sash, 0xd8842c, 8, seed + 3), side: T.DoubleSide }, 0xffb878, 0.26);
+        var cloakMat = paint({ map: tex.cloth(F.mixHex(wrapC, robeC, 0.4), wrapC, 5, seed + 4), side: T.DoubleSide }, 0xc8d0ff, 0.22);
+        var leather = paint({ color: tone(0x6a4022) }, 0xffc890, 0.25), leatherDk = paint({ color: tone(0x3a2216) }, 0xffc890, 0.2);
+        var brass = paint({ color: tone(0xc79a46), emissive: 0x1a0e02 }, 0xfff0b0, 0.5);
+        var skinC = o.skin == null ? 0x7a5238 : o.skin, skin = paint({ color: tone(F.mixHex(skinC, 0x3a1c14, 0.15)) }, 0xffc890, 0.28);
+        function put(mesh, x, y, z, parent) { mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; (parent || g).add(mesh); return mesh; }
+        var crease = function (k, d) { return function (a, u) { return 1 + d * Math.sin(a * k + u * 9) * Math.sin(u * Math.PI); }; };
+
+        // legs: loose trousers gathered into tall boots, a knee that bends
+        var legs = [-1, 1].map(function (sd) {
+          var leg = new T.Group(); leg.position.set(sd * 0.105, 0.94, 0); g.add(leg);
+          put(new T.Mesh(loft([[0, 0.04, 0, 0.1, 0.11], [0, -0.2, -0.01, 0.112, 0.12], [0, -0.44, 0, 0.09, 0.095]], { bump: crease(5, 0.05) }), trouser), 0, 0, 0, leg);
+          var knee = new T.Group(); knee.position.y = -0.44; leg.add(knee);
+          put(new T.Mesh(loft([[0, 0.03, 0, 0.088, 0.093], [0, -0.1, 0.005, 0.1, 0.105], [0, -0.2, 0.01, 0.075, 0.08]], { bump: crease(6, 0.07) }), trouser), 0, 0, 0, knee);
+          put(new T.Mesh(loft([[0, -0.17, 0.01, 0.072, 0.078], [0, -0.3, 0.012, 0.062, 0.07], [0, -0.42, 0.01, 0.054, 0.064], [0, -0.47, 0.0, 0.056, 0.07]]), leather), 0, 0, 0, knee);
+          put(new T.Mesh(loft([[0, -0.455, 0.075, 0.04, 0.035], [0, -0.455, 0.0, 0.056, 0.048], [0, -0.465, -0.1, 0.054, 0.038], [0, -0.455, -0.2, 0.03, 0.022], [0, -0.42, -0.235, 0.01, 0.01]]), leather), 0, 0, 0, knee);
+          var cuff = put(new T.Mesh(new T.TorusGeometry(0.076, 0.012, 6, 18), leather), 0, -0.18, 0.01, knee); cuff.rotation.x = Math.PI / 2;
+          leg.userData.knee = knee;
+          return leg;
+        });
+
+        // the chest and the tunic that falls from the sash to the knee, slit at the front for the stride
+        put(new T.Mesh(loft([[0, 0.9, 0, 0.2, 0.15], [0, 1.05, 0, 0.19, 0.14], [0, 1.26, -0.012, 0.225, 0.155], [0, 1.42, 0, 0.235, 0.14], [0, 1.5, 0.005, 0.15, 0.105], [0, 1.57, 0.005, 0.07, 0.07]], { radial: 20, bump: crease(7, 0.025) }), robeMat), 0, 0, 0);
+        var pleat = function (th, t) { return { r: 1 + 0.06 * Math.sin(th * 9 + t * 2) * (1 - t * 0.7) + 0.025 * Math.sin(th * 4 + 1), y: t < 0.05 ? 0.02 * Math.sin(th * 9) : 0 }; };
+        var skirt = put(new T.Mesh(foldedLathe([[0.33, 0.47], [0.31, 0.6], [0.26, 0.82], [0.215, 1.0], [0.2, 1.06]], 44, pleat), robeMat), 0, 0, 0); skirt.scale.set(0.94, 1, 0.78);
+        var waist = put(new T.Mesh(new T.TorusGeometry(0.205, 0.055, 10, 36), sashMat), 0, 1.02, 0); waist.rotation.x = Math.PI / 2; waist.scale.set(0.96, 0.76, 1.25);
+        put(new T.Mesh(new T.SphereGeometry(0.055, 12, 10), sashMat), -0.15, 1.0, -0.15).scale.set(1.1, 0.9, 0.8);
+        var tail = put(new T.Mesh(new T.PlaneGeometry(0.11, 0.42, 2, 6), sashMat), -0.17, 0.78, -0.17); tail.rotation.set(0.1, -0.35, -0.08);
+        // crossed belts with brass studs, a pouch, a curved sword in its scabbard on the left hip, a dagger in the sash
+        [-1, 1].forEach(function (sd) {
+          var b = put(new T.Mesh(F.tube([[sd * 0.2, 1.47, 0.03], [sd * 0.13, 1.4, -0.135], [0, 1.24, -0.172], [-sd * 0.16, 1.09, -0.14], [-sd * 0.2, 1.05, 0.02], [-sd * 0.12, 1.2, 0.15], [sd * 0.08, 1.4, 0.14], [sd * 0.2, 1.47, 0.03]], 0.02, { segments: 30, radial: 6, flat: 0.4 }), leather), 0, 0, 0);
+          for (var k = 0; k < 4; k++) { var u = 0.14 + k * 0.09; put(new T.Mesh(new T.SphereGeometry(0.011, 6, 5), brass), sd * (0.14 - u * 0.75), 1.42 - u * 0.86, -0.15 - 0.05 * Math.sin(u * 2.4)); }
+        });
+        put(new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 0.012, 14), brass), 0, 1.24, -0.185).rotation.x = Math.PI / 2;
+        put(new T.Mesh(new T.BoxGeometry(0.12, 0.13, 0.06), leather), 0.2, 0.9, -0.06);
+        var sword = new T.Group(); sword.position.set(-0.235, 1.0, -0.04); sword.rotation.set(0.75, 0, 0.1); g.add(sword);
+        put(new T.Mesh(F.tube([[0, 0, 0], [0, -0.22, 0.015], [0, -0.43, 0.065], [0, -0.6, 0.16]], function (u) { return 0.046 - 0.02 * u; }, { segments: 14, radial: 10, flat: 0.42 }), leatherDk), 0, 0, 0, sword);
+        [0.02, 0.3, 0.57].forEach(function (u, k) { var rg = put(new T.Mesh(new T.TorusGeometry(0.042 - k * 0.008, 0.008, 5, 14), brass), 0, -u, [0.0, 0.03, 0.14][k], sword); rg.rotation.x = Math.PI / 2 - k * 0.25; rg.scale.y = 0.5; });
+        put(new T.Mesh(new T.BoxGeometry(0.11, 0.018, 0.03), brass), 0, 0.02, 0, sword);
+        put(new T.Mesh(new T.CylinderGeometry(0.014, 0.017, 0.13, 8), leather), 0, 0.09, 0, sword);
+        put(new T.Mesh(new T.SphereGeometry(0.022, 8, 6), brass), 0, 0.165, -0.008, sword);
+        var dag = put(new T.Mesh(new T.ConeGeometry(0.02, 0.2, 6), leatherDk), 0.1, 0.95, -0.18); dag.rotation.set(Math.PI, 0, -0.35);
+        put(new T.Mesh(new T.CylinderGeometry(0.011, 0.013, 0.08, 6), brass), 0.146, 1.08, -0.18).rotation.z = -0.35;
+
+        // the cloak: a short cape over both shoulders, and behind it the long fall the wind takes
+        var cfold = function (th, t) { return { r: 1 + 0.04 * Math.sin(th * 7 + 1), y: t > 0.75 ? -0.03 * (0.5 + 0.5 * Math.cos(th * 9)) : 0 }; };
+        var cape = put(new T.Mesh(foldedLathe([[0.085, 1.585], [0.17, 1.555], [0.26, 1.48], [0.3, 1.38], [0.3, 1.3]], 40, cfold), cloakMat), 0, 0, 0); cape.scale.set(1, 1, 0.72);
+        var cloakG = new T.PlaneGeometry(0.6, 1.02, 6, 9), CP = cloakG.attributes.position;
+        for (var ci = 0; ci < CP.count; ci++) {
+          // narrow at the shoulders, full at the hem, wrapped round the back, in soft folds
+          var cx = CP.getX(ci), cy = CP.getY(ci), down = 0.5 - cy / 1.02, wd = 0.62 + 0.38 * down, xx = cx * wd;
+          CP.setXYZ(ci, xx, cy, -0.5 * xx * xx * (1.6 - down) + 0.03 * down * Math.cos(cx * 26));
+        }
+        cloakG.computeVertexNormals();
+        var cloak = new T.Mesh(cloakG, cloakMat); cloak.position.set(0, 0.96, 0.2); cloak.rotation.x = -0.05; cloak.castShadow = true; g.add(cloak);
+        var cloths = [clothSim(cloak, { ws: 6, hs: 9, minZ: -0.09, wind: [0.45, 0, 0.7], gust: 0.9, damp: 0.975 }), clothSim(tail, { ws: 2, hs: 6, maxZ: 0.01, wind: [0.4, 0, 0.5], gust: 0.8, damp: 0.975 })];
+
+        // the head: all that shows is the bridge of the nose and the eyes
+        put(new T.Mesh(loft([[0, 1.52, 0.005, 0.09, 0.085], [0, 1.6, 0.0, 0.078, 0.08], [0, 1.66, -0.005, 0.085, 0.09]], { bump: crease(4, 0.06) }), wrap), 0, 0, 0);
+        var head = new T.Group(); head.position.set(0, 1.7, 0); head.scale.setScalar(1.3); g.add(head);
+        var rig = F.head({ size: 0.13, skin: skinC, age: 0.55, iris: o.iris == null ? 0x6a4a22 : o.iris, brow: { color: 0x120c0a, thick: 1.1 }, nose: 1.15, jaw: 0.7, cheek: 1.15, ridge: 1.3, kohl: true, seed: seed, detail: 64, mouth: false });
+        head.add(rig.group);
+        var turban = new T.Mesh(F.shell(rig, function (nx, ny, nz) {
+          var back = Math.max(0, Math.min(1, (nz + 0.35) / 0.45));
+          return Math.max(0, Math.min(1, (ny - (0.4 * (1 - back) - 0.6 * back)) / 0.16));
+        }, { thick: 0.2, segs: [72, 56], ridges: { count: 1, depth: 0.05, swirl: 24 }, uvRepeat: 2 }), wrap);
+        turban.castShadow = true; rig.group.add(turban);
+        var veil = new T.Mesh(F.shell(rig, function (nx, ny, nz) {
+          var front = Math.max(0, Math.min(1, (0.35 - nz) / 0.5));
+          return Math.max(0, Math.min(1, ((-0.04 - 0.1 * Math.abs(nx)) - ny) / 0.08)) * (0.55 + 0.45 * front);
+        }, { thick: 0.085, segs: [72, 56], ridges: { count: 1, depth: 0.016, swirl: 30 }, uvRepeat: 2 }), wrap);
+        veil.castShadow = true; rig.group.add(veil);
+        var end = new T.Mesh(new T.PlaneGeometry(0.11, 0.36, 2, 6), wrap); end.position.set(0.085, -0.19, 0.1); end.rotation.set(0.1, -0.5, 0.06); end.castShadow = true; head.add(end);
+        cloths.push(clothSim(end, { ws: 2, hs: 6, minZ: -0.004, wind: [0.5, 0, 0.8], gust: 0.9, damp: 0.975 }));
+        var face = F.face(rig);
+
+        // the left arm, bent, its hand on the hilt; the right one is the game's to move
+        function sleeve(pts, parent) { return put(new T.Mesh(loft(pts, { bump: crease(5, 0.06) }), clothMat), 0, 0, 0, parent); }
+        function bracer(parent, y) { var b = put(new T.Mesh(loft([[0, y + 0.01, 0, 0.05, 0.05], [0, y - 0.07, 0, 0.044, 0.042], [0, y - 0.15, 0, 0.037, 0.034]], { radial: 10 }), leather), 0, 0, 0, parent); [y - 0.02, y - 0.12].forEach(function (yy) { put(new T.Mesh(new T.TorusGeometry(yy > y - 0.05 ? 0.049 : 0.039, 0.005, 5, 12), brass), 0, yy, 0, parent).rotation.x = Math.PI / 2; }); return b; }
+        var armL = new T.Group(); armL.position.set(-0.235, 1.44, 0); armL.rotation.set(0.1, 0, -0.22); g.add(armL);
+        put(new T.Mesh(new T.SphereGeometry(0.08, 12, 9), clothMat), 0, 0, 0, armL);
+        sleeve([[0, 0.02, 0, 0.075, 0.078], [0, -0.14, 0, 0.07, 0.074], [0, -0.3, 0, 0.062, 0.064]], armL);
+        var foreL = new T.Group(); foreL.position.y = -0.3; foreL.rotation.set(0.95, 0, 0.5); armL.add(foreL);
+        sleeve([[0, 0.02, 0, 0.064, 0.066], [0, -0.07, 0, 0.066, 0.07], [0, -0.13, 0, 0.055, 0.056]], foreL);
+        bracer(foreL, -0.11);
+        var hL = F.hand({ mat: skin, size: 1.05, curl: 0.75, side: -1 }); hL.position.y = -0.26; foreL.add(hL);
+        var arm = new T.Group(); arm.position.set(0.235, 1.44, 0); g.add(arm);
+        put(new T.Mesh(new T.SphereGeometry(0.08, 12, 9), clothMat), 0, 0, 0, arm);
+        sleeve([[0, 0.02, 0, 0.075, 0.078], [0, -0.14, 0, 0.07, 0.074], [0, -0.3, 0, 0.062, 0.064]], arm);
+        var fore = new T.Group(); fore.position.y = -0.3; arm.add(fore);
+        sleeve([[0, 0.02, 0, 0.064, 0.066], [0, -0.07, 0, 0.066, 0.07], [0, -0.13, 0, 0.055, 0.056]], fore);
+        bracer(fore, -0.11);
+        var hold = new T.Group(); hold.position.y = -0.3; fore.add(hold);
+        var hR = F.hand({ mat: skin, size: 1.05, curl: 0.95, side: 1 }); hR.rotation.set(0, 0, Math.PI / 2); hR.position.set(-0.062, 0, 0.03); hold.add(hR);
+
+        g.scale.setScalar(o.scale || 1);
+        // only the big shapes throw a shadow: nobody misses the shadow of a stud, and each one is a draw
+        var quiet = [brass, leatherDk, skin, sashMat, wrap];
+        g.traverse(function (m) { if (m.isMesh && (quiet.indexOf(m.material) >= 0 || m.parent === sword || m.parent === hold || m.parent === foreL)) m.castShadow = false; });
+        turban.castShadow = true;
+        var life = persona(g, { head: head, face: face, legs: legs, stride: 0.55 });
+        bake(g);
+        var asleep = false, body = new T.Object3D();
+        g.userData = {
+          arm: arm, fore: fore, hold: hold, head: head, life: life, body: body, face: face,
+          look: function (v) { life.look(v); }, react: function (k) { life.react(k); }, sleep: function (on) { asleep = !!on; if (face.shut) face.shut(asleep ? 1 : 0); },
+          update: function (t) {
+            // the elbow follows the shoulder (bent when the torch is carried low, nearly straight when it is held high),
+            // and the fist keeps what it holds upright
+            var up = Math.max(0, Math.min(1, (arm.rotation.x - 0.3) / 1.6));
+            fore.rotation.x = 1.0 - 0.75 * up;
+            hold.rotation.x = -(arm.rotation.x + fore.rotation.x) - 0.12;
+            if (!asleep) face.mood(0, 0.55, 0);
+            life.update(t);
+            for (var i = 0; i < cloths.length; i++) cloths[i].update(t);
+          }
+        };
+        return g;
+      }
+
+      // A dromedary, saddled for the road: a deep chest and a tucked belly, one hump under a striped blanket, a long
+      // neck that carries the head high, heavy lids and long lashes, a jaw that chews sideways, knees that fold when
+      // it couches. Faces -z. userData: kneel(k 0…1), walk(on), update(t), head, parts
+      //   o: coat, blanket, blanket2 (hex), seed, scale
+      function camel(paint, o) {
+        o = o || {};
+        var g = new T.Group(), parts = new T.Group(), F = window.EclipseFigure, seed = o.seed || 41; g.add(parts);
+        var coatC = o.coat == null ? 0xb08a5c : o.coat;
+        // a short coat: soft patches of sun and dust, and the fine hairs only where you look for them
+        var furT = F.canvasTex(256, 256, function (c2, w, h) {
+          var r = rng(seed), dk = F.mixHex(coatC, 0x3a2010, 0.5), lt = F.mixHex(coatC, 0xfff0d0, 0.4), css = function (hx, a) { return 'rgba(' + ((hx >> 16) & 255) + ',' + ((hx >> 8) & 255) + ',' + (hx & 255) + ',' + a + ')'; };
+          c2.fillStyle = css(coatC, 1); c2.fillRect(0, 0, w, h);
+          for (var i = 0; i < 60; i++) { var x = r() * w, y = r() * h, rr = 18 + r() * 40, gr = c2.createRadialGradient(x, y, 0, x, y, rr); gr.addColorStop(0, css(r() < 0.5 ? dk : lt, 0.16)); gr.addColorStop(1, css(coatC, 0)); c2.fillStyle = gr; c2.fillRect(x - rr, y - rr, rr * 2, rr * 2); }
+          for (var k2 = 0; k2 < 1500; k2++) { var sx = r() * w, sy = r() * h; c2.strokeStyle = css(r() < 0.5 ? dk : lt, 0.1 + r() * 0.12); c2.lineWidth = 1; c2.beginPath(); c2.moveTo(sx, sy); c2.lineTo(sx + (r() - 0.5) * 3, sy + 4 + r() * 7); c2.stroke(); }
+        });
+        furT.wrapS = furT.wrapT = T.RepeatWrapping; furT.repeat.set(2, 2);
+        var fur = paint({ map: furT }, 0xffe0b0, 0.3), furDk = paint({ map: furT, color: 0x8a7868 }, 0xffe0b0, 0.2);
+        var pad = paint({ color: tone(F.mixHex(coatC, 0x2a1a10, 0.6)) }, 0xffc890, 0.15), dark = new T.MeshBasicMaterial({ color: 0x120a08 });
+        var blanket = paint({ map: tex.cloth(o.blanket == null ? 0x7e2a22 : o.blanket, o.blanket2 == null ? 0x4e1814 : o.blanket2, 14, seed), side: T.DoubleSide }, 0xffb878, 0.25);
+        var blanket2 = paint({ map: tex.cloth(0x2c3a5a, 0xcdb98c, 6, seed + 1), side: T.DoubleSide }, 0xffb878, 0.2);
+        var leather = paint({ color: tone(0x6a4022) }, 0xffc890, 0.25), wood = paint({ map: tex.wood(0x6a4426, seed) }, 0xffd8a8, 0.15), brass = paint({ color: tone(0xc79a46), emissive: 0x1a0e02 }, 0xfff0b0, 0.5);
+        var ropeM = paint({ color: tone(0xb09a6a) }, 0xffe0b0, 0.15), tassel = paint({ color: tone(0xd89a34) }, 0xfff0b0, 0.3);
+        function put(mesh, x, y, z, parent) { mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; (parent || parts).add(mesh); return mesh; }
+        var shag = function (k, d) { return function (a, u) { return 1 + d * Math.sin(a * k + u * 7) * (0.5 + 0.5 * Math.sin(u * 23)); }; };
+
+        // trunk: chest forward (-z), a belly that rises to the flank, the rump
+        put(new T.Mesh(loft([[0, 1.5, -0.84, 0.13, 0.22], [0, 1.42, -0.68, 0.3, 0.44], [0, 1.39, -0.35, 0.37, 0.5], [0, 1.45, 0.1, 0.38, 0.45], [0, 1.52, 0.5, 0.33, 0.37], [0, 1.5, 0.78, 0.24, 0.31], [0, 1.42, 0.92, 0.08, 0.12]], { radial: 22, steps: 5, uv: [1, 1.5] }), fur), 0, 0, 0);
+        var humpG = new T.SphereGeometry(1, 22, 16), HP = humpG.attributes.position;
+        for (var hi = 0; hi < HP.count; hi++) { var hy = HP.getY(hi), hz = HP.getZ(hi); HP.setXYZ(hi, HP.getX(hi) * (1 - 0.25 * Math.max(0, hy)), hy > 0 ? hy : hy * 0.5, hz + 0.18 * Math.max(0, hy) * Math.max(0, hy)); }
+        humpG.computeVertexNormals();
+        var hump = put(new T.Mesh(humpG, fur), 0, 1.76, 0.08); hump.scale.set(0.27, 0.44, 0.46);
+
+        // legs: a thick forearm, a knobbed knee, a thin shin, a broad split pad
+        function leg(x, z, front) {
+          var hip = new T.Group(); hip.position.set(x, 1.36, z); parts.add(hip);
+          put(new T.Mesh(front
+            ? loft([[0, 0.16, 0.02, 0.12, 0.19], [0, -0.1, 0, 0.105, 0.145], [0, -0.4, -0.01, 0.075, 0.09], [0, -0.64, 0, 0.066, 0.072], [0, -0.74, 0, 0.07, 0.076]], { radial: 12 })
+            : loft([[0, 0.18, -0.06, 0.13, 0.27], [0, -0.1, -0.03, 0.115, 0.2], [0, -0.38, 0.02, 0.078, 0.105], [0, -0.62, 0.05, 0.062, 0.072], [0, -0.74, 0.04, 0.066, 0.074]], { radial: 12 }), fur), 0, 0, 0, hip);
+          var knee = new T.Group(); knee.position.set(0, -0.72, front ? 0 : 0.04); hip.add(knee);
+          put(new T.Mesh(loft([[0, 0.04, 0, 0.068, 0.074], [0, -0.14, 0, 0.054, 0.06], [0, -0.42, 0, 0.046, 0.052], [0, -0.54, -0.01, 0.06, 0.066], [0, -0.6, -0.03, 0.075, 0.085]], { radial: 10 }), fur), 0, 0, 0, knee);
+          [-1, 1].forEach(function (sd) { put(new T.Mesh(new T.SphereGeometry(0.075, 10, 8), pad), sd * 0.04, -0.6, -0.05, knee).scale.set(0.85, 0.5, 1.55); });
+          return { hip: hip, knee: knee, front: front, side: x < 0 ? -1 : 1 };
+        }
+        var legs = [leg(-0.19, -0.56, true), leg(0.19, -0.56, true), leg(-0.19, 0.6, false), leg(0.19, 0.6, false)];
+
+        // the neck swings from the chest; the head hangs from the neck
+        var neck = new T.Group(); neck.position.set(0, 1.5, -0.7); parts.add(neck);
+        put(new T.Mesh(loft([[0, -0.06, 0.1, 0.17, 0.26], [0, -0.14, -0.22, 0.13, 0.2], [0, 0.0, -0.5, 0.105, 0.15], [0, 0.3, -0.66, 0.092, 0.12], [0, 0.62, -0.68, 0.085, 0.105], [0, 0.84, -0.62, 0.08, 0.1]], { radial: 16, steps: 5, bump: shag(7, 0.035), uv: [1, 1.2] }), fur), 0, 0, 0, neck);
+        // a mane down the back of the neck and a tuft on the crown
+        put(new T.Mesh(F.strands(loft([[0, 0.9, -0.52, 0.035, 0.05], [0, 0.6, -0.57, 0.045, 0.07], [0, 0.28, -0.53, 0.05, 0.08], [0, 0.04, -0.34, 0.05, 0.08], [0, -0.02, -0.08, 0.04, 0.06]], { radial: 8 }), { count: 5, depth: 0.012 }), furDk), 0, 0, 0, neck);
+        var head = new T.Group(); head.position.set(0, 0.86, -0.62); neck.add(head);
+        put(new T.Mesh(loft([[0, 0.0, 0.14, 0.07, 0.085], [0, 0.03, 0.0, 0.098, 0.11], [0, 0.02, -0.16, 0.086, 0.095], [0, -0.03, -0.32, 0.064, 0.07], [0, -0.07, -0.44, 0.062, 0.058], [0, -0.09, -0.5, 0.045, 0.04]], { radial: 16, steps: 5 }), fur), 0, 0, 0, head);
+        var jaw = new T.Group(); jaw.position.set(0, -0.06, -0.1); head.add(jaw);
+        put(new T.Mesh(loft([[0, 0.0, 0.08, 0.06, 0.04], [0, -0.035, -0.12, 0.058, 0.04], [0, -0.065, -0.3, 0.048, 0.034], [0, -0.07, -0.385, 0.036, 0.026]], { radial: 10 }), fur), 0, 0, 0, jaw);
+        [-1, 1].forEach(function (sd) {
+          put(new T.Mesh(new T.SphereGeometry(0.034, 12, 10), dark), sd * 0.082, 0.045, -0.09, head);
+          var lid = put(new T.Mesh(new T.SphereGeometry(0.04, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.5), fur), sd * 0.082, 0.047, -0.09, head); lid.rotation.set(0.2, 0, sd * -0.55);
+          var lash = put(new T.Mesh(new T.TorusGeometry(0.041, 0.006, 5, 12, Math.PI), dark), sd * 0.086, 0.046, -0.09, head); lash.rotation.set(Math.PI / 2 + 0.2, sd * 0.9, 0);
+          put(new T.Mesh(new T.SphereGeometry(0.05, 10, 8), fur), sd * 0.06, 0.09, -0.08, head).scale.set(0.9, 0.5, 1.3);    // the brow
+          var ear = put(new T.Mesh(new T.ConeGeometry(0.034, 0.1, 8), fur), sd * 0.085, 0.125, 0.06, head); ear.rotation.set(-0.5, 0, sd * -0.6); ear.scale.z = 0.55;
+          put(new T.Mesh(new T.SphereGeometry(0.014, 8, 6), dark), sd * 0.03, -0.065, -0.49, head).scale.set(0.7, 1, 1.8);   // nostril
+        });
+        put(new T.Mesh(F.strands(new T.SphereGeometry(0.07, 12, 10), { count: 5, depth: 0.012 }), furDk), 0, 0.12, 0.02, head).scale.set(1, 0.7, 1.2);
+
+        // the tail
+        var tailG = new T.Group(); tailG.position.set(0, 1.52, 0.9); parts.add(tailG);
+        put(new T.Mesh(F.tube([[0, 0, 0], [0, -0.14, 0.09], [0, -0.4, 0.11], [0, -0.62, 0.08]], function (u) { return 0.034 - 0.02 * u; }, { segments: 10, radial: 7 }), fur), 0, 0, 0, tailG);
+        put(new T.Mesh(F.strands(new T.SphereGeometry(0.05, 10, 10), { count: 5, depth: 0.014 }), furDk), 0, -0.68, 0.075, tailG).scale.set(0.8, 1.8, 0.8);
+
+        // the harness: two blankets, a wooden saddle with its horns round the hump, bags, a water skin, tassels, a halter
+        var over = function (r, k) { return function (a, u) { return r + k * Math.sin(u * Math.PI); }; };
+        put(new T.Mesh(loft([[0, 1.5, -0.5, 0.345, 0.47], [0, 1.52, -0.1, 0.36, 0.47], [0, 1.55, 0.3, 0.355, 0.44], [0, 1.56, 0.62, 0.32, 0.38]], { radial: 22, steps: 4, arc: [Math.PI * 1.02, Math.PI * 1.98], bump: over(1.0, 0.02), uv: [4, 1] }), blanket2), 0, 0, 0);
+        put(new T.Mesh(loft([[0, 1.53, -0.38, 0.365, 0.5], [0, 1.56, -0.05, 0.385, 0.62], [0, 1.58, 0.25, 0.385, 0.62], [0, 1.58, 0.5, 0.35, 0.46]], { radial: 22, steps: 4, arc: [Math.PI * 1.1, Math.PI * 1.9], bump: over(1.0, 0.03), uv: [3, 1] }), blanket), 0, 0, 0);
+        for (var tk = 0; tk < 7; tk++) [-1, 1].forEach(function (sd) {
+          var tz = -0.34 + tk * 0.135, ts = put(new T.Mesh(new T.ConeGeometry(0.024, 0.11, 6), tassel), sd * 0.375, 1.37, tz); ts.rotation.z = Math.PI;
+          put(new T.Mesh(new T.SphereGeometry(0.016, 6, 5), brass), sd * 0.375, 1.43, tz);
+        });
+        [-0.34, 0.5].forEach(function (z, k) {
+          [-1, 1].forEach(function (sd) { var bar = put(new T.Mesh(new T.CylinderGeometry(0.022, 0.026, 0.62, 8), wood), sd * 0.13, 2.02, z); bar.rotation.z = sd * 0.42; bar.rotation.x = k ? 0.12 : -0.12; });
+          put(new T.Mesh(new T.SphereGeometry(0.04, 10, 8), brass), 0, 2.3, z + (k ? 0.035 : -0.035));
+        });
+        [-1, 1].forEach(function (sd) {
+          var rail = put(new T.Mesh(new T.CylinderGeometry(0.02, 0.02, 0.86, 8), wood), sd * 0.24, 1.86, 0.08); rail.rotation.x = Math.PI / 2;
+          put(new T.Mesh(loft([[0, 0.18, 0, 0.1, 0.045], [0, 0.0, 0, 0.16, 0.085], [0, -0.2, 0, 0.15, 0.08], [0, -0.3, 0, 0.07, 0.04]], { radial: 12 }), leather), sd * 0.42, 1.5, 0.3).rotation.y = Math.PI / 2;
+          put(new T.Mesh(new T.BoxGeometry(0.012, 0.2, 0.2), leather), sd * 0.465, 1.6, 0.3);
+          put(new T.Mesh(new T.SphereGeometry(0.014, 6, 5), brass), sd * 0.475, 1.52, 0.3);
+        });
+        put(new T.Mesh(new T.SphereGeometry(0.15, 14, 10), paint({ color: tone(0x7a4a26) }, 0xffc890, 0.22)), -0.4, 1.52, -0.18).scale.set(0.6, 1.3, 0.85);
+        var roll = put(new T.Mesh(new T.CylinderGeometry(0.1, 0.1, 0.62, 14), blanket2), 0, 1.98, 0.6); roll.rotation.z = Math.PI / 2;
+        [-0.2, 0.2].forEach(function (x) { put(new T.Mesh(new T.TorusGeometry(0.103, 0.01, 5, 14), leather), x, 1.98, 0.6).rotation.y = Math.PI / 2; });
+        var girth = put(new T.Mesh(new T.TorusGeometry(0.4, 0.016, 5, 28), leather), 0, 1.46, -0.3); girth.scale.set(0.86, 1.14, 1);
+        var nose = put(new T.Mesh(new T.TorusGeometry(0.068, 0.008, 5, 16), leather), 0, -0.045, -0.33, head); nose.scale.set(1, 1.1, 1);
+        var cheekS = put(new T.Mesh(new T.TorusGeometry(0.105, 0.007, 5, 18), leather), 0, 0.0, -0.02, head); cheekS.scale.set(1, 1.15, 1);
+        [-1, 1].forEach(function (sd) { put(new T.Mesh(F.tube([[sd * 0.07, -0.04, -0.33], [sd * 0.095, -0.01, -0.18], [sd * 0.1, 0.0, -0.02]], 0.007, { segments: 6, radial: 5 }), leather), 0, 0, 0, head); });
+        // the rein: from the halter to the front horn, with its own weight
+        var rv = new T.Vector3();
+        var rein = rope(ropeM, function () { return reinEnd(); }, [0, 2.24, -0.36], { segments: 9, radius: 0.009, slack: 1.12 });
+        function reinEnd() { rv.set(0, -0.11, -0.33); head.updateWorldMatrix(true, false); head.localToWorld(rv); parts.worldToLocal(rv); return [rv.x, rv.y, rv.z]; }
+        rein.userData.live = true; parts.add(rein);
+
+        g.scale.setScalar(o.scale || 1);
+        var quiet = [tassel, brass, dark, leather, pad, ropeM, furDk, wood];
+        g.traverse(function (m) { if (m.isMesh && (quiet.indexOf(m.material) >= 0 || m.parent === jaw)) m.castShadow = false; });
+        bake(g, { skip: [rein] });
+        var kT = 0, k = null, walking = false, wgt = 0, ph = (seed % 7), lastT = null, phase = 0, calm = clothReduced();
+        var chewT = 2 + (seed % 5), flick = 0;
+        function pose() {
+          var e = k * k * (3 - 2 * k);
+          parts.position.y = -0.98 * e;
+          legs.forEach(function (L, i) {
+            var s = Math.sin(Math.PI * 2 * phase + (L.side > 0 ? Math.PI : 0) + (L.front ? 0 : 0.5)), lift = Math.max(0, Math.cos(Math.PI * 2 * phase + (L.side > 0 ? Math.PI : 0) + (L.front ? 0 : 0.5)));
+            L.hip.rotation.x = (L.front ? 1.38 : 1.15) * e + 0.42 * s * wgt * (1 - e);
+            L.knee.rotation.x = -(L.front ? 2.76 : 2.5) * e - 0.85 * lift * wgt * (1 - e);
+          });
+          neck.rotation.x = 0.1 * e;
+        }
+        g.userData = {
+          parts: parts, head: head, neck: neck, legs: legs,
+          kneel: function (v, now) { kT = v ? 1 : 0; if (now || k == null) { k = kT; pose(); } },
+          walk: function (on) { walking = !!on; },
+          update: function (t) {
+            if (lastT == null) { lastT = t; if (k == null) k = kT; pose(); return; }
+            var dt = Math.min(0.066, Math.max(0, t - lastT)); lastT = t;
+            if (!(dt > 0)) return;
+            k += Math.max(-dt / 2.6, Math.min(dt / 2.6, kT - k));
+            wgt += ((walking ? 1 : 0) - wgt) * Math.min(1, dt * 4);
+            if (wgt > 0.01) phase = (phase + dt * 0.95) % 1;
+            pose();
+            var a = Math.PI * 2 * phase;
+            parts.position.y += 0.03 * Math.sin(a * 2) * wgt;
+            parts.rotation.z = 0.025 * Math.sin(a) * wgt;
+            // it chews for a while, sideways, then rests; it breathes; an ear and the tail flick at the flies
+            chewT -= dt; if (chewT < -4) chewT = 3 + Math.random() * 5;
+            var chew = chewT < 0 && !calm ? 1 : 0;
+            jaw.rotation.x = chew * 0.07 * (0.5 + 0.5 * Math.sin(t * 6.2 + ph));
+            jaw.position.x = chew * 0.012 * Math.sin(t * 3.1 + ph);
+            flick -= dt; if (flick < -0.5) flick = 2 + Math.random() * 6;
+            tailG.rotation.z = calm ? 0 : (flick < 0 ? 0.5 * Math.sin((flick + 0.5) * Math.PI * 4) : 0.05 * Math.sin(t * 0.9 + ph));
+            tailG.rotation.x = 0.1 * Math.sin(a * 2) * wgt;
+            neck.rotation.x += (calm ? 0 : 0.02 * Math.sin(t * 0.5 + ph)) + 0.05 * Math.sin(a * 2 + 0.6) * wgt;
+            neck.rotation.y = calm ? 0 : 0.06 * Math.sin(t * 0.23 + ph * 2) * (1 - wgt);
+            head.rotation.x = (calm ? 0 : 0.05 * Math.sin(t * 0.37 + ph)) - 0.05 * Math.sin(a * 2 + 0.6) * wgt;
+            head.rotation.y = calm ? 0 : 0.18 * Math.sin(t * 0.17 + ph * 3) * (1 - wgt);
+            parts.scale.x = 1 + (calm ? 0 : 0.012 * Math.sin(t * 1.3 + ph));
+            rein.userData.update(t);
           }
         };
         return g;
@@ -1948,7 +2292,7 @@
       }
 
       window.EclipseScenery = {
-        tex: tex, preTone: preTone, clothSim: clothSim, rope: rope, bake: bake, faceLife: faceLife, persona: persona, foldedLathe: foldedLathe, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
+        tex: tex, preTone: preTone, clothSim: clothSim, rope: rope, bake: bake, faceLife: faceLife, persona: persona, foldedLathe: foldedLathe, loft: loft, orbit: orbit, beams: beams, cliffWall: cliffWall, util: { hex: hex, mix: mix, smooth: smooth, clamp: clamp, lerp: lerp, pixelCanvas: pixelCanvas, toTex: toTex, greyCanvas: greyCanvas }, chars: { elder: elder, nomad: youngNomad, raider: raider, camel: camel }, sky: sky, terrain: terrain, ridges: ridges, scatter: scatter, air: air, lights: lights, desertCamp: desertCamp,
         props: { brazier: brazier, banner: banner, palm: palm, awning: awning, amphora: amphora, crate: crate, sack: sack, firepit: firepit, column: column, rocks: rocks, tracks: tracks },
         paint: paintFor, shadowy: shadowy, noise: { vnoise: vnoise, fbm: fbm, hash2: hash2, rng: rng }
       };

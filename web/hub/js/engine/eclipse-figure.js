@@ -5,7 +5,7 @@
     //                           portrait (blush, shadow under the brow, lines of age, lips, freckles); two eyeballs with a
     //                           painted iris that turn to look; lids with lashes that close; brows that move; ears; a jaw
     //                           that carries the beard and works when he talks.
-    //   face(rig)             · what plays that head: blinks, glances, surprise, worry, joy, speech.
+    //   face(rig)             · what plays that head: blinks, glances, surprise, worry, joy, speech, sleep.
     //   shell(rig, mask, t)   · a skin over part of that skull (a cap of hair, a close beard, a headcloth) that fits it exactly.
     //   tube(points, r, …)    · a tapering tube along a curve (a moustache, a lock of hair, a finger, a strap).
     //   strands(geo, …)       · combs a surface into locks; hairTex(…) paints the strands.
@@ -451,12 +451,13 @@
         if (rig.stone) eyes.forEach(function (e) { e.lid.rotation.x = 0.15; });
         var jawX = rig.jaw ? rig.jaw.rotation.x : 0;
         var next = 1 + Math.random() * 3, b = 0, ph = 0, dbl = false, sur = 0, wor = 0, joy = 0, gx = 0, gy = 0, tx = 0, ty = 0, sx = 0, sy = 0, sacT = 0, talking = false, sp = 0, t = Math.random() * 9;
-        var calm = reduced();
+        var calm = reduced(), asleep = 0;
         return {
           blink: function () { if (!ph) ph = 1; },
           mood: function (surprise, worry, j) { sur = Math.max(sur, surprise || 0); wor = Math.max(wor, worry || 0); joy = Math.max(joy, j || 0); },
           gaze: function (x, y) { tx = x || 0; ty = y || 0; },
           talk: function (on) { talking = !!on; },
+          shut: function (k) { asleep = k || 0; eyes.forEach(function (e) { e.lid.rotation.x = OPEN + (SHUT - OPEN) * asleep; }); },
           update: function (dt) {
             if (!live || !(dt > 0)) return;
             t += dt;
@@ -477,7 +478,7 @@
               e.ball.rotation.y = -gx * 0.5; e.ball.rotation.x = -gy * 0.32;
               // the lid follows the eye, opens wide with surprise, narrows with worry and with a smile
               var open = OPEN + 0.2 * sur - 0.16 * wor - 0.14 * joy - gy * 0.16;
-              e.lid.rotation.x = open + (SHUT - open) * b;
+              e.lid.rotation.x = open + (SHUT - open) * Math.max(b, asleep);
               e.lower.rotation.x = LOW + 0.22 * joy + 0.1 * wor + 0.12 * b - 0.06 * sur;
               e.brow.position.y = e.by + 0.085 * sur - 0.05 * wor + 0.02 * joy - 0.025 * b + 0.012 * syl;
               e.brow.rotation.z = e.sd * (0.3 * wor - 0.16 * sur - 0.05 * joy);
