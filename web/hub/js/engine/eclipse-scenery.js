@@ -616,7 +616,8 @@
           body: body,
           speak: function (on) { speaking = !!on; if (c.face && c.face.talk) c.face.talk(speaking); },
           look: function (v) { target = v ? (target || new T.Vector3()).set(v.x, v.y, v.z) : null; },
-          react: function (kind) { rx = { kind: kind, t: 0, dur: kind === 'bow' ? 1.8 : 0.9 }; if (c.face) { if (kind === 'startle') { c.face.mood(1, 0); } else c.face.blink(); } },
+          // 'bow', 'startle', 'nod', 'offer' (the free hand held out: a coin, a cord, a flask)
+          react: function (kind) { rx = { kind: kind, t: 0, dur: { bow: 2.0, nod: 1.0, offer: 2.4 }[kind] || 0.9 }; if (c.face) { if (kind === 'startle') { c.face.mood(1, 0); } else c.face.blink(); } },
           moving: function () { return wgt > 0.05; },
           update: function (t) {
             if (lastT == null) { lastT = t; return; }
@@ -640,18 +641,29 @@
             }
             sp += ((speaking ? 1 : 0) - sp) * Math.min(1, dt * 6);
             var e = 0;
-            if (rx) { rx.t += dt; var u = rx.t / rx.dur; if (u >= 1) rx = null; else { e = u < 0.25 ? u / 0.25 : 1 - (u - 0.25) / 0.75; e = e * e * (3 - 2 * e); } }
-            var bow = rx && rx.kind === 'bow' ? e : 0, start = rx && rx.kind === 'startle' ? e : 0;
+            var nodK = 0;
+            if (rx) {
+              rx.t += dt; var u = rx.t / rx.dur;
+              if (u >= 1) rx = null;
+              else {
+                // a bow and an offered hand are held a moment; the rest rise fast and let go
+                if (rx.kind === 'bow' || rx.kind === 'offer') e = u < 0.3 ? u / 0.3 : u > 0.7 ? (1 - u) / 0.3 : 1;
+                else e = u < 0.25 ? u / 0.25 : 1 - (u - 0.25) / 0.75;
+                e = e * e * (3 - 2 * e);
+                if (rx.kind === 'nod') nodK = e * Math.sin(u * Math.PI * 4);
+              }
+            }
+            var bow = rx && rx.kind === 'bow' ? e : 0, start = rx && rx.kind === 'startle' ? e : 0, offer = rx && rx.kind === 'offer' ? e : 0;
             body.position.y = -0.025 * (0.5 - 0.5 * Math.cos(2 * a)) * wgt + 0.004 * br * (1 - wgt);
             body.position.x = 0.012 * sw * wgt + (calm ? 0 : 0.006 * Math.sin(t * 0.41) * (1 - wgt));
-            body.rotation.x = -0.05 * wgt - 0.22 * bow + 0.07 * start;
+            body.rotation.x = -0.05 * wgt - 0.3 * bow + 0.07 * start - 0.06 * offer;
             body.rotation.z = 0.03 * sw * wgt + (calm ? 0 : 0.008 * Math.sin(t * 0.33) * (1 - wgt));
             body.scale.y = 1 + 0.005 * br;
             if (c.stick && sb) c.stick.rotation.x = sb.x + 0.16 * sw * wgt;
             if (c.lantern && lb) c.lantern.rotation.x = lb.x + 0.14 * Math.sin(a + 1.1) * wgt;
             if (c.arm && ab) {
               // the free hand marks the words: it rises as he speaks and beats with them
-              c.arm.rotation.x = ab.x + sp * (0.32 + 0.1 * Math.sin(t * 3.3) + 0.05 * Math.sin(t * 7.1)) + 0.5 * start - 0.12 * sw * wgt;
+              c.arm.rotation.x = ab.x + sp * (1 - offer) * (0.32 + 0.1 * Math.sin(t * 3.3) + 0.05 * Math.sin(t * 7.1)) + 0.5 * start - 0.12 * sw * wgt + 0.95 * offer;
               c.arm.rotation.z = ab.z - sp * 0.1 * Math.sin(t * 2.2);
             }
             if (head && hb) {
@@ -670,7 +682,7 @@
               }
               yaw += (ty - yaw) * Math.min(1, dt * 3.5); pitch += (tp - pitch) * Math.min(1, dt * 3.5);
               head.rotation.y = hb.y + yaw;
-              head.rotation.x = hb.x + pitch + sp * (0.035 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + 0.02) - 0.3 * bow + 0.16 * start + 0.015 * Math.sin(t * 0.3);
+              head.rotation.x = hb.x + pitch + sp * (0.035 * Math.sin(t * 7.3) * Math.sin(t * 2.1) + 0.02) - 0.36 * bow + 0.16 * start + 0.14 * nodK + 0.015 * Math.sin(t * 0.3);
               head.rotation.z = hb.z + sp * 0.03 * Math.sin(t * 1.9);
               if (c.face) c.face.gaze(Math.max(-1, Math.min(1, (ty - yaw) * 3)), 0);
             }

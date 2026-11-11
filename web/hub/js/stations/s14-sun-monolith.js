@@ -16,7 +16,6 @@
         awake: 'order_sun_monolith_awake',
         marks: 'order_sun_monolith_marks',
         done: 'order_sun_monolith_completed',
-        fails: 'order_monolith_key_fails',
         hint: 'order_monolith_hint',
         minute: 'order_monolith_sun_minute'
       };
@@ -57,7 +56,10 @@
         { id: 'moon', icon: '🌙', name: 'the Moon', x: 0, y: -20 },
         { id: 'star', icon: '⭐', name: 'the Star', x: -7, y: 5 }
       ]);
-      const ALL_MARKS = MARKS.concat(DECOYS).map((m) => Object.assign(m, { radius: Math.max(3, 0.11 * Math.hypot(m.x, m.y)) }));
+      // Each mark is as wide as the ground the tip of the shadow crosses there in about twenty-five minutes, so every
+      // moment gives the same time to stop the sun on it (the tip crawls at noon and races at dusk). The unreachable two keep a fixed size.
+      const tipSpeed = (m) => { const a = shadowTip(m - 1), b = shadowTip(m + 1); return Math.hypot(b.x - a.x, b.y - a.y) / 2; };
+      const ALL_MARKS = MARKS.concat(DECOYS).map((m) => Object.assign(m, { radius: m.minute != null ? Math.max(1.1, Math.min(7.5, tipSpeed(m.minute) * 12.5)) : 2.2 }));
 
       const INSCRIPTION = [
         'First, the morning shadow, as long as the outermost ring, leaning toward the sunset.',
@@ -84,9 +86,10 @@
       const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       const toast = (msg) => { if (typeof window.showDesertToast === 'function') window.showDesertToast(msg); };
       const P = window.EclipsePaint, SC = window.EclipseScenery;
+      const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
 
       const el = {
-        close: $('btn-close-monolith'), stage: $('mon3d-stage'), canvas: $('mon3d-canvas'), subtitle: $('mon3d-subtitle'), fade: $('mon3d-fade'),
+        close: $('btn-close-monolith'), stage: $('mon3d-stage'), canvas: $('mon3d-canvas'), subtitle: $('mon3d-subtitle'),
         clock: $('mon3d-clock'), hearts: $('mon3d-hearts'), marksHud: $('mon3d-marks'), where: $('mon3d-where'), dispatch: $('monolith-dispatch-text'),
         controls: $('mon3d-controls'), sigilRow: $('mon3d-sigil-row'), sunRow: $('mon3d-sun-row'),
         keyInput: $('monolith-key-input'), speak: $('btn-monolith-speak'), keyFeedback: $('monolith-key-feedback'),
@@ -147,8 +150,9 @@
 
       let minute = Math.max(FIRST_MINUTE, Math.min(LAST_MINUTE, parseInt(get(KEYS.minute) || String(FIRST_MINUTE), 10) || FIRST_MINUTE));
       let G = null, raf = 0, lastT = 0, cine = null, howtoPage = 0;
-      let walk = null, busy = false, introPending = false;
-      const view = { rings: -1, ringsT0: 0, lidT0: 0, sealT0: 0, lid: 0, seal: 0, glowPulse: 0, flash: 0 };
+      let walk = null, busy = false;
+      // free: the day is won and the sun is hers to move; sweep: the day walking by on its own; near: the mark under the tip
+      const view = { ringsT0: 0, lidT0: 0, sealT0: 0, free: false, sweep: null, near: null, quarter: -1, ibisNew: false };
 
       const fmt = (m) => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
       const svgEl = (tag, attrs) => {
@@ -163,9 +167,10 @@
         node.classList.toggle('is-error', kind === 'error');
         node.classList.toggle('is-ok', kind === 'ok');
       }
-      function subtitle(text, secs) {
+      function subtitle(text, secs, kind) {
         if (!el.subtitle) return;
         el.subtitle.textContent = text;
+        el.subtitle.classList.toggle('is-act', kind === 'act');
         el.subtitle.classList.add('is-on');
         clearTimeout(subtitle.t);
         subtitle.t = setTimeout(() => el.subtitle.classList.remove('is-on'), (secs || 5) * 1000);
@@ -193,6 +198,25 @@
         el.sky.appendChild(sunDot);
       }
 
+      // The card over the scene: the page to use, or the line of the inscription the stone waits for
+      let quest = null;
+      function paintQuest(ph, found) {
+        const hud = el.stage && el.stage.querySelector('.chasm3d-hud');
+        if (!hud) return;
+        if (!quest) {
+          quest = document.createElement('div');
+          quest.className = 'mon3d-quest';
+          quest.setAttribute('aria-hidden', 'true');   // the panel says the same for screen readers
+          hud.appendChild(quest);
+        }
+        let html = '';
+        if (ph === 'sigil') html = '<b>📖 Your journal</b><span>Solve the seven noons on the page “The Sun Monolith &amp; Cairn II” and speak the sigil to the stone.</span>';
+        else if (ph === 'sun' && found < MARKS.length) html = '<b>Line ' + ['I', 'II', 'III', 'IV'][found] + ' of the inscription</b><span>“' + INSCRIPTION[found] + '”</span><i>' + MARKS.map((m, i) => '<em class="' + (i < found ? 'is-on' : '') + '"></em>').join('') + '</i>';
+        else if (ph === 'done' && view.free) html = '<b>The day is yours</b><span>Move the sun and watch the four marks answer the shadow.</span>';
+        if (quest.innerHTML !== html) quest.innerHTML = html;
+        quest.hidden = !html;
+      }
+
       function markUnderShadow(m) {
         const tip = shadowTip(m);
         return ALL_MARKS.find((mk) => Math.hypot(tip.x - mk.x, tip.y - mk.y) <= mk.radius) || null;
@@ -203,13 +227,18 @@
         const found = marksFound(), ph = phase();
         const tip = shadowTip(minute);
         if (sunDot) { sunDot.setAttribute('cx', SKY_X(minute).toFixed(2)); sunDot.setAttribute('cy', SKY_Y(minute).toFixed(2)); }
-        if (el.sky) el.sky.setAttribute('data-locked', ph === 'sun' && !busy ? 'false' : 'true');
-        if (el.slider) { el.slider.value = String(minute); el.slider.setAttribute('aria-valuetext', fmt(minute)); el.slider.disabled = busy; }
+        const free = ph === 'done' && view.free;
+        if (el.sky) el.sky.setAttribute('data-locked', (ph === 'sun' || free) && !busy && !view.sweep ? 'false' : 'true');
+        if (el.slider) { el.slider.value = String(minute); el.slider.setAttribute('aria-valuetext', fmt(minute)); }
         if (el.timeLabel) el.timeLabel.textContent = fmt(minute);
         if (el.clock) el.clock.textContent = '☀ ' + fmt(minute);
         if (el.hearts) {
-          el.hearts.innerHTML = [0, 1, 2].map((i) => '<i class="chasm3d-heart' + (i < (S ? S.hearts : HEARTS) ? '' : ' is-lost') + '">♥</i>').join('');
-          el.hearts.setAttribute('aria-label', (S ? S.hearts : HEARTS) + ' of 3 hearts left');
+          const hearts = S ? S.hearts : HEARTS, was = el.hearts.getAttribute('data-n');
+          if (was !== String(hearts)) {
+            el.hearts.innerHTML = [0, 1, 2].map((i) => '<i class="chasm3d-heart' + (i < hearts ? '' : ' is-lost') + (was !== null && i === hearts && +was === hearts + 1 ? ' is-breaking' : '') + '">♥</i>').join('');
+            el.hearts.setAttribute('data-n', String(hearts));
+            el.hearts.setAttribute('aria-label', hearts + ' of 3 hearts left');
+          }
         }
         if (el.marksHud) {
           el.marksHud.innerHTML = MARKS.map((m, i) => '<i class="mon3d-mark' + (i < found ? ' is-found' : '') + '" title="' + m.name + '">' + m.icon + '</i>').join('');
@@ -224,15 +253,21 @@
         }
         const lost = ph === 'lost', done = ph === 'done';
         if (el.sigilRow) el.sigilRow.hidden = ph !== 'sigil';
-        if (el.sunRow) el.sunRow.hidden = ph !== 'sun';
-        if (el.controls) el.controls.style.display = (lost || done) ? 'none' : '';
+        if (el.sunRow) el.sunRow.hidden = !(ph === 'sun' || free);
+        if (el.controls) el.controls.style.display = (lost || (done && !free)) ? 'none' : '';
         if (el.lost) el.lost.hidden = !lost;
         if (el.victory) el.victory.style.display = done ? '' : 'none';
         if (el.help) el.help.style.display = (lost || done) ? 'none' : '';
-        if (el.mark) el.mark.disabled = ph !== 'sun' || busy;
+        if (el.mark) { el.mark.disabled = ph !== 'sun' || busy; el.mark.hidden = done; }
+        if (el.slider) el.slider.disabled = busy || !!view.sweep;
+        if (el.earlier) el.earlier.disabled = busy || !!view.sweep;
+        if (el.later) el.later.disabled = busy || !!view.sweep;
+        if (el.replay) el.replay.disabled = !!view.sweep;
         if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
         if (isAwake() && el.keyFeedback && el.keyFeedback.textContent !== 'Sigil spoken: ' + SIGIL + ' ✓') feedback(el.keyFeedback, 'Sigil spoken: ' + SIGIL + ' ✓', 'ok');
-        if (el.inscription) {
+        const listKey = (isAwake() ? 'a' : 's') + found;
+        if (el.inscription && el.inscription.getAttribute('data-k') !== listKey) {
+          el.inscription.setAttribute('data-k', listKey);
           el.inscription.innerHTML = '';
           INSCRIPTION.forEach((line, i) => {
             const li = document.createElement('li');
@@ -242,7 +277,8 @@
             el.inscription.appendChild(li);
           });
         }
-        if (el.fragments) {
+        if (el.fragments && el.fragments.getAttribute('data-k') !== listKey) {
+          el.fragments.setAttribute('data-k', listKey);
           el.fragments.innerHTML = '';
           FRAGMENTS.forEach((text, i) => {
             const div = document.createElement('div');
@@ -251,12 +287,18 @@
             el.fragments.appendChild(div);
           });
         }
+        paintQuest(ph, found);
+        // the music walks faster as the marks wake
+        const amb = window.EclipseAmbience;
+        if (amb && amb.intensity) amb.intensity(ph === 'sun' ? 0.35 + 0.17 * found : ph === 'done' ? 0.6 : 0.3);
         sigilHints.refresh(); shadowHints.refresh();
       }
 
       function setMinute(m, persist) {
-        if (busy || cine && cine.active) return;
+        if (busy || view.sweep || cine && cine.active) return;
         minute = Math.max(FIRST_MINUTE, Math.min(LAST_MINUTE, Math.round(m)));
+        const q = Math.floor(minute / 15);
+        if (q !== view.quarter) { if (view.quarter >= 0) cue('click'); view.quarter = q; }
         if (persist) set(KEYS.minute, String(minute));
         paintChrome();
       }
@@ -320,32 +362,42 @@
         const mono = new T.Group();
         const plinth = new T.Mesh(new T.BoxGeometry(6.4, 0.7, 6.4), stone); plinth.position.y = 0.35; mono.add(plinth);
         const step2 = new T.Mesh(new T.BoxGeometry(5.2, 0.5, 5.2), stone); step2.position.y = 0.95; mono.add(step2);
-        const shaft = new T.Mesh(new T.CylinderGeometry(1.5, 2.7, 22.0, 4, 1), monoMat);
-        shaft.rotation.y = Math.PI / 4; shaft.position.y = 1.2 + 11.0; mono.add(shaft);
+        const shaft = new T.Mesh(new T.CylinderGeometry(1.5, 2.7, 21.8, 4, 1), monoMat);
+        shaft.rotation.y = Math.PI / 4; shaft.position.y = 1.2 + 10.9; mono.add(shaft);
         const tip = new T.Mesh(new T.ConeGeometry(1.4, 1.0, 4), goldMat);
-        tip.rotation.y = Math.PI / 4; tip.position.y = 23.2 + 0.5; mono.add(tip);
+        tip.rotation.y = Math.PI / 4; tip.position.y = 23.0 + 0.5; mono.add(tip);
         scene.add(mono);
 
-        // the dial painted on the paving: seven rings, north half, with their lengths in paces on the west side
-        const decalTex = P.canvasTex(1024, 1024, (g, w, h) => {
+        // the dial painted on the paving, as the page draws it: seven rings on the north half, their lengths in paces on
+        // the east side, and the path the tip of the shadow walks from sunrise to sunset worn faintly into the stone
+        const DIAL = 150;   // paces across: the evening shadow reaches the Serpent, 57 paces out
+        const decalTex = P.canvasTex(2048, 2048, (g, w, h) => {
           g.clearRect(0, 0, w, h);
-          const s = w / 100, cx = w / 2, cy = h / 2;
-          g.lineCap = 'round';
+          const s = w / DIAL, cx = w / 2, cy = h / 2;
+          g.lineCap = 'round'; g.lineJoin = 'round';
+          g.strokeStyle = 'rgba(60,32,12,0.3)'; g.lineWidth = 6; g.setLineDash([16, 18]);
+          g.beginPath();
+          for (let m = FIRST_MINUTE; m <= LAST_MINUTE; m += 3) { const p = shadowTip(m), X = cx + p.x * s, Y = cy - p.y * s; if (m === FIRST_MINUTE) g.moveTo(X, Y); else g.lineTo(X, Y); }
+          g.stroke(); g.setLineDash([]);
           for (let r = 6; r <= 42; r += 6) {
-            g.strokeStyle = 'rgba(60,32,12,0.55)'; g.lineWidth = 7;
+            g.strokeStyle = 'rgba(60,32,12,0.55)'; g.lineWidth = 12;
             g.beginPath(); g.arc(cx, cy, r * s, Math.PI, 2 * Math.PI); g.stroke();
-            g.strokeStyle = r === 42 ? 'rgba(232,190,100,0.95)' : 'rgba(232,190,100,0.7)'; g.lineWidth = 3;
+            g.strokeStyle = r === 42 ? 'rgba(232,190,100,0.95)' : 'rgba(232,190,100,0.7)'; g.lineWidth = 5;
             g.beginPath(); g.arc(cx, cy, r * s, Math.PI, 2 * Math.PI); g.stroke();
-            g.fillStyle = 'rgba(70,40,16,0.85)'; g.font = '700 22px Cinzel, Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-            g.fillText(String(r), cx - r * s, cy + 22);
+            g.strokeStyle = 'rgba(60,32,12,0.7)'; g.lineWidth = 5;
+            g.beginPath(); g.moveTo(cx + r * s, cy - 14); g.lineTo(cx + r * s, cy + 14); g.stroke();
+            g.fillStyle = 'rgba(70,40,16,0.9)'; g.font = '700 40px Cinzel, Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.fillText(String(r), cx + r * s, cy + 44);
           }
-          g.strokeStyle = 'rgba(60,32,12,0.4)'; g.lineWidth = 4;
+          g.strokeStyle = 'rgba(60,32,12,0.4)'; g.lineWidth = 7;
           g.beginPath(); g.moveTo(cx - 44 * s, cy); g.lineTo(cx + 44 * s, cy); g.stroke();
           g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx, cy - 44 * s); g.stroke();
-          g.fillStyle = 'rgba(70,40,16,0.9)'; g.font = '700 30px Cinzel, Georgia, serif';
-          g.fillText('N', cx, cy - 46 * s); g.fillText('W', cx - 46 * s, cy + 2); g.fillText('E', cx + 46 * s, cy + 2);
+          g.fillStyle = 'rgba(70,40,16,0.9)'; g.font = '700 54px Cinzel, Georgia, serif';
+          g.fillText('N', cx, cy - 47 * s); g.fillText('W', cx - 47 * s, cy + 2); g.fillText('E', cx + 47 * s, cy + 2);
+          g.font = '600 30px Cinzel, Georgia, serif'; g.textAlign = 'left'; g.fillText('paces', cx + 45.6 * s, cy + 48); g.textAlign = 'center';
         });
-        const decal = new T.Mesh(new T.PlaneGeometry(100, 100), paint({ map: decalTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+        try { decalTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); } catch (e) {}
+        const decal = new T.Mesh(new T.PlaneGeometry(DIAL, DIAL), paint({ map: decalTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
         decal.rotation.x = -Math.PI / 2; decal.position.y = 0.05; decal.receiveShadow = true;
         scene.add(decal);
 
@@ -358,8 +410,8 @@
             g.fillText(ring.c, w / 2, h / 2 + 4);
           });
           const mat = paint({ map: tex, emissive: 0xffb347, emissiveIntensity: 0 });
-          const slab = new T.Mesh(new T.BoxGeometry(2.6, 0.34, 2.6), [stone, stone, mat, stone, stone, stone]);
-          slab.position.set(0, 0.17, -ring.r); slab.castShadow = true; slab.receiveShadow = true; slab.visible = false;
+          const slab = new T.Mesh(new T.BoxGeometry(1.3, 0.3, 1.3), [stone, stone, mat, stone, stone, stone]);
+          slab.position.set(0, 0.15, -ring.r); slab.castShadow = true; slab.receiveShadow = true; slab.visible = false;
           slab.userData = { mat };
           scene.add(slab);
           return slab;
@@ -403,6 +455,13 @@
         const tipBeam = new T.Mesh(new T.CylinderGeometry(0.1, 0.1, 7, 8, 1, true), new T.MeshBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0.32, depthWrite: false, blending: T.AdditiveBlending }));
         tipBeam.position.y = 3.5;
         const tipGroup = new T.Group(); tipGroup.add(tipRing, tipBeam); scene.add(tipGroup);
+        // the shadow drawn once more as a soft band on the paving, from the foot of the Monolith to the ring at its tip,
+        // shaped like the stone (wide at the foot, a point at the end): the real shadow softens with distance, this one always reads
+        const bandGeo = new T.BufferGeometry();
+        bandGeo.setAttribute('position', new T.Float32BufferAttribute([-1.9, 0, 0, 1.9, 0, 0, 0.12, 0, -1, -0.12, 0, -1], 3));
+        bandGeo.setIndex([0, 2, 1, 0, 3, 2]);
+        const band = new T.Mesh(bandGeo, new T.MeshBasicMaterial({ color: 0x2c1606, transparent: true, opacity: 0.2, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 }));
+        band.position.y = 0.08; band.renderOrder = 2; scene.add(band);
 
         // Cairn II at the foot of the Monolith: three steps, a lid that slides, a niche, a Seal that rises
         const cairn = new T.Group();
@@ -455,11 +514,12 @@
           sparks = FX.particles(scene, { max: 260, additive: true });
           prints = FX.footprints(scene, { max: 64, life: 18 });
           if (H) gait = FX.gait(H, { onStep: (st) => {
+            cue('step');
             prints.stamp(st.pos.x, 0.07, st.pos.z, H.hermes.rotation.y, st.side, 2.5);
             dust.emit(st.pos, 3, { size: [0.45, 0.8], speed: [0.2, 0.7], up: [0.25, 0.7], life: [0.6, 1.1], alpha: 0.3, gravity: -0.7, color: 0xdcbb8c });
           } });
         }
-        return { skyFog, T, renderer, scene, camera, sky, lights, mono, slabs, marks, tipGroup, tipRing, tipBeam, cairn, lid, niche, nicheMat, seal, sealHalo, H, hermes: H && H.hermes, goldMat, ground, post, gait, dust, sparks, prints, shake, windT: 0, ringsShown: 0, lidWas: 0 };
+        return { skyFog, T, renderer, scene, camera, sky, lights, mono, slabs, marks, band, tipGroup, tipRing, tipBeam, cairn, lid, niche, nicheMat, seal, sealHalo, H, hermes: H && H.hermes, goldMat, ground, post, gait, dust, sparks, prints, shake, windT: 0, ringsShown: 0, lidWas: 0 };
       }
 
       // The sun: its light, its sky and the colour of the haze follow the minute of the day
@@ -474,8 +534,9 @@
         G.lights.key.target.position.set(0, 0, -24);
         G.lights.key.target.updateMatrixWorld();
         G.lights.key.color.setHex(WARM.key).lerp(new T.Color(NOON.key), k);
-        G.lights.key.intensity = 0.62 + 0.62 * k;
-        G.lights.hemi.intensity = 0.34 + 0.16 * k;
+        // a strong sun and a soft sky, so the shadow is deep enough to follow from the far side of the dial
+        G.lights.key.intensity = 0.72 + 0.72 * k;
+        G.lights.hemi.intensity = 0.24 + 0.12 * k;
         const u = G.sky.uniforms;
         u.uSun.value.copy(dir);
         u.uHorizon.value.setHex(WARM.horizon).lerp(new T.Color(NOON.horizon), k);
@@ -490,6 +551,9 @@
         }
         const tip = shadowTip(minute);
         G.tipGroup.position.set(tip.x, 0, -tip.y);
+        G.band.rotation.y = Math.atan2(-tip.x, tip.y);
+        G.band.scale.set(1, 1, tip.length);
+        G.band.material.opacity = 0.14 + 0.1 * k;   // a low sun throws a longer, paler shadow
         G.lastSun = minute;
       }
 
@@ -518,6 +582,7 @@
         if (w.then) w.then();
       }
       const goHome = (then) => goTo(BASE.x, BASE.z, then, { face: CAIRN });
+      const SIDE = { x: 3.5, z: 7.3 };     // beside Cairn II, where he watches it open
 
       // ---- The camera ----
       const orbit = { yaw: 0, pitch: 0, tYaw: 0, tPitch: 0, down: false, x: 0, y: 0 };
@@ -549,10 +614,11 @@
           p = [hx - walk.dir.x * 8 - walk.dir.z * 1.5, 3.8, hz - walk.dir.z * 8 + walk.dir.x * 1.5];
           l = [hx + walk.dir.x * 10, 1.6, hz + walk.dir.z * 10];
         } else if (ph === 'sigil') { p = [11, 4.8, 16]; l = [1.8, 3.6, 3.2]; }
-        else if (ph === 'done') { p = [12, 6.5, 18]; l = [3, 2.2, 2]; }
+        else if (ph === 'done' && !view.free) { p = [12, 6.5, 18]; l = [3, 2.2, 2]; }
         else {
-          const base = new T.Vector3(0, 27, 42), look = new T.Vector3(0, 9, -21);
-          const off = base.clone().sub(look), rad2 = off.length();
+          // the whole dial, from the Jackal in the west to the Serpent in the east, whatever the shape of the window
+          const base = new T.Vector3(7, 40, 47), look = new T.Vector3(7, 2, -15);
+          const off = base.clone().sub(look), rad2 = off.length() * Math.max(1, Math.min(1.7, 1.6 / (cam.aspect || 1.6)));
           const hor = Math.hypot(off.x, off.z), el0 = Math.atan2(off.y, hor), az0 = Math.atan2(off.x, off.z);
           const elv = Math.max(0.12, Math.min(1.25, el0 + orbit.pitch)), az = az0 + orbit.yaw;
           p = [look.x + Math.sin(az) * rad2 * Math.cos(elv), look.y + rad2 * Math.sin(elv), look.z + Math.cos(az) * rad2 * Math.cos(elv)];
@@ -586,6 +652,12 @@
         if (!G) return;
         const t = now / 1000;
         for (let i = timers.length - 1; i >= 0; i--) { timers[i].t -= dt; if (timers[i].t <= 0) { const f = timers.splice(i, 1)[0].fn; f(); } }
+        if (view.sweep) {
+          view.sweep.t += dt;
+          const u = Math.min(1, view.sweep.t / view.sweep.dur), m = Math.round(FIRST_MINUTE + (LAST_MINUTE - FIRST_MINUTE) * (u * u * (3 - 2 * u)));
+          if (m !== minute) { minute = m; paintChrome(); }
+          if (u >= 1) endSweep();
+        }
         if (walk && G.hermes) {
           walk.t += dt;
           const u = Math.min(1, walk.t / walk.dur), e = u * u * (3 - 2 * u);
@@ -602,17 +674,24 @@
         if (G.gait) {
           // he watches what matters: the tip of the shadow while the sun walks, the cairn when it opens
           const ph0 = phase();
-          G.gait.look(walk ? null : ph0 === 'sun' ? G.tipGroup.position : ph0 === 'sigil' ? { x: 0, y: 6, z: 0 } : { x: CAIRN.x, y: 1.8, z: CAIRN.z });
+          G.gait.look(walk ? null : (ph0 === 'sun' || view.free) ? G.tipGroup.position : ph0 === 'sigil' ? { x: 0, y: 6, z: 0 } : { x: CAIRN.x, y: 1.8, z: CAIRN.z });
           G.gait.update(dt);
         }
         if (G.lastSun !== minute) applySun();
-        const found = marksFound(), near = phase() === 'sun' ? markUnderShadow(minute) : null, pulse = reduced() ? 0.5 : 0.5 + 0.5 * Math.sin(t * 4);
+        const free = phase() === 'done' && view.free;
+        const found = marksFound(), near = (phase() === 'sun' || free) ? markUnderShadow(minute) : null, pulse = reduced() ? 0.5 : 0.5 + 0.5 * Math.sin(t * 4);
+        // the tip arriving on carved stone is heard: a dry tap on any slab, a bell when the day is won and a true mark answers
+        const nearId = near ? near.id : null;
+        if (nearId !== view.near) {
+          view.near = nearId;
+          if (near) { const ti = MARKS.indexOf(near); if (free && ti >= 0) cue('bell', { f: 587.33 * Math.pow(2, [0, 3, 5, 7][ti] / 12), v: 0.08, len: 2.2 }); else cue('bell', { f: 1046.5, v: 0.035, len: 0.8 }); }
+        }
         G.marks.forEach((mk) => {
-          const idx = MARKS.indexOf(mk.m), awake = idx >= 0 && idx < found, isNear = !!near && near.id === mk.m.id && !awake;
-          mk.faceMat.emissiveIntensity = awake ? 0.5 + 0.12 * pulse : isNear ? 0.18 + 0.22 * pulse : 0;
-          mk.halo.material.opacity = awake ? 0.55 : isNear ? 0.22 + 0.2 * pulse : 0;
+          const idx = MARKS.indexOf(mk.m), awake = idx >= 0 && idx < found, isNear = !!near && near.id === mk.m.id;
+          mk.faceMat.emissiveIntensity = awake ? (isNear && free ? 0.9 : 0.5) + 0.12 * pulse : isNear ? 0.18 + 0.22 * pulse : 0;
+          mk.halo.material.opacity = awake ? (isNear && free ? 0.9 : 0.55) : isNear ? 0.22 + 0.2 * pulse : 0;
         });
-        G.tipGroup.visible = phase() === 'sun' || phase() === 'lost';
+        G.tipGroup.visible = phase() === 'sun' || phase() === 'lost' || free;
         G.tipRing.scale.setScalar(near ? Math.max(1, near.radius / 1.5) * (0.96 + 0.06 * pulse) : 1 + 0.06 * pulse);
         G.tipRing.material.color.setHex(near ? 0xfff0a8 : 0xffd27a);
         G.tipBeam.material.opacity = 0.2 + 0.2 * pulse;
@@ -628,6 +707,7 @@
         if (view.ringsT0 && nRings > G.ringsShown && G.dust) {
           for (let i = Math.max(0, G.ringsShown); i < Math.min(nRings, G.slabs.length); i++) {
             const sp = G.slabs[i].position;
+            cue('bell', { f: 293.66 * Math.pow(2, [0, 1, 4, 5, 7, 8, 10][i] / 12), v: 0.07, len: 2 });
             G.dust.emit({ x: sp.x, y: 0.2, z: sp.z }, 14, { size: [0.8, 1.4], speed: [0.8, 2.0], up: [0.4, 1.2], life: [0.9, 1.6], alpha: 0.35, spread: 2.4 });
             G.sparks.emit({ x: sp.x, y: 0.4, z: sp.z }, 18, { color: 0xffcf7a, size: [0.2, 0.35], grow: 0.3, speed: [0.3, 1.2], up: [1.5, 3.5], life: [0.7, 1.3], alpha: 0.9, gravity: -2.5, drag: 0.6, spread: 2 });
           }
@@ -670,7 +750,7 @@
       }
       function frame(t) {
         if (!G || modal.style.display === 'none') return;
-        if (window.__filmMode) return;
+        if (window.__filmMode) return;   // the film recorder drives the frames itself (__sunMonolith.frames)
         const dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
         lastT = t;
         tick(t, dt);
@@ -690,21 +770,20 @@
         const typed = (el.keyInput ? el.keyInput.value : '').normalize('NFD').replace(/[^A-Za-z]/g, '').toUpperCase();
         if (!typed) { feedback(el.keyFeedback, 'Type the seven letters from the page “The Sun Monolith & Cairn II”.', 'error'); return; }
         if (typed !== SIGIL) {
-          const fails = (parseInt(get(KEYS.fails) || '0', 10) || 0) + 1;
-          set(KEYS.fails, String(fails));
-          if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+          cue('thud');
           feedback(el.keyFeedback, 'The Monolith stays silent. Check the seven noons on the page “The Sun Monolith & Cairn II”.', 'error');
           sigilHints.fail();
           return;
         }
         set(KEYS.awake, 'true');
-        if (sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (G && G.gait && G.gait.react) G.gait.react('cheer');
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'SUNDIAL. The rings of Cairn II light up one by one.', 'ok');
         view.ringsT0 = (window.__vclock || performance.now()) + 1;
         say("The rings are glowing, Silvia! And under Cairn II there is an inscription I can finally read. It names four moments of the day. Move the sun: when the Monolith's shadow touches the right mark, tell me to mark it. The inscription lists them in order.");
-        subtitle('The seven rings wake', 4);
+        subtitle('Hermes lifts his staff. Ring by ring, the dial of Cairn II wakes.', 5, 'act');
         paintChrome();
       }
 
@@ -718,13 +797,13 @@
           if (G.post) G.post.flash(0x3d1206, S.hearts <= 0 ? 0.42 : 0.26, S.hearts <= 0 ? 1.6 : 0.9);
           if (G.dust) G.dust.emit({ x: touched.x, y: 0.3, z: -touched.y }, 26, { size: [0.9, 1.6], speed: [1, 2.6], up: [0.6, 1.6], life: [1, 1.8], alpha: 0.4, spread: touched.radius || 2, color: 0xb98e5e });
         }
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        cue(S.hearts <= 0 ? 'dusk' : 'heart');
         let note = base;
         if (S.hearts <= 0) {
           S.lost = true;
           set(KEYS.marks, '0');
           note = 'The sun is going down on us, Silvia, and the last of my strength with it. Every mark has gone back to sleep. Let me rest until sunrise and we will walk the sun again.';
-          subtitle('The sun sets', 4);
+          subtitle('The sun sinks behind the ridge. Hermes sits down against the Monolith to wait for morning.', 6, 'act');
           minute = LAST_MINUTE;
           set(KEYS.minute, String(minute));
         } else if (S.hearts === 1) {
@@ -744,6 +823,7 @@
         }
         busy = true;
         paintChrome();
+        subtitle('Hermes walks out to the tip of the shadow and sets his staff on ' + touched.name + '.', 4, 'act');
         goTo(touched.x, -touched.y, () => resolveMark(touched, found), { face: { x: 0, z: 0 } });
       }
       function resolveMark(touched, found) {
@@ -752,6 +832,8 @@
           later(0.9, () => goHome(() => { busy = false; paintChrome(); }));
         };
         if (TRAPS.indexOf(touched) >= 0) {
+          cue('thud');
+          subtitle('The stone of ' + touched.name + ' stays cold. A shudder runs through the dial and Hermes staggers.', 5, 'act');
           shadowHints.fail();
           if (found > 0) {
             set(KEYS.marks, '0');
@@ -771,6 +853,7 @@
           return;
         }
         if (idx !== found) {
+          subtitle('The stone of ' + touched.name + ' stays silent under the staff.', 4, 'act');
           feedback(el.markFeedback, 'The stone stays silent. The inscription names another moment first.', 'error');
           shadowHints.fail();
           strike(touched, 'The stone did not answer. That mark is true, but not yet: the inscription names another moment first.');
@@ -778,7 +861,7 @@
           return;
         }
         set(KEYS.marks, String(found + 1));
-        if (sfx && sfx.playChimeHover) sfx.playChimeHover();
+        if (found + 1 < MARKS.length) { cue('shimmer', { deg: 14 + found * 2 }); subtitle(touched.name.charAt(0).toUpperCase() + touched.name.slice(1) + ' glows under the staff, and a line of the founders rises in the stone.', 5, 'act'); }
         if (G && G.sparks) {
           G.sparks.emit({ x: touched.x, y: 0.5, z: -touched.y }, 70, { color: 0xffd27a, size: [0.18, 0.34], grow: 0.4, speed: [0.5, 2.4], up: [2.2, 5.2], life: [0.9, 1.9], alpha: 0.95, gravity: -3.2, drag: 0.7, bounce: 0.45, spread: touched.radius || 2 });
           if (G.post) G.post.pulse(0.7, 1.4);
@@ -800,7 +883,7 @@
         // The Ibis slab only looked like a trap: if the stone keepers of Tower II asked for an ibis, it was a lock, and here is the key
         if (road().statues && typeof window.addRelicToInventory === 'function') {
           window.addRelicToInventory('ibis_figure');
-          setTimeout(() => { if (typeof window.openItemAcquiredModal === 'function') window.openItemAcquiredModal({ id: 'ibis_figure' }); }, 4200);
+          view.ibisNew = true;   // its card opens when Silvia leaves the reward, never over the film
         }
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
@@ -810,8 +893,16 @@
           set(CINE_OUTRO, 'seen');
           busy = true;
           view.lidT0 = 0; view.sealT0 = 0; view.sealGone = false; view.ending = true;
+          // the film cuts to the cairn: Hermes is already there, beside it, to watch the lid move
+          snapHermes(SIDE.x, SIDE.z, CAIRN);
           cine.start(endingShots(), () => { view.sealGone = true; view.ending = false; after(); }, { fade: true });
-        } else { view.sealGone = true; after(); }
+        } else {
+          view.sealGone = true;
+          busy = true;
+          cue('stone', { dur: 2.2 });
+          later(0.6, () => cue('win'));
+          goTo(SIDE.x, SIDE.z, after, { face: CAIRN });
+        }
         paintChrome();
       }
       function applyVictory() {
@@ -829,11 +920,34 @@
         set(KEYS.minute, String(minute));
         busy = false;
         walk = null;
+        view.free = false; view.sweep = null;
         hideReward(true);
         saveWalk();
         snapHermes(BASE.x, BASE.z, CAIRN);
         say('A new day, Silvia. Sunrise number ' + S.tries + ' on the Ridge, and the marks are asleep again. Read the inscription once more and walk the sun in order.');
         feedback(el.markFeedback, '', '');
+        paintChrome();
+      }
+
+      // Once the Seal is won the day can be watched: the sun walks from sunrise to sunset on its own, each mark rings as the
+      // shadow passes it, and then the sun is hers to move
+      function watchDay() {
+        if (!isDone() || busy || (cine && cine.active)) return;
+        hideReward(true);
+        feedback(el.markFeedback, '', '');
+        view.free = true;
+        minute = FIRST_MINUTE;
+        set(KEYS.minute, String(minute));
+        if (G && G.hermes) snapHermes(BASE.x, BASE.z, CAIRN);
+        say('Watch the day go by, Silvia. Every mark rings as the shadow passes it. The Seal stays safe in my satchel.');
+        subtitle('Sunrise again on the Ridge. Hermes leans on his staff and watches the shadow walk.', 5, 'act');
+        view.sweep = G && !reduced() ? { t: 0, dur: 18 } : null;
+        if (!view.sweep) endSweep();
+        paintChrome();
+      }
+      function endSweep() {
+        view.sweep = null;
+        say('That was the whole day of the Ridge, Silvia. Now the sun is yours: move it and the four marks will answer.');
         paintChrome();
       }
 
@@ -853,11 +967,11 @@
           reward.box.addEventListener('pointerdown', (e) => { if (!(e.target.closest && e.target.closest('button'))) reward.box.classList.add('is-fast'); });
         }
         const w = S || freshWalk();
-        const rows = MARKS.map((m, i) => '<li class="clep-line" style="--t:' + (0.5 + i * 0.25).toFixed(2) + 's"><b>' + m.icon + ' ' + m.name.replace('the ', '') + '</b><span>' + fmt(m.minute) + '</span></li>').join('');
-        const lucid = (w.wrong | 0) === 0;
+        const rows = MARKS.map((m, i) => '<li class="clep-line" style="--t:' + (0.5 + i * 0.25).toFixed(2) + 's"><b>' + m.icon + ' ' + m.name.replace('the ', '') + '</b><small>' + Math.round(m.length) + ' paces</small><em>' + fmt(m.minute) + '</em></li>').join('');
+        const lucid = (w.wrong | 0) === 0, tries = Math.max(1, w.tries | 0);
         reward.box.onclick = (e) => {
           const med = e.target.closest && e.target.closest('.clep-medal[data-relic]');
-          if (med && typeof window.openItemAcquiredModal === 'function') window.openItemAcquiredModal({ id: med.getAttribute('data-relic') });
+          if (med && typeof window.openItemAcquiredModal === 'function') { if (med.getAttribute('data-relic') === 'ibis_figure') view.ibisNew = false; window.openItemAcquiredModal({ id: med.getAttribute('data-relic') }); }
         };
         reward.box.innerHTML = '<div class="rw-rays" aria-hidden="true"></div>'
           + '<div class="rw-sparks" aria-hidden="true">' + Array.from({ length: 18 }, (_, i) => '<i style="--a:' + ((i * 360 / 18) | 0) + 'deg;--d:' + (120 + (i % 5) * 36) + 'px;--t:' + (0.9 + (i % 4) * 0.2).toFixed(2) + 's"></i>').join('') + '</div>'
@@ -870,16 +984,16 @@
           + '<div class="rw-label">The four shadows</div>'
           + '<ol class="clep-registry">' + rows + '</ol>'
           + '<ul class="mon3d-rw-frags">' + FRAGMENTS.map((f) => '<li>“' + f + '”</li>').join('') + '</ul>'
-          + ((w.tries | 1) > 1 ? '<div class="chasm3d-reward-stats"><div><b>' + (w.tries | 1) + '</b><span>sunrises</span></div></div>' : '')
-          + (lucid && (w.tries | 1) === 1 ? '<div class="rw-flawless">✦ A clear day ✦</div>' : '')
+          + (tries > 1 ? '<div class="chasm3d-reward-stats"><div><b>' + tries + '</b><span>sunrises</span></div></div>' : '')
+          + (lucid && tries === 1 ? '<div class="rw-flawless">✦ A clear day ✦</div>' : '')
           + '</section>'
           + '<section class="rw-loot">'
           + '<svg class="mon3d-seal" viewBox="0 0 80 80" aria-label="The Seal of Cairn II"><circle cx="40" cy="40" r="34" fill="#e8bf63" stroke="#7c5a32" stroke-width="3"/><circle cx="40" cy="40" r="26" fill="none" stroke="#7c5a32" stroke-width="2" stroke-dasharray="3 3"/><path d="M40 16v10M40 54v10M16 40h10M54 40h10M23 23l7 7M50 50l7 7M57 23l-7 7M30 50l-7 7" stroke="#7c5a32" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="40" r="9" fill="#7c5a32"/></svg>'
           + '<div class="mon3d-rw-eqs">'
-          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut inside the lid</div><div class="rw-ledger-title">The Line of the Noon</div><div class="rw-eq" aria-label="D plus F equals 24"><i>D</i><u>+</u><i>F</i><u>=</u><b>24</b></div><p>A line for your Cipher Ledger. Two new letters to find.</p></div></div>'
-          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut beneath it</div><div class="rw-ledger-title">The Line of the Shadow</div><div class="rw-eq" aria-label="C minus T equals 8"><i>C</i><u>−</u><i>T</i><u>=</u><b>8</b></div><p>The second line. Record both in your Ledger.</p></div></div>'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut inside the lid</div><div class="rw-ledger-title">The Deneb Line</div><div class="rw-eq" aria-label="D plus F equals 24"><i>D</i><u>+</u><i>F</i><u>=</u><b>24</b></div><p>A line for your Cipher Ledger. Two new letters to find.</p></div></div>'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut beneath it</div><div class="rw-ledger-title">The Cygnus Line</div><div class="rw-eq" aria-label="C minus T equals 8"><i>C</i><u>−</u><i>T</i><u>=</u><b>8</b></div><p>The second line. Record both in your Ledger.</p></div></div>'
           + '</div>'
-          + (road().statues ? '<div class="clep-relics"><button type="button" class="clep-medal" data-relic="ibis_figure" aria-label="The Ibis Figure: open the card"><img src="./assets/items/item_ibis_figure.png" alt="" loading="lazy"><span>Ibis Figure</span></button></div>' : '')
+          + (road().statues ? '<div class="clep-relics"><button type="button" class="clep-medal' + (view.ibisNew ? ' is-new' : '') + '" data-relic="ibis_figure" aria-label="The Ibis Figure: open the card"><img src="./assets/items/item_ibis_figure.png" alt="" loading="lazy"><span>Ibis Figure</span></button></div>' : '')
           + '<div class="rw-next">Next · down to the Sandstone Labyrinth</div>'
           + '</section></div>'
           + '<div class="chasm3d-reward-actions">'
@@ -892,9 +1006,16 @@
         void reward.box.offsetWidth;
         reward.box.classList.add('is-on');
         const wireBtn = reward.box.querySelector('.chasm3d-reward-wire'), stayBtn = reward.box.querySelector('.chasm3d-reward-stay');
-        if (wireBtn) wireBtn.addEventListener('click', () => { hideReward(true); finishAndLeave(); });
-        if (stayBtn) stayBtn.addEventListener('click', () => hideReward());
+        if (wireBtn) wireBtn.addEventListener('click', () => { hideReward(true); afterRelic(finishAndLeave); });
+        if (stayBtn) stayBtn.addEventListener('click', () => { hideReward(); afterRelic(null); });
         if (wireBtn) wireBtn.focus({ preventScroll: true });
+      }
+      // A relic won on the Ridge shows its own card once the reward is left, then the way goes on
+      function afterRelic(then) {
+        if (view.ibisNew && typeof window.openItemAcquiredModal === 'function') {
+          view.ibisNew = false;
+          window.openItemAcquiredModal({ id: 'ibis_figure' }, then || null);
+        } else if (then) then();
       }
       function hideReward(quietly) {
         if (!rewardOpen()) return;
@@ -938,7 +1059,7 @@
       }
       if (el.sky) {
         el.sky.addEventListener('pointerdown', (e) => {
-          if (phase() !== 'sun' || busy) return;
+          if (!(phase() === 'sun' || (phase() === 'done' && view.free)) || busy || view.sweep) return;
           dragging = true;
           try { el.sky.setPointerCapture(e.pointerId); } catch (err) {}
           setMinute(minuteFromPointer(e), false);
@@ -957,7 +1078,7 @@
       if (el.again) el.again.addEventListener('click', beginAgain);
       if (el.finish) el.finish.addEventListener('click', finishAndLeave);
       if (el.rewardBtn) el.rewardBtn.addEventListener('click', showReward);
-      if (el.replay) el.replay.addEventListener('click', () => { minute = FIRST_MINUTE; set(KEYS.minute, String(minute)); say('Watch the day go by, Silvia. The Seal stays safe in my satchel.'); paintChrome(); });
+      if (el.replay) el.replay.addEventListener('click', watchDay);
       if (el.help) el.help.addEventListener('click', () => showHowto(0));
       const hb = $('btn-monolith-howto-back'), hn = $('btn-monolith-howto-next'), hs = $('btn-monolith-howto-skip');
       if (hb) hb.addEventListener('click', () => { if (howtoPage === 0) hideHowto(); else showHowto(howtoPage - 1); });
@@ -1039,8 +1160,12 @@
           cine = P.cinema(el.stage, {
             reduced,
             onShot: (i, sh) => {
-              if (sh.line) subtitle(sh.line, sh.dur - 0.4);
-              if (view.ending) { const n = window.__vclock || performance.now(); if (i === 0) view.lidT0 = n; if (i === 1) view.sealT0 = n; }
+              if (sh.line) subtitle(sh.line, sh.dur - 0.4, sh.act ? 'act' : '');
+              if (view.ending) {
+                const n = window.__vclock || performance.now();
+                if (i === 0) { view.lidT0 = n; cue('stone', { dur: 3.6 }); }
+                if (i === 1) { view.sealT0 = n; cue('win'); if (G && G.gait && G.gait.react) G.gait.react('wonder'); }
+              } else if (i === 0) cue('whoosh', { dur: 1.8 });
             }
           });
         }
@@ -1049,6 +1174,7 @@
         fit();
         S = loadWalk();
         busy = false; walk = null; timers.length = 0;
+        view.free = false; view.sweep = null; view.near = null; view.quarter = -1;
         camNow.p = null;
         if (S.lost) minute = LAST_MINUTE;
         else minute = Math.max(FIRST_MINUTE, Math.min(LAST_MINUTE, parseInt(get(KEYS.minute) || String(FIRST_MINUTE), 10) || FIRST_MINUTE));
@@ -1059,7 +1185,6 @@
         say(introLine());
         paintChrome();
         const finishOpen = () => {
-          introPending = false;
           if (get(HOWTO_KEY) !== 'seen' && !isDone() && !(S && S.lost)) showHowto(0);
           const focusTarget = isDone() ? el.finish : isAwake() ? el.slider : el.keyInput;
           if (focusTarget) setTimeout(() => { if (modal.style.display !== 'none') focusTarget.focus({ preventScroll: true }); }, 60);
@@ -1069,7 +1194,7 @@
         raf = requestAnimationFrame(frame);
         if (el.close) el.close.focus({ preventScroll: true });
         if (G && cine && !reduced() && !isDone() && get(CINE_INTRO) !== 'seen') {
-          introPending = true; set(CINE_INTRO, 'seen');
+          set(CINE_INTRO, 'seen');
           busy = true; paintChrome();
           cine.start(openingShots(), () => { busy = false; paintChrome(); finishOpen(); });
         } else finishOpen();
@@ -1102,8 +1227,10 @@
       window.__sunMonolith = {
         shadowTip, marks: MARKS.map((m) => ({ id: m.id, minute: m.minute })),
         setMinute: (m) => { setMinute(m, true); return minute; },
-        state: () => ({ ending: !!view.ending, lidT0: view.lidT0, sealT0: view.sealT0, phase: phase(), hearts: S ? S.hearts : HEARTS, tries: S ? S.tries : 1, wrong: S ? S.wrong : 0, found: marksFound(), minute, busy, gl: !!G, awake: isAwake(), done: isDone() }),
-        settle: () => { for (let i = 0; i < 12 && (walk || timers.length || (cine && cine.active)); i++) { if (cine && cine.active) cine.skip(); finishWalk(); const ts = timers.splice(0); ts.forEach((x) => x.fn()); } return window.__sunMonolith.state(); },
+        windows: () => ALL_MARKS.map((m) => ({ id: m.id, r: +m.radius.toFixed(2) })),
+        watch: () => { watchDay(); return window.__sunMonolith.state(); },
+        state: () => ({ free: view.free, sweep: !!view.sweep, ending: !!view.ending, lidT0: view.lidT0, sealT0: view.sealT0, phase: phase(), hearts: S ? S.hearts : HEARTS, tries: S ? S.tries : 1, wrong: S ? S.wrong : 0, found: marksFound(), minute, busy, gl: !!G, awake: isAwake(), done: isDone() }),
+        settle: () => { for (let i = 0; i < 12 && (walk || timers.length || view.sweep || (cine && cine.active)); i++) { if (cine && cine.active) cine.skip(); if (view.sweep) { minute = LAST_MINUTE; endSweep(); } finishWalk(); const ts = timers.splice(0); ts.forEach((x) => x.fn()); } return window.__sunMonolith.state(); },
         speak: (w) => { if (el.keyInput) el.keyInput.value = w; speakSigil(); return window.__sunMonolith.state(); },
         mark: () => { markShadow(); return window.__sunMonolith.state(); },
         again: () => { beginAgain(); return window.__sunMonolith.state(); },

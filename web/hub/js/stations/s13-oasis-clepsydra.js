@@ -487,7 +487,7 @@
           // Hermes walks on to the gates of Tower II (Sheet 13A); the scene plays at the gates, then the road to Station 14
           if (typeof window.selectMapNode === 'function') window.selectMapNode(27, true);
           if (typeof window.showDesertToast === 'function') {
-            window.showDesertToast('✦ TOWER II · THE GATES ✦ Hermes has reached the Sandstone Sanctuary at last light. Stand with him at the threshold (Sheet 13A).');
+            window.showDesertToast('✦ TOWER II · THE GATES ✦ Hermes has reached the Sandstone Sanctuary at last light. Stand with him at the threshold (the page “At the Gates of Tower II”).');
           }
         });
       }

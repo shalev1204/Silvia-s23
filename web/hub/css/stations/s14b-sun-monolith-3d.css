@@ -36,6 +36,35 @@
 #modal-sun-monolith .monolith-fragment.is-sealed { color: #8e7b5c; }
 #modal-sun-monolith .chasm3d-stage.is-flat .mon3d-sky { display: none; }
 
+/* the card over the scene: the page to use, or the line of the inscription the stone waits for */
+#modal-sun-monolith .mon3d-quest {
+  position: absolute; top: 62px; left: 12px; max-width: min(44%, 400px); display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 14px; border-radius: 10px; background: rgba(16, 9, 5, 0.78); border: 1px solid rgba(212, 168, 83, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); pointer-events: none; animation: mon3d-quest-in 0.5s ease both;
+}
+#modal-sun-monolith .mon3d-quest b { font-family: 'Cinzel', Georgia, serif; font-size: 0.74rem; letter-spacing: 0.08em; color: #d4a853; font-weight: 700; }
+#modal-sun-monolith .mon3d-quest span { font-family: 'EB Garamond', Georgia, serif; font-size: 1.06rem; line-height: 1.38; color: #f3e2b8; font-style: italic; }
+#modal-sun-monolith .mon3d-quest i { display: flex; gap: 5px; margin-top: 2px; }
+#modal-sun-monolith .mon3d-quest em { width: 18px; height: 4px; border-radius: 2px; background: rgba(232, 220, 192, 0.25); }
+#modal-sun-monolith .mon3d-quest em.is-on { background: #fde68a; box-shadow: 0 0 6px rgba(253, 230, 138, 0.6); }
+@keyframes mon3d-quest-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+#modal-sun-monolith .mon3d-time-row input[type="range"][dir="rtl"] { direction: rtl; }
+#modal-sun-monolith .mon3d-time-row .mon3d-step { flex: 0 0 auto; }
+#modal-sun-monolith .mon3d-time-row input[type="range"] { flex: 1 1 auto; height: 28px; }
+/* the four shadows on the reward card: mark, length on the dial, hour */
+#modal-sun-monolith .clep-rw-page { text-align: left; }
+#modal-sun-monolith .clep-registry { list-style: none; margin: 8px 0 10px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+#modal-sun-monolith .clep-line {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 7px 10px; border-radius: 8px;
+  background: #fff6e4; border: 1px solid rgba(122, 74, 24, 0.35); font-family: 'Cinzel', Georgia, serif; font-size: 0.8rem; letter-spacing: 0.03em; color: #5c3412;
+}
+#modal-sun-monolith .clep-line b { font-weight: 700; color: #7c2d12; }
+#modal-sun-monolith .clep-line small { font-size: 0.72rem; opacity: 0.8; }
+#modal-sun-monolith .clep-line em { font-style: normal; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: #fde68a; color: #7c2d12; }
+#modal-sun-monolith .clep-medal.is-new { animation: mon3d-new 1.6s ease-in-out infinite; }
+@keyframes mon3d-new { 50% { box-shadow: 0 0 0 3px rgba(253, 230, 138, 0.75), 0 0 18px rgba(253, 230, 138, 0.6); } }
+@media (prefers-reduced-motion: reduce) { #modal-sun-monolith .mon3d-quest, #modal-sun-monolith .clep-medal.is-new { animation: none; } }
+
 /* the reward */
 #modal-sun-monolith .mon3d-seal { width: 74px; height: 74px; margin: 0 auto 8px; display: block; }
 #modal-sun-monolith .mon3d-rw-eqs { display: grid; gap: 8px; }
@@ -44,6 +73,8 @@
 #modal-sun-monolith .chasm3d-reward.is-on :not(.rw-rays):not(.rw-sparks):not(.rw-sparks *) { animation: none; opacity: 1; }
 #modal-sun-monolith .rw-rays { left: 0; top: 0; right: 0; bottom: 0; width: auto; height: auto; margin: 0; animation: none; }
 @media (max-width: 760px) {
+  #modal-sun-monolith .mon3d-quest { top: 56px; max-width: calc(100% - 24px); padding: 7px 10px; }
+  #modal-sun-monolith .mon3d-quest span { font-size: 0.92rem; }
   #modal-sun-monolith .mon3d-sky { width: 44%; }
   #modal-sun-monolith .mon3d-mark { width: 28px; height: 34px; }
 }

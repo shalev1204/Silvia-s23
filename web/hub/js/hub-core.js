@@ -1698,7 +1698,7 @@
               : 'The colossal ramparts of Tower II rise at the western margin of the salt playa. Cross the sands of Camp VIII first.',
             rewards: [
               { icon: '🏛️', label: 'The Sandstone Sanctuary', desc: 'Tower II of the three ancient towers' },
-              { icon: '📜', label: 'The Demand of the Five Seals', desc: 'Sheet 13A in your journal' }
+              { icon: '📜', label: 'The Demand of the Five Seals', desc: 'The page “At the Gates of Tower II” in your journal' }
             ],
             btnText: clepDone ? '✦ STAND AT THE GATES OF TOWER II ➔' : 'The gates are sealed',
             btnDisabled: !clepDone,

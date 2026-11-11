@@ -3392,7 +3392,7 @@
           <span class="chasm-header-icon">🏛️</span>
           <div>
             <div class="chasm-header-title" id="gates-modal-title">At the Gates of Tower II</div>
-            <div class="chasm-header-subtitle">The Sandstone Sanctuary · The Threshold of the Oracle · Sheet 13A</div>
+            <div class="chasm-header-subtitle">The Sandstone Sanctuary · The Threshold of the Oracle</div>
           </div>
         </div>
         <button type="button" class="chasm-close-btn" id="btn-close-gates-tower-ii" title="Close" aria-label="Close the Gates of Tower II">✕</button>
@@ -4408,9 +4408,9 @@
             </div>
             <div class="mon3d-sun-row" id="mon3d-sun-row" hidden>
               <div class="mon3d-time-row">
-                <button type="button" class="chasm3d-btn mon3d-step" id="btn-monolith-earlier" aria-label="Five minutes earlier (the sun moves east)">−5′</button>
-                <input type="range" id="monolith-time-slider" min="420" max="1020" step="1" value="420" aria-label="Hour of the day">
-                <button type="button" class="chasm3d-btn mon3d-step" id="btn-monolith-later" aria-label="Five minutes later (the sun moves west)">+5′</button>
+                <button type="button" class="chasm3d-btn mon3d-step" id="btn-monolith-later" aria-label="Five minutes later (the sun moves west, to the left)">◀ +5′</button>
+                <input type="range" id="monolith-time-slider" min="420" max="1020" step="1" value="420" dir="rtl" aria-label="Hour of the day: sunrise on the right, sunset on the left, as in the sky">
+                <button type="button" class="chasm3d-btn mon3d-step" id="btn-monolith-earlier" aria-label="Five minutes earlier (the sun moves east, to the right)">−5′ ▶</button>
                 <span class="mon3d-time-label" id="monolith-time-label">07:00</span>
               </div>
               <button type="button" class="chasm3d-btn is-way" id="btn-monolith-mark">✦ Mark this shadow</button>
@@ -4459,7 +4459,7 @@
           <section class="chasm3d-howto-page" data-page="2" hidden>
             <h3>II · The walking sun</h3>
             <ol class="chasm3d-howto-steps">
-              <li>Move the sun with the slider, the −5′ and +5′ buttons, or by dragging the little sun in the top corner. Watch the real shadow of the Monolith sweep the ground like the hand of a clock.</li>
+              <li>Move the sun with the slider, the ◀ +5′ and −5′ ▶ buttons, or by dragging the little sun in the top corner. Everything moves the way the sky does: sunrise on the right (east), sunset on the left (west). Watch the real shadow of the Monolith sweep the ground like the hand of a clock.</li>
               <li>The inscription names <strong>four moments</strong>. Each tells you where the shadow must fall, not what time it is. When the glowing tip of the shadow rests on the carved mark you want, press <em>✦ Mark this shadow</em>.</li>
               <li>The marks must be awakened <strong>in the order the inscription gives</strong>.</li>
             </ol>
@@ -4557,6 +4557,7 @@
   <script src="./hub/js/previously.js"></script>
   <script src="./hub/js/field-journal.js"></script>
   <script src="./hub/js/ambience.js"></script>
+  <script src="./hub/js/game-frame.js"></script>
   <script src="./hub/js/cinematic.js"></script>
   <script src="./hub/js/mirror-speaker.js"></script>
   <script src="./hub/js/aurelia-letters.js"></script>

@@ -306,7 +306,7 @@
         } else if (targetId === 27) {
           window.selectMapNode(27, true);
           if (window.openGatesTowerIIModal) window.openGatesTowerIIModal();
-          else showDesertToast('At the Gates of Tower II · The Sandstone Sanctuary of the Oracle · Sheet 13A.');
+          else showDesertToast('At the Gates of Tower II · The Sandstone Sanctuary of the Oracle · the page “At the Gates of Tower II”.');
         } else if (targetId === 23) {
           window.selectMapNode(23, true);
           if (window.openSunMonolithModal) window.openSunMonolithModal();

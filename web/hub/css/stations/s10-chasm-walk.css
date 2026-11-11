@@ -1,6 +1,6 @@
     /* ---- Station 10 · The Whispering Chasm: the walk behind Hermes (3D); the Salt Playa (Station 11) wears the same window ---- */
     /* The canyon fills the whole screen: a thin living border, the picture as large as it can be */
-    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon, #modal-oasis-visions) { padding: 8px; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon, #modal-oasis-visions, #modal-sun-monolith) { padding: 8px; }
     .chasm3d-window { --sun: 0.6; max-width: none; height: 100%; max-height: none; isolation: isolate; }
     .chasm3d-window > :not(.chasm3d-ambient) { position: relative; z-index: 1; }
     .chasm3d-window > .chasm3d-howto, .chasm3d-window > .map-frame-corner { position: absolute; }
@@ -93,6 +93,10 @@
       opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
     }
     .chasm3d-subtitle.is-on { opacity: 1; }
+    /* a stage direction, said like a caption in a series: what happens, not who speaks */
+    .chasm3d-subtitle.is-act { color: #fde68a; background: rgba(10, 6, 3, 0.74); border: 1px solid rgba(212, 168, 83, 0.28); letter-spacing: 0.01em; }
+    .chasm3d-subtitle.is-act::before { content: '✦ '; color: #d4a853; font-style: normal; }
+    @media (min-width: 1100px) { .chasm3d-subtitle { font-size: 1.1rem; max-width: min(80%, 760px); } }
     .chasm3d-fade { position: absolute; inset: 0; background: #e8c9a0; opacity: 0; pointer-events: none; transition: opacity 0.6s ease; }
     .chasm3d-fade.is-on { opacity: 0.92; }
 
@@ -537,3 +541,19 @@
     .chasm3d-stage.is-cine .chasm3d-subtitle.is-on { opacity: 1; z-index: 8; }
     :is(#modal-salt-playa, #modal-desert-lexicon) .chasm3d-body:has(.is-cine) .chasm3d-controls { visibility: hidden; }
     @media (prefers-reduced-motion: reduce) { .cine-bar, .cine-fade { transition: none; } .cine-title.is-on { animation: none; opacity: 1; } }
+
+    /* ---- The frame of every 3D game (hub/js/game-frame.js): full screen, and the side panel folded away ---- */
+    .gf-tools { display: inline-flex; gap: 8px; margin-left: auto; margin-right: 10px; align-items: center; }
+    :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) .gf-tools ~ .ambience-toggle { margin-left: 0; }
+    .gf-btn {
+      width: 40px; height: 40px; border-radius: 8px; border: 1px solid rgba(212, 168, 83, 0.6); background: rgba(60, 36, 16, 0.85); color: #fde68a;
+      box-shadow: inset 0 0 0 2px rgba(20, 12, 4, 0.55), 0 2px 8px rgba(0, 0, 0, 0.35); font-size: 1.1rem; line-height: 1; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; transition: transform 0.15s ease, background 0.2s ease;
+    }
+    .gf-btn:hover { background: rgba(110, 66, 24, 0.9); color: #fff3c4; transform: translateY(-2px); }
+    .gf-btn:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+    .gf-btn[aria-pressed="true"] { background: rgba(120, 72, 20, 0.95); }
+    .chasm3d-body.is-folded { grid-template-columns: minmax(0, 1fr) !important; }
+    .chasm3d-body.is-folded > .chasm3d-panel { display: none !important; }
+    @media (max-width: 760px) { .gf-fold { display: none; } }
+    @media (prefers-reduced-motion: reduce) { .gf-btn { transition: none; } .gf-btn:hover { transform: none; } }

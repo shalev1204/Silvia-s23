@@ -393,10 +393,12 @@
           face: face,
           // while he talks his head marks the words and his free hand moves with them
           speak: function (on) { talking = !!on; if (face && face.talk) face.talk(talking); },
-          // 'flinch' (a blow, a wrong step), 'cheer' (he lifts his staff), 'nod', 'wonder' (he looks up, eyes wide)
+          // 'flinch' (a blow, a wrong step), 'cheer' (he lifts his staff), 'nod', 'wonder' (he looks up, eyes wide),
+          // 'bow' (he bows from the waist), 'kneel' (he goes down on one knee, to the ground or a fire), 'offer' (he holds
+          // something out in his right hand: a flask, a disc, a seal)
           react: function (kind) {
-            rx = { kind: kind, t: 0, dur: kind === 'cheer' ? 1.7 : kind === 'wonder' ? 2.2 : kind === 'nod' ? 0.9 : 0.8 };
-            if (face) { if (kind === 'flinch') { face.mood(0.2, 1); face.blink(); } else if (kind === 'nod') { face.blink(); face.mood(0, 0, 0.7); } else if (kind === 'cheer') face.mood(0.5, 0, 1); else face.mood(1, 0); }
+            rx = { kind: kind, t: 0, dur: { cheer: 1.7, wonder: 2.2, nod: 0.9, bow: 2.0, kneel: 3.4, offer: 2.6 }[kind] || 0.8 };
+            if (face) { if (kind === 'flinch') { face.mood(0.2, 1); face.blink(); } else if (kind === 'nod' || kind === 'bow') { face.blink(); face.mood(0, 0, 0.7); } else if (kind === 'cheer' || kind === 'offer') face.mood(0.5, 0, 1); else if (kind === 'kneel') face.blink(); else face.mood(1, 0); }
           },
           update: function (dt) {
             if (!(dt > 0)) return;
@@ -446,10 +448,17 @@
             if (rx) {
               rx.t += dt; var u = rx.t / rx.dur;
               if (u >= 1) rx = null;
-              else { kind = rx.kind; e = u < 0.18 ? u / 0.18 : 1 - (u - 0.18) / 0.82; e = e * e * (3 - 2 * e); }
+              else {
+                kind = rx.kind;
+                // the held gestures go down, stay a while and come back up; the quick ones rise fast and let go slowly
+                if (kind === 'bow' || kind === 'kneel' || kind === 'offer') e = u < 0.28 ? u / 0.28 : u > 0.72 ? (1 - u) / 0.28 : 1;
+                else e = u < 0.18 ? u / 0.18 : 1 - (u - 0.18) / 0.82;
+                e = e * e * (3 - 2 * e);
+              }
             }
             var flinch = kind === 'flinch' ? e : 0, cheer = kind === 'cheer' ? e : 0, wonder = kind === 'wonder' ? e : 0;
             var nod = kind === 'nod' ? e * Math.sin(rx.t / rx.dur * TAU * 2) : 0;
+            var bow = kind === 'bow' ? e : 0, kneel = kind === 'kneel' ? e : 0, offer = kind === 'offer' ? e : 0;
             // and when nothing happens: he glances aside, or lifts the lamp to see better
             var idle = wgt < 0.05 && !rx && !reduced();
             if (idle) { fid.t -= dt; if (fid.t <= 0) { fid.t = 6 + Math.random() * 8; fid.dur = 1.6 + Math.random(); fid.k = fid.dur; fid.kind = Math.random() < 0.65 ? 0 : 1; fid.yaw = (Math.random() < 0.5 ? -1 : 1) * (0.3 + Math.random() * 0.25); } }
@@ -459,13 +468,17 @@
             var lift = fid.kind === 1 ? fe : 0, glance = fid.kind === 0 ? fe * fid.yaw : 0;
             sp += ((talking ? 1 : 0) - sp) * Math.min(1, dt * 6);
             var beat = sp * (0.6 + 0.4 * Math.sin(t * 3.1)) * (0.5 + 0.5 * Math.sin(t * 7.3));
-            body.rotation.x += 0.09 * flinch - 0.03 * cheer - 0.02 * sp;
-            body.position.y += -0.035 * flinch + 0.02 * cheer;
+            body.rotation.x += 0.09 * flinch - 0.03 * cheer - 0.02 * sp - 0.38 * bow - 0.2 * kneel - 0.08 * offer;
+            body.position.y += -0.035 * flinch + 0.02 * cheer - 0.34 * kneel;
+            body.position.z = -0.08 * kneel;
+            // down on one knee: the right leg folds back under him, the left stays planted
+            // (only y and the angle: foot() eases z towards the stride every frame, so an offset there would pile up)
+            if (kneel > 0) { H.legR.position.y -= 0.18 * kneel; H.legR.rotation.x += 0.9 * kneel; H.legL.position.y -= 0.1 * kneel; H.legL.rotation.x -= 0.25 * kneel; }
 
-            if (armR && base.armR) { armR.rotation.x = base.armR.x + 0.2 * c2 * wgt + 0.02 * breathe + 0.4 * flinch + 0.3 * lift + 0.2 * wonder + 0.14 * beat; armR.rotation.z = base.armR.z + 0.12 * flinch; }
-            if (armL && base.armL) { armL.rotation.x = base.armL.x - 0.1 * c2 * wgt + 1.15 * cheer + 0.15 * flinch; armL.rotation.z = base.armL.z - 0.22 * cheer; }
+            if (armR && base.armR) { armR.rotation.x = base.armR.x + 0.2 * c2 * wgt + 0.02 * breathe + 0.4 * flinch + 0.3 * lift + 0.2 * wonder + 0.14 * beat + 1.05 * offer + 0.55 * kneel + 0.25 * bow; armR.rotation.z = base.armR.z + 0.12 * flinch; }
+            if (armL && base.armL) { armL.rotation.x = base.armL.x - 0.1 * c2 * wgt + 1.15 * cheer + 0.15 * flinch + 0.2 * bow; armL.rotation.z = base.armL.z - 0.22 * cheer; }
             // the elbows: they give with each step, fold to lift the lamp to his face, straighten to raise the staff
-            if (foreR) foreR.rotation.x = foreR0 + 0.1 * c2 * wgt + 0.75 * lift + 0.5 * flinch + 0.35 * wonder + 0.1 * beat;
+            if (foreR) foreR.rotation.x = foreR0 + 0.1 * c2 * wgt + 0.75 * lift + 0.5 * flinch + 0.35 * wonder + 0.1 * beat - 0.2 * offer + 0.2 * kneel;
             if (foreL) foreL.rotation.x = foreL0 - 0.06 * c2 * wgt - 0.1 * cheer + 0.25 * flinch;
             if (staffOff && H.staff) {
               H.staff.position.copy(handInBody()).add(staffOff);
@@ -508,7 +521,7 @@
               look.yaw += (ty - look.yaw) * Math.min(1, dt * 4);
               look.pitch += (tp - look.pitch) * Math.min(1, dt * 4);
               head.rotation.y = base.head.y + look.yaw;
-              head.rotation.x = base.head.x + look.pitch + 0.06 * wgt - 0.24 * flinch + 0.2 * cheer + 0.3 * wonder + 0.12 * nod + sp * 0.04 * Math.sin(t * 7.3) * Math.sin(t * 2.1);
+              head.rotation.x = base.head.x + look.pitch + 0.06 * wgt - 0.24 * flinch + 0.2 * cheer + 0.3 * wonder + 0.12 * nod - 0.3 * bow - 0.2 * kneel + sp * 0.04 * Math.sin(t * 7.3) * Math.sin(t * 2.1);
               // the eyes get there before the head does
               if (face) face.gaze(clamp((ty - look.yaw) * 3, -1, 1), clamp((tp - look.pitch) * 3 + wonder, -1, 1));
             }

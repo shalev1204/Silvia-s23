@@ -30,7 +30,13 @@
   var camera = null;
   var animFrameId = null;
   var socketMeshes = [];
-  var firstSealMesh = null, extraSeals = [], doorPivots = [], gloomMat = null, doorK = 0, doorTarget = 0;
+  var firstSealMesh = null, extraSeals = [], doorPivots = [], gloomMat = null, holeMat = null;
+  // the bronze doors: each leaf has its own opening (0 shut, 1 wide), the founders' wicket in the left leaf too
+  var doors = { L: 0, R: 0, W: 0, tL: 0, tR: 0, tW: 0, speed: 1.5 };
+  var shakeK = 0;
+  // what the people on the stairs do (walk, bow, hand things over): the scene fills this in; without WebGL it stays quiet
+  var act = { reset: function () {}, home: function () {}, walk: function () {}, react: function () {}, later: function (s2, fn) { setTimeout(fn, s2 * 1000); }, setTime: function () {}, hermesAway: function () {}, pigeons: function () {}, faceTo: function () { return null; }, where: function () { return { x: 0, z: 0 }; } };
+  var fireFed = false;
   var isSceneInitialized = false;
   var bubbleEl = null;
   var speaking = null;
@@ -265,6 +271,11 @@
 
     var paint = SC.paint();
     var skyObj = SC.sky(scene, { zenith: 0x2f3f78, mid: 0xc8788a, horizon: HORIZON, glow: 0xff9650, sun: [-0.5, 0.14, -0.85] });
+    // last light for the first meeting, a peach-coloured dawn for the return
+    var PALETTE = {
+      dusk: { zenith: 0x2f3f78, mid: 0xc8788a, horizon: HORIZON, glow: 0xff9650, sun: [-0.5, 0.14, -0.85], key: 0xffa662, keyI: 1.7, back: 0xff7c46, fill: 0x8a94d8, sky: 0xd4a2a6, ground: 0x7a4430, exp: 1.06 },
+      dawn: { zenith: 0x5b82c4, mid: 0xf1b4a2, horizon: 0xf3c09a, glow: 0xffd08c, sun: [0.55, 0.16, -0.82], key: 0xffc996, keyI: 1.6, back: 0xffb488, fill: 0xa4bce8, sky: 0xeec6bc, ground: 0x8a5a40, exp: 1.12 }
+    };
 
     // ---- the ground: red sand dunes, a flagstone plaza before the stairs ----
     var ground = SC.terrain(scene, paint, { seed: 44, flatRadius: 17, size: 190, segments: 130 });
@@ -307,8 +318,48 @@
     solid(3.95, WALL_H, WALL_D, wallMat(3, 6), 3.825, WALL_H / 2, wz);
     solid(3.7, WALL_H - DOOR_TOP, WALL_D, wallMat(3, 3), 0, (WALL_H + DOOR_TOP) / 2, wz);
     solid(3.7, PLAT, WALL_D, wallMat(3, 1), 0, PLAT / 2, wz);
-    // the dark inside, just behind the doors
-    gloomMat = new T.MeshBasicMaterial({ color: 0x080403 });
+    // the hall behind the doors, painted in perspective: the burned atrium, its columns and mirrors, and at the back the
+    // short stair down into the rock with the morning on it. Dark while the doors are shut, lit as they open.
+    var hallTex = (function () {
+      var c = document.createElement('canvas'); c.width = 512; c.height = 512;
+      var g = c.getContext('2d'), vx = 256, vy = 250;
+      var bg = g.createRadialGradient(vx, vy, 10, vx, vy, 420);
+      bg.addColorStop(0, '#fff1cf'); bg.addColorStop(0.18, '#f0b878'); bg.addColorStop(0.5, '#8a4a2c'); bg.addColorStop(1, '#2a140c');
+      g.fillStyle = bg; g.fillRect(0, 0, 512, 512);
+      // the flagstone floor and the dark ceiling, both running to the vanishing point
+      g.fillStyle = 'rgba(120,62,34,0.55)'; g.beginPath(); g.moveTo(0, 512); g.lineTo(512, 512); g.lineTo(vx + 30, vy + 22); g.lineTo(vx - 30, vy + 22); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(30,14,8,0.75)'; g.beginPath(); g.moveTo(0, 0); g.lineTo(512, 0); g.lineTo(vx + 30, vy - 36); g.lineTo(vx - 30, vy - 36); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(40,18,10,0.35)'; g.lineWidth = 1.5;
+      for (var i = -6; i <= 6; i++) { g.beginPath(); g.moveTo(vx + i * 5, vy + 22); g.lineTo(vx + i * 95, 512); g.stroke(); }
+      for (var k = 1; k < 8; k++) { var y = vy + 22 + Math.pow(k / 8, 2.2) * 290; g.beginPath(); g.moveTo(0, y); g.lineTo(512, y); g.stroke(); }
+      // the stair at the back: a bright arch, its steps going down into light
+      g.fillStyle = '#fff6dc'; g.beginPath(); g.moveTo(vx - 26, vy + 22); g.lineTo(vx - 26, vy - 18); g.arc(vx, vy - 18, 26, Math.PI, 0); g.lineTo(vx + 26, vy + 22); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(150,90,50,0.6)'; for (var st = 0; st < 5; st++) g.fillRect(vx - 24 + st * 2, vy + 4 + st * 4, 48 - st * 4, 2);
+      // two rows of columns going away, each darker on its far side; a mirror between some of them catches the light
+      [-1, 1].forEach(function (sd) {
+        for (var n = 0; n < 6; n++) {
+          var d = Math.pow(0.66, n), x = vx + sd * (40 + 215 * d), w = 10 + 46 * d, top = vy - 36 - 250 * d, bot = vy + 22 + 290 * d;
+          var cg = g.createLinearGradient(x - w / 2, 0, x + w / 2, 0);
+          cg.addColorStop(0, sd < 0 ? '#c98a5c' : '#5a2e1a'); cg.addColorStop(1, sd < 0 ? '#5a2e1a' : '#c98a5c');
+          g.fillStyle = cg; g.fillRect(x - w / 2, top, w, bot - top);
+          g.fillStyle = 'rgba(20,8,4,0.55)'; g.fillRect(x - w / 2 - 2, top, w + 4, 6 * d + 3); g.fillRect(x - w / 2 - 2, bot - 6 * d - 3, w + 4, 6 * d + 3);
+          if (n % 2 === 1) {
+            var mx = x - sd * (w / 2 + 22 * d + 4), mw = 18 * d + 5, mh = 120 * d + 14;
+            g.fillStyle = 'rgba(255,240,205,0.75)'; g.fillRect(mx - mw / 2, vy - 10 - mh * 0.6, mw, mh);
+            g.strokeStyle = 'rgba(80,40,18,0.9)'; g.lineWidth = 2; g.strokeRect(mx - mw / 2, vy - 10 - mh * 0.6, mw, mh);
+          }
+        }
+      });
+      // soot from the old fire, high on the walls and the ceiling
+      for (var sm = 0; sm < 14; sm++) {
+        var sx = (sm * 97) % 512, sy = 20 + (sm * 53) % 170, sr = 30 + (sm * 13) % 50;
+        var sg = g.createRadialGradient(sx, sy, 2, sx, sy, sr); sg.addColorStop(0, 'rgba(10,4,2,0.45)'); sg.addColorStop(1, 'rgba(10,4,2,0)');
+        g.fillStyle = sg; g.fillRect(sx - sr, sy - sr, sr * 2, sr * 2);
+      }
+      var t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+      return t;
+    })();
+    gloomMat = new T.MeshBasicMaterial({ map: hallTex, color: 0x0a0806 });
     var gloom = new T.Mesh(new T.PlaneGeometry(3.7, DOOR_TOP - PLAT), gloomMat);
     gloom.position.set(0, (DOOR_TOP + PLAT) / 2, -0.8); scene.add(gloom);
     // string course, pilasters at the corners, cornice with dentils, a crown of merlons
@@ -398,7 +449,25 @@
       hinge.position.set(sd * (leafW + 0.01), 0, 0);
       m.position.set(-sd * leafW / 2, PLAT + leafH / 2 + 0.01, 0.0);
       m.castShadow = m.receiveShadow = true; hinge.add(m); scene.add(hinge);
-      doorPivots.push({ g: hinge, sd: sd });
+      var piv = { g: hinge, sd: sd };
+      if (sd === -1) {
+        // the founders' wicket: a small door cut low in the left leaf, on hinges of its own (the trusted come in by it)
+        var wkHinge = new T.Group();
+        wkHinge.position.set(0.34, PLAT + 0.03, 0.104);
+        var wk = new T.Mesh(new T.BoxGeometry(0.78, 1.62, 0.05), new T.MeshStandardMaterial({ color: 0x5a3c1c, metalness: 0.66, roughness: 0.46 }));
+        wk.position.set(0.39, 0.81, 0.0); wk.castShadow = true; wkHinge.add(wk);
+        var ring = new T.Mesh(new T.TorusGeometry(0.07, 0.016, 8, 18), paint({ color: 0xc9a24e, metalness: 0.6, roughness: 0.35 }));
+        ring.position.set(0.66, 0.82, 0.04); wkHinge.add(ring);
+        hinge.add(wkHinge);
+        // the hole it leaves, as dark as the hall behind, and as bright once morning comes in
+        // the wicket shows the same hall: the slice of the picture that lies behind it
+        var holeTex = hallTex.clone(); holeTex.needsUpdate = true; holeTex.repeat.set(0.21, 0.46); holeTex.offset.set(0.09, 0.01);
+        holeMat = new T.MeshBasicMaterial({ map: holeTex, color: 0x0a0806 });
+        var hole = new T.Mesh(new T.PlaneGeometry(0.78, 1.62), holeMat);
+        hole.position.set(0.73, PLAT + 0.84, 0.101); hole.visible = false; hinge.add(hole);
+        piv.wicket = wkHinge; piv.hole = hole;
+      }
+      doorPivots.push(piv);
     });
     solid(3.9, 0.12, 1.5, stoneDark, 0, PLAT + 0.0, 0.5);
 
@@ -486,7 +555,7 @@
     drift.scale.set(2.6, 0.3, 1.3); drift.position.set(-7.4, -0.08, 8.2); drift.receiveShadow = true; scene.add(drift);
 
     // ---- light: last sun low on the right, cool sky, an ember glow from the fires ----
-    SC.lights(scene, { key: 0xffa662, keyI: 1.7, kx: 20, ky: 8.5, kz: 7, tx: 0, tz: 2.2, fill: 0x8a94d8, fillI: 0.32, back: 0xff7c46, backI: 0.5, sky: 0xd4a2a6, ground: 0x7a4430, hemi: 0.34, amb: 0.08, shadowExtent: 13, shadowSize: 2048 });
+    var lit = SC.lights(scene, { key: 0xffa662, keyI: 1.7, kx: 20, ky: 8.5, kz: 7, tx: 0, tz: 2.2, fill: 0x8a94d8, fillI: 0.32, back: 0xff7c46, backI: 0.5, sky: 0xd4a2a6, ground: 0x7a4430, hemi: 0.34, amb: 0.08, shadowExtent: 13, shadowSize: 2048 });
     var beams = SC.beams(scene, { count: 4, x0: -9, dx: 4.4, y: 6, z: 3.5, tilt: -0.6, opacity: 0.12 });
     var air = SC.air(scene, { cz: 3, dust: 110, sand: 120, birds: 3 });
 
@@ -507,17 +576,21 @@
         ringHermes.material.opacity += ((spH ? pulse : 0) - ringHermes.material.opacity) * Math.min(1, dt * 8);
         ringHermes.material.color.setHex(speaking === 'silvia' ? 0x9fe8ff : 0x7fb4ff);
         // the old man talks with his head and his free hand, and keeps his eyes on Hermes; Hermes does the same
-        if (servant.userData.speak) { servant.userData.speak(spS); servant.userData.look({ x: hermes.position.x, y: hermes.position.y + 1.7, z: hermes.position.z }); }
+        if (servant.userData.speak) { servant.userData.speak(spS); servant.userData.look(walking(servant) || !hermes.visible ? null : { x: hermes.position.x, y: hermes.position.y + 1.7, z: hermes.position.z }); }
         if (spS) servant.userData.sight.rotation.z += 0.01;
-        if (gfx && gfx.gait && gfx.gait.speak) { gfx.gait.speak(speaking === 'hermes'); hermes.position.y = treads[3]; }
-        else hermes.position.y = treads[3] + (spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0);
+        stepWalkers(t, dt);
+        if (gfx && gfx.gait && gfx.gait.speak) gfx.gait.speak(speaking === 'hermes');
+        else hermes.position.y += spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0;
+        ringHermes.position.set(hermes.position.x, hermes.position.y + 0.03, hermes.position.z);
+        ringHermes.visible = hermes.visible;
+        ringServant.position.set(servant.position.x, servant.position.y + 0.03, servant.position.z);
         H.flame.scale.set(1 + 0.08 * Math.sin(t * 9), 1.35 + 0.12 * Math.sin(t * 13 + 1), 1);
         if (gfx) {
-          if (gfx.gait) gfx.gait.look(spS || speaking !== 'hermes' ? { x: servant.position.x, y: PLAT + 1.9, z: servant.position.z } : null);
+          if (gfx.gait) gfx.gait.look(walking(hermes) ? null : (spS || speaking !== 'hermes' ? { x: servant.position.x, y: servant.position.y + 1.9, z: servant.position.z } : null));
           gfx.frame(dt, camera);
         } else { H.lamp.rotation.z = Math.sin(t * 1.3) * 0.04; H.cloak.scale.y = 1 + Math.sin(t * 1.1) * 0.004; }
         fireFlash *= Math.pow(0.4, dt);
-        fireLevel += ((ds.flags && (ds.flags.gaveOil || ds.flags.lostOil) ? 1 : 0.38) - fireLevel) * Math.min(1, dt * 1.5);
+        fireLevel += ((fireFed ? 1 : 0.38) - fireLevel) * Math.min(1, dt * 1.5);
         braziers.forEach(function (b, bi) { b.g.userData.update(t, b.ph, bi === 0 ? fireLevel + fireFlash : 1); });
         banners.forEach(function (b) { b.g.userData.update(t, b.ph); });
         beams.update(t);
@@ -531,14 +604,115 @@
           sealMat.emissiveIntensity = 0.55;
         }
         // the bronze doors swing in on their hinges (the return), and the dark behind them turns to morning
-        if (Math.abs(doorTarget - doorK) > 0.0005) {
-          doorK += (doorTarget - doorK) * Math.min(1, dt * 1.5);
-          if (reducedMotion) doorK = doorTarget;
-          doorPivots.forEach(function (d) { d.g.rotation.y = -d.sd * doorK * 1.5; });
-          gloomMat.color.setRGB(0.03 + 0.97 * doorK, 0.016 + 0.76 * doorK, 0.012 + 0.5 * doorK);
-        }
+        var dk = Math.min(1, dt * doors.speed);
+        ['L', 'R', 'W'].forEach(function (k) { doors[k] += (doors['t' + k] - doors[k]) * (reducedMotion ? 1 : dk); if (Math.abs(doors['t' + k] - doors[k]) < 0.0005) doors[k] = doors['t' + k]; });
+        doorPivots.forEach(function (d) {
+          d.g.rotation.y = -d.sd * (d.sd < 0 ? doors.L : doors.R) * 1.5;
+          if (d.wicket) { d.wicket.rotation.y = -doors.W * 1.45; d.hole.visible = doors.W > 0.01; }
+        });
+        var light = Math.max(doors.L, doors.R, doors.W * 0.85);
+        gloomMat.color.setRGB(0.04 + 0.96 * light, 0.03 + 0.9 * light, 0.024 + 0.82 * light);
+        if (holeMat) { var wl = doors.W; holeMat.color.setRGB(0.04 + 0.96 * wl, 0.03 + 0.9 * wl, 0.024 + 0.82 * wl); }
+        // a cloud of pigeons from the cornice (the bold road's boom)
+        birds.forEach(function (b) {
+          if (b.life <= 0) return;
+          b.life -= dt; b.m.visible = b.life > 0;
+          b.m.position.x += b.vx * dt; b.m.position.y += b.vy * dt; b.m.position.z += b.vz * dt; b.vy += dt * 0.6;
+          b.m.scale.y = 0.3 + Math.abs(Math.sin(t * 22 + b.ph));
+          b.m.material.opacity = Math.min(1, b.life);
+          b.m.lookAt(camera.position);
+        });
       }
     ];
+
+    // ---- the people on the stairs walk: send anyone to a spot, and the height follows the treads under their feet ----
+    var HOME = { hermes: { x: -1.35, z: 3.6, rot: -0.38 }, servant: { x: 0.95, z: 0.95, rot: 2.44 } };
+    function stairY(x, z) {
+      if (Math.abs(x) > 4.55 || z > 4.09) return 0;
+      if (z < 1.59) return PLAT;
+      return treads[Math.min(3, Math.floor((z - 1.59) / 0.62))];
+    }
+    function adiff(a, b) { return ((a - b + Math.PI * 3) % (Math.PI * 2)) - Math.PI; }
+    function faceTo(o, x, z) { return Math.atan2(-(x - o.position.x), -(z - o.position.z)); }
+    var walks = [], timers = [];
+    function walking(o) { return walks.some(function (w) { return w.obj === o; }); }
+    function stepWalkers(t, dt) {
+      for (var ti = timers.length - 1; ti >= 0; ti--) { timers[ti].t -= dt; if (timers[ti].t <= 0) { var fn = timers[ti].fn; timers.splice(ti, 1); fn(); } }
+      walks.slice().forEach(function (w) {
+        var o = w.obj, dx = w.x - o.position.x, dz = w.z - o.position.z, d = Math.hypot(dx, dz);
+        var face = typeof w.face === 'function' ? w.face() : w.face;
+        if (d > 0.04) {
+          var step = Math.min(d, w.speed * dt);
+          o.position.x += dx / d * step; o.position.z += dz / d * step;
+          o.rotation.y += adiff(face != null && d < 0.7 ? face : Math.atan2(-dx, -dz), o.rotation.y) * Math.min(1, dt * 5);
+        } else if (face != null && Math.abs(adiff(face, o.rotation.y)) > 0.03) {
+          o.rotation.y += adiff(face, o.rotation.y) * Math.min(1, dt * 5);
+        } else {
+          walks.splice(walks.indexOf(w), 1);
+          if (w.hide) o.visible = false;
+          if (w.then) w.then();
+        }
+      });
+      [hermes, servant].forEach(function (o) {
+        var want = stairY(o.position.x, o.position.z);
+        o.position.y += (want - o.position.y) * Math.min(1, dt * 9);
+      });
+    }
+    function who(name) { return name === 'servant' ? servant : hermes; }
+    act = {
+      walk: function (name, x, z, o) {
+        o = o || {};
+        var ob = who(name);
+        walks = walks.filter(function (w) { return w.obj !== ob; });
+        walks.push({ obj: ob, x: x, z: z, speed: o.speed || 1.0, face: o.face == null ? null : o.face, then: o.then || null, hide: !!o.hide });
+      },
+      // name, kind: 'bow', 'nod', 'offer', 'kneel', 'startle', 'cheer', 'wonder'
+      react: function (name, kind) {
+        if (name === 'servant') { if (servant.userData.react) servant.userData.react(kind); }
+        else if (gfx && gfx.gait && gfx.gait.react) gfx.gait.react(kind);
+      },
+      later: function (sec, fn) { timers.push({ t: sec, fn: fn }); },
+      faceTo: function (name, x, z) { return function () { return faceTo(who(name), x, z); }; },
+      // both back to where the scene put them (after a walk to the fire, the niches, the tracks)
+      home: function () {
+        ['hermes', 'servant'].forEach(function (n) {
+          var o = who(n), h = HOME[n];
+          if (!o.visible || walking(o) || n === 'hermes' && ds.away) return;
+          if (Math.hypot(o.position.x - h.x, o.position.z - h.z) > 0.08 || Math.abs(adiff(h.rot, o.rotation.y)) > 0.05) act.walk(n, h.x, h.z, { speed: 1.1, face: h.rot });
+        });
+      },
+      reset: function () {
+        walks = []; timers = [];
+        ['hermes', 'servant'].forEach(function (n) { var o = who(n), h = HOME[n]; o.position.set(h.x, stairY(h.x, h.z), h.z); o.rotation.y = h.rot; o.visible = true; });
+        birds.forEach(function (b) { b.life = 0; b.m.visible = false; });
+      },
+      // Hermes has already left for Cairn II: only his voice is here, on the field wire
+      hermesAway: function (away) { hermes.visible = !away; },
+      where: function (name) { var o = who(name); return { x: o.position.x, z: o.position.z }; },
+      setTime: function (k) {
+        var c = PALETTE[k] || PALETTE.dusk, u = skyObj.uniforms;
+        u.uZenith.value.setHex(c.zenith); u.uMid.value.setHex(c.mid); u.uHorizon.value.setHex(c.horizon); u.uGlow.value.setHex(c.glow);
+        u.uSun.value.set(c.sun[0], c.sun[1], c.sun[2]);
+        scene.fog.color.setHex(c.horizon);
+        if (lit) { lit.key.color.setHex(c.key); lit.key.intensity = c.keyI; lit.back.color.setHex(c.back); lit.fill.color.setHex(c.fill); lit.hemi.color.setHex(c.sky); lit.hemi.groundColor.setHex(c.ground); }
+        renderer.toneMappingExposure = c.exp;
+      },
+      pigeons: function () {
+        birds.forEach(function (b, i) {
+          b.life = 2.6 + Math.random() * 1.4; b.ph = Math.random() * 6;
+          b.m.position.set(-5 + i * (10 / birds.length) + Math.random() * 0.6, WALL_H + 0.4, 0.9);
+          b.vx = (Math.random() - 0.5) * 5; b.vy = 2.4 + Math.random() * 2.2; b.vz = 1.5 + Math.random() * 3;
+          b.m.visible = true;
+        });
+      }
+    };
+    // the pigeons that live in the cornice
+    var birdTex = (function () { var c = document.createElement('canvas'); c.width = 64; c.height = 32; var g = c.getContext('2d'); g.fillStyle = '#2a2026'; g.beginPath(); g.moveTo(0, 6); g.quadraticCurveTo(22, 12, 32, 22); g.quadraticCurveTo(42, 12, 64, 6); g.quadraticCurveTo(44, 20, 32, 28); g.quadraticCurveTo(20, 20, 0, 6); g.fill(); return new T.CanvasTexture(c); })();
+    var birds = [];
+    for (var bi2 = 0; bi2 < 12; bi2++) {
+      var bm = new T.Mesh(new T.PlaneGeometry(0.42, 0.21), new T.MeshBasicMaterial({ map: birdTex, transparent: true, depthWrite: false, side: T.DoubleSide }));
+      bm.visible = false; scene.add(bm); birds.push({ m: bm, life: 0, vx: 0, vy: 0, vz: 0, ph: 0 });
+    }
 
     if (!bubbleEl) {
       bubbleEl = document.createElement('div');
@@ -576,6 +750,10 @@
     clock.t += dt;
     for (var i = 0; i < updaters.length; i++) updaters[i](clock.t, dt);
     if (orbitCtl) orbitCtl.update(dt, !reducedMotion);
+    if (shakeK > 0.002 && !reducedMotion) {
+      camera.position.x += (Math.random() - 0.5) * shakeK * 0.22; camera.position.y += (Math.random() - 0.5) * shakeK * 0.16;
+      shakeK *= Math.pow(0.02, dt);
+    }
     if (gfx) gfx.render(scene, camera, dt); else renderer.render(scene, camera);
     placeBubble();
   }
@@ -587,6 +765,7 @@
     if (!tmpV) tmpV = new T.Vector3();
     var who = ds.speaker;
     if (who === 'servant') servantRef.localToWorld(tmpV.set(0, 2.5, 0));
+    else if (!hermesRef.visible) tmpV.set(who === 'silvia' ? -2.6 : -1.2, who === 'silvia' ? 3.2 : 2.4, 4.6);   // only his voice: at the foot of the stairs
     else if (who === 'hermes') hermesRef.localToWorld(tmpV.set(0, 2.35, 0));
     else hermesRef.localToWorld(tmpV.set(-0.8, 2.9, 0));
     tmpV.project(camera);
@@ -665,9 +844,13 @@
     if (sfx.playCelestialChime) sfx.playCelestialChime();
   }
 
-  function sleep(ms) {
-    return new Promise(function (res) { setTimeout(res, ds.fast ? 50 : ms); });
-  }
+  // the slow, readable pace of every story scene (story-chat.js): it waits while the scene is paused, and a click on
+  // the chat hurries the beat in flight
+  var pauseCtl = window.EclipseChat && canvas ? window.EclipseChat.pauser(canvas.parentNode) : { paused: false, set: function () {} };
+  var sleep = window.EclipseChat ? window.EclipseChat.waiter({ isFast: function () { return ds.fast; }, isPaused: function () { return pauseCtl.paused; } })
+    : function (ms) { return new Promise(function (res) { setTimeout(res, ds.fast ? 50 : ms); }); };
+  var PACE = window.EclipseChat ? window.EclipseChat.pace : null;
+  var SUB = window.EclipseChat ? window.EclipseChat.subtitle : null;
 
   function scrollLog() {
     if (logEl) { logEl.scrollTop = logEl.scrollHeight; requestAnimationFrame(function () { logEl.scrollTop = logEl.scrollHeight; }); }
@@ -684,7 +867,7 @@
     d.textContent = text;
     logEl.appendChild(d);
     scrollLog();
-    if (subtitle) subtitle.textContent = text;
+    if (SUB) SUB.act(subtitle, text); else if (subtitle) subtitle.textContent = text;
   }
 
   function logCard(title, items) {
@@ -703,10 +886,10 @@
 
   // chat rhythm: the "typing…" dots last as long as the message would take to write, then there is time to read it
   function typingTime(who, text) {
-    var per = who === 'silvia' ? 22 : 34;
-    return Math.min(3000, 750 + text.length * per);
+    if (PACE) return PACE.typing(who, text);
+    return Math.min(3000, 750 + text.length * (who === 'silvia' ? 22 : 34));
   }
-  function readTime(text) { return Math.min(2600, 650 + text.length * 30); }
+  function readTime(text) { return PACE ? PACE.read(text) : Math.min(2600, 650 + text.length * 30); }
 
   // One chat bubble per run of messages from the same speaker: each line is typed in turn, inside the same bubble.
   // lines: array of {say, fx}
@@ -719,6 +902,7 @@
       '<div class="gl-bubble"></div></div>';
     var bubble = row.querySelector('.gl-bubble');
     logEl.appendChild(row);
+    if (SUB) SUB.quiet(subtitle);
     for (var i = 0; i < lines.length; i++) {
       var ln = lines[i], text = typeof ln === 'string' ? ln : ln.say;
       var p = document.createElement('p');
@@ -750,14 +934,14 @@
       if (ln.unk && ds.knows) { i++; continue; }
       if (ln.card) {
         setSpeaking(null);
-        logCard('📖 Your diary · Sheet 13A', ln.card);
-        await sleep(1400);
+        logCard('📖 Your diary · “At the Gates of Tower II”', ln.card);
+        await sleep(PACE ? PACE.card : 1400);
         i++;
       } else if (ln.narr) {
         setSpeaking(null);
         logNarration(ln.narr.replace('{S}', theMan()));
         if (ln.fx) ln.fx();
-        await sleep(1100 + Math.min(1400, ln.narr.length * 22));
+        await sleep(PACE ? PACE.narr(ln.narr, ln.hold) : 1100 + Math.min(1400, ln.narr.length * 22));
         i++;
       } else {
         var run = [];
@@ -780,7 +964,8 @@
     bubbleEl.innerHTML = '<div class="gb-name">' + c.icon + ' ' + c.name.toUpperCase() + '</div>' +
       '<div class="gb-text">' + (text ? text.replace(/</g, '&lt;') : '<span class="gl-typing"><i></i><i></i><i></i></span>') + '</div>';
     if (who === 'silvia') bubbleEl.classList.add('gb-radio');
-    focusOn(who === 'servant' ? 'servant' : who === 'hermes' ? 'hermes' : 'overview');
+    if (who === 'hermes' && hermesRef && !hermesRef.visible) bubbleEl.classList.add('gb-away');
+    focusOn(who === 'servant' ? 'servant' : who === 'hermes' && !(hermesRef && !hermesRef.visible) ? 'hermes' : 'overview');
   }
   function hideStageBubble() {
     if (bubbleEl) bubbleEl.className = 'gates-bubble';
@@ -828,6 +1013,22 @@
     if (!id || typeof window.openItemAcquiredModal !== 'function') { ds.relics = []; return; }
     window.openItemAcquiredModal({ id: id }, showQueuedRelics);
   }
+  function cue(kind, o) { try { if (window.EclipseAmbience && window.EclipseAmbience.sfx) window.EclipseAmbience.sfx(kind, o); } catch (e) {} }
+  // someone feeds the dying fire by the left column: they walk to the bowl, pour, and the fire roars up
+  function feedFire(who) {
+    var pour = function () { fireFed = true; fireBurst(1.6); };
+    if (!servantRef) { pour(); return; }
+    act.walk(who, -3.15, 1.75, { speed: 1.0, face: act.faceTo(who, -3.9, 1.1), then: function () { act.react(who, 'offer'); act.later(0.8, pour); } });
+  }
+  // the old man comes down to Hermes and puts something in his hand (the red cord, the coin), then goes back up
+  function handOver() {
+    if (!servantRef || !hermesRef || !hermesRef.visible) return;
+    var h = act.where('hermes');
+    act.walk('servant', h.x + 0.85, h.z - 0.75, { speed: 0.9, face: function () { var w = act.where('hermes'), me = act.where('servant'); return Math.atan2(-(w.x - me.x), -(w.z - me.z)); }, then: function () {
+      act.react('servant', 'offer'); act.later(0.5, function () { act.react('hermes', 'offer'); });
+      act.later(2.8, function () { act.walk('servant', 0.95, 0.95, { speed: 0.9, face: 2.44 }); });
+    } });
+  }
   function fireBurst(k) {
     fireFlash = k; if (sfx.playCelestialChime) sfx.playCelestialChime();
     if (gfx && gfx.post) gfx.post.pulse(0.35 * k, 1.2);
@@ -838,7 +1039,7 @@
     greet: {
       icon: '🙏', label: 'Greet him with respect.', say: 'Hermes, greet him. Slowly, with respect.',
       lines: function () { return [
-        nar('Hermes lowers his staff and bows his head.'),
+        nar('Hermes lowers his staff and bows his head.', { fx: function () { act.react('hermes', 'bow'); } }),
         sayH('Peace on your door, elder.'),
         nar('{S} studies him for a long moment.'),
         sayS('Peace. You walk like one who has walked far.'),
@@ -851,7 +1052,7 @@
       lines: function () { return [
         sayH('Silvia... are you sure? He is old, but that staff is iron.'),
         sayH('Step aside, elder. We have business with the Oracle.'),
-        nar('The iron staff drops across the stairs with a ringing crack.'),
+        nar('The iron staff drops across the stairs with a ringing crack.', { fx: function () { act.react('servant', 'startle'); cue('thud'); cue('stone'); shakeK = 0.6; } }),
         sayS('Business. Everyone who climbs has business.'),
         sayS('Answer one question, or turn back.'),
         sayS(STAFF_Q, { fx: look('staff') })
@@ -861,7 +1062,7 @@
     study: {
       icon: '👁️', label: 'Look around first.', say: 'Wait, Hermes. Do not speak yet. Look around.',
       lines: function () { return [
-        nar('Hermes holds still. His eyes travel over the gates, the fires, the stone.'),
+        nar('Hermes holds still. His eyes travel over the gates, the fires, the stone.', { fx: function () { act.react('hermes', 'wonder'); } }),
         sayH('What should I look at first, Silvia?')
       ]; },
       after: function () { ds.tone = 'observer'; ds.stage = 'look'; setMission('Look closely at the gates'); }
@@ -892,7 +1093,7 @@
     look_tracks: {
       icon: '🔍', label: 'The prints on the ground.', say: 'What is on the ground, Hermes? Any prints?',
       lines: function () { return [
-        nar('Hermes crouches at the foot of the stairs.', { fx: look('tracks') }),
+        nar('Hermes crouches at the foot of the stairs.', { hold: 1200, fx: function () { look('tracks')(); act.walk('hermes', 1.0, 4.75, { speed: 1.1, face: act.faceTo('hermes', 1.9, 5.4), then: function () { act.react('hermes', 'kneel'); } }); } }),
         sayH('Camel prints. Two animals, I think.'),
         sayH('They come right up to the stairs. Whoever it was stood here a while.')
       ]; },
@@ -901,7 +1102,7 @@
     look_fire: {
       icon: '🔍', label: 'The fires by the columns.', say: 'Look at the fires on the landing.',
       lines: function () { return [
-        nar('Hermes turns to the braziers.', { fx: look('fire') }),
+        nar('Hermes turns to the braziers.', { fx: function () { look('fire')(); act.walk('hermes', -1.9, 3.5, { speed: 0.9, face: act.faceTo('hermes', -3.9, 1.1) }); } }),
         sayH('Four fires. Three burn high.'),
         sayH('The one on the left, by the column, is nearly out. The bowl is almost dry.'),
         nar('The old man glances at it, then looks away.')
@@ -911,7 +1112,7 @@
     look_statues: {
       icon: '🔍', label: 'The stone guardians.', say: 'Look at the statues in the niches.',
       lines: function () { return [
-        nar('Hermes studies the niches in the wall.', { fx: look('statues') }),
+        nar('Hermes studies the niches in the wall.', { hold: 800, fx: function () { look('statues')(); act.walk('hermes', -3.1, 2.15, { speed: 1.1, face: act.faceTo('hermes', -4.7, 0.2) }); } }),
         sayH('Two statues. Old men, hooded, with long staffs.'),
         sayH('They hold their staffs just as he does. Like a long line of them.'),
         sayH('Maybe he is not the first to keep this door.')
@@ -923,7 +1124,7 @@
       lines: function () {
         var n = seenCount();
         return [
-          nar('Hermes turns to the old man.', { fx: look('overview') }),
+          nar('Hermes turns to the old man.', { fx: function () { look('overview')(); act.home(); } }),
           n >= 2 ? sayS('You look before you speak. Few do.') : sayS('Speak, traveler.')
         ];
       },
@@ -955,14 +1156,14 @@
           sayS(cold ? 'I keep this door. Do not mistake me for a friend.' : 'I keep this door. Nothing more.'),
           sayH('The Servant of the Oracle... so he is not the Oracle herself.'),
           sayH('In 1998 I had it wrong, Silvia.'),
-          sayH('Read Sheet 13A in your diary now. It tells of the Servant and the five cairns.')
+          sayH('Read “At the Gates of Tower II” in your diary now. It tells of the Servant and the five cairns.')
         ];
       }
     },
     oracle: {
       icon: '👁️', label: 'Ask about the Oracle.', say: 'Ask him where the Oracle is.',
       lines: function () {
-        var out = [nar('Hermes steps closer and asks.')];
+        var out = [nar('Hermes steps closer and asks.', { fx: function () { act.walk('hermes', -0.85, 2.9, { speed: 0.9, face: act.faceTo('hermes', 0.95, 0.95) }); } })];
         if (ds.regard <= -1) {
           out.push(sayS('Not for you. Not tonight.'), sayS('Earn the stair first.'), sayH('Then we earn it. Ask how, Silvia?'));
           ds.flags.trialHint = true;
@@ -1000,10 +1201,10 @@
       }
     },
     diary: {
-      icon: '📖', label: 'Check my diary (Sheet 13A).', say: 'Wait. Let me check my diary, Sheet 13A.',
+      icon: '📖', label: 'Check my diary: “At the Gates of Tower II”.', say: 'Wait. Let me check my diary, “At the Gates of Tower II”.',
       lines: function () { return [
-        nar('Silvia turns to Sheet 13A: “At the Gates of Tower II”.'),
-        { card: ['Five cairns were raised across the desert.', 'Each one holds a seal. Five seals open Tower II.', 'Cairn I: the river stones at Wadi al-Hajar. Your seal comes from here.', 'Next: Cairn II, the Sun Monolith (Sheet 13B).', 'The lintel of the arch, in worn capitals: “OPEN AT THE SETTING OF THE SUN”.'] },
+        nar('Silvia turns to the page “At the Gates of Tower II”.'),
+        { card: ['Five cairns were raised across the desert.', 'Each one holds a seal. Five seals open Tower II.', 'Cairn I: the river stones at Wadi al-Hajar. Your seal comes from here.', 'Next: Cairn II, the Sun Monolith (“The Sun Monolith & Cairn II”).', 'The lintel of the arch, in worn capitals: “OPEN AT THE SETTING OF THE SUN”.'] },
         { who: 'silvia', say: 'Five cairns, five seals. We have one.' },
         sayH('Then one is where we begin.')
       ]; }
@@ -1022,7 +1223,7 @@
     t8: {
       icon: '8️⃣', label: 'Eight points.', say: 'Eight. The star has eight points.',
       lines: function () {
-        var out = [nar('The old man lifts his staff. The star-sight catches the last light.'), sayS('Eight. Eyes that count.')];
+        var out = [nar('The old man lifts his staff. The star-sight catches the last light.', { fx: function () { act.react('servant', 'offer'); fireBurst(0.4); } }), sayS('Eight. Eyes that count.')];
         if (ds.seen.staff) out.push(sayS('You looked. I saw you looking.'));
         out.push(sayS('Few see what stands in front of them.'), sayH('Well done, Silvia.'));
         return out;
@@ -1052,7 +1253,7 @@
       lines: function () { return [
         sayH('My lantern oil? It is all I have for the night walk.', { fx: look('fire') }),
         sayH('Your call, Silvia... Very well.'),
-        nar('Hermes tips the little flask over the bowl. The fire roars up, gold and tall.', { fx: function () { fireFlash = 1.6; ds.flags.gaveOil = true; if (sfx.playCelestialChime) sfx.playCelestialChime(); } }),
+        nar('Hermes tips the little flask over the bowl. The fire roars up, gold and tall.', { hold: 1500, fx: function () { ds.flags.gaveOil = true; feedFire('hermes'); } }),
         nar('The old man’s face softens. For the first time he looks at Hermes, not through him.'),
         sayS('Oil is dear in the Erg. You paid more than the flask.'),
         sayH('My lantern burns low now. The night walk will be dark.')
@@ -1064,7 +1265,7 @@
     seal: {
       icon: '🪨', label: 'Show him the Seal of Cairn I.', say: 'Hermes, show him the seal from Cairn I.',
       lines: function () {
-        var ok = ds.regard >= 1 || ds.flags.testPassed || (ds.flags.stumbled && ds.flags.gaveOil), out = [nar('Hermes lifts a stone disc from his satchel.'), sayH('Proof of survey, elder. From the dry river.')];
+        var ok = ds.regard >= 1 || ds.flags.testPassed || (ds.flags.stumbled && ds.flags.gaveOil), out = [nar('Hermes lifts a stone disc from his satchel.', { fx: function () { act.react('hermes', 'offer'); } }), sayH('Proof of survey, elder. From the dry river.')];
         if (!ds.knows) out.push(sayS('I am the Servant of the Oracle. I keep this door.', { unk: true, reveal: true }));
         if (!ok) {
           out.push(nar('{S} turns the disc in his fingers, then hands it back.'));
@@ -1080,7 +1281,7 @@
         }
         out.push(nar('{S} studies the sun and the waves cut into the stone.'));
         out.push(sayS(ds.tone === 'humble' ? 'True stone. True hand. And a true bow before it.' : ds.tone === 'bold' ? 'True stone. A pity about the manners.' : ds.tone === 'observer' ? 'True stone. And you looked before you asked.' : 'True stone. True hand.'));
-        out.push(nar('He presses it into the first socket of the arch.', { fx: sealFx }));
+        out.push(nar('He presses it into the first socket of the arch.', { fx: function () { act.react('servant', 'offer'); sealFx(); } }));
         out.push(nar('A deep chime rolls through the canyon. The socket glows gold.'));
         out.push(sayS('One seal is home. Four still sleep in stone.'), sayH('Four more, Silvia.'));
         ds.sealAccepted = true;
@@ -1139,7 +1340,7 @@
       icon: '🧵', label: 'Ask for his blessing on the road.', say: 'Hermes, ask him for a blessing for the road.',
       lines: function () { return [
         sayH('Elder, will you bless the road ahead?'),
-        nar('The old man unties a faded red cord from his staff and knots it round Hermes’s wrist.'),
+        nar('The old man unties a faded red cord from his staff and knots it round Hermes’s wrist.', { hold: 1800, fx: function () { handOver(); } }),
         sayS('Red for the road. It will not stop the sun. It will remind you who waits.'),
         sayH('I will not take it off.', { fx: function () { giveRelic('red_cord'); } })
       ]; },
@@ -1171,8 +1372,8 @@
         if (ds.flags.gaveOil || ds.flags.lostOil) out.push(sayH('My lantern is nearly dry. We will walk the night half blind.'));
         if (ds.flags.blessing) out.push(sayH('And the red cord stays on my wrist.'));
         if (!ds.flags.gaveOil && !ds.flags.lostOil) out.push(sayH('I still have my lamp oil. A little light on the road will not hurt.'));
-        out.push(sayH('Keep Sheet 13B close, Silvia.'), sayH('At the Monolith, the seven noons are yours to solve.'));
-        out.push(nar('Hermes turns north-north-east. The long march begins.'));
+        out.push(sayH('Keep “The Sun Monolith & Cairn II” close, Silvia.'), sayH('At the Monolith, the seven noons are yours to solve.'));
+        out.push(nar('Hermes turns north-north-east. The long march begins.', { hold: 1200, fx: function () { act.react('servant', 'nod'); ds.away = true; act.walk('hermes', 4.6, 11.5, { speed: 1.25, hide: true }); } }));
         return out;
       },
       after: function () { completeQuestEncounter(); }
@@ -1187,7 +1388,7 @@
     return [
       sayS('The desert is patient. I am not.'),
       sayH('Silvia... he is closing the door on us.'),
-      nar('The old man lowers his staff. The test is over.'),
+      nar('The old man lowers his staff. The test is over.', { fx: function () { act.react('servant', 'nod'); } }),
       sayS('You will learn. A fire burns low by that column. Think on it.')
     ];
   }
@@ -1201,7 +1402,8 @@
   var extras = window.GatesExtras ? window.GatesExtras({
     ds: ds, CHOICES: CHOICES, nar: nar, sayH: sayH, sayS: sayS, sayV: sayV, look: look, R: R, STAFF_Q: STAFF_Q,
     setMission: setMission, focusThing: focusThing, giveRelic: giveRelic, fireBurst: fireBurst,
-    fitSeals: fitSeals, openDoors: function (k) { doorTarget = k; }, finishReturn: showReturnCard
+    fitSeals: fitSeals, openDoors: openDoors, finishReturn: showReturnCard,
+    act: function () { return act; }, feedFire: feedFire, handOver: handOver, cue: cue, shake: function (k) { shakeK = Math.max(shakeK, k); }
   }) : null;
   if (extras) for (var xid in extras.choices) CHOICES[xid] = extras.choices[xid];
 
@@ -1281,6 +1483,7 @@
     if (c.after) c.after();
     ds.busy = false;
     if (ds.relics.length) showQueuedRelics();
+    if (ds.stage !== 'done' && ds.stage !== 'ret_done' && ds.mode !== 'return') act.home();
     if (ds.stage !== 'done') renderChoices();
     setSpeaking(null);
     if (ds.stage !== 'done') hideStageBubbleSoon(token);
@@ -1308,6 +1511,19 @@
     });
   }
 
+  // How the bronze doors open, by the road that led here:
+  //   'full' at once (already open), 'keepers' (both leaves, by themselves), 'bold' (flung wide with a boom),
+  //   'observer' (parted without a sound, just wide enough), 'trusted' (only the founders' wicket), 'humble' (wide, by hand)
+  function openDoors(style) {
+    if (style === 1 || style === 'full') { doors.tL = doors.tR = doors.L = doors.R = 1; doors.tW = doors.W = 0; return; }
+    if (style === 0 || style === 'shut') { doors.tL = doors.tR = doors.L = doors.R = doors.tW = doors.W = 0; return; }
+    var st = { keepers: [1, 1, 0, 0.9], bold: [1, 1, 0, 5.5], observer: [0.4, 0.4, 0, 0.55], trusted: [0, 0, 1, 1.2], humble: [1, 1, 0, 0.8] }[style] || [1, 1, 0, 1.2];
+    doors.tL = st[0]; doors.tR = st[1]; doors.tW = st[2]; doors.speed = st[3];
+    if (style === 'bold') { shakeK = 1; act.pigeons(); cue('thud'); cue('whoosh', { dur: 1.6 }); }
+    else if (style === 'keepers') { cue('reveal'); }
+    else if (style !== 'observer') cue('stone');
+  }
+
   // the return: seal number n goes home in the arch
   function fitSeals(n) {
     ds.retSeals = n;
@@ -1333,7 +1549,11 @@
     if (extras) extras.reset();
     // the doors stand open only for those who have already been received at the end of the Desert Path
     var back = !!(window.GatesRoad && window.GatesRoad.returned());
-    ds.mode = null; ds.onReturn = null; ds.retSeals = back ? 5 : 0; doorTarget = back ? 1 : 0;
+    ds.mode = null; ds.onReturn = null; ds.retSeals = back ? 5 : 0; ds.away = !!resume;
+    openDoors(back ? 'full' : 'shut');
+    act.reset(); act.setTime('dusk'); act.hermesAway(!!resume);
+    pauseCtl.set(false);
+    if (SUB) SUB.reset(subtitle, 'Last light at the gates of Tower II.');
     if (hudTime) hudTime.textContent = '18:30 · LAST LIGHT';
     ds.sealPlaced = getLs('order_monolith_gate_seal1') === 'true' && isCompleted();
     if (resume) {
@@ -1341,6 +1561,7 @@
       ds.tone = getLs('order_gates_path') || null;
       ds.regard = ds.flags.regard || 0; ds.seen = ds.flags.seen || {};
     }
+    fireFed = !!(ds.flags.gaveOil || ds.flags.lostOil);
     logEl.innerHTML = '';
     choicesBox.innerHTML = '';
     choicesBox.parentNode.style.display = 'none';
@@ -1358,11 +1579,11 @@
 
     if (resume) {
       ds.stage = 'done';
-      var f = ds.flags, lines = [nar('Hermes has already set out for Cairn II.')];
+      var f = ds.flags, lines = [nar('Hermes has already set out for Cairn II. Only his voice is here now, on the field wire.')];
       lines.push(sayS(ds.tone === 'humble' ? 'He bowed. I remember a bow.' : ds.tone === 'bold' ? 'He came hard. I remember that, too.' : 'He looked before he spoke. I remember that.'));
       if (f.gaveOil) lines.push(sayS('And a fire still burns by my column because of his oil.'));
       if (f.blessing) lines.push(nar('A red cord is tied to Hermes’s wrist.'));
-      lines.push(sayH((window.GatesRoad ? window.GatesRoad.hoursWord() : 'Twelve') + ' hours across the Erg. Sheet 13B is next, Silvia.'));
+      lines.push(sayH((window.GatesRoad ? window.GatesRoad.hoursWord() : 'Twelve') + ' hours across the Erg. “The Sun Monolith & Cairn II” is next, Silvia.'));
       await play(lines, token);
       if (token !== ds.token) return;
       ds.busy = false; setSpeaking(null); hideStageBubble();
@@ -1396,7 +1617,11 @@
     ds.regard = ds.flags.regard || 0; ds.seen = ds.flags.seen || {};
     ds.wrongs = 0; ds.picked = {}; ds.duel = null; ds.relics = []; ds.statueMiss = 0;
     ds.ret = { sealed: false, asked: false, keepers: false };
-    ds.retSeals = 1; doorTarget = 0;
+    ds.retSeals = 1; ds.away = false;
+    openDoors('shut'); act.reset(); act.setTime('dawn'); act.hermesAway(false);
+    fireFed = !!(ds.flags.gaveOil || ds.flags.lostOil);
+    pauseCtl.set(false);
+    if (SUB) SUB.reset(subtitle, 'Dawn at the gates of Tower II.');
     if (hudTime) hudTime.textContent = '06:10 · DAWN';
     if (extras) extras.reset();
     logEl.innerHTML = '';
@@ -1535,6 +1760,7 @@
       if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ ON THE ROAD ✦ Hermes is still walking to the gates of Tower II. He will call you from the steps at last light.');
       return;
     }
+    returnFocusTo = document.activeElement;
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     var begin = function () { if (ret) startReturn(opts.onDone); else startConversation(isCompleted()); };
@@ -1547,14 +1773,26 @@
     }
   }
 
+  var returnFocusTo = null;
   function closeGatesModal() {
+    if (modal.style.display === 'none') return;
     modal.style.display = 'none';
     document.body.classList.remove('modal-open');
     ds.token++;
     ds.busy = false;
+    pauseCtl.set(false);
     stopLoop();
     if (sfx.playMechanicalClick) sfx.playMechanicalClick();
+    if (returnFocusTo && typeof returnFocusTo.focus === 'function' && document.contains(returnFocusTo)) { try { returnFocusTo.focus(); } catch (e) {} }
+    returnFocusTo = null;
   }
+  // Escape leaves the scene, unless a card (an item, the Field Wire) sits on top of it
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || modal.style.display === 'none') return;
+    var el = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+    if (el && !modal.contains(el)) return;
+    closeGatesModal();
+  });
 
   // Event Listeners
   if (closeBtn) closeBtn.addEventListener('click', closeGatesModal);
@@ -1585,7 +1823,7 @@
 
   window.addEventListener('resize', handleResize);
   if (window.ResizeObserver && canvas) new ResizeObserver(handleResize).observe(canvas);
-  window.__gates = { dlg: function () { return ds; }, render: renderChoices, pick: function (id) { return pick(id); }, fast: function () { ds.fast = true; }, world: function () { return { scene: scene, camera: camera, orbit: orbitCtl, renderer: renderer }; } };
+  window.__gates = { dlg: function () { return ds; }, render: renderChoices, pick: function (id) { return pick(id); }, fast: function () { ds.fast = true; }, world: function () { return { scene: scene, camera: camera, orbit: orbitCtl, renderer: renderer }; }, state: function () { var r = function (v) { return Math.round(v * 100) / 100; }, h = act.where('hermes'), sv = act.where('servant'); return { stage: ds.stage, busy: ds.busy, away: ds.away, hermes: h && [r(h.x), r(h.z)], servant: sv && [r(sv.x), r(sv.z)], doors: [r(doors.L), r(doors.R), r(doors.W)] }; } };
 
   // Expose global launcher
   window.openGatesTowerIIModal = function (opts) { return openGatesModal(opts && opts.mode ? opts : undefined); };

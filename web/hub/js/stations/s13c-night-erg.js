@@ -41,7 +41,7 @@
   var speaking = null;
 
   var chat = window.EclipseChat.create({
-    log: logEl, cast: CAST, subtitle: subtitle,
+    log: logEl, cast: CAST, subtitle: subtitle, stage: canvas ? canvas.parentNode : null,
     onSpeak: function (who, text) { speaking = who; showBubble(who, text); }
   });
 
@@ -59,8 +59,8 @@
     traveller: {
       title: 'The Traveller', time: '02:40 · DEEP NIGHT',
       open: function () { return [
-        nar('The wind drops. Far ahead, a light the size of a seed is moving across the dunes.', { fx: fx('travellerComes') }),
-        H('Silvia... a lantern, coming my way. Someone is walking toward my fire.'),
+        nar('The wind drops. Far ahead, a dark shape is coming over the dunes, toward the glow of the fire.', { fx: fx('travellerComes') }),
+        H('Silvia... someone is out there, coming my way. Walking toward my fire.'),
         nar('A young nomad in a striped headcloth stops at the edge of the firelight. His own lantern is dark.'),
         N('Peace, traveller. My lamp died two dunes ago.'),
         N('I have walked blind since moonrise. A little oil would carry me to the well by dawn.'),
@@ -74,7 +74,7 @@
           lines: function () { return [
             nar('Hermes pours half his oil into the nomad’s lamp. It catches, small and gold.', {
               fx: function () {
-                fx('pour')();
+                fx('pour')('half');
                 if (Road && Road.patch) Road.patch({ nightOil: 'shared' });
                 if (window.syncLampOil) window.syncLampOil();
                 if (window.updateInventoryBadge) window.updateInventoryBadge();
@@ -96,7 +96,7 @@
           lines: function () { return [
             nar('Hermes empties the flask into the nomad’s lamp. His own lantern gutters, and dies.', {
               fx: function () {
-                fx('pour')();
+                fx('pour')('all');
                 if (Road && Road.patch) Road.patch({ nightOil: 'all' });
                 if (window.dropRelic) window.dropRelic('lamp_oil');
                 if (window.syncLampOil) window.syncLampOil();
@@ -130,7 +130,7 @@
           } },
         refuse: { icon: '✋', label: 'Refuse. We need every drop.', say: 'I am sorry, Hermes. We need every drop. Tell him gently.',
           lines: function () { return [
-            H('Forgive me, friend. The road is long and we have little.'),
+            H('Forgive me, friend. The road is long and we have little.', { fx: fx('hermesBow') }),
             N('Then I walk. The desert is wide enough for both of us.'),
             nar('He nods once, and the dark takes him.', { fx: fx('travellerLeaves') }),
             H('I hope he finds his well, Silvia.')
@@ -155,15 +155,15 @@
       choices: {
         follow: { icon: '👣', label: 'Follow it.', say: 'Follow it, Hermes. Slowly.',
           lines: function () { return [
-            nar('The camel turns and walks. Hermes follows its glowing prints for an hour.', { fx: fx('camelLeads') }),
-            nar('At a toppled caravan cairn, it kneels, and is gone.', { fx: fx('camelFades') }),
-            H('A carved stone, Silvia. A jackal, and under it three words: “Morning leans west.”'),
+            nar('The camel turns and walks. Hermes follows its glowing prints for an hour.', { fx: function () { fx('camelLeads')('follow'); } }),
+            nar('At a toppled caravan cairn, it kneels, and is gone.', { fx: fx('camelKneels') }),
+            H('A carved stone, Silvia. A jackal, and under it three words: “Morning leans west.”', { fx: fx('hermesKneel') }),
             H('I think the camel wanted me to read it.')
           ]; },
           done: function () { grant('s14-shadow', 1); Road.patch({ nightGhost: 'followed' }); } },
         watch: { icon: '👁️', label: 'Keep still. Watch what it does.', say: 'Stay still, Hermes. Watch what it does.',
           lines: function () { return [
-            nar('The camel looks back once. Then it walks away in a perfectly straight line.', { fx: fx('camelLeads') }),
+            nar('The camel looks back once. Then it walks away in a perfectly straight line.', { fx: function () { fx('camelLeads')('line'); } }),
             H('Silvia, it is walking north-north-east. Exactly 14°. It is pointing the way.'),
             nar('Where it passes, the prints form a line that runs straight at the dawn.', { fx: fx('camelFades') }),
             H('I will walk on the line it drew. A camel never walks crooked.')
@@ -171,7 +171,7 @@
           done: function () { grant('s14-sigil', 1); Road.patch({ nightGhost: 'watched' }); } },
         call: { icon: '📣', label: 'Call out to it.', say: 'Call out to it, Hermes. Ask who it is.',
           lines: function () { return [
-            H('Hello? Whose camel are you?'),
+            H('Hello? Whose camel are you?', { fx: fx('hermesCall') }),
             nar('At the sound of a voice, the camel dissolves into the dark.', { fx: fx('camelFades') }),
             H('Gone. Perhaps it only wanted to be left alone.')
           ]; },
@@ -198,33 +198,33 @@
       choices: {
         cord: { icon: '🧵', label: 'Measure it with the red cord.', say: 'Hermes, use the red cord. Measure the 14° against your fist.',
           lines: function () { return [
-            nar('Hermes stretches the cord along his arm, and counts the knots against the sky.'),
+            nar('Hermes stretches the cord along his arm, and counts the knots against the sky.', { fx: fx('hermesMeasure') }),
             H('At arm’s length, one fist is about ten degrees. Fourteen is a fist and a bit more.'),
             H('That is a lot more than nothing, Silvia. Which side?')
           ]; } },
         keep: { icon: '⭐', label: 'Keep the Pole Star straight ahead.', say: 'Walk with the Pole Star straight ahead.', wrong: true,
-          lines: function () { return lostLines('straight at the Pole Star, which is true north'); },
+          lines: function () { return lostLines('straight at the Pole Star, which is true north', 0); },
           done: function () { Road.patch({ nightLost: true }); } },
         right: { icon: '➡️', label: '14° to the right of the Pole Star.', say: 'Put the Pole Star a little to your left. Walk 14° to the right of it.',
           lines: function () { return [
             H('East is on the right when you face north. So a fist and a bit to the right of the star.'),
-            nar('Hermes turns until the Pole Star sits at the edge of his left eye, and walks.', { fx: fx('lookAhead') }),
+            nar('Hermes turns until the Pole Star sits at the edge of his left eye, and walks.', { fx: function () { fx('walkBearing')(14); } }),
             nar('Hours pass. The sand is firm and cold. At the first grey of dawn, a tall black shape rises dead ahead.'),
             H('The Monolith. Silvia, we came out exactly right.'),
             H('I watched my own shadow all night under the moon, and measured it against my staff. It will help me with the Monolith’s.')
           ]; },
           done: function () { grant('s14-sigil', 1); Road.patch({ nightStars: true }); } },
         left: { icon: '⬅️', label: '14° to the left of the Pole Star.', say: 'Walk 14° to the left of the Pole Star.', wrong: true,
-          lines: function () { return lostLines('to the left of the Pole Star, which is west of north'); },
+          lines: function () { return lostLines('to the left of the Pole Star, which is west of north', -14); },
           done: function () { Road.patch({ nightLost: true }); } }
       }
     }
   };
 
-  function lostLines(where) {
+  function lostLines(where, deg) {
     return [
       H('If you say so, Silvia. I walk ' + where + '.'),
-      nar('Hours pass. The stars turn, and the Pole Star does not seem to move at all. Neither does the horizon.', { fx: fx('lookAhead') }),
+      nar('Hours pass. The stars turn, and the Pole Star does not seem to move at all. Neither does the horizon.', { fx: function () { fx('walkBearing')(deg); } }),
       nar('At first light, the Monolith stands far off to the side of the way.'),
       H('I have lost two hours and half a skin of water, Silvia. East of north is on the right when you face north. I should have said so.'),
       H('No harm done. But next time, we count the fists.')
@@ -306,6 +306,7 @@
     var tm = document.getElementById('night-hud-time'); if (tm) tm.textContent = night.time;
     var tt = document.getElementById('night-title-kind'); if (tt) tt.textContent = night.title;
     if (S3) S3.setKind(ns.kind, flags);
+    if (window.EclipseChat.subtitle) window.EclipseChat.subtitle.reset(subtitle, 'Hermes walks the Great Erg by night, 14° north-north-east.');
     hideBubble();
 
     var hours = Road ? Road.marchHours() : 12, mk = Road ? Road.marchKind() : 'steady';
@@ -485,13 +486,75 @@
       var pm = new T.Mesh(new T.CircleGeometry(0.2, 14), printMat.clone());
       pm.rotation.x = -Math.PI / 2; pm.scale.set(0.9, 1.4, 1); pm.visible = false; pm.userData.life = 0; scene.add(pm); prints.push(pm);
     }
-    var printI = 0;
+    var printI = 0, printSide = 1;
     function dropPrint(x, z, rotY, side) {
       var p = prints[printI++ % PN];
       p.position.set(x + Math.cos(rotY) * 0.28 * side, 0.04, z - Math.sin(rotY) * 0.28 * side);
       p.rotation.z = rotY; p.visible = true; p.userData.life = 1;
     }
-    var mover = { target: null, speed: 0, pathDone: null, stride: 0, side: 1 };
+    var camelK = { kneel: 0, fade: 0 };
+    function camelReset() {
+      camelK.kneel = 0; camelK.fade = 0; camel.position.y = 0;
+      camel.userData.mats[0].opacity = 0.36; camel.userData.mats[1].opacity = 0.12;
+      camel.userData.legs.forEach(function (l) { l.leg.rotation.x = 0; l.lo.rotation.x = 0; });
+    }
+
+    // ---- the toppled caravan cairn the ghost camel kneels by (its night only) ----
+    var CAIRN_AT = { x: 5.2, z: -13.5 };
+    var cairnG = new T.Group();
+    var cRocks = SC.props.rocks(paint, { seed: 23, scale: 0.55, count: 4 });
+    cRocks.traverse(function (o) { if (o.isMesh) { o.material = o.material.clone(); o.material.color.setHex(0x55608c); o.castShadow = true; } });
+    cairnG.add(cRocks);
+    // its face: weathered stone, a jackal cut into it and three words under it (what Hermes reads aloud)
+    var slabTex = (function () {
+      var c = document.createElement('canvas'); c.width = 256; c.height = 392;
+      var g = c.getContext('2d'), r = lcg(41);
+      g.fillStyle = '#7d7f92'; g.fillRect(0, 0, 256, 392);
+      for (var i = 0; i < 900; i++) { var v = 90 + Math.floor(r() * 70); g.fillStyle = 'rgba(' + v + ',' + v + ',' + (v + 14) + ',0.35)'; g.fillRect(r() * 256, r() * 392, 1 + r() * 3, 1 + r() * 3); }
+      g.strokeStyle = 'rgba(40,40,56,0.5)'; g.lineWidth = 1.2;
+      for (var k = 0; k < 6; k++) { g.beginPath(); var x = r() * 256, y = r() * 392; g.moveTo(x, y); for (var s2 = 0; s2 < 4; s2++) { x += (r() - 0.5) * 40; y += r() * 30; g.lineTo(x, y); } g.stroke(); }
+      // the jackal, lying watchful: an incised line, dark in the cut and pale on its lower lip
+      function jackal(dx, dy, col) {
+        g.save(); g.translate(dx, dy); g.fillStyle = col; g.beginPath();
+        g.moveTo(40, 170); g.quadraticCurveTo(60, 140, 120, 142); g.lineTo(168, 140);
+        g.lineTo(176, 108); g.lineTo(170, 70); g.lineTo(184, 96); g.lineTo(192, 70); g.lineTo(196, 104);
+        g.lineTo(226, 120); g.lineTo(222, 128); g.lineTo(194, 128); g.lineTo(186, 150);
+        g.lineTo(214, 166); g.lineTo(212, 174); g.lineTo(60, 176); g.quadraticCurveTo(26, 178, 18, 196); g.quadraticCurveTo(22, 170, 40, 170);
+        g.closePath(); g.fill(); g.restore();
+      }
+      jackal(1.5, 2, 'rgba(225,228,240,0.55)'); jackal(0, 0, 'rgba(28,28,42,0.85)');
+      g.fillStyle = 'rgba(28,28,42,0.85)'; g.fillRect(28, 196, 200, 4);
+      g.textAlign = 'center'; g.font = '700 34px Cinzel, Georgia, serif';
+      ['MORNING', 'LEANS', 'WEST'].forEach(function (w, n) {
+        g.fillStyle = 'rgba(225,228,240,0.5)'; g.fillText(w, 129.5, 252 + n * 46 + 1.5);
+        g.fillStyle = 'rgba(28,28,42,0.9)'; g.fillText(w, 128, 252 + n * 46);
+      });
+      var t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 4;
+      return t;
+    })();
+    var slabSide = paint({ color: 0x5c6080 });
+    var slab = new T.Mesh(new T.BoxGeometry(0.75, 1.15, 0.16), [slabSide, slabSide, slabSide, slabSide, paint({ map: slabTex, bumpMap: slabTex, bumpScale: 1.2, color: 0xb4b8d0 }), slabSide]);
+    slab.position.set(0.15, 0.52, 0.55); slab.rotation.set(-0.14, 0.32, 0.07); slab.castShadow = slab.receiveShadow = true;
+    cairnG.add(slab);
+    cairnG.position.set(CAIRN_AT.x, 0, CAIRN_AT.z); cairnG.visible = false; scene.add(cairnG);
+
+    // ---- walkers: the nomad, the camel and Hermes himself can be sent somewhere; their legs follow on their own ----
+    var walks = [], timers = [], followCam = false;
+    function faceTo(obj, tgt) { return Math.atan2(-(tgt.position.x - obj.position.x), -(tgt.position.z - obj.position.z)); }
+    function adiff(a, b) { return ((a - b + Math.PI * 3) % (Math.PI * 2)) - Math.PI; }
+    function walkTo(obj, x, z, o) {
+      o = o || {};
+      walks = walks.filter(function (w) { return w.obj !== obj; });
+      walks.push({ obj: obj, x: x, z: z, speed: o.speed || 1.5, face: o.face == null ? null : o.face, prints: !!o.prints, hideAtEnd: !!o.hideAtEnd, then: o.then || null, stride: 0 });
+    }
+    // a small timeline on the scene's own clock: it waits while the window is closed
+    function later(sec, fn) { timers.push({ t: sec, fn: fn }); }
+    function cue(kind, o) { try { if (window.EclipseAmbience && window.EclipseAmbience.sfx) window.EclipseAmbience.sfx(kind, o); } catch (e) {} }
+
+    // the lamps: the nomad's takes the poured flame; Hermes's dies when the last drop is gone
+    var nomadLit = false, nomadLampK = 0, lampDying = 0;
+    function nomadLampOn(on) { nomadLit = !!on; if (nomad.userData.setLamp) nomad.userData.setLamp(nomadLit); }
+    function lampDie() { lampDying = 1; cue('dusk'); }
 
     // ---- wind-blown sand (a storm made the night longer) ----
     var WN = 360, wp = new Float32Array(WN * 3), wr = lcg(5);
@@ -509,15 +572,18 @@
 
     var kind = 'traveller', fl = {}, lampK = 1, lampBoost = 0;
     var flameOn = true;
+    var HOME = { x: -1.5, z: 0.4, rot: -2.1 };
 
     function setKind(k, flags) {
       kind = k; fl = flags || {};
       var lantern = Road ? Road.hasLantern(fl) : true;
-      flameOn = lantern; Hh.flame.visible = lantern; lampK = lantern ? 1 : 0;
+      flameOn = lantern; Hh.flame.visible = lantern; lampK = lantern ? 1 : 0; lampDying = 0;
       camp.visible = (k === 'traveller'); camp.userData.on = camp.visible;
-      nomad.visible = false; camel.visible = false; nomadLamp.intensity = 0; if (nomad.userData.setLamp) nomad.userData.setLamp(false);
+      nomad.visible = false; camel.visible = false; nomadLamp.intensity = 0; nomadLampK = 0; nomadLampOn(false);
+      cairnG.visible = false; camelReset();
       prints.forEach(function (p) { p.visible = false; });
-      mover.target = null;
+      walks = []; timers = []; followCam = false;
+      hermes.position.set(HOME.x, 0, HOME.z); hermes.rotation.y = HOME.rot;
       var storm = Road && Road.marchKind() === 'storm';
       windDust.material.opacity = storm ? 0.55 : 0.0;
       scene.fog.near = storm ? 14 : 26; scene.fog.far = storm ? 62 : 95;
@@ -527,15 +593,62 @@
       else frame(0.4, 1.7, 0, 11.5);
     }
 
+    function gaitReact(k) { if (efx && efx.gait && efx.gait.react) efx.gait.react(k); }
     S3 = {
-      setKind: setKind, nomadObj: nomad,
+      setKind: setKind, nomadObj: nomad, hermesObj: hermes,
+      state: function () { return { hermes: [+hermes.position.x.toFixed(2), +hermes.position.z.toFixed(2)], nomad: nomad.visible, nomadLit: nomadLit, flame: flameOn, camel: camel.visible, kneel: +camelK.kneel.toFixed(2), cairn: cairnG.visible, walks: walks.length }; },
       fx: {
-        travellerComes: function () { nomad.visible = true; nomad.position.set(9, 0, -4); mover.target = { obj: nomad, x: 1.5, z: -0.3, face: Math.PI + 0.9, speed: 2.6, lamp: false }; frame(0.2, 1.6, -0.2, 8.5); },
-        travellerLeaves: function () { nomadLamp.intensity = 1.1; if (nomad.userData.setLamp) nomad.userData.setLamp(true); mover.target = { obj: nomad, x: -15, z: -22, face: null, speed: 2.2, lamp: true, hideAtEnd: true }; },
-        pour: function () { lampBoost = 1.4; if (sfx.playCelestialChime) sfx.playCelestialChime(); },
-        camelComes: function () { camel.visible = true; camel.position.set(10, 0, -7); mover.target = { obj: camel, x: 2.6, z: -2.0, face: null, speed: 2.4, prints: true }; frame(0.6, 1.6, -0.8, 9.5); },
-        camelLeads: function () { mover.target = { obj: camel, x: 7, z: -34, face: null, speed: 2.4, prints: true }; },
-        camelFades: function () { mover.fade = 1; },
+        // the traveller walks up out of the dark, his lamp dead, and stops facing Hermes
+        travellerComes: function () {
+          nomad.visible = true; nomad.position.set(9, 0, -4); nomad.rotation.y = 1.95; nomadLampOn(false);
+          walkTo(nomad, 1.5, -0.3, { speed: 1.7, face: function () { return faceTo(nomad, hermes); } });
+          frame(0.2, 1.6, -0.2, 8.5);
+        },
+        // he bows if his lamp is burning again, nods if it is not, and walks on into the dark
+        travellerLeaves: function () {
+          if (nomad.userData.react) nomad.userData.react(nomadLit ? 'bow' : 'nod');
+          later(nomadLit ? 1.9 : 1.1, function () { walkTo(nomad, -15, -22, { speed: 1.5, hideAtEnd: true }); });
+        },
+        // Hermes steps up, holds his flask out over the nomad's lamp and pours: the nomad's lamp takes the flame.
+        // With 'all', the last drop leaves his own lantern dry, and it gutters out.
+        pour: function (how) {
+          // round the far side of the fire (it stands at -0.2, 0.9), to arm's length of the nomad
+          walkTo(hermes, 0.45, -0.35, { speed: 1.1, face: function () { return faceTo(hermes, nomad); }, then: function () {
+            gaitReact('offer');
+            later(0.9, function () { nomadLampOn(true); lampBoost = 0.6; cue('shimmer', { deg: 4 }); if (nomad.userData.react) nomad.userData.react('nod'); });
+            if (how === 'all') later(1.9, lampDie);
+          } });
+        },
+        hermesBow: function () { gaitReact('bow'); },
+        hermesKneel: function () { gaitReact('kneel'); },
+        hermesMeasure: function () { gaitReact('offer'); },
+        hermesCall: function () { gaitReact('cheer'); later(0.5, function () { if (camel.visible && !camelK.fade) { camelK.fade = 1; cue('whoosh', { dur: 1.2 }); } }); },
+        camelComes: function () {
+          camel.visible = true; camelReset(); camel.position.set(10, 0, -7); camel.rotation.y = 2.2;
+          walkTo(camel, 2.6, -2.0, { speed: 1.6, prints: true, face: function () { return faceTo(camel, hermes); } });
+          frame(0.6, 1.6, -0.8, 9.5); cue('shimmer', { deg: 2 });
+        },
+        camelLeads: function (how) {
+          if (how === 'follow') {
+            // it turns and walks to the toppled cairn; Hermes follows its prints, and the camera follows him
+            cairnG.visible = true;
+            walkTo(camel, CAIRN_AT.x - 0.5, CAIRN_AT.z + 1.7, { speed: 1.35, prints: true, face: function () { return faceTo(camel, cairnG); } });
+            later(1.3, function () { followCam = true; walkTo(hermes, CAIRN_AT.x - 1.7, CAIRN_AT.z + 3.4, { speed: 1.3, face: function () { return faceTo(hermes, cairnG); } }); });
+          } else {
+            // a straight line toward the dawn: 14° east of north, as far as the eye can see
+            var a = 14 * Math.PI / 180;
+            walkTo(camel, camel.position.x + Math.sin(a) * 40, camel.position.z - Math.cos(a) * 40, { speed: 1.7, prints: true });
+            frame(2.2, 1.8, -5, 13);
+          }
+        },
+        camelKneels: function () { later(0.4, function () { camelK.kneel = 0.0001; }); later(2.6, function () { camelK.fade = 1; cue('whoosh', { dur: 1.4 }); }); },
+        camelFades: function () { if (!camelK.fade) camelK.fade = 1; },
+        // Hermes walks the bearing Silvia gave him (0 = straight at the Pole Star, + to the east), the camera with him
+        walkBearing: function (deg) {
+          var a = (deg || 0) * Math.PI / 180;
+          walkTo(hermes, hermes.position.x + Math.sin(a) * 9, hermes.position.z - Math.cos(a) * 9, { speed: 1.15 });
+          followCam = true;
+        },
         lookNorth: function () { frame(0.2, 3.6, 0, 11); },
         lookAhead: function () { frame(0.4, 1.7, 0, 11.5); }
       }
@@ -558,8 +671,17 @@
       lampBoost *= Math.pow(0.35, dt);
       Hh.lamp.getWorldPosition(tmp);
       lampLight.position.copy(tmp);
-      lampLight.intensity = flameOn ? (1.5 + 0.2 * Math.sin(t * 11) + 0.1 * Math.sin(t * 23)) * (1 + lampBoost) : 0;
-      Hh.flame.scale.set(1 + 0.08 * Math.sin(t * 9), 1.35 + 0.12 * Math.sin(t * 13 + 1) + lampBoost * 0.5, 1);
+      // the lantern gutters: it flickers hard, shrinks and goes out
+      if (lampDying > 0) {
+        lampDying = Math.max(0, lampDying - dt / 1.8);
+        lampK = lampDying * (0.65 + 0.35 * Math.abs(Math.sin(t * 19)));
+        if (lampDying === 0) { flameOn = false; Hh.flame.visible = false; lampK = 0; }
+      }
+      lampLight.intensity = flameOn ? (1.5 + 0.2 * Math.sin(t * 11) + 0.1 * Math.sin(t * 23)) * (1 + lampBoost) * lampK : 0;
+      Hh.flame.scale.set((1 + 0.08 * Math.sin(t * 9)) * Math.max(0.05, lampK), (1.35 + 0.12 * Math.sin(t * 13 + 1) + lampBoost * 0.5) * Math.max(0.05, lampK), 1);
+      // the nomad's lamp: dark until the oil is poured, then a small gold flame that swings with him
+      nomadLampK += ((nomadLit && nomad.visible ? 1 : 0) - nomadLampK) * Math.min(1, dt * 2.5);
+      nomadLamp.intensity = nomadLampK * (1.05 + 0.12 * Math.sin(t * 10.3));
       if (!(efx && efx.gait)) { Hh.lamp.rotation.z = Math.sin(t * 1.3) * 0.04; Hh.cloak.scale.y = 1 + Math.sin(t * 1.1) * 0.004; }
       if (camp.visible) camp.userData.update(t, 0.7, 1);
       nomad.userData.update && nomad.visible && nomad.userData.update(t);
@@ -567,39 +689,60 @@
       ringH.material.opacity += ((spH ? pulse : 0) - ringH.material.opacity) * Math.min(1, dt * 8);
       ringN.material.opacity += ((spN && nomad.visible ? pulse : 0) - ringN.material.opacity) * Math.min(1, dt * 8);
       ringN.position.set(nomad.position.x, 0.03, nomad.position.z);
-      if (nomad.userData.speak) { nomad.userData.speak(spN && nomad.visible); nomad.userData.look(mover.target && mover.target.obj === nomad && mover.target.hideAtEnd ? null : { x: hermes.position.x, y: 2.1, z: hermes.position.z }); }
+      ringH.position.set(hermes.position.x, 0.03, hermes.position.z);
+      if (nomad.userData.speak) { nomad.userData.speak(spN && nomad.visible); nomad.userData.look(walks.some(function (w) { return w.obj === nomad && w.hideAtEnd; }) ? null : { x: hermes.position.x, y: 2.1, z: hermes.position.z }); }
       if (efx && efx.gait && efx.gait.speak) { efx.gait.speak(speaking === 'hermes'); hermes.position.y = 0; }
       else hermes.position.y = spH ? 0.02 * Math.abs(Math.sin(t * 8)) : 0;
       if (efx) {
         // he looks at the traveller while he is there, and at the fire otherwise
-        if (efx.gait) efx.gait.look(nomad.visible ? { x: nomad.position.x, y: 2.2, z: nomad.position.z } : { x: camp.position.x, y: 0.6, z: camp.position.z });
+        // he looks at the night's visitor while it is there, ahead while he walks, and at the fire otherwise
+        var hw = walks.some(function (w) { return w.obj === hermes; });
+        if (efx.gait) efx.gait.look(camel.visible && !camelK.fade ? { x: camel.position.x, y: 2.4, z: camel.position.z } : nomad.visible ? { x: nomad.position.x, y: 2.2, z: nomad.position.z } : hw ? null : camp.visible ? { x: camp.position.x, y: 0.6, z: camp.position.z } : null);
         efx.frame(dt, camera);
       }
-      nomadLamp.position.set(nomad.position.x - 0.4, 1.4, nomad.position.z + 0.3);
-      // walkers: the nomad slides on, the camel strides and leaves prints
-      var m = mover.target;
-      if (m) {
-        var o = m.obj, dx = m.x - o.position.x, dz = m.z - o.position.z, d = Math.hypot(dx, dz);
-        if (d > 0.08) {
-          var step = Math.min(d, m.speed * dt);
+      nomad.updateMatrixWorld(); nomadLamp.position.set(-0.4, 1.4, 0.3).applyMatrix4(nomad.matrixWorld);
+      // the timeline, then the walkers: each turns into its path, strides there and turns to what it should face
+      for (var ti = timers.length - 1; ti >= 0; ti--) { timers[ti].t -= dt; if (timers[ti].t <= 0) { var tfn = timers[ti].fn; timers.splice(ti, 1); tfn(); } }
+      var camelWalking = false;
+      walks.slice().forEach(function (w) {
+        var o = w.obj, dx = w.x - o.position.x, dz = w.z - o.position.z, d = Math.hypot(dx, dz);
+        var face = typeof w.face === 'function' ? w.face() : w.face;
+        if (d > 0.06) {
+          var step = Math.min(d, w.speed * dt);
           o.position.x += dx / d * step; o.position.z += dz / d * step;
-          var want = m.face != null && d < 2.4 ? m.face : Math.atan2(-dx, -dz);
-          o.rotation.y += (((want - o.rotation.y + Math.PI * 3) % (Math.PI * 2)) - Math.PI) * Math.min(1, dt * 4);
-          if (o === camel) {
-            camel.userData.legs.forEach(function (l) { var a = Math.sin(t * 5.5 + l.ph); l.leg.rotation.x = a * 0.5; l.lo.rotation.x = Math.max(0, -a) * 0.7; });
-            camel.position.y = Math.abs(Math.sin(t * 5.5)) * 0.04;
-          } else if (!o.userData.life) o.position.y = Math.abs(Math.sin(t * 6)) * 0.03;   // the nomad walks on his own legs now
-          mover.stride += step;
-          if (m.prints && mover.stride > 1.0) { mover.stride = 0; mover.side *= -1; dropPrint(camel.position.x, camel.position.z, camel.rotation.y, mover.side); }
-        } else {
-          if (o === camel) camel.userData.legs.forEach(function (l) { l.leg.rotation.x *= 0.9; l.lo.rotation.x *= 0.9; });
-          if (m.hideAtEnd) { o.visible = false; m.hideAtEnd = false; nomadLamp.intensity = 0; if (nomad.userData.setLamp) nomad.userData.setLamp(false); }
+          var want = face != null && d < 1.0 ? face : Math.atan2(-dx, -dz);
+          o.rotation.y += adiff(want, o.rotation.y) * Math.min(1, dt * 4);
+          if (o === camel) camelWalking = true;
+          w.stride += step;
+          if (w.prints && w.stride > 1.0) { w.stride = 0; printSide *= -1; dropPrint(o.position.x, o.position.z, o.rotation.y, printSide); }
+          return;
         }
+        if (face != null && Math.abs(adiff(face, o.rotation.y)) > 0.04) { o.rotation.y += adiff(face, o.rotation.y) * Math.min(1, dt * 4); return; }
+        walks.splice(walks.indexOf(w), 1);
+        if (w.hideAtEnd) { o.visible = false; if (o === nomad) nomadLampOn(false); }
+        if (w.then) w.then();
+      });
+      // the camel of moonlight: legs that stride, then fold as it kneels; then it melts into the dark
+      var legsC = camel.userData.legs;
+      if (camelK.kneel > 0) {
+        camelK.kneel = Math.min(1, camelK.kneel + dt / 1.5);
+        var kk = camelK.kneel * camelK.kneel * (3 - 2 * camelK.kneel);
+        camel.position.y = -0.72 * kk;
+        legsC.forEach(function (l, i) { var front = i < 2; l.leg.rotation.x = (front ? 0.55 : -0.7) * kk; l.lo.rotation.x = (front ? -2.3 : 2.1) * kk; });
+      } else if (camelWalking) {
+        legsC.forEach(function (l) { var a = Math.sin(t * 5.5 + l.ph); l.leg.rotation.x = a * 0.5; l.lo.rotation.x = Math.max(0, -a) * 0.7; });
+        camel.position.y = Math.abs(Math.sin(t * 5.5)) * 0.04;
+      } else legsC.forEach(function (l) { l.leg.rotation.x *= 0.9; l.lo.rotation.x *= 0.9; });
+      if (camelK.fade > 0) {
+        camelK.fade = Math.max(0, camelK.fade - dt * 0.7);
+        camel.userData.mats[0].opacity = 0.36 * camelK.fade; camel.userData.mats[1].opacity = 0.12 * camelK.fade;
+        if (camelK.fade === 0) { camel.visible = false; walks = walks.filter(function (w) { return w.obj !== camel; }); camelReset(); }
       }
-      if (mover.fade) {
-        mover.fade = Math.max(0, mover.fade - dt * 0.8);
-        camel.userData.mats[0].opacity = 0.36 * mover.fade; camel.userData.mats[1].opacity = 0.12 * mover.fade;
-        if (mover.fade === 0) { camel.visible = false; camel.userData.mats[0].opacity = 0.36; camel.userData.mats[1].opacity = 0.12; mover.target = null; }
+      // the camera keeps Hermes in the shot while he walks away from the fire
+      if (followCam && orbitCtl) {
+        var fx2 = hermes.position.x, fz2 = hermes.position.z;
+        if (camel.visible) { fx2 = (fx2 + camel.position.x) / 2; fz2 = (fz2 + camel.position.z) / 2; }
+        orbitCtl.setTarget(fx2, 1.6, fz2);
       }
       prints.forEach(function (p) { if (p.userData.life > 0) { p.userData.life = Math.max(0, p.userData.life - dt * 0.18); p.material.opacity = 0.7 * p.userData.life; if (!p.userData.life) p.visible = false; } });
       if (windDust.material.opacity > 0 && !reducedMotion) {
@@ -620,7 +763,8 @@
     if (!bubbleEl || !bubbleWho || !S3 || !camera) return;
     if (!tmpV) tmpV = new T.Vector3();
     if (bubbleWho === 'nomad') S3.nomadObj.localToWorld(tmpV.set(0, 2.4, 0));
-    else tmpV.set(bubbleWho === 'silvia' ? -2.3 : -1.5, bubbleWho === 'silvia' ? 3.0 : 2.45, 0.4);
+    else if (bubbleWho === 'silvia') S3.hermesObj.localToWorld(tmpV.set(-0.8, 2.75, 0));
+    else S3.hermesObj.localToWorld(tmpV.set(0, 2.2, 0));
     tmpV.project(camera);
     var W = canvas.clientWidth, Ht = canvas.clientHeight;
     if (tmpV.z > 1) { bubbleEl.style.opacity = '0'; return; }
@@ -682,10 +826,14 @@
 
   if (closeBtn) closeBtn.addEventListener('click', function () { close(ns.stage === 'done'); });
   if (finishBtn) finishBtn.addEventListener('click', function () { close(true); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.style.display !== 'none') close(ns.stage === 'done'); });
+  function onTop() {
+    var el = document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2);
+    return !el || modal.contains(el);
+  }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.style.display !== 'none' && onTop()) close(ns.stage === 'done'); });
 
   // Station 14 asks: has the road's night been lived yet?
   window.needsNightErg = function () { return !!Road && !Road.nightDone(); };
   window.openNightErgModal = open;
-  window.__nightErg = { kinds: Object.keys(NIGHTS), kindFor: function (f) { return Road.nightKind(f); }, fast: function () { chat.fast = true; window.__nightFast = true; } };
+  window.__nightErg = { kinds: Object.keys(NIGHTS), kindFor: function (f) { return Road.nightKind(f); }, fast: function () { chat.fast = true; window.__nightFast = true; }, pick: function (id) { return pick(id); }, state: function () { return S3 && S3.state ? Object.assign({ stage: ns.stage, kind: ns.kind }, S3.state()) : { stage: ns.stage, kind: ns.kind }; } };
 })();

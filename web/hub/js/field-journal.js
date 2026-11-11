@@ -106,7 +106,7 @@
 
       // Misses and Hermes's notes, summed over the game's puzzles on the hint ladder
       // The two games with three hearts keep how many times Hermes had to begin again (tries - 1)
-      var WALK_STATE = { playa: 'order_playa_walk', lexicon: 'order_lexicon_walk' };
+      var WALK_STATE = { playa: 'order_playa_walk', lexicon: 'order_lexicon_walk', s14: 'order_monolith_walk' };
       function restarts(id) {
         var s = null;
         try { s = JSON.parse(get(WALK_STATE[id]) || 'null'); } catch (e) { s = null; }

@@ -8,6 +8,9 @@
 
   window.GatesExtras = function (c) {
     var ds = c.ds, nar = c.nar, H = c.sayH, S = c.sayS, V = c.sayV, look = c.look, R = c.R;
+    // the people on the stairs (walk, bow, hand over): a no-op when the scene has no 3D
+    function A() { return (c.act && c.act()) || null; }
+    function react(who, kind) { var a = A(); if (a) a.react(who, kind); }
 
     // The Servant's truth, cut in the lintel of every Order gate (what makes his "dawn" a lie)
     var LINTEL = 'OPEN AT THE SETTING OF THE SUN';
@@ -32,7 +35,7 @@
         S('Dusk. Yes. The founders cut it over every door.'),
         S('The Oracle’s keepers must tell every visitor one lie. Most nod, and thank me.'),
         S('You did not. You looked.'),
-        nar('He presses a small bronze coin into Hermes’s palm. It is cut with a half-lit disc and a notch like a keyhole.', { fx: function () { c.giveRelic('servant_coin'); } }),
+        nar('He presses a small bronze coin into Hermes’s palm. It is cut with a half-lit disc and a notch like a keyhole.', { hold: 1500, fx: function () { c.giveRelic('servant_coin'); if (c.handOver) c.handOver(); } }),
         S('Keep it. If ever you cannot find me, listen for stone that knocks.'),
         H('A coin for a caught lie. I will keep it close, elder.')
       ];
@@ -41,7 +44,7 @@
     function wrongChallenge(why) {
       return [
         H('Elder... Silvia doubts your word.'),
-        nar('The iron staff strikes the step once. The braziers flinch.'),
+        nar('The iron staff strikes the step once. The braziers flinch.', { fx: function () { react('servant', 'startle'); if (c.cue) c.cue('thud'); if (c.shake) c.shake(0.5); c.fireBurst(0.5); } }),
         S(why),
         S('You call a true thing false. I will not be called a liar twice.'),
         H('Silvia... that was a mistake. He has turned his back on us.')
@@ -89,7 +92,7 @@
       statue_read: {
         icon: '🗿', label: 'Read the plinths of the stone keepers.', say: 'Hermes, look at the foot of the statues. Is anything written there?',
         lines: function () { return [
-          nar('Hermes crosses to the niches and wipes the dust from two worn plinths.', { fx: look('statues') }),
+          nar('Hermes crosses to the niches and wipes the dust from two worn plinths.', { hold: 1500, fx: function () { look('statues')(); var a = A(); if (a) a.walk('hermes', -3.85, 1.25, { speed: 1.1, face: a.faceTo('hermes', -4.7, 0.2), then: function () { react('hermes', 'kneel'); } }); } }),
           H('Two hollows in the stone, round, empty. And words, very faint.'),
           nar('Left plinth: “I weigh the noon. When the shadow is shortest, I stand guard.”'),
           nar('Right plinth: “I write the hour at the water’s edge, on a bill like a pen. Wading, I wait.”'),
@@ -105,7 +108,7 @@
       sr_fi: {
         icon: '🪶', label: 'The Falcon and the Ibis.', say: 'The falcon, for noon. And the ibis, who writes the hour. The falcon and the ibis.',
         lines: function () { return [
-          nar('Dust trickles from the stone hands. The left hollow glows faintly, where a falcon would sit. Then the right.'),
+          nar('Dust trickles from the stone hands. The left hollow glows faintly, where a falcon would sit. Then the right.', { fx: function () { c.fireBurst(0.6); if (c.cue) c.cue('reveal'); } }),
           nar('The statues do not move. But something in the stone has woken.', { fx: look('statues') }),
           H('The falcon is in my satchel already: the brass weight from the spring.'),
           H('The ibis... I have never held one. We will need it when we return with five seals.'),
@@ -128,7 +131,7 @@
         icon: '⚖️', label: 'Challenge him to a riddle duel instead.', say: 'Hermes, tell him I will not take his test. I challenge him: riddle for riddle.',
         lines: function () { return [
           H('Elder... my companion refuses your question. She asks for a duel instead.'),
-          nar('The old man’s eyebrows rise. For a long moment only the braziers speak.'),
+          nar('The old man’s eyebrows rise. For a long moment only the braziers speak.', { fx: function () { react('servant', 'startle'); } }),
           S('A duel. Nobody has asked in thirty years.'),
           S('Three riddles. Win two, and you skip my test. I will even answer one thing, truly.'),
           S('And if I win?'),
@@ -143,7 +146,7 @@
         lines: function () { return [
           H('We accept, elder.'),
           S('Then we begin.'),
-          nar('He plants the iron staff. The star-sight catches the last of the light.', { fx: look('staff') }),
+          nar('He plants the iron staff. The star-sight catches the last of the light.', { fx: function () { look('staff')(); if (c.cue) c.cue('stone'); } }),
           S('First riddle. I have iron bowls and I drink oil. I wear tongues of fire.'),
           S('Count the tongues on my landing: how many of me burn?', { fx: look('fire') })
         ]; },
@@ -253,7 +256,7 @@
       } else {
         out.push(nar('The old man lowers his staff, almost kindly.'),
           S('Two wins were the price. You have ' + (s === 1 ? 'one' : 'none') + '.'),
-          nar('He takes the little flask from Hermes’s belt and empties it into his dying fire.', { fx: function () { c.fireBurst(1.5); } }),
+          nar('He takes the little flask from Hermes’s belt and empties it into his dying fire.', { hold: 2200, fx: function () { if (c.feedFire) c.feedFire('servant'); else c.fireBurst(1.5); } }),
           S('The oil is mine. Now the test, as it was always going to be.'),
           S(c.STAFF_Q, { fx: look('staff') }),
           H('My lantern is gone, Silvia. The night walk will be black.'));
@@ -323,13 +326,13 @@
     }
 
     function fitLines() {
-      var out = [nar('Hermes climbs the steps. The first seal still glows in its socket, high in the arch, where he fitted it at dusk.')];
+      var out = [nar('Hermes climbs the steps. The first seal still glows in its socket, high in the arch, where he fitted it at dusk.', { hold: 1000, fx: function () { look('arch')(); var a = A(); if (a) a.walk('hermes', -1.0, 1.35, { speed: 1.0, face: a.faceTo('hermes', -0.6, -2) }); } })];
       [2, 3, 4, 5].forEach(function (i) {
-        out.push(nar('The seal of ' + SEAL_NAMES[i] + ' goes into its socket and turns.', { fx: function () { c.fitSeals(i); } }));
+        out.push(nar('The seal of ' + SEAL_NAMES[i] + ' goes into its socket and turns.', { fx: function () { react('hermes', 'offer'); c.fitSeals(i); } }));
       });
       out.push(
         S('Five. The arch has not held five since the earthquake.'),
-        nar('All five sockets burn the same amber, and the whole arch hums like a struck bell.'),
+        nar('All five sockets burn the same amber, and the whole arch hums like a struck bell.', { fx: function () { c.fireBurst(1.0); if (c.cue) c.cue('bell', { f: 196, v: 0.5, len: 5 }); } }),
         H('The doors have not moved yet, Silvia.'));
       return out;
     }
@@ -352,24 +355,41 @@
 
     function keepersLines() {
       return [
-        nar('Hermes carries the brass falcon to the left niche and sets it in the round hollow. It fits with a small, dry click.'),
-        nar('The brass ibis goes into the right. For a moment both stone keepers seem to breathe.', { fx: function () { c.fireBurst(1.2); } }),
+        nar('Hermes carries the brass falcon to the left niche and sets it in the round hollow. It fits with a small, dry click.', { hold: 1200, fx: function () { var a = A(); if (a) a.walk('hermes', -3.85, 1.25, { speed: 1.1, face: a.faceTo('hermes', -4.7, 0.2), then: function () { react('hermes', 'offer'); if (c.cue) c.cue('click'); } }); } }),
+        nar('The brass ibis goes into the right. For a moment both stone keepers seem to breathe.', { hold: 1600, fx: function () { var a = A(); if (a) a.walk('hermes', 0.95, 2.35, { speed: 1.3, then: function () { a.walk('hermes', 3.85, 1.25, { speed: 1.3, face: a.faceTo('hermes', 4.7, 0.2), then: function () { react('hermes', 'offer'); c.fireBurst(1.2); if (c.cue) c.cue('click'); } }); } }); else c.fireBurst(1.2); } }),
         S('Who read their plinths? They have asked for those two figures for fifty years. No one ever looked at the stone.'),
         nar('A stone disc slides from the base of the niches: a falcon and an ibis, face to face under a rising sun.', { fx: function () { c.giveRelic('statue_seal'); } }),
-        H('A sixth seal, Silvia. It opens nothing the five did not. But look at his face.')];
+        H('A sixth seal, Silvia. It opens nothing the five did not. But look at his face.', { fx: function () { var a = A(); if (a) a.walk('hermes', 0.95, 2.35, { speed: 1.2, then: function () { a.walk('hermes', -1.0, 1.38, { speed: 1.2, face: a.faceTo('hermes', -0.6, -2) }); } }); } })];
     }
 
     // how the bronze doors open, by what the road was
     function openingLines(ending) {
-      var open = function () { c.openDoors(1); };
+      // each road opens the doors its own way (see openDoors in s13b-gates-tower-ii.js); the humble road is a little
+      // ceremony: he comes down to Hermes, bows, goes back up and opens the leaves with his own hands
+      var open = function () {
+        var a = A();
+        if (ending === 'humble' && a) {
+          var h = a.where('hermes');
+          a.walk('servant', h.x + 0.95, h.z - 0.35, { speed: 0.85, face: function () { var w = a.where('hermes'), me = a.where('servant'); return Math.atan2(-(w.x - me.x), -(w.z - me.z)); }, then: function () {
+            react('servant', 'bow'); a.later(0.7, function () { react('hermes', 'bow'); });
+            a.later(2.4, function () { a.walk('servant', 0.15, 0.55, { speed: 0.85, face: 0, then: function () { react('servant', 'offer'); c.openDoors('humble'); a.later(2.2, function () { a.walk('servant', 1.5, 0.75, { speed: 0.8, face: 2.6 }); }); } }); });
+          } });
+        } else if (ending === 'trusted' && a) {
+          // Hermes steps back to the right so the little door is seen; the old man opens it and holds it, beside it
+          a.walk('hermes', 0.55, 1.75, { speed: 1.0, face: a.faceTo('hermes', -1.1, 0.3) });
+          a.walk('servant', -0.45, 0.7, { speed: 0.9, face: 0, then: function () { react('servant', 'offer'); c.openDoors('trusted'); a.later(1.6, function () { a.walk('servant', -0.25, 0.85, { speed: 0.7, face: a.faceTo('servant', 0.55, 1.75) }); }); } });
+        } else if (ending === 'bold') { react('servant', 'startle'); c.openDoors('bold'); }
+        else if (ending === 'observer') { react('servant', 'offer'); c.openDoors('observer'); }
+        else c.openDoors(ending === 'humble' || ending === 'trusted' ? ending : 'keepers');
+      };
       var out;
       if (ending === 'keepers') out = [
-        nar('Before the old man can lift his staff, the two stone keepers turn their heads toward the doors. The brass falcon and the brass ibis begin to glow.', { fx: function () { c.fireBurst(1.4); } }),
+        nar('Before the old man can lift his staff, the two stone keepers turn their heads toward the doors. The brass falcon and the brass ibis begin to glow.', { fx: function () { react('servant', 'startle'); c.fireBurst(1.4); } }),
         nar('On each bronze leaf a half of the Order’s sign slides toward the middle. They meet. The half-lit disc is whole at last.', { fx: open }),
         S('I have kept these doors a long time. I have never seen them open like this.'),
         H('We were right to read the plinths, Silvia.')];
       else if (ending === 'trusted') out = [
-        nar('The old man does not touch the great doors. He opens a small wicket cut into the left leaf, and holds it.', { fx: open }),
+        nar('The old man does not touch the great doors. He opens a small wicket cut into the left leaf, and holds it.', { hold: 1500, fx: open }),
         S('Those who hear a secret use the small door. The founders cut it for the ones who are trusted.'),
         H('A little door, Silvia, and a whole life behind it.')];
       else if (ending === 'bold') out = [
@@ -381,7 +401,7 @@
         S('You looked at everything before you spoke. Look at this.'),
         H('A long hall of mirrors and morning light, Silvia. And the stone keepers follow me with their eyes.')];
       else out = [
-        nar('The old man comes down from the top step for the first time, and bows to Hermes. Then he lays both hands on the leaves.', { fx: open }),
+        nar('The old man comes down from the top step for the first time, and bows to Hermes. Then he lays both hands on the leaves.', { hold: 3500, fx: open }),
         S('Enter, travellers. This house is yours.'),
         H('He bowed first, Silvia.')];
       if (ds.flags.coin && ending !== 'keepers') out.push(S('The coin has done its work. Keep it as a memory.'));
