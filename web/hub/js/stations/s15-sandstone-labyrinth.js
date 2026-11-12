@@ -248,7 +248,7 @@
 
         // Labels around the board
         b.appendChild(svgText(cx(sx), -4, 'CAIRN III', { fill: '#fde68a', 'font-size': 4.2, 'letter-spacing': 0.4 }));
-        b.appendChild(svgText(65, LEVEL.rows * CELL + 7, 'THE SOUTHERN MOUTH · RAIDERS', { fill: '#fb923c', 'font-size': 3.6, 'letter-spacing': 0.3 }));
+        b.appendChild(svgText(65, LEVEL.rows * CELL + 7, 'RAIDERS AT THE SOUTHERN MOUTH ↓', { fill: '#fb923c', 'font-size': 3.6, 'letter-spacing': 0.3 }));
         b.appendChild(svgText(0, LEVEL.rows * CELL + 13, 'THE WESTERN CLEFT ⇧', { fill: '#86efac', 'font-size': 3.6, 'text-anchor': 'start', 'letter-spacing': 0.3 }));
       }
 
@@ -259,7 +259,7 @@
       const wz = (y) => (y - (LEVEL.rows - 1) / 2) * S;
       const faceYaw = (dx, dz) => Math.atan2(-dx, -dz);
       const CLEFT = { x: wx(LEVEL.exit[0]) - S * 1.25, z: wz(LEVEL.exit[1]) };
-      const CAIRN = { x: wx(LEVEL.start[0]), z: wz(LEVEL.start[1]) - S * 0.28 };
+      const CAIRN = { x: wx(LEVEL.start[0]), z: wz(LEVEL.start[1]) - S * 0.36 };
       let G = null, raf = 0, lastT = 0, cine = null, howtoPage = 0;
       const view = { snapNext: true, ending: 0, prevLives: LIVES, sigilT: 0, hover: -1, wasDone: false };
 
@@ -356,13 +356,23 @@
 
         // ---- Cairn III at the head of the labyrinth: dry stone in three steps, and two copper plates on its face ----
         const cairn = new T.Group();
-        [[2.0, 0.55, 1.6, 0.275], [1.55, 0.55, 1.25, 0.82], [1.05, 0.5, 0.9, 1.34]].forEach(([w, h, d, y]) => {
-          const b = new T.Mesh(new T.BoxGeometry(w, h, d), stoneMat); b.position.y = y; b.castShadow = true; b.receiveShadow = true; cairn.add(b);
+        // four courses of dry stone, each a little smaller, so the pyramid reads as laid by hand (page “The Five Geodetic Cairns”)
+        const PYR_H = 1.9, PYR_HALF = 0.82, slope = Math.atan2(PYR_HALF, PYR_H);
+        [[0, 0.5], [0.5, 0.98], [0.98, 1.42], [1.42, PYR_H]].forEach(([y0, y1], n) => {
+          const r0 = PYR_HALF * (1 - y0 / PYR_H) * Math.SQRT2, r1 = Math.max(0.02, PYR_HALF * (1 - y1 / PYR_H) * Math.SQRT2);
+          const course = new T.Mesh(new T.CylinderGeometry(r1, r0, y1 - y0 - 0.03, 4, 1), stoneMat);
+          course.rotation.y = Math.PI / 4 + (n % 2 ? 0.04 : -0.03); course.position.y = (y0 + y1) / 2;
+          course.castShadow = true; course.receiveShadow = true; cairn.add(course);
         });
-        const capStone = new T.Mesh(new T.DodecahedronGeometry(0.34, 0), stoneMat); capStone.position.y = 1.78; capStone.castShadow = true; cairn.add(capStone);
+        const faceZ = (y) => PYR_HALF * (1 - y / PYR_H) + 0.03;
         const copperMat = paint({ color: 0xb8683a, emissive: 0xff8a3c, emissiveIntensity: 0.05 });
-        const plate = new T.Mesh(new T.BoxGeometry(0.7, 0.42, 0.05), copperMat); plate.position.set(0, 0.82, 0.66); cairn.add(plate);
-        const oldPlate = new T.Mesh(new T.BoxGeometry(0.9, 0.3, 0.04), paint({ color: 0x8a4a28, emissive: 0xffb14a, emissiveIntensity: 0 })); oldPlate.position.set(0, 0.3, 0.82); cairn.add(oldPlate);
+        // Hermes's own 1998 benchmark: a round copper plate on the south face
+        const plate = new T.Mesh(new T.CylinderGeometry(0.27, 0.27, 0.04, 28), copperMat);
+        plate.rotation.x = Math.PI / 2 - slope; plate.position.set(0, 0.98, faceZ(0.98)); cairn.add(plate);
+        // the founders' older plate below it, with its eight letter slots: it turns on a pin when the sigil is spoken
+        const oldPlate = new T.Mesh(new T.CylinderGeometry(0.34, 0.34, 0.035, 8), paint({ color: 0x8a4a28, emissive: 0xffb14a, emissiveIntensity: 0 }));
+        oldPlate.geometry.rotateX(Math.PI / 2);
+        const oldPin = new T.Group(); oldPin.rotation.x = -slope; oldPin.position.set(0, 0.38, faceZ(0.38)); oldPin.add(oldPlate); cairn.add(oldPin);
         const sealHalo = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffd27a, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
         sealHalo.scale.set(2.6, 2.6, 1); sealHalo.position.set(0, 0.85, 0.9); cairn.add(sealHalo);
         cairn.position.set(CAIRN.x, 0, CAIRN.z);
@@ -535,8 +545,9 @@
         const done = isDone();
         const ex = wx(LEVEL.exit[0]), ez = wz(LEVEL.exit[1]);
         const wave = (x, z) => (view.ending ? Math.hypot(x - ex, z - ez) * 0.035 : 0);
-        G.tiles.forEach((t, i) => setRise(G.tiles, i, done || seen.has(i), wave(t.x, t.z)));
-        G.plan.segs.forEach((s, i) => setRise(G.plan.segs, i, done || s.cells.some((k) => seen.has(k)), wave(s.x, s.z)));
+        const all = done || view.cineAll;
+        G.tiles.forEach((t, i) => setRise(G.tiles, i, all || seen.has(i), wave(t.x, t.z)));
+        G.plan.segs.forEach((s, i) => setRise(G.plan.segs, i, all || s.cells.some((k) => seen.has(k)), wave(s.x, s.z)));
         G.plan.pillars.forEach((p, i) => setRise(G.plan.pillars, i, p.segs.some((s) => G.plan.segs[s].goal > 0), wave(p.x, p.z) + 0.05));
       }
       function writeInstances(force) {
@@ -696,8 +707,9 @@
         if (cf) { p = cf.p; l = cf.l; snap = true; }
         else {
           let tx, tz, dist, pitch, yaw = 0;
-          if (view.ending || (isDone() && view.overview)) { tx = 0; tz = 1; dist = 44; pitch = 1.12; }
-          else if (!isAwake()) { tx = CAIRN.x; tz = CAIRN.z + 0.4; dist = 9; pitch = 0.8; yaw = 0.35; }
+          if (view.ending || (isDone() && view.overview)) { tx = -3; tz = 2.5; dist = 44; pitch = 1.12; }
+          // at the cairn, from the side so Hermes never hides the plates; it stays there while the old plate turns
+          else if (!isAwake() || (view.sigilT && performance.now() - view.sigilT < 2400)) { tx = CAIRN.x; tz = CAIRN.z + 0.5; dist = 5.4; pitch = 1.12; yaw = -1.0; }
           else {
             c.dist += (c.tDist - c.dist) * Math.min(1, dt * 6); c.pitch += (c.tPitch - c.pitch) * Math.min(1, dt * 6);
             tx = G.hermes ? G.hermes.position.x : wx(run.x); tz = G.hermes ? G.hermes.position.z : wz(run.y); dist = c.dist; pitch = c.pitch;
@@ -716,7 +728,7 @@
       function openingShots() {
         return [
           { from: { p: [0, 58, 44], l: [0, 0, 0] }, to: { p: [0, 40, 30], l: [0, 0, -2] }, dur: 6, kicker: 'STATION 15', title: 'THE SANDSTONE LABYRINTH', line: 'Night over the Sandstone Labyrinth. Far below, four torches move between the pillars.' },
-          { from: { p: [6, 6, 24], l: [3, 1, 10] }, to: { p: [2, 5, 21], l: [3, 1.2, 8] }, dur: 5, line: 'The BC Ashes followed Hermes in. They have been waiting here for days, for someone to open the cairn.' },
+          { from: { p: [6, 6, 24], l: [3, 1, 10] }, to: { p: [2, 5, 21], l: [3, 1.2, 8] }, dur: 5, line: 'The BC Ashes got here first. They have been camped in the fissures for days, waiting for someone to open the cairn.' },
           { from: { p: [CAIRN.x + 5, 3.2, CAIRN.z + 7], l: [CAIRN.x, 1, CAIRN.z] }, to: { p: [CAIRN.x + 3, 2.4, CAIRN.z + 5], l: [CAIRN.x, 1.1, CAIRN.z] }, dur: 5, line: 'And at the foot of Cairn III, his lamp turned low, Hermes.' }
         ];
       }
@@ -750,6 +762,8 @@
         const sk = view.sigilT ? Math.max(0, 1 - (now - view.sigilT) / 2600) : 0;
         G.copperMat.emissiveIntensity = isAwake() ? 0.2 + 0.6 * sk : 0.22 + (rm ? 0 : 0.06 * Math.sin(t * 2));
         G.oldPlate.material.emissiveIntensity = isAwake() ? 0.3 + 0.5 * sk : 0.16;
+        const turn = view.sigilT && !rm ? Math.min(1, (now - view.sigilT) / 1600) : 1;
+        G.oldPlate.rotation.z = isAwake() ? Math.PI * (turn * turn * (3 - 2 * turn)) : 0;
         G.sealHalo.material.opacity = sk * 0.9;
         G.starMat.emissiveIntensity = 0.12 + (rm ? 0 : 0.08 * Math.sin(t * 1.7));
         G.cleftGlow.material.opacity = (isDone() ? 0.95 : 0.6) + (rm ? 0 : 0.12 * Math.sin(t * 1.3));
@@ -797,7 +811,7 @@
         const spoken = 'Sigil spoken: ' + SIGIL + ' ✓';
         if (awake && el.keyFeedback && el.keyFeedback.textContent !== spoken) feedback(el.keyFeedback, spoken, 'ok');
         Object.values(el.pad).forEach((btn) => { if (btn) btn.disabled = !awake || done; });
-        if (el.hint) el.hint.style.display = torchHintOn() && !done ? '' : 'none';
+        if (el.hint) el.hint.style.display = 'none';   // the rounds are announced by the hint note and by Hermes
         if (el.victory) el.victory.style.display = done ? '' : 'none';
         if (el.game) el.game.style.display = done ? 'none' : '';
         syncWorld();
@@ -832,7 +846,7 @@
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'WINDROSE. The copper plate turns, and the seal is in Hermes\'s hand.', 'ok');
-        say("The plate turned under my hand, Silvia, and the Seal of Cairn III is in my palm. But there are torches at the Southern Mouth. The BC Ashes followed my tracks into the labyrinth, and I cannot go back the way I came. The founders cut another way out, the Western Cleft. Guide me there through the dark. Let the torches pass, then follow behind them.");
+        say("The plate turned under my hand, Silvia, and the Seal of Cairn III is in my palm. But those ruts were theirs, Silvia: the BC Ashes were already inside, and now their torches stand between me and the Southern Mouth. I cannot go back the way I came. The founders cut another way out, the Western Cleft, through the lower fissures. Your page shows only the true road; nobody ever drew the fissures, so my lamp will draw them for you, square by square. Guide me there through the dark. Let the torches pass, then follow behind them.");
         subtitle('The copper plate turns. The Seal of Cairn III is in his hand, and there are torches in the dark.', 5, 'act');
         if (G) {
           view.sigilT = performance.now();
@@ -980,6 +994,7 @@
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
         const k = KEYMAP[e.key];
         if (!k) return;
+        if (e.repeat) { e.preventDefault(); return; }
         if (busyOverlay()) return;
         // The space bar holds still even when a pad arrow has focus: the browser would otherwise press that arrow again
         if (k === 'wait' && e.target && e.target.tagName === 'BUTTON' && !modal.contains(e.target)) return;
@@ -1050,7 +1065,7 @@
       }
       function stopHubScroll(e) {
         const panel = el.dispatch && el.dispatch.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         if (el.howto && el.howto.contains(e.target)) return;
         if (e.target === el.canvas) return;
         e.preventDefault();
@@ -1090,7 +1105,7 @@
         view.ending = 0; view.overview = isDone(); view.sigilT = 0; view.snapNext = true;
         if (G) { G.cam.p = null; G.cam.dist = G.cam.tDist = 16; G.cam.pitch = G.cam.tPitch = 1.02; }
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am inside the labyrinth, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road, the one on the page “The Sandstone Labyrinth & Cairn III” of your journal.");
+        else if (!isAwake()) say("Silvia, I reached the Southern Mouth at noon and waited in the rocks for dark. Now I am inside, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road, the one on the page “The Sandstone Labyrinth & Cairn III” of your journal.");
         else say("The torches are still out there. Watch their rounds, Silvia, and take me to the Western Cleft.");
         render();
         // The bed starts at its own level when the modal appears; set ours once it has
@@ -1106,7 +1121,13 @@
         if (G && cine && !reduced() && !isDone() && get(CINE_INTRO) !== 'seen') {
           set(CINE_INTRO, 'seen');
           if (el.stage) el.stage.classList.add('is-cine');
-          cine.start(openingShots(), () => { if (el.stage) el.stage.classList.remove('is-cine'); finishOpen(); });
+          view.cineAll = true; view.snapNext = true; syncWorld();
+          cine.start(openingShots(), () => {
+            if (el.stage) el.stage.classList.remove('is-cine');
+            if (el.subtitle) el.subtitle.classList.remove('is-on');   // a skipped film leaves no line behind
+            view.cineAll = false; syncWorld();
+            finishOpen();
+          });
         } else finishOpen();
       }
       function closeLabyrinthModal() {

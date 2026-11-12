@@ -1105,7 +1105,7 @@
         // The reward card and the side panel may scroll. The stage and the map behind must not.
         if (reward.box && !reward.box.hidden && reward.box.contains(e.target)) return;
         const panel = el.controls && el.controls.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         e.preventDefault();
       }
       function openVisions() {

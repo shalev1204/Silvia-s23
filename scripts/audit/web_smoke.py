@@ -82,7 +82,8 @@ BASE = f"http://127.0.0.1:{PORT}"
 VIEWS = ["view-trail", "view-transmissions", "view-archives", "view-chronicles", "view-cipher", "view-field-wire"]
 
 # Seeds a profile once per tab (sessionStorage guard), so reloads keep whatever the page writes
-SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
+# order_story_monolith_v1: hub/js/story-point.js would replace a seeded journey with Silvia's 12 Nov story point
+SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;if(s.__nostory)delete s.__nostory;else if(!('order_story_monolith_v1' in s))s.order_story_monolith_v1='done';for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
 SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done", "order_silvia_live_v3": "done",
           "order_silvia_north_portal_v1": "done"}
 DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true"}
@@ -164,7 +165,10 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
                          "order_stele_cine_intro": "seen", "order_stele_howto": "seen",
                          "order_oracle_cine_intro": "seen", "order_oracle_howto": "seen",
                          "order_masks_cine_intro": "seen", "order_masks_howto": "seen",
-                         "order_camera_cine_intro": "seen", "order_camera_howto": "seen"}, **seed)
+                         "order_camera_cine_intro": "seen", "order_camera_howto": "seen",
+                         "order_gallery_cine_intro": "seen", "order_gallery_howto": "seen"}, **seed)
+        if not cine_seen:
+            seed = dict(seed, __nostory=1)   # an empty-browser test must hold nothing but the seeker
         page.add_init_script(SEED_JS % json.dumps(seed))
     return ctx, page, errors
 
@@ -1234,8 +1238,12 @@ def test_oracle_horizon(browser):
     check(js("window.__oracle.rot()") == [0, 0, 0] and reading == "DECEMBEREIGHTEENTOTWENTY",
           "three stars set to the sky: read from the north, rim to heart, the disc says DECEMBER EIGHTEEN TO TWENTY")
     check(js("getComputedStyle(document.getElementById('oracle-read-panel')).display") != "none", "the shining disc can be read")
-    page.wait_for_timeout(600)
-    w = js("window.__oracle.world()")
+    ring_true = lambda w: w.get("jewel", 0) > 0.5 and all(abs(a) < 0.05 or abs(abs(a) - 6.28) < 0.05 for a in w.get("rings", [1]))
+    for _ in range(12):   # the rings ease into place: under a busy GPU the last one can take a moment longer
+        page.wait_for_timeout(300)
+        w = js("window.__oracle.world()")
+        if ring_true(w):
+            break
     check(w.get("jewel", 0) > 0.5 and all(abs(a) < 0.05 or abs(abs(a) - 6.28) < 0.05 for a in w.get("rings", [1])),
           "3D: the three rings turned true and the jewel at the heart wakes", w)
     js("window.__oracle.read('DECEMBER EIGHTEEN')")
@@ -1339,8 +1347,8 @@ def test_profiles(browser):
     page.wait_for_timeout(2500)
     check(seals() == 4, "Carles reaches Cairn IV with the tester")
     login(page, "Silvia")
-    # Her own canonical point (23 Oct): only the Wash River Seal of Cairn I, at the North Portal
-    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 1 and get("order_seal_cairn_1") == "true" and get("order_field_wire_step") == "4"
+    # Her own canonical point (12 Nov, hub/js/story-point.js): only the Wash River Seal of Cairn I, at the foot of the Sun Monolith
+    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 1 and get("order_seal_cairn_1") == "true" and get("order_field_wire_step") == "9"
           and get("order_cairn_iv_completed") is None and "tuning_pebble" not in page.evaluate("window.getOwnedRelicIds()"),
           "Silvia does not inherit Carles's seals, inventory or chat")
     page.evaluate("localStorage.setItem('seeker_silvia_cipher_ledger', JSON.stringify({O: 23, A: 7, R: 3}))")
@@ -1564,6 +1572,10 @@ def test_masks_gate(browser):
     wrong_words(3)
     check(notes("masks-key-feedback") == 3 and "Top left" in js("document.getElementById('masks-key-feedback').nextElementSibling.innerText"),
           "9 wrong words: the third note does the first two masks with her, never the word")
+    check(js("window.__masks.gfx().great.length") == 12, "the twelve great masks of the page hang in the middle of the wall, a letter on each")
+    page.fill("#masks-key-input", "golden"); page.click("#btn-masks-speak"); page.wait_for_timeout(150)
+    check("letters of the six that lie" in js("document.getElementById('masks-key-feedback').innerText") and get("order_masks_gate_awake") is None,
+          "the liars' word GOLDEN is refused with its own warning: trust only what is reflected true")
     page.fill("#masks-key-input", " sil-ver "); page.click("#btn-masks-speak"); page.wait_for_timeout(250)
     check(get("order_masks_gate_awake") == "true" and notes("masks-key-feedback") == 0, "the word SILVER, typed loosely, opens the gate and the notes go")
     w = wait_world(lambda w: w.get("gate") == 1 and w.get("phase") == "mask" and w.get("glass") and (w.get("hermes") or [0, 9])[1] < 0, 20)
@@ -2389,6 +2401,11 @@ def test_a11y(browser):
         page.evaluate(f"window.{fn}()" if fn.startswith("open") else f"window.{fn} 0")
         page.wait_for_timeout(1200)
         inside = f"document.getElementById('{mid}').contains(document.activeElement)"
+        # without a GPU the first frame of a 3D scene can hold the window's fade-in for seconds: wait for it to finish opening
+        for _ in range(20):
+            if page.evaluate(inside) and page.evaluate(f"getComputedStyle(document.getElementById('{mid}')).opacity") == "1":
+                break
+            page.wait_for_timeout(300)
         if not page.evaluate(inside):
             trapped.append(mid + " (focus not inside)")
         for _ in range(30):
@@ -2794,8 +2811,6 @@ def test_camera_obscura(browser):
 def test_whispering_gallery(browser):
     print("\n30. Station 22 · The Whispering Gallery, from the pause and the seal to Fragment III and [J] × 2 = [T]")
     now_ms = int(time.time() * 1000)
-    with open(os.path.join(ROOT, "journal", "stage_seals.json"), encoding="utf-8") as f:
-        printed_code = json.load(f)["20B"]["code"]   # the code of the seal printed on Sheet 20B
     seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true",
             "order_masks_gate_awake": "true", "order_masks_carved": "3", "order_masks_march_bypassed": "true",
             "order_camera_obscura_completed": "true", "order_sheet_seal_41": "true",
@@ -2830,21 +2845,14 @@ def test_whispering_gallery(browser):
     js("window.selectStageStation(42)"); page.wait_for_timeout(500)
     check(not modal_open() and "OPENS IN" in card(), "the card says when the door opens and the room stays shut")
 
-    # the pause is over: the seal of Sheet 20B is the key
+    # the pause is over: the printed page “The Whispering Gallery” has no seal, so Hermes writes from the head of the second stair
+    check(js("EclipseSheetSeals.SEALS[42]") is None, "the page “The Whispering Gallery” carries no seal, so its room needs none")
     js("localStorage.setItem('order_journal', JSON.stringify({s21: {at: %d, fails: 0, notes: 0}}))" % (now_ms - 7 * 3600 * 1000))
     page.reload(wait_until="load"); page.wait_for_timeout(2500)
     open_wire()
-    check("seal printed on the page “The Whispering Gallery”" in bar_desc() and get("order_field_wire_step") == "40", "after the pause the chat asks for the seal of the page “The Whispering Gallery”", bar_desc())
-    js("window.selectStageStation(42)"); page.wait_for_timeout(500)
-    check(not modal_open() and "SEAL OF THE PAGE “THE WHISPERING GALLERY”" in card(), "the card asks for the seal and the room stays shut")
-    check(js("EclipseSheetSeals.accept('nobody')") is None and js("EclipseSheetSeals.accept(%s)" % json.dumps(printed_code)) == 42,
-          "only the code printed on the page “The Whispering Gallery” turns the key")
-
-    # the key is in: Hermes writes from the head of the second stair
-    page.reload(wait_until="load"); page.wait_for_timeout(2500)
-    open_wire()
-    check(get("order_field_wire_step") == "41" and "The Whispering Gallery" in wire_text() and js("document.querySelectorAll('#wire-choices-grid button').length") == 3,
-          "with the seal turned the chat reaches step 41: the second stair, the page “The Whispering Gallery” and 3 replies")
+    check(get("order_field_wire_step") == "41" and "The Whispering Gallery" in wire_text() and "rose on the floor" in wire_text()
+          and "ruler" not in wire_text() and js("document.querySelectorAll('#wire-choices-grid button').length") == 3,
+          "after the pause the chat reaches step 41: the second stair, the rose of the page “The Whispering Gallery” and 3 replies")
     js("document.querySelector('#wire-choices-grid button').click()"); page.wait_for_timeout(9000)
     check(get("order_field_wire_step") == "42" and "Station 22 Awaits" in bar() and "THE GALLERY" in wire_text(),
           "the answer takes him down to the gallery, and the bar waits for Station 22", bar())
@@ -2858,7 +2866,22 @@ def test_whispering_gallery(browser):
     page.click("#btn-gallery-listen"); page.wait_for_timeout(200)
     check("Nothing reaches him" in text("gallery-focus-feedback") and get("order_hint_s22-focus_fails") == "1", "listening at the door is a miss")
 
-    # the keyboard walks him: up to the middle, then west, where the whisper starts to come through from the left
+    # the hall in 3D: a click on its floor sends Hermes there, and he walks
+    w3 = js("window.__gallery.world()")
+    check(w3.get("gl") and w3.get("plate") is False and w3.get("raiders") == 2, "the gallery is a 3D hall with the two raiders and no plate showing on the pins", str(w3)[:160])
+    pt = js("window.__gallery.screenOf(-1.15, 0, 1.15)")
+    page.mouse.click(pt[0], pt[1]); page.wait_for_timeout(200)
+    check(js("window.__gallery.pos()") == [-1, -1], "a click on the floor of the hall sends Hermes there", str(js("window.__gallery.pos()")))
+    walked = False
+    for _ in range(60):
+        h = js("window.__gallery.world()").get("hermes") or [0, 0]
+        if abs(h[0] + 1.15) < 0.05 and abs(h[1] - 1.15) < 0.05:
+            walked = True; break
+        page.wait_for_timeout(250)
+    check(walked, "Hermes walks across the hall to where she clicked", str(js("window.__gallery.world()").get("hermes")))
+    js("window.__gallery.moveTo(0, -3.5)")
+
+    # the keyboard walks him: up to the middle, then west; only within a vara of the pin does a murmur come, and it does not say from where
     page.focus("#gallery-plan")
     for _ in range(7):
         page.keyboard.press("ArrowUp")
@@ -2866,19 +2889,22 @@ def test_whispering_gallery(browser):
           "seven steps north: the middle of the gallery, still silent", text("gallery-where"))
     for _ in range(4):
         page.keyboard.press("ArrowLeft")
-    check(js("window.__gallery.pos()") == [-2, 0] and "from your left" in text("gallery-heard") and 0 < js("window.__gallery.clarity()") < 1,
-          "two varas west the whisper comes through, faint, from the left", text("gallery-heard")[:90])
+    check(js("window.__gallery.pos()") == [-2, 0] and js("window.__gallery.clarity()") == 0 and "No whisper reaches here" in text("gallery-heard"),
+          "two varas west, a vara from the pin, still nothing: the hall does not find the pin for her", text("gallery-heard")[:90])
+    page.keyboard.press("ArrowUp"); page.keyboard.press("ArrowLeft")
+    check(js("window.__gallery.pos()") == [-2.5, 0.5] and "murmur" in text("gallery-heard") and "from your" not in text("gallery-heard") and 0 < js("window.__gallery.clarity()") < 1,
+          "very close, a faint murmur, with no side named before the hints", text("gallery-heard")[:90])
     page.keyboard.press("Enter"); page.wait_for_timeout(200)
     check(not js("window.__gallery.atFocus()") and "slip away" in text("gallery-focus-feedback"), "close is not enough: words that slip away")
-    check(js("window.__gallery.moveTo(3, 0)") is False and "Ash, very close" in text("gallery-focus-feedback") and js("window.__gallery.pos()") == [-2, 0],
+    check(js("window.__gallery.moveTo(3, 0)") is False and "Ash, very close" in text("gallery-focus-feedback") and js("window.__gallery.pos()") == [-2.5, 0.5],
           "Hermes will not walk into the raiders at the east pin")
     page.focus("#gallery-plan")
-    page.keyboard.press("ArrowLeft"); page.keyboard.press("ArrowLeft")
+    page.keyboard.press("ArrowDown"); page.keyboard.press("ArrowLeft")
     check(js("window.__gallery.pos()") == [-3, 0] and "Clear as a bell" in text("gallery-heard"), "three varas west, on the long axis: clear as a bell", text("gallery-heard")[:80])
     page.keyboard.press("Enter"); page.wait_for_timeout(300)
     check(js("window.__gallery.atFocus()") and get("order_whispering_gallery_focus") == "true" and shown("gallery-bells-card")
-          and "She will come" in text("gallery-heard") and "WEST PIN" in text("gallery-telem-focus"),
-          "at the west pin every word arrives, and the bells of the niche appear")
+          and "She will come" in text("gallery-heard") and "west pin ✓" in text("gallery3d-status") and js("window.__gallery.world()").get("plate") is True,
+          "at the west pin every word arrives, the plate shows under his boots, and the bells of the niche appear", text("gallery3d-status"))
     page.wait_for_timeout(1600); wait_tune()
     check(not js("window.__gallery.playing()") and js("document.querySelectorAll('#gallery-bells .gallery-bell').length") == 5, "the tune has played: five bells wait")
     check(js("window.EclipseAmbience.state().hushed") is True, "the music falls silent while the bells must be heard")
@@ -2894,8 +2920,16 @@ def test_whispering_gallery(browser):
         page.click("#gallery-bells .gallery-bell:nth-child(%d)" % (b + 1))
         page.wait_for_timeout(120)
     page.wait_for_timeout(900)
-    check(get("order_whispering_gallery_completed") == "true" and shown("gallery-victory") and "OPEN" in text("gallery-telem-niche"),
+    check(get("order_whispering_gallery_completed") == "true" and shown("gallery-victory") and "niche is open" in text("gallery3d-status"),
           "the tune played back from its last bell to its first opens the niche")
+    opened = 0
+    for _ in range(30):
+        opened = js("window.__gallery.world()").get("door") or 0
+        if opened > 0.9:
+            break
+        page.wait_for_timeout(200)
+    check(opened > 0.9 and not shown("btn-gallery-listen") and not shown("gallery-where") and "Chronicles" in text("gallery-victory"),
+          "in the hall the little door swings open; the search controls leave the panel and the card points to Aurelia's letter", str(opened))
     check(js("window.EclipseAmbience.state().hushed") is False, "with the niche open the music comes back")
     check(js("document.getElementById('gallery-fragment-svg').childNodes.length") > 3 and "[J] × 2 = [T]" in text("gallery-victory"),
           "Fragment III and the line of the niche are in the victory card")

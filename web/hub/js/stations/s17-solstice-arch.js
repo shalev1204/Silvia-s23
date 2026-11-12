@@ -63,7 +63,7 @@
       const ROUNDS = ['SS', 'SLS', 'LLSS', 'SSSLL'];
       const FLASH_MS = { S: 220, L: 760 }, GAP_MS = 380, PAUSE_MS = 1100, LONG_PRESS_MS = 380;
       const ROUND_DISPATCH = [
-        "It answered, Silvia! It repeats our flashes back to us, and asks for more. Whoever is up there is testing us.",
+        "We answered it, Silvia, flash for flash, and it has sent another at once. Whoever is up there is testing us.",
         "Again. Longer this time. My hands are steadier than my heart.",
         "One more. Silvia... I think I know the next one before it comes."
       ];
@@ -100,7 +100,7 @@
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
           'Do not read every sun-stone on the page “Arch of the Solstice & The Solar Altar”, Silvia. Follow the ray from the arrow under the arch: only the stones it crosses count, in the order it crosses them.',
-          'I wrote down how the ray bounces off the mirrors. It is in Ask Hermes: "How do I follow the ray of the page “Arch of the Solstice & The Solar Altar”?"',
+          'I wrote down how the ray bounces off the mirrors. It is in Ask Hermes: "How do I follow the ray on the page “Arch of the Solstice & The Solar Altar”?"',
           'Let us follow it together. From the arrow the ray goes straight down, and on the third flagstone it meets a mirror leaning like \\, which sends it to the right. Two flagstones further on it crosses the first sun-stone: D. Keep following it, mirror by mirror, until it reaches the altar.'
         ]
       });
@@ -110,7 +110,7 @@
         texts: [
           'Do not wait for the sun to turn the mirrors, Silvia. The first ray can be set in the dark: turn the mirrors before you call the dawn, and save your haste for the other three.',
           'I have learnt to breathe slowly: now each ray waits longer. My note on working backwards from the altar is in Ask Hermes: "How do I aim the mirrors for an October dawn?"',
-          'Let us set the first ray together, in the dark. Light can only fall on the altar from straight above it, so follow its column up to the first mirror: it must catch the light from the west and drop it down, so it leans like \\. Now look west of that mirror: the one there must send the light toward it. Ask the same question there, and walk back until you reach the arch.'
+          'Let us set the first ray together, in the dark. Light can reach the altar from straight above it, or from the east along the bottom row. Try the first way: follow its column up to the first mirror, it must catch the light from the west and drop it down, so it leans like \\. Now look west of that mirror: the one there must send the light toward it. Ask the same question there, and walk back until you reach the arch.'
         ]
       });
       const signalHints = hints.define({
@@ -441,7 +441,7 @@
       function runFinale() {
         finale = true;
         feedback(el.signalFeedback, '', '');
-        say("Three short, a pause, two long. Silvia... I made that code for one person, more than fifty years ago. And the light up there has just answered it. Now it is spelling something, slowly, in the old light-code of the Order. I am writing it down.");
+        say("Three short, a pause, two long. Silvia... I made that code for one person, more than fifty years ago, and the light up there has just sent it to us. We sent it back. Now it is spelling something, slowly, in the old light-code of the Order. I am writing it down.");
         const lines = ['[Y] − [O] = 2', '[L] + [G] = 23'];
         const burst = 'SLSSLLSLSSLSLLSS';
         let shown = '';
@@ -1347,7 +1347,7 @@
       }
       function stopHubScroll(e) {
         const panel = el.dispatch && el.dispatch.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         if (el.howto && el.howto.contains(e.target)) return;
         if (e.target === el.canvas) return;
         e.preventDefault();

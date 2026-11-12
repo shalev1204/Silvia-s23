@@ -1,0 +1,44 @@
+/* Station 22 · the gallery in 3D (the shared look lives in s10-chasm-walk.css; the plan and the bells in s22-whispering-gallery.css) */
+#modal-whispering-gallery [hidden] { display: none !important; }
+#modal-whispering-gallery .chasm3d-hud { z-index: 3; }
+#modal-whispering-gallery .chasm3d-fade { background: #020103; }
+#modal-whispering-gallery .chasm3d-canvas { cursor: pointer; touch-action: none; }
+
+/* the little plan in the corner of the hall: the same axes as the page, and where Hermes stands */
+#modal-whispering-gallery .gallery3d-map {
+  position: absolute; right: 12px; top: 12px; width: min(24%, 220px);
+  pointer-events: auto; line-height: 0;
+  background: rgba(10, 7, 9, 0.72); border: 1px solid rgba(201, 154, 59, 0.45); border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5); overflow: hidden; transition: opacity 0.4s ease;
+}
+#modal-whispering-gallery .gallery3d-map .gallery-plan { width: 100%; height: auto; }
+#modal-whispering-gallery .gallery-label { font-size: 34px; }
+/* without WebGL the plan is the whole hall again */
+#modal-whispering-gallery .chasm3d-stage.is-flat .gallery3d-map { left: 50%; right: auto; top: 50%; width: min(92%, 640px); transform: translate(-50%, -50%); background: #0a0709; }
+
+/* the panel */
+#modal-whispering-gallery .gallery-where { margin-top: 0; font-size: 0.84rem; color: #e8dcc0; }
+#modal-whispering-gallery .gallery-heard { margin: 0; }
+#modal-whispering-gallery .gallery-heard:empty { display: none; }
+#modal-whispering-gallery .gallery-sound { margin: 0; }
+#modal-whispering-gallery .gallery-actions { margin-top: 0; }
+#modal-whispering-gallery .gallery-listen { font-weight: 600; color: #fde68a; border-color: rgba(253, 230, 138, 0.55); }
+#modal-whispering-gallery .gallery-bells-card { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border: 1px solid rgba(201, 154, 59, 0.4); border-radius: 12px; background: rgba(20, 8, 16, 0.55); }
+#modal-whispering-gallery .gallery-bells-title { font-family: 'Cinzel', serif; font-size: 0.9rem; color: #f7dc8c; }
+#modal-whispering-gallery .gallery-bells-card .gallery-lead { margin: 0; font-size: 0.84rem; line-height: 1.45; }
+#modal-whispering-gallery .gallery-bells { margin: 0; }
+#modal-whispering-gallery .gallery-played { margin: 0; }
+#modal-whispering-gallery .monolith-feedback { min-height: 1.2em; font-size: 0.88rem; color: #d6c3a0; }
+#modal-whispering-gallery .monolith-feedback:empty { min-height: 0; }
+#modal-whispering-gallery .monolith-feedback.is-ok { color: #bbf7d0; }
+#modal-whispering-gallery .monolith-feedback.is-error { color: #fecaca; }
+#modal-whispering-gallery .masks-fragment-row { grid-template-columns: 96px minmax(0, 1fr); }
+#modal-whispering-gallery .masks-fragment { width: 96px; height: 96px; }
+#modal-whispering-gallery .gallery-letter-note { margin: 4px 0 8px; font-size: 0.86rem; font-style: italic; color: #f3e2b8; }
+
+@media (max-width: 760px) {
+  #modal-whispering-gallery .gallery3d-map { width: 34%; right: 8px; top: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #modal-whispering-gallery .gallery3d-map { transition: none; }
+}

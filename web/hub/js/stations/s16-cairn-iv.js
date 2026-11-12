@@ -249,7 +249,7 @@
         svg.appendChild(svgEl('line', { x1: 0, y1: TAPE_H / 2, x2: width, y2: TAPE_H / 2, stroke: '#8a6d3b', 'stroke-width': 0.6 }));
         for (let b = 0; b <= beats; b++) {
           svg.appendChild(svgEl('line', { x1: xb(b), y1: TAPE_H / 2 - 5, x2: xb(b), y2: TAPE_H / 2 + 5, stroke: '#5c4524', 'stroke-width': 0.8 }));
-          if (countHintOn()) svg.appendChild(svgText(xb(b), TAPE_H / 2 + 13, String(b), { 'font-size': 7, fill: '#7c5a32' }));
+          if (countHintOn()) svg.appendChild(svgText(xb(b), TAPE_H / 2 + 13, String(b), { 'font-size': 11, fill: '#7c5a32' }));
         }
         if (!tape) return;
         tape.events.forEach((ev) => {
@@ -260,7 +260,7 @@
           const color = top ? '#b45309' : '#0f766e';
           if (ev.kind === 'call') {
             svg.appendChild(svgEl('rect', { x: xb(ev.beat), y, width: w, height: 20, rx: 2, fill: color }));
-            if (tape.events.length > 2) svg.appendChild(svgText(xb(ev.beat) + w / 2, y + 28, String(ev.n), { 'font-size': 7, fill: color, 'font-weight': 700 }));
+            if (tape.events.length > 2) svg.appendChild(svgText(xb(ev.beat) + w / 2, y + 28, String(ev.n), { 'font-size': 11, fill: color, 'font-weight': 700 }));
           } else {
             svg.appendChild(svgEl('rect', { x: xb(ev.beat), y: y + 2, width: w, height: 16, rx: 2, fill: 'none', stroke: color, 'stroke-width': 1.6 }));
           }
@@ -1105,6 +1105,7 @@
       function setMood() {
         const amb = window.EclipseAmbience;
         if (!amb || !amb.intensity) return;
+        if (amb.hush) amb.hush(!!(tape && tape.raf));
         if (tape && tape.raf) { amb.intensity(0.1); return; }
         amb.intensity(isDone() ? 0.6 : !isAwake() ? 0.3 : 0.35 + 0.08 * versesSung());
       }
@@ -1173,7 +1174,7 @@
       }
       function stopHubScroll(e) {
         const panel = el.dispatch && el.dispatch.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         if (el.howto && el.howto.contains(e.target)) return;
         if (el.tapeWrap && el.tapeWrap.contains(e.target)) return;
         if (e.target === el.canvas) return;

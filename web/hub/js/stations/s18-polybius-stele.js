@@ -146,7 +146,7 @@
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
           'Every pair of numbers in the six stanzas on the page “The Polybius Stele” points to one square of the grid above them. One square, one letter.',
-          'I wrote down how to read the stanzas, and how the mirage turns some of them round. It is in Ask Hermes: "How do I read the stanzas of the page “The Polybius Stele”?"',
+          'I wrote down how to read the stanzas, and how the mirage turns some of them round. It is in Ask Hermes: "How do I read the stanzas on the page “The Polybius Stele”?"',
           'Let us read the first letter together. Stanza I is a solar stanza, so its first pair, (IV, IV), means row IV, then column IV: that square holds S. Go on along stanza I, and when you reach stanza II, remember that its first number is the column.'
         ]
       });
@@ -165,7 +165,7 @@
         texts: [
           'Watch the fire, not only the hatch. Glowing flagstones catch on the next turn, bare stone never burns, and a flagstone that has burnt out is ash.',
           'Now every flagstone shows in how many turns it will catch. My longer note is in Ask Hermes: "How do I cross the burning atrium?"',
-          'Let us take the first steps together. From the side door, without waiting, go up three flagstones, then one to the right: that one is bare stone, and the fire cannot reach you there. From it, look further north for the next bare stone, and remember that the last stretch to the hatch is walked on ash.'
+          'Let us take the first steps together. From the side door, without waiting, go up three flagstones, then one to the right: that one is bare stone, and the fire cannot reach you there. Do not wait on it: walk on at once and look further north for the next bare stone. Only by the west columns is there time to wait, and the last stretch to the hatch is walked on ash.'
         ]
       });
 
@@ -280,7 +280,10 @@
         }
       }
       // Stops the knocks at once; `finish` still runs what was waiting for them (Silvia's answer gets judged)
+      let belowRun = false;
       function stopKnocks(finish) {
+        if (playing && belowRun) { heard = []; renderTape(el.tape, heard, false); }
+        belowRun = false;
         if (playing) playing.forEach((t) => clearTimeout(t));
         playing = null;
         const then = afterPlaying;
@@ -292,6 +295,7 @@
         stopKnocks(true);
         playing = [];
         afterPlaying = done || null;
+        belowRun = !!fromBelow;
         if (fromBelow) { heard = []; renderTape(el.tape, heard, false); }
         let t = 350;
         groups.forEach((count, gi) => {
@@ -310,7 +314,7 @@
           }
         });
         playing.push(setTimeout(() => {
-          playing = null; afterPlaying = null;
+          playing = null; afterPlaying = null; belowRun = false;
           if (fromBelow) renderTape(el.tape, heard, false);
           render();
           if (done) done();
@@ -1493,6 +1497,7 @@
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
         const k = KEYMAP[e.key];
         if (!k) return;
+        if (e.repeat || view.freeze) { e.preventDefault(); return; }
         if (k === 'wait' && e.target && e.target.tagName === 'BUTTON' && !modal.contains(e.target)) return;
         e.preventDefault();
         press(k);
@@ -1568,7 +1573,7 @@
       }
       function stopHubScroll(e) {
         const panel = el.dispatch && el.dispatch.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         if (el.howto && el.howto.contains(e.target)) return;
         if (e.target === el.canvas) return;
         e.preventDefault();

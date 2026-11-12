@@ -812,13 +812,13 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
   THE SANDSTONE TOWER             THE STAGE TOWER
   (The Sandstone Sanctuary ·       (The Mirror Sanctuary / The Theater ·
    Desert Path · The Oracle)        Stage Path · The Mirror Speaker)
-  [ 1ª PISTA: WHEN = Fecha y Hora ] [ 2ª PISTA: WHERE = Ciudad y Teatro ]
+  [ 1ª PISTA: WHEN = Fecha        ] [ 2ª PISTA: WHERE = Ciudad y Teatro ]
 ```
 
 *Invariante Canónico Absoluto de las Pistas*: Silvia comienza su viaje sin conocer ni el **WHAT**, ni el **WHERE**, ni el **HOW**. Las revelaciones siguen un orden estricto de anclaje:
 1. **Tower II — The Sandstone Tower / The Sandstone Sanctuary** (Dunas · Desert Path · El Oráculo):
    - Monolito de arenisca milenario en el desierto profundo. *(Nunca "Sunken")*.
-   - Revela: **1ª Gran Pista — WHEN** (La fecha, momento exacto y estación del año de la cita).
+   - Revela: **1ª Gran Pista — WHEN** (la fecha y la estación del año de la cita: **18–20 de diciembre, sin hora**; decisión del Operador, 11-2026).
 2. **Tower III — The Stage Tower / The Mirror Sanctuary / The Theater** (Escenario · Stage Path · The Mirror Speaker):
    - Santuario de la simetría y la acústica. *(Nunca "Coastal" ni "Coast")*.
    - Revela: **2ª Gran Pista — WHERE** (La ciudad europea y el teatro histórico de la representación).
@@ -887,7 +887,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$. *(web, Estación 18)* La Torre II arde (los BC Ashes quemaron la biblioteca del atrio) y el Sirviente ha desaparecido; el proverbio gira la estela (en su dorso, 348° NNW). Segunda parte: el Sirviente, escondido en el pozo bajo el atrio, golpea en la cuadrícula de la estela con la Ley del Espejismo Invertido (WHO · SEEK, la respuesta de Silvia · WELL · ASH). Tercera parte: el atrio en llamas, por turnos, hasta la tapa del pozo. $[H] - [U] = 16$ y $[M] + [T] = 25$; la reliquia *The Servant's Key*; la frase del Sirviente sobre la Oráculo (ver §12).
   - **Cara B (17B · Lore)**: **The Desert Oracle** (impresa). Nota de la expedición de 1998: Hermes observa durante horas desde una cresta al hombre que cree el Oráculo (en realidad el Sirviente del Santuario, §8.A.5), junto a su refugio bajo un saliente de arenisca; no puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen». Menciona el Astrolabio recuperado. No revela el WHEN ni menciona Vega.
 - **Hoja 18**:
-  - **Cara A (18A · Juego D10)**: **The Oracle's Horizon**. Ante la Oráculo, Silvia recibe la primera gran pista impresa: el **WHEN** («the hour and season ordained under the stars»). Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path). *(web, Estación 19)* El sigilo `OVERTURE` abre la cámara interior; la Oráculo velada alza el disco de 24 avistamientos y, ajustado al cielo, da el **WHEN: 18–20 de diciembre** (`DECEMBER EIGHTEEN TO TWENTY`, 24 letras). Silvia recompone el voto, Hermes lo pronuncia y la Oráculo se quita el velo: **es Aurelia**, con la memoria a medias. $[Z] + [D] = 23$ y $[I] + [E] = 12$; la reliquia *The Gilded Star*; los BC Ashes huyen al este con el Astrolabio, hacia la Torre III.
+  - **Cara A (18A · Juego D10)**: **The Oracle's Horizon**. Ante la Oráculo, Silvia recibe la primera gran pista impresa: el **WHEN** («the hour and season ordained under the stars»; ⚠️ el WHEN no lleva hora: en la próxima reimpresión de 18A esa frase pasa a «the day and season ordained under the stars», decisión del Operador, 11-2026). Triangulación de horizontes de la Torre II (The Sandstone Sanctuary) y sellado de la pista **WHEN** para desbloquear el camino a la Torre III (Stage Path). *(web, Estación 19)* El sigilo `OVERTURE` abre la cámara interior; la Oráculo velada alza el disco de 24 avistamientos y, ajustado al cielo, da el **WHEN: 18–20 de diciembre** (`DECEMBER EIGHTEEN TO TWENTY`, 24 letras). Silvia recompone el voto, Hermes lo pronuncia y la Oráculo se quita el velo: **es Aurelia**, con la memoria a medias. $[Z] + [D] = 23$ y $[I] + [E] = 12$; la reliquia *The Gilded Star*; los BC Ashes huyen al este con el Astrolabio, hacia la Torre III.
   - **Cara B (18B · Arte de Transición)**: **Dibujo de Transición al Stage Path**. Obra estética inspirada en el boceto artístico (pliegues teatrales violetas, columnas chevron en perspectiva, espirales, estrellas y malla geométrica escénica).
 
 ---

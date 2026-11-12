@@ -80,7 +80,7 @@
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
           'Do not read the eight beacons where they stand, Silvia. Each one has to travel across the chart first, through the three mirrors, and only the square where it lands gives a letter.',
-          'I wrote down how a beacon crosses the mirrors. It is in Ask Hermes: "How do the three mirrors of the page “The Oracle\'s Horizon” work?"',
+          'I wrote down how a beacon crosses the mirrors. It is in Ask Hermes: "How do the three mirrors on the page “The Oracle\'s Horizon” work?"',
           'Let us send the first beacon together. It starts in column 2, Row A. Mirror I, on column 4, sends it to column 6, still on Row A. In column 6 Mirror II lies on Row D: Row A is three rows above it, so it lands three rows below, on Row G. Mirror III, on column 10, sends column 6 to column 14. Read the letter in column 14, Row G: that is the first letter of the sigil. Now beacon 2.'
         ]
       });
@@ -1093,7 +1093,7 @@
       }
       function stopHubScroll(e) {
         const panel = el.dispatch && el.dispatch.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         if (el.howto && el.howto.contains(e.target)) return;
         if (e.target === el.canvas) return;
         e.preventDefault();

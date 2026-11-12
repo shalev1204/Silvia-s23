@@ -268,7 +268,9 @@
       }
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = 'Silvia held the page “The Camera Obscura” against the city on the wall, turned the lens until the picture stood upright, and saw what had changed: a flag, a cart, a shutter and, above the narrow house behind the market, a chimney that smokes. Where the raiders had lit a fire, the second piece of the mirror of Tower III was waiting in the ashes.';
+          const seen = found().filter((c) => c !== 'smoke').map((c) => ({ flag: 'a flag', cart: 'a cart', shutter: 'a shutter' })[c]);
+          const also = seen.length ? 'saw what had changed: ' + seen.join(', ') + (seen.length > 1 ? ',' : '') + ' and, above the narrow house behind the market, a third chimney breathing fire' : 'went straight to what mattered: above the narrow house behind the market, a third chimney breathing fire';
+          el.victoryText.textContent = 'Silvia held the page “The Camera Obscura” against the city on the wall, turned the lens until the picture stood upright, and ' + also + '. Where the raiders had lit their hearth, the second piece of the mirror of Tower III was waiting in the ashes.';
         }
         drawFragment();
       }
@@ -294,6 +296,10 @@
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
         if (el.ring) el.ring.setAttribute('aria-disabled', done ? 'true' : 'false');
+        const controls = el.ring && el.ring.closest('.camera-controls');
+        if (controls) controls.style.display = done ? 'none' : '';
+        const where = modal.querySelector('.chasm3d-where');
+        if (where) where.style.display = done ? 'none' : '';
         if (done && angle !== 0) setAngle(0);
         syncWorld();
         // the dark room has no music, but its bed follows the hunt like the others
@@ -754,7 +760,7 @@
       }
       function stopHubScroll(e) {
         const panel = el.dispatch && el.dispatch.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         if (el.howto && el.howto.contains(e.target)) return;
         e.preventDefault();
       }
@@ -863,7 +869,7 @@
             statusClass: 'status-done-badge',
             title: 'The Camera Obscura · Tower III',
             thumb,
-            lore: 'Silvia held the page “The Camera Obscura” against the city on the wall and found the four things that had changed. A chimney that was cold now smoked: the raiders had hidden in the narrow house behind the market, and the second piece of the mirror of Tower III lay in their ashes.',
+            lore: 'Silvia held the page “The Camera Obscura” against the city on the wall and watched where the smoke rose. A third chimney breathed fire where none should burn: the raiders had hidden in the narrow house behind the market, and the second piece of the mirror of Tower III lay in their ashes.',
             rewards: [
               { icon: '🪞', label: 'Fragment II', desc: 'Set in the mirror of Tower III' },
               { icon: '🏠', label: 'The Narrow House', desc: 'Where the raiders hid' }

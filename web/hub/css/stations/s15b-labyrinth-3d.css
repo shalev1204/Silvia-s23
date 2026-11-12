@@ -58,7 +58,11 @@
 #modal-sandstone-labyrinth .chasm3d-stage.is-flat .laby3d-map-wrap {
   top: 50%; left: 50%; right: auto; transform: translate(-50%, -54%); width: min(86%, 560px);
 }
+#modal-sandstone-labyrinth #btn-laby-finish { margin-top: 12px; }
+/* the flat fallback is the map alone: the picture of the printed page would show a different maze behind it */
+#modal-sandstone-labyrinth .chasm3d-flat img { display: none; }
 @media (max-width: 760px) {
+  #modal-sandstone-labyrinth .chasm3d-stage { height: 55vh; }
   #modal-sandstone-labyrinth .laby3d-map-wrap { width: 40%; }
   #modal-sandstone-labyrinth .laby3d-danger { font-size: 0.7rem; padding: 4px 9px; }
 }

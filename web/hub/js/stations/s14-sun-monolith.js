@@ -190,7 +190,7 @@
         for (let m = 6 * 60; m <= 18 * 60; m += 10) d += (d ? ' L ' : 'M ') + SKY_X(m).toFixed(2) + ' ' + SKY_Y(m).toFixed(2);
         el.sky.appendChild(svgEl('path', { d, fill: 'none', stroke: '#fde68a', 'stroke-opacity': 0.45, 'stroke-width': 0.6, 'stroke-dasharray': '2 2' }));
         [['W · sunset', 12, 'start'], ['S · noon', 100, 'middle'], ['E · sunrise', 188, 'end']].forEach(([label, x, anchor]) => {
-          const t = svgEl('text', { x, y: 63, fill: '#fff1cc', 'font-size': 4.4, 'text-anchor': anchor });
+          const t = svgEl('text', { x, y: 63, fill: '#fff1cc', 'font-size': 6.4, 'text-anchor': anchor });
           t.textContent = label;
           el.sky.appendChild(t);
         });
@@ -559,7 +559,7 @@
 
       // ---- Hermes on the Ridge: he walks to the tip of the shadow, and back ----
       const timers = [];
-      const later = (sec, fn) => { timers.push({ t: sec, fn }); };
+      const later = (sec, fn) => { if (!G) { setTimeout(fn, sec * 1000); return; } timers.push({ t: sec, fn }); };
       function snapHermes(x, z, toward) {
         if (!G || !G.hermes) return;
         G.hermes.position.set(x, 0, z);
@@ -618,7 +618,7 @@
         else {
           // the whole dial, from the Jackal in the west to the Serpent in the east, whatever the shape of the window
           const base = new T.Vector3(7, 40, 47), look = new T.Vector3(7, 2, -15);
-          const off = base.clone().sub(look), rad2 = off.length() * Math.max(1, Math.min(1.7, 1.6 / (cam.aspect || 1.6)));
+          const off = base.clone().sub(look), rad2 = off.length() * Math.max(1, Math.min(2.0, 2.0 / (cam.aspect || 1.6)));
           const hor = Math.hypot(off.x, off.z), el0 = Math.atan2(off.y, hor), az0 = Math.atan2(off.x, off.z);
           const elv = Math.max(0.12, Math.min(1.25, el0 + orbit.pitch)), az = az0 + orbit.yaw;
           p = [look.x + Math.sin(az) * rad2 * Math.cos(elv), look.y + rad2 * Math.sin(elv), look.z + Math.cos(az) * rad2 * Math.cos(elv)];
@@ -990,7 +990,7 @@
           + '<section class="rw-loot">'
           + '<svg class="mon3d-seal" viewBox="0 0 80 80" aria-label="The Seal of Cairn II"><circle cx="40" cy="40" r="34" fill="#e8bf63" stroke="#7c5a32" stroke-width="3"/><circle cx="40" cy="40" r="26" fill="none" stroke="#7c5a32" stroke-width="2" stroke-dasharray="3 3"/><path d="M40 16v10M40 54v10M16 40h10M54 40h10M23 23l7 7M50 50l7 7M57 23l-7 7M30 50l-7 7" stroke="#7c5a32" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="40" r="9" fill="#7c5a32"/></svg>'
           + '<div class="mon3d-rw-eqs">'
-          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut inside the lid</div><div class="rw-ledger-title">The Deneb Line</div><div class="rw-eq" aria-label="D plus F equals 24"><i>D</i><u>+</u><i>F</i><u>=</u><b>24</b></div><p>A line for your Cipher Ledger. Two new letters to find.</p></div></div>'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut inside the lid</div><div class="rw-ledger-title">The Deneb Line</div><div class="rw-eq" aria-label="D plus F equals 24"><i>D</i><u>+</u><i>F</i><u>=</u><b>24</b></div><p>A line for your Cipher Ledger.</p></div></div>'
           + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut beneath it</div><div class="rw-ledger-title">The Cygnus Line</div><div class="rw-eq" aria-label="C minus T equals 8"><i>C</i><u>−</u><i>T</i><u>=</u><b>8</b></div><p>The second line. Record both in your Ledger.</p></div></div>'
           + '</div>'
           + (road().statues ? '<div class="clep-relics"><button type="button" class="clep-medal' + (view.ibisNew ? ' is-new' : '') + '" data-relic="ibis_figure" aria-label="The Ibis Figure: open the card"><img src="./assets/items/item_ibis_figure.png" alt="" loading="lazy"><span>Ibis Figure</span></button></div>' : '')
@@ -1028,6 +1028,8 @@
         closeSunMonolithModal();
         if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+        const wireTab = document.querySelector('[data-view="view-field-wire"]');
+        if (wireTab) wireTab.click();
         if (typeof window.showDesertToast === 'function') {
           let seals = 0;
           for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
@@ -1121,7 +1123,7 @@
       function stopHubScroll(e) {
         if (reward.box && !reward.box.hidden && reward.box.contains(e.target)) return;
         const panel = el.controls && el.controls.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         e.preventDefault();
       }
       function introLine() {
@@ -1220,6 +1222,7 @@
         if (e.key !== 'Escape' || modal.style.display === 'none') return;
         if (cine && cine.active) { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); return; }
         if (el.howto && !el.howto.hidden) { hideHowto(); return; }
+        if (rewardOpen()) { hideReward(); return; }
         closeSunMonolithModal();
       }, true);
 

@@ -128,7 +128,7 @@
     .monolith-btn:hover:not(:disabled) { background: rgba(212, 168, 83, 0.3); transform: translateY(-1px); }
     .monolith-btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .monolith-btn-primary { background: rgba(245, 158, 11, 0.24); border-color: #f59e0b; }
-    .monolith-feedback { min-height: 1.2em; margin-top: 6px; font-size: 0.8rem; color: #d6c3a0; }
+    .monolith-feedback { min-height: 1.2em; margin-top: 6px; margin-bottom: 8px; font-size: 0.8rem; color: #d6c3a0; }
     .monolith-feedback.is-error { color: #fca5a5; }
     .monolith-feedback.is-ok { color: #86efac; }
     .monolith-game { position: relative; }

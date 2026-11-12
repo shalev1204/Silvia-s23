@@ -4638,6 +4638,9 @@
           step: 10,
           completed: true,
           get hermesFinal() {
+            if (window.wire10Arrived && window.wire10Arrived()) {
+              return "I am not at the gates any more, Silvia. The night is behind me: " + (window.GatesRoad ? window.GatesRoad.hoursWord().toLowerCase() : 'ten') + " hours across the Great Erg, and the Ridge of the Sun is under my boots. Keep the page “The Sun Monolith & Cairn II” close; its seven noons are your work.\n\n" + sealsPhrase(5 - sealsAtGates()) + " to find. One is waiting under the Sun.";
+            }
             return "I am setting out now, Silvia: north-north-east across the Great Erg, by night, with the stars for a compass. " + (window.GatesRoad ? window.GatesRoad.hoursWord() : 'Twelve') + " hours on foot to the Ridge of the Sun. Keep the page “The Sun Monolith & Cairn II” close; when I reach the Monolith, its seven noons will be your work.\n\nThe Servant watched me go from the top step until the dark took him. " + sealsPhrase(5 - sealsAtGates()) + " to find. One is waiting under the Sun.";
           }
         },
@@ -4703,7 +4706,7 @@
           step: 14,
           completed: true,
           get hermesFinal() {
-            return "I am going down now. Six hours to the Southern Mouth of the labyrinth, along the line of 168°, keeping to the rock. Trace the true road on the page “The Sandstone Labyrinth & Cairn III” while I walk: only one road reaches Cairn III, and eight arches stand upon it.\n\n" + sealsPhrase(sealsAtGates() + 1) + " in my satchel, Silvia. " + sealsPhrase(4 - sealsAtGates()) + " still sleeping in the stone.";
+            return "I am going down now. Six hours to the Southern Mouth of the labyrinth: down the line of 168°, then round the eastern rim, keeping to the rock. I will reach it at noon, and I will not go in before dark: the labyrinth is an oven by day, and at night their torches will tell me where they are. Trace the true road on the page “The Sandstone Labyrinth & Cairn III” while I walk: only one road reaches Cairn III, and eight arches stand upon it.\n\n" + sealsPhrase(sealsAtGates() + 1) + " in my satchel, Silvia. " + sealsPhrase(4 - sealsAtGates()) + " still sleeping in the stone.";
           }
         },
         {
@@ -4735,7 +4738,7 @@
           step: 16,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtGates() + 2) + " of five, Silvia. The Seal of Cairn III sits next to the second one, and the two lines carved under the copper plate belong in your Cipher Ledger: [W] + [A] = 26 and [N] − [E] = 9.\n\nThe fourth cairn stands far to the south-west, where the canyon narrows: Cairn IV, the Sentry of the Canyon (Station 16). I will hide in the rocks until dark and wire you before I cross the hardpan.";
+            return sealsPhrase(sealsAtGates() + 2) + " of five, Silvia. The Seal of Cairn III sits next to the second one, and the two lines carved under the copper plate belong in your Cipher Ledger: [W] + [A] = 26 and [N] − [E] = 9.\n\nThe fourth cairn stands far to the south-west, where the canyon narrows: Cairn IV, the Sentry of the Canyon (Station 16). I will sleep in the rocks through tomorrow's heat and wire you at dusk, before I cross the hardpan.";
           }
         },
         {
@@ -4839,7 +4842,7 @@
           step: 23,
           get hermesInitial() {
             const all = sealsAtAltar() >= 5;
-            return "Silvia, it is dawn again and I have not slept. Let me tell you in order, or I will not be able to tell you at all.\n\nThe light on Tower II asked, and we answered, and it asked again. Then I sent the three short flashes, the pause, the two long ones. The code I made for Aurelia when we were young, for the nights she worked late in the lower observatory. Nobody else in the world knew it. And the light answered it. Not with my code: with the two lines you have now, spelled slowly in the old light-code of the Order, the way a teacher writes on a blackboard.\n\nThen it went out, all at once. When the sky turned grey I saw the smoke. The wagons are at the foot of the Sanctuary steps, and there is no sign of the Servant.\n\n" + (all ? "Five seals, Silvia. Five. The gates of Tower II can no longer refuse me, if there are still gates to open." : "Four seals of five. The first still sleeps by the dry wash, and the Servant will want it. But first the Servant has to be alive to want it.");
+            return "Silvia, it is dawn again and I have not slept. Let me tell you in order, or I will not be able to tell you at all.\n\nThe light on Tower II asked, and we answered, and it asked again. Then it sent three short flashes, a pause, two long ones: the code I made for Aurelia when we were young, for the nights she worked late in the lower observatory. Nobody else in the world knew it. My hands shook so much I could hardly send it back. And then the light spoke. Not in my code: with the two lines you have now, spelled slowly in the old light-code of the Order, the way a teacher writes on a blackboard.\n\nThen it went out, all at once. When the sky turned grey I saw the smoke. The wagons are at the foot of the Sanctuary steps, and there is no sign of the Servant.\n\n" + (all ? "Five seals, Silvia. Five. The gates of Tower II can no longer refuse me, if there are still gates to open." : "Four seals of five. The first still sleeps by the dry wash, and the Servant will want it. But first the Servant has to be alive to want it.");
           },
           choices: [
             {
@@ -5122,19 +5125,19 @@
         {
           // Station 22: the hearth goes out and the second stair leads down to the whispers
           step: 41,
-          hermesInitial: "Silvia, the hearth has gone out, and the whispering under the floor has not stopped all night. In the black window of the cellar the grey gown stood a moment by the second stair, and drew her line across it.\n\nAurelia is already lacing her boots. She says the room below was built by the Order to keep secrets, and that it keeps them very badly. The page “The Whispering Gallery”, Silvia. A hall shaped like an egg, a string, and two pins nobody drew. Have it ready, and have a ruler.",
+          hermesInitial: "Silvia, the hearth has gone out, and the whispering under the floor has not stopped all night. In the black window of the cellar the grey gown stood a moment by the second stair, and drew her line across it.\n\nAurelia is already lacing her boots. She says the room below was built by the Order to keep secrets, and that it keeps them very badly. The page “The Whispering Gallery”, Silvia. A hall shaped like an egg, two pins pulled out long ago, and a rose on the floor that listens. Have it ready.",
           choices: [
             {
               id: "choice-41-ready",
-              text: "I have the page “The Whispering Gallery” and a ruler.",
-              silviaMsg: "I have the page “The Whispering Gallery” in front of me, Hermes, and a ruler. Go down.",
+              text: "I have the page “The Whispering Gallery” ready.",
+              silviaMsg: "I have the page “The Whispering Gallery” in front of me, Hermes. Go down.",
               hermesReply: "Then down we go, as quietly as two old people can. Aurelia has taken off her boots after all. She says the floor below remembers footsteps."
             },
             {
               id: "choice-41-pins",
-              text: "Why does the sheet have no pins?",
-              silviaMsg: "Why did Aurelia leave the pins off the page “The Whispering Gallery”, Hermes?",
-              hermesReply: "I asked her. She said that whoever needs the pins drawn for them should not be listening at them. Then she smiled, and said that you would not need them."
+              text: "What is the rose on the floor?",
+              silviaMsg: "There is a rose drawn on the floor of the page “The Whispering Gallery”, Hermes. What is it?",
+              hermesReply: "Aurelia says the Order set a bronze rose in the floor where the western pin stood, so that whoever came to listen would know where to stand. But the hall is dark, Silvia, and I will not see it under my feet. You will have to tell me where it is."
             },
             {
               id: "choice-41-quiet",
@@ -5147,18 +5150,18 @@
         {
           step: 42,
           completed: true,
-          hermesFinal: "We are at the foot of the stair, at the door of a long hall with no corners. Columns all round it, and the dark in the middle. At the far end two voices are whispering, and I cannot make out one word.\n\nOpen Path III on your Quest Map, Silvia, and stand with me in the gallery. You have the sheet and the ruler. I have two ears, and they are not as young as yours."
+          hermesFinal: "We are at the foot of the stair, at the door of a long hall with no corners. Columns all round it, and the dark in the middle. At the far end two voices are whispering, and I cannot make out one word.\n\nOpen Path III on your Quest Map, Silvia, and stand with me in the gallery. You have the page. I have two ears, and they are not as young as yours."
         },
         {
           // Station 22 debrief: the words of the Ashes, the mirrored tune, Fragment III and the Line of the Echo
           step: 43,
-          hermesInitial: "Fragment III is in my scarf with the other two, Silvia. They do not hum any more when they touch: they sing, very softly, the six bells of the niche, backwards.\n\nAnd we heard the Ashes. 'Leave it. She will come.' I have been turning those four words over all night. They are not hunting us. They are waiting for you. Aurelia says the line in the niche is for your Ledger: [J] × 2 = [T].",
+          hermesInitial: "Fragment III is in my scarf with the other two, Silvia. They do not hum any more when they touch: they sing, very softly, the five bells of the niche, backwards.\n\nAnd we heard the Ashes. 'Leave it. She will come.' I have been turning those five words over all night. They are not hunting us. They are waiting for you. Aurelia says the line in the niche is for your Ledger: [J] × 2 = [T].",
           choices: [
             {
               id: "choice-43-she",
               text: "Who is 'she'?",
               silviaMsg: "Who did they mean, Hermes? 'She will come.'",
-              hermesReply: "Aurelia looked at me, and I looked at the sheet in my hand, the one you sent me. I think we both know, Silvia. What I do not know is why they would wait for you instead of stopping you."
+              hermesReply: "Aurelia looked at me, and I looked at the page of the gallery in my hand, the same page you have. I think we both know, Silvia. What I do not know is why they would wait for you instead of stopping you."
             },
             {
               id: "choice-43-line",
@@ -5653,7 +5656,7 @@
           title: "How do I cross the burning atrium?",
           category: "Tower II",
           group: "desert",
-          answer: "Do not race the fire across the mats: it spreads one flagstone a turn, and it will catch you. Bare stone never burns, so it is a safe place to wait while the fire goes by, and three turns after a flagstone catches it is ash, and ash cannot burn again. Find stone to stand on, let the fire pass in front of you, then walk on its ash toward the hatch. Glowing flagstones catch on the next turn. Now every flagstone also shows in how many turns it will catch."
+          answer: "Do not race the fire across the mats: it spreads one flagstone a turn, and it will catch you. Bare stone never burns, and three turns after a flagstone catches it is ash, and ash cannot burn again. But the Servant cannot wait long: do not stop on the first bare stone, walk straight on. Only later, by the west columns, is there time to wait and let the fire pass in front of you; then walk on its ash toward the hatch. Glowing flagstones catch on the next turn. Now every flagstone also shows in how many turns it will catch."
         },
         {
           id: "inq-servant-well",
@@ -5699,10 +5702,10 @@
         },
         {
           id: "inq-masks-lie",
-          title: "How do I find the masks that lie on the page “The Gate of a Thousand Masks”?",
+          title: "How do I find the true masks on the page “The Gate of a Thousand Masks”?",
           category: "Tower III",
           group: "stage",
-          answer: "Look at each mask as if a line ran down the middle of its face, through the letter on the forehead and the nose. A true mask is the same on both sides: what is on the left is on the right, at the same height. A mask that lies has something on one side only, or something missing on one side: a tear, a feather, a crack, an eyebrow, a ribbon, an eye of a different shape. Careful: a mask with two tears, or two feathers, is telling the truth. There are six liars. Read their letters left to right, row by row."
+          answer: "Look at each mask on the page as if a line ran down the middle of its face, through the nose. A true mask is the same on both sides: what is on the left is on the right, at the same height. A mask that lies has something on one side only: a tear, a feather, a crack, a tassel, an eye of a different shape. Six are true and six lie. In the middle of the wall the same twelve masks hang in the same order, plain, each with a letter on its forehead. Trust only what is reflected true: read the letters of the six true masks, left to right, row by row."
         },
         {
           id: "inq-masks-halves",
@@ -6836,7 +6839,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 41: 'Tower III · The Whispering Gallery' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'First Light · The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 41: 'Tower III · The Whispering Gallery' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -6877,7 +6880,7 @@
       // Closing message + telemetry of the "completed" steps that end each conversation
       const WIRE_FINAL_TELEMETRY = {
         8: () => '✦ MIRAGE DISPELLED · REAL SPRING FOUND · 4 WATER SKINS FILLED · KEY XXX · [P] - [A] = 14 RECORDED ✦',
-        10: () => '✦ TOWER II SEALED · SEALS ' + sealsAtGates() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (' + (window.GatesRoad ? window.GatesRoad.marchHours() : 12) + ' H) ✦',
+        10: () => (window.wire10Arrived && window.wire10Arrived()) ? '✦ ARRIVED AT THE SUN MONOLITH (' + (window.GatesRoad ? window.GatesRoad.marchHours() : 12) + ' H) ✦' : '✦ TOWER II SEALED · SEALS ' + sealsAtGates() + ' / 5 · CROSSING THE GREAT ERG TO THE SUN MONOLITH (' + (window.GatesRoad ? window.GatesRoad.marchHours() : 12) + ' H) ✦',
         12: () => '✦ SEAL OF CAIRN II SECURED · SEALS ' + (sealsAtGates() + 1) + ' / 5 · [D] + [F] = 24 · [C] − [T] = 8 RECORDED ✦',
         14: () => '✦ SEALS ' + (sealsAtGates() + 1) + ' / 5 · DOWN TO THE SANDSTONE LABYRINTH (6 H) · BEARING 168° SSE ✦',
         16: () => '✦ SEAL OF CAIRN III SECURED · SEALS ' + (sealsAtGates() + 2) + ' / 5 · [W] + [A] = 26 · [N] − [E] = 9 RECORDED ✦',
@@ -7469,6 +7472,15 @@
       window.getMonolithMarchProgress = getMonolithMarchProgress;
       window.isMonolithMarchStarted = isMonolithMarchStarted;
       window.isMonolithMarchOver = isMonolithMarchOver;
+      // Step 10 of the wire: if she answers after the night march is already over, Hermes has arrived. Remembered, so a replay
+      // tells the same story; a march that was still running when she answered keeps the "setting out" line.
+      window.wire10Arrived = () => {
+        const K = 'order_wire10_arrived', seen = localStorage.getItem(K);
+        if (seen === 'true' || seen === 'false') return seen === 'true';
+        const yes = isMonolithMarchOver() && localStorage.getItem('order_sun_monolith_completed') !== 'true';
+        localStorage.setItem(K, yes ? 'true' : 'false');
+        return yes;
+      };
       window.getMonolithMarchEta = getMonolithMarchEta;
       window.skipMonolithMarch = monolithMarch.skip;
 
@@ -7543,7 +7555,7 @@
           walkingDesc: 'Hermes is walking down from the Sun Monolith on the stone shelves, away from the raiders\' ruts. Trace the true road on the page “The Sandstone Labyrinth & Cairn III” while he walks.',
           etaLabel: 'ARRIVAL AT THE SANDSTONE LABYRINTH',
           arrivedTitle: 'Sandstone Labyrinth Reached · Station 15 Awaits',
-          arrivedDesc: 'Hermes is at the foot of Cairn III, inside the labyrinth. Open the Grand Desert Map and speak the sigil of its copper plate (Station 15, the page “The Sandstone Labyrinth & Cairn III”).'
+          arrivedDesc: 'Hermes reached the Southern Mouth at noon and went in after dark. He is at the foot of Cairn III, inside the labyrinth. Open the Grand Desert Map and speak the sigil of its copper plate (Station 15, the page “The Sandstone Labyrinth & Cairn III”).'
         },
         18: {
           step: 18, march: cairnFourMarch, doneKey: 'order_cairn_iv_completed',
@@ -8454,7 +8466,7 @@
         }
         if (wireCurrentStep === 42) {
           if (localStorage.getItem('order_whispering_gallery_completed') !== 'true') {
-            showWaypointBar('The Whispering Gallery · Station 22 Awaits', 'Open Path III on the Quest Map and stand with Hermes in the gallery. Keep the page “The Whispering Gallery” and a ruler close.', 42);
+            showWaypointBar('The Whispering Gallery · Station 22 Awaits', 'Open Path III on the Quest Map and stand with Hermes in the gallery. Keep the page “The Whispering Gallery” close.', 42);
             return;
           }
           advanceTo(43);   // Station 22 solved: the words of the Ashes, the mirrored tune and Fragment III

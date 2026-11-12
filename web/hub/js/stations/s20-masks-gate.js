@@ -1,7 +1,10 @@
 
     // =========================================================================
     // STATION 20 · THE GATE OF A THOUSAND MASKS (Tower III, Stage Path · node 40)
-    // Part I (journal): six of the twelve masks of Sheet 19B lie; their forehead letters spell SILVER.
+    // Part I (journal + hall): Sheet 19B (already printed) draws twelve masks without letters; six are true and six hide a flaw
+    // (a tear, a crack, a feather, a crack, an odd eye, a tassel: masks 2, 4, 5, 8, 10, 11 in reading order). In the hall the same
+    // twelve hang as plain great masks in the middle of the wall, a letter on each forehead: the true ones spell SILVER, the
+    // liars GOLDEN. 'Trust only what is reflected true.' The faces are only on the page, the letters only in the hall.
     // Part II (web only), The Missing Halves: three masks carved on one side only. Silvia draws the other
     // half, as a mirror would show it. The drawing is held to the mirror: it must cover every carved line
     // (coverage) without wandering off them (precision). After three tries the Mirror Speaker shows a guide.
@@ -28,7 +31,9 @@
         drawFails: 'order_masks_draw_fails',
         drawHint: 'order_masks_draw_hint'
       };
-      const WORD = 'SILVER';
+      const WORD = 'SILVER', TRAP = 'GOLDEN';
+      // the twelve great masks of the wall, in the order of the page (4 across, 3 down): true ones carry SILVER, liars GOLDEN
+      const GREAT = ['S', 'G', 'I', 'O', 'L', 'L', 'V', 'D', 'E', 'E', 'N', 'R'];
       const NODE = 40;
 
       // ---- The masks: right halves in mask units (x ≥ 0 from the axis, y down from the centre) ----
@@ -91,9 +96,9 @@
         id: 's20-word', station: 'Station 20', title: 'the word of the gate', group: 'stage',
         anchor: el.keyFeedback, solved: isAwake, legacyKey: KEYS.hint,
         texts: [
-          'The sheet already gives you the rule, Silvia: a true face is the same on both sides. Forget the letters for a moment and look only at the faces, one at a time.',
+          'The page gives you the rule, Silvia: some masks are cast in perfect symmetry, others hide a flaw, and you must trust only what is reflected true. In the middle of the wall the same twelve masks hang in the same order as on the page, each with a letter on its forehead.',
           'I wrote down how to catch a mask that lies. It is in Ask Hermes: "How do I find the masks that lie on the page “The Gate of a Thousand Masks”?"',
-          'Let us do the first two together. Top left: diamonds on both cheeks, both brows, both eyes alike. It tells the truth, so its letter stays out. The one beside it has a tear on one cheek only: it lies, and its letter is the first of the word. Go on from the third mask, row by row.'
+          'Let us do the first two together. Top left on the page: the laurel crown, both eyes and both sides alike. It is true, so the letter of the first great mask on the wall is the first of the word. The one beside it weeps from one eye only: it lies, so leave its letter out. Go on from the third mask, row by row.'
         ]
       });
       const halfHints = hints.define({
@@ -398,7 +403,7 @@
       }
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = 'Silvia found the six masks that lie on the page “The Gate of a Thousand Masks” and spoke their word, SILVER, and the wall of masks opened like a curtain. Inside, she gave three half-carved masks their missing halves, the way a mirror would. Behind the last one waited the first piece of the mirror of Tower III. On the same mask, someone had pinned a note sealed with ash.';
+          el.victoryText.textContent = 'Silvia found the six true masks on the page “The Gate of a Thousand Masks”, read their letters on the wall and spoke their word, SILVER, and the wall of masks opened like a curtain. Inside, she gave three half-carved masks their missing halves, the way a mirror would. Behind the last one waited the first piece of the mirror of Tower III. On the same mask, someone had pinned a note sealed with ash.';
         }
         if (el.keyInput) { el.keyInput.value = WORD; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
@@ -413,7 +418,9 @@
         if (typed !== WORD) {
           set(KEYS.fails, String((parseInt(get(KEYS.fails) || '0', 10) || 0) + 1));
           if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.keyFeedback, 'The masks stay still. Look again at the two halves of each mask on the page “The Gate of a Thousand Masks”.', 'error');
+          feedback(el.keyFeedback, typed === TRAP
+            ? 'GOLDEN... and every mask on the wall smiles at once. Those are the letters of the six that lie, Silvia: trust only what is reflected true.'
+            : 'The masks stay still. Look again at the two halves of each mask on the page “The Gate of a Thousand Masks”, then read the letters of the true ones on the wall.', 'error');
           wordHints.fail();
           return;
         }
@@ -616,6 +623,7 @@
           for (let c = 0; c < COLS; c++) {
             const x = -GATE_W / 2 + 0.33 + c * (GATE_W - 0.66) / (COLS - 1), y = 0.62 + r * 0.66;
             if (y > GATE_H - 0.9 - 0.9 * (Math.abs(x) / (GATE_W / 2)) ** 4) continue;   // the arch cuts the top corners
+            if (Math.abs(x) < 2.1 && y > 1.6 && y < 5.3) continue;                          // room for the twelve great masks
             slots.push({ x, y, side: x < 0 ? 0 : 1, kind: (r * 5 + c * 3) % 3, delay: (Math.abs(x) * 0.12 + (ROWS - r) * 0.07) * (0.8 + 0.4 * ((r * 7 + c * 13) % 5) / 5), tilt: ((r * 11 + c * 7) % 7 - 3) * 0.03 });
           }
         }
@@ -642,6 +650,31 @@
           });
         }
         poseMasks(null);
+
+        // ---- The twelve great masks, in the order of the page: plain faces (the flaws are only on paper), a letter on each brow ----
+        const greatGeo = maskGeometry(T, 0.84);
+        const great = GREAT.map((ch, i) => {
+          const col = i % 4, row = Math.floor(i / 4), x = -1.44 + col * 0.96, y = 4.62 - row * 1.18;
+          const cv = faceCanvas(MASKS[0], [true, true], { tint: '#fbf3e2' });
+          const g = cv.getContext('2d');
+          g.font = '700 84px Cinzel, Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+          g.fillStyle = 'rgba(255,248,230,0.9)'; g.fillRect(AX - 38, CY - 142, 76, 84);   // a smooth brow, the letter cut into it
+          g.fillStyle = 'rgba(70,30,10,0.5)'; g.fillText(ch, AX + 2, CY - 98 + 3);
+          g.fillStyle = '#8a1c12'; g.fillText(ch, AX, CY - 98);
+          const tex = new T.CanvasTexture(cv); tex.encoding = T.sRGBEncoding; tex.anisotropy = 4;
+          const mat = paint({ map: tex, alphaTest: 0.5, side: T.DoubleSide }, 0xffd9a0, 0.28);
+          const m = new T.Mesh(greatGeo, mat); m.castShadow = true; m.receiveShadow = true;
+          m.position.set(x, y, 0.05);
+          halves[x < 0 ? 0 : 1].add(m);
+          return { m, mat, x, y, delay: Math.abs(x) * 0.12 + (2 - row) * 0.1, ph: i * 1.7 };
+        });
+        // two lanterns hang before them; their light flickers on the letters
+        const lanterns = [-1, 1].map((sd) => { const l = new T.PointLight(0xffb060, 0.9, 5.5, 1.6); l.position.set(sd * 1.0, 3.5, 1.4); scene.add(l); return l; });
+        const poseGreat = (turnT, t) => great.forEach((gm) => {
+          const u = turnT == null ? 0 : clamp((turnT - gm.delay) / 1.1, 0, 1);
+          gm.m.rotation.y = Math.PI * 2 * ease(u);
+          gm.mat.emissiveIntensity = 0.24 + 0.08 * Math.sin(t * 7.3 + gm.ph) * Math.sin(t * 2.9 + gm.ph * 0.5);
+        });
 
         // ---- The corridor of mirrors: tall glass in gilt frames, candles between them ----
         const corridor = new T.Group(); scene.add(corridor);
@@ -728,15 +761,21 @@
         const shardLight = new T.PointLight(0xffe0a0, 0, 2.6, 1.8); shardLight.position.set(0, 0, 0.6); niche.add(shardLight);
 
         // ---- The Mirror Speaker: for a moment, in the last mirror of the left wall, a woman in a grey gown and the line she draws ----
+        // she is never seen in the room, only in the glass: flattened against the last mirror of the right wall and cut to its frame
+        const LAST_MZ = -1.4 - 7 * 1.75 - 0.85;   // the centre of that mirror (see the corridor above)
+        renderer.localClippingEnabled = true;
+        const inGlass = [new T.Plane(new T.Vector3(0, 0, 1), -(LAST_MZ - 0.475)), new T.Plane(new T.Vector3(0, 0, -1), LAST_MZ + 0.475),
+          new T.Plane(new T.Vector3(0, 1, 0), -0.5), new T.Plane(new T.Vector3(0, -1, 0), 3.0)];
         let speaker = null;
         try {
-          speaker = SC.chars.oracle(paint, { robe: 0x8a8a94, trim: 0xc8c8d0, mantle: 0x6a6a76, scale: 1.08 });
+          speaker = SC.chars.oracle(paint, { robe: 0x8a8a94, trim: 0xc8c8d0, mantle: 0x6a6a76, scale: 0.9 });
           speaker.userData.lift(1);
-          speaker.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.transparent = true; o.material.opacity = 0; o.material.depthWrite = false; o.castShadow = false; } });
-          speaker.position.set(COR_W / 2 - 0.22, 0, COR_END + 0.7); speaker.rotation.y = Math.PI / 2; speaker.visible = false; scene.add(speaker);
+          speaker.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.transparent = true; o.material.opacity = 0; o.material.depthWrite = false; o.material.clippingPlanes = inGlass; o.castShadow = false; } });
+          speaker.scale.z *= 0.3;
+          speaker.position.set(COR_W / 2 - 0.07, 0.5, LAST_MZ); speaker.rotation.y = Math.PI / 2; speaker.visible = false; scene.add(speaker);
         } catch (e) { speaker = null; }
-        const signLine = new T.Mesh(new T.BoxGeometry(1.3, 0.02, 0.02), new T.MeshBasicMaterial({ color: 0xe9d5ff, transparent: true, opacity: 0, toneMapped: false }));
-        signLine.position.set(COR_W / 2 - 0.6, 1.95, COR_END + 0.7); signLine.rotation.y = Math.PI / 2; scene.add(signLine);
+        const signLine = new T.Mesh(new T.BoxGeometry(0.02, 0.02, 0.8), new T.MeshBasicMaterial({ color: 0xe9d5ff, transparent: true, opacity: 0, toneMapped: false }));
+        signLine.position.set(COR_W / 2 - 0.1, 2.25, LAST_MZ); scene.add(signLine);
 
         // ---- Hermes, and Aurelia with the lamp ----
         let HM = null;
@@ -772,7 +811,7 @@
           }
         } catch (e) { fx = null; }
 
-        return { T, renderer, scene, camera, lowPower, halves, poseMasks, inst, stations, candles, corLights, braziers, niche, shard, shardGlow, shardLight,
+        return { T, renderer, scene, camera, lowPower, halves, poseMasks, poseGreat, great, lanterns, inst, stations, candles, corLights, braziers, niche, shard, shardGlow, shardLight,
           speaker, signLine, H: HM, hermes: HM && HM.hermes, aurelia, lampLight, fx, dust, dustAcc: 0, gateOpen: 0, turning: false,
           hMove: null, aMove: null, spot: null, cam: { yaw: 0, pitch: 0, dist: 1, tYaw: 0, tPitch: 0, tDist: 1, p: null, l: null } };
       }
@@ -919,14 +958,16 @@
         // the wall: every mask turns once on its nail, then the two halves part like a curtain
         if (view.wordT && !rm) {
           const e = (now - view.wordT) / 1000;
-          if (e < 3.4) { G.poseMasks(e); G.turning = true; }
-          else if (G.turning) { G.poseMasks(null); G.turning = false; }
+          if (e < 3.4) { G.poseMasks(e); G.poseGreat(e, t); G.turning = true; }
+          else if (G.turning) { G.poseMasks(null); G.poseGreat(null, t); G.turning = false; }
           const open = ease(clamp((e - 2.3) / 2.6, 0, 1));
           if (open > G.gateOpen) {
             G.gateOpen = open;
             if (G.fx && open < 1) { G.fx.shake.add(0.012); if (Math.random() < dt * 10) G.fx.puff({ x: (Math.random() - 0.5) * 2, y: 0.1, z: 0.3 }, 2, { color: 0x8a7a70, alpha: 0.25, size: [0.2, 0.4], up: [0.1, 0.4] }); }
           }
         } else if (isAwake()) G.gateOpen = 1;
+        if (!G.turning) G.poseGreat(null, rm ? 0 : t);
+        G.lanterns.forEach((l, i) => { l.intensity = (1 - G.gateOpen) * (rm ? 0.9 : 0.8 + 0.25 * Math.sin(t * 9.1 + i * 2) * Math.sin(t * 3.7 + i)); });
         G.halves.forEach((h, i) => { h.position.x = (i ? 1 : -1) * G.gateOpen * (GATE_W / 2 + 0.3); });
         // each mask made whole turns on its nail, and then its mirror swings open on the hinge
         G.stations.forEach((st, i) => {
@@ -990,7 +1031,7 @@
           }
         }
         const line = done ? (view.endT && !rm ? clamp((e - 6.8) / 1.4, 0, 1) : 1) : 0;
-        G.signLine.scale.x = Math.max(0.001, ease(line));
+        G.signLine.scale.z = Math.max(0.001, ease(line));
         G.signLine.material.opacity = 0.9 * line * (view.endT && !rm ? Math.max(0.25, Math.min(1, (14 - e) / 2)) : 0.25);
         // dust in the lamplight
         if (G.dust && !rm) {
@@ -1119,7 +1160,7 @@
       }
       function stopHubScroll(e) {
         const panel = el.dispatch && el.dispatch.closest('.chasm3d-panel');
-        if (panel && panel.contains(e.target) && panel.scrollHeight > panel.clientHeight + 1) return;
+        if (panel && panel.contains(e.target) && (panel.scrollHeight > panel.clientHeight + 1 || panel.parentElement.scrollHeight > panel.parentElement.clientHeight + 1)) return;
         if (el.howto && el.howto.contains(e.target)) return;
         if (e.target === el.stage3d) return;
         e.preventDefault();   // the glass too: a finger drawing on it must never scroll the hub behind
@@ -1161,7 +1202,7 @@
         if (G) { G.cam.p = null; G.spot = null; G.hMove = null; G.aMove = null; }
         if (el.fade) el.fade.classList.remove('is-on');
         if (isDone()) { applyVictory(); say("We sleep tonight behind the gate, Silvia, in the dressing rooms, on piles of old costumes. The masks have all turned back to face the corridor. Every one of them is smiling now."); }
-        else if (!isAwake()) say("Silvia, we are at the gate of Tower III. It is not a door: it is a wall of masks, hundreds of them, from the ground to the top of the arch, all white, all staring. Aurelia says the old charts of the Sanctuary call it the Gate of a Thousand Masks. Six of these lie, she says, and the letter knew it. Find its page in your journal, please.");
+        else if (!isAwake()) say("Silvia, we are at the gate of Tower III. It is not a door: it is a wall of masks, hundreds of them, from the ground to the top of the arch, all white, all staring. Aurelia says the old charts of the Sanctuary call it the Gate of a Thousand Masks. Six of these lie, she says, and the letter knew it. In the middle of the wall twelve great masks carry a letter each on the forehead. Find their page in your journal, please.");
         else say("The three masks are waiting, Silvia, each carved on one side only. Give each its other half. Aurelia is holding the lamp.");
         render();
         sizeCanvas();
@@ -1232,7 +1273,7 @@
             statusClass: 'status-done-badge',
             title: 'The Gate of a Thousand Masks · Tower III',
             thumb,
-            lore: 'Silvia found the six masks that lie and spoke their word, and the wall of masks opened like a curtain. She gave three half-carved masks their missing halves, the way a mirror would, and the first piece of the mirror of Tower III was hers.',
+            lore: 'Silvia found the six masks that tell the truth and spoke their word, and the wall of masks opened like a curtain. She gave three half-carved masks their missing halves, the way a mirror would, and the first piece of the mirror of Tower III was hers.',
             rewards: [
               { icon: '🪞', label: 'Fragment I', desc: 'Set in the mirror of Tower III' },
               { icon: '✉️', label: 'A Note Sealed in Ash', desc: 'Pinned on the last mask' }

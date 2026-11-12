@@ -71,6 +71,24 @@ La Torre III es un **teatro-santuario vivo** de la Orden: autómatas, una orques
 
 Cada cara de juego lleva además un **fragmento dibujado**: su silueta y el trozo de reflejo que contiene. Juntos forman el espejo (sin necesidad de recortar nada).
 
+### 4.1 Lo que de verdad se imprimió (revisión de las maquetas, 12-11-2026)
+
+Las 16 caras están **impresas y entregadas** (decisión del Operador): la web se adapta a ellas, no al revés. Títulos impresos: 19A *The Unsent Letter*… 21A **The Alpine Memories**, 22B **The Ashes Before Christ**, 23B **The Disc and the Vow**, 24B **The Doctrine of the Mirror Speaker**, 25B **The Terrace Under the Stars**, 26B **Back to the Peaks**.
+
+| Cara | Qué trae el papel | Consecuencia para la web |
+| :---: | :--- | :--- |
+| 19B | 12 máscaras **sin letras** (4 × 3). Mienten la 2 (lágrima), 4 (Bauta agrietada), 5 (gato de una pluma), 8 (rey agrietado), 10 (encapuchada de ojos distintos) y 11 (pierrot de la borla). Texto: *«trust only what is reflected true»*. | Las 12 cuelgan en el centro del muro 3D, lisas, con una letra en la frente: las verdaderas dicen **SILVER**, las mentirosas **GOLDEN** (trampa con aviso propio). |
+| 20A | Ciudad boca abajo (misma geometría que `camera_city.py`), *The Three Hearths*, **sello QR** (TEDDWHYX). | Sin cambios de juego. |
+| 20B | Plano con la **rosa** (*Rosa phonica*) en el foco oeste, marcas I–V, escala de varas, 4 campanas dibujadas (el texto dice 5). **Sin sello.** | `SEALS[42] = null`; chat y pistas hablan de la rosa, no de una regla. |
+| 21B | Cilindro sin púas legibles, 6 campanas C·D·E·F·G·A, regla: borde opuesto + del último compás al primero. Sin sello. | La melodía vive en la web (S23). |
+| 22A | Clinómetro a **38°** (±2° bloquea), luego contrapeso igual a la masa del telón. Sin masa impresa, sin ecuación Q. Sin sello. | La masa y la ecuación de Q las da la web (S24). |
+| 23A | Teatro de sombras (luna, torre, figura), tres lámparas, **sello QR** (YCIJNQSR = hash `77d1d1fa`, nodo 45). | Pegar el hash en `SEALS[45]` al construir la S25. |
+| 23B | Disco con tres aberturas que, al trasluz, caen sobre las tres lámparas de 23A. **No hay letras impresas**: el trasluz muestra solo las lámparas. | La palabra de la S25 tiene que salir de la escena web guiada por las lámparas. |
+| 24A | Plano del laberinto con eje central plegable, «20 Venetian paces from the Western gate». Sin sello. | S26. |
+| 24B / 25B | Notas de **Aurelia (1970)** que nombran a **Pope-E** quemando las cuerdas en 1970, y de Hermes (1998). | Choca con §9 (Pope-E solo en 2026): ya impreso; la web no lo contradice ni lo explica. |
+| 25A | Linterna caleidoscópica: girar el anillo exterior hasta que los rayos converjan en el dial; «northern angle». Sin sello. | S27. |
+| 26A | **Dibuja la fachada de la Ópera** en el espejo y da **48° 12′ N, 16° 22′ E** y «imperial capital». Pide «the marks from the margins of Sheets 19 to 26», pero **no se imprimió ninguna marca en los márgenes**. | El WHERE ya es deducible en papel. La ceremonia de la S28 no puede depender de marcas que no existen. |
+
 ---
 
 ## 5. El mapa: El Espejo Roto Vivo + Caleidoscopio
@@ -203,7 +221,7 @@ Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{
 | :--- | :--- |
 | Biblia del Stage Path | ✅ Este documento |
 | Base web (pestaña, mapa del espejo + caleidoscopio, chat, probador) | ✅ Espejo Vivo (`stage-mirror.js`), pestaña Path III, Field Wire 33–44, probador `s20`, `s21` y `s22` |
-| Hojas 19 a 26 (impresión) | ✅ Hoja 19 (19A, 19B) · ✅ Hoja 20 (20A, 20B) · ⏳ Hojas 21 a 26 · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
+| Hojas 19 a 26 (impresión) | ✅ Hojas 19 a 26 impresas y entregadas (ver §4.1) · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
 | Estaciones 20 a 28 | ✅ Estaciones 20, 21 y 22 · ⏳ Estaciones 23 a 28 |
 
 ### Estación 22 · The Whispering Gallery (Hoja 20B · Fragmento III · J) · construida el 23-10-2026
@@ -237,6 +255,6 @@ Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{
 
 - **Hoja 19A** *(The Unsent Letter)*: carta de una Oráculo de hace siglos a la Mirror Speaker de su tiempo, en escritura de espejo (perdón; el espejo roto en 9 piezas para que nadie pueda girar el Astrolabio solo; aviso sobre los Ashes, más antiguos que la Orden; «The first piece sleeps behind a thousand faces. Only the one who sees what is not equal will find it.»). Nota de Aurelia, nota de Hermes (Leonardo escribía igual), espejo de mano que muestra el principio leído al derecho.
 - **Hoja 19B**: 12 máscaras venecianas, 6 mienten (lágrima, ceja ausente, pluma, grieta, ojo distinto, cinta: siempre en un solo lado). Señuelos simétricos (dos lágrimas, dos plumas, dos cintas). Letras de las mentirosas en orden de lectura: **SILVER**. Las 12 letras: M S A I L O T V H E R U. Fragmento I dibujado y su lugar en el espejo.
-- **Web**: palabra `SILVER` (tolerante con espacios y guiones; 3 fallos → pista en Ask Hermes). Después, **The Missing Halves**: tres máscaras talladas en una mitad; Silvia dibuja la otra mitad, en espejo, con el dedo o el ratón. Se acepta si el dibujo cubre el 72 % de la mitad reflejada, cada línea al menos el 45 % y el 70 % de lo dibujado cae sobre una línea (tolerancia 15 unidades sobre 300). Un pulso tembloroso pasa; copiar sin reflejar, desplazar, agrandar o garabatear no. Tras 3 intentos: guía punteada y el botón «Let the Mirror Speaker carve it» (camino de teclado).
+- **Web**: palabra `SILVER` (tolerante con espacios y guiones; 6 fallos → pista en Ask Hermes (nivel 2 de la escalera 3/6/9)). Después, **The Missing Halves**: tres máscaras talladas en una mitad; Silvia dibuja la otra mitad, en espejo, con el dedo o el ratón. Se acepta si el dibujo cubre el 72 % de la mitad reflejada, cada línea al menos el 45 % y el 70 % de lo dibujado cae sobre una línea (tolerancia 15 unidades sobre 300). Un pulso tembloroso pasa; copiar sin reflejar, desplazar, agrandar o garabatear no. Tras 3 intentos: guía punteada y el botón «Let the Mirror Speaker carve it» (camino de teclado).
 - **Premio**: Fragmento I (destella en el Espejo Vivo al cerrar el modal). Sin ecuación (J, Q y X llegan en 22, 24 y 27).
 - **Field Wire**: 33 partida (las hojas 19–26 llegan con una paloma de la Orden) → 18 h → 35 balance: el reflejo de la Mirror Speaker (firma con una línea), el Fragmento I y **la primera nota de Pope-E**, clavada en la última máscara: *«Let her through.»*, sello de ceniza (círculo cruzado por una línea). 36 cierre.

@@ -7,6 +7,7 @@
   <!-- Cloud save first: it must see every localStorage write the Hub makes (docs/IDEAS_BACKLOG.md #19) -->
   <script src="./hub/js/cloud-config.js"></script>
   <script src="./hub/js/cloud-save.js"></script>
+  <script src="./hub/js/story-point.js"></script>
   <script>
     /* Path theme (constellation | desert | stage) is set before first paint to avoid a flash of the wrong backdrop. */
     try {
@@ -84,6 +85,7 @@
   <link rel="stylesheet" href="./hub/css/stations/s21-camera-obscura.css">
   <link rel="stylesheet" href="./hub/css/stations/s21b-camera-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s22-whispering-gallery.css">
+  <link rel="stylesheet" href="./hub/css/stations/s22b-gallery-3d.css">
   <link rel="stylesheet" href="./hub/css/hint-ladder.css">
   <link rel="stylesheet" href="./hub/css/previously.css">
   <link rel="stylesheet" href="./hub/css/field-journal.css">
@@ -3561,7 +3563,7 @@
           <div class="laby3d-sigil" id="solstice-sigil-card">
             <div class="chasm3d-where">I · The sigil of Cairn V: follow the midsummer ray through the bronze mirrors and read the sun-stones it crosses</div>
             <label class="monolith-sr-only" for="solstice-key-input">The eight-letter sigil of Cairn V</label>
-            <input type="text" class="mon3d-input laby3d-input" id="solstice-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+            <input type="text" class="mon3d-input laby3d-input" id="solstice-key-input" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
             <button type="button" class="chasm3d-btn is-way" id="btn-solstice-speak">✦ Speak the Sigil</button>
             <div class="monolith-feedback" id="solstice-key-feedback" role="status" aria-live="polite"></div>
           </div>
@@ -3885,7 +3887,7 @@
           <div class="laby3d-sigil" id="oracle-sigil-card">
             <div class="chasm3d-where">I · The sigil of the Oracle: send the eight beacons across the three mirrors of the page “The Oracle's Horizon”</div>
             <label class="monolith-sr-only" for="oracle-key-input">The eight-letter sigil of the Oracle</label>
-            <input type="text" class="mon3d-input laby3d-input" id="oracle-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+            <input type="text" class="mon3d-input laby3d-input" id="oracle-key-input" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
             <button type="button" class="chasm3d-btn is-way" id="btn-oracle-speak">✦ Speak the Sigil</button>
             <div class="monolith-feedback" id="oracle-key-feedback" role="status" aria-live="polite"></div>
           </div>
@@ -3941,7 +3943,7 @@
           <button type="button" class="chasm3d-btn chasm3d-help" id="btn-oracle-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
           <details class="chasm3d-laws">
-            <summary>The Disc of Aurelia</summary>
+            <summary>The Disc of 24 Sightings</summary>
             <ul class="laby-rules">
               <li>The disc has three rings of eight sightings, one letter each, around a jewel. Each ring carries one gold star, engraved beside one of its letters.</li>
               <li>Turn each ring until its star points where that star stands in the sky over Tower II. North is at the top of the disc, as on the sky Hermes drew.</li>
@@ -4030,7 +4032,7 @@
           <div class="chasm3d-voice" id="masks-dispatch-text" role="status" aria-live="polite"></div>
 
           <div class="laby3d-sigil" id="masks-word-card">
-            <div class="chasm3d-where">I · The word of the gate: find the six masks that lie on the page “The Gate of a Thousand Masks”, and read their foreheads</div>
+            <div class="chasm3d-where">I · The word of the gate: find the six true masks on the page “The Gate of a Thousand Masks”, and read their letters on the wall</div>
             <label class="monolith-sr-only" for="masks-key-input">The six-letter word of the gate</label>
             <input type="text" class="mon3d-input laby3d-input" id="masks-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · ·">
             <button type="button" class="chasm3d-btn is-way" id="btn-masks-speak">✦ Speak the Word</button>
@@ -4074,7 +4076,7 @@
             <summary>The House of the Mirror</summary>
             <ul class="laby-rules">
               <li>A true face is the same on both sides. On the page “The Gate of a Thousand Masks”, six of the twelve masks lie: one of their halves is different.</li>
-              <li>Their forehead letters, read in order, make the word that opens the gate.</li>
+              <li>In the middle of the wall the same twelve masks hang in the same order, each with a letter on its forehead. The letters of the true ones, read in order, make the word that opens the gate.</li>
               <li>Inside, three masks wait with one half missing. Draw the missing half on the mirror side, as if the carved half were reflected in the glass.</li>
               <li>The mirror forgives a shaking hand, but not a missing eye.</li>
             </ul>
@@ -4093,7 +4095,8 @@
           </section>
           <section class="chasm3d-howto-page" data-page="1" hidden>
             <h3>I · The word of the gate</h3>
-            <p>Open the page <strong>“The Gate of a Thousand Masks”</strong>. A true face is the same on both sides. Find the six masks that lie, read their forehead letters in order, type the word and press <em>✦ Speak the Word</em>.</p>
+            <p>Open the page <strong>“The Gate of a Thousand Masks”</strong>. A true face is the same on both sides; six of the twelve hide a flaw. In the middle of the wall the same twelve masks hang in the same order, each with a letter on its forehead.</p>
+            <p>Read the letters of the true masks in order, type the word and press <em>✦ Speak the Word</em>.</p>
           </section>
           <section class="chasm3d-howto-page" data-page="2" hidden>
             <h3>II · The missing halves</h3>
@@ -4221,7 +4224,7 @@
             <ol class="chasm3d-howto-steps">
               <li>Open the page <strong>“The Camera Obscura”</strong>: the city as it stood yesterday, drawn upside down.</li>
               <li>Four things have changed since: something in the sky, something in the street, a shutter, and something on a roof.</li>
-              <li>Only one of the four is a fire. The raiders carry their fire wherever they go.</li>
+              <li>The page tells you to watch where smoke rises. Read “The Three Hearths” on it before you point.</li>
             </ol>
           </section>
           <section class="chasm3d-howto-page" data-page="3" hidden>
@@ -4240,86 +4243,126 @@
   </div>
 
   <!-- Station 22 · The Whispering Gallery (Tower III, Stage Path) -->
-  <div class="monolith-modal-backdrop is-stage-room" id="modal-whispering-gallery" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="gallery-modal-title">
-    <div class="monolith-window">
-      <div class="monolith-header">
-        <div class="monolith-title-wrap">
-          <span class="monolith-title-icon" aria-hidden="true">👂</span>
+  <div class="chasm-modal-backdrop" id="modal-whispering-gallery" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="gallery-modal-title">
+    <div class="chasm-workbench-window chasm3d-window gallery3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">👂</span>
           <div>
-            <h2 class="monolith-title" id="gallery-modal-title">THE WHISPERING GALLERY</h2>
-            <div class="monolith-subtitle">Station 22 · Tower III · The Two Pins and the Mirrored Tune</div>
+            <div class="chasm-header-title" id="gallery-modal-title">The Whispering Gallery · Station 22</div>
+            <div class="chasm-header-subtitle">Tower III · The Two Pins and the Mirrored Tune · page “The Whispering Gallery”</div>
           </div>
         </div>
-        <button type="button" class="monolith-close-btn" id="btn-close-gallery" aria-label="Close The Whispering Gallery">✕</button>
+        <button type="button" class="chasm-close-btn" id="btn-close-gallery" title="Close" aria-label="Close The Whispering Gallery">✕</button>
       </div>
 
-      <div class="monolith-telemetry">
-        <div>EXPEDITION:<strong>TOWER III // THE GALLERY</strong></div>
-        <div>LISTENING POST:<strong id="gallery-telem-focus">[ SEARCHING ]</strong></div>
-        <div>THE NICHE:<strong id="gallery-telem-niche">[ UNHEARD ]</strong></div>
-        <div>FRAGMENT III:<strong id="gallery-telem-fragment">[ MISSING ]</strong></div>
-      </div>
-
-      <div class="monolith-body">
-        <div class="monolith-panel">
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Plan of the Gallery</div>
-            <div class="gallery-speaker" id="gallery-speaker"></div>
-            <p class="gallery-lead">The raiders whisper at the <strong>east pin</strong>. Find on the page <strong>“The Whispering Gallery”</strong> where the pins stood, move Hermes to the <strong>west</strong> one, and listen there.</p>
-            <p class="gallery-sound" id="gallery-sound"></p>
-            <div class="gallery-hall">
-              <svg class="gallery-plan" id="gallery-plan" viewBox="-560 -430 1120 860" tabindex="0" role="application" aria-roledescription="plan" aria-label="The plan of the gallery. Move Hermes with the arrow keys, half a vara at a time; Enter listens where he stands." aria-describedby="gallery-where"></svg>
+      <div class="chasm3d-body">
+        <div class="chasm3d-stage" id="gallery3d-stage" tabindex="-1">
+          <canvas id="gallery3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
+          <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/whispering_gallery_preview.webp" alt=""></div>
+          <div class="chasm3d-hud">
+            <div class="gallery3d-map">
+              <svg class="gallery-plan" id="gallery-plan" viewBox="-520 -420 1040 820" tabindex="0" role="application" aria-roledescription="plan" aria-label="The plan of the gallery. Move Hermes with the arrow keys, half a vara at a time; Enter listens where he stands." aria-describedby="gallery-where"></svg>
             </div>
-            <div class="gallery-where" id="gallery-where" aria-live="polite"></div>
-            <p class="gallery-heard" id="gallery-heard" aria-live="polite"></p>
-            <div class="gallery-actions">
-              <button type="button" class="monolith-btn monolith-btn-primary" id="btn-gallery-listen">👂 Stand still and listen here</button>
+            <div class="chasm3d-status">
+              <div class="chasm3d-clock" id="gallery3d-status">Searching for the west pin</div>
             </div>
-            <div class="monolith-feedback" id="gallery-focus-feedback" role="status" aria-live="polite"></div>
           </div>
+          <div class="chasm3d-subtitle" id="gallery3d-subtitle" role="status" aria-live="polite"></div>
+          <div class="chasm3d-fade" id="gallery3d-fade"></div>
         </div>
 
-        <div class="monolith-panel">
-          <div class="monolith-card" id="gallery-bells-card" style="display: none;">
-            <div class="monolith-card-title">The Bells of the Niche</div>
-            <p class="gallery-lead">Six bells rang from the east. The raiders played them back note for note, and the niche stayed shut.</p>
+        <div class="chasm3d-panel">
+          <div class="chasm3d-voice-label">📻 Hermes, on the Field Wire</div>
+          <div class="chasm3d-voice" id="gallery-dispatch-text" role="status" aria-live="polite"></div>
+          <div class="gallery-speaker" id="gallery-speaker"></div>
+
+          <div class="chasm3d-where" id="gallery-lead">The raiders whisper at the <strong>east pin</strong>. Find on the page <strong>“The Whispering Gallery”</strong> where the pins stood, walk Hermes to the <strong>west</strong> one, and listen there.</div>
+          <p class="gallery-sound" id="gallery-sound"></p>
+          <div class="gallery-where" id="gallery-where" aria-live="polite"></div>
+          <p class="gallery-heard" id="gallery-heard" aria-live="polite"></p>
+          <div class="gallery-actions">
+            <button type="button" class="chasm3d-btn gallery-listen" id="btn-gallery-listen">👂 Stand still and listen here</button>
+          </div>
+          <div class="monolith-feedback" id="gallery-focus-feedback" role="status" aria-live="polite"></div>
+
+          <div class="gallery-bells-card" id="gallery-bells-card" style="display: none;">
+            <div class="gallery-bells-title">The bells of the niche</div>
+            <p class="gallery-lead">The niche at the east end played a tune of six notes on its five bells. The raiders played it back note for note, and their niche stayed shut. Answer on the bells beside Hermes (click them in the hall, or here).</p>
             <div class="gallery-bells" id="gallery-bells" role="group" aria-label="The five bells, from the biggest to the smallest"></div>
             <div class="gallery-played" id="gallery-played" role="img" aria-label="No bell played yet"></div>
             <div class="gallery-actions">
-              <button type="button" class="monolith-btn" id="btn-gallery-again">🔔 Hear the tune again</button>
-              <button type="button" class="monolith-btn" id="btn-gallery-restart">↺ Start my answer again</button>
+              <button type="button" class="chasm3d-btn" id="btn-gallery-again">🔔 Hear the tune again</button>
+              <button type="button" class="chasm3d-btn" id="btn-gallery-restart">↺ Start my answer again</button>
             </div>
             <div class="monolith-feedback" id="gallery-echo-feedback" role="status" aria-live="polite"></div>
           </div>
+          <div class="laby-hint" id="gallery-hint" style="display: none;"></div>
 
-          <div class="monolith-card">
-            <div class="monolith-card-title">The Gallery</div>
-            <ul class="laby-rules">
-              <li>The Order laid this hall out with two pins in the floor and a string of ten varas. A whisper at one pin is heard at the other, and nowhere else.</li>
-              <li>The page “The Whispering Gallery” shows the gallery, its axes and its scale, but not the pins.</li>
-              <li>Near the right place the whisper starts to come through, from the side where it is clearer.</li>
-              <li>What the gallery says must be answered the way a mirror answers.</li>
-            </ul>
-            <div class="laby-hint" id="gallery-hint" style="display: none;"></div>
-          </div>
-
-          <div class="monolith-card monolith-victory" id="gallery-victory" style="display: none;">
-            <div class="monolith-card-title">✦ The Niche Is Open</div>
-            <p id="gallery-victory-text"></p>
+          <div class="chasm-victory-card" id="gallery-victory" style="display: none;">
+            <div class="chasm-victory-title"><span>🪞</span><span>The Niche Is Open</span></div>
+            <div class="chasm-victory-text" id="gallery-victory-text"></div>
             <div class="masks-fragment-row">
               <svg class="masks-fragment" id="gallery-fragment-svg" viewBox="0 0 100 100" role="img" aria-label="Fragment III of the mirror of Tower III, with an arch and the edge of a balcony in it."></svg>
               <div>
                 <strong class="masks-fragment-name">Fragment III</strong>
-                <span>Three ninths of the mirror of Tower III. Inside the niche's door: [J] × 2 = [T], now in the Cipher Ledger.</span>
+                <span>Three ninths of the mirror of Tower III. Inside the niche's little door: [J] × 2 = [T], now in the Cipher Ledger.</span>
               </div>
             </div>
-            <button type="button" class="monolith-btn monolith-btn-primary" id="btn-gallery-finish-station">✦ Set Fragment III in the Mirror ➔</button>
+            <p class="gallery-letter-note">✉ And one more thing came back to Aurelia tonight: her first letter is waiting, sealed, in the Chronicles.</p>
+            <button type="button" class="btn-chasm-finish" id="btn-gallery-finish-station"><span>✦ Set Fragment III in the Mirror ➔</span></button>
           </div>
+          <button type="button" class="chasm3d-btn chasm3d-help" id="btn-gallery-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
-          <div class="monolith-card">
-            <div class="monolith-dispatch-sender">📻 FIELD WIRE DISPATCH // THE GALLERY</div>
-            <div class="monolith-dispatch" id="gallery-dispatch-text" role="status" aria-live="polite"></div>
+          <details class="chasm3d-laws">
+            <summary>The Gallery</summary>
+            <ul class="laby-rules">
+              <li>The Order laid this hall out with two pins in the floor and a string of ten varas. A whisper at one pin is heard at the other, and nowhere else.</li>
+              <li>The page “The Whispering Gallery” shows the gallery, its axes and its scale, and a rose on the floor where the western pin stood. In the dark hall nobody can see it.</li>
+              <li>Only very close to the right place does a whisper start to come through.</li>
+              <li>What the gallery says must be answered the way a mirror answers.</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
+      <div class="chasm3d-howto" id="gallery3d-howto" hidden role="region" aria-label="How to play">
+        <div class="chasm3d-howto-card">
+          <div class="chasm3d-howto-count" id="gallery3d-howto-count">1 of 4</div>
+          <div class="chasm3d-howto-dots" id="gallery3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
+          <section class="chasm3d-howto-page" data-page="0">
+            <h3>What you are doing</h3>
+            <p>Hermes and Aurelia are in a <strong>whispering gallery</strong>: an oval hall where a whisper spoken at one special spot is carried round the walls to a second spot, and heard there as if it were spoken at your ear.</p>
+            <p>Two raiders are whispering at the east spot. Stand Hermes on the west one, and he will hear everything.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="1" hidden>
+            <h3>Find the spot on paper</h3>
+            <ol class="chasm3d-howto-steps">
+              <li>Open the page <strong>“The Whispering Gallery”</strong>. The Order drew this oval with two pins and a string; the pins are the two spots.</li>
+              <li>The pins are gone, but the page marks where the west one stood. The hall is dark: Hermes cannot see the mark under his feet, so you must find it on the page.</li>
+              <li>The little plan in the corner of the hall has the same axes, so you can count how far from the middle Hermes is.</li>
+            </ol>
+          </section>
+          <section class="chasm3d-howto-page" data-page="2" hidden>
+            <h3>Walk and listen</h3>
+            <p>Click or tap the floor of the hall (or the little plan) and Hermes walks there. The arrow keys move him half a vara at a time.</p>
+            <p>When you think he stands on the spot, press <strong>Stand still and listen here</strong>. Only very close to it does a whisper reach him.</p>
+          </section>
+          <section class="chasm3d-howto-page" data-page="3" hidden>
+            <h3>The bells</h3>
+            <p>On the spot, a tune will come across the hall. Answer it on the five bells beside Hermes: click them in the hall, or use the bell buttons in the panel.</p>
+            <p>The raiders already tried the obvious answer. Hints wait under <em>Ask Hermes</em>.</p>
+          </section>
+          <div class="chasm3d-howto-nav">
+            <button type="button" class="chasm3d-btn" id="btn-gallery-howto-back">← Back</button>
+            <button type="button" class="chasm3d-btn chasm3d-howto-next" id="btn-gallery-howto-next">Next →</button>
           </div>
+          <button type="button" class="chasm3d-howto-skip" id="btn-gallery-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
     </div>
@@ -4527,7 +4570,7 @@
         <div class="chasm-header-title-wrap">
           <span class="chasm-header-icon">🌀</span>
           <div>
-            <div class="chasm-header-title" id="laby-modal-title">The Sandstone Labyrinth &amp; Cairn III · Station 15</div>
+            <div class="chasm-header-title" id="laby-modal-title">The Sandstone Labyrinth &amp; Cairn III<span class="chasm-header-station"> · Station 15</span></div>
             <div class="chasm-header-subtitle">Escape from the BC Ashes · page “The Sandstone Labyrinth &amp; Cairn III”</div>
           </div>
         </div>
@@ -4559,7 +4602,7 @@
           <div class="laby3d-sigil" id="laby-sigil-card">
             <div class="chasm3d-where">I · The sigil of Cairn III: the eight arches of the true road, from the Southern Mouth up to the cairn</div>
             <label class="monolith-sr-only" for="laby-key-input">The eight-letter sigil of Cairn III</label>
-            <input type="text" class="mon3d-input laby3d-input" id="laby-key-input" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
+            <input type="text" class="mon3d-input laby3d-input" id="laby-key-input" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
             <button type="button" class="chasm3d-btn is-way" id="btn-laby-speak">✦ Speak the Sigil</button>
             <div class="monolith-feedback" id="laby-key-feedback" role="status" aria-live="polite"></div>
           </div>
@@ -4611,7 +4654,7 @@
           <div class="chasm3d-howto-dots" id="laby3d-howto-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i></div>
           <section class="chasm3d-howto-page" data-page="0">
             <h3>What you are doing</h3>
-            <p>Hermes is deep inside the Sandstone Labyrinth, at the foot of <strong>Cairn III</strong>, the third of the five seals. It is night, and the raiders of the BC Ashes have followed his tracks in.</p>
+            <p>Hermes is deep inside the Sandstone Labyrinth, at the foot of <strong>Cairn III</strong>, the third of the five seals. It is night, and the raiders of the BC Ashes are inside the labyrinth with him.</p>
             <p>Part I opens the cairn with a word from your journal. Part II brings Hermes out alive.</p>
           </section>
           <section class="chasm3d-howto-page" data-page="1" hidden>
@@ -4624,6 +4667,7 @@
               <li>The labyrinth is dark. Hermes's lamp shows only the rock around him, and the walls he has seen stay drawn on his <strong>map</strong>, in the top corner.</li>
               <li>Each time he takes a step, or holds still, <strong>every torch takes one step too</strong>. Each raider walks the same round again and again.</li>
               <li>A torch lights its own square and the two in front of it. Those squares <strong>glow orange on the ground</strong>: never end a step inside them.</li>
+              <li>Before each step, look where each torch's arrow points: that is where its light falls next. Holding still in a dark side passage is often the safest move.</li>
             </ol>
           </section>
           <section class="chasm3d-howto-page" data-page="3" hidden>

@@ -87,7 +87,7 @@
           earned: ['Fragment II of the mirror'], sketch: T + 'camera_obscura_preview.webp'
         },
         s22: {
-          note: 'Tower III, the Whispering Gallery. Two pins nobody drew, a string of ten varas, and the Ashes whispering at the far end. Silvia knew where to stand.',
+          note: 'Tower III, the Whispering Gallery. A bronze rose lost in the dark, a string of ten varas, and the Ashes whispering at the far end. Silvia knew where to stand.',
           quote: 'A mirror gives everything back, but the last thing first.',
           earned: ['Fragment III of the mirror'], ledger: ['The Line of the Echo'], sketch: T + 'whispering_gallery_preview.webp'
         }
@@ -125,7 +125,8 @@
         var w = WALKS[id];
         if (!w || get(w[1]) === 'true') return null;
         var start = num(w[0]);
-        return start > 1e12 ? start + w[2] * 3600 * 1000 : null;   // the tester's "complete" writes a start of 1
+        var hours = id === 's14' && window.GatesRoad && window.GatesRoad.marchHours ? window.GatesRoad.marchHours() : w[2];
+        return start > 1e12 ? start + hours * 3600 * 1000 : null;   // the tester's "complete" writes a start of 1
       }
 
       // ---- Watching for games that become solved (and for tester resets that unsolve them)
