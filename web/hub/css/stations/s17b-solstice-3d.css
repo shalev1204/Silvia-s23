@@ -24,7 +24,7 @@
   opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease; pointer-events: none;
 }
 #modal-solstice-arch .solstice3d-aim.is-on { opacity: 1; transform: translate(-50%, 0); }
-#modal-solstice-arch .chasm3d-stage.is-night .solstice3d-aim { top: auto; bottom: 64px; }
+#modal-solstice-arch .chasm3d-stage.is-night .solstice3d-aim { top: 74px; bottom: auto; white-space: normal; text-align: center; max-width: 86%; }   /* clear of the subtitles */
 
 /* the panel: the sigil, then the part she is in */
 #modal-solstice-arch .laby3d-sigil { display: flex; flex-direction: column; gap: 8px; }

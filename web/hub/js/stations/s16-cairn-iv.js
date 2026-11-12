@@ -105,7 +105,7 @@
           'I have numbered the beats on the tape for you. My note on counting by ear is in Ask Hermes: "How do I count an echo by ear?"',
           'Let us take the first call of the first verse together. The Left pillar calls on beat 0, and its echo comes back on beat 6: six beats are 30 paces, so the first fissure is Left, 30. Go on call by call. When echoes cross, remember that a long call comes back long.'
         ],
-        onLevel: (n) => { if (n >= 2 && tape) drawTape(tape.raf ? 0 : Infinity); }
+        onLevel: (n) => { if (n >= 2) { if (tape && !tape.raf) drawTape(Infinity); render(); } }
       });
 
       let verseIdx = Math.min(versesSung(), VERSES.length - 1);
@@ -227,7 +227,8 @@
       }
 
       // ---- The chronograph tape (along the top of the scene) ----
-      const BEAT_PX = 14, TAPE_PAD = 12, TAPE_H = 96;
+      const TAPE_PAD = 12, TAPE_H = 96;
+      let BEAT_PX = 14, TAPE_K = 1;   // a beat in tape units, and the tape's scale on screen
       let tape = null;   // { events, beats, beatMs, label, start, raf, beatNow }
       function eventsOf(calls) {
         const evs = [];
@@ -242,9 +243,12 @@
         if (!svg) return;
         svg.textContent = '';
         const beats = tape ? tape.beats : 24;
+        TAPE_K = (svg.clientHeight || TAPE_H) / TAPE_H;
+        const room = el.tapeWrap ? (el.tapeWrap.clientWidth - 16) / TAPE_K : 0;
+        BEAT_PX = Math.max(14, Math.min(34, (room - TAPE_PAD * 2) / beats));
         const width = TAPE_PAD * 2 + beats * BEAT_PX;
         svg.setAttribute('viewBox', `0 0 ${width} ${TAPE_H}`);
-        svg.setAttribute('width', String(width));
+        svg.setAttribute('width', String(Math.round(width * TAPE_K)));
         const xb = (b) => TAPE_PAD + b * BEAT_PX;
         svg.appendChild(svgEl('line', { x1: 0, y1: TAPE_H / 2, x2: width, y2: TAPE_H / 2, stroke: '#8a6d3b', 'stroke-width': 0.6 }));
         for (let b = 0; b <= beats; b++) {
@@ -306,12 +310,13 @@
           const beat = cur.beatNow();
           drawTape(Math.max(0, beat));
           if (el.tapeWrap) {
-            const x = TAPE_PAD + beat * BEAT_PX - el.tapeWrap.clientWidth * 0.6;
+            const x = (TAPE_PAD + beat * BEAT_PX) * TAPE_K - el.tapeWrap.clientWidth * 0.6;
             if (x > el.tapeWrap.scrollLeft) el.tapeWrap.scrollLeft = x;
           }
           if (beat < cur.beats) { cur.raf = requestAnimationFrame(frame); return; }
           cur.raf = null;
           drawTape(Infinity);
+          if (el.tapeWrap) el.tapeWrap.scrollLeft = 0;   // the whole verse, from its first call
           setMood();
           if (el.tapeStatus) el.tapeStatus.textContent = label + ' · recorded';
           if (!cur.isTest) { record = cur; return; }
@@ -356,7 +361,6 @@
         RINGS.forEach((d) => {
           const y = ringY(d);
           svg.appendChild(svgEl('path', { d: `M${PLAN.wallL} ${y + 7} Q 60 ${y - 9} ${PLAN.wallR} ${y + 7}`, fill: 'none', stroke: '#b8a07a', 'stroke-opacity': 0.45, 'stroke-width': 0.5 }));
-          svg.appendChild(svgText(60, y - 3.6, String(d), { 'font-size': 4.2, fill: '#d6c3a0' }));
         });
         [['L', 50], ['R', 70]].forEach(([side, x]) => {
           svg.appendChild(svgEl('rect', { x: x - 4, y: PLAN.baseY, width: 8, height: 8, fill: '#3b2a17', stroke: side === 'L' ? '#f59e0b' : '#2dd4bf', 'stroke-width': 0.9 }));
@@ -372,6 +376,7 @@
             const tx = side === 'L' ? x - 8 : x + 8;
             g.appendChild(svgEl('rect', { class: 'pillars-tag', x: tx - 4.5, y: y - 4.5, width: 9, height: 9, rx: 1, fill: shown.has(id) ? 'rgba(134, 239, 172, 0.18)' : '#1a120a', stroke: side === 'L' ? '#f59e0b' : '#2dd4bf', 'stroke-width': 0.5 }));
             g.appendChild(svgText(tx, y + 1.8, shown.has(id) ? WALLS[side][d] : '?', { 'font-size': 5, fill: shown.has(id) ? '#86efac' : '#b8a07a' }));
+            g.appendChild(svgText(side === 'L' ? x + 9 : x - 9, y + 1.5, String(d), { 'font-size': 3.6, fill: '#d6c3a0' }));
             g.appendChild(svgEl('rect', { x: side === 'L' ? 0 : x - 10, y: y - 6.4, width: side === 'L' ? x + 10 : 120 - x + 10, height: 12.8, fill: 'transparent' }));
             svg.appendChild(g);
           });
@@ -561,7 +566,7 @@
         });
         ringStones.count = ni; ringStones.receiveShadow = true; scene.add(ringStones);
         const ringLabels = RINGS.map((d) => {
-          const m = new T.Mesh(new T.PlaneGeometry(1.1, 0.55), new T.MeshBasicMaterial({ map: P.canvasTex(128, 64, (g, w, h) => {
+          const m = new T.Mesh(new T.PlaneGeometry(2.4, 1.2), new T.MeshBasicMaterial({ map: P.canvasTex(128, 64, (g, w, h) => {
             g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(20,14,10,0.55)'; g.fillRect(8, 6, w - 16, h - 12);
             g.fillStyle = '#e8dcc0'; g.font = '700 34px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(String(d), w / 2, h / 2 + 2);
           }), transparent: true, depthWrite: false }));
@@ -577,7 +582,7 @@
             const s = sideX(side), z = fz(d);
             const id = fissureId(side, d);
             const plaque = new T.Mesh(new T.PlaneGeometry(1.05, 1.31), new T.MeshBasicMaterial({ map: plaqueTex(T, side, d, false), transparent: true, depthWrite: false, toneMapped: false }));
-            plaque.position.set(s * (CW - 0.95), 3.9, z + 0.95);
+            plaque.position.set(s * (CW - 0.95), 3.9, z + 0.95); plaque.userData.id = id;
             plaque.rotation.y = -s * Math.PI / 2 * 0.72;
             scene.add(plaque);
             const glow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: side === 'L' ? 0xffb35a : 0x5ef0d8, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
@@ -665,7 +670,7 @@
 
         return { T, renderer, scene, camera, lowPower, sky, paintSky, stars, moon, hemi, moonLight, cliffs, fissures, pillars, plate, bronzeMat, beatLamp, chamberLight,
           seal, pebble, waves, orbs, markers, markerTex, ringLabels, H, hermes: H && H.hermes, lamp, fx,
-          ray: new T.Raycaster(), hits: fissures.map((f) => f.hit),
+          ray: new T.Raycaster(), hits: fissures.map((f) => f.hit), plaques: fissures.map((f) => f.plaque),
           cam: { yaw: 0, pitch: 0.46, dist: 30, tYaw: 0, tPitch: 0.46, tDist: 30, p: null, l: null }, dawnShown: -1 };
       }
 
@@ -761,8 +766,8 @@
             const dx = e.clientX - pt.x, dy = e.clientY - pt.y;
             pt.moved += Math.abs(dx) + Math.abs(dy);
             if (G && pt.moved > 4) {
-              G.cam.tYaw = Math.max(-0.55, Math.min(0.55, G.cam.tYaw - dx * 0.004));
               G.cam.tPitch = Math.max(0.1, Math.min(1.1, G.cam.tPitch + dy * 0.004));
+              G.cam.tYaw -= dx * 0.004; clampYaw();
             }
             pt.x = e.clientX; pt.y = e.clientY;
           } else setHover(fissureUnder(e));
@@ -776,16 +781,34 @@
         });
         c.addEventListener('pointercancel', () => { pt.down = false; });
         c.addEventListener('pointerleave', () => setHover(null));
-        c.addEventListener('wheel', (e) => { if (!G) return; e.preventDefault(); G.cam.tDist = Math.max(12, Math.min(44, G.cam.tDist * Math.exp(e.deltaY * 0.0012))); }, { passive: false });
+        c.addEventListener('wheel', (e) => { if (!G) return; e.preventDefault(); G.cam.tDist = Math.max(12, Math.min(44, G.cam.tDist * Math.exp(e.deltaY * 0.0012))); clampYaw(); }, { passive: false });
         c.addEventListener('dblclick', () => { if (G) { G.cam.tYaw = 0; G.cam.tPitch = 0.46; G.cam.tDist = 30; } });
+      }
+      // the camera never leaves the gorge: outside the cliffs the screen is rock and every click lands on the wrong fissure
+      function clampYaw() {
+        const c = G.cam, lim = Math.asin(Math.min(0.9, 3.4 / Math.max(1, Math.cos(c.tPitch) * c.tDist)));
+        c.tYaw = Math.max(-lim, Math.min(lim, c.tYaw));
       }
       function fissureUnder(e) {
         if (!G || !isAwake() || isDone()) return null;
         const r = el.canvas.getBoundingClientRect();
         const ndc = new G.T.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
         G.ray.setFromCamera(ndc, G.camera);
-        const hit = G.ray.intersectObjects(G.hits, false)[0];
-        return hit ? G.fissures.find((f) => f.id === hit.object.userData.id) : null;
+        // the carved plaque she is pointing at wins; otherwise the place where her look meets the cliff face, to the nearest ring
+        const plaque = G.ray.intersectObjects(G.plaques, false)[0];
+        if (plaque) return G.fissures.find((f) => f.id === plaque.object.userData.id) || null;
+        const o = G.ray.ray.origin, dir = G.ray.ray.direction;
+        for (const side of ['L', 'R']) {
+          if (Math.abs(dir.x) < 1e-4) continue;
+          const t = (sideX(side) * CW - o.x) / dir.x;
+          if (t <= 0) continue;
+          const y = o.y + dir.y * t, paces = -(o.z + dir.z * t) / PACE;
+          if (y < 0 || y > 10.5) continue;
+          const d = Math.round(paces / 5) * 5;
+          const f = G.fissures.find((q) => q.side === side && q.d === d);
+          if (f) return f;
+        }
+        return null;
       }
       function setHover(f) {
         view.hover = f || null;
@@ -803,8 +826,8 @@
         if (cf) { p = cf.p; l = cf.l; snap = true; }
         else if (!isAwake()) { p = [3.4, 4.2, 8.2]; l = [0, 1.6, -0.5]; }
         // the end: first the chamber between the pillars, then the gorge at first light with the pillars in front
-        else if (view.ending === 1) { p = [3.2, 2.8, 6.4]; l = [0, 1.7, 0]; }
-        else if (isDone()) { p = [0, 8.5, 15]; l = [0, 3, -12]; }
+        else if (view.ending === 1) { p = [3.2, 3.3, 6.6]; l = [0, 0.7, 0]; }
+        else if (isDone()) { p = [0, 9.4, 18]; l = [0, 1.6, -10]; }   // Hermes and the open chamber stay in frame, above the subtitle
         else {
           const k = Math.min(1, dt * 5);
           c.yaw += (c.tYaw - c.yaw) * k; c.pitch += (c.tPitch - c.pitch) * k; c.dist += (c.tDist - c.dist) * k;
@@ -916,7 +939,7 @@
       function chooseFissure(id) {
         if (!isAwake() || isDone()) return;
         const side = id[0], d = parseInt(id.slice(1), 10);
-        if (mode === 'call') { testCall(side, d); return; }
+        if (mode === 'call') { testCall(side, d); mode = 'mark'; render(); return; }
         const need = VERSES[verseIdx].answer.length;
         if (slots.length >= need) { feedback(el.songFeedback, 'This verse has ' + need + ' echoes. Remove one (⌫) or sing it back.', 'error'); return; }
         slots.push(id);
@@ -986,7 +1009,7 @@
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(4);
         else set('order_seal_cairn_4', 'true');
         if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('tuning_pebble');
-        say("STONE... and listen, Silvia. Listen to how the wind played that last verse: three short calls, a pause, two long ones. That is the code I engraved on Aurelia's disc. The same light I saw from the cliffs in 2016. And in the throat of the Left pillar there is a pebble that the river never put there.");
+        say("STONE... and listen, Silvia. Listen to how the wind played that last verse: three short calls, a pause, two long ones. That is the code I engraved on Aurelia's disc, and the rhythm of the light I saw through my telescope ten years ago, blinking far out in this desert. And in the throat of the Left pillar there is a pebble that the river never put there.");
         if (G && !reduced()) {
           view.ending = 1; view.opened = 0;
           setTimeout(() => { if (G && G.fx) G.fx.triumph({ x: 0, y: 1.6, z: 0.4 }, 1); }, 900);
@@ -1218,7 +1241,7 @@
         view.dawn = isDone() ? 0.75 : versesSung() * 0.08;
         if (G) { G.cam.p = null; G.dawnShown = -1; }
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am at the southern mouth of the gorge. Two hollow pillars, taller than three men, and the wind already hums inside them. The bronze plate between them asks for the sigil of the seven echoes, the ones on the page “Cairn IV: Sentry of the Canyon” of your journal.");
+        else if (!isAwake()) say("Silvia, I reached the southern mouth of the gorge in the afternoon heat and slept in the shade until the night wind rose. Two hollow pillars, taller than three men, and now the wind hums inside them. The bronze plate between them asks for the sigil of the seven echoes, the ones on the page “Cairn IV: Sentry of the Canyon” of your journal.");
         else say("The pillars are still singing. Let the wind play, count the echoes, and sing the verse back.");
         render();
         // The bed starts at its own level when the modal appears; set ours once it has
@@ -1296,7 +1319,7 @@
           if (!G) return null;
           const f = G.fissures.find((x) => x.id === id);
           if (!f) return null;
-          const v = f.hit.position.clone().project(G.camera), r = el.canvas.getBoundingClientRect();
+          const v = f.plaque.position.clone().project(G.camera), r = el.canvas.getBoundingClientRect();
           return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
         },
         frames: (n) => { for (let i = 0; i < (n || 1); i++) tick(performance.now() + i * 33, 1 / 30); }

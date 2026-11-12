@@ -242,7 +242,7 @@
       const stepMs = () => (get(KEYS.dawnHint) === 'true' ? STEP_MS_HINTED : STEP_MS);
       function startDawn() {
         if (!isAwake() || dawnDone() || dawn.running) return;
-        dawn.running = true; dawn.step = 0; dawn.locks = 0;
+        dawn.running = true; dawn.step = 0; dawn.locks = 0; dawn.seen = 0;
         dawn.deadline = performance.now() + stepMs();
         cue('whoosh', { dur: 1.4 });
         feedback(el.dawnFeedback, 'The first ray slips under the arch.', '');
@@ -255,10 +255,25 @@
       }
       function tick() {
         if (!dawn.running) return;
-        const left = dawn.deadline - performance.now();
+        const now = performance.now();
+        // the sun waits while she reads How to play
+        if (dawn.seen && el.howto && !el.howto.hidden) dawn.deadline += now - dawn.seen;
+        dawn.seen = now;
+        const left = dawn.deadline - now;
         if (el.clock) el.clock.style.width = Math.max(0, Math.min(100, (left / stepMs()) * 100)).toFixed(1) + '%';
+        sunClock(left);
         if (left <= 0) { dawnSpent(); return; }
         dawn.raf = requestAnimationFrame(tick);
+      }
+      // the clock of the sun over the scene: drawn by the timer, so it also shows without WebGL
+      function sunClock(left) {
+        if (!el.sun) return;
+        el.sun.classList.toggle('is-on', dawn.running);
+        if (!dawn.running || !el.sunLabel) return;
+        const secs = Math.max(0, Math.ceil(left / 1000));
+        const txt = '☀ Ray ' + (dawn.step + 1) + ' of 4 · ' + secs + ' s';
+        if (el.sunLabel.textContent !== txt) el.sunLabel.textContent = txt;
+        el.sun.classList.toggle('is-late', secs <= 8);
       }
       let pausedLeft = null;
       document.addEventListener('visibilitychange', () => {
@@ -267,7 +282,7 @@
           if (dawn.running) { pausedLeft = dawn.deadline - performance.now(); if (dawn.raf) cancelAnimationFrame(dawn.raf); dawn.raf = null; }
         } else if (dawn.running && pausedLeft !== null) {
           dawn.deadline = performance.now() + Math.max(0, pausedLeft);
-          pausedLeft = null;
+          pausedLeft = null; dawn.seen = 0;
           tick();
         }
       });
@@ -276,6 +291,7 @@
         if (dawn.raf) cancelAnimationFrame(dawn.raf);
         dawn.raf = null;
         if (el.clock) el.clock.style.width = '0%';
+        sunClock(0);
       }
       function checkRay() {
         if (!dawn.running) return;
@@ -293,7 +309,7 @@
           sceneDawnDone();
           subtitle('The fourth lock closes. The brass ring turns, and the altar opens like a flower.', 5.2, 'act');
           feedback(el.dawnFeedback, 'The fourth lock closes. The altar opens.', 'ok');
-          say("Four locks! The brass ring turned, Silvia, and the altar opened like a flower: the Seal of Cairn V is in my hand. The fifth one. I am going to sit down for a moment. Then I will wait for the night here, under the arch: from up here I can see Tower II.");
+          say("Four locks! The brass ring turned, Silvia, and the altar opened like a flower: the Seal of Cairn V is in my hand. The fifth one. Under it lay a small bronze hand mirror, freshly polished, with the Order's mark on its rim. I am going to sit down for a moment. Then I will wait for the night here, under the arch: from up here I can see Tower II.");
           render();
           return;
         }
@@ -301,6 +317,7 @@
         feedback(el.dawnFeedback, 'Lock ' + dawn.locks + ' of 4 closed. The sun moves on.', 'ok');
         dawn.step = dawn.locks;
         dawn.deadline = performance.now() + stepMs();
+        render();
         checkRay();
       }
       function dawnSpent() {
@@ -364,9 +381,10 @@
         playing.push(setTimeout(() => { playing = null; if (done) done(); }, t));
       }
       function watchLight() {
-        if (!dawnDone() || isDone() || finale) return;
+        if (!dawnDone() || isDone() || finale || modal.style.display === 'none') return;
         const r = roundsDone();
-        feedback(el.signalFeedback, '', '');
+        if (!el.signalFeedback || !el.signalFeedback.classList.contains('is-error')) feedback(el.signalFeedback, '', '');
+        if (el.hint) el.hint.style.display = 'none';   // the log shows the flashes only once they have been seen
         playPattern(ROUNDS[r], () => {
           if (get(KEYS.signalHint) === 'true') showHint();
         });
@@ -419,6 +437,7 @@
           feedback(el.signalFeedback, 'The light on Tower II waits, then asks again.', 'error');
           pulses = []; renderPulses();
           render();
+          setTimeout(() => { if (!pulses.length) watchLight(); }, 1600);   // unless she is already answering
           return;
         }
         pulses = []; renderPulses();
@@ -448,12 +467,13 @@
         playPattern(burst, () => {
           if (el.message) el.message.textContent = lines.join('   ·   ');
           drawNight(true);
+          view.burn = 1;
           if (G && G.fx) { G.fx.shake.add(0.25); if (G.fx.gait) G.fx.gait.react('flinch'); }
           subtitle('The light on Tower II goes out, all at once. A red glow rises at its foot.', 5.5, 'act');
           cue('thud');
           cue('flame', { dur: 2.4 });
           say("And then the light went out. Not slowly, Silvia: all at once. There is a red glow at the foot of Tower II now, and the wind smells of smoke. The wagons. They have reached the Sanctuary.");
-          setTimeout(completeStation, 1800);
+          setTimeout(completeStation, reduced() ? 1800 : 6000);
         });
         lines.forEach((line, i) => setTimeout(() => {
           shown += (shown ? '   ·   ' : '') + line;
@@ -543,8 +563,8 @@
         if (el.victory) el.victory.style.display = done ? '' : 'none';
         // the panel shows the part she is in; the scene shows the rest
         if (el.dawnGame) el.dawnGame.style.display = dDone ? 'none' : '';
-        if (el.nightGame) el.nightGame.style.display = (!dDone || done) ? 'none' : '';
-        if (el.status) el.status.textContent = done ? '✦ The last seal' : !awake ? 'The altar sleeps' : !dDone ? 'Locks ' + (dawn.running ? dawn.locks : 0) + ' / 4' : 'Signal ' + Math.min(r + 1, ROUNDS.length) + ' of ' + ROUNDS.length;
+        if (el.nightGame) el.nightGame.style.display = (!dDone || done || view.ending === 1) ? 'none' : '';
+        if (el.status) el.status.textContent = done ? '✦ The last seal' : !awake ? 'The altar sleeps' : view.ending === 1 ? '✦ The altar opens' : !dDone ? 'Locks ' + (dawn.running ? dawn.locks : 0) + ' / 4' : 'Signal ' + Math.min(r + 1, ROUNDS.length) + ' of ' + ROUNDS.length;
         if (el.stage) el.stage.classList.toggle('is-night', nightMode());
         setHover(view.hover !== null && awake && !dDone ? view.hover : null);
         syncWorld();
@@ -1007,6 +1027,7 @@
         let at, face;
         const [ax, ay] = COURT.altar;
         if (nightMode()) { at = [0.9, 0.2]; face = [TOWER.x - 0.9, TOWER.z - 0.2]; }
+        else if (view.ending === 1) { at = [colX(ax) + 2.2, rowZ(ay) - 2.2]; face = [-1, 1]; }   // beside the altar, not between it and the camera
         else if (!isAwake()) { at = [colX(ax) + 1.6, rowZ(ay) + 0.5]; face = [-1.6, -0.5]; }
         else { at = [colX(ax) + 1.25, rowZ(ay) + S * 0.95]; face = [-0.6, -1]; }
         if (snap || !G.hermesAt) { G.hermesAt = at.slice(); }
@@ -1066,7 +1087,7 @@
           const [x, y] = COURT.mirrors[view.hover];
           el.aim.textContent = '⟲ Turn this mirror · row ' + (y + 1) + ', column ' + (x + 1);
           el.aim.classList.add('is-on');
-        } else if (nightMode() && !isDone() && dawnDone()) {
+        } else if (nightMode() && !isDone() && dawnDone() && !finale) {
           el.aim.textContent = '🪞 Press and hold on the scene to flash the mirror';
           el.aim.classList.add('is-on');
         } else el.aim.classList.remove('is-on');
@@ -1126,7 +1147,7 @@
           G.paintSky(s);
           G.stars.material.opacity = 0.9 * Math.max(0, 1 - s * 2.2);
           G.moon.material.opacity = Math.max(0, 1 - s * 2);
-          G.hemi.intensity = 0.3 + s * 0.5;
+          G.hemi.intensity = 0.17 + s * 0.63;   // a real night: the moon draws the stones, it does not light them like a day
           G.hemi.color.setHex(0x6a7cc8).lerp(new G.T.Color(0xffe8c8), Math.min(1, s * 1.4));
           G.hemi.groundColor.setHex(0x1a1626).lerp(new G.T.Color(0x6a5040), s);
         }
@@ -1140,7 +1161,7 @@
         const moonDir = [-14, 40, 30], sunDir = [G.sun.position.x * 0.12, G.sun.position.y * 0.12, -36];
         G.key.position.set(moonDir[0] + (sunDir[0] - moonDir[0]) * kd, moonDir[1] + (sunDir[1] - moonDir[1]) * kd, moonDir[2] + (sunDir[2] - moonDir[2]) * kd);
         G.key.color.setHex(0xbccbff).lerp(new G.T.Color(s > 0.6 ? 0xfff0dc : 0xffc890), kd);
-        G.key.intensity = 0.55 + kd * (s > 0.6 ? 0.95 : 0.7);
+        G.key.intensity = 0.34 + kd * (s > 0.6 ? 1.16 : 0.91);
         // the mirrors turn on their pivots with a little overshoot, and shine where the ray strikes them
         G.mirrors.forEach((m, i) => {
           const d = m.target - m.angle;
@@ -1175,7 +1196,7 @@
         const lv = towerOn ? 1 : 0;
         G.towerLight.material.opacity = night ? lv * 1.0 + 0.04 : 0;
         G.towerSpark.material.opacity = night ? lv : 0;
-        const fireOn = done ? 1 : 0;
+        const fireOn = done || view.burn ? 1 : 0;
         view.fire += (fireOn - view.fire) * Math.min(1, dt * (rm ? 50 : 0.5));
         G.fireGlow.material.opacity = night ? view.fire * (0.75 + (rm ? 0 : 0.15 * Math.sin(t * 3.3))) : 0;
         G.smoke.forEach((m, i) => {
@@ -1217,16 +1238,6 @@
         placeCamera(dt, false);
         if (G.fx) G.fx.render(G.scene, G.camera, dt); else G.renderer.render(G.scene, G.camera);
         if (G.adapt) G.adapt(dt); else if (P.fitSpeed) G.adapt = P.fitSpeed(G.renderer);
-        // the clock of the sun, over the scene
-        if (el.sun) {
-          el.sun.classList.toggle('is-on', dawn.running);
-          if (dawn.running && el.sunLabel) {
-            const secs = Math.max(0, Math.ceil((dawn.deadline - performance.now()) / 1000));
-            const txt = '☀ Ray ' + (dawn.step + 1) + ' of 4 · ' + secs + ' s';
-            if (el.sunLabel.textContent !== txt) el.sunLabel.textContent = txt;
-            el.sun.classList.toggle('is-late', secs <= 8);
-          }
-        }
       }
       function frame(t) {
         if (!G || modal.style.display === 'none') return;
@@ -1267,7 +1278,7 @@
         const go = () => { view.ending = 0; view.rayCol = -1; view.sky = 0; if (G) G.skyShown = -1; placeHermes(true); if (G) G.cam.p = null; render(); };
         if (!G || reduced() || !el.fade || modal.style.display === 'none') { go(); return; }
         el.fade.classList.add('is-on');
-        setTimeout(() => { go(); subtitle('Night again. Far to the north, through the arch, a light burns on top of Tower II.', 5, 'act'); el.fade.classList.remove('is-on'); }, 700);
+        setTimeout(() => { go(); subtitle('Night again. Far off, through the arch, a light burns on top of Tower II.', 5, 'act'); el.fade.classList.remove('is-on'); }, 700);
       }
       function sceneSpent() {
         view.spentT = performance.now();
@@ -1387,7 +1398,7 @@
         fit();
         view.snapNext = true; view.ending = 0; view.sigilT = 0; view.rayCol = -1; view.holdCol = -1; view.holdFx = null;
         view.opened = dawnDone() ? 1 : 0;
-        view.sky = 0; view.fire = isDone() ? 1 : 0;
+        view.sky = 0; view.fire = isDone() ? 1 : 0; view.burn = 0;
         if (G) { G.cam.p = null; G.skyShown = -1; G.hermesGoal = null; }
         if (isDone()) applyVictory();
         else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. The courtyard behind it is paved with bronze mirrors and fallen pillars, and the Solar Altar waits on its terrace with a brass ring. From here I can see the dunes where Cairn V stands guard. Open the page “Arch of the Solstice & The Solar Altar”, please: the sigil first.");

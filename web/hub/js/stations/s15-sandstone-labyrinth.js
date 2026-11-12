@@ -953,7 +953,7 @@
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(3);
         else set('order_seal_cairn_3', 'true');
         feedback(el.moveFeedback, 'The Western Cleft. Hermes is out.', 'ok');
-        say("I am out, Silvia! Through the Western Cleft and onto the open hardpan. The torches are still searching the fissures behind me.");
+        say("I am out, Silvia! Through the Western Cleft and out to the edge of the hardpan. The torches are still searching the fissures behind me.");
         subtitle('Through the Western Cleft, and out onto the open hardpan. Behind him the torches search the dark.', 6, 'act');
         if (G && !reduced()) {
           // he squeezes through the cleft; then the whole labyrinth stands up out of the dark, from the cleft outwards

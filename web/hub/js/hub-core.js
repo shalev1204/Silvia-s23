@@ -4659,13 +4659,13 @@
               id: "choice-11-painter",
               text: "Could another painter of the Order use the same lapis?",
               silviaMsg: "Could another painter of the Order have used the same lapis?",
-              hermesReply: "Perhaps. The founders painted their charts with the same stone for centuries. That is the sensible answer, and I am trying very hard to be sensible."
+              hermesReply: "Perhaps. The founders painted their charts with the same stone for centuries. That is the sensible answer, and I am trying very hard to be sensible. Still, I scraped a grain of it into the brass box where I keep my compass."
             },
             {
               id: "choice-11-raiders",
               text: "The raiders know about the seals. We have to be faster.",
               silviaMsg: "Forget the ghosts for now. The raiders know about the seals, and they won't stop at one failed niche. We have to be faster.",
-              hermesReply: "You are right. The iron marks are days old, no more. If they cannot open the cairns, they will try to follow the one who can. From now on I will cover my tracks."
+              hermesReply: "You are right. The iron marks are days old, no more. If they cannot open the cairns, they will try to follow the one who can. From now on I will cover my tracks. And I scraped a grain of that blue into the brass box where I keep my compass; I could not leave it all behind."
             }
           ]
         },
@@ -4712,7 +4712,7 @@
         {
           // Station 15 debrief: the raiders' camp and the gold star
           step: 15,
-          hermesInitial: "I am out, Silvia. Through the Western Cleft and onto the open hardpan, with the Seal of Cairn III wrapped in my scarf. They never saw my face.\n\nTwo things I cannot stop thinking about. Their camp: cold ashes, a broken wagon wheel, the charred circle of the BC Ashes scratched on the rock. They have been sleeping in that labyrinth for days, waiting for someone to open the cairn for them. Now they know someone did.\n\nAnd the star. A star painted in gold leaf on the wall of a fissure, eight points over a ground of blue, and the gold still bright. Aurelia gilded her stars exactly like that, the blue first so the gold would seem to burn in the night. First the blue at Cairn II, now this. Either the sun is cooking my mind, or someone walks these cairns ahead of me and knows the old way of painting the sky.",
+          hermesInitial: "I am out, Silvia. Through the Western Cleft and into the rocks at the edge of the hardpan, with the Seal of Cairn III wrapped in my scarf. They never saw my face.\n\nTwo things I cannot stop thinking about. Their camp: cold ashes, a broken wagon wheel, the charred circle of the BC Ashes scratched on the rock. They have been sleeping in that labyrinth for days, waiting for someone to open the cairn for them. Now they know someone did.\n\nAnd the star. A star painted in gold leaf on the wall of a fissure, eight points over a ground of blue, and the gold still bright. Aurelia gilded her stars exactly like that, the blue first so the gold would seem to burn in the night. First the blue at Cairn II, now this. Either the sun is cooking my mind, or someone walks these cairns ahead of me and knows the old way of painting the sky.",
           choices: [
             {
               id: "choice-15-star",
@@ -4744,7 +4744,7 @@
         {
           // Dusk at the edge of the hardpan: a shepherd, and the veiled woman who sings to the stars
           step: 17,
-          hermesInitial: "Dusk, Silvia, and I am not alone. At a seep under the last rocks before the hardpan there is an old shepherd with a dozen black goats. He shared his water and asked me nothing, which is the desert's way of being kind.\n\nHe says the hardpan can be crossed in one night if you walk toward the singing: when the night wind blows, the pillars of Cairn IV can be heard from the Natural Bridge of the Sentinel Mesa. Then he said something I cannot shake off. Every autumn, on the clear nights, a veiled woman comes down from the sandstone and sings to the stars. The herders leave her milk and dates on a flat stone. Nobody has seen her face.\n\nThe raiders' wagons came by here yesterday, he says. Heading south-west, like me.",
+          hermesInitial: "Dusk, Silvia, and I am not alone. At a seep under the last rocks before the hardpan there is an old shepherd with a dozen black goats. He shared his water and asked me nothing, which is the desert's way of being kind.\n\nHe says the hardpan can be crossed in one night if you walk toward the singing: when the night wind blows, the pillars of Cairn IV can be heard from the Natural Bridge of the Sentinel Mesa. Then he said something I cannot shake off. Every autumn, on the clear nights, a veiled woman comes down from the sandstone and sings to the stars. The herders leave her milk and dates on a flat stone. Nobody has seen her face.\n\nThe raiders' wagons came by here at first light, he says. Heading south-west, in a hurry.",
           choices: [
             {
               id: "choice-17-veiled",
@@ -4776,7 +4776,7 @@
         {
           // Station 16 debrief: the pillars sang the disc's code, Cairn IV never fell, and the raiders split up
           step: 19,
-          hermesInitial: "Silvia, I have not slept. I have been sitting between the pillars with the pebble in my hand.\n\nThe chamber of Cairn IV opened with the founders' own mechanism: bronze reeds inside the pillars, untouched since before the first road was cut. This cairn never fell. SUN, ECHO, STONE: the cairns are instruments, and the Order measured the whole desert with them.\n\nBut the last verse... three short calls, a pause, two long. The code I engraved on Aurelia's brass disc, the same light I saw blinking from the cliffs in 2016. And wedged in the throat of the Left pillar, a river pebble painted with a small gold star on blue. Someone tuned this canyon to sing that code.\n\nAnd one more thing. From the Natural Bridge, at dawn, I saw the raiders stuck at the switchbacks. They split. A few men on foot are following my tracks. The wagons, and the one under oilcloth, turned back north-east. Toward Tower II.",
+          hermesInitial: "Silvia, I have not slept. I have been sitting between the pillars with the pebble in my hand.\n\nThe chamber of Cairn IV opened with the founders' own mechanism: bronze reeds inside the pillars, untouched since before the first road was cut. This cairn never fell. SUN, ECHO, STONE: the cairns are instruments, and the Order measured the whole desert with them.\n\nBut the last verse... three short calls, a pause, two long. The code I engraved on Aurelia's brass disc, the same rhythm as the light I saw through my telescope in the autumn of 2016, blinking far out in the desert. And wedged in the throat of the Left pillar, a river pebble painted with a small gold star on blue. Someone tuned this canyon to sing that code.\n\nAnd one more thing. Yesterday at dawn, from the Natural Bridge, I saw the raiders stuck at the switchbacks. They split. A few men on foot are following my tracks. The wagons, and the one under oilcloth, turned back north-east. Toward Tower II.",
           choices: [
             {
               id: "choice-19-pebble",
@@ -4788,13 +4788,13 @@
               id: "choice-19-tower",
               text: "The Sanctuary is in danger. Hurry.",
               silviaMsg: "If the wagons are heading to Tower II, the Sanctuary is in danger. The Servant is alone there. You have to hurry.",
-              hermesReply: "The last cairn stands near the Sanctuary, under the Arch of the Solstice. One road for both. I will walk until my legs refuse, and then I will walk a little more."
+              hermesReply: "The last cairn watches from the dunes by the Arch of the Solstice, near the Sanctuary. One road for both. I will walk until my legs refuse, and then I will walk a little more."
             },
             {
               id: "choice-19-instruments",
               text: "The cairns are instruments...",
               silviaMsg: "Sun, echo, stone... the cairns are instruments. Then the Astrolabe was never meant to work alone, was it?",
-              hermesReply: "No. I think the Astrolabe reads what the cairns measure, the way a musician reads a score. Without the five seals it is only brass. That is why the raiders want the seals, and why they followed me instead of breaking the cairns."
+              hermesReply: "No. I think the Astrolabe reads what the cairns measure, the way a musician reads a score. Without the five seals it is only brass. That is why the raiders want the seals, and why they wait for me to open the cairns instead of breaking them."
             }
           ]
         },
@@ -4802,13 +4802,13 @@
           step: 20,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtGates() + 3) + " of five, Silvia. The Seal of Cairn IV rests with the others, and the two lines engraved on the bronze reed belong in your Cipher Ledger: [S] + [U] = 17 and [S] − [U] = 9. Two unknowns, two lines: you know the trick.\n\nThe last cairn is waiting under the Arch of the Solstice, by the Solar Altar, not far from the Sanctuary (Station 17). The raiders' wagons are on the same road. I will wire you before I set out.";
+            return sealsPhrase(sealsAtGates() + 3) + " of five, Silvia. The Seal of Cairn IV rests with the others, and the two lines engraved on the bronze reed belong in your Cipher Ledger: [S] + [U] = 17 and [S] − [U] = 9. Two unknowns, two lines: you know the trick.\n\nThe last cairn watches from the dunes above the Arch of the Solstice, and its seal sleeps in the Solar Altar, not far from the Sanctuary (Station 17). The raiders' wagons are on the same road. I will wire you before I set out.";
           }
         },
         {
           // Leaving Cairn IV at dusk. Covers the printed "At midsummer dawn" of Sheet 16B: Hermes arrives in October.
           step: 21,
-          hermesInitial: "Dusk again, Silvia, and I am leaving the pillars behind. Before the light went I read the page “Arch of the Solstice & The Solar Altar” one more time, and one line will not let me go: 'At midsummer dawn, the sun's first ray slips beneath the arch.'\n\nMidsummer. The founders built the Courtyard of Rays for the longest day of the year. We are in October. The sun rises far to the south of where it rose for them, and its first ray will strike the arch at another place. If the courtyard is blind in autumn, the last seal is locked until June.\n\nAnd the footprints of the raiders who followed me are fresh on the road east. Eighteen hours to the Arch. I will not stop to sleep.",
+          hermesInitial: "Dusk again, Silvia, and I am leaving the pillars behind. Before the light went I read the page “Arch of the Solstice & The Solar Altar” one more time, and one line will not let me go: 'At midsummer dawn, the sun's first ray slips beneath the arch.'\n\nMidsummer. The founders built the Courtyard of Rays for the longest day of the year. We are in October. The sun rises far to the south of where it rose for them, and its first ray will strike the arch at another place. If the courtyard is blind in autumn, the last seal is locked until June.\n\nAnd the ruts of the raiders' wagons are fresh on the road east. Eighteen hours to the Arch. I will not stop to sleep.",
           choices: [
             {
               id: "choice-21-mirrors",
@@ -4834,7 +4834,7 @@
           step: 22,
           completed: true,
           get hermesFinal() {
-            return "Eighteen hours east, Silvia, without sleep: back across the Natural Bridge, along the Lower Wash and over the dunes where Cairn V stands guard at 163°. I will reach the Arch of the Solstice before the next dawn but one.\n\nKeep the page “Arch of the Solstice & The Solar Altar” close: the midsummer ray and its eight sun-stones. " + sealsPhrase(sealsAtGates() + 3) + " in my satchel. The fifth is waiting under the Arch.";
+            return "Eighteen hours east, Silvia, without sleep: back across the Natural Bridge, along the Lower Wash and over the dunes where Cairn V stands guard at 163°. I will reach the Arch of the Solstice tomorrow at noon, with a night to spare before the dawn we need.\n\nKeep the page “Arch of the Solstice & The Solar Altar” close: the midsummer ray and its eight sun-stones. " + sealsPhrase(sealsAtGates() + 3) + " in my satchel. The fifth is waiting under the Arch.";
           }
         },
         {
@@ -4855,7 +4855,7 @@
               id: "choice-23-who",
               text: "Who else could know Aurelia's code?",
               silviaMsg: "Hermes... who else could know Aurelia's code? Think. Anyone you told, anything you wrote down?",
-              hermesReply: "No one. I never wrote it, Silvia; it was ours. I have been asking myself that question since the light answered, and every answer I find frightens me more than the smoke."
+              hermesReply: "No one. I never said it aloud to anyone but her, Silvia, and I wrote it only once: on her disc. So either someone has held that disc, or... I have been asking myself that question since the light answered, and every answer I find frightens me more than the smoke."
             },
             {
               id: "choice-23-mirror",
@@ -6229,7 +6229,7 @@
           image: "assets/items/item_signal_mirror.webp",
           origin: "Courtyard of Rays · Arch of the Solstice · Oct 2026",
           summary: "A small bronze hand mirror with a sun-ray rim and an eclipse engraved at the top.",
-          lore: "One of the founders' bronze mirrors, worked loose from its post in the Courtyard of Rays. With it Hermes answered the light on Tower II in the code he made for Aurelia, and the light answered back."
+          lore: "A small bronze hand mirror with the Order's mark on its rim. It lay under the Seal of Cairn V in the Solar Altar, polished by a recent hand. With it Hermes answered the light on Tower II in the code he made for Aurelia, and the light answered back."
         },
         gilded_star: {
           id: "gilded_star",
@@ -6839,7 +6839,7 @@
         pill.textContent = text;
         wireMessagesStream.appendChild(pill);
       }
-      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'First Light · The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 41: 'Tower III · The Whispering Gallery' };
+      const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'First Light · The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Next Evening · The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'That Evening · Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 41: 'Tower III · The Whispering Gallery' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
       function countCairnSeals() {
@@ -7571,7 +7571,7 @@
           walkingDesc: 'Hermes walks without rest, back over the Natural Bridge and across the dunes of Cairn V. Keep the page “Arch of the Solstice & The Solar Altar” close.',
           etaLabel: 'ARRIVAL AT THE ARCH',
           arrivedTitle: 'The Arch of the Solstice · Station 17 Awaits',
-          arrivedDesc: 'Hermes is under the Arch, by the Courtyard of Rays. Open the Grand Desert Map and speak the sigil of Cairn V (Station 17, the page “Arch of the Solstice & The Solar Altar”).'
+          arrivedDesc: 'Hermes reached the Arch at noon and waits for the dark by the Courtyard of Rays. Open the Grand Desert Map and speak the sigil of Cairn V (Station 17, the page “Arch of the Solstice & The Solar Altar”).'
         },
         26: {
           step: 26, march: steleMarch, doneKey: 'order_polybius_stele_completed',

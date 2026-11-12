@@ -841,7 +841,7 @@ def test_solstice_arch(browser):
             js(f"window.__cairn5.flash('{p}')")
         js("window.__cairn5.send()"); page.wait_for_timeout(200)
     check(rounds[-1] == "SSSLL" and js("window.__cairn5.state().finale"), "the last signal is the disc's code: three short, two long")
-    page.wait_for_timeout(16000)
+    page.wait_for_timeout(21000)   # the light spells its lines, goes out, and the red glow is seen before the seals
     check(get("order_arch_solstice_completed") == "true" and get("order_seal_cairn_5") == "true", "the light speaks and goes out: Seal of Cairn V granted")
     page.wait_for_timeout(1200)
     check(js("getComputedStyle(document.getElementById('five-seals-overlay')).display") != "none" and get("order_five_seals_celebrated") == "true",
