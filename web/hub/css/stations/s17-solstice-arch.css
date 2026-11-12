@@ -40,6 +40,12 @@
       -webkit-user-select: none;
     }
     .solstice-flash-btn.is-down { background: rgba(253, 230, 138, 0.45); box-shadow: 0 0 22px rgba(253, 230, 138, 0.6); }
+    .solstice-moon-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 8px 0 4px; font: italic 0.95rem 'EB Garamond', Georgia, serif; color: #c7d6ff; }
+    .solstice-moon-row[hidden] { display: none; }
+    .solstice-moon-row .chasm3d-btn { padding: 5px 10px; font-size: 0.78rem; border-color: rgba(170, 195, 255, 0.55); }
+    .solstice-moon-row .chasm3d-btn.is-on { background: rgba(130, 160, 255, 0.28); border-color: #dbe6ff; color: #f4f7ff; }
+    .solstice-tower-trace { min-height: 1.4em; margin: 4px 0 2px; font-family: 'Cinzel', serif; font-size: 1.05rem; letter-spacing: 0.12em; color: #fca5a5; opacity: 0; transition: opacity 0.2s; white-space: pre; }
+    .solstice-tower-trace.is-on { opacity: 1; }
     .solstice-pulses { display: flex; gap: 6px; flex-wrap: wrap; min-height: 26px; align-items: center; font-family: 'Cinzel', serif; font-size: 1.15rem; color: #fde68a; letter-spacing: 0.15em; }
     .solstice-message { font-family: 'Cinzel', serif; color: #fde68a; letter-spacing: 0.06em; min-height: 1.4em; }
 

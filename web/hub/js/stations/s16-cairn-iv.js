@@ -111,6 +111,7 @@
       let verseIdx = Math.min(versesSung(), VERSES.length - 1);
       let mode = 'mark';
       let slots = [];
+      let falseIdx = new Set();   // the tokens that did not ring true at the last singing
 
       function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
       function feedback(node, text, kind) {
@@ -316,6 +317,7 @@
           if (beat < cur.beats) { cur.raf = requestAnimationFrame(frame); return; }
           cur.raf = null;
           drawTape(Infinity);
+          if (G && G.fx && G.fx.gait) G.fx.gait.look(null);
           if (el.tapeWrap) el.tapeWrap.scrollLeft = 0;   // the whole verse, from its first call
           setMood();
           if (el.tapeStatus) el.tapeStatus.textContent = label + ' · recorded';
@@ -645,6 +647,21 @@
           m.scale.set(0.9, 0.9, 1); m.visible = false; scene.add(m);
           return { m, on: false };
         });
+        // a verse that rings true: a spark runs from each pillar to its fissure and home again, call by call
+        const runs = Array.from({ length: 6 }, () => {
+          const m = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffffff, transparent: true, opacity: 0.95, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+          m.scale.set(1.1, 1.1, 1); m.visible = false; scene.add(m);
+          return { m, on: false };
+        });
+        // the Tuning Pebble in the throat of the Left pillar: blue, with a small gold star
+        const pebbleStone = new T.Mesh(new T.SphereGeometry(0.16, 18, 12), new T.MeshStandardMaterial({ map: P.canvasTex(128, 64, (g, w, h) => {
+          g.fillStyle = '#2a4f8f'; g.fillRect(0, 0, w, h);
+          g.fillStyle = '#f2c14e'; g.beginPath();
+          for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 6 : 15; g.lineTo(w * 0.75 + Math.cos(a) * r, h / 2 + Math.sin(a) * r); }
+          g.closePath(); g.fill();
+        }), roughness: 0.55, metalness: 0.05, emissive: 0x1a2a50, emissiveIntensity: 0.4 }));
+        pebbleStone.scale.set(1, 0.62, 0.85); pebbleStone.rotation.y = -0.5;   // the star faces the close-up
+        pebbleStone.position.set(-PILLAR_X, 4.52, -1.16); pebbleStone.visible = false; scene.add(pebbleStone);
         // her marks: a numbered token at the foot of each fissure she names
         const markers = [];
         const markerTex = {};
@@ -669,7 +686,7 @@
         } catch (e) { fx = null; }
 
         return { T, renderer, scene, camera, lowPower, sky, paintSky, stars, moon, hemi, moonLight, cliffs, fissures, pillars, plate, bronzeMat, beatLamp, chamberLight,
-          seal, pebble, waves, orbs, markers, markerTex, ringLabels, H, hermes: H && H.hermes, lamp, fx,
+          seal, pebble, pebbleStone, runs, waves, orbs, markers, markerTex, ringLabels, H, hermes: H && H.hermes, lamp, fx,
           ray: new T.Raycaster(), hits: fissures.map((f) => f.hit), plaques: fissures.map((f) => f.plaque),
           cam: { yaw: 0, pitch: 0.46, dist: 30, tYaw: 0, tPitch: 0.46, tDist: 30, p: null, l: null }, dawnShown: -1 };
       }
@@ -695,7 +712,7 @@
       function placeMarkers() {
         if (!G) return;
         const T = G.T, counts = {};
-        G.markers.forEach((m) => { m.visible = false; });
+        G.markers.forEach((m, i) => { m.visible = false; if (i >= slots.length) m.userData.id = null; });
         if (!isAwake() || isDone()) return;
         slots.forEach((id, i) => {
           const f = G.fissures.find((x) => x.id === id);
@@ -711,8 +728,18 @@
           if (!G.markerTex[key]) G.markerTex[key] = numberTex(i + 1, f.side === 'L' ? '#f59e0b' : '#2dd4bf');
           if (m.material.map !== G.markerTex[key]) { m.material.map = G.markerTex[key]; m.material.needsUpdate = true; }
           const n = counts[id] = (counts[id] || 0) + 1;
-          m.position.set(sideX(f.side) * (CW - 1.3 - (n - 1) * 0.8), 0.6, fz(f.d) + 0.2);
-          if (m.visible === false && !m.userData.born) m.userData.born = performance.now();
+          const to = { x: sideX(f.side) * (CW - 1.3 - (n - 1) * 0.8), y: 0.6, z: fz(f.d) + 0.2 };
+          if (m.userData.id !== id) {
+            // a new token: Hermes throws it from his hand to the foot of the fissure
+            m.userData.id = id; m.userData.born = performance.now();
+            const hp = G.hermes ? G.hermes.position : { x: 0, z: 2.4 };
+            m.userData.from = { x: hp.x + 0.3, y: 1.5, z: hp.z - 0.2 };
+            if (G.fx && G.fx.gait) { G.fx.gait.look({ x: to.x, y: 0.6, z: to.z }); G.fx.gait.react('offer'); }
+          }
+          m.userData.to = to;
+          if (!m.userData.from) m.position.set(to.x, to.y, to.z);
+          m.material.color.setHex(falseIdx.has(i) ? 0x8a6a6a : 0xffffff);
+          m.material.opacity = falseIdx.has(i) ? 0.55 : 1;
           m.visible = true;
         });
       }
@@ -734,8 +761,14 @@
           if (ev.beat > beat || (tape.fired && tape.fired[i])) return;
           (tape.fired || (tape.fired = []))[i] = true;
           const p = G.pillars[ev.side];
-          if (ev.kind === 'call') { p.burst = 1; p.hold = LEN_BEATS[ev.len] * tape.beatMs / 1000; wave(ev.side, 1, false); if (G.fx && G.fx.gait && i === 0 && !tape.isTest) G.fx.gait.react('wonder'); }
-          else { p.echo = 1; p.echoHold = LEN_BEATS[ev.len] * tape.beatMs / 1000; wave(ev.side, 0.5, true); }
+          const gait = G.fx && G.fx.gait;
+          if (ev.kind === 'call') {
+            p.burst = 1; p.hold = LEN_BEATS[ev.len] * tape.beatMs / 1000; wave(ev.side, 1, false);
+            if (gait) { if (!tape.isTest) gait.react('listen'); gait.look({ x: sideX(ev.side) * PILLAR_X, y: 4.7, z: -1.2 }); }
+          } else {
+            p.echo = 1; p.echoHold = LEN_BEATS[ev.len] * tape.beatMs / 1000; wave(ev.side, 0.5, true);
+            if (gait) gait.look({ x: sideX(ev.side) * (CW - 0.4), y: 3.4, z: fz(ev.d) });
+          }
           if (tape.isTest && ev.kind === 'call') {
             const o = G.orbs[0];
             o.on = true; o.from = { x: sideX(ev.side) * PILLAR_X, y: 4.7, z: -1.2 }; o.to = { x: sideX(ev.side) * (CW - 0.2), y: 3.4, z: fz(ev.d) };
@@ -827,6 +860,7 @@
         else if (!isAwake()) { p = [3.4, 4.2, 8.2]; l = [0, 1.6, -0.5]; }
         // the end: first the chamber between the pillars, then the gorge at first light with the pillars in front
         else if (view.ending === 1) { p = [3.2, 3.3, 6.6]; l = [0, 0.7, 0]; }
+        else if (view.ending === 2) { p = [-1.3, 5.5, -3.5]; l = [-PILLAR_X, 4.5, -1.16]; }   // the pebble, from up the gorge
         else if (isDone()) { p = [0, 9.4, 18]; l = [0, 1.6, -10]; }   // Hermes and the open chamber stay in frame, above the subtitle
         else {
           const k = Math.min(1, dt * 5);
@@ -834,10 +868,16 @@
           const tx = 0, ty = 2.6, tz = -17;
           p = [tx + Math.sin(c.yaw) * Math.cos(c.pitch) * c.dist, ty + Math.sin(c.pitch) * c.dist, tz + Math.cos(c.yaw) * Math.cos(c.pitch) * c.dist];
           l = [tx, ty, tz];
+          // while the wind plays a verse, the camera stands behind Hermes so she sees him listen, with the fissures ahead
+          c.listen = (c.listen || 0) + ((tape && tape.raf && !tape.isTest ? 1 : 0) - (c.listen || 0)) * Math.min(1, dt * 2.2);
+          if (c.listen > 0.002) {
+            const w = c.listen * c.listen * (3 - 2 * c.listen), LP = [0, 11, 17], LL = [0, -1, -12];
+            p = p.map((v, i) => v + (LP[i] - v) * w); l = l.map((v, i) => v + (LL[i] - v) * w);
+          }
         }
         if (!c.p || snap) { c.p = p.slice(); c.l = l.slice(); }
         else {
-          const k = 1 - Math.exp(-dt * (view.ending === 1 ? 2.2 : isDone() ? 0.8 : 3.2));
+          const k = 1 - Math.exp(-dt * (view.ending ? 2.2 : isDone() ? 0.8 : 3.2));
           for (let i = 0; i < 3; i++) { c.p[i] += (p[i] - c.p[i]) * k; c.l[i] += (l[i] - c.l[i]) * k; }
         }
         cam.position.set(c.p[0], c.p[1], c.p[2]);
@@ -887,9 +927,26 @@
         G.markers.forEach((m) => {
           if (!m.visible) return;
           const age = m.userData.born ? (now - m.userData.born) / 1000 : 1;
-          const pop = rm ? 1 : Math.min(1, age * 4);
-          m.scale.setScalar(0.75 * (pop < 1 ? 1 + Math.sin(pop * Math.PI) * 0.4 : 1));
-          m.position.y = 0.6 + (rm ? 0 : Math.sin(t * 2.4 + m.position.z) * 0.05);
+          const fly = rm ? 1 : Math.min(1, age / 0.75), to = m.userData.to, from = m.userData.from;
+          if (to && from && fly < 1) {
+            const e = fly * fly * (3 - 2 * fly);
+            m.position.set(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e + Math.sin(fly * Math.PI) * 3.2, from.z + (to.z - from.z) * e);
+            m.scale.setScalar(0.75);
+          } else {
+            const pop = rm ? 1 : Math.min(1, (age - 0.75) * 4);
+            m.scale.setScalar(0.75 * (pop > 0 && pop < 1 ? 1 + Math.sin(pop * Math.PI) * 0.4 : 1));
+            if (to) m.position.set(to.x, 0.6 + (rm ? 0 : Math.sin(t * 2.4 + to.z) * 0.05), to.z);
+          }
+        });
+        G.runs.forEach((r) => {
+          if (!r.on) return;
+          const u = (now - r.t0) / r.dur;
+          if (u < 0) { r.m.visible = false; return; }
+          if (u >= 1) { r.on = false; r.m.visible = false; return; }
+          const k = u < 0.5 ? u * 2 : (1 - u) * 2, e = k * k * (3 - 2 * k);
+          r.m.visible = true;
+          r.m.position.set(r.from.x + (r.to.x - r.from.x) * e, r.from.y + (r.to.y - r.from.y) * e + Math.sin(e * Math.PI) * 1.6, r.from.z + (r.to.z - r.from.z) * e);
+          if (u >= 0.5 && !r.hit) { r.hit = true; if (r.f) r.f.flash = 1; cue('echo', { deg: RINGS.indexOf(r.f ? r.f.d : 25) + (r.side === 'L' ? 3 : 7), n: 1, v: 0.045 }); }
         });
         // the end: the plate sinks into the plinth, the chamber glows, the seal rises, the pebble shines, and dawn comes
         const done = isDone();
@@ -899,7 +956,8 @@
         G.chamberLight.intensity = 2.6 * ok;
         G.seal.material.opacity = ok;
         G.seal.position.y = 1.1 + 0.9 * ok + (rm ? 0 : Math.sin(t * 1.6) * 0.06 * ok);
-        G.pebble.material.opacity = done ? (0.45 + (rm ? 0 : 0.35 * Math.sin(t * 3.1))) * ok : 0;
+        G.pebble.material.opacity = done ? (0.45 + (rm ? 0 : 0.35 * Math.sin(t * 3.1))) * ok * (view.ending === 2 ? 0.35 : 1) : 0;
+        G.pebbleStone.visible = done;
         G.bronzeMat.emissiveIntensity = isAwake() ? 0.12 + (view.sigilT ? Math.max(0, 1 - (now - view.sigilT) / 2200) * 0.8 : 0) : 0.06 + (rm ? 0 : 0.04 * Math.sin(t * 2));
         const dawnTarget = done ? Math.min(1, versesSung() / 3) * 0.75 : versesSung() * 0.08;
         view.dawn += (dawnTarget - view.dawn) * Math.min(1, dt * (rm ? 50 : 0.35));
@@ -957,7 +1015,7 @@
           for (let i = 0; i < need; i++) {
             const div = document.createElement('div');
             const id = slots[i];
-            div.className = 'pillars-slot' + (id ? ' is-filled' : '');
+            div.className = 'pillars-slot' + (id ? ' is-filled' : '') + (id && falseIdx.has(i) ? ' is-false' : '');
             div.textContent = id ? SIDE_NAME[id[0]][0] + ' · ' + id.slice(1) : 'Call ' + (i + 1);
             el.slots.appendChild(div);
           }
@@ -977,14 +1035,25 @@
           set(KEYS.songFails, String(fails));
           songHints.fail();
           if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-          feedback(el.songFeedback, 'The pillars fall silent. ' + right + ' of ' + v.answer.length + ' echoes rang true.', 'error');
+          falseIdx = new Set(slots.map((id, i) => (id === v.answer[i] ? -1 : i)).filter((i) => i >= 0));
+          feedback(el.songFeedback, 'The pillars fall silent. ' + right + ' of ' + v.answer.length + ' echoes rang true; the dimmed tokens did not.', 'error');
           if (G && G.fx) G.fx.blow(null, 0.25);
           subtitle('The pillars fall silent. ' + right + ' of ' + v.answer.length + ' echoes rang true.', 3);
           render();
           return;
         }
         set(KEYS.verses, String(verseIdx + 1));
-        slots = [];
+        if (G && !reduced()) {
+          const t0 = performance.now() + 300;
+          v.calls.forEach((c, i) => {
+            const r = G.runs[i % G.runs.length];
+            r.on = true; r.hit = false; r.t0 = t0 + i * 420; r.dur = 1300; r.side = c.side;
+            r.from = { x: sideX(c.side) * PILLAR_X, y: 4.7, z: -1.2 }; r.to = { x: sideX(c.side) * (CW - 0.3), y: 3.4, z: fz(c.d) };
+            r.f = G.fissures.find((x) => x.id === fissureId(c.side, c.d));
+            r.m.material.color.setHex(c.side === 'L' ? 0xffc27a : 0x7ef5e2);
+          });
+        }
+        slots = []; falseIdx = new Set();
         stopTape();
         tape = null; record = null;
         drawTape(Infinity);
@@ -1013,8 +1082,9 @@
         if (G && !reduced()) {
           view.ending = 1; view.opened = 0;
           setTimeout(() => { if (G && G.fx) G.fx.triumph({ x: 0, y: 1.6, z: 0.4 }, 1); }, 900);
-          setTimeout(() => { view.ending = 0; }, 4200);
-          setTimeout(() => { subtitle('In the throat of the Left pillar, a river pebble painted with a gold star on blue.', 5, 'act'); }, 6200);
+          setTimeout(() => { view.ending = 2; }, 4600);
+          setTimeout(() => { subtitle('In the throat of the Left pillar, a river pebble painted with a gold star on blue.', 5, 'act'); cue('shimmer', { deg: 18 }); }, 5600);
+          setTimeout(() => { if (view.ending === 2) view.ending = 0; }, 11000);
         }
         applyVictory();
         render();
@@ -1078,7 +1148,7 @@
               tape = null; record = null;
               drawTape(Infinity);
               if (el.tapeStatus) el.tapeStatus.textContent = '';
-              verseIdx = i; slots = []; render();
+              verseIdx = i; slots = []; falseIdx = new Set(); render();
             });
             el.tabs.appendChild(b);
           });
@@ -1147,7 +1217,7 @@
       if (el.sound) el.sound.addEventListener('click', () => { set(KEYS.sound, soundOn() ? 'off' : 'on'); if (!soundOn()) silence(); render(); });
       if (el.modeMark) el.modeMark.addEventListener('click', () => { mode = 'mark'; render(); });
       if (el.modeCall) el.modeCall.addEventListener('click', () => { mode = 'call'; render(); });
-      if (el.undo) el.undo.addEventListener('click', () => { if (slots.length) cue('tick', { f: 1300, v: 0.06 }); slots.pop(); renderSlots(); });
+      if (el.undo) el.undo.addEventListener('click', () => { if (slots.length) cue('tick', { f: 1300, v: 0.06 }); slots.pop(); falseIdx.delete(slots.length); renderSlots(); });
       if (el.sing) el.sing.addEventListener('click', singBack);
       if (el.speak) el.speak.addEventListener('click', speakSigil);
       if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });

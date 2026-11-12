@@ -5962,13 +5962,13 @@
         '12A': { title: 'Grand Desert Map · South-East', note: 'The fourth quarter of the Grand Desert Map.', thumb: './assets/maps/desert_quadrant_4_se.webp', path: 'desert', mapOnly: true, nodeLabel: 'Open the Grand Desert Map' },
         '12B': { title: 'The Oasis Clepsydra', note: 'The logic grid of the four seekers at the Four Wells.', thumb: './assets/thumbnails/oasis_clepsydra_preview.webp', path: 'desert', node: 12, nodeLabel: 'Station 13 · The Oasis Clepsydra' },
         '13A': { title: 'At the Gates of Tower II', note: 'The Sandstone Sanctuary, its Servant, and the demand of the five seals. The great circuit begins north-north-east.' },
-        '13B': { title: 'The Sun Monolith & Cairn II', note: 'Seven noons, seven shadows, seven rings of the dial: the sigil of Cairn II.', thumb: './assets/thumbnails/sun_monolith_preview.webp', path: 'desert', node: 23, nodeLabel: 'Station 14 · The Sun Monolith' },
+        '13B': { title: 'The Sun Monolith & Cairn II', note: 'Seven noons, seven shadows, seven rings of the dial: the sigil of Cairn II.', thumb: './assets/thumbnails/sun_monolith_preview.webp', page: './assets/journal_pages/page_13b_sun_monolith.webp', path: 'desert', node: 23, nodeLabel: 'Station 14 · The Sun Monolith' },
         '14A': { title: 'The Five Geodetic Cairns', note: 'The markers of the Order, the words of the Servant, and the survey of Cairn III: 112° to Watchtower VI, 348° to the Sun Monolith.' },
         '16A': { title: 'The Eastern Buttress & Lower Wash', note: 'The right half of the Natural Bridge zoom: the eastern pier, the switchbacks and the boulders of the 1971 quake.' },
-        '16B': { title: 'Arch of the Solstice & The Solar Altar', note: 'The midsummer ray, the Courtyard of Rays and its eight sun-stones: the sigil of Cairn V.', thumb: './assets/thumbnails/solstice_arch_preview.webp', path: 'desert', node: 26, nodeLabel: 'Station 17 · The Arch of the Solstice' },
-        '15A': { title: 'Cairn IV: Sentry of the Canyon', note: 'Two singing pillars, three laws of the echo and the survey log of seven echoes: the sigil of the Sentry.', thumb: './assets/thumbnails/cairn_iv_preview.webp', path: 'desert', node: 25, nodeLabel: 'Station 16 · Cairn IV' },
+        '16B': { title: 'Arch of the Solstice & The Solar Altar', note: 'The midsummer ray, the Courtyard of Rays and its eight sun-stones: the sigil of Cairn V.', thumb: './assets/thumbnails/solstice_arch_preview.webp', page: './assets/journal_pages/page_16b_solstice_arch.webp', path: 'desert', node: 26, nodeLabel: 'Station 17 · The Arch of the Solstice' },
+        '15A': { title: 'Cairn IV: Sentry of the Canyon', note: 'Two singing pillars, three laws of the echo and the survey log of seven echoes: the sigil of the Sentry.', thumb: './assets/thumbnails/cairn_iv_preview.webp', page: './assets/journal_pages/page_15a_cairn_iv.webp', path: 'desert', node: 25, nodeLabel: 'Station 16 · Cairn IV' },
         '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on the page “The Eastern Buttress & Lower Wash”).' },
-        '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
+        '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', page: './assets/journal_pages/page_14b_sandstone_labyrinth.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
         '18A': { title: "The Oracle's Horizon", note: 'Eight beacons sent east across the three mirrors of the horizon: the sigil of the Oracle, and the first truth.', thumb: './assets/thumbnails/oracle_horizon_preview.webp', path: 'desert', node: 14, nodeLabel: "Station 19 · The Oracle's Horizon" },
         '18B': { title: 'From the Desert to the Stage', note: 'Curtains, columns and the floor of a stage: the passage to the third tower.' },
         '17A': { title: 'The Polybius Stele', note: "The Servant's trial: the founders' 5 × 5 grid, keyed with PHOENIX, and six stanzas carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' },
@@ -5988,10 +5988,42 @@
         sheetPopoverAnchor = null;
       }
 
+      let pageViewer = null;
+      function closePageViewer() {
+        if (!pageViewer) return;
+        const back = pageViewer.__back;
+        pageViewer.remove(); pageViewer = null;
+        if (back && back.focus) try { back.focus(); } catch (e) {}
+      }
+      function openPageViewer(info, from) {
+        closeSheetPopover(); closePageViewer();
+        const v = document.createElement('div');
+        v.className = 'journal-page-viewer';
+        v.setAttribute('role', 'dialog');
+        v.setAttribute('aria-modal', 'true');
+        v.setAttribute('aria-label', 'Your journal: the page ' + info.title);
+        v.innerHTML = `
+          <div class="jpv-bar"><span>📖 Your journal · “${info.title}”</span><button type="button" class="jpv-close" aria-label="Close the page">✕ Close</button></div>
+          <div class="jpv-scroll"><img class="jpv-page" src="${info.page}" alt="The printed page ${info.title}"></div>
+          <div class="jpv-tip">Scroll to read the whole page. The paper in your hands is the real one.</div>`;
+        v.__back = from || null;
+        document.body.appendChild(v);
+        v.addEventListener('click', (e) => { if (e.target === v || e.target.closest('.jpv-close')) closePageViewer(); });
+        pageViewer = v;
+        const c = v.querySelector('.jpv-close'); if (c) c.focus();
+      }
+      // Escape closes the page first and never reaches the game underneath (window capture runs before every document listener)
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && pageViewer) { e.preventDefault(); e.stopImmediatePropagation(); closePageViewer(); }
+      }, true);
+      window.openJournalPage = (key, from) => { const info = JOURNAL_SHEETS[key]; if (info && info.page) openPageViewer(info, from); };
+
       function openSheetPopover(pill) {
         closeSheetPopover();
         const key = pill.getAttribute('data-sheet') || '';
         const info = JOURNAL_SHEETS[key] || JOURNAL_SHEETS[key.replace(/[A-Z]$/, '')] || null;
+        // inside a game the pill opens the printed page straight away
+        if (info && info.page && pill.getAttribute('data-open') === 'page') { openPageViewer(info, pill); return; }
         const el = document.createElement('div');
         el.className = 'journal-sheet-popover';
         el.setAttribute('role', 'dialog');
@@ -6002,6 +6034,7 @@
           <div class="jsp-title">${info ? info.title : 'Your physical journal'}</div>
           ${info && info.thumb ? `<img class="jsp-thumb" src="${info.thumb}" alt="Preview of the page ${info.title}" loading="lazy">` : ''}
           <div class="jsp-note">${info ? info.note : 'Open your physical journal.'}</div>
+          ${info && info.page ? `<button type="button" class="jsp-go jsp-page">📖 See the printed page</button>` : ''}
           ${info && info.nodeLabel ? `<button type="button" class="jsp-go">🗺️ ${info.nodeLabel} ➔</button>` : ''}
         `;
         document.body.appendChild(el);
@@ -6016,7 +6049,9 @@
         el.style.top = top + 'px';
 
         el.querySelector('.jsp-close').addEventListener('click', closeSheetPopover);
-        const go = el.querySelector('.jsp-go');
+        const pg = el.querySelector('.jsp-page');
+        if (pg) pg.addEventListener('click', () => openPageViewer(info, pill));
+        const go = el.querySelector('.jsp-go:not(.jsp-page)');
         if (go && info) {
           go.addEventListener('click', () => {
             closeSheetPopover();

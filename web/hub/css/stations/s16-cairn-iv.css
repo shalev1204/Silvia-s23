@@ -45,6 +45,7 @@
       background: rgba(15, 10, 5, 0.6);
     }
     .pillars-slot.is-filled { border-style: solid; background: rgba(245, 158, 11, 0.16); }
+    .pillars-slot.is-false { opacity: 0.55; border-color: #a07070; background: rgba(120, 60, 60, 0.18); text-decoration: line-through; }
     .pillars-mode .monolith-btn[aria-pressed="true"] { background: rgba(56, 189, 248, 0.2); border-color: #7dd3fc; color: #e0f2fe; }
     .pillars-words { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
     .pillars-word {

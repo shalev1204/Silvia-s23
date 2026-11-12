@@ -81,7 +81,7 @@
         night: $('solstice-night'), watch: $('btn-solstice-watch'), roundLabel: $('solstice-round-label'), flash: $('btn-solstice-flash'),
         pulses: $('solstice-pulses'), clear: $('btn-solstice-clear'), send: $('btn-solstice-send'), message: $('solstice-message'),
         signalFeedback: $('solstice-signal-feedback'), hint: $('solstice-hint'), victory: $('solstice-victory'), victoryText: $('solstice-victory-text'),
-        finish: $('btn-solstice-finish'), dispatch: $('solstice-dispatch-text'),
+        finish: $('btn-solstice-finish'), dispatch: $('solstice-dispatch-text'), moon: $('solstice-moon-row'), towerTrace: $('solstice-tower-trace'),
         tSigil: $('solstice-telem-sigil'), tDawn: $('solstice-telem-dawn'), tSignal: $('solstice-telem-signal'), tSeal: $('solstice-telem-seal'),
         stage: $('solstice3d-stage'), canvas: $('solstice3d-canvas'), subtitle: $('solstice3d-subtitle'), fade: $('solstice3d-fade'), aim: $('solstice3d-aim'),
         status: $('solstice3d-status'), sun: $('solstice3d-sun'), sunLabel: $('solstice3d-sun-label'), howto: $('solstice3d-howto'), help: $('btn-solstice-howto'),
@@ -189,9 +189,10 @@
           const past = dawnDone() || k < dawn.locks;
           svg.appendChild(svgEl('path', { d: `M ${cx(col) - 2} -3 L ${cx(col) + 2} -3 L ${cx(col)} 0 Z`, fill: past ? '#86efac' : (dawn.running && k === dawn.step ? '#fde68a' : '#7a6a52') }));
         });
-        if (dawn.running) {
-          const col = COURT.entries[dawn.step];
-          svg.appendChild(svgEl('circle', { cx: cx(col), cy: -15, r: 4.5, fill: '#fbbf24', stroke: '#fff7d6', 'stroke-width': 0.6 }));
+        const moonCol = !dawn.running && rehearsing() ? COURT.entries[view.rehearse.k] : -1;
+        if (dawn.running || moonCol >= 0) {
+          const col = dawn.running ? COURT.entries[dawn.step] : moonCol, moon = !dawn.running;
+          svg.appendChild(svgEl('circle', { cx: cx(col), cy: -15, r: 4.5, fill: moon ? '#dbe6ff' : '#fbbf24', stroke: moon ? '#f4f7ff' : '#fff7d6', 'stroke-width': 0.6 }));
           const ray = trace(col);
           const pts = [[cx(col), -11]].concat(ray.pts.map(([x, y]) => [cx(x), cy(y)]));
           if (ray.end === 'out') {
@@ -200,8 +201,8 @@
             pts.push([cx(lx) + ray.dir[0] * 9, cy(ly) + ray.dir[1] * 9]);
           }
           const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
-          svg.appendChild(svgEl('path', { d, fill: 'none', stroke: 'rgba(253, 230, 138, 0.28)', 'stroke-width': 4, 'stroke-linejoin': 'round' }));
-          svg.appendChild(svgEl('path', { d, fill: 'none', stroke: '#fde68a', 'stroke-width': 1.1, 'stroke-linejoin': 'round' }));
+          svg.appendChild(svgEl('path', { d, fill: 'none', stroke: moon ? 'rgba(170, 195, 255, 0.28)' : 'rgba(253, 230, 138, 0.28)', 'stroke-width': 4, 'stroke-linejoin': 'round' }));
+          svg.appendChild(svgEl('path', { d, fill: 'none', stroke: moon ? '#c7d6ff' : '#fde68a', 'stroke-width': 1.1, 'stroke-linejoin': 'round', 'stroke-dasharray': moon ? '2 1.2' : 'none' }));
         }
         // fallen pillars
         COURT.pillars.forEach(([x, y]) => {
@@ -226,6 +227,35 @@
         });
       }
 
+      // ---- Moonlight: before the dawn she can see where each of the four rays would go, with no clock and no locks ----
+      let rehearseT = 0;
+      const rehearsing = () => !!view.rehearse && isAwake() && !dawnDone() && !dawn.running;
+      function rehearse(k) {
+        if (!isAwake() || dawnDone() || dawn.running || k < 0 || k >= COURT.entries.length) return;
+        if (view.rehearse && view.rehearse.k === k) { endRehearse(); return; }
+        view.rehearse = { k };
+        cue('bell', { f: 1046.5 * Math.pow(2, -k / 12), v: 0.035, len: 1.2 });
+        if (G && G.fx && G.fx.gait) G.fx.gait.react('wonder');
+        moonNote();
+        armRehearse();
+        render();
+      }
+      function armRehearse() { clearTimeout(rehearseT); rehearseT = setTimeout(endRehearse, 20000); }
+      function endRehearse() {
+        clearTimeout(rehearseT);
+        if (!view.rehearse) return;
+        view.rehearse = null;
+        if (!dawn.running) feedback(el.dawnFeedback, '', '');
+        render();
+      }
+      function moonNote() {
+        if (!rehearsing()) return;
+        const k = view.rehearse.k, end = trace(COURT.entries[k]).end;
+        const n = ['first', 'second', 'third', 'fourth'][k];
+        feedback(el.dawnFeedback, end === 'altar'
+          ? '🌙 By moonlight, the ' + n + ' ray reaches the brass ring. At dawn it would close a lock.'
+          : '🌙 By moonlight, the ' + n + ' ray ' + (end === 'pillar' ? 'dies on a fallen pillar.' : 'runs out of the courtyard.') + ' Turn the mirrors and watch it move.', end === 'altar' ? 'ok' : '');
+      }
       function turnMirror(i) {
         if (!isAwake() || dawnDone() || i < 0 || i >= mirrors.length) return;
         mirrors[i] = mirrors[i] === 'f' ? 'b' : 'f';
@@ -233,6 +263,7 @@
         if (!turnCue() && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         const hadFocus = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-i') === String(i);
         checkRay();
+        if (rehearsing()) { moonNote(); armRehearse(); }
         drawCourt();
         syncWorld();
         if (hadFocus) { const g = el.court.querySelector('[data-i="' + i + '"]'); if (g) g.focus(); }
@@ -242,6 +273,7 @@
       const stepMs = () => (get(KEYS.dawnHint) === 'true' ? STEP_MS_HINTED : STEP_MS);
       function startDawn() {
         if (!isAwake() || dawnDone() || dawn.running) return;
+        if (view.rehearse) { view.rehearse = null; clearTimeout(rehearseT); }
         dawn.running = true; dawn.step = 0; dawn.locks = 0; dawn.seen = 0;
         dawn.deadline = performance.now() + stepMs();
         cue('whoosh', { dur: 1.4 });
@@ -366,14 +398,24 @@
         playing = null;
         lightOn(false);
       }
-      function playPattern(pattern, done) {
+      function towerTrace(text) {
+        if (!el.towerTrace) return;
+        el.towerTrace.textContent = text;
+        el.towerTrace.classList.toggle('is-on', !!text);
+      }
+      function playPattern(pattern, done, traced) {
         stopLight();
         playing = [];
-        let t = 400;
+        let t = 400, seen = '';
+        if (traced) towerTrace('Tower II:');
         pattern.split('').forEach((p, i) => {
-          if (pattern === ROUNDS[3] && i === 3) t += PAUSE_MS - GAP_MS;
-          // a high bell rings with each flash of the far light, longer for a long flash
-          playing.push(setTimeout(() => { lightOn(true); cue('bell', { f: 1318.5, v: 0.04, len: p === 'L' ? 1.4 : 0.45 }); }, t));
+          const pause = pattern === ROUNDS[3] && i === 3;
+          if (pause) t += PAUSE_MS - GAP_MS;
+          // a high bell rings with each flash of the far light, longer for a long flash; the log draws it as it comes
+          playing.push(setTimeout(() => {
+            lightOn(true); cue('bell', { f: 1318.5, v: 0.04, len: p === 'L' ? 1.4 : 0.45 });
+            if (traced) { seen += (pause ? '   ' : ' ') + (p === 'S' ? '·' : '—'); towerTrace('Tower II:' + seen); }
+          }, t));
           t += FLASH_MS[p];
           playing.push(setTimeout(() => lightOn(false), t));
           t += GAP_MS;
@@ -387,7 +429,7 @@
         if (el.hint) el.hint.style.display = 'none';   // the log shows the flashes only once they have been seen
         playPattern(ROUNDS[r], () => {
           if (get(KEYS.signalHint) === 'true') showHint();
-        });
+        }, true);
       }
       function renderPulses() {
         if (!el.pulses) return;
@@ -440,7 +482,7 @@
           setTimeout(() => { if (!pulses.length) watchLight(); }, 1600);   // unless she is already answering
           return;
         }
-        pulses = []; renderPulses();
+        pulses = []; renderPulses(); towerTrace('');
         set(KEYS.round, String(r + 1));
         if (!cue('shimmer', { deg: 10 + r * 2 }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
         if (r + 1 >= ROUNDS.length) { runFinale(); return; }
@@ -534,6 +576,11 @@
         drawCourt();
         if (!finale && el.night && (!el.night.firstChild || done)) drawNight(done);
         if (el.locks) el.locks.forEach((b, i) => b.classList.toggle('is-on', i < (dDone ? 4 : dawn.locks)));
+        if (el.moon) {
+          el.moon.hidden = !awake || dDone || dawn.running;
+          el.moon.querySelectorAll('button[data-k]').forEach((b) => b.classList.toggle('is-on', rehearsing() && view.rehearse.k === +b.getAttribute('data-k')));
+        }
+        if (done || !dDone) towerTrace('');
         if (el.dawnBtn) {
           el.dawnBtn.disabled = !awake || dDone || dawn.running;
           el.dawnBtn.textContent = dDone ? '☀ The altar is open' : (dawn.running ? '☀ Dawn · step ' + (dawn.step + 1) + ' of 4' : '☀ Await the dawn');
@@ -592,7 +639,7 @@
       const TOWER = { x: 14, z: -125, h: 40 };
       const faceYaw = (dx, dz) => Math.atan2(-dx, -dz);
       let G = null, raf = 0, lastT = 0, cine = null, howtoPage = 0;
-      const view = { snapNext: true, ending: 0, hover: null, sigilT: 0, sky: 0, spentT: 0, pulseT: 0, lockT: 0, opened: 0, fire: 0, rayCol: -1, endTimer: 0, holdCol: -1, holdT: 0, holdFx: null };
+      const view = { snapNext: true, ending: 0, hover: null, sigilT: 0, sky: 0, spentT: 0, pulseT: 0, lockT: 0, opened: 0, fire: 0, rayCol: -1, endTimer: 0, holdCol: -1, holdT: 0, holdFx: null, rehearse: null, moonBeam: false };
       const nightMode = () => dawnDone() && view.ending === 0;
 
       function discTex() {
@@ -935,8 +982,14 @@
       function updateBeam(dt, now) {
         const holding = view.holdCol >= 0 && now - view.holdT < 1300;
         if (!holding && view.holdCol >= 0) { view.holdCol = -1; if (view.holdFx) { view.holdFx(); view.holdFx = null; } }
-        const showRay = dawn.running || view.ending === 1;
-        const col = holding ? view.holdCol : dawn.running ? COURT.entries[dawn.step] : view.rayCol;
+        const moon = !holding && !dawn.running && view.ending !== 1 && rehearsing();
+        const showRay = dawn.running || view.ending === 1 || moon;
+        const col = holding ? view.holdCol : dawn.running ? COURT.entries[dawn.step] : moon ? COURT.entries[view.rehearse.k] : view.rayCol;
+        if (moon !== view.moonBeam) {
+          view.moonBeam = moon;
+          G.beam.forEach((b) => { b.core.material.color.setHex(moon ? 0xe6eeff : 0xfff2c0); b.sheath.material.color.setHex(moon ? 0x7f9cff : 0xffb040); });
+          G.tipGlow.material.color.setHex(moon ? 0xdbe6ff : 0xfff0c0); G.entryGlow.material.color.setHex(moon ? 0xb8c8ff : 0xffd890);
+        }
         G.beam.forEach((b) => { b.core.visible = b.sheath.visible = false; });
         G.mirrors.forEach((m) => { m.lit = Math.max(0, m.lit - dt * 3); });
         if (!showRay || col < 0) {
@@ -1006,7 +1059,7 @@
         G.shaft.position.set(ex - dx / 2, BEAM_Y - dy / 2, ez - dz / 2);
         G.shaft.lookAt(ex, BEAM_Y, ez);
         G.shaft.scale.set(1.4, 1.4, L);
-        G.shaft.material.opacity = Math.min(0.12, G.shaft.material.opacity + dt * 0.2);
+        G.shaft.material.opacity = moon ? Math.max(0, G.shaft.material.opacity - dt * 2) : Math.min(0.12, G.shaft.material.opacity + dt * 0.2);
       }
 
       // ---- Keeping the scene in step with the game ----
@@ -1296,6 +1349,7 @@
         el.court.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e); } });
       }
       if (el.dawnBtn) el.dawnBtn.addEventListener('click', startDawn);
+      if (el.moon) el.moon.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('button[data-k]'); if (b) rehearse(+b.getAttribute('data-k')); });
       if (el.watch) el.watch.addEventListener('click', watchLight);
       if (el.flash) {
         el.flash.addEventListener('pointerdown', pressStart);
@@ -1401,7 +1455,7 @@
         view.sky = 0; view.fire = isDone() ? 1 : 0; view.burn = 0;
         if (G) { G.cam.p = null; G.skyShown = -1; G.hermesGoal = null; }
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. The courtyard behind it is paved with bronze mirrors and fallen pillars, and the Solar Altar waits on its terrace with a brass ring. From here I can see the dunes where Cairn V stands guard. Open the page “Arch of the Solstice & The Solar Altar”, please: the sigil first.");
+        else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. The courtyard behind it is paved with bronze mirrors and fallen pillars, and the Solar Altar waits on its terrace with a brass ring. From here I can see the dunes where Cairn V stands guard. On the way I crossed the bootprints of the men who carried the torches in the labyrinth: they went east, to meet the wagons on the road to the Sanctuary. Open the page “Arch of the Solstice & The Solar Altar”, please: the sigil first.");
         else if (!dawnDone()) say("The mirrors are where you left them. Set them as you think best, and call the dawn when you are ready.");
         else say("Night again. Watch the light on Tower II, and answer it with my mirror.");
         render();

@@ -215,6 +215,13 @@
           });
         }
 
+        // the round of the torch she clicked, bright for a few seconds
+        if (view.peek && !done) {
+          const route = LEVEL.guards[view.peek.n];
+          const pts = route.map(([x, y]) => cx(x) + ',' + cy(y)).join(' ');
+          b.appendChild(svgEl('polyline', { points: pts + ' ' + cx(route[0][0]) + ',' + cy(route[0][1]), fill: 'none', stroke: '#fde68a', 'stroke-opacity': 0.95, 'stroke-width': 1.3, 'stroke-dasharray': '2 1.2', 'stroke-linejoin': 'round' }));
+        }
+
         // Torchlight is visible from anywhere in the dark
         if (!done) {
           lit.forEach((k) => {
@@ -245,9 +252,11 @@
         // Hermes and his lamp
         b.appendChild(svgEl('circle', { cx: cx(run.x), cy: cy(run.y), r: 6, fill: 'rgba(253, 230, 138, 0.12)' }));
         b.appendChild(svgEl('circle', { cx: cx(run.x), cy: cy(run.y), r: 2.9, fill: '#fde68a', stroke: '#fff7d6', 'stroke-width': 0.6 }));
+        // once the plate has turned, the Seal of Cairn III travels with him: a gold ring round his dot
+        if (isAwake()) b.appendChild(svgEl('circle', { cx: cx(run.x), cy: cy(run.y), r: 4.3, fill: 'none', stroke: '#fbbf24', 'stroke-width': 0.7, 'stroke-dasharray': '1.2 0.8' }));
 
         // Labels around the board
-        b.appendChild(svgText(cx(sx), -4, 'CAIRN III', { fill: '#fde68a', 'font-size': 4.2, 'letter-spacing': 0.4 }));
+        b.appendChild(svgText(cx(sx), -4, isAwake() ? 'CAIRN III · ✦ SEAL IN HAND' : 'CAIRN III', { fill: '#fde68a', 'font-size': 4.2, 'letter-spacing': 0.4 }));
         b.appendChild(svgText(65, LEVEL.rows * CELL + 7, 'RAIDERS AT THE SOUTHERN MOUTH ↓', { fill: '#fb923c', 'font-size': 3.6, 'letter-spacing': 0.3 }));
         b.appendChild(svgText(0, LEVEL.rows * CELL + 13, 'THE WESTERN CLEFT ⇧', { fill: '#86efac', 'font-size': 3.6, 'text-anchor': 'start', 'letter-spacing': 0.3 }));
       }
@@ -261,7 +270,9 @@
       const CLEFT = { x: wx(LEVEL.exit[0]) - S * 1.25, z: wz(LEVEL.exit[1]) };
       const CAIRN = { x: wx(LEVEL.start[0]), z: wz(LEVEL.start[1]) - S * 0.36 };
       let G = null, raf = 0, lastT = 0, cine = null, howtoPage = 0;
-      const view = { snapNext: true, ending: 0, prevLives: LIVES, sigilT: 0, hover: -1, wasDone: false };
+      const view = { snapNext: true, ending: 0, prevLives: LIVES, sigilT: 0, hover: -1, wasDone: false, peek: null, idleT: 0, whispers: 0 };
+      // the torch standing on a square right now, if any (its index in LEVEL.guards)
+      const torchOn = (cell) => (run && cell >= 0 ? LEVEL.guards.findIndex((route) => { const [x, y] = guardAt(route, run.t); return cellKey(x, y) === cell; }) : -1);
 
       // the walls of the plan, once each: the north and west sides of every square, the south and east of the last row and column
       function wallSegments() {
@@ -377,6 +388,13 @@
         sealHalo.scale.set(2.6, 2.6, 1); sealHalo.position.set(0, 0.85, 0.9); cairn.add(sealHalo);
         cairn.position.set(CAIRN.x, 0, CAIRN.z);
         scene.add(cairn);
+        // the Seal of Cairn III: it rises out of the opened plate and flies into Hermes's hand
+        const seal = new T.Group();
+        const sealDisc = new T.Mesh(new T.CylinderGeometry(0.2, 0.2, 0.05, 28), new T.MeshBasicMaterial({ color: 0xe3a93d }));
+        sealDisc.rotation.x = Math.PI / 2; seal.add(sealDisc);
+        const sealGlow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xffd27a, transparent: true, opacity: 0.85, depthWrite: false, blending: T.AdditiveBlending }));
+        sealGlow.scale.set(1.3, 1.3, 1); seal.add(sealGlow);
+        seal.visible = false; scene.add(seal);
 
         // ---- The gold star on the north wall of its fissure: eight points of gold leaf on a ground of blue, fresh ----
         const starTex = P.canvasTex(256, 256, (g, w, h) => {
@@ -452,7 +470,8 @@
         const rounds = new T.Group();
         LEVEL.guards.forEach((route) => {
           const pts = route.concat([route[0]]).map(([x, y]) => new T.Vector3(wx(x), 0.16, wz(y)));
-          const line = new T.Line(new T.BufferGeometry().setFromPoints(pts), new T.LineDashedMaterial({ color: 0xfb923c, dashSize: 0.45, gapSize: 0.35, transparent: true, opacity: 0.7 }));
+          const line = new T.Line(new T.BufferGeometry().setFromPoints(pts), new T.LineDashedMaterial({ color: 0xfb923c, dashSize: 0.45, gapSize: 0.35, transparent: true, opacity: 0.7, depthTest: false }));
+          line.renderOrder = 4;
           line.computeLineDistances(); rounds.add(line);
         });
         rounds.visible = false; scene.add(rounds);
@@ -508,7 +527,7 @@
         } catch (e) { fx = null; }
 
         return { T, renderer, scene, camera, lowPower, plan, walls, pillars, floor, tiles, cairn, plate, oldPlate, copperMat, sealHalo, star, starMat, camp, cleft, cleftGlow, cleftLight,
-          litMesh, rounds, raiders, H, hermes: H && H.hermes, lamp, rings, fx, dummy: new T.Object3D(), ray: new T.Raycaster(), floorPlane: new T.Plane(new T.Vector3(0, 1, 0), 0),
+          litMesh, rounds, raiders, seal, H, hermes: H && H.hermes, lamp, rings, fx, dummy: new T.Object3D(), ray: new T.Raycaster(), floorPlane: new T.Plane(new T.Vector3(0, 1, 0), 0),
           hMove: null, cam: { dist: 16, pitch: 1.02, tDist: 16, tPitch: 1.02, p: null, l: null } };
       }
 
@@ -631,7 +650,14 @@
         placeLit();
         revealWorld();
         if (snap) writeInstances(true);
-        G.rounds.visible = torchHintOn() && !done;
+        // all the rounds once Hermes has learnt them; otherwise only the one she clicked, for a few seconds
+        G.rounds.visible = !done && (torchHintOn() || !!view.peek);
+        G.rounds.children.forEach((line, i) => {
+          const on = !!view.peek && view.peek.n === i;
+          line.visible = torchHintOn() || on;
+          line.material.color.setHex(on ? 0xfde68a : 0xfb923c);
+          line.material.opacity = on ? 1 : 0.7;
+        });
         G.star.visible = done || seen.has(cellKey(LEVEL.star[0], LEVEL.star[1]));
         G.camp.visible = done || seen.has(cellKey(LEVEL.camp[0], LEVEL.camp[1]));
         placeRings();
@@ -679,6 +705,8 @@
           pt.down = false;
           if (pt.moved > 6 || !G) return;
           const cell = cellUnder(e);
+          const tn = raiderUnder(e);
+          if (tn >= 0 || torchOn(cell) >= 0) { peekRound(tn >= 0 ? tn : torchOn(cell)); return; }
           if (cell >= 0 && run && isAwake() && !isDone()) {
             const x = cell % LEVEL.cols, y = Math.floor(cell / LEVEL.cols), dx = x - run.x, dy = y - run.y;
             if (Math.abs(dx) + Math.abs(dy) <= 1) takeTurn(dx, dy);
@@ -689,6 +717,25 @@
         c.addEventListener('pointerleave', () => { view.hover = -1; });
         c.addEventListener('wheel', (e) => { if (!G) return; e.preventDefault(); G.cam.tDist = Math.max(8, Math.min(34, G.cam.tDist * Math.exp(e.deltaY * 0.0012))); }, { passive: false });
         c.addEventListener('dblclick', () => { if (G) { G.cam.tDist = 16; G.cam.tPitch = 1.02; } });
+      }
+      function raiderUnder(e) {
+        if (!G || !run || isDone()) return -1;
+        const r = el.canvas.getBoundingClientRect();
+        const ndc = new G.T.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        G.ray.setFromCamera(ndc, G.camera);
+        const hit = G.ray.intersectObjects(G.raiders.map((q) => q.g), true)[0];
+        if (!hit) return -1;
+        return G.raiders.findIndex((q) => { let o = hit.object; while (o) { if (o === q.g) return true; o = o.parent; } return false; });
+      }
+      // Watching a torch costs no turn: its round is drawn on the ground and on the map for a few seconds
+      function peekRound(n) {
+        if (n < 0 || isDone() || !run) return;
+        const route = LEVEL.guards[n];
+        view.peek = { n, until: performance.now() + 6500 };
+        view.idleT = performance.now();
+        cue('tick', { f: 660, v: 0.05 });
+        subtitle('Hermes watches that torch from the dark: it comes back to the same square every ' + route.length + ' turns.', 5);
+        render();
       }
       function cellUnder(e) {
         if (!G) return -1;
@@ -757,7 +804,7 @@
           m.material.opacity = m.visible ? (hot ? 0.95 : 0.35 + (rm ? 0 : 0.15 * Math.sin(t * 3.4))) : 0;
           m.scale.setScalar(hot ? 1.18 : 1);
         });
-        if (el.canvas) el.canvas.style.cursor = G.rings.some((m) => m.visible && m.userData.cell && cellKey(m.userData.cell[0], m.userData.cell[1]) === view.hover) ? 'pointer' : '';
+        if (el.canvas) el.canvas.style.cursor = torchOn(view.hover) >= 0 || G.rings.some((m) => m.visible && m.userData.cell && cellKey(m.userData.cell[0], m.userData.cell[1]) === view.hover) ? 'pointer' : '';
         // the copper plate warms when the sigil is spoken; the seal shines for a moment
         const sk = view.sigilT ? Math.max(0, 1 - (now - view.sigilT) / 2600) : 0;
         G.copperMat.emissiveIntensity = isAwake() ? 0.2 + 0.6 * sk : 0.22 + (rm ? 0 : 0.06 * Math.sin(t * 2));
@@ -765,6 +812,17 @@
         const turn = view.sigilT && !rm ? Math.min(1, (now - view.sigilT) / 1600) : 1;
         G.oldPlate.rotation.z = isAwake() ? Math.PI * (turn * turn * (3 - 2 * turn)) : 0;
         G.sealHalo.material.opacity = sk * 0.9;
+        if (view.peek && now > view.peek.until) { view.peek = null; render(); }
+        const se = view.sigilT && !rm ? (now - view.sigilT) / 1000 : 9;
+        G.seal.visible = se < 2.3;
+        if (G.seal.visible) {
+          const from = { x: CAIRN.x, y: 0.85, z: CAIRN.z + 0.9 }, up = Math.min(1, se / 1.2), fly = Math.max(0, Math.min(1, (se - 1.2) / 1.0)), fe = fly * fly * (3 - 2 * fly);
+          const hp = G.hermes ? G.hermes.position : from;
+          G.seal.position.set(from.x + (hp.x - from.x) * fe, from.y + 0.9 * (up * (2 - up)) + (1.3 - from.y - 0.9) * fe, from.z + (hp.z - from.z) * fe);
+          G.seal.rotation.y = se * 5;
+          G.seal.scale.setScalar(1 - 0.55 * fe);
+        }
+        if (isAwake() && !isDone() && !(cine && cine.active) && (!el.howto || el.howto.hidden) && view.idleT && now - view.idleT > 40000 && view.whispers < 3) whisper();
         G.starMat.emissiveIntensity = 0.12 + (rm ? 0 : 0.08 * Math.sin(t * 1.7));
         G.cleftGlow.material.opacity = (isDone() ? 0.95 : 0.6) + (rm ? 0 : 0.12 * Math.sin(t * 1.3));
         growRises(dt);
@@ -789,6 +847,19 @@
         G.camera.updateProjectionMatrix();
       }
 
+      // Hermes whispers when she has left him still in the dark for a long while (three times at most per visit)
+      const WHISPERS = [
+        "I can hear their boots, Silvia. Hold me still in a dark passage with the space bar, and count the turns until a torch comes back to the same square.",
+        "Point at a torch, on my map or down here in the dark, and I will watch it for you: you will see its whole round.",
+        "Behind a torch is the safest place in this labyrinth. Let it pass me, then follow it while it walks away."
+      ];
+      function whisper() {
+        view.idleT = performance.now();
+        say(WHISPERS[view.whispers % WHISPERS.length]);
+        subtitle('Hermes whispers on the wire.', 3.5, 'act');
+        cue('tick', { f: 520, v: 0.04 });
+        view.whispers++;
+      }
       function render() {
         const awake = isAwake(), done = isDone();
         if (run) drawBoard();
@@ -848,9 +919,11 @@
         feedback(el.keyFeedback, 'WINDROSE. The copper plate turns, and the seal is in Hermes\'s hand.', 'ok');
         say("The plate turned under my hand, Silvia, and the Seal of Cairn III is in my palm. But those ruts were theirs, Silvia: the BC Ashes were already inside, and now their torches stand between me and the Southern Mouth. I cannot go back the way I came. The founders cut another way out, the Western Cleft, through the lower fissures. Your page shows only the true road; nobody ever drew the fissures, so my lamp will draw them for you, square by square. Guide me there through the dark. Let the torches pass, then follow behind them.");
         subtitle('The copper plate turns. The Seal of Cairn III is in his hand, and there are torches in the dark.', 5, 'act');
+        view.idleT = performance.now();
         if (G) {
           view.sigilT = performance.now();
           if (G.fx) G.fx.triumph({ x: CAIRN.x, y: 1, z: CAIRN.z + 0.8 }, 0.8);
+          setTimeout(() => cue('bell', { f: 783.99, v: 0.08, len: 2.2 }), 2100);   // the seal lands in his hand
         }
         render();
         if (el.pad.wait) setTimeout(() => el.pad.wait.focus({ preventScroll: true }), 60);
@@ -873,6 +946,7 @@
           }
         }
         run.trail.push([run.x, run.y]);
+        view.idleT = performance.now();
         stepCue(dx || dy ? 'step' : 'tick', { f: 900, v: 0.05 });
         run.x += dx; run.y += dy;
         run.moves++;
@@ -1013,6 +1087,7 @@
           pt.x = e.clientX; pt.y = e.clientY;
           const p = pt.matrixTransform(ctm.inverse());
           const x = Math.floor(p.x / CELL), y = Math.floor(p.y / CELL);
+          if (x >= 0 && y >= 0 && x < LEVEL.cols && y < LEVEL.rows && torchOn(cellKey(x, y)) >= 0) { peekRound(torchOn(cellKey(x, y))); return; }
           const dx = x - run.x, dy = y - run.y;
           if (Math.abs(dx) + Math.abs(dy) <= 1) takeTurn(dx, dy);
         });
@@ -1102,7 +1177,7 @@
         if (el.stage) el.stage.classList.toggle('is-flat', !G);
         if (G && 'ResizeObserver' in window && !el.stage.__labyFit) { el.stage.__labyFit = true; new ResizeObserver(fit).observe(el.stage); }
         fit();
-        view.ending = 0; view.overview = isDone(); view.sigilT = 0; view.snapNext = true;
+        view.ending = 0; view.overview = isDone(); view.sigilT = 0; view.snapNext = true; view.peek = null; view.idleT = performance.now(); view.whispers = 0;
         if (G) { G.cam.p = null; G.cam.dist = G.cam.tDist = 16; G.cam.pitch = G.cam.tPitch = 1.02; }
         if (isDone()) applyVictory();
         else if (!isAwake()) say("Silvia, I reached the Southern Mouth at noon and waited in the rocks for dark. Now I am inside, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road, the one on the page “The Sandstone Labyrinth & Cairn III” of your journal.");

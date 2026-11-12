@@ -506,12 +506,13 @@
 
         // the feel: a lens that lets the sun and the gold bloom, a body for Hermes, a camera that breathes, sand that falls
         const FX = window.EclipseFX;
-        let post = null, gait = null, dust = null, sparks = null, prints = null, shake = null;
+        let post = null, gait = null, dust = null, sparks = null, trail = null, prints = null, shake = null;
         if (FX) {
           try { post = FX.post(renderer, { bloom: 0.5, threshold: 0.95, knee: 0.12, vignette: 0.3, grain: 0.026, ca: 0.18, sat: 1.04, contrast: 1.03, shafts: 0.4, shaftThreshold: 0.8, shade: 0.32 }); } catch (e) { post = null; }
           shake = FX.shaker({ idle: 0.0022 });
           dust = FX.particles(scene, { max: 360, wind: [0.9, 0, 0.25] });
           sparks = FX.particles(scene, { max: 260, additive: true });
+          trail = FX.particles(scene, { max: 140 });   // the gold dust the shadow leaves: opaque, so it reads on bright sand
           prints = FX.footprints(scene, { max: 64, life: 18 });
           if (H) gait = FX.gait(H, { onStep: (st) => {
             cue('step');
@@ -519,7 +520,7 @@
             dust.emit(st.pos, 3, { size: [0.45, 0.8], speed: [0.2, 0.7], up: [0.25, 0.7], life: [0.6, 1.1], alpha: 0.3, gravity: -0.7, color: 0xdcbb8c });
           } });
         }
-        return { skyFog, T, renderer, scene, camera, sky, lights, mono, slabs, marks, band, tipGroup, tipRing, tipBeam, cairn, lid, niche, nicheMat, seal, sealHalo, H, hermes: H && H.hermes, goldMat, ground, post, gait, dust, sparks, prints, shake, windT: 0, ringsShown: 0, lidWas: 0 };
+        return { skyFog, T, renderer, scene, camera, sky, lights, mono, slabs, marks, band, tipGroup, tipRing, tipBeam, cairn, lid, niche, nicheMat, seal, sealHalo, H, hermes: H && H.hermes, goldMat, ground, post, gait, dust, sparks, trail, prints, shake, windT: 0, ringsShown: 0, lidWas: 0 };
       }
 
       // The sun: its light, its sky and the colour of the haze follow the minute of the day
@@ -554,6 +555,15 @@
         G.band.rotation.y = Math.atan2(-tip.x, tip.y);
         G.band.scale.set(1, 1, tip.length);
         G.band.material.opacity = 0.14 + 0.1 * k;   // a low sun throws a longer, paler shadow
+        // the tip of the shadow leaves a trail of gold dust on the paving as the sun walks, fading behind it
+        const ph = phase();
+        if (G.trail && G.lastSun != null && !reduced() && (ph === 'sun' || ph === 'lost' || (ph === 'done' && view.free))) {
+          const was = shadowTip(G.lastSun), steps = Math.min(6, Math.max(1, Math.round(Math.hypot(tip.x - was.x, tip.y - was.y) / 0.8)));
+          for (let i = 1; i <= steps; i++) {
+            const f = i / steps;
+            G.trail.emit({ x: was.x + (tip.x - was.x) * f, y: 0.2, z: -(was.y + (tip.y - was.y) * f) }, 2, { color: 0xe0a020, size: [1.6, 2.3], grow: 0.4, speed: [0, 0.08], up: [0.05, 0.2], life: [2.2, 3.0], alpha: 0.95, gravity: 0, drag: 0.9, spread: 0.45 });
+          }
+        }
         G.lastSun = minute;
       }
 
@@ -740,6 +750,7 @@
           }
           G.dust.update(dt, G.camera, G.renderer);
           G.sparks.update(dt, G.camera, G.renderer);
+          if (G.trail) G.trail.update(dt, G.camera, G.renderer);
         }
         if (G.prints) G.prints.update(dt);
         placeCamera(dt, false);
@@ -861,6 +872,8 @@
           return;
         }
         set(KEYS.marks, String(found + 1));
+        // every animal has its own note, and the four rise together into a chord as the day is read
+        cue('bell', { f: 587.33 * Math.pow(2, [0, 3, 5, 7][idx] / 12), v: 0.1, len: 2.6 });
         if (found + 1 < MARKS.length) { cue('shimmer', { deg: 14 + found * 2 }); subtitle(touched.name.charAt(0).toUpperCase() + touched.name.slice(1) + ' glows under the staff, and a line of the founders rises in the stone.', 5, 'act'); }
         if (G && G.sparks) {
           G.sparks.emit({ x: touched.x, y: 0.5, z: -touched.y }, 70, { color: 0xffd27a, size: [0.18, 0.34], grow: 0.4, speed: [0.5, 2.4], up: [2.2, 5.2], life: [0.9, 1.9], alpha: 0.95, gravity: -3.2, drag: 0.7, bounce: 0.45, spread: touched.radius || 2 });

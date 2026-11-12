@@ -3561,6 +3561,7 @@
           <div class="chasm3d-voice" id="solstice-dispatch-text" role="status" aria-live="polite"></div>
 
           <div class="laby3d-sigil" id="solstice-sigil-card">
+            <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="16B" data-open="page" aria-haspopup="dialog" title="See the printed page Arch of the Solstice &amp; The Solar Altar"><span class="pill-icon">📖</span> Arch of the Solstice &amp; The Solar Altar</span></div>
             <div class="chasm3d-where">I · The sigil of Cairn V: follow the midsummer ray through the bronze mirrors and read the sun-stones it crosses</div>
             <label class="monolith-sr-only" for="solstice-key-input">The eight-letter sigil of Cairn V</label>
             <input type="text" class="mon3d-input laby3d-input" id="solstice-key-input" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
@@ -3575,6 +3576,13 @@
                 <button type="button" class="chasm3d-btn is-way" id="btn-solstice-dawn">☀ Await the dawn</button>
                 <div class="solstice-locks" aria-label="Locks of the brass ring"><span>Ring</span><b></b><b></b><b></b><b></b></div>
               </div>
+              <div class="solstice-moon-row" id="solstice-moon-row" role="group" aria-label="Rehearse the four rays by moonlight" hidden>
+                <span>🌙 By moonlight, before the dawn:</span>
+                <button type="button" class="chasm3d-btn" data-k="0" aria-label="Show where the first ray would go">Ray I</button>
+                <button type="button" class="chasm3d-btn" data-k="1" aria-label="Show where the second ray would go">Ray II</button>
+                <button type="button" class="chasm3d-btn" data-k="2" aria-label="Show where the third ray would go">Ray III</button>
+                <button type="button" class="chasm3d-btn" data-k="3" aria-label="Show where the fourth ray would go">Ray IV</button>
+              </div>
               <div class="monolith-feedback" id="solstice-dawn-feedback" role="status" aria-live="polite"></div>
               <details class="chasm3d-laws solstice3d-court-box">
                 <summary>The courtyard from above</summary>
@@ -3588,6 +3596,7 @@
             <div class="monolith-game-inner">
               <div class="chasm3d-where">III · The night signal: watch the light on Tower II, then answer it with Hermes's mirror</div>
               <svg class="solstice-night" id="solstice-night" viewBox="0 0 200 90" role="img" aria-label="The night desert. On the horizon, the dark shape of Tower II, and a small light."></svg>
+              <div class="solstice-tower-trace" id="solstice-tower-trace" aria-live="polite"></div>
               <div class="pillars-row">
                 <button type="button" class="chasm3d-btn" id="btn-solstice-watch">👁 Watch the light</button>
                 <span class="monolith-feedback" id="solstice-round-label" style="margin: 0;"></span>
@@ -3647,6 +3656,7 @@
             <h3>II · The autumn dawn</h3>
             <ol class="chasm3d-howto-steps">
               <li><strong>Click a mirror</strong> to turn it a quarter. You can set the first ray in the dark, before the sun comes up. Drag to look around, scroll to come closer.</li>
+              <li><strong>🌙 By moonlight</strong>, before you call the dawn, the buttons <em>Ray I</em> to <em>Ray IV</em> show where each ray will go. No clock runs and no lock closes.</li>
               <li>Press <strong>☀ Await the dawn</strong>. A ray comes under the arch at one of the four bronze notches and bounces from mirror to mirror. Fallen pillars stop it.</li>
               <li>When the ray reaches the brass ring, a lock closes and the sun climbs: the next ray enters further west. Four rays, four locks. Each ray gives you 30 seconds (the bar at the top). If it runs out, you start again from the first ray; the mirrors stay as you left them.</li>
             </ol>
@@ -4451,6 +4461,7 @@
           <div class="chasm3d-voice" id="pillars-dispatch-text" role="status" aria-live="polite"></div>
 
           <div class="laby3d-sigil" id="pillars-sigil-card">
+            <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="15A" data-open="page" aria-haspopup="dialog" title="See the printed page Cairn IV: Sentry of the Canyon"><span class="pill-icon">📖</span> Cairn IV: Sentry of the Canyon</span></div>
             <div class="chasm3d-where">I · The sigil of the Sentry: the seven echoes of the survey log, read as carved letters</div>
             <label class="monolith-sr-only" for="pillars-key-input">The seven-letter sigil of Cairn IV</label>
             <input type="text" class="mon3d-input laby3d-input" id="pillars-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
@@ -4600,6 +4611,7 @@
           <div class="chasm3d-voice" id="laby-dispatch-text" role="status" aria-live="polite"></div>
 
           <div class="laby3d-sigil" id="laby-sigil-card">
+            <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="14B" data-open="page" aria-haspopup="dialog" title="See the printed page The Sandstone Labyrinth &amp; Cairn III"><span class="pill-icon">📖</span> The Sandstone Labyrinth &amp; Cairn III</span></div>
             <div class="chasm3d-where">I · The sigil of Cairn III: the eight arches of the true road, from the Southern Mouth up to the cairn</div>
             <label class="monolith-sr-only" for="laby-key-input">The eight-letter sigil of Cairn III</label>
             <input type="text" class="mon3d-input laby3d-input" id="laby-key-input" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
@@ -4668,6 +4680,7 @@
               <li>Each time he takes a step, or holds still, <strong>every torch takes one step too</strong>. Each raider walks the same round again and again.</li>
               <li>A torch lights its own square and the two in front of it. Those squares <strong>glow orange on the ground</strong>: never end a step inside them.</li>
               <li>Before each step, look where each torch's arrow points: that is where its light falls next. Holding still in a dark side passage is often the safest move.</li>
+              <li><strong>Click a torch</strong>, in the scene or on the map, to watch its whole round for a few seconds. Watching costs no turn.</li>
             </ol>
           </section>
           <section class="chasm3d-howto-page" data-page="3" hidden>
@@ -4731,6 +4744,7 @@
 
           <div class="chasm3d-controls mon3d-controls" id="mon3d-controls" role="group" aria-label="Guide Hermes on the Ridge of the Sun">
             <div class="mon3d-sigil-row" id="mon3d-sigil-row">
+              <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="13B" data-open="page" aria-haspopup="dialog" title="See the printed page The Sun Monolith &amp; Cairn II"><span class="pill-icon">📖</span> The Sun Monolith &amp; Cairn II</span></div>
               <label class="monolith-sr-only" for="monolith-key-input">The seven-letter sigil of Cairn II</label>
               <input type="text" class="mon3d-input" id="monolith-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
               <button type="button" class="chasm3d-btn is-way" id="btn-monolith-speak">✦ Speak the Sigil</button>
