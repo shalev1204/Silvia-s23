@@ -2,16 +2,17 @@
    inside it, and the reply deck always at the foot. One chapter at a time; the earlier ones are one click away.
    Loaded after view-workshop.css and workshop-chat.css. */
 
-/* the page header gives way, so the whole chat fits on the screen */
-#view-field-wire .view-header { margin-bottom: 8px; padding-top: 0; }
-#view-field-wire .view-header .view-desc, #view-field-wire .view-header .view-tagline { display: none; }
-#view-field-wire .view-header .view-title { font-size: 1.35rem; margin: 0; }
+/* the chat takes the room: the page header gives way and the window is as wide and tall as the screen allows */
+#view-field-wire .view-header { display: none; }
+#view-field-wire .camp-messenger-container { max-width: min(1360px, 100%); }
 #view-field-wire .messenger-app-window {
-  height: calc(100vh - 190px);
-  height: calc(100dvh - 190px);
-  max-height: 960px;
-  min-height: 460px;
+  height: calc(100vh - 112px);
+  height: calc(100dvh - 112px);
+  max-height: 1100px;
+  min-height: 480px;
 }
+#view-field-wire .messenger-chat-body { padding: 20px clamp(20px, 4vw, 56px); gap: 14px; }
+#view-field-wire .chat-bubble-wrap { max-width: 78%; }
 #view-field-wire .messenger-top-bar { flex: 0 0 auto; }
 #view-field-wire .messenger-chat-body {
   flex: 1 1 auto;
@@ -24,7 +25,7 @@
 }
 #view-field-wire .messenger-chat-body.is-restoring { scroll-behavior: auto; }
 #view-field-wire .messenger-typing-bar { flex: 0 0 auto; }
-#view-field-wire .messenger-reply-deck { flex: 0 0 auto; max-height: 46%; overflow-y: auto; overscroll-behavior: contain; }
+#view-field-wire .messenger-reply-deck { flex: 0 0 auto; max-height: 38%; padding: 14px 22px; overflow-y: auto; overscroll-behavior: contain; }
 
 /* the chapter strip: where we are in the expedition, under the tabs */
 .wire-chapter-strip {

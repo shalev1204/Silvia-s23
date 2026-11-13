@@ -6907,7 +6907,9 @@
           if (icon) icon.textContent = on ? '🔊' : '🔇';
         }
       }
-      try { window.hubChatMuted = localStorage.getItem('order_chat_sound') === 'off'; } catch (e) { window.hubChatMuted = false; }
+      // The chat's own sound switch is gone (the speaker of the Hub, in the corner, mutes everything): the chat is never muted, and an old “off” is forgotten
+      window.hubChatMuted = false;
+      try { localStorage.removeItem('order_chat_sound'); } catch (e) {}
       applyChatSoundState();
       if (btnWireSound) {
         btnWireSound.addEventListener('click', () => {
