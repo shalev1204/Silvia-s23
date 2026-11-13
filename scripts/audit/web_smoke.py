@@ -2262,6 +2262,8 @@ A11Y_TOUCH_JS = """([root, FOC]) => {
     if (r.width >= 44 && r.height >= 44) return;
     const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     if (cx < 22 || cy < 22 || cx > innerWidth - 22 || cy > innerHeight - 22) return;   // off screen: not checked
+    const sc = el.closest('.messenger-chat-body');   // a control at the very edge of a scrolling chat is half hidden by it: not checked until it scrolls in
+    if (sc) { const q = sc.getBoundingClientRect(); if (cy < q.top + 22 || cy > q.bottom - 22) return; }
     const miss = [[-21, 0], [21, 0], [0, -21], [0, 21]].some(([dx, dy]) => {
       const hit = document.elementFromPoint(cx + dx, cy + dy);
       return !hit || !(el.contains(hit) || hit.closest(FOC));
@@ -4586,6 +4588,25 @@ def test_wire_chapters(browser):
     js("document.getElementById('tab-wire-expedition').click()"); page.wait_for_timeout(300)
     check(strip_hidden and tabs_visible and not js("document.getElementById('wire-chapter-strip').hidden"),
           "Ask Hermes is one click from anywhere in the chat (the header never scrolls away), and the chapter strip belongs to the expedition")
+    # the scroll is remembered when she goes to Ask Hermes and comes back
+    js("document.getElementById('wire-messages-stream').scrollTo({ top: 120, behavior: 'instant' })"); page.wait_for_timeout(200)
+    js("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(300)
+    js("document.getElementById('tab-wire-expedition').click()"); page.wait_for_timeout(400)
+    top = js("document.getElementById('wire-messages-stream').scrollTop")
+    check(abs(top - 120) < 6, "back from Ask Hermes the conversation is where she left it", str(top))
+    # what is new: the first visit counts everything as read; later, messages she has not seen are marked
+    read = js("JSON.parse(localStorage.getItem('order_wire_read') || 'null')")
+    last = max(int(k) for k in read) if read else -1
+    check(read and last >= 5 and not js("!!document.getElementById('wire-new-marker')") and js("document.getElementById('wcs-new').hidden"),
+          "the first time everything already there is read: no marker", str(read))
+    read[str(last)] = max(0, read[str(last)] - 3)
+    js("r => localStorage.setItem('order_wire_read', JSON.stringify(r))", read)
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+    st = js("(() => ({ marker: !!document.getElementById('wire-new-marker'), tag: !document.getElementById('wcs-new').hidden, read: JSON.parse(localStorage.getItem('order_wire_read')) }))()")
+    check(st["marker"] and st["tag"] and st["read"][str(last)] == read[str(last)] + 3,
+          "three messages she had not seen: a “New messages” line where they begin, a NEW tag on the chapter, and then they count as read", str(st))
     # the cut of a text into beats
     beats = js("[window.__wireTest.beats('One short line.'), window.__wireTest.beats('First paragraph.\\n\\nSecond paragraph.'), window.__wireTest.beats(['A.', 'B.']), window.__wireTest.beats('" + ("This is a sentence of some length, said calmly. " * 8).strip() + "')]")
     check(beats[0] == ["One short line."] and len(beats[1]) == 2 and beats[2] == ["A.", "B."] and len(beats[3]) >= 3 and all(len(b) <= 160 for b in beats[3]),
@@ -4603,6 +4624,8 @@ def test_wire_chapters(browser):
         const tgt = document.querySelector('.telegraph-typewriter-target'); if (tgt) { const n = tgt.textContent.length; if (n > 0 && n < 40) grew = true; seen = Math.max(seen, n); } }, 40);
       await window.__wireTest.play(['The lamp is lit, Silvia.', 'I can see the whole gorge from here.', 'Nobody has moved on the terraces.'], 11);
       clearInterval(poll); return { ms: Math.round(performance.now() - t0), dots, grew, bubbles: document.querySelectorAll('.chat-bubble-wrap.incoming').length }; }""")
+    ticks = js("window.__wireTicks || 0")
+    check(ticks == 3, "one soft tick for each message, not a burst and not a click for every letter", str(ticks))
     check(res["dots"] and res["grew"] and res["ms"] > 6000,
           "Hermes's messages come one by one: the typing dots, the text typed slowly, a breath between them", str(res))
     check(not errors, "no JS errors in the chat window", "; ".join(sorted(set(errors))[:3]))

@@ -43,6 +43,25 @@
           return window.hubChatMuted === true && document.body.getAttribute('data-active-view') === 'view-field-wire';
         }
 
+        // One soft, dry tick as each of Hermes's messages opens (the beats of the Field Wire): quiet enough to be heard for an hour
+        playSoftTick() {
+          window.__wireTicks = (window.__wireTicks || 0) + 1;
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime, osc = this.ctx.createOscillator(), gain = this.ctx.createGain(), lp = this.ctx.createBiquadFilter();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1500, now);
+            osc.frequency.exponentialRampToValueAtTime(760, now + 0.05);
+            lp.type = 'lowpass'; lp.frequency.value = 2400;
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.028, now + 0.004);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+            osc.connect(lp); lp.connect(gain); gain.connect(this.ctx.destination);
+            osc.start(now); osc.stop(now + 0.09);
+          } catch (e) {}
+        }
+
         // Short telegraph burst (dit dit dah) when a new dispatch from Hermes starts to arrive
         playTelegraphArrival() {
           if (this._muted()) return;
@@ -6919,6 +6938,7 @@
           if (!wireMessagesStream.classList.contains('is-restoring')) wireFirstChapter = wireChapterIdx;   // a chapter that opens now is the one on screen
         }
         pill.dataset.chapter = String(wireChapterIdx);
+        if (wireRead && wireRead[wireChapterIdx] == null && !wireMessagesStream.classList.contains('is-restoring')) wireRead[wireChapterIdx] = 0;   // a chapter that opens now: its messages are unread until she sees them
         wireMessagesStream.appendChild(pill);
         if (!wireMessagesStream.classList.contains('is-restoring')) applyWireChapters();
       }
@@ -6944,7 +6964,7 @@
         if (first > 0) {
           const prev = wireChapterList[first - 1], card = document.createElement('button');
           card.type = 'button'; card.id = 'wire-earlier-card'; card.className = 'wire-earlier-card';
-          card.innerHTML = '↑ Earlier chapter<small>' + prev.name + '</small>';
+          card.innerHTML = '↑ Earlier chapter' + (wireNew[first - 1] != null ? ' · <b class="wire-new-dot">● new</b>' : '') + '<small>' + prev.name + '</small>';
           card.addEventListener('click', () => showEarlierWireChapter());
           wireMessagesStream.insertBefore(card, wireMessagesStream.firstChild);
         }
@@ -6954,7 +6974,10 @@
           if (num) num.textContent = String(first + 1);
           if (tot) tot.textContent = String(wireChapterIdx + 1);
           if (nm) nm.textContent = (wireChapterList[first] || cur).name;
-          if (btn) { btn.hidden = first <= 0; btn.onclick = () => showEarlierWireChapter(); }
+          const tag = document.getElementById('wcs-new');
+          if (tag) tag.hidden = wireNew[first] == null;
+          const earlierNew = Object.keys(wireNew).some((k) => parseInt(k, 10) < first);
+          if (btn) { btn.hidden = first <= 0; btn.onclick = () => showEarlierWireChapter(); btn.classList.toggle('has-new', earlierNew); btn.textContent = earlierNew ? '↑ Earlier chapters · ● new' : '↑ Earlier chapters'; }
         }
       }
       function showEarlierWireChapter() {
@@ -6964,6 +6987,51 @@
         applyWireChapters();
         wireMessagesStream.scrollTo({ top: 0, behavior: 'instant' });
       }
+      // What she has read: for each chapter, how many of Hermes's messages she has seen with the chat open. A chapter with more
+      // messages than that gets a “NEW” tag in the strip and a “New messages” line where the unread ones begin. The first time
+      // (no record yet) everything already there counts as read.
+      const WIRE_READ_KEY = 'order_wire_read';
+      let wireRead = null, wireNew = {};
+      try { wireRead = JSON.parse(localStorage.getItem(WIRE_READ_KEY) || 'null'); } catch (e) { wireRead = null; }
+      const wireIncoming = (ch) => (wireMessagesStream ? wireMessagesStream.querySelectorAll('.chat-bubble-wrap.incoming:not(.chat-typing-wrap)[data-chapter="' + ch + '"]') : []);
+      function wireWatching() { return document.body.getAttribute('data-active-view') === 'view-field-wire' && currentWireTab === 'expedition' && !document.hidden; }
+      function saveWireRead() { try { localStorage.setItem(WIRE_READ_KEY, JSON.stringify(wireRead)); } catch (e) {} }
+      // chapters on screen are read; called as messages arrive and when the chat is opened or comes back to the front
+      function markWireSeen() {
+        if (!wireWatching() || !wireRead || (wireMessagesStream && wireMessagesStream.classList.contains('is-restoring'))) return;   // not while the history is being drawn
+        let changed = false;
+        for (let i = Math.min(wireFirstChapter, wireChapterIdx); i <= wireChapterIdx; i++) {
+          const n = wireIncoming(i).length;
+          if ((wireRead[i] || 0) !== n) { wireRead[i] = n; changed = true; }
+        }
+        if (changed) saveWireRead();
+      }
+      // at the end of a history render: what is new since she last looked
+      function wireFindUnread() {
+        const old = document.getElementById('wire-new-marker');
+        if (old) old.remove();
+        wireNew = {};
+        const counts = [];
+        for (let i = 0; i <= wireChapterIdx; i++) counts.push(wireIncoming(i).length);
+        if (!wireRead) wireRead = {};
+        let learnt = false;
+        counts.forEach((n, i) => {
+          if (wireRead[i] == null) { wireRead[i] = n; learnt = true; }   // a chapter nobody has recorded yet (the first time, or before this existed): all of it counts as read
+          else if (n > wireRead[i]) wireNew[i] = wireRead[i];
+        });
+        if (learnt) saveWireRead();
+        const cur = wireNew[wireChapterIdx];
+        if (cur > 0 && !window.__wireAllChapters) {   // part of this chapter was read: a line where the new messages begin
+          const first = wireIncoming(wireChapterIdx)[cur];
+          if (first) {
+            const mk = document.createElement('div');
+            mk.id = 'wire-new-marker'; mk.className = 'wire-new-marker'; mk.dataset.chapter = String(wireChapterIdx);
+            mk.innerHTML = '<span>New messages</span>';
+            wireMessagesStream.insertBefore(mk, first);
+          }
+        }
+      }
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) markWireSeen(); });
       window.__wireShowAllChapters = () => { window.__wireAllChapters = true; applyWireChapters(); };
       window.__wireTest = { beats: (t) => wireBeats(t), play: (t, step) => new Promise((res) => playHermesBeats(t, { type: 'expedition', step: step || 11 }, res)) };   // for scripts/audit/web_smoke.py
 
@@ -7268,7 +7336,6 @@
           setTimeout(() => {
             if (!alive()) return;
             showTyping(false);
-            if (sfx && sfx.playChimeHover && i === 1) sfx.playChimeHover();
             appendWireMessage(getCartographerTitle(), text, false, true, () => setTimeout(next, readingGap(text)), null, Object.assign({ slow: true }, meta || {}));
           }, typingLead(text));
         };
@@ -7283,6 +7350,7 @@
       function appendWireMessage(sender, text, isSystem = false, isLive = false, onComplete = null, targetStream = null, meta = null) {
         const el = appendWireMessageCore(sender, text, isSystem, isLive, onComplete, targetStream, meta);
         if (el && el.parentNode === wireMessagesStream && el.dataset.chapter == null) el.dataset.chapter = String(wireChapterIdx);
+        if (el && el.classList.contains('incoming')) markWireSeen();   // read at once if the chat is open in front of her
         noteNewMessage();
         return el;
       }
@@ -7413,7 +7481,7 @@
           if (stream.scrollHeight - stream.scrollTop - stream.clientHeight < 140) stream.scrollTop = stream.scrollHeight;   // follow the typing
 
           const now = Date.now();
-          if (now - lastSoundTime > (meta && meta.slow ? 90 : 65)) {
+          if (!(meta && meta.slow) && now - lastSoundTime > 65) {
             if (sfx && typeof sfx.playMechanicalClick === 'function') {
               try { sfx.playMechanicalClick(); } catch(e) {}
             }
@@ -7433,7 +7501,8 @@
           }
         }
 
-        if (sfx && typeof sfx.playTelegraphArrival === 'function') sfx.playTelegraphArrival();
+        if (meta && meta.slow) { if (sfx && sfx.playSoftTick) sfx.playSoftTick(); }
+        else if (sfx && typeof sfx.playTelegraphArrival === 'function') sfx.playTelegraphArrival();
         typeTick();
         return msgEl;
       }
@@ -8400,7 +8469,9 @@
             ? promptBox
             : ((completedBar && completedBar.style.display !== 'none') ? completedBar : null);
 
-          wireScrollEnd(wireMessagesStream, smooth);
+          const mk = document.getElementById('wire-new-marker');
+          if (mk && wireMessagesStream) wireMessagesStream.scrollTo({ top: Math.max(0, mk.offsetTop - 80), behavior: 'instant' });   // the unread messages first
+          else wireScrollEnd(wireMessagesStream, smooth);
         };
         doScroll();
         if (typeof requestAnimationFrame === 'function') {
@@ -8552,7 +8623,9 @@
 
         wireMessagesStream.classList.remove('is-restoring');
         wireFirstChapter = wireChapterIdx;   // the chat opens on the chapter in course
+        wireFindUnread();
         applyWireChapters();
+        markWireSeen();
         if (!dawnFinalePlaying) {
           renderWireChoices();
           scrollChatToActivePrompt(false);
@@ -9265,9 +9338,18 @@
         }, 650);
       }
 
+      const wireScrollMem = {};
       function switchWireTab(tab) {
         if (sfx) sfx.playMechanicalClick();
+        // each conversation keeps where she was reading (a hidden element forgets its scroll)
+        { const from = currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream;
+          if (from && from.style.display !== 'none') wireScrollMem[currentWireTab] = { top: from.scrollTop, bottom: from.scrollHeight - from.scrollTop - from.clientHeight < 40 }; }
         currentWireTab = tab;
+        requestAnimationFrame(() => {
+          const to = tab === 'inquiries' ? wireInquiriesStream : wireMessagesStream, m = wireScrollMem[tab];
+          if (!to || !m) return;
+          to.scrollTo({ top: m.bottom ? to.scrollHeight : m.top, behavior: 'instant' });   // back at the end if she was there: whatever arrived meanwhile is in view
+        });
         if (tab === 'expedition') {
           if (tabWireExpedition) tabWireExpedition.classList.add('active');
           if (tabWireInquiries) tabWireInquiries.classList.remove('active');
