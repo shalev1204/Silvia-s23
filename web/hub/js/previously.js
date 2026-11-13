@@ -21,6 +21,7 @@
         playa: 'Silvia found Hermes a safe road across the Salt Playa, slab by slab, around the sinkholes. CRYSTAL opened the post of the Order, and at noon, in the Sump, Hermes was her eyes until he reached a marker with a little brass balance.',
         lexicon: 'At Camp VII, under the torch of the raiders’ rearguard, Silvia read the nomad steles and locked the Al-Qibla bearing: the true road to Tower II. Hermes fled through the old walls and read the raiders’ name on their hearth: the BC Ashes.',
         clepsydra: 'At the Four Wells of Camp VIII the heat showed Hermes four basins that were never there. Silvia kept his head clear with the page in her journal, and under a carved falcon he found a real spring and filled the water skins.',
+        gates: 'At the gates of Tower II the Servant took the first seal and pointed north-north-east: four seals still sleep in stone, and Hermes set out across the Great Erg.',
         s14: 'At the Sun Monolith, Silvia woke Cairn II and its seal came out of the niche. On the rim, Hermes found a smear of cobalt blue, ground the way Aurelia ground her lapis.',
         s15: 'In the Sandstone Labyrinth, Silvia slipped Hermes past the raiders’ torches to the Seal of Cairn III. On the way out he saw a star in gold leaf, painted over blue.',
         s16: 'Between the singing pillars of Cairn IV, the song gave up the fourth seal and a river pebble painted with a gold star. At dawn the raiders split: a few men on Hermes’s tracks, the wagons back north-east.',

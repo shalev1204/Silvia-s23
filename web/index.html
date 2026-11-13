@@ -100,6 +100,7 @@
   <link rel="stylesheet" href="./hub/css/camp-messenger.css">
   <link rel="stylesheet" href="./hub/css/view-workshop.css">
   <link rel="stylesheet" href="./hub/css/workshop-chat.css">
+  <link rel="stylesheet" href="./hub/css/wire-chapters.css">
   <link rel="stylesheet" href="./hub/css/sandstorm.css">
   <link rel="stylesheet" href="./hub/css/a11y.css">
 </head>
@@ -2050,6 +2051,13 @@
                     <span>↺</span>
                   </button>
                 </div>
+              </div>
+
+              <!-- Where we are in the expedition: the chapter, and a way back to the earlier ones -->
+              <div class="wire-chapter-strip" id="wire-chapter-strip">
+                <span class="wcs-kicker">CHAPTER <b id="wcs-num">1</b> OF <span id="wcs-total">1</span></span>
+                <span class="wcs-name" id="wcs-name"></span>
+                <button type="button" class="wcs-earlier" id="btn-wire-earlier" hidden>↑ Earlier chapters</button>
               </div>
 
               <!-- Chat Messages Area: Expedition Stream -->
@@ -4994,6 +5002,10 @@
   <script src="./hub/js/gates-road.js"></script>
   <script src="./hub/js/stage-pause.js"></script>
   <script src="./hub/js/sheet-seals.js"></script>
+  <script src="./hub/js/wire-script-monolith.js"></script>
+  <script src="./hub/js/wire-script-bridge.js"></script>
+  <script src="./hub/js/wire-script-tower.js"></script>
+  <script src="./hub/js/wire-script-stage.js"></script>
   <script src="./hub/js/hub-core.js"></script>
   <script src="./hub/js/stations/s10-desert-map-and-chasm.js"></script>
   <script src="./hub/js/stations/s10-whispering-chasm.js"></script>

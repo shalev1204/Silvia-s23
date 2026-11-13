@@ -86,7 +86,8 @@ VIEWS = ["view-trail", "view-transmissions", "view-archives", "view-chronicles",
 SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;if(s.__nostory)delete s.__nostory;else if(!('order_story_monolith_v1' in s))s.order_story_monolith_v1='done';for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
 SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done", "order_silvia_live_v3": "done",
           "order_silvia_north_portal_v1": "done"}
-DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true"}
+DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true",
+               "order_gates_scene_completed": "true"}   # the gates of Tower II are behind her (the wire waits for that scene)
 DESERT_BASE = dict(SILVIA, order_dawn_step="3", order_cairn1_completed="true", order_seal_cairn_1="true",
                    order_chasm_march_start="1", order_whispering_chasm_completed="true",
                    order_salt_playa_completed="true", order_field_wire_step="4",
@@ -156,6 +157,7 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
     page.on("pageerror", lambda e: errors.append("JS error: " + str(e)[:200]))
     page.on("console", lambda m: errors.append("console: " + m.text[:200]) if m.type == "error" else None)
     page.on("response", lambda r: errors.append(f"HTTP {r.status}: {r.url}") if r.status >= 400 else None)
+    page.add_init_script("window.__wireFast = true; window.__wireAllChapters = true")   # the Field Wire types slowly for a person; a test does not wait for it (section 47 tests the pace)
     page.add_init_script("document.addEventListener('securitypolicyviolation', e => console.error('CSP blocked ' + e.violatedDirective + ' ' + e.blockedURI))")
     if seed:
         # the openings and endings of the Salt Playa and the Desert Lexicon play once: the tests that are not about them find them seen
@@ -330,12 +332,10 @@ def test_sun_monolith(browser):
         page.wait_for_timeout(9000)   # Hermes types his final message
 
     open_wire()
-    check(get("order_field_wire_step") == "9" and choices() == 3 and "He is her Servant" in wire_text(),
-          "gates of Tower II: step 9 with 3 replies")
-    js("window.selectDesertStation(23)"); page.wait_for_timeout(500)
-    check(not modal_open(), "monolith sealed before Hermes sets out")
-    open_wire(); answer_first()
-    check(get("order_field_wire_step") == "10" and get("order_monolith_march_start"), "reply at the gates starts the 12-hour crossing")
+    page.wait_for_timeout(1500)
+    check(get("order_field_wire_step") == "10" and get("order_monolith_march_start") and "He is her Servant" not in wire_text()
+          and "TOWER II · THE GATES" in wire_text().upper() and "setting out now" in wire_text() and choices() == 0,
+          "gates of Tower II: no chat here (the 3D scene tells it); Hermes simply sets out and the 12-hour crossing begins")
     js("window.selectDesertStation(23)"); page.wait_for_timeout(500)
     check(not modal_open(), "monolith sealed during the crossing")
 
@@ -406,8 +406,8 @@ def test_sun_monolith(browser):
 
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(get("order_field_wire_step") == "13" and text.count("He is her Servant") == 1 and "Two seals of five" in text
-          and text.count("First light, Silvia") == 1, "reload replays steps 9-13 once each")
+    check(get("order_field_wire_step") == "13" and "He is her Servant" not in text and text.count("setting out now") == 1 and "Two seals of five" in text
+          and text.count("First light, Silvia") == 1, "reload replays steps 10-13 once each (the gates have no chat)")
     check("Four seals to find" in text and "SEALS 1 / 5 · CROSSING" in text, "replayed crossing keeps the seal count Hermes had at the gates")
     js("window.openSunMonolithModal()"); page.wait_for_timeout(400)
     check("4 of 4" in js("document.getElementById('mon3d-marks').getAttribute('aria-label')"), "monolith restores its solved state")
@@ -1294,7 +1294,7 @@ def test_oracle_horizon(browser):
           "step 32 closes the Desert Path, and the morning of departure for Tower III follows (step 33)", bar)
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(text.count("mint tea") == 1 and text.count("She did not die in 1971") == 1 and text.count("A whole day at the Sanctuary") == 1, "reload replays steps 29-33 once each")
+    check(text.count("mint tea") == 1 and text.count("She did not die in 1971") == 1 and text.count("the best day I have had since 1971") == 1, "reload replays steps 29-33 once each")
     check(not errors, "no JS errors during Station 19", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
@@ -1353,7 +1353,7 @@ def test_profiles(browser):
     check(seals() == 4, "Carles reaches Cairn IV with the tester")
     login(page, "Silvia")
     # Her own canonical point (12 Nov, hub/js/story-point.js): only the Wash River Seal of Cairn I, at the foot of the Sun Monolith
-    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 1 and get("order_seal_cairn_1") == "true" and get("order_field_wire_step") == "9"
+    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 1 and get("order_seal_cairn_1") == "true" and get("order_field_wire_step") == "10"
           and get("order_cairn_iv_completed") is None and "tuning_pebble" not in page.evaluate("window.getOwnedRelicIds()"),
           "Silvia does not inherit Carles's seals, inventory or chat")
     page.evaluate("localStorage.setItem('seeker_silvia_cipher_ledger', JSON.stringify({O: 23, A: 7, R: 3}))")
@@ -1836,7 +1836,7 @@ def test_previously(browser):
 
     ctx, page, errors, text = recap(dict(DESERT_DONE, order_field_wire_step="10", order_monolith_march_start=hours_ago(1),
                                          order_last_seen_at=hours_ago(20)))
-    check("Four Wells" in text.split("|")[0] and ("He arrives in 10 h 5" in text or "He arrives in 11 h 00" in text) and "Keep the page “The Sun Monolith & Cairn II” close" in text.split("|")[-1],
+    check("gates of Tower II" in text.split("|")[0] and ("He arrives in 10 h 5" in text or "He arrives in 11 h 00" in text) and "Keep the page “The Sun Monolith & Cairn II” close" in text.split("|")[-1],
           "on the crossing to the Sun Monolith: the hours left and the sheet to keep close", text[:240])
     ctx.close()
 
@@ -4559,6 +4559,56 @@ def test_bridge_spyglass(browser):
     ctx.close()
 
 
+def test_wire_chapters(browser):
+    print("\n47. The Field Wire: a chat window with a fixed header, one chapter at a time, and Hermes in short messages typed slowly")
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.add_init_script("window.__wireAllChapters = false")
+    page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("TesterDesert.jumpTo('s17')"); page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+    st = js("""(() => { const s = document.getElementById('wire-messages-stream'), w = document.querySelector('.messenger-app-window').getBoundingClientRect(), deck = document.querySelector('.messenger-reply-deck').getBoundingClientRect();
+      return { ov: getComputedStyle(s).overflowY, scrolls: s.scrollHeight > s.clientHeight, hidden: [...s.children].filter(c => c.hidden).length, shown: [...s.children].filter(c => !c.hidden).length,
+               name: document.getElementById('wcs-name').textContent, num: document.getElementById('wcs-num').textContent, total: document.getElementById('wcs-total').textContent,
+               earlier: !document.getElementById('btn-wire-earlier').hidden, winBottom: w.bottom, deckBottom: deck.bottom, vh: innerHeight }; })()""")
+    check(st["ov"] == "auto" and st["scrolls"] and st["winBottom"] <= st["vh"] + 1 and st["deckBottom"] <= st["vh"] + 1,
+          "the Wire is a window that fits the screen: the conversation scrolls inside it and the reply deck stays at the foot", str(st))
+    check(st["num"] == st["total"] and int(st["total"]) >= 6 and "Arch of the Solstice" in st["name"] and st["hidden"] > 50 and st["earlier"],
+          "only the chapter in course is shown, with its name, its number and a way back", str(st))
+    js("document.getElementById('btn-wire-earlier').click()"); page.wait_for_timeout(500)
+    st2 = js("(() => ({ name: document.getElementById('wcs-name').textContent, num: document.getElementById('wcs-num').textContent, card: !!document.getElementById('wire-earlier-card'), top: document.getElementById('wire-messages-stream').scrollTop }))()")
+    check("Natural Bridge" in st2["name"] and int(st2["num"]) == int(st["num"]) - 1 and st2["top"] == 0,
+          "the earlier chapter opens above it, one at a time, and the chat scrolls to its start", str(st2))
+    js("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(300)
+    strip_hidden = js("document.getElementById('wire-chapter-strip').hidden")
+    tabs_visible = js("(b => b.top >= 0 && b.bottom <= innerHeight)(document.getElementById('tab-wire-inquiries').getBoundingClientRect())")
+    js("document.getElementById('tab-wire-expedition').click()"); page.wait_for_timeout(300)
+    check(strip_hidden and tabs_visible and not js("document.getElementById('wire-chapter-strip').hidden"),
+          "Ask Hermes is one click from anywhere in the chat (the header never scrolls away), and the chapter strip belongs to the expedition")
+    # the cut of a text into beats
+    beats = js("[window.__wireTest.beats('One short line.'), window.__wireTest.beats('First paragraph.\\n\\nSecond paragraph.'), window.__wireTest.beats(['A.', 'B.']), window.__wireTest.beats('" + ("This is a sentence of some length, said calmly. " * 8).strip() + "')]")
+    check(beats[0] == ["One short line."] and len(beats[1]) == 2 and beats[2] == ["A.", "B."] and len(beats[3]) >= 3 and all(len(b) <= 160 for b in beats[3]),
+          "a text is cut into short beats at its paragraphs, and long paragraphs at their sentences", str(beats)[:300])
+    ctx.close()
+
+    # the pace: the dots, then the message typed slowly, then a breath: never all at once
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.add_init_script("window.__wireFast = false")
+    page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
+    res = js("""async () => { const t0 = performance.now(); let dots = false, grew = false, seen = 0;
+      const poll = setInterval(() => { if (document.querySelector('.chat-typing-wrap')) dots = true;
+        const tgt = document.querySelector('.telegraph-typewriter-target'); if (tgt) { const n = tgt.textContent.length; if (n > 0 && n < 40) grew = true; seen = Math.max(seen, n); } }, 40);
+      await window.__wireTest.play(['The lamp is lit, Silvia.', 'I can see the whole gorge from here.', 'Nobody has moved on the terraces.'], 11);
+      clearInterval(poll); return { ms: Math.round(performance.now() - t0), dots, grew, bubbles: document.querySelectorAll('.chat-bubble-wrap.incoming').length }; }""")
+    check(res["dots"] and res["grew"] and res["ms"] > 6000,
+          "Hermes's messages come one by one: the typing dots, the text typed slowly, a breath between them", str(res))
+    check(not errors, "no JS errors in the chat window", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -4579,7 +4629,7 @@ SECTIONS = {
     "gamecine": test_game_cinematics,
     "visions": test_clepsydra_visions, "gatesmarch": test_gates_march, "testerworld": test_tester_world,
     "balance": test_balance,
-    "dream": test_stones_dream, "spyglass": test_bridge_spyglass,
+    "dream": test_stones_dream, "spyglass": test_bridge_spyglass, "wirechat": test_wire_chapters,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
 QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon", "reduced", "cinematic", "road", "gamecine"]

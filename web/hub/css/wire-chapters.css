@@ -1,0 +1,88 @@
+/* The Field Wire as a chat window: a fixed header (the tabs, Hermes, the signal and the chapter), a conversation that scrolls
+   inside it, and the reply deck always at the foot. One chapter at a time; the earlier ones are one click away.
+   Loaded after view-workshop.css and workshop-chat.css. */
+
+/* the page header gives way, so the whole chat fits on the screen */
+#view-field-wire .view-header { margin-bottom: 8px; padding-top: 0; }
+#view-field-wire .view-header .view-desc, #view-field-wire .view-header .view-tagline { display: none; }
+#view-field-wire .view-header .view-title { font-size: 1.35rem; margin: 0; }
+#view-field-wire .messenger-app-window {
+  height: calc(100vh - 190px);
+  height: calc(100dvh - 190px);
+  max-height: 960px;
+  min-height: 460px;
+}
+#view-field-wire .messenger-top-bar { flex: 0 0 auto; }
+#view-field-wire .messenger-chat-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 168, 138, 0.4) transparent;
+}
+#view-field-wire .messenger-chat-body.is-restoring { scroll-behavior: auto; }
+#view-field-wire .messenger-typing-bar { flex: 0 0 auto; }
+#view-field-wire .messenger-reply-deck { flex: 0 0 auto; max-height: 46%; overflow-y: auto; overscroll-behavior: contain; }
+
+/* the chapter strip: where we are in the expedition, under the tabs */
+.wire-chapter-strip {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 22px;
+  background: linear-gradient(180deg, rgba(40, 30, 22, 0.96), rgba(28, 20, 15, 0.96));
+  border-bottom: 1px solid rgba(196, 168, 138, 0.3);
+  font-family: 'Cinzel', serif; color: #d9c7ae;
+}
+.wire-chapter-strip[hidden] { display: none; }
+.wcs-kicker { font-size: 0.68rem; letter-spacing: 0.18em; color: #a8987f; white-space: nowrap; }
+.wcs-kicker b { color: #fde68a; font-weight: 700; }
+.wcs-name { flex: 1; min-width: 0; font-size: 0.86rem; letter-spacing: 0.05em; color: #f0decc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wcs-earlier {
+  flex: 0 0 auto; padding: 6px 12px; cursor: pointer; border-radius: 999px;
+  font: 600 0.72rem 'Cinzel', serif; letter-spacing: 0.08em; color: #fde68a;
+  background: rgba(212, 168, 83, 0.1); border: 1px solid rgba(212, 168, 83, 0.45);
+  transition: background 0.15s ease;
+}
+.wcs-earlier:hover { background: rgba(212, 168, 83, 0.22); }
+.wcs-earlier:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+.wcs-earlier[hidden] { display: none; }
+
+/* the same button at the top of the conversation, for whoever is reading from the start */
+.wire-earlier-card {
+  align-self: center; margin: 2px 0 14px; padding: 9px 18px; cursor: pointer; border-radius: 12px;
+  font: 600 0.78rem 'Cinzel', serif; letter-spacing: 0.08em; color: #f0decc; text-align: center;
+  background: rgba(60, 44, 30, 0.7); border: 1px dashed rgba(196, 168, 138, 0.5);
+}
+.wire-earlier-card small { display: block; margin-top: 3px; font: italic 0.82rem 'EB Garamond', Georgia, serif; letter-spacing: 0; color: #b8aba0; }
+.wire-earlier-card:hover { background: rgba(84, 62, 42, 0.85); }
+.wire-earlier-card:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+
+/* where one conversation ends and the next begins */
+#wire-messages-stream .messenger-date-pill { margin-top: 18px; }
+#wire-messages-stream .messenger-date-pill.wire-chapter-start {
+  margin: 34px 0 20px; padding: 14px 0; flex-direction: column; gap: 4px; font-size: 0.95rem; letter-spacing: 0.2em; color: #fde68a;
+  border-top: 1px solid rgba(196, 168, 138, 0.28); border-bottom: 1px solid rgba(196, 168, 138, 0.28);
+  background: linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.07), transparent);
+}
+#wire-messages-stream .messenger-date-pill.wire-chapter-start::before { display: none; }
+#wire-messages-stream .messenger-date-pill.wire-chapter-start::after {
+  content: attr(data-kicker); flex: none; height: auto; background: none; order: -1;
+  font-size: 0.64rem; letter-spacing: 0.3em; color: #a8987f;
+}
+#wire-messages-stream .chat-bubble-wrap.system-event { margin: 14px 0 26px; }
+#wire-messages-stream .chat-bubble-wrap[hidden], #wire-messages-stream .messenger-date-pill[hidden] { display: none !important; }
+
+/* a finger, not a mouse */
+@media (pointer: coarse) {
+  #view-field-wire .messenger-toggle-btn, #view-field-wire .btn-hermes-status, #view-field-wire .messenger-btn-restart,
+  .wcs-earlier, .wire-earlier-card { min-height: 44px; min-width: 44px; }
+  #view-field-wire .messenger-btn-restart { min-width: 44px; }
+}
+@media (max-width: 760px) {
+  #view-field-wire .messenger-app-window { height: calc(100dvh - 120px); min-height: 420px; }
+  .wire-chapter-strip { padding: 7px 14px; gap: 9px; }
+  .wcs-kicker { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { #view-field-wire .messenger-chat-body { scroll-behavior: auto; } }
