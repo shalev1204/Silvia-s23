@@ -1995,8 +1995,12 @@
 
 
             <!-- The Inset Messenger Display Viewport -->
-            <div class="messenger-app-window">
+            <div class="messenger-app-window is-expedition" data-mood="dawn">
+              <div class="wire-mood-fx" id="wire-mood-fx" aria-hidden="true"></div>
+              <div id="wire-ambient-probe" aria-hidden="true" style="position:absolute;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none"></div>
 
+              <!-- The fixed head of the chat: who, the tabs, and the chapter. It stays under the Hub's own bar while the page scrolls. -->
+              <div class="wire-fixed-head">
               <!-- Top Contact Bar -->
               <div class="messenger-top-bar">
                 <div class="messenger-contact-meta">
@@ -2056,6 +2060,7 @@
                 <span class="wcs-name" id="wcs-name"></span>
                 <span class="wcs-new" id="wcs-new" hidden>NEW</span>
                 <button type="button" class="wcs-earlier" id="btn-wire-earlier" hidden>↑ Earlier chapters</button>
+              </div>
               </div>
 
               <!-- Chat Messages Area: Expedition Stream -->
@@ -5004,6 +5009,7 @@
   <script src="./hub/js/wire-script-bridge.js"></script>
   <script src="./hub/js/wire-script-tower.js"></script>
   <script src="./hub/js/wire-script-stage.js"></script>
+  <script src="./hub/js/wire-script-marches.js"></script>
   <script src="./hub/js/hub-core.js"></script>
   <script src="./hub/js/stations/s10-desert-map-and-chasm.js"></script>
   <script src="./hub/js/stations/s10-whispering-chasm.js"></script>

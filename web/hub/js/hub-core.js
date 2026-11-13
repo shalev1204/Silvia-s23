@@ -5807,7 +5807,9 @@
         hours: () => (window.GatesRoad && window.GatesRoad.hoursWord ? window.GatesRoad.hoursWord() : 'Twelve'),
         dream: (k) => (window.StonesDream ? window.StonesDream.answer(k) : null),
         bridge: () => (window.BridgeSpyglass && window.BridgeSpyglass.done() ? window.BridgeSpyglass.choice() : null),
-        hint: (id, n) => { if (window.EclipseHints && window.EclipseHints.grant) window.EclipseHints.grant(id, n); }
+        hint: (id, n) => { if (window.EclipseHints && window.EclipseHints.grant) window.EclipseHints.grant(id, n); },
+        // the option she picked in an event on a march (0/1), or null if it never reached her or went unanswered
+        event: (id) => { const st = marchEvState(); for (const k of Object.keys(st)) { const e = (st[k] || []).find((x) => x.id === id); if (e) return typeof e.pick === 'number' ? e.pick : null; } return null; }
       };
       (function applyWireScript() {
         const script = window.WIRE_SCRIPT || {};
@@ -6921,20 +6923,84 @@
       }
 
       // Divider between camps in the expedition thread
+      // The look of the chat follows the story: where Hermes is and what time of day it is for him (dawn, noon, dusk, night, the fire of
+      // Tower II in flames, the lamp of Tower III). Only a colour and a light; the chapters before the Monolith keep the dawn.
+      function wireMoodFor(step) {
+        if (step < 5) return 'dawn';
+        if (step <= 8) return 'noon';
+        const t = { 9: 'night', 10: 'night', 11: 'dusk', 12: 'dusk', 13: 'dawn', 14: 'noon', 15: 'night', 16: 'dawn', 17: 'dusk', 18: 'night', 19: 'dawn', 20: 'dawn', 21: 'dusk', 22: 'night', 23: 'noon', 24: 'dusk',
+          25: 'noon', 26: 'noon', 27: 'fire', 28: 'fire', 29: 'dawn', 30: 'dawn', 31: 'noon', 32: 'noon', 33: 'dawn', 34: 'night' };
+        return t[step] || 'lamp';
+      }
+      function applyWireMood() {
+        const win = document.querySelector('.messenger-app-window');
+        if (!win) return;
+        const mood = wireMoodFor(wireCurrentStep);
+        if (win.dataset.mood === mood) return;
+        const fx = document.getElementById('wire-mood-fx');
+        if (fx && !window.__wireFast && win.dataset.mood) {   // the light changes slowly: a fade out and in
+          fx.classList.add('is-shifting');
+          setTimeout(() => { win.dataset.mood = mood; fx.classList.remove('is-shifting'); }, 650);
+        } else win.dataset.mood = mood;
+      }
       // The expedition is told in chapters, one for each place Hermes goes to (a mission and its debrief). The chat shows the
       // chapter we are in; the earlier ones are one click away. A divider is always drawn; one that starts a chapter is bigger.
       const WIRE_CHAPTERS = { 5: 'The Nomad Ruins and the Four Wells', 9: 'The Sun Monolith · Cairn II', 13: 'The Sandstone Labyrinth · Cairn III', 17: 'The Natural Bridge · Cairn IV', 21: 'The Arch of the Solstice · Cairn V',
         25: 'Tower II in Flames · The Polybius Stele', 29: 'The Oracle of Tower II', 33: 'The Plateau and the Gate of Tower III', 37: 'The Camera Obscura', 41: 'The Whispering Gallery' };
       let wireChapterList = [{ name: 'The Dawn · The Whispering Chasm' }], wireChapterIdx = 0, wireFirstChapter = 0;
       function resetWireChapters() { wireChapterList = [{ name: 'The Dawn · The Whispering Chasm' }]; wireChapterIdx = 0; wireFirstChapter = 0; }
+      // The card that closes a chapter: what Hermes brought back, how it ended, and what Silvia chose. It opens the next chapter (so it is
+      // the first thing she sees there), before the divider.
+      const WIRE_CHAPTER_CARDS = {
+        5: { prize: 'The Al-Qibla bearing · the water of Camp VIII', note: 'The wells were a mirage, and the real spring was under the falcon.' },
+        9: { prize: 'The Seal of Cairn II', note: 'Seven noons, and a smear of blue nobody can explain yet.' },
+        13: { prize: 'The Seal of Cairn III', note: 'Eight arches in the dark, and a gold star painted over blue.' },
+        17: { prize: 'The Seal of Cairn IV', note: 'The pillars sang the code of Aurelia’s disc.' },
+        21: { prize: 'The Seal of Cairn V', note: 'The light on Tower II answered, and then came the smoke.' },
+        25: { prize: 'The Servant alive · the Oracle’s charts safe', note: 'The Polybius Stele opened a way through the fire.' },
+        29: { prize: 'The first truth: the WHEN', note: 'The Oracle was Aurelia, alive since 1971.' },
+        33: { prize: 'Fragment I of the mirror', note: 'The Gate of a Thousand Masks.' },
+        37: { prize: 'Fragment II of the mirror', note: 'The city on the dark wall.' },
+        41: { prize: 'Fragment III of the mirror', note: 'The pins of the ellipse, and an echo played backwards.' }
+      };
+      const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+      function wireChapterCard(prevIdx) {
+        const prev = wireChapterList[prevIdx], data = prev && WIRE_CHAPTER_CARDS[prev.step];
+        if (!prev || !data) return null;
+        const from = prev.step, nextStart = (wireChapterList[prevIdx + 1] || {}).step || (from + 4), picks = [];
+        for (let st = from; st < nextStart; st++) {
+          const c = EXPEDITION_THREAD[st] && EXPEDITION_THREAD[st].choices, i = wireHistory[st];
+          if (c && typeof i === 'number' && c[i]) {
+            let t = String(c[i].text).replace(/<[^>]*>/g, '').replace(/[“”]/g, '').replace(/\s+/g, ' ').trim();
+            if (t.length > 84) t = t.slice(0, 84).replace(/\s+\S*$/, '') + '…';
+            picks.push(t);
+          }
+        }
+        const card = document.createElement('div');
+        card.className = 'wire-chapter-card';
+        if (picks.length > 3) picks.length = 3;
+        const num = ROMAN[prevIdx + 1] || String(prevIdx + 1);
+        card.innerHTML = '<svg class="wcc-seal" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="1.2 2.6"/>' +
+          '<circle cx="50" cy="50" r="31" fill="none" stroke="currentColor" stroke-width="1"/><path d="M50 19 A31 31 0 0 1 50 81 Z" fill="currentColor" opacity="0.28"/><text x="50" y="57" text-anchor="middle" font-size="19" font-family="Cinzel, serif" fill="currentColor">' + num + '</text></svg>' +
+          '<div class="wcc-body"><div class="wcc-kicker">CHAPTER ' + num + ' · COMPLETE</div><div class="wcc-title"></div><div class="wcc-prize"></div><div class="wcc-note"></div>' + (picks.length ? '<div class="wcc-choices-title">Your choices</div><ul class="wcc-choices"></ul>' : '') + '</div>';
+        card.querySelector('.wcc-title').textContent = prev.name;
+        card.querySelector('.wcc-prize').textContent = '✦ ' + data.prize;
+        card.querySelector('.wcc-note').textContent = data.note;
+        const ul = card.querySelector('.wcc-choices');
+        if (ul) picks.forEach((t) => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+        return card;
+      }
       function appendWireDivider(text, step) {
         if (!wireMessagesStream) return;
         const pill = document.createElement('div');
         pill.className = 'messenger-date-pill';
         pill.textContent = text;
+        let carded = false;
         if (step != null && WIRE_CHAPTERS[step]) {
           wireChapterList.push({ name: WIRE_CHAPTERS[step], step });
           wireChapterIdx = wireChapterList.length - 1;
+          const card = wireChapterIdx >= 2 ? wireChapterCard(wireChapterIdx - 1) : null;
+          if (card) { card.dataset.chapter = String(wireChapterIdx); wireMessagesStream.appendChild(card); carded = true; if (!wireMessagesStream.classList.contains('is-restoring')) card.classList.add('is-new'); }
           pill.classList.add('wire-chapter-start');
           pill.dataset.kicker = 'CHAPTER ' + (wireChapterIdx + 1);
           if (!wireMessagesStream.classList.contains('is-restoring')) wireFirstChapter = wireChapterIdx;   // a chapter that opens now is the one on screen
@@ -6943,6 +7009,7 @@
         if (wireRead && wireRead[wireChapterIdx] == null && !wireMessagesStream.classList.contains('is-restoring')) wireRead[wireChapterIdx] = 0;   // a chapter that opens now: its messages are unread until she sees them
         wireMessagesStream.appendChild(pill);
         if (!wireMessagesStream.classList.contains('is-restoring')) applyWireChapters();
+        return carded;
       }
       // whatever lands in the stream belongs to the chapter in course
       if (wireMessagesStream && window.MutationObserver) {
@@ -6987,7 +7054,7 @@
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         wireFirstChapter = Math.min(wireFirstChapter, wireChapterIdx) - 1;
         applyWireChapters();
-        wireMessagesStream.scrollTo({ top: 0, behavior: 'instant' });
+        wireJumpTo(wireMessagesStream.querySelector('.wire-chapter-start:not([hidden])') || wireMessagesStream.firstElementChild);
       }
       // What she has read: for each chapter, how many of Hermes's messages she has seen with the chat open. A chapter with more
       // messages than that gets a “NEW” tag in the strip and a “New messages” line where the unread ones begin. The first time
@@ -7038,11 +7105,14 @@
       window.__wireTest = { beats: (t) => wireBeats(t), play: (t, step) => new Promise((res) => playHermesBeats(t, { type: 'expedition', step: step || 11 }, res)) };   // for scripts/audit/web_smoke.py
 
       // the newest message is always in view, inside the chat (never by scrolling the page)
+      // The page scrolls (not the chat): the newest message is brought into view above the reply deck, which stays at the foot of the screen.
       function wireScrollEnd(stream, smooth = true) {
-        const st = stream || wireMessagesStream;
-        if (!st) return;
-        try { st.scrollTo({ top: st.scrollHeight, behavior: smooth && !window.__wireFast ? 'smooth' : 'auto' }); } catch (e) { st.scrollTop = st.scrollHeight; }
+        const st = stream || wireMessagesStream, last = st && st.lastElementChild;
+        if (!last) return;
+        try { last.scrollIntoView({ behavior: smooth && !window.__wireFast ? 'smooth' : 'auto', block: 'end' }); } catch (e) { last.scrollIntoView(false); }
       }
+      const wireNearEnd = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 320;
+      const wireJumpTo = (el, behavior = 'auto') => { if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 150), behavior }); };
       const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'First Light · The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Next Evening · The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'That Evening · Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 41: 'Tower III · The Whispering Gallery' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
@@ -7103,11 +7173,123 @@
         42: () => '✦ THE GALLERY · TWO PINS NOBODY DREW · “THE WHISPERING GALLERY” READY · LISTEN AT THE WEST ONE ✦',
         44: () => '✦ THE NICHE OPENED · THE TUNE MIRRORED · FRAGMENT III SET · 3 / 9 · [J] × 2 = [T] RECORDED ✦'
       };
+
+      // ---- Events on the march ----
+      // While Hermes walks a long march (6 to 18 real hours) a few small events reach the chat at fixed points of the walk
+      // (hub/js/wire-script-marches.js: window.WIRE_MARCH_EVENTS[leg] = [{ at, pool: [{ id, beats, choices? }, x3] }]). The game picks
+      // one of the three variants of each slot, the same one for the whole march and a different one in each march. Some end in a
+      // question with two answers; the answer changes his reply. Only marches that start after MARCH_EVENTS_FROM have them.
+      const MARCH_EVENTS_FROM = Date.parse('2026-11-13T00:00:00');
+      const MARCH_EV_KEY = 'order_wire_marchev';   // { leg: [{ id, pick }] } pick: 0/1 = her answer, null = waiting for it, 'x' = unanswered, 'n' = no question
+      const MARCH_NOREPLY = ['No answer came through, so I chose for myself. I will tell you how it went.', 'The line stayed quiet, so I went with my gut.', 'Nothing came back. I decided alone, so do not worry.'];
+      function marchEvState() { try { return JSON.parse(localStorage.getItem(MARCH_EV_KEY) || '{}') || {}; } catch (e) { return {}; } }
+      function marchEvSave(st) { try { localStorage.setItem(MARCH_EV_KEY, JSON.stringify(st)); } catch (e) {} }
+      function marchHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+      window.__marchHash = marchHash;   // (tests choose a march start that picks a given variant)
+      function marchSlots(legNo) { return (window.WIRE_MARCH_EVENTS && window.WIRE_MARCH_EVENTS[legNo]) || []; }
+      function marchEvFind(legNo, id) {
+        for (const sl of marchSlots(legNo)) { const ev = (sl.pool || []).find((x) => x.id === id); if (ev) return ev; }
+        return null;
+      }
+      function marchText(t) { try { return wireBeats(typeof t === 'function' ? t(window.WireScript) : t); } catch (e) { console.warn('wire march event', e); return []; } }
+      function marchNoReply(id) { return MARCH_NOREPLY[marchHash(id) % MARCH_NOREPLY.length]; }
+      // The variant of a slot for this march (a slot that reaches her late, among others, avoids the ones that ask a question)
+      function marchPick(legNo, leg, slotIdx, plainOnly) {
+        const pool = marchSlots(legNo)[slotIdx].pool, n = pool.length;
+        let i = marchHash(legNo + ':' + slotIdx + ':' + leg.march.startedAt()) % n;
+        if (plainOnly && pool[i].choices) for (let k = 1; k < n; k++) { if (!pool[(i + k) % n].choices) { i = (i + k) % n; break; } }
+        return pool[i];
+      }
+      function marchActive(legNo, leg) {
+        return !!(leg && marchSlots(legNo).length && wireCurrentStep === legNo && leg.march.startedAt() >= MARCH_EVENTS_FROM && !leg.march.skipped());
+      }
+      function marchPending(legNo) {
+        const e = (marchEvState()[legNo] || []).find((x) => x.pick === null);
+        return e ? { entry: e, ev: marchEvFind(legNo, e.id) } : null;
+      }
+      // The events of a march already delivered, drawn in the history right after Hermes sets out
+      function appendMarchEvents(legNo) {
+        (marchEvState()[legNo] || []).forEach((e) => {
+          const ev = marchEvFind(legNo, e.id);
+          if (!ev) return;
+          const meta = { type: 'expedition', step: legNo };
+          marchText(ev.beats).forEach((b) => appendWireMessage(getCartographerTitle(), b, false, false, null, wireMessagesStream, meta));
+          if (typeof e.pick === 'number' && ev.choices && ev.choices[e.pick]) {
+            const c = ev.choices[e.pick];
+            appendWireMessage('SILVIA · NAVIGATOR', c.silviaMsg, false, false, null, wireMessagesStream, meta);
+            marchText(c.reply).forEach((b) => appendWireMessage(getCartographerTitle(), b, false, false, null, wireMessagesStream, meta));
+          } else if (e.pick === 'x') {
+            appendWireMessage(getCartographerTitle(), marchNoReply(e.id), false, false, null, wireMessagesStream, meta);
+          }
+        });
+      }
+      // His question went unanswered: he chooses for himself
+      function marchExpire(legNo, live) {
+        const pend = marchPending(legNo);
+        if (!pend) return;
+        const st = marchEvState(), e = (st[legNo] || []).find((x) => x.id === pend.entry.id);
+        if (e) { e.pick = 'x'; marchEvSave(st); }
+        const line = marchNoReply(pend.entry.id);
+        if (live) playHermesBeats([line], { type: 'expedition', step: legNo }, null);
+        else appendWireMessage(getCartographerTitle(), line, false, false, null, wireMessagesStream, { type: 'expedition', step: legNo });
+      }
+      // Delivers what the walk has reached (one slot at a time). Returns true while it is speaking.
+      function deliverMarchEvents(legNo, leg) {
+        if (wireBeatsPlaying || !marchActive(legNo, leg)) return false;
+        const st = marchEvState(), got = st[legNo] || [], slots = marchSlots(legNo), prog = leg.march.progress();
+        const done = new Set(got.map((e) => e.id));
+        const due = [];
+        slots.forEach((sl, i) => { if (prog >= sl.at && !(sl.pool || []).some((v) => done.has(v.id))) due.push(i); });
+        if (!due.length) return false;
+        const watching = wireWatching(), last = due.length === 1 && !leg.march.over();   // once he has arrived a question has no one to wait for
+        const ev = marchPick(legNo, leg, due[0], !last), meta = { type: 'expedition', step: legNo };
+        if (marchPending(legNo)) marchExpire(legNo, false);
+        const st2 = marchEvState(); (st2[legNo] = st2[legNo] || []).push({ id: ev.id, pick: ev.choices ? (last ? null : 'x') : 'n' }); marchEvSave(st2);
+        const beats = marchText(ev.beats).concat(ev.choices && !last ? [marchNoReply(ev.id)] : []);
+        if (!beats.length) return false;
+        if (watching) {
+          wireBeatsPlaying = true;
+          playHermesBeats(beats, meta, () => { updateMessengerBadge(); renderWireChoices(); });
+          return true;
+        }
+        beats.forEach((b) => appendWireMessage(getCartographerTitle(), b, false, false, null, wireMessagesStream, meta));
+        if (typeof window.setMessengerUnread === 'function') window.setMessengerUnread((parseInt(localStorage.getItem('order_messenger_unread_count') || '0', 10) || 0) + 1);
+        updateMessengerBadge();
+        return false;
+      }
+      // The question waiting for her answer, as two reply pills in the deck
+      function showMarchChoice(legNo) {
+        const pend = marchPending(legNo);
+        if (!pend || !pend.ev || !pend.ev.choices || !wirePromptBox || !wireChoicesGrid) return false;
+        const header = document.getElementById('wire-prompt-header-text');
+        if (header) header.textContent = 'Hermes is waiting for your answer';
+        wireChoicesGrid.innerHTML = '';
+        wirePromptBox.style.display = 'block';
+        pend.ev.choices.forEach((c, i) => wireChoicesGrid.appendChild(makeChoicePill('0' + (i + 1), formatJournalCallouts(c.text), () => pickMarchChoice(legNo, pend.entry.id, i))));
+        return true;
+      }
+      function pickMarchChoice(legNo, id, i) {
+        const ev = marchEvFind(legNo, id), c = ev && ev.choices && ev.choices[i];
+        if (!c || wireBeatsPlaying) return;
+        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        const st = marchEvState(), e = (st[legNo] || []).find((x) => x.id === id);
+        if (!e || e.pick !== null) return;
+        e.pick = i; marchEvSave(st);
+        const meta = { type: 'expedition', step: legNo };
+        appendWireMessage('SILVIA · NAVIGATOR', c.silviaMsg, false, false, null, wireMessagesStream, meta);
+        if (typeof c.onPick === 'function') { try { c.onPick(window.WireScript); } catch (err) { console.warn('wire march onPick', err); } }
+        wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        wirePromptBox.style.display = 'none';
+        wireBeatsPlaying = true;
+        setTimeout(() => playHermesBeats(marchText(c.reply), meta, () => { updateMessengerBadge(); renderWireChoices(); }), window.__wireFast ? 30 : 700);
+      }
+
       function appendStepFinal(stepIdx) {
         (stepIdx >= 10 ? wireBeats(EXPEDITION_THREAD[stepIdx].hermesFinal) : [EXPEDITION_THREAD[stepIdx].hermesFinal]).forEach((b) => appendWireMessage(getCartographerTitle(), b, false, false, null, null, { type: 'expedition', step: stepIdx }));
         appendWireMessage('SYSTEM TELEMETRY', WIRE_FINAL_TELEMETRY[stepIdx](), true, false, null, null, { type: 'expedition', step: stepIdx });
         if (stepIdx === 36) appendWireIntercept();
         appendLetterNotes(stepIdx);
+        if (MARCH_LEGS[stepIdx]) appendMarchEvents(stepIdx);   // what happened on the road
       }
 
       // Hermes answers each of Aurelia's letters at the step where Silvia read it (hub/js/aurelia-letters.js)
@@ -7141,12 +7323,12 @@
       }
 
       function appendStepIntro(stepIdx, live = false) {
-        if (WIRE_STEP_DIVIDERS[stepIdx]) appendWireDivider(WIRE_STEP_DIVIDERS[stepIdx], stepIdx);
+        const carded = WIRE_STEP_DIVIDERS[stepIdx] ? appendWireDivider(WIRE_STEP_DIVIDERS[stepIdx], stepIdx) : false;
         if (EXPEDITION_THREAD[stepIdx] && EXPEDITION_THREAD[stepIdx].hermesInitial) {
           const initial = EXPEDITION_THREAD[stepIdx].hermesInitial;
           if (stepIdx >= 10) {
             // history draws every beat at once; a step that has just opened is spoken live, and the deck waits
-            if (live) { setTimeout(() => playHermesBeats(initial, { type: 'expedition', step: stepIdx }, () => renderWireChoices()), window.__wireFast ? 30 : 900); wireBeatsPlaying = true; }
+            if (live) { setTimeout(() => playHermesBeats(initial, { type: 'expedition', step: stepIdx }, () => renderWireChoices()), window.__wireFast ? 30 : (carded ? 3800 : 900)); wireBeatsPlaying = true; }
             else wireBeats(initial).forEach((b) => appendWireMessage('HERMES · CARTOGRAPHER', b, false, false, null, null, { type: 'expedition', step: stepIdx }));
           } else {
             appendWireMessage('HERMES · CARTOGRAPHER', initial, false, false, null, null, { type: 'expedition', step: stepIdx });
@@ -7480,7 +7662,7 @@
           const currentSub = text.substring(0, charIdx);
 
           targetSpan.innerHTML = currentSub.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
-          if (stream.scrollHeight - stream.scrollTop - stream.clientHeight < 140) stream.scrollTop = stream.scrollHeight;   // follow the typing
+          if (wireNearEnd() && msgEl.scrollIntoView) msgEl.scrollIntoView({ block: 'end' });   // follow the typing
 
           const now = Date.now();
           if (!(meta && meta.slow) && now - lastSoundTime > 65) {
@@ -7671,7 +7853,9 @@
         };
         // When Hermes arrives (ms since epoch), 0 before he sets out
         const arrivesAt = () => { const t = parseInt(localStorage.getItem(keys.start) || '0', 10); return t > 1 ? t + msNow() : 0; };
-        return { progress, started, over, camped, eta, start, skip, arrivesAt };
+        const startedAt = () => parseInt(localStorage.getItem(keys.start) || '0', 10) || 0;
+        const skipped = () => localStorage.getItem(keys.bypassed) === 'true';
+        return { progress, started, over, camped, eta, start, skip, arrivesAt, startedAt, skipped };
       }
 
       // The Operator's hold on Station 11 (24-10-2026): the Salt Playa is being rebuilt as a 3D game. While true,
@@ -8472,7 +8656,7 @@
             : ((completedBar && completedBar.style.display !== 'none') ? completedBar : null);
 
           const mk = document.getElementById('wire-new-marker');
-          if (mk && wireMessagesStream) wireMessagesStream.scrollTo({ top: Math.max(0, mk.offsetTop - 80), behavior: 'instant' });   // the unread messages first
+          if (mk && wireMessagesStream) wireJumpTo(mk);   // the unread messages first
           else wireScrollEnd(wireMessagesStream, smooth);
         };
         doScroll();
@@ -8626,6 +8810,7 @@
         wireMessagesStream.classList.remove('is-restoring');
         wireFirstChapter = wireChapterIdx;   // the chat opens on the chapter in course
         wireFindUnread();
+        applyWireMood();
         applyWireChapters();
         markWireSeen();
         if (!dawnFinalePlaying) {
@@ -8667,13 +8852,17 @@
         // then the arrival bar stays until the station is solved. Returns true while that leg is not finished.
         const showMarchLeg = (leg) => {
           leg.march.start();   // a save that stands here without a start time (e.g. after a tester replay) sets out now
+          if (deliverMarchEvents(leg.step, leg)) return true;   // an event of the road is reaching her: the deck waits for it
+          if (leg.march.over() && marchPending(leg.step)) marchExpire(leg.step, false);
           if (leg.campedTitle && leg.march.camped()) {
             showWaypointBar(leg.campedTitle, leg.campedDesc, leg.step);
             return true;
           }
           if (!leg.march.over()) {
             const descEl = showWaypointBar(leg.walkingTitle, '', leg.step);
+            showMarchChoice(leg.step);   // a question from the road waits above the trek bar
             const updateTrek = () => {
+              if (!wireBeatsPlaying && deliverMarchEvents(leg.step, leg)) return;
               const arrived = leg.march.over() || leg.march.camped();
               if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || arrived) {
                 if (window.__wireMarchTimer) { clearInterval(window.__wireMarchTimer); window.__wireMarchTimer = null; }
@@ -8702,6 +8891,7 @@
         const advanceTo = (step) => {
           wireCurrentStep = step;
           try { localStorage.setItem('order_field_wire_step', String(step)); } catch (e) {}
+          applyWireMood();
           appendStepIntro(step, true);
         };
 
@@ -9344,13 +9534,13 @@
       function switchWireTab(tab) {
         if (sfx) sfx.playMechanicalClick();
         // each conversation keeps where she was reading (a hidden element forgets its scroll)
-        { const from = currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream;
-          if (from && from.style.display !== 'none') wireScrollMem[currentWireTab] = { top: from.scrollTop, bottom: from.scrollHeight - from.scrollTop - from.clientHeight < 40 }; }
+        wireScrollMem[currentWireTab] = { top: window.scrollY, bottom: wireNearEnd() };
         currentWireTab = tab;
+        { const win = document.querySelector('.messenger-app-window'); if (win) win.classList.toggle('is-expedition', tab === 'expedition'); }
         requestAnimationFrame(() => {
-          const to = tab === 'inquiries' ? wireInquiriesStream : wireMessagesStream, m = wireScrollMem[tab];
-          if (!to || !m) return;
-          to.scrollTo({ top: m.bottom ? to.scrollHeight : m.top, behavior: 'instant' });   // back at the end if she was there: whatever arrived meanwhile is in view
+          const m = wireScrollMem[tab];
+          if (!m) return;
+          window.scrollTo({ top: m.bottom ? document.documentElement.scrollHeight : m.top, behavior: 'auto' });   // back at the end if she was there: whatever arrived meanwhile is in view
         });
         if (tab === 'expedition') {
           if (tabWireExpedition) tabWireExpedition.classList.add('active');

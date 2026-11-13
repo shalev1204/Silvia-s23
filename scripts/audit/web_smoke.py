@@ -4570,18 +4570,25 @@ def test_wire_chapters(browser):
     js("TesterDesert.jumpTo('s17')"); page.reload(); page.wait_for_timeout(2500)
     js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
-    st = js("""(() => { const s = document.getElementById('wire-messages-stream'), w = document.querySelector('.messenger-app-window').getBoundingClientRect(), deck = document.querySelector('.messenger-reply-deck').getBoundingClientRect();
-      return { ov: getComputedStyle(s).overflowY, scrolls: s.scrollHeight > s.clientHeight, hidden: [...s.children].filter(c => c.hidden).length, shown: [...s.children].filter(c => !c.hidden).length,
+    st = js("""(() => { const s = document.getElementById('wire-messages-stream'), deck = document.querySelector('.messenger-reply-deck'), head = document.querySelector('.wire-fixed-head');
+      return { ov: getComputedStyle(s).overflowY, inner: s.scrollHeight > s.clientHeight + 4, docH: document.documentElement.scrollHeight, vh: innerHeight, hidden: [...s.children].filter(c => c.hidden).length,
                name: document.getElementById('wcs-name').textContent, num: document.getElementById('wcs-num').textContent, total: document.getElementById('wcs-total').textContent,
-               earlier: !document.getElementById('btn-wire-earlier').hidden, winBottom: w.bottom, deckBottom: deck.bottom, vh: innerHeight }; })()""")
-    check(st["ov"] == "auto" and st["scrolls"] and st["winBottom"] <= st["vh"] + 60 and st["deckBottom"] <= st["vh"] + 60,   # a little page scroll is fine on a narrow screen
-          "the Wire is a window that fits the screen: the conversation scrolls inside it and the reply deck stays at the foot", str(st))
+               earlier: !document.getElementById('btn-wire-earlier').hidden, headPos: getComputedStyle(head).position, deckPos: getComputedStyle(deck).position, deckOv: getComputedStyle(deck).overflowY }; })()""")
+    check(st["ov"] == "visible" and not st["inner"] and st["docH"] > st["vh"] and st["headPos"] == "sticky" and st["deckPos"] == "sticky" and st["deckOv"] == "visible",
+          "the page scrolls, not the chat: the window grows with the conversation, and the head and the reply deck stay put", str(st))
+    js("window.scrollTo(0, 400)"); page.wait_for_timeout(300)
+    pos = js("(() => ({ head: document.querySelector('.wire-fixed-head').getBoundingClientRect().top, deck: document.querySelector('.messenger-reply-deck').getBoundingClientRect().bottom, vh: innerHeight }))()")
+    check(pos["head"] <= 2 and pos["deck"] <= pos["vh"] + 1, "scrolled up through the chat, the head is still at the top of the screen and the deck at the foot", str(pos))
     check(st["num"] == st["total"] and int(st["total"]) >= 6 and "Arch of the Solstice" in st["name"] and st["hidden"] > 50 and st["earlier"],
           "only the chapter in course is shown, with its name, its number and a way back", str(st))
+    cards = js("[...document.querySelectorAll('.wire-chapter-card')].map(c => c.innerText.replace(/\\s+/g, ' '))")
+    mood = js("document.querySelector('.messenger-app-window').dataset.mood")
+    check(len(cards) >= 4 and all("COMPLETE" in c and "✦" in c for c in cards) and any("Seal of Cairn III" in c for c in cards) and mood in ("dawn", "noon", "dusk", "night", "fire", "lamp"),
+          "each chapter opens with the card that closes the one before (what he brought back and what she chose), and the chat takes the light of the place", str(cards[:1]) + " / " + str(mood))
     js("document.getElementById('btn-wire-earlier').click()"); page.wait_for_timeout(500)
-    st2 = js("(() => ({ name: document.getElementById('wcs-name').textContent, num: document.getElementById('wcs-num').textContent, card: !!document.getElementById('wire-earlier-card'), top: document.getElementById('wire-messages-stream').scrollTop }))()")
-    check("Natural Bridge" in st2["name"] and int(st2["num"]) == int(st["num"]) - 1 and st2["top"] == 0,
-          "the earlier chapter opens above it, one at a time, and the chat scrolls to its start", str(st2))
+    st2 = js("(() => ({ name: document.getElementById('wcs-name').textContent, num: document.getElementById('wcs-num').textContent, card: !!document.getElementById('wire-earlier-card'), top: (document.querySelector('#wire-messages-stream .wire-chapter-start:not([hidden])') || document.getElementById('wire-messages-stream').firstElementChild).getBoundingClientRect().top }))()")
+    check("Natural Bridge" in st2["name"] and int(st2["num"]) == int(st["num"]) - 1 and 0 <= st2["top"] <= 400,
+          "the earlier chapter opens above it, one at a time, and the page scrolls to its start", str(st2))
     js("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(300)
     strip_hidden = js("document.getElementById('wire-chapter-strip').hidden")
     tabs_visible = js("(b => b.top >= 0 && b.bottom <= innerHeight)(document.getElementById('tab-wire-inquiries').getBoundingClientRect())")
@@ -4589,11 +4596,13 @@ def test_wire_chapters(browser):
     check(strip_hidden and tabs_visible and not js("document.getElementById('wire-chapter-strip').hidden"),
           "Ask Hermes is one click from anywhere in the chat (the header never scrolls away), and the chapter strip belongs to the expedition")
     # the scroll is remembered when she goes to Ask Hermes and comes back
-    js("document.getElementById('wire-messages-stream').scrollTo({ top: 120, behavior: 'instant' })"); page.wait_for_timeout(200)
+    js("window.scrollTo(0, 350)"); page.wait_for_timeout(300)
+    before = js("Math.round(window.scrollY)")
     js("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(300)
-    js("document.getElementById('tab-wire-expedition').click()"); page.wait_for_timeout(400)
-    top = js("document.getElementById('wire-messages-stream').scrollTop")
-    check(abs(top - 120) < 6, "back from Ask Hermes the conversation is where she left it", str(top))
+    js("window.scrollTo(0, 0)"); page.wait_for_timeout(200)
+    js("document.getElementById('tab-wire-expedition').click()"); page.wait_for_timeout(500)
+    top = js("Math.round(window.scrollY)")
+    check(abs(top - before) < 8, "back from Ask Hermes the conversation is where she left it", "%s -> %s" % (before, top))
     # what is new: the first visit counts everything as read; later, messages she has not seen are marked
     read = js("JSON.parse(localStorage.getItem('order_wire_read') || 'null')")
     last = max(int(k) for k in read) if read else -1
@@ -4632,6 +4641,71 @@ def test_wire_chapters(browser):
     ctx.close()
 
 
+def test_wire_march_events(browser):
+    print("\n48. The Field Wire: while Hermes walks, small events reach the chat (a pick of three for each moment of the march), and some ask her a question")
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("TesterDesert.jumpTo('s14')"); page.reload(); page.wait_for_timeout(2500)
+    ev = js("window.WIRE_MARCH_EVENTS")
+    slots = {k: len(v) for k, v in ev.items()}
+    check(slots == {"10": 3, "14": 2, "18": 3, "22": 3, "26": 2, "34": 3} and all(len(sl["pool"]) == 3 for v in ev.values() for sl in v),
+          "six marches have events, two or three moments each and three versions of every moment", str(slots))
+    # a march start whose pick for the first moment of the Great Erg is a question (the pick is a hash of the start, so search for one)
+    setup = """() => { const hrs = (window.GatesRoad && window.GatesRoad.marchHours) ? window.GatesRoad.marchHours() : 12;
+      const pool = window.WIRE_MARCH_EVENTS[10][0].pool, want = pool.findIndex((v) => v.choices);
+      let start = Date.now() - Math.round(hrs * 3600e3 * 0.3);
+      while (window.__marchHash('10:0:' + start) % 3 !== want) start += 1;
+      ['order_monolith_march_bypassed', 'order_sun_monolith_completed', 'order_wire_marchev'].forEach((k) => localStorage.removeItem(k));
+      localStorage.setItem('order_monolith_march_start', String(start)); localStorage.setItem('order_field_wire_step', '10');
+      const c = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]'); while (c.length < 10) c.push(0); c.length = 10; localStorage.setItem('order_field_wire_choices', JSON.stringify(c));
+      return { hrs, id: pool[want].id, start }; }"""
+    info = js(setup)
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+    st = js("""(() => ({ pills: [...document.querySelectorAll('#wire-choices-grid .messenger-choice-pill')].length, deck: document.getElementById('wire-prompt-box').style.display,
+      head: document.getElementById('wire-prompt-header-text').textContent, bar: document.getElementById('wire-completed-bar').style.display,
+      saved: JSON.parse(localStorage.getItem('order_wire_marchev') || '{}') }))()""")
+    check(st["pills"] == 2 and st["deck"] == "block" and "waiting" in st["head"] and st["saved"].get("10", [{}])[0].get("id") == info["id"] and st["saved"]["10"][0]["pick"] is None,
+          "an event reaches the chat on its moment of the march, and its question waits for her as two replies", str(st))
+    before = js("document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap.incoming').length")
+    js("document.querySelectorAll('#wire-choices-grid .messenger-choice-pill')[1].click()"); page.wait_for_timeout(1500)
+    st = js("""(() => ({ saved: JSON.parse(localStorage.getItem('order_wire_marchev'))['10'][0].pick, deck: document.getElementById('wire-prompt-box').style.display,
+      mine: [...document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap.outgoing')].length, ev: window.WireScript.event('%s'),
+      n: document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap.incoming').length }))()""" % info["id"])
+    check(st["saved"] == 1 and st["deck"] == "none" and st["mine"] >= 1 and st["ev"] == 1 and st["n"] > before,
+          "her answer is saved, she says it, Hermes replies, and the question closes", str(st))
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
+    n2 = js("document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap.incoming').length")
+    saved = js("JSON.parse(localStorage.getItem('order_wire_marchev'))['10']")
+    check(n2 >= st["n"] and len(saved) == 1 and saved[0]["pick"] == 1, "after a reload the event is in the history once, with her answer, and is not delivered again", str(saved))
+    # he arrives while a question is unanswered: he chose for himself
+    js("""() => { const st = JSON.parse(localStorage.getItem('order_wire_marchev')); st['10'][0].pick = null; localStorage.setItem('order_wire_marchev', JSON.stringify(st));
+      const h = (window.GatesRoad && window.GatesRoad.marchHours) ? window.GatesRoad.marchHours() : 12; localStorage.setItem('order_monolith_march_start', String(Date.now() - (h + 1) * 3600e3)); }""")
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+    saved = js("JSON.parse(localStorage.getItem('order_wire_marchev'))['10']")
+    check(saved[0]["pick"] == "x" and len(saved) == 3 and js("document.getElementById('wire-prompt-box').style.display") == "none",
+          "if he arrives before she answers, he chooses for himself, and the moments she missed reach the chat without a question", str(saved))
+    # a march that began before the events existed, or that a tester skipped, has none
+    js("""() => { ['order_wire_marchev'].forEach((k) => localStorage.removeItem(k)); localStorage.setItem('order_monolith_march_start', String(Date.parse('2026-11-01T10:00:00'))); }""")
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
+    check(js("localStorage.getItem('order_wire_marchev')") is None, "a march that began before the events existed stays as it was")
+    js("""() => { localStorage.setItem('order_monolith_march_start', String(Date.now() - 3 * 3600e3)); localStorage.setItem('order_monolith_march_bypassed', 'true'); }""")
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
+    check(js("localStorage.getItem('order_wire_marchev')") is None, "a walk the tester skipped brings no events")
+    check(not errors, "no JS errors with the events of the road", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -4652,7 +4726,7 @@ SECTIONS = {
     "gamecine": test_game_cinematics,
     "visions": test_clepsydra_visions, "gatesmarch": test_gates_march, "testerworld": test_tester_world,
     "balance": test_balance,
-    "dream": test_stones_dream, "spyglass": test_bridge_spyglass, "wirechat": test_wire_chapters,
+    "dream": test_stones_dream, "spyglass": test_bridge_spyglass, "wirechat": test_wire_chapters, "wiremarch": test_wire_march_events,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
 QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon", "reduced", "cinematic", "road", "gamecine"]

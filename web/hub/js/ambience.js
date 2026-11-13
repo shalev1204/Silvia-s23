@@ -49,6 +49,8 @@
         'modal-oasis-clepsydra': { name: 'four wells', wind: [0.15, 420, 0.8, 0.05], drips: [0.32, 1.2], rumble: [0.1, 800], music: 'wells' },
         'modal-oasis-visions': { name: 'four wells', wind: [0.15, 420, 0.8, 0.05], drips: [0.32, 1.2], rumble: [0.1, 800], music: 'wells' },
         'modal-gates-tower-ii': { name: 'gates of tower ii', wind: [0.32, 480, 0.8, 0.05], drone: [0.08, 65.41, 98], crackle: [0.1, 1.4], music: 'gates' },
+        // the Field Wire (its probe is only on screen while the chat is): a very quiet wind under the conversation, no music
+        'wire-ambient-probe': { name: 'the wire', wind: [0.1, 520, 0.7, 0.03] },
         'modal-night-erg': { name: 'night on the erg', wind: [0.3, 380, 0.7, 0.05], drone: [0.06, 98, 147], music: 'night' },
         'modal-stones-dream': { name: 'a dream of 1998', wind: [0.22, 520, 0.6, 0.04], drone: [0.07, 73.4, 110, 146.8], crackle: [0.05, 0.7], music: 'dawn' },
         'modal-bridge-spyglass': { name: 'dawn on the natural bridge', wind: [0.55, 360, 1.1, 0.07, true], drone: [0.05, 55, 82.4], music: 'canyon' },
