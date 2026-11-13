@@ -68,6 +68,7 @@
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-clepsydra.css">
   <link rel="stylesheet" href="./hub/css/stations/s13-oasis-visions.css">
   <link rel="stylesheet" href="./hub/css/stations/s13b-gates-tower-ii.css">
+  <link rel="stylesheet" href="./hub/css/stations/s15b-interludes.css">
   <link rel="stylesheet" href="./hub/css/stations/s14-sun-monolith.css">
   <link rel="stylesheet" href="./hub/css/stations/s14b-sun-monolith-3d.css">
   <link rel="stylesheet" href="./hub/css/stations/s15-sandstone-labyrinth.css">
@@ -3515,6 +3516,130 @@
   </div>
 
   <!-- ===================================================================
+       THE MEMORY OF THE STONES: a dream of the autumn of 1998 (s15b-stones-dream.js).
+       The page “The Five Geodetic Cairns”, lived. Opens once from the Field Wire, after the Station 15 debrief.
+       Not a game: nothing can be lost. Shares the stage look of At the Gates of Tower II.
+       =================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-stones-dream" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="dream-modal-title">
+    <div class="chasm-workbench-window chasm3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🕰️</span>
+          <div>
+            <div class="chasm-header-title" id="dream-modal-title">The Memory of the Stones</div>
+            <div class="chasm-header-subtitle">A dream of the autumn of 1998 · page “The Five Geodetic Cairns”</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-dream" title="Close" aria-label="Close the Memory of the Stones">✕</button>
+      </div>
+
+      <div class="chasm3d-body">
+        <div class="gates-stage" id="dream-stage">
+          <canvas id="dream-canvas" class="gates-canvas" aria-hidden="true"></canvas>
+          <div class="gates-hud">
+            <div class="gates-hud-time"><span>✦</span><span id="dream-hud-time">AUTUMN 1998 · A DREAM</span></div>
+          </div>
+          <div class="dream-five" id="dream-five" hidden></div>
+          <div class="gates-stage-subtitle" id="dream-subtitle" role="status" aria-live="polite">Hermes sleeps in the rocks at the edge of the hardpan.</div>
+        </div>
+
+        <div class="gates-panel" id="dream-dialogue-panel">
+          <div class="gates-mission">
+            <span class="gm-label">GOAL</span>
+            <span class="gm-text" id="dream-mission-text">A dream of the autumn of 1998</span>
+          </div>
+          <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="14A" data-open="page" aria-haspopup="dialog" title="See the printed page The Five Geodetic Cairns"><span class="pill-icon">📖</span> The Five Geodetic Cairns</span></div>
+          <div class="dream-plates" id="dream-plates" aria-label="The plates that have come clear" hidden></div>
+
+          <div class="gates-log" id="dream-log" role="log" aria-live="polite"></div>
+
+          <div class="dream-fragments" id="dream-fragments" hidden></div>
+
+          <div class="gates-choices-container">
+            <div class="gates-choice-label">📡 YOUR REPLY · SILVIA</div>
+            <div id="dream-choices" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+
+          <div class="gates-decree-card" id="dream-finish-card" style="display: none;">
+            <div class="gates-decree-title"><span>🌇</span><span>Dusk at the Edge of the Hardpan</span></div>
+            <p class="gates-decree-body" id="dream-finish-body"></p>
+            <button type="button" class="btn-gates-depart" id="btn-dream-finish"><span>📡 Back to the Field Wire ➔</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       THE SPYGLASS ON THE NATURAL BRIDGE (s15c-bridge-spyglass.js).
+       The pages “The Natural Bridge of the Sentinel Mesa” and “The Eastern Buttress & Lower Wash”, lived.
+       Opens once, on arrival at Cairn IV (Station 16). Not a game: nothing can be lost.
+       =================================================================== -->
+  <div class="chasm-modal-backdrop" id="modal-bridge-spyglass" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="spy-modal-title">
+    <div class="chasm-workbench-window chasm3d-window">
+      <div class="map-frame-corner corner-tl"></div>
+      <div class="map-frame-corner corner-tr"></div>
+      <div class="map-frame-corner corner-bl"></div>
+      <div class="map-frame-corner corner-br"></div>
+
+      <div class="chasm-header-bar">
+        <div class="chasm-header-title-wrap">
+          <span class="chasm-header-icon">🔭</span>
+          <div>
+            <div class="chasm-header-title" id="spy-modal-title">The Spyglass on the Natural Bridge</div>
+            <div class="chasm-header-subtitle">Dawn on the Sentinel Mesa · between the hardpan and Cairn IV</div>
+          </div>
+        </div>
+        <button type="button" class="chasm-close-btn" id="btn-close-spy" title="Close" aria-label="Close the Spyglass on the Natural Bridge">✕</button>
+      </div>
+
+      <div class="chasm3d-body">
+        <div class="gates-stage" id="spy-stage" tabindex="0" role="application" aria-label="The spyglass. Arrow keys move it, plus and minus bring things closer or push them away. Hold it still on what you find.">
+          <canvas id="spy-canvas" class="gates-canvas" aria-hidden="true"></canvas>
+          <div class="gates-hud">
+            <div class="gates-hud-time"><span>✦</span><span id="spy-hud-time">06:10 · FIRST LIGHT</span></div>
+          </div>
+          <div class="gates-stage-subtitle" id="spy-subtitle" role="status" aria-live="polite">Dawn on the Natural Bridge of the Sentinel Mesa.</div>
+        </div>
+
+        <div class="gates-panel" id="spy-dialogue-panel">
+          <div class="gates-mission">
+            <span class="gm-label">GOAL</span>
+            <span class="gm-text" id="spy-mission-text">Dawn on the Natural Bridge</span>
+          </div>
+          <div class="station-page-pill">Your pages:
+            <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="15B" data-open="page" aria-haspopup="dialog" title="See the printed page The Natural Bridge of the Sentinel Mesa"><span class="pill-icon">📖</span> The Natural Bridge of the Sentinel Mesa</span>
+            <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="16A" data-open="page" aria-haspopup="dialog" title="See the printed page The Eastern Buttress &amp; Lower Wash"><span class="pill-icon">📖</span> The Eastern Buttress &amp; Lower Wash</span>
+          </div>
+          <div class="spy-tracker">
+            <div class="spy-tracker-head"><span>🔭 WHAT THE GLASS HAS FOUND</span><span id="spy-sights-count">0 / 7</span></div>
+            <div class="spy-sights" id="spy-sights"></div>
+            <button type="button" class="spy-hint-btn" id="btn-spy-hint" hidden>🧭 Hermes, where should I look?</button>
+          </div>
+
+          <div class="gates-log" id="spy-log" role="log" aria-live="polite"></div>
+
+          <div class="gates-choices-container">
+            <div class="gates-choice-label">📡 YOUR REPLY · SILVIA</div>
+            <div id="spy-choices" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+
+          <div class="gates-decree-card" id="spy-finish-card" style="display: none;">
+            <div class="gates-decree-title"><span>🗿</span><span>The Southern Mouth of the Gorge</span></div>
+            <p class="gates-decree-body" id="spy-finish-body"></p>
+            <button type="button" class="btn-gates-depart" id="btn-spy-finish"><span>🗿 Go to Cairn IV ➔</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
        STATION 17: THE ARCH OF THE SOLSTICE & CAIRN V · THE AUTUMN DAWN AND THE NIGHT SIGNAL
        Part I is the journal (Sheet 16B: the eight sun-stones on the path of the midsummer ray).
        Part II only exists here: in October the ray misses the altar, and Silvia re-aims the bronze
@@ -4888,6 +5013,8 @@
   <script src="./hub/js/stations/s13b-gates-extras.js"></script>
   <script src="./hub/js/stations/s13b-gates-tower-ii.js"></script>
   <script src="./hub/js/stations/s13c-night-erg.js"></script>
+  <script src="./hub/js/stations/s15b-stones-dream.js"></script>
+  <script src="./hub/js/stations/s15c-bridge-spyglass.js"></script>
   <script src="./hub/js/stations/s14-sun-monolith.js"></script>
   <script src="./hub/js/stations/s15-sandstone-labyrinth.js"></script>
   <script src="./hub/js/stations/s16-cairn-iv.js"></script>

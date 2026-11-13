@@ -89,7 +89,9 @@ SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done",
 DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true"}
 DESERT_BASE = dict(SILVIA, order_dawn_step="3", order_cairn1_completed="true", order_seal_cairn_1="true",
                    order_chasm_march_start="1", order_whispering_chasm_completed="true",
-                   order_salt_playa_completed="true", order_field_wire_step="4")
+                   order_salt_playa_completed="true", order_field_wire_step="4",
+                   # the two story scenes between Cairn III and Cairn IV are lived (sections "dream" and "spyglass" test them)
+                   order_stones_dream='{"done":true,"skipped":true}', order_bridge_spyglass='{"done":true,"choice":"skipped"}')
 
 failures = []
 
@@ -1327,6 +1329,9 @@ def test_oracle_horizon(browser):
 
 
 def login(page, name):
+    # Silvia's saved point is stamped on 12 Nov (story-point.js): once she has been "away" for 12 hours the recap card
+    # opens over the page, as it should for her. A test that is not about it puts it away first.
+    page.evaluate("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
     page.click("#btn-seeker-switch")
     page.wait_for_timeout(300)
     page.fill("#gate-username", name)
@@ -1390,7 +1395,7 @@ def test_tester_play(browser):
         page.wait_for_timeout(3200)
         st = page.evaluate(WORLD_JS)
         # Station 14 opens on the night on the Erg and Station 19 on the bronze doors: the game follows when they end
-        prelude = {"s14": "modal-night-erg", "s19": "modal-gates-tower-ii"}.get(gid)
+        prelude = {"s14": "modal-night-erg", "s16": "modal-bridge-spyglass", "s19": "modal-gates-tower-ii"}.get(gid)
         opened = (modals[gid] in st["open"] or prelude in st["open"]) if gid in modals else bool(st["open"])
         clean = (gid in ("s20", "s21", "s22") or "gilded_star" not in st["relics"]) and (gid in ("s19", "s20", "s21", "s22") or "servant_key" not in st["relics"]) and (gid in ("s17", "s18", "s19", "s20", "s21", "s22") or ("tuning_pebble" not in st["relics"] and "signal_mirror" not in st["relics"]))
         check(st["seals"] == seals_before[gid] and opened and clean, f"Play {gid}: the world is at its arrival and the game opens",
@@ -2191,7 +2196,8 @@ def test_seals(browser):
 A11Y_MODALS = [("openWhisperingChasmModal", "modal-whispering-chasm"), ("openCairnOneModal", "modal-cairn-one"),
                ("openSaltPlayaModal", "modal-salt-playa"), ("openDesertLexiconModal", "modal-desert-lexicon"),
                ("openOasisClepsydraModal", "modal-oasis-visions"), ("openSunMonolithModal", "modal-sun-monolith"),
-               ("openLabyrinthModal", "modal-sandstone-labyrinth"), ("openCairnFourModal", "modal-cairn-four"),
+               ("openLabyrinthModal", "modal-sandstone-labyrinth"), ("openStonesDreamModal", "modal-stones-dream"),
+               ("openBridgeSpyglassModal", "modal-bridge-spyglass"), ("openCairnFourModal", "modal-cairn-four"),
                ("openSolsticeModal", "modal-solstice-arch"), ("openSteleModal", "modal-polybius-stele"),
                ("openOracleModal", "modal-oracle-horizon"), ("selectStageStation(40); void", "modal-masks-gate"), ("openCameraObscuraModal", "modal-camera-obscura"),
                ("openWhisperingGalleryModal", "modal-whispering-gallery"),
@@ -4327,6 +4333,232 @@ def test_clepsydra_visions(browser):
     ctx.close()
 
 
+INTERLUDE_SEED = dict(order_sun_monolith_completed="true", order_seal_cairn_2="true", order_sandstone_labyrinth_completed="true",
+                      order_seal_cairn_3="true", order_monolith_gate_seal1="true")
+
+
+def test_stones_dream(browser):
+    print("\n45. The Memory of the Stones: the dream of 1998, between Cairn III and the hardpan (the page “The Five Geodetic Cairns”)")
+    seed = dict(DESERT_BASE, **DESERT_DONE, **INTERLUDE_SEED, order_field_wire_step="16",
+                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0]")
+    seed.pop("order_stones_dream", None)
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    shown = lambda i: js("i => getComputedStyle(document.getElementById(i)).display !== 'none'", i)
+    state = lambda: js("window.__stonesDream.state()")
+    wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
+
+    def open_wire():
+        js("document.querySelector('[data-view=\"view-field-wire\"]').click()")
+        page.wait_for_timeout(2200)
+
+    def settle(stages, limit=60):
+        for _ in range(limit * 5):
+            js("window.__stonesDream.fast()")
+            st = state()
+            if st["stage"] in stages and not st["busy"]:
+                return st
+            page.wait_for_timeout(200)
+        return state()
+
+    open_wire()
+    bar = js("document.getElementById('wire-completed-bar').innerText")
+    check(get("order_field_wire_step") == "16" and "DREAM OF 1998" in bar.upper() and js("!!document.getElementById('btn-wire-dream')")
+          and "Dusk, Silvia" not in wire_text() and not js("!!document.querySelector('.btn-admin-skip-dream')"),
+          "after the Station 15 debrief the wire waits: Hermes sleeps, and the dream has a door (no tester's skip for Silvia)", bar[:120])
+    js("document.getElementById('btn-wire-dream').click()"); page.wait_for_timeout(900)
+    st = state()
+    gl = st["gl"]
+    plates = js("window.__stonesDream.plates")
+    check(shown("modal-stones-dream") and st["stage"] == "intro" and [p["id"] for p in plates] == ["wash", "ridge", "plateau"]
+          and all(len(p["choices"]) == 3 for p in plates), "the door opens the dream: three plates, three answers to each")
+    st = settle(["plate"])
+    motes = js("document.querySelectorAll('.dream-mote').length")
+    check(st["plate"] == 0 and js("window.__stonesDream.open()") == ["stones", "radio", "hands"]
+          and ((motes == 3 and st["tBlur"] > 4 and st["sat"] is not None and st["sat"] < 0.3) if gl else js("document.querySelectorAll('#dream-fragments button').length") == 3),
+          "plate I is blurred and sepia, with three lights to touch", str(st))
+    check(js("window.__stonesDream.find('theodolite')") is False and state()["found"] == [], "a fragment of another plate cannot be touched")
+    js("(document.querySelector('.dream-mote') || document.querySelector('#dream-fragments button')).click()"); page.wait_for_timeout(300)
+    st = settle(["plate"])
+    check(len(st["found"]) == 1 and (not gl or (st["tBlur"] < 4 and st["placed"][0] > 0)), "a touched light clears the plate a step, and stones fly to the mound", str(st))
+    for fid in js("window.__stonesDream.open()"):
+        js("f => { window.__stonesDream.find(f); }", fid); st = settle(["plate", "asking"])
+    check(st["stage"] == "asking" and js("document.querySelectorAll('#dream-choices button').length") == 3 and (not gl or st["placed"][0] < st["stones"][0]),
+          "three fragments found: Hermes asks why he built it, and the mound waits for its last stones")
+    js("document.getElementById('dream-choice-grief').click()")
+    st = settle(["plate"])
+    check(st["plate"] == 1 and st["answers"].get("why") == "grief" and (not gl or (st["photos"] == 1 and st["scene"] == 1 and st["tNight"] == 1 and st["placed"][0] == st["stones"][0])),
+          "her answer develops plate I into a photograph, and the night on the ridge begins", str(st))
+    for fid in js("window.__stonesDream.open()"):
+        js("f => { window.__stonesDream.find(f); }", fid); st = settle(["plate", "asking"])
+    check(st["stage"] == "asking" and "I think it is you" in js("document.getElementById('dream-log').innerText"),
+          "plate II: the receiver of 1998 crackles, and the dream lets Silvia speak into it")
+    js("document.getElementById('dream-choice-alone').click()")
+    st = settle(["plate"])
+    check(st["plate"] == 2 and js("window.__stonesDream.open()") == ["theodolite", "plate", "groove"], "plate III: the theodolite, the copper plate and the groove; nobody on the ridge yet")
+    for fid in ["theodolite", "plate", "groove"]:
+        js("f => { window.__stonesDream.find(f); }", fid); st = settle(["plate", "asking"])
+    js("window.__stonesDream.frames(240, 1 / 30)"); st = state()   # eight seconds of the scene: he walks to the mound, hammers three times and lays the plate
+    check(st["stage"] == "plate" and js("window.__stonesDream.open()") == ["watcher"] and (not gl or (st["watcher"] and st["copper"] == 1)),
+          "the copper plate lies under the mound, and only then the watcher shows on the ridge", str(st))
+    js("window.__stonesDream.find('watcher')"); st = settle(["asking"])
+    js("document.getElementById('dream-choice-finish').click()")
+    st = settle(["done"], 90)
+    page.wait_for_timeout(2500)
+    saved = json.loads(get("order_stones_dream") or "{}")
+    five = js("[...document.querySelectorAll('#dream-five .dream-five-cairn')].map(c => c.classList.contains('has-seal'))")
+    st = state()
+    check(st["stage"] == "done" and saved.get("done") is True and (saved.get("why"), saved.get("radio"), saved.get("end")) == ("grief", "alone", "finish")
+          and shown("dream-finish-card") and five == [True, True, True, False, False] and (not gl or (st["photos"] == 3 and st["awake"] and st["grade"] > 0.15)),
+          "he wakes: three photographs, the colour back, the five cairns of the page with the seals he carries, and her answers saved", f"{saved} {five} {st}")
+    js("document.getElementById('btn-dream-finish').click()"); page.wait_for_timeout(1800)
+    text = wire_text()
+    check(not shown("modal-stones-dream") and get("order_field_wire_step") == "17" and "I woke with a meridian to finish" in text and "Dusk, Silvia" in text
+          and js("[...document.querySelectorAll('#wire-choices-grid button')].length") == 3,
+          "back on the wire: dusk at the hardpan opens, and what she told him at the end of the dream stays with him")
+    page.reload(); page.wait_for_timeout(2500); open_wire()
+    check(wire_text().count("Dusk, Silvia") == 1 and not js("!!document.getElementById('btn-wire-dream')"), "a reload keeps the dusk, and the door is gone")
+    # the page in the journal offers the dream again, and living it again changes nothing
+    again = js("""(() => { const s = document.createElement('span'); s.className = 'journal-ref-pill'; s.setAttribute('data-sheet', '14A'); s.textContent = 'x'; document.body.appendChild(s); s.click();
+      const b = document.querySelector('.journal-sheet-popover .jsp-scene'), pg = document.querySelector('.journal-sheet-popover .jsp-page:not(.jsp-scene)'); if (b) b.click(); s.remove(); return [!!b, !!pg]; })()""")
+    page.wait_for_timeout(900)
+    st = settle(["plate"])
+    js("window.__stonesDream.find('radio')"); settle(["plate"])
+    check(again == [True, True] and shown("modal-stones-dream") and st["replay"] is True and json.loads(get("order_stones_dream")) == saved,
+          "the page “The Five Geodetic Cairns” offers its printed face and the dream again; a second dream leaves the first untouched")
+    js("document.getElementById('btn-close-dream').click()"); page.wait_for_timeout(500)
+    check(not shown("modal-stones-dream") and not errors, "no JS errors in the dream", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # Carles can skip the dream from the wire, and a station finished by hand has dreamed it
+    seed2 = dict(seed, the_eclipse_active_seeker="Carles")
+    ctx, page, errors = new_page(browser, seed2)
+    page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2200)
+    has_skip = js("!!document.querySelector('.btn-admin-skip-dream')")
+    js("(document.querySelector('.btn-admin-skip-dream') || { click() {} }).click()"); page.wait_for_timeout(4500)
+    check(has_skip and js("localStorage.getItem('order_field_wire_step')") == "17" and "Dusk, Silvia" in js("document.getElementById('view-field-wire').innerText")
+          and "I woke with" not in js("document.getElementById('view-field-wire').innerText") and "I woke as" not in js("document.getElementById('view-field-wire').innerText"), "the tester's skip opens the dusk at once, with no echo of a dream nobody dreamed",
+          "skip %s step %s %s" % (has_skip, js("localStorage.getItem('order_field_wire_step')"), js("document.getElementById('view-field-wire').innerText")[-300:]))
+    js("window.TesterDesert.replayFrom('s15')")
+    gone = js("localStorage.getItem('order_stones_dream')")
+    js("window.TesterDesert.completeUpTo('s16')")
+    check(gone is None and "skipped" in (js("localStorage.getItem('order_stones_dream')") or "") and "skipped" in (js("localStorage.getItem('order_bridge_spyglass')") or ""),
+          "the tester: a replay of Station 15 forgets the dream; Station 16 completed by hand has lived both scenes")
+    check(not errors, "no JS errors for the tester", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+def test_bridge_spyglass(browser):
+    print("\n46. The Spyglass on the Natural Bridge: dawn before Cairn IV (the pages “The Natural Bridge of the Sentinel Mesa” and “The Eastern Buttress & Lower Wash”)")
+    seed = dict(DESERT_BASE, **DESERT_DONE, **INTERLUDE_SEED, order_cairn4_sound="off", order_field_wire_step="18",
+                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0]", order_cairn4_march_start="1")
+    seed.pop("order_bridge_spyglass", None)
+    ctx, page, errors = new_page(browser, seed)
+    page.goto(f"{BASE}/index.html", wait_until="load")
+    page.wait_for_timeout(2500)
+    get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
+    js = page.evaluate
+    shown = lambda i: js("i => getComputedStyle(document.getElementById(i)).display !== 'none'", i)
+    state = lambda: js("window.__spyglass.state()")
+    chips = lambda: js("[...document.querySelectorAll('#spy-sights .spy-chip')].map(c => c.textContent)")
+
+    def settle(stages, limit=60, seen=None):
+        for _ in range(limit * 5):
+            js("window.__spyglass.fast()")
+            st = state()
+            if st["stage"] in stages and not st["busy"] and (seen is None or seen in st["seen"]):
+                return st
+            page.wait_for_timeout(200)
+        return state()
+
+    js("window.openCairnFourModal()"); page.wait_for_timeout(900)
+    st = state()
+    gl = st["gl"]
+    check(shown("modal-bridge-spyglass") and not shown("modal-cairn-four") and st["stage"] == "intro" and len(chips()) == 7 and st["replay"] is False,
+          "arrival at Cairn IV: the dawn on the Natural Bridge comes first, with seven things for the glass to find")
+    st = settle(["glass"]); page.wait_for_timeout(900)
+    st = state()
+    if gl:
+        check(st["mode"] == "glass" and st["lens"] and st["zoom"] == 0 and js("!document.getElementById('btn-spy-hint').hidden"), "Hermes hands over the spyglass: the eye is at the lens", str(st))
+        # the lens finds what it rests on
+        js("window.__spyglass.aim('wagons', false)"); st = settle(["glass"], 20, "wagons")
+        check("wagons" in st["seen"] and any("wedged wagon" in c for c in chips()) and js("document.getElementById('spy-sights-count').textContent").startswith("1 / 7"),
+              "held still on the terraces, the glass finds the wedged wagon, and Hermes says what he sees", str(st))
+        # too far at the first draw: the note says so, and ＋ brings it close enough
+        js("window.__spyglass.aim('oilcloth', false)"); page.wait_for_timeout(600); js("window.__spyglass.frames(45, 1 / 30)")   # a second and a half of the scene, however slowly this browser draws
+        note = js("document.getElementById('spy-note').textContent")
+        check("oilcloth" not in state()["seen"] and "closer" in note, "the covered wagon is too far for the first draw of the tube: the lens says to bring it closer", f"note '{note}' {state()}")
+        js("document.getElementById('btn-spy-in').click()"); st = settle(["glass"], 20, "oilcloth")
+        check("oilcloth" in st["seen"] and st["zoom"] == 1 and "three flames" in js("document.getElementById('spy-log').innerText"), "one draw closer, the mark of the BC Ashes on the oilcloth can be read")
+        # the keyboard moves the glass too
+        b0 = state()["bearing"]
+        js("document.getElementById('spy-stage').focus()")
+        for _ in range(6): page.keyboard.press("ArrowRight")
+        page.keyboard.press("-"); page.wait_for_timeout(700)
+        st = state()
+        check(st["bearing"] != b0 and st["zoom"] == 0, "the arrow keys turn the glass and − pushes the tube in", f"{b0} -> {st['bearing']} zoom {st['zoom']}")
+        # Hermes points, then turns the glass himself
+        js("document.getElementById('btn-spy-hint').click()"); page.wait_for_timeout(500)
+        sub = js("document.getElementById('spy-subtitle').textContent")
+        arrow = js("!document.getElementById('spy-arrow').hidden")
+        js("document.getElementById('btn-spy-hint').click()"); st = settle(["glass"], 25, "stone")
+        check("north-east" in sub and arrow and "stone" in st["seen"], "asked where to look, Hermes names the eastern rim and an arrow shows the way; asked again, he turns the glass to the survey stone 980", sub)
+    else:
+        for sid in ["wagons", "oilcloth", "stone"]:
+            js("s => { document.getElementById('spy-chip-' + s).click(); }", sid); settle(["glass"], 20, sid)
+        check(all(s in state()["seen"] for s in ["wagons", "oilcloth", "stone"]), "without WebGL the things to look at are buttons, and Hermes still tells them")
+    js("window.__spyglass.discover('boulders')"); st = settle(["glass"], 20, "boulders")
+    check(st["stage"] == "glass" and "1971" in js("document.getElementById('spy-log').innerText"), "four found: the boulders of 1971, and no shout yet")
+    js("window.__spyglass.discover('pillars')"); st = settle(["event"], 40, "pillars")
+    check(st["stage"] == "event" and get("order_hint_s16-song_level") == "1" and (not gl or st["phase"] == "halt"),
+          "the pillars heard through the glass open the first note of their song; with five things found, a shout rises from the terraces", str(st))
+    js("window.__spyglass.discover('tower')"); st = settle(["event"], 20, "tower")
+    check("tower" in st["seen"] and st["stage"] == "event", "the rest of the gorge can still be looked at while the men argue")
+    if gl:
+        js("window.__spyglass.aim('hairpin', true)")
+    else:
+        js("document.getElementById('spy-chip-hairpin').click()")
+    st = settle(["asking"], 60)
+    check(st["stage"] == "asking" and js("document.querySelectorAll('#spy-choices button').length") == 3 and "Four of them" in js("document.getElementById('spy-log').innerText")
+          and (not gl or (st["mode"] in ("wide", "glass") and st["phase"] in ("split", "turn"))),
+          "the glass on the second turn: four raiders start back up toward the bridge, the wagons turn north-east, and Hermes asks what to do", str(st))
+    js("document.getElementById('spy-choice-hide').click()")
+    st = settle(["done"], 90)
+    saved = json.loads(get("order_bridge_spyglass") or "{}")
+    check(st["stage"] == "done" and saved.get("done") is True and saved.get("choice") == "hide" and set(saved.get("seen", [])) >= {"wagons", "oilcloth", "stone", "boulders", "pillars", "tower", "hairpin"}
+          and get("order_hint_s16-sigil_level") == "1" and shown("spy-finish-card") and "7 of 7" in js("document.getElementById('spy-finish-body').textContent"),
+          "hidden under the lip of the bridge he hears the pillars: the first note of the sigil opens, and the dawn is saved", f"{saved} {st['stage']}")
+    js("document.getElementById('btn-spy-finish').click()"); page.wait_for_timeout(1500)
+    check(not shown("modal-bridge-spyglass") and shown("modal-cairn-four"), "the finish card goes on to Cairn IV")
+    js("window.closeCairnFourModal()"); page.wait_for_timeout(500)
+    js("window.openCairnFourModal()"); page.wait_for_timeout(700)
+    check(shown("modal-cairn-four") and not shown("modal-bridge-spyglass"), "opened again, Cairn IV opens straight away: the dawn is lived once")
+    js("window.closeCairnFourModal()"); page.wait_for_timeout(400)
+    # the pages offer the spyglass again: a second look saves nothing, and may find what was missed
+    again = js("""(() => { const s = document.createElement('span'); s.className = 'journal-ref-pill'; s.setAttribute('data-sheet', '16A'); s.textContent = 'x'; document.body.appendChild(s); s.click();
+      const b = document.querySelector('.journal-sheet-popover .jsp-scene'), pg = document.querySelector('.journal-sheet-popover .jsp-page:not(.jsp-scene)'); if (b) b.click(); s.remove(); return [!!b, !!pg]; })()""")
+    page.wait_for_timeout(900)
+    st = settle(["glass"])
+    js("window.__spyglass.discover('blue')"); st = settle(["glass"], 20, "blue")
+    check(again == [True, True] and st["replay"] is True and any("smear of blue" in c for c in chips()) and json.loads(get("order_bridge_spyglass")) == saved,
+          "the page “The Eastern Buttress & Lower Wash” offers its printed face and the spyglass again; the second look finds the smear of blue and saves nothing")
+    js("document.getElementById('btn-close-spy').click()"); page.wait_for_timeout(500)
+    # the Station 16 debrief remembers what she saw and chose
+    js("localStorage.setItem('order_cairn_iv_completed', 'true'); localStorage.setItem('order_seal_cairn_4', 'true'); localStorage.setItem('order_cairn4_awake', 'true'); localStorage.setItem('order_cairn4_verses', '3')")
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
+    text = js("document.getElementById('view-field-wire').innerText")
+    check(get("order_field_wire_step") == "19" and "what we saw through the glass" in text and "walked over my head" in text and "Toward Tower II" in text,
+          "the debrief of Station 16 tells the dawn as she lived it: the four on foot walked over his head")
+    check(not errors, "no JS errors on the Natural Bridge", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -4347,6 +4579,7 @@ SECTIONS = {
     "gamecine": test_game_cinematics,
     "visions": test_clepsydra_visions, "gatesmarch": test_gates_march, "testerworld": test_tester_world,
     "balance": test_balance,
+    "dream": test_stones_dream, "spyglass": test_bridge_spyglass,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
 QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon", "reduced", "cinematic", "road", "gamecine"]
@@ -4364,7 +4597,7 @@ def run_section(key, chromium):
                 SECTIONS[key](browser)
                 browser.close()
         except Exception:
-            check(False, f"{key}: section crashed", traceback.format_exc(limit=3).strip().splitlines()[-1])
+            check(False, f"{key}: section crashed", " | ".join(traceback.format_exc(limit=4).strip().splitlines()[-9:]))
     text = out.getvalue()
     return {"section": key, "ok": not failures, "seconds": round(time.time() - start, 1),
             "checks": sum(line.startswith(("  ✓", "  ✗")) for line in text.splitlines()),

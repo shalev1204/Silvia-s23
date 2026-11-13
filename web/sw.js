@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '99c49c65690b';  // 198 files, 48.3 MB
+var VERSION = '4960ebc33dfe';  // 204 files, 49.0 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -58,8 +58,11 @@ var PRECACHE = [
   "./assets/items/item_water_skins.jpg",
   "./assets/items/item_water_skins.png",
   "./assets/journal_pages/page_13b_sun_monolith.webp",
+  "./assets/journal_pages/page_14a_five_cairns.webp",
   "./assets/journal_pages/page_14b_sandstone_labyrinth.webp",
   "./assets/journal_pages/page_15a_cairn_iv.webp",
+  "./assets/journal_pages/page_15b_natural_bridge.webp",
+  "./assets/journal_pages/page_16a_eastern_buttress.webp",
   "./assets/journal_pages/page_16b_solstice_arch.webp",
   "./assets/js/camera-city-data.js",
   "./assets/js/desert-map-3d.js",
@@ -135,6 +138,7 @@ var PRECACHE = [
   "./hub/css/stations/s14-sun-monolith.css",
   "./hub/css/stations/s14b-sun-monolith-3d.css",
   "./hub/css/stations/s15-sandstone-labyrinth.css",
+  "./hub/css/stations/s15b-interludes.css",
   "./hub/css/stations/s15b-labyrinth-3d.css",
   "./hub/css/stations/s16-cairn-iv.css",
   "./hub/css/stations/s16b-pillars-3d.css",
@@ -196,6 +200,8 @@ var PRECACHE = [
   "./hub/js/stations/s13c-night-erg.js",
   "./hub/js/stations/s14-sun-monolith.js",
   "./hub/js/stations/s15-sandstone-labyrinth.js",
+  "./hub/js/stations/s15b-stones-dream.js",
+  "./hub/js/stations/s15c-bridge-spyglass.js",
   "./hub/js/stations/s16-cairn-iv.js",
   "./hub/js/stations/s17-solstice-arch.js",
   "./hub/js/stations/s18-polybius-stele.js",

@@ -744,12 +744,15 @@
           {
             id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', flag: 'order_sandstone_labyrinth_completed', built: true,
             complete() { set('order_labyrinth_march_start', '1'); set('order_labyrinth_awake', 'true'); set('order_labyrinth_star_seen', 'true'); set('order_labyrinth_camp_seen', 'true'); set('order_sandstone_labyrinth_completed', 'true'); set('order_seal_cairn_3', 'true'); },
-            reset() { dels(['order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed', 'order_five_seals_celebrated']); }
+            reset() { dels(['order_stones_dream', 'order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed', 'order_five_seals_celebrated']); }
           },
           {
             id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', flag: 'order_cairn_iv_completed', built: true,
-            complete() { set('order_cairn4_march_start', '1'); set('order_cairn4_awake', 'true'); set('order_cairn4_verses', '3'); set('order_cairn_iv_completed', 'true'); set('order_seal_cairn_4', 'true'); },
-            reset() { dels(['order_cairn_iv_completed', 'order_cairn4_awake', 'order_cairn4_verses', 'order_cairn4_key_fails', 'order_cairn4_hint', 'order_cairn4_song_fails', 'order_cairn4_count_hint', 'order_seal_cairn_4', 'order_cairn4_march_start', 'order_cairn4_march_bypassed', 'order_five_seals_celebrated']); dropRelic('tuning_pebble'); }
+            complete() {
+              if (!get('order_stones_dream')) set('order_stones_dream', JSON.stringify({ done: true, skipped: true }));
+              if (!get('order_bridge_spyglass')) set('order_bridge_spyglass', JSON.stringify({ done: true, choice: 'skipped' }));
+              set('order_cairn4_march_start', '1'); set('order_cairn4_awake', 'true'); set('order_cairn4_verses', '3'); set('order_cairn_iv_completed', 'true'); set('order_seal_cairn_4', 'true'); },
+            reset() { dels(['order_bridge_spyglass', 'order_cairn_iv_completed', 'order_cairn4_awake', 'order_cairn4_verses', 'order_cairn4_key_fails', 'order_cairn4_hint', 'order_cairn4_song_fails', 'order_cairn4_count_hint', 'order_seal_cairn_4', 'order_cairn4_march_start', 'order_cairn4_march_bypassed', 'order_five_seals_celebrated']); dropRelic('tuning_pebble'); }
           },
           {
             id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', flag: 'order_arch_solstice_completed', built: true,
@@ -4744,7 +4747,12 @@
         {
           // Dusk at the edge of the hardpan: a shepherd, and the veiled woman who sings to the stars
           step: 17,
-          hermesInitial: "Dusk, Silvia, and I am not alone. At a seep under the last rocks before the hardpan there is an old shepherd with a dozen black goats. He shared his water and asked me nothing, which is the desert's way of being kind.\n\nHe says the hardpan can be crossed in one night if you walk toward the singing: when the night wind blows, the pillars of Cairn IV can be heard from the Natural Bridge of the Sentinel Mesa. Then he said something I cannot shake off. Every autumn, on the clear nights, a veiled woman comes down from the sandstone and sings to the stars. The herders leave her milk and dates on a flat stone. Nobody has seen her face.\n\nThe raiders' wagons came by here at first light, he says. Heading south-west, in a hurry.",
+          // what she answered at the end of the dream of 1998 stays with him (s15b-stones-dream.js)
+          get hermesInitial() {
+            const end = window.StonesDream && window.StonesDream.done() ? window.StonesDream.answer('end') : null;
+            const echo = { hands: "I woke with river stone on my hands, Silvia, and for once I know whose work they have been doing.\n\n", never: "I woke as the last surveyor of the Order, Silvia, and it sits on me more lightly than I feared.\n\n", finish: "I woke with a meridian to finish, Silvia: two cairns never fell, and tonight I start walking toward the first of them.\n\n" }[end] || '';
+            return echo + "Dusk, Silvia, and I am not alone. At a seep under the last rocks before the hardpan there is an old shepherd with a dozen black goats. He shared his water and asked me nothing, which is the desert's way of being kind.\n\nHe says the hardpan can be crossed in one night if you walk toward the singing: when the night wind blows, the pillars of Cairn IV can be heard from the Natural Bridge of the Sentinel Mesa. Then he said something I cannot shake off. Every autumn, on the clear nights, a veiled woman comes down from the sandstone and sings to the stars. The herders leave her milk and dates on a flat stone. Nobody has seen her face.\n\nThe raiders' wagons came by here at first light, he says. Heading south-west, in a hurry.";
+          },
           choices: [
             {
               id: "choice-17-veiled",
@@ -4776,7 +4784,15 @@
         {
           // Station 16 debrief: the pillars sang the disc's code, Cairn IV never fell, and the raiders split up
           step: 19,
-          hermesInitial: "Silvia, I have not slept. I have been sitting between the pillars with the pebble in my hand.\n\nThe chamber of Cairn IV opened with the founders' own mechanism: bronze reeds inside the pillars, untouched since before the first road was cut. This cairn never fell. SUN, ECHO, STONE: the cairns are instruments, and the Order measured the whole desert with them.\n\nBut the last verse... three short calls, a pause, two long. The code I engraved on Aurelia's brass disc, the same rhythm as the light I saw through my telescope in the autumn of 2016, blinking far out in the desert. And wedged in the throat of the Left pillar, a river pebble painted with a small gold star on blue. Someone tuned this canyon to sing that code.\n\nAnd one more thing. Yesterday at dawn, from the Natural Bridge, I saw the raiders stuck at the switchbacks. They split. A few men on foot are following my tracks. The wagons, and the one under oilcloth, turned back north-east. Toward Tower II.",
+          // the last paragraph remembers the dawn on the Natural Bridge as she lived it (s15c-bridge-spyglass.js)
+          get hermesInitial() {
+            const c = window.BridgeSpyglass && window.BridgeSpyglass.done() ? window.BridgeSpyglass.choice() : null;
+            const foot = { cross: "The four on foot heard the stone I sent into the gorge, and they are behind me on my tracks.", hide: "The four on foot walked over my head and on to the Mesa. They found nothing there, and they will come back along their own prints.", trail: "The four on foot are still hunting a strip of blue cloth along the eastern rim. They will not be fooled for long." }[c];
+            const last = foot
+              ? "And one more thing: what we saw through the glass at dawn, from the Natural Bridge. The raiders gave up the switchbacks and split. " + foot + " The wagons, and the one under oilcloth, turned back north-east. Toward Tower II."
+              : "And one more thing. Yesterday at dawn, from the Natural Bridge, I saw the raiders stuck at the switchbacks. They split. A few men on foot are following my tracks. The wagons, and the one under oilcloth, turned back north-east. Toward Tower II.";
+            return "Silvia, I have not slept. I have been sitting between the pillars with the pebble in my hand.\n\nThe chamber of Cairn IV opened with the founders' own mechanism: bronze reeds inside the pillars, untouched since before the first road was cut. This cairn never fell. SUN, ECHO, STONE: the cairns are instruments, and the Order measured the whole desert with them.\n\nBut the last verse... three short calls, a pause, two long. The code I engraved on Aurelia's brass disc, the same rhythm as the light I saw through my telescope in the autumn of 2016, blinking far out in the desert. And wedged in the throat of the Left pillar, a river pebble painted with a small gold star on blue. Someone tuned this canyon to sing that code.\n\n" + last;
+          },
           choices: [
             {
               id: "choice-19-pebble",
@@ -5963,11 +5979,11 @@
         '12B': { title: 'The Oasis Clepsydra', note: 'The logic grid of the four seekers at the Four Wells.', thumb: './assets/thumbnails/oasis_clepsydra_preview.webp', path: 'desert', node: 12, nodeLabel: 'Station 13 · The Oasis Clepsydra' },
         '13A': { title: 'At the Gates of Tower II', note: 'The Sandstone Sanctuary, its Servant, and the demand of the five seals. The great circuit begins north-north-east.' },
         '13B': { title: 'The Sun Monolith & Cairn II', note: 'Seven noons, seven shadows, seven rings of the dial: the sigil of Cairn II.', thumb: './assets/thumbnails/sun_monolith_preview.webp', page: './assets/journal_pages/page_13b_sun_monolith.webp', path: 'desert', node: 23, nodeLabel: 'Station 14 · The Sun Monolith' },
-        '14A': { title: 'The Five Geodetic Cairns', note: 'The markers of the Order, the words of the Servant, and the survey of Cairn III: 112° to Watchtower VI, 348° to the Sun Monolith.' },
-        '16A': { title: 'The Eastern Buttress & Lower Wash', note: 'The right half of the Natural Bridge zoom: the eastern pier, the switchbacks and the boulders of the 1971 quake.' },
+        '14A': { title: 'The Five Geodetic Cairns', note: 'The markers of the Order, the words of the Servant, and the survey of Cairn III: 112° to Watchtower VI, 348° to the Sun Monolith.', page: './assets/journal_pages/page_14a_five_cairns.webp', scene: 'dream', sceneLabel: 'Dream the autumn of 1998 again' },
+        '16A': { title: 'The Eastern Buttress & Lower Wash', note: 'The right half of the Natural Bridge zoom: the eastern pier, the switchbacks and the boulders of the 1971 quake.', page: './assets/journal_pages/page_16a_eastern_buttress.webp', scene: 'bridge', sceneLabel: 'Take the spyglass again' },
         '16B': { title: 'Arch of the Solstice & The Solar Altar', note: 'The midsummer ray, the Courtyard of Rays and its eight sun-stones: the sigil of Cairn V.', thumb: './assets/thumbnails/solstice_arch_preview.webp', page: './assets/journal_pages/page_16b_solstice_arch.webp', path: 'desert', node: 26, nodeLabel: 'Station 17 · The Arch of the Solstice' },
         '15A': { title: 'Cairn IV: Sentry of the Canyon', note: 'Two singing pillars, three laws of the echo and the survey log of seven echoes: the sigil of the Sentry.', thumb: './assets/thumbnails/cairn_iv_preview.webp', page: './assets/journal_pages/page_15a_cairn_iv.webp', path: 'desert', node: 25, nodeLabel: 'Station 16 · Cairn IV' },
-        '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on the page “The Eastern Buttress & Lower Wash”).' },
+        '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on the page “The Eastern Buttress & Lower Wash”).', page: './assets/journal_pages/page_15b_natural_bridge.webp', scene: 'bridge', sceneLabel: 'Take the spyglass again' },
         '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', page: './assets/journal_pages/page_14b_sandstone_labyrinth.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
         '18A': { title: "The Oracle's Horizon", note: 'Eight beacons sent east across the three mirrors of the horizon: the sigil of the Oracle, and the first truth.', thumb: './assets/thumbnails/oracle_horizon_preview.webp', path: 'desert', node: 14, nodeLabel: "Station 19 · The Oracle's Horizon" },
         '18B': { title: 'From the Desert to the Stage', note: 'Curtains, columns and the floor of a stage: the passage to the third tower.' },
@@ -6024,6 +6040,10 @@
         const info = JOURNAL_SHEETS[key] || JOURNAL_SHEETS[key.replace(/[A-Z]$/, '')] || null;
         // inside a game the pill opens the printed page straight away
         if (info && info.page && pill.getAttribute('data-open') === 'page') { openPageViewer(info, pill); return; }
+        // a page that became a scene (the dream of 1998, the spyglass on the bridge) can be lived again once it has been
+        const sceneOpen = !info || !info.scene ? null
+          : info.scene === 'dream' ? (window.StonesDream && window.StonesDream.done() ? window.openStonesDreamModal : null)
+          : info.scene === 'bridge' ? (window.BridgeSpyglass && window.BridgeSpyglass.done() ? window.openBridgeSpyglassModal : null) : null;
         const el = document.createElement('div');
         el.className = 'journal-sheet-popover';
         el.setAttribute('role', 'dialog');
@@ -6035,6 +6055,7 @@
           ${info && info.thumb ? `<img class="jsp-thumb" src="${info.thumb}" alt="Preview of the page ${info.title}" loading="lazy">` : ''}
           <div class="jsp-note">${info ? info.note : 'Open your physical journal.'}</div>
           ${info && info.page ? `<button type="button" class="jsp-go jsp-page">📖 See the printed page</button>` : ''}
+          ${sceneOpen ? `<button type="button" class="jsp-go jsp-page jsp-scene">✦ ${info.sceneLabel} ➔</button>` : ''}
           ${info && info.nodeLabel ? `<button type="button" class="jsp-go">🗺️ ${info.nodeLabel} ➔</button>` : ''}
         `;
         document.body.appendChild(el);
@@ -6049,8 +6070,10 @@
         el.style.top = top + 'px';
 
         el.querySelector('.jsp-close').addEventListener('click', closeSheetPopover);
-        const pg = el.querySelector('.jsp-page');
+        const pg = el.querySelector('.jsp-page:not(.jsp-scene)');
         if (pg) pg.addEventListener('click', () => openPageViewer(info, pill));
+        const sc = el.querySelector('.jsp-scene');
+        if (sc) sc.addEventListener('click', () => { closeSheetPopover(); sceneOpen(null, { replay: true }); });
         const go = el.querySelector('.jsp-go:not(.jsp-page)');
         if (go && info) {
           go.addEventListener('click', () => {
@@ -8530,6 +8553,24 @@
           advanceTo(15);   // Station 15 solved: the raiders' camp and the gold star
         }
         if (wireCurrentStep === 16) {
+          // He sleeps through the heat in the rocks, and dreams of 1998: the page “The Five Geodetic Cairns”
+          // (hub/js/stations/s15b-stones-dream.js). The dusk waits until the dream has been lived.
+          // (Read from the save itself: this chat is drawn before the scene's script has loaded.)
+          let dreamt = false;
+          try { dreamt = !!(JSON.parse(localStorage.getItem('order_stones_dream') || '{}') || {}).done; } catch (e) { dreamt = false; }
+          if (!dreamt && localStorage.getItem('order_sandstone_labyrinth_completed') === 'true') {
+            const descEl = showWaypointBar('Hermes Sleeps in the Rocks · A Dream of 1998', '', 16);
+            if (descEl) {
+              descEl.innerHTML = 'He will not cross the hardpan before dark. While he sleeps he dreams of his first expedition, and at dusk he will tell it to you: the page “The Five Geodetic Cairns”.'
+                + '<div><button type="button" class="btn-wire-dream" id="btn-wire-dream">🕰️ Enter the dream of 1998 ➔</button></div>'
+                + (isCarlesTester() ? '<div style="margin-top:8px;"><button type="button" class="btn-admin-skip-dream" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:\'Cinzel\',serif; font-size:0.72rem; cursor:pointer;">⏩ Skip the dream (tester)</button></div>' : '');
+              const enter = descEl.querySelector('#btn-wire-dream');
+              if (enter) enter.onclick = (e) => { e.stopPropagation(); if (typeof window.openStonesDreamModal === 'function') window.openStonesDreamModal(() => renderWireChoices()); };
+              const skip = descEl.querySelector('.btn-admin-skip-dream');
+              if (skip) skip.onclick = (e) => { e.stopPropagation(); try { localStorage.setItem('order_stones_dream', JSON.stringify({ done: true, skipped: true })); } catch (err) {} renderWireChoices(); };
+            }
+            return;
+          }
           advanceTo(17);   // dusk at the edge of the hardpan: the shepherd and the veiled woman
         }
         if (wireCurrentStep === 18) {

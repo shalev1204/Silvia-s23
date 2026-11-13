@@ -1286,6 +1286,12 @@
           }
           return;
         }
+        // the dawn on the Natural Bridge comes first, once: the pages “The Natural Bridge of the Sentinel Mesa” and
+        // “The Eastern Buttress & Lower Wash” (s15c-bridge-spyglass.js). A cairn already awake never goes back to it.
+        if (!isDone() && !isAwake() && typeof window.needsBridgeSpyglass === 'function' && window.needsBridgeSpyglass() && typeof window.openBridgeSpyglassModal === 'function') {
+          window.openBridgeSpyglassModal(openCairnFourModal);
+          return;
+        }
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         modal.style.display = 'flex';
         modal.classList.remove('closing');

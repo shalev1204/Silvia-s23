@@ -3,14 +3,14 @@
    Encounter between Hermes, The Sanctuary Servant and Silvia
    ========================================================================= */
 
-:is(#modal-gates-tower-ii, #modal-night-erg) {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) {
   padding: 8px;
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: none;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .chasm3d-window {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .chasm3d-window {
   max-width: none;
   height: 100%;
   max-height: none;
@@ -21,14 +21,14 @@
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(253, 230, 138, 0.15);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .chasm-header-bar {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .chasm-header-bar {
   padding: 8px 44px;
   background: rgba(22, 14, 8, 0.75);
   border-bottom: 1px solid rgba(212, 168, 83, 0.35);
   flex-shrink: 0;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .chasm3d-body {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .chasm3d-body {
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -38,13 +38,13 @@
 }
 
 @media (max-width: 900px) {
-  :is(#modal-gates-tower-ii, #modal-night-erg) .chasm3d-body {
+  :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .chasm3d-body {
     flex-direction: column;
   }
 }
 
 /* ---- 3D Stage Viewport ---- */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage {
   flex: 1.15;
   position: relative;
   min-width: 0;
@@ -54,14 +54,14 @@
   touch-action: none;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-canvas {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-canvas {
   width: 100%;
   height: 100%;
   display: block;
 }
 
 /* 3D HUD & Archivolt Sockets */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-hud {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-hud {
   position: absolute;
   top: 12px;
   left: 14px;
@@ -73,7 +73,7 @@
   z-index: 10;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-hud-time {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-hud-time {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -89,7 +89,7 @@
   backdrop-filter: blur(4px);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-hud-sockets {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-hud-sockets {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -100,7 +100,7 @@
   backdrop-filter: blur(4px);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gate-socket-chip {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gate-socket-chip {
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -114,7 +114,7 @@
   transition: all 0.4s ease;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gate-socket-chip.is-fitted {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gate-socket-chip.is-fitted {
   background: radial-gradient(circle, #fde68a 0%, #c49a38 70%, #63430c 100%);
   color: #211204;
   border: 1px solid #fef3c7;
@@ -123,7 +123,7 @@
 }
 
 /* Stage Subtitle Banner */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage-subtitle {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage-subtitle {
   position: absolute;
   bottom: 12px;
   left: 16px;
@@ -144,7 +144,7 @@
 }
 
 /* ---- Dialogue & Encounter Panel ---- */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-panel {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-panel {
   flex: 0.95;
   min-width: 320px;
   max-width: 460px;
@@ -160,7 +160,7 @@
 }
 
 @media (max-width: 900px) {
-  :is(#modal-gates-tower-ii, #modal-night-erg) .gates-panel {
+  :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-panel {
     max-width: none;
     flex: 1.2;
     border-left: none;
@@ -169,7 +169,7 @@
 }
 
 /* Speaker Badge */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-speaker-badge {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-speaker-badge {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -183,21 +183,21 @@
   width: fit-content;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .speaker-servant {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .speaker-servant {
   background: rgba(94, 28, 20, 0.35);
   border: 1px solid rgba(248, 113, 113, 0.45);
   color: #fca5a5;
   box-shadow: 0 0 10px rgba(220, 38, 38, 0.15);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .speaker-hermes {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .speaker-hermes {
   background: rgba(30, 58, 82, 0.35);
   border: 1px solid rgba(125, 211, 252, 0.45);
   color: #bae6fd;
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.15);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .speaker-silvia {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .speaker-silvia {
   background: rgba(20, 83, 45, 0.35);
   border: 1px solid rgba(134, 239, 172, 0.45);
   color: #bbf7d0;
@@ -205,7 +205,7 @@
 }
 
 /* Speech Text Box */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-speech-box {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-speech-box {
   background: rgba(14, 8, 4, 0.65);
   border: 1px solid rgba(212, 168, 83, 0.28);
   border-radius: 10px;
@@ -220,13 +220,13 @@
   overscroll-behavior: contain;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-speech-text {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-speech-text {
   margin: 0;
   white-space: pre-line;
 }
 
 /* Dialogue Choices */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-choices-container {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-choices-container {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -234,7 +234,7 @@
   flex-shrink: 0;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-choice-label {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-choice-label {
   font-family: 'Cinzel', Georgia, serif;
   font-size: 0.7rem;
   letter-spacing: 0.14em;
@@ -243,7 +243,7 @@
   padding: 0 2px;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-choice-btn {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-choice-btn {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -262,7 +262,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-choice-btn:hover {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-choice-btn:hover {
   background: linear-gradient(180deg, rgba(82, 48, 24, 0.95) 0%, rgba(56, 32, 16, 1) 100%);
   border-color: #fde68a;
   transform: translateY(-1px);
@@ -270,23 +270,23 @@
   color: #ffffff;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-choice-btn:active {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-choice-btn:active {
   transform: translateY(1px);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-choice-icon {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-choice-icon {
   font-size: 1.15rem;
   flex-shrink: 0;
 }
 
 /* Journal Excerpt Accordion / Study Button */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-study-box {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-study-box {
   margin-top: auto;
   padding-top: 10px;
   border-top: 1px solid rgba(212, 168, 83, 0.22);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .btn-gates-study {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .btn-gates-study {
   width: 100%;
   padding: 9px 12px;
   background: rgba(22, 14, 8, 0.55);
@@ -304,14 +304,14 @@
   gap: 8px;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .btn-gates-study:hover {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .btn-gates-study:hover {
   background: rgba(38, 22, 11, 0.85);
   border-color: rgba(253, 230, 138, 0.6);
   color: #fff;
 }
 
 /* Victory / Quest Decree Card */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-decree-card {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-decree-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -328,7 +328,7 @@
   100% { box-shadow: 0 6px 30px rgba(212, 168, 83, 0.25), inset 0 0 20px rgba(253, 230, 138, 0.2); }
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-decree-title {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-decree-title {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -342,7 +342,7 @@
   padding-bottom: 8px;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-decree-body {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-decree-body {
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 0.9rem;
   line-height: 1.55;
@@ -350,7 +350,7 @@
   margin: 0;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .btn-gates-depart {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .btn-gates-depart {
   width: 100%;
   padding: 12px 14px;
   background: linear-gradient(180deg, #b48530 0%, #7d5918 100%);
@@ -366,13 +366,13 @@
   box-shadow: 0 4px 14px rgba(212, 168, 83, 0.4);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .btn-gates-depart:hover {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .btn-gates-depart:hover {
   background: linear-gradient(180deg, #d4a345 0%, #996e20 100%);
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(253, 230, 138, 0.6);
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .btn-gates-replay {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .btn-gates-replay {
   width: 100%;
   padding: 8px 10px;
   background: transparent;
@@ -386,14 +386,14 @@
   transition: all 0.2s;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .btn-gates-replay:hover {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .btn-gates-replay:hover {
   background: rgba(212, 168, 83, 0.12);
   color: #fef3c7;
   border-color: #fde68a;
 }
 
 /* Camera hint: shown at first, then fades */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-orbit-hint {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-orbit-hint {
   position: absolute;
   top: 54px;
   left: 50%;
@@ -411,8 +411,8 @@
   z-index: 10;
   transition: opacity 1.2s ease;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-orbit-hint.is-faded { opacity: 0; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage::after {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-orbit-hint.is-faded { opacity: 0; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -423,9 +423,9 @@
 /* =========================================================================
    Conversation: a chat log with named, coloured speakers + bubbles in the scene
    ========================================================================= */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-panel { gap: 10px; overflow-y: auto; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-panel { gap: 10px; overflow-y: auto; }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-mission {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-mission {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -435,7 +435,7 @@
   border-radius: 8px;
   flex-shrink: 0;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gm-label {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gm-label {
   font-family: 'Cinzel', Georgia, serif;
   font-size: 0.64rem;
   letter-spacing: 0.16em;
@@ -445,8 +445,8 @@
   border-radius: 4px;
   font-weight: 700;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gm-text { flex: 1; font-size: 0.8rem; color: #fde9b6; line-height: 1.3; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-log {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gm-text { flex: 1; font-size: 0.8rem; color: #fde9b6; line-height: 1.3; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-log {
   flex: 1 1 0;
   min-height: 150px;
   overflow-y: auto;
@@ -462,11 +462,11 @@
   scrollbar-width: thin;
 }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-row { display: flex; align-items: flex-end; gap: 8px; animation: glPop 0.28s ease-out both; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-row.gl-silvia { flex-direction: row-reverse; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-row { display: flex; align-items: flex-end; gap: 8px; animation: glPop 0.28s ease-out both; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-row.gl-silvia { flex-direction: row-reverse; }
 @keyframes glPop { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-avatar {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-avatar {
   width: 34px; height: 34px; flex: none;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
@@ -475,9 +475,9 @@
   background: var(--gl-bg, #222);
   box-shadow: 0 0 10px var(--gl-glow, transparent);
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-main { display: flex; flex-direction: column; gap: 2px; max-width: 80%; min-width: 0; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-silvia .gl-main { align-items: flex-end; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-name {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-main { display: flex; flex-direction: column; gap: 2px; max-width: 80%; min-width: 0; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-silvia .gl-main { align-items: flex-end; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-name {
   font-family: 'Cinzel', Georgia, serif;
   font-size: 0.66rem;
   letter-spacing: 0.1em;
@@ -485,8 +485,8 @@
   color: var(--gl-c, #ccc);
   font-weight: 700;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-name small { opacity: 0.65; font-weight: 400; letter-spacing: 0.04em; text-transform: none; margin-left: 4px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-bubble {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-name small { opacity: 0.65; font-weight: 400; letter-spacing: 0.04em; text-transform: none; margin-left: 4px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-bubble {
   padding: 8px 12px;
   border-radius: 14px;
   border: 1px solid var(--gl-c, #888);
@@ -497,14 +497,14 @@
   line-height: 1.38;
   word-break: break-word;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-hermes  { --gl-c: #6fa8e8; --gl-bg: #172a45; --gl-t: #e6f1ff; --gl-glow: rgba(111,168,232,0.35); }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-servant { --gl-c: #d79a4a; --gl-bg: #3a1e12; --gl-t: #fdebd0; --gl-glow: rgba(215,154,74,0.35); }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-silvia  { --gl-c: #b79bf2; --gl-bg: #2a2150; --gl-t: #f0e9ff; --gl-glow: rgba(183,155,242,0.35); }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-hermes .gl-bubble  { border-bottom-left-radius: 4px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-servant .gl-bubble { border-bottom-left-radius: 4px; font-style: italic; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-silvia .gl-bubble  { border-bottom-right-radius: 4px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-hermes  { --gl-c: #6fa8e8; --gl-bg: #172a45; --gl-t: #e6f1ff; --gl-glow: rgba(111,168,232,0.35); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-servant { --gl-c: #d79a4a; --gl-bg: #3a1e12; --gl-t: #fdebd0; --gl-glow: rgba(215,154,74,0.35); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-silvia  { --gl-c: #b79bf2; --gl-bg: #2a2150; --gl-t: #f0e9ff; --gl-glow: rgba(183,155,242,0.35); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-hermes .gl-bubble  { border-bottom-left-radius: 4px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-servant .gl-bubble { border-bottom-left-radius: 4px; font-style: italic; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-silvia .gl-bubble  { border-bottom-right-radius: 4px; }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-narr {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-narr {
   align-self: center;
   max-width: 92%;
   text-align: center;
@@ -514,7 +514,7 @@
   padding: 2px 8px;
   animation: glPop 0.3s ease-out both;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-card {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-card {
   align-self: stretch;
   background: rgba(230, 195, 106, 0.09);
   border: 1px dashed rgba(230, 195, 106, 0.5);
@@ -522,22 +522,22 @@
   padding: 8px 12px;
   animation: glPop 0.3s ease-out both;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-card-title { font-family: 'Cinzel', Georgia, serif; font-size: 0.72rem; letter-spacing: 0.1em; color: #e6c36a; margin-bottom: 4px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-card ul { margin: 0; padding-left: 18px; font-size: 0.84rem; line-height: 1.45; color: #f3e7cd; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-card-title { font-family: 'Cinzel', Georgia, serif; font-size: 0.72rem; letter-spacing: 0.1em; color: #e6c36a; margin-bottom: 4px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-card ul { margin: 0; padding-left: 18px; font-size: 0.84rem; line-height: 1.45; color: #f3e7cd; }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-typing { display: inline-flex; gap: 4px; align-items: center; height: 14px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-typing i {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-typing { display: inline-flex; gap: 4px; align-items: center; height: 14px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-typing i {
   width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4;
   animation: glDot 1s infinite;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-typing i:nth-child(2) { animation-delay: 0.15s; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-typing i:nth-child(3) { animation-delay: 0.3s; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-typing i:nth-child(2) { animation-delay: 0.15s; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-typing i:nth-child(3) { animation-delay: 0.3s; }
 @keyframes glDot { 0%, 100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-4px); opacity: 1; } }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-choice-btn { padding: 9px 12px; font-size: 0.8rem; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-choice-btn { padding: 9px 12px; font-size: 0.8rem; }
 
 /* speech bubble that follows the speaker in the 3D scene */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble {
   position: absolute;
   z-index: 12;
   pointer-events: none;
@@ -555,9 +555,9 @@
   opacity: 0;
   transition: opacity 0.25s ease;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.is-on,
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.is-typing { opacity: 1; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble::after {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.is-on,
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.is-typing { opacity: 1; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble::after {
   content: '';
   position: absolute;
   left: 50%; bottom: -10px;
@@ -567,60 +567,60 @@
   border-bottom: 2px solid var(--gl-c, #888);
   transform: translateX(-50%) rotate(45deg);
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gb-name { font-family: 'Cinzel', Georgia, serif; font-size: 0.62rem; letter-spacing: 0.14em; color: var(--gl-c); font-weight: 700; margin-bottom: 3px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.gb-hermes  { --gl-c: #6fa8e8; --gl-bg: #172a45; --gl-t: #e6f1ff; --gl-glow: rgba(111,168,232,0.5); }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.gb-servant { --gl-c: #d79a4a; --gl-bg: #3a1e12; --gl-t: #fdebd0; --gl-glow: rgba(215,154,74,0.5); font-style: italic; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.gb-silvia  { --gl-c: #b79bf2; --gl-bg: #2a2150; --gl-t: #f0e9ff; --gl-glow: rgba(183,155,242,0.5); border-style: dashed; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.gb-silvia .gb-name::after { content: ' · RADIO'; opacity: 0.7; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gb-name { font-family: 'Cinzel', Georgia, serif; font-size: 0.62rem; letter-spacing: 0.14em; color: var(--gl-c); font-weight: 700; margin-bottom: 3px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-hermes  { --gl-c: #6fa8e8; --gl-bg: #172a45; --gl-t: #e6f1ff; --gl-glow: rgba(111,168,232,0.5); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-servant { --gl-c: #d79a4a; --gl-bg: #3a1e12; --gl-t: #fdebd0; --gl-glow: rgba(215,154,74,0.5); font-style: italic; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-silvia  { --gl-c: #b79bf2; --gl-bg: #2a2150; --gl-t: #f0e9ff; --gl-glow: rgba(183,155,242,0.5); border-style: dashed; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-silvia .gb-name::after { content: ' · RADIO'; opacity: 0.7; }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-bubble .gl-line { margin: 0; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-bubble .gl-line + .gl-line { margin-top: 5px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-row.is-revealed .gl-avatar { animation: glReveal 0.9s ease-out; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-bubble .gl-line { margin: 0; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-bubble .gl-line + .gl-line { margin-top: 5px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-row.is-revealed .gl-avatar { animation: glReveal 0.9s ease-out; }
 @keyframes glReveal { 0% { transform: scale(1.5) rotate(-12deg); box-shadow: 0 0 22px #fde68a; } 100% { transform: none; } }
 
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-path-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 2px 0 6px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gpt-label { font-family: 'Cinzel', Georgia, serif; font-size: 0.62rem; letter-spacing: 0.14em; color: #e6c36a; margin-right: 4px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gpt-tag { font-size: 0.74rem; padding: 3px 9px; border-radius: 999px; background: rgba(230,195,106,0.12); border: 1px solid rgba(230,195,106,0.45); color: #fde9b6; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-path-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 2px 0 6px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gpt-label { font-family: 'Cinzel', Georgia, serif; font-size: 0.62rem; letter-spacing: 0.14em; color: #e6c36a; margin-right: 4px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gpt-tag { font-size: 0.74rem; padding: 3px 9px; border-radius: 999px; background: rgba(230,195,106,0.12); border: 1px solid rgba(230,195,106,0.45); color: #fde9b6; }
 
 /* The Night on the Erg shares this stage; its third voice is the night traveller */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-nomad { --gl-c: #62d2c0; --gl-bg: #0f2f33; --gl-t: #dcfbf5; --gl-glow: rgba(98,210,192,0.35); }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-nomad .gl-bubble { border-bottom-left-radius: 4px; font-style: italic; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.gb-nomad { --gl-c: #62d2c0; --gl-bg: #0f2f33; --gl-t: #dcfbf5; --gl-glow: rgba(98,210,192,0.5); font-style: italic; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-nomad { --gl-c: #62d2c0; --gl-bg: #0f2f33; --gl-t: #dcfbf5; --gl-glow: rgba(98,210,192,0.35); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-nomad .gl-bubble { border-bottom-left-radius: 4px; font-style: italic; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-nomad { --gl-c: #62d2c0; --gl-bg: #0f2f33; --gl-t: #dcfbf5; --gl-glow: rgba(98,210,192,0.5); font-style: italic; }
 
 /* ---- the story scenes play slowly, like a film: stage directions are gold subtitles, the scene can be paused ---- */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage-subtitle {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage-subtitle {
   left: 50%; right: auto; width: min(760px, calc(100% - 32px)); transform: translateX(-50%); bottom: 16px;
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage-subtitle.is-act {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage-subtitle.is-act {
   font-family: 'EB Garamond', Georgia, serif; font-style: italic; font-size: 1.12rem; line-height: 1.4; letter-spacing: 0.01em;
   color: #fde68a; background: rgba(10, 6, 3, 0.78); border-color: rgba(212, 168, 83, 0.5); padding: 9px 18px;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage-subtitle.is-act::before { content: '✦ '; color: #d4a853; font-style: normal; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage-subtitle.is-quiet { opacity: 0; transform: translateX(-50%) translateY(6px); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage-subtitle.is-act::before { content: '✦ '; color: #d4a853; font-style: normal; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage-subtitle.is-quiet { opacity: 0; transform: translateX(-50%) translateY(6px); }
 @media (min-width: 1300px) {
-  :is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage-subtitle.is-act { font-size: 1.24rem; }
-  :is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble { font-size: 1rem; max-width: min(340px, 70%); }
+  :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage-subtitle.is-act { font-size: 1.24rem; }
+  :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble { font-size: 1rem; max-width: min(340px, 70%); }
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-pause {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-pause {
   position: absolute; top: 52px; right: 14px; z-index: 13;
   padding: 6px 12px; border-radius: 999px; cursor: pointer;
   background: rgba(18, 11, 6, 0.82); border: 1px solid rgba(212, 168, 83, 0.45); color: #fde68a;
   font-family: 'Cinzel', Georgia, serif; font-size: 0.72rem; letter-spacing: 0.08em;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); transition: background 0.2s ease, transform 0.2s ease;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-pause:hover { background: rgba(110, 66, 24, 0.92); transform: translateY(-1px); }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gl-pause:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage.is-paused .gl-pause { background: rgba(120, 72, 20, 0.95); color: #fff3c4; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-stage.is-paused::before {
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-pause:hover { background: rgba(110, 66, 24, 0.92); transform: translateY(-1px); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-pause:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage.is-paused .gl-pause { background: rgba(120, 72, 20, 0.95); color: #fff3c4; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-stage.is-paused::before {
   content: 'PAUSED'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 11; pointer-events: none;
   font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.4em; font-size: 0.9rem; color: rgba(253, 230, 138, 0.85);
   padding: 8px 18px; border-radius: 999px; background: rgba(10, 6, 3, 0.55);
 }
 /* Hermes has left for Cairn II: only his voice is at the gates */
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.gb-away { border-style: dashed; }
-:is(#modal-gates-tower-ii, #modal-night-erg) .gates-bubble.gb-away .gb-name::after { content: ' · RADIO'; opacity: 0.7; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-away { border-style: dashed; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-away .gb-name::after { content: ' · RADIO'; opacity: 0.7; }
 @media (prefers-reduced-motion: reduce) {
-  :is(#modal-gates-tower-ii, #modal-night-erg) :is(.gl-row, .gl-narr, .gl-card, .gl-row.is-revealed .gl-avatar) { animation: none !important; }
-  :is(#modal-gates-tower-ii, #modal-night-erg) :is(.gates-stage-subtitle, .gates-bubble, .gl-pause) { transition: none; }
+  :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) :is(.gl-row, .gl-narr, .gl-card, .gl-row.is-revealed .gl-avatar) { animation: none !important; }
+  :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) :is(.gates-stage-subtitle, .gates-bubble, .gl-pause) { transition: none; }
 }

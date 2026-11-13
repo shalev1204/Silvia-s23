@@ -387,12 +387,15 @@
           leg.position.x = side;
         }
 
+        var held = null, heldLast = null, heldK = 0;
         return {
           body: body,
           look: function (v) { look.target = v ? (v.clone ? v.clone() : new T.Vector3(v.x, v.y, v.z)) : null; },
           face: face,
           // while he talks his head marks the words and his free hand moves with them
           speak: function (on) { talking = !!on; if (face && face.talk) face.talk(talking); },
+          // a gesture kept until it is let go: hold('kneel') and he stays down on one knee; hold(null) and he gets up
+          hold: function (kind) { held = kind || null; if (held) heldLast = held; },
           // 'flinch' (a blow, a wrong step), 'cheer' (he lifts his staff), 'nod', 'wonder' (he looks up, eyes wide),
           // 'bow' (he bows from the waist), 'kneel' (he goes down on one knee, to the ground or a fire), 'offer' (he holds
           // something out in his right hand: a flask, a disc, a seal), 'listen' (his free hand cupped to his ear, head bent to the sound)
@@ -456,6 +459,8 @@
                 e = e * e * (3 - 2 * e);
               }
             }
+            heldK += ((held && !rx ? 1 : 0) - heldK) * Math.min(1, dt * 3);
+            if (!rx && heldK > 0.002 && (held || heldLast)) { kind = held || heldLast; e = heldK * heldK * (3 - 2 * heldK); }
             var flinch = kind === 'flinch' ? e : 0, cheer = kind === 'cheer' ? e : 0, wonder = kind === 'wonder' ? e : 0;
             var nod = kind === 'nod' ? e * Math.sin(rx.t / rx.dur * TAU * 2) : 0;
             var bow = kind === 'bow' ? e : 0, kneel = kind === 'kneel' ? e : 0, offer = kind === 'offer' ? e : 0, listen = kind === 'listen' ? e : 0;
