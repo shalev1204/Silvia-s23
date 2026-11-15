@@ -37,7 +37,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           { text: "Could the Servant be inside?", silviaMsg: "Hermes... could the Servant still be inside that tower?",
             reply: ["He has not left his post in fifty years.", "If he is in there, he is hiding. Or he is not. I did not finish that thought, and I will not finish it for you."] },
           { text: "How many men are down there?", silviaMsg: "Wagons mean men. How many, Hermes?",
-            reply: ["Four wagons, one under oilcloth. A dozen riders would fit round them.", "I do not like those odds in the dark."] },
+            reply: ["Three wagons, one under oilcloth. A dozen riders would fit round them.", "I do not like those odds in the dark."] },
           { text: "A burning tower. Of course.", silviaMsg: "So you are walking into a burning tower. Of course you are. Promise me it will not become a habit.",
             reply: ["It is my first burning tower, Silvia, and I mean it to be my last.", "Though I will admit the smoke has a certain flair."] }
         ] },
@@ -76,8 +76,8 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         silviaMsg: "Find the Servant first, Hermes. The stele can wait. He can't.",
         hermesReply: (W) => [
           W.ask(25, 'i', 1) === 0
-            ? "You asked if he is inside, and I cannot stop asking it myself. I would give all five seals to find him alive."
-            : "He made me wait at his gates until I had five seals. I would give all five to find him alive.",
+            ? "You asked if he is inside, and I cannot stop asking it myself. I would give every seal I carry to find him alive."
+            : "He made me wait at his gates until I had five seals. I would give every seal I carry to find him alive.",
           "The last I saw of him, he stood on the top step and watched me go until the dark took him.",
           "So no creeping about. Straight to the atrium by the shortest way: the stele has waited since the founders, and it can wait for me. Going now, Silvia."
         ]
@@ -99,7 +99,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       "Silvia, he is alive. He is sitting next to me on the rim of the well, with a wet cloth round his hands.",
       [
         "The dark did its work. The side door in the cliff let me in, and nobody saw me.",
-        "The side door let me in, as I hoped. After that it was your work and his: you read that stele like a Servant yourself.",
+        "I found a side door in the cliff and slipped in. After that it was your work and his: you read that stele like a Servant yourself.",
         "You were right to send me to him first. Everything else could burn, and nearly did."
       ][W.choice(25)] || null,
       "The library is embers. The stele still stands in the atrium, black with soot and whole.",
@@ -108,10 +108,10 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           reply: ["Burnt palms and a cough. He says he has had worse from a bad stew.", "That is why the wet cloth."] },
         { text: "What did he say when he saw you?", silviaMsg: "What did he say when he saw you?",
           reply: ["'You are late.' Then he gave me his own cup of water, with hands that would not stop shaking."] },
-        { text: "Did he ask for his seals back?", silviaMsg: "Did he ask for his five seals back? I would have.",
+        { text: "Did he ask for his seals back?", silviaMsg: "Did he ask for his seals back? I would have.",
           reply: ["He counted them first. Of course he did.", "Then he said nothing, which is his way of saying well done."] }
       ] },
-      "The Ashes came at dusk and asked for the Oracle and her charts. He said no, so they burned the library to smoke out whoever was hiding.",
+      "The Ashes came in the night, while the light was still speaking, and asked for the Oracle and her charts. He said no, so they burned the library.",
       "He went down the old well with the charts in his arms and pulled the hatch shut. The Oracle is safe, he says, deeper in the rock than fire can reach.",
       { ask: [
         { text: "Have you ever seen the Oracle?", silviaMsg: "Have you ever seen the Oracle, Hermes?",
@@ -119,7 +119,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         { text: "Is she really safe down there?", silviaMsg: "Is she really safe down there?",
           reply: ["The Servant would stake his life on it. Tonight he very nearly did."] },
         { text: "Take me to her. Now.", silviaMsg: "Then take me to her, Hermes. Now.",
-          reply: ["Not yet. He is strict about order: the stele first, then the seals.", "At dawn, if he allows it."] }
+          reply: ["Not yet. She receives at dawn, and only with the five seals.", "At dawn, if he allows it."] }
       ] },
       "Then I asked who answered my light. He said: 'She came from the edge of the sky with a disc in her arms and no name.'"
     ]),
@@ -276,7 +276,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         { text: "I knew it.", silviaMsg: "I knew it, Hermes. I knew it.",
           reply: ["You believed it before I did. I owe this desert an apology for doubting it."] },
         { text: "Hermes... are you crying?", silviaMsg: "Hermes... are you crying?",
-          reply: ["Yes. Do not tell the Servant.", "He has been pretending not to see for an hour."] },
+          reply: ["Yes. Do not tell the Servant.", "He came down when the door opened, and has pretended not to see ever since."] },
         { text: "How? Tell me everything.", silviaMsg: "How? Tell me everything, from the start.",
           reply: ["From the very beginning, then. Slowly, or I will tell it wrong."] }
       ] },
@@ -325,7 +325,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
             { text: "Promise me you'll be careful.", silviaMsg: "Promise me you will be careful. Both of you.",
               reply: ["I promise to be careful, and to be seen being careful. That is the best I do."] }
           ] },
-          "But not today. She has not slept in two nights, and neither have I. At dawn."
+          "But not today. She has not slept in two nights, and I have slept one. At dawn."
         ]
       }
     ]

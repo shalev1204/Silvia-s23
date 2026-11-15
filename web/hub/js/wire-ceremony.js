@@ -15,7 +15,9 @@
         num: 'II', title: 'The Five Cairns', place: 'The Seals of the Sun',
         epilogue: [
           'Four cairns woke under Hermes’s hands: the sun-stone that told the noon, the labyrinth that kept its road in the dark, the pillars that sang over the bridge, the arch that caught the midsummer ray.',
-          'Each gave up a seal, and each seal weighed more than bronze. Together with the first they made a key the desert had held back since 1998.',
+          () => seal1()
+            ? 'Each gave up a seal, and each seal weighed more than bronze. Together with the first they made a key the desert had held back since 1998.'
+            : 'Each gave up a seal, and each seal weighed more than bronze. The first still waits for him, and without it the key is not whole.',
           'On the last night a light answered from Tower II. Then the smoke rose. The chapter of the stones is over, and the chapter of the tower is about to begin.'
         ],
         prize: 'The Seals of Cairns II, III, IV and V'
@@ -23,8 +25,8 @@
       open: {
         num: 'III', title: 'Tower II in Flames', place: 'Tower II · The Sandstone Sanctuary',
         prologue: [
-          'At noon, under the Arch, the smoke stood on the horizon like a pillar of grey sand. It was coming from Tower II.',
-          'Hermes carries five seals and a mirror that learned to answer a tower. He also carries a fear he will not say aloud: that he is late again.',
+          'At noon, under the Arch, the smoke stood on the horizon like a black pillar. It was coming from Tower II.',
+          'Hermes carries the seals of the cairns and a mirror that learned to answer a tower. He also carries a fear he will not say aloud: that he is late again.',
           'Six hours of road lie between the Arch and the gates. Behind the gates an old servant keeps a lamp, and under the servant someone has waited a very long time.'
         ]
       }
@@ -34,7 +36,7 @@
         num: 'III', title: 'Tower II in Flames', place: 'The Oracle of Tower II',
         epilogue: [
           'The fire gave way to a stone grid and the key that fitted it, and the Servant was found alive by the well.',
-          'Then came the inner stair, the five seals laid in their places, and a voice the desert had not heard since 1971.',
+          'Then came the inner stair, the five seals laid in their places, and a name the desert had not heard since 1971.',
           'The Oracle was never a stranger or a ghost. She was Aurelia, and she had waited for the light as long as Hermes had walked away from it.',
           'The first truth was spoken: the WHEN. Two secrets still sleep, and the road to the next tower leaves at dawn, with the two of them walking side by side.'
         ],
@@ -46,7 +48,7 @@
           'The desert ends on a plateau of wind, and on the plateau stands a tower made of glass, shadow and echo.',
           'It is guarded by someone who is never seen, only reflected. Hermes has promised himself to look at the glass and never at the face.',
           'Nine pieces of a broken mirror lie scattered through its rooms, and each room opens only for the one who has read the room before it.',
-          'The crossing takes eighteen hours and nobody sleeps. This time Aurelia walks beside him, and the navigator walks on the wire.'
+          'The crossing takes eighteen hours, with one short sleep at noon. This time Aurelia walks beside him, and the navigator walks on the wire.'
         ]
       }
     },
@@ -71,6 +73,9 @@
     }
   };
 
+  // a line may be a function, for the words that depend on her road (the Seal of Cairn I may still be waiting)
+  const txt = (v) => (typeof v === 'function' ? v() : v);
+  const seal1 = () => { try { return localStorage.getItem('order_seal_cairn_1') === 'true'; } catch (e) { return true; } };
   const reduce = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const fast = () => !!window.__wireFast;
   let root = null, running = false;
@@ -147,7 +152,8 @@
     await wait(1100);
     close.classList.add('is-stamp'); sfxCall('playStoneLift');
     await wait(900); sfxCall('playCelestialChime');
-    for (const line of S.close.epilogue) {
+    for (const raw of S.close.epilogue) {
+      const line = txt(raw); if (!line) continue;
       const p = el('p', 'wcer-line', line); q('.wcer-lines').appendChild(p);
       void p.offsetWidth; p.classList.add('is-in'); sfxCall('playSoftTick');
       await wait(Math.min(3600, 900 + line.length * 22));
@@ -182,7 +188,8 @@
     await wait(800);
     open.classList.add('is-place');
     await wait(700);
-    for (const line of S.open.prologue) {
+    for (const raw of S.open.prologue) {
+      const line = txt(raw); if (!line) continue;
       const p = el('p', 'wcer-pline', line); q('.wcer-prologue').appendChild(p);
       void p.offsetWidth; p.classList.add('is-in'); sfxCall('playSoftTick');
       await wait(Math.min(3600, 900 + line.length * 22));

@@ -17,7 +17,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         "Dawn at the Sanctuary, Silvia. Boots on, coat buttoned, and behind me the best day I have had since 1971.",
         c === 0 ? "You told me to stay, so I stayed. She showed me her charts, and I watched her hands."
           : c === 1 ? "I watched her remember, a little more each hour: cedar smoke, a tune, my voice. Not the bridge, and I do not push."
-          : c === 2 ? "You wanted the raiders chased at once. Aurelia kept me one more day, and I was glad of it."
+          : c === 2 ? "You wanted us on the raiders’ road. Aurelia kept me one more day, and I was glad of it."
           : "She showed me her charts, and I watched her hands.",
         "The raiders have a day’s start and the Astrolabe, and their ruts run east, to Tower III: the Stage Tower, and the Mirror Speaker’s truth. The WHERE.",
         { ask: [
@@ -32,7 +32,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
                 : null
             ]) },
           { text: "What will the Speaker want?", silviaMsg: "What will the Mirror Speaker want from us?",
-            reply: ["Nobody knows. She never speaks, only reflects.", "Aurelia says she asks nothing and sees everything. I find that worse."] }
+            reply: ["Nobody knows. She never shows herself, only her reflection.", "Aurelia says she asks nothing and sees everything. I find that worse."] }
         ] },
         "Aurelia found a letter in the cedar chest, written by an Oracle to the Mirror Speaker, and never sent. It is written backwards.",
         "A pigeon of the Order has just landed with eight new pages for you. The Servant stays on guard, and packed us bread, dates and a lamp.",
@@ -44,7 +44,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         text: "I have the pages. Let’s go to the third tower.",
         silviaMsg: "I have the pages and a mirror, Hermes. The page “The Unsent Letter” is open. Let’s go.",
         hermesReply: (W) => clean([
-          W.ask(33, 'i', 1) === 1 ? "Good. If we are to catch them, we do not waste the cool of the morning."
+          W.ask(33, 'i', 0) === 1 ? "Good. If we are to catch them, we do not waste the cool of the morning."
             : "Good. We do not waste the cool of the morning.",
           "Eighteen hours to the gate of Tower III, if the plateau is kind. Aurelia is already ten paces ahead; she says I have grown slow. She is right.",
           "Keep the pages within reach, Silvia. I have a feeling this tower will want you before it wants me."
@@ -109,7 +109,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           { text: "Bow to her. Politely.", silviaMsg: "Bow to her, Hermes. Politely. We are guests.",
             reply: ["I bowed to the glass. In the mirror, she bowed back, a heartbeat late.", "I turned round again. Only the empty corridor, and my own old face."] },
           { text: "Does she say anything?", silviaMsg: "Does she say anything at all?",
-            reply: ["Not one word. She tilts her head, as if I were the one who owed her an explanation.", "I have been looked at that way by Aurelia for fifty-five years. I know when to be quiet."] },
+            reply: ["Not one word. She tilts her head, as if I were the one who owed her an explanation.", "Aurelia looked at me that way in 1970. I learned then when to be quiet."] },
           { text: "Ask her where the fragment is.", silviaMsg: "Ask her where Fragment I is, Hermes. Politely.",
             reply: ["I did. She turned and walked ahead of us, in the glass only, and we followed her reflections.", "It is like following a rumour. Very tidy, and no explanations."] }
         ] },
@@ -187,7 +187,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           : c === 1 ? "I slept badly. Each time I woke, the grey gown stood in the glass at the end of the corridor, still as a painting."
           : c === 2 ? "I slept badly. Fragment I kept me company all night, cold as a coin from the bottom of a well."
           : "I slept badly, which at my age is practically a hobby.",
-        "At the end of the corridor the grey gown stood beside a door that was not there before. She drew her line on it, and it opened on a stair going down.",
+        "In the glass at the end of the corridor, the grey gown stood by a door that was not there before. She drew her line, and it opened on a stair.",
         { ask: [
           { text: "Is she still there?", silviaMsg: "Is she still there, Hermes? The grey gown?",
             reply: ["The glass is empty now. Only me, in a coat two sizes too big, and a door standing open.", "She has gone, and she wanted us to see that she has gone."] },
@@ -225,7 +225,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         text: "Be careful on the stair.",
         silviaMsg: "Be careful on the stair, Hermes. Hold the rail.",
         hermesReply: [
-          "There is no rail. There is Aurelia’s hand, and she has not let go of mine since the gate.",
+          "There is no rail. Aurelia came back up for me, took my hand, and has not let go.",
           "I test each step with my stick. The fourth is cracked clean through, and Aurelia stepped over it without looking down.",
           "She has walked this stair before, Silvia, long ago. I did not ask. She had the look of someone listening to a song from the next room."
         ]
@@ -254,10 +254,10 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       const c = W.choice(37);
       return clean([
         "Fragment II is in my hands, Silvia, and my hands are black to the wrists.",
-        "You spotted it on the wall: a chimney cold on your page, smoking in the dark. We found the fragment in it, in a cloth that smelled of old smoke.",
+        "You spotted it on the wall: a chimney cold on your page, smoking in the dark. We found the fragment on the hearth below it, in a cloth that smelled of old smoke.",
         { ask: [
           { text: "Are you hurt?", silviaMsg: "Black to the wrists? Are you hurt, Hermes?",
-            reply: ["Only soot and pride. I had to reach up the flue to the elbow, and the flue won.", "Aurelia says soot suits me."] },
+            reply: ["Only soot and pride. I knelt in the hearth to lift it, and the hearth won.", "Aurelia says soot suits me."] },
           { text: "What does it look like?", silviaMsg: "What does Fragment II look like?",
             reply: ["Smaller than the first, and warmer, as if someone held it a long time. Inside it there is a little window with a candle in it."] },
           { text: "Soot suits you.", silviaMsg: "Aurelia is right. Soot suits you.",
@@ -393,7 +393,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
   // =========================================================================================
   S[43] = {
     hermesInitial: (W) => [
-      "Fragment III is in my scarf with the other two, Silvia. They do not hum any more when they touch: they sing the tune of the niche, backwards.",
+      "Fragment III is in my scarf with the other two, Silvia. When the three touch, they sing: the tune of the niche, backwards.",
       W.chose(41, 1)
         ? "You found the rose for me in the dark. I stood on it, and the whole hall poured its whispers into my ear."
         : "You walked me out to the rose, and the whole hall poured its whispers into my ear. I have never heard so clearly in my life.",
@@ -406,8 +406,8 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         { text: "Were they good musicians?", silviaMsg: "Were they at least good musicians?",
           reply: ["Dreadful. Every note correct, and not one note of feeling. Aurelia winced twice."] }
       ] },
+      "Before they left I heard their last words: ‘Leave it. She will come.’ They are not hunting us, Silvia. They are waiting for you.",
       "You played it from the last note to the first, the way a mirror would, and a little door opened in the wall.",
-      "Then I heard their last words: ‘Leave it. She will come.’ They are not hunting us, Silvia. They are waiting for you.",
       "Inside the door, scratched in Aurelia’s own old hand, there was a line for your Ledger: [J] × 2 = [T]. Three questions, and only one of me. Pick."
     ],
     choices: [
@@ -424,7 +424,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         text: "I will solve the line.",
         silviaMsg: "I will put [J] × 2 = [T] in my Ledger and solve it.",
         hermesReply: [
-          "Twice J is T. And you found T long ago, in the desert.",
+          "Twice J is T. And you found T long ago, before the sand.",
           "I could do the sum on my fingers, and I will not. This one is yours.",
           "Aurelia says the Order liked its echoes exact: a sound that comes back twice as strong is not an echo. It is an answer."
         ]
@@ -435,7 +435,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         hermesReply: [
           "She will not tell me. Something short, always the same, and it comes back across the hall small and clear.",
           "Once I thought it was my name. Then I thought it was a date. But she knew every column by touch, Silvia: she has been in this hall before.",
-          "I will not push. The Servant said an echo comes back like water into a dry well: slowly, and from below."
+          "I will not push. What comes back on its own comes back to stay."
         ]
       }
     ]

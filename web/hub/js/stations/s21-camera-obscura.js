@@ -798,7 +798,7 @@
         if (el.picture) el.picture.classList.remove('is-tremble');
         if (el.fade) el.fade.classList.remove('is-on');
         if (el.speaker && window.EclipseMirrorSpeaker) window.EclipseMirrorSpeaker.render(NODE, el.speaker);
-        if (isDone()) { applyVictory(); setAngle(0); say("We sleep tonight in the old dressing rooms again, Silvia, but nobody can say the dark room let us down. The picture on its wall is still turned the right way up, and a little smoke is still rising from the narrow house, as if the glass remembered."); }
+        if (isDone()) { applyVictory(); setAngle(0); say("We rest tonight in the cellar of the narrow house, Silvia, by the hearth where the raiders left Fragment II. Nobody can say the dark room let us down: it showed us the smoke, and the smoke told the truth."); }
         else {
           setAngle(START_DEG);
           say("Silvia, the Mirror Speaker's reflection led us down a stair and into a room with no windows. It is as black as the inside of a cupboard, and in one wall there is a hole no bigger than a coin. On the opposite wall, hanging in the dark, is the whole city of the third tower, upside down: roofs where the ground should be, smoke falling toward the sky. Aurelia says this is a camera obscura. Open the page “The Camera Obscura”, please. She says it shows the city as it was yesterday.");

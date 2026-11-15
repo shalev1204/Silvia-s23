@@ -1,0 +1,144 @@
+<title>Mapa del Field Wire</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column like a field logbook; chapters are bound sections, steps are entries, gates are the road between them. */
+:root {
+  --bg: #eceef1; --surface: #ffffff; --ink: #1c222c; --muted: #5b6472; --line: #d5d9e0;
+  --brass: #8a5d12; --brass-soft: #f3e6cc; --silvia: #2a64a8; --silvia-soft: #e3edf9; --rule: #b98a35;
+  --march: #7a5a2a; --station: #2d6b4f; --rest: #4b4f8f; --scene: #8a3f6b; --cer: #9a6a12; --door: #5a6b7a;
+  --display: 'Cinzel', 'Trajan Pro', Georgia, serif; --body: 'Inter', system-ui, -apple-system, sans-serif; --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11141a; --surface: #191e26; --ink: #e7e3d9; --muted: #9aa3b1; --line: #2c333e;
+  --brass: #e0b25a; --brass-soft: #2e2618; --silvia: #8ab8ee; --silvia-soft: #1b2738; --rule: #c99a45;
+  --march: #d1a466; --station: #6cc29a; --rest: #a3a8ee; --scene: #e08bbd; --cer: #e8b85a; --door: #9fb2c4; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11141a; --surface: #191e26; --ink: #e7e3d9; --muted: #9aa3b1; --line: #2c333e;
+  --brass: #e0b25a; --brass-soft: #2e2618; --silvia: #8ab8ee; --silvia-soft: #1b2738; --rule: #c99a45;
+  --march: #d1a466; --station: #6cc29a; --rest: #a3a8ee; --scene: #e08bbd; --cer: #e8b85a; --door: #9fb2c4; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 15px/1.6 var(--body); }
+.wrap { max-width: 920px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 28px; }
+h1 { font: 700 clamp(1.7rem, 4.5vw, 2.5rem)/1.15 var(--display); letter-spacing: 0.04em; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 66ch; margin: 8px 0 0; }
+.kicker { font: 500 0.72rem var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.stat { background: var(--surface); padding: 14px 16px; }
+.stat b { display: block; font: 600 1.6rem var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+.stat span { font-size: 0.82rem; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.84rem; color: var(--muted); align-items: center; }
+.legend i, .rhythm i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; }
+.r-h { background: var(--brass); } .r-a { background: var(--silvia); } .r-c { background: var(--silvia); border-radius: 2px !important; width: 14px !important; height: 14px !important; } .r-t { background: transparent; border: 1.5px dashed var(--muted); }
+nav.toc { display: flex; flex-wrap: wrap; gap: 8px; }
+nav.toc a { font: 600 0.8rem var(--display); letter-spacing: 0.06em; color: var(--ink); text-decoration: none; border: 1px solid var(--line); background: var(--surface); padding: 6px 12px; border-radius: 20px; }
+nav.toc a:hover, nav.toc a:focus-visible { border-color: var(--brass); outline: none; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+.panel h2 { font: 700 1.1rem var(--display); letter-spacing: 0.05em; margin: 0 0 10px; }
+.panel ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.panel li { max-width: 72ch; }
+.chapter { display: flex; flex-direction: column; gap: 10px; }
+.ch-h { border-top: 2px solid var(--rule); padding-top: 14px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.ch-n { grid-column: 1 / -1; font: 500 0.74rem var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass); }
+.ch-h h2 { margin: 0; font: 700 clamp(1.2rem, 3vw, 1.55rem)/1.25 var(--display); letter-spacing: 0.03em; text-wrap: balance; }
+.ch-r { font: 0.8rem var(--mono); color: var(--muted); }
+.note { color: var(--muted); font-size: 0.92rem; max-width: 70ch; }
+.step { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.step.even { background: transparent; border-style: dashed; }
+.st-n { font: 600 1.25rem var(--mono); color: var(--brass); text-align: right; font-variant-numeric: tabular-nums; }
+.st-b { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.st-place { font: 700 0.95rem var(--display); letter-spacing: 0.04em; }
+.step.even .st-place { font: 500 0.82rem var(--body); color: var(--muted); }
+.st-stats { font-size: 0.84rem; color: var(--muted); }
+.rhythm { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.rh-n { font: 0.76rem var(--mono); color: var(--muted); }
+details > summary { cursor: pointer; font-size: 0.86rem; color: var(--brass); font-weight: 600; width: fit-content; }
+details > summary:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 3px; }
+.conv { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.conv h4 { margin: 10px 0 2px; font: 600 0.72rem var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.m { margin: 0; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; font-size: 0.92rem; max-width: 72ch; }
+.who { font: 600 0.68rem var(--mono); width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; margin-top: 2px; }
+.m.h .who { background: var(--brass-soft); color: var(--brass); }
+.m.s .who { background: var(--silvia-soft); color: var(--silvia); }
+.m.s { color: var(--silvia); }
+.m.sub { padding-left: 14px; grid-template-columns: 22px minmax(0, 1fr); }
+.ask { border-left: 2px solid var(--silvia); padding: 4px 0 4px 12px; display: flex; flex-direction: column; gap: 8px; }
+.ask-k { font: 600 0.7rem var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--silvia); }
+.opt, .choice { display: flex; flex-direction: column; gap: 4px; }
+.choice { border-top: 1px solid var(--line); padding-top: 8px; }
+.pill { font-size: 0.8rem; font-weight: 600; color: var(--silvia); background: var(--silvia-soft); padding: 2px 10px; border-radius: 12px; width: fit-content; max-width: 100%; }
+.pill.main { border-radius: 4px; }
+.gates { display: flex; flex-direction: column; gap: 6px; padding-left: 66px; position: relative; }
+.gates::before { content: ''; position: absolute; left: 41px; top: -10px; bottom: -10px; width: 2px; background: repeating-linear-gradient(var(--line) 0 6px, transparent 6px 11px); }
+.gate { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 0.88rem; }
+.g-tag { font: 600 0.68rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; border: 1px solid currentColor; }
+.g-t { min-width: 0; flex: 1 1 260px; }
+.g-march .g-tag { color: var(--march); } .g-station .g-tag { color: var(--station); } .g-rest .g-tag { color: var(--rest); } .g-scene .g-tag { color: var(--scene); }
+.g-ceremony .g-tag { color: var(--cer); } .g-door .g-tag, .g-gate .g-tag, .g-end .g-tag { color: var(--door); }
+.ev { flex-basis: 100%; }
+.slot { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.slot-k { font: 600 0.72rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--march); }
+.var { border-left: 2px solid var(--line); padding-left: 10px; display: flex; flex-direction: column; gap: 4px; }
+.var-id { font: 0.74rem var(--mono); color: var(--muted); }
+.cer { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+.cer p { margin: 0; font-style: italic; }
+.cer .prize { font-style: normal; font-weight: 600; color: var(--cer); }
+.cer .tag { font: 600 0.68rem var(--mono); font-style: normal; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; margin-right: 4px; }
+.rev h3 { font: 600 0.95rem var(--display); letter-spacing: 0.04em; margin: 18px 0 6px; }
+.rev ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 5px; }
+.rev li { max-width: 78ch; }
+.rev q { font-style: italic; }
+.cer-k { font: 600 0.72rem var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--cer); margin-top: 6px; }
+footer { color: var(--muted); font-size: 0.82rem; }
+@media (max-width: 560px) {
+  .step { grid-template-columns: 1fr; gap: 4px; } .st-n { text-align: left; }
+  .gates { padding-left: 14px; } .gates::before { left: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">The Eclipse Order · auditoría del {{DATE}}</div>
+    <h1>Mapa del Field Wire</h1>
+    <p class="lede">Cada paso del chat entre Hermes y Silvia desde la estación 14: dónde está, qué se dice, cuándo interviene Silvia y qué se interpone entre una conversación y la siguiente (marchas, estaciones, descansos, escenas, ceremonias y puertas). Se genera desde los guiones reales del juego.</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b>{{TOTC}}</b><span>conversaciones con elección de Silvia</span></div>
+    <div class="stat"><b>{{TOTA}}</b><span>intervenciones rápidas de Silvia (un toque)</span></div>
+    <div class="stat"><b>{{TOTH}}</b><span>mensajes de Hermes escritos (todas las ramas)</span></div>
+    <div class="stat"><b>{{MAXRUN}}</b><span>máximo de mensajes seguidos de Hermes</span></div>
+  </div>
+
+  <div class="legend">
+    <span><i class="r-h"></i> mensaje de Hermes</span>
+    <span><i class="r-a"></i> Silvia interviene</span>
+    <span><i class="r-c"></i> elección principal</span>
+    <span><i class="r-t"></i> telegrama del sistema</span>
+    <span>La tira de cada paso sigue la primera opción de cada pregunta, de la apertura al cierre.</span>
+  </div>
+
+  <nav class="toc" aria-label="Capítulos">
+    <a href="#cap-i">I · The Red Storm</a><a href="#cap-ii">II · The Five Cairns</a><a href="#cap-iii">III · Tower II in Flames</a><a href="#cap-iv">IV · The Mirror Sanctuary</a><a href="#cap-v">V · The Whispering Gallery</a><a href="#revision">Revisión</a>
+  </nav>
+
+  <section class="panel">
+    <h2>Cómo se organiza una conversación</h2>
+    <ul>
+      <li><b>Apertura</b> (pasos impares): Hermes sitúa dónde está, cuándo y qué busca en los dos primeros mensajes. Dentro, Silvia interviene una o dos veces con un toque, nunca tras más de tres mensajes seguidos de él.</li>
+      <li><b>Elección principal</b>: tres opciones con resultados distintos. Hermes las recuerda más adelante.</li>
+      <li><b>Cierre</b> (pasos pares): dos o tres mensajes, la línea del Cipher Ledger si la hay, la página del diario que conviene tener a mano y el telegrama del sistema.</li>
+      <li><b>Entre conversaciones</b>: marchas en tiempo real con pequeños acontecimientos en el camino, la estación, un descanso que Silvia marca con un toque, una escena (el sueño o el catalejo), una ceremonia de capítulo o una puerta de la Torre III que abre horas después.</li>
+    </ul>
+  </section>
+
+  {{BODY}}
+
+  <section class="panel" id="revision">
+    <h2>Revisión</h2>
+    {{REVIEW}}
+  </section>
+
+  <footer>Generado desde <code>web/hub/js/wire-script-*.js</code>, <code>wire-ceremony.js</code> y la lógica de <code>hub-core.js</code>. Los textos variables se muestran con un recorrido de ejemplo (camino humilde, cinco sellos, sin escenas previas).</footer>
+</div>

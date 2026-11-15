@@ -145,7 +145,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
           'Silvia, the horizon has grown a thorn. A thin dark finger stands on the far edge of the dunes, straight as a ruler.',
           'The Monolith. I knew it would be there, and I still stopped and took off my hat, as if it were a person.',
           'The first sun has touched the very top of it, in gold, while everything else is still blue night.',
-          'After ' + String(W.hours() || 'Twelve').toLowerCase() + ' hours on foot I would forgive it for being smaller. It is not. A couple of hours more, I think.'
+          'After a whole night on foot I would forgive it for being smaller. It is not. A couple of hours more, I think.'
         ]) }
     ] }
   ];
@@ -174,7 +174,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
           { text: 'Pick up the glove. It may tell us something.',
             silviaMsg: 'Take the glove, Hermes. It might tell us something about them.',
             reply: [
-              'Stiff leather, black with soot, and on the cuff a charred circle stitched on. The Ashes’ mark, Silvia.',
+              'Stiff leather, black with soot, and on the cuff a phoenix over three flames, stitched in red. The Ashes’ mark, Silvia.',
               'Nothing in the fingers but a burnt match and a thread. A poor prize, but a fine proof: they were here, in a hurry, and gone.',
               'It goes into the satchel. I will show it to the Servant, who will tell me I should have left it.'
             ] },
@@ -206,7 +206,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
             reply: [
               'Once. By the head librarian, who was fast asleep and woke only to inform me that I walked like a mule.',
               'Which is why I walk on stone shelves now. I keep the grace of the mule, only lighter.',
-              'Ah, the follies of nineteen. I would give almost all five seals for an hour of them.'
+              'Ah, the follies of nineteen. I would give a seal for an hour of them.'
             ] }
         ] }
     ] },
@@ -460,7 +460,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
           'I stood like a post and felt each wing pass without a touch. A bat reads you with sound and goes round. I wish people did.'
         ] }
     ] },
-    { at: 0.5, pool: [
+    { at: 0.68, pool: [
       { id: 'ret-wrong-turn',
         beats: [
           'I have taken a wrong turn, Silvia. The Lower Wash is a maze of boulders as big as houses, and in this grey light every gap looks like the right one.',
@@ -518,7 +518,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
         beats: [
           'A dust devil has just crossed the dune in front of me, Silvia: a lazy brown spiral twice my height, spinning along the crest as if it owned it.',
           'It plucked my hat clean off my head and carried it away. My hat, which has survived fifty years, three deserts and one very rude goat.',
-          'It is rolling down the far side of the dune rather happily, and I am standing in the noon sun with a bare head and a tired mind.'
+          'It is rolling down the far side of the dune rather happily, and I am standing in the morning sun with a bare head and a tired mind.'
         ],
         choices: [
           { text: 'Run after the hat!',
@@ -593,8 +593,8 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
           ({
             bold: 'I came through his gates like a gale. I have written three apologies for it in my head, and each one is worse than the last.',
             observer: 'At his gates I looked before I spoke, and he noticed. Now I must learn how to look at him if he is hurt.',
-            humble: 'I bowed to him at his gates, and he opened them with his own hands. Now I must find words of thanks, and I only own words for maps.'
-          })[W.road()] || 'I stood at his gates and he opened them with his own hands. Now I must find words of thanks, and I only own words for maps.',
+            humble: 'I bowed to him at his gates, and he bowed back. Now I must find words of thanks, and I only own words for maps.'
+          })[W.road()] || 'I stood at his gates and he gave me the road. Now I must find words of thanks, and I only own words for maps.',
           'If he is alive, I will say the simplest thing. I have noticed that the simplest thing is usually the hardest to say.'
         ]),
         choices: [
@@ -619,8 +619,8 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
         beats: (W) => K([
           'The wind has turned, Silvia, and it carries the smell of the Sanctuary to me: cedar smoke, burnt oil and hot stone.',
           'Something big has burned, and not long ago. I tied my scarf over my nose. The dust is the colour of ash, and so is my mood.',
-          W.choice(25) === 0 ? 'I keep to the dry bed and off the ridges, as you advised. A man on a skyline is a man in a spyglass.'
-            : W.choice(25) === 2 ? 'No creeping about, as you said. Straight on, by the shortest way, and the smell grows with every step.'
+          W.choice(25) === 0 ? 'I keep to the dry bed and off the ridges. You said to use the dark, and the dark is coming.'
+            : W.choice(25) === 2 ? 'Straight to him, as you asked, by the shortest way, and the smell grows with every step.'
             : 'I am walking as quietly as an old man can, which is not very, but I try.'
         ]) },
       { id: 'dry-silence',
@@ -647,7 +647,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
         ] },
       { id: 'dry-arrow',
         beats: (W) => K([
-          'On a flat rock beside the dry bed I found an arrow drawn in charcoal. It points straight at the Sanctuary, with the Ashes’ circle beside it.',
+          'On a flat rock beside the dry bed I found an arrow drawn in charcoal. It points straight at the Sanctuary, with the Ashes’ phoenix beside it.',
           'A signpost for stragglers. Someone wants whoever comes after to find the way without asking.',
           W.event('hp-ruts') === 0
             ? 'On the hardpan I followed their ruts because the going was easy. An arrow is the same temptation, so I stopped and thought.'
@@ -701,7 +701,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
         ] },
       { id: 'plat-hum',
         beats: [
-          'She is humming again, Silvia: the tune with no words, rising and falling, the one the shepherd hummed on the hardpan.',
+          'She is humming again, Silvia: the tune with no words, rising and falling, the one that came through her door at the Sanctuary.',
           'This time I caught myself finishing her phrase, a few notes before she did. I did not know I knew them.',
           'She stopped and looked at me. ‘You have heard it before,’ she said, not as a question. I said yes, long ago, and she nodded.'
         ],
@@ -733,7 +733,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
       { id: 'plat-last-camp',
         beats: (W) => K([
           'We found their last camp, Silvia, the one I told you about. Cold ashes, a trench of wheel marks, and a flat place where the animals were tethered.',
-          'The ashes are cold, so they are a day ahead of us. On a flat rock somebody has scratched the same ugly mark: a circle with a line across it.',
+          'The ashes are cold, so they are a day ahead of us. On a flat rock somebody has scratched the same ugly mark: a phoenix over three flames.',
           'Aurelia read the camp like a letter. She says they cooked in a hurry and left in a quarrel: three half-eaten bowls, boot marks pointing three ways.',
           num(W.seals()) >= 5
             ? 'Let the Ashes keep their camp. I carry all five seals sewn in my coat, and a woman who reads camps like letters.'
@@ -758,7 +758,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
       { id: 'plat-lapis-evening',
         beats: [
           'At the rest she asked me, out of nowhere, what we used to do on summer evenings. I said: we ground blue for the charts, and quarrelled about north.',
-          'She laughed, and the laugh was exactly the same. I have not heard it for fifty-five years, and my chest felt like a door opening.',
+          'She laughed, the same laugh I remember from the observatory, and my chest felt like a door opening.',
           'Then she went quiet, and said she could smell lapis and cedar, and see a table with a lamp. Nothing more. But it is more than yesterday.'
         ],
         choices: [

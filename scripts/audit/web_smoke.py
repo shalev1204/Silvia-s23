@@ -701,7 +701,7 @@ def test_cairn_four(browser):
     check(get("order_field_wire_step") == "21" and choices() == 3 and "Dusk again" in wire_text(), "she waits for dusk: leaving Cairn IV (step 21) opens")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
-    check(text.count("Dusk, Silvia") == 1 and text.count("I have not slept") == 1 and "Four seals of five" in text
+    check(text.count("Dusk, Silvia") == 1 and text.count("I have barely slept") == 1 and "Four seals of five" in text
           and text.count("Dusk again, Silvia") == 1, "reload replays steps 17-21 once each")
     check(not errors, "no JS errors during Station 16", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
@@ -4445,7 +4445,10 @@ def test_stones_dream(browser):
     js("window.__stonesDream.find('radio')"); settle(["plate"])
     check(again == [True, True] and shown("modal-stones-dream") and st["replay"] is True and json.loads(get("order_stones_dream")) == saved,
           "the page “The Five Geodetic Cairns” offers its printed face and the dream again; a second dream leaves the first untouched")
-    js("document.getElementById('btn-close-dream').click()"); page.wait_for_timeout(500)
+    js("document.getElementById('btn-close-dream').click()")
+    # the modal hides on a 220 ms timer that also stops the 3D loop; under a loaded headless GPU a frame can hold it past a fixed wait
+    try: page.wait_for_function("() => document.getElementById('modal-stones-dream').style.display === 'none'", timeout=4000)
+    except Exception: pass
     check(not shown("modal-stones-dream") and not errors, "no JS errors in the dream", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 

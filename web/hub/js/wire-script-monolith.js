@@ -267,7 +267,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
             reply: ['I admit it. I will write it in my log: “Silvia walked me past the torches.” Underlined twice.']
           }
         ] },
-        'First, their camp: cold ashes, a broken wagon wheel, the charred circle of the BC Ashes scratched on the rock.',
+        'First, their camp: cold ashes, a broken wagon wheel, and a phoenix over three flames, the mark of the BC Ashes, cut into the rock.',
         'They had slept there for days, waiting for someone to open the cairn for them. Now they know someone did.',
         'Second, a star on the wall of a fissure: eight points in gold leaf over a ground of blue, the gold still bright.',
         { ask: [

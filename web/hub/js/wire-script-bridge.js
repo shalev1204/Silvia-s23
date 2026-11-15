@@ -102,9 +102,9 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         cross: 'And what we saw through the glass was true: the raiders split. The four on foot heard my stone fall in the gorge and are on my tracks.',
         hide: 'And what we saw through the glass was true: the raiders split. The four on foot, one limping, walked over my head and found nothing.',
         trail: 'And what we saw through the glass was true: the raiders split. The four on foot still hunt the blue cloth, and it will not fool them long.'
-      }[b] || 'Yesterday at dawn, from the Natural Bridge, I saw the raiders stuck at the switchbacks. They split, and a few men on foot follow my tracks.';
+      }[b] || 'This morning at dawn, from the Natural Bridge, I saw the raiders stuck at the switchbacks. They split, and a few men on foot follow my tracks.';
       return beats([
-        'Silvia, I have not slept. I am sitting between the singing pillars of Cairn IV.',
+        'Silvia, I have barely slept. I am sitting between the singing pillars of Cairn IV.',
         'Cairn IV never fell: its reeds are the founders’ own. SUN, ECHO, STONE: the cairns are instruments, and the Order measured the desert with them.',
         'The last verse stopped my heart: three short calls, a pause, two long. Aurelia’s disc code, and the blink I saw in the desert in 2016.',
         { ask: [
@@ -124,7 +124,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         hermesReply: (W) => beats([
           'It rides in the brass box now, beside the grain of blue from Cairn II. Blue, then a gold star in the labyrinth, now the same star on a pebble.',
           'A river pebble in a canyon that has never seen a river. Somebody carried it here on purpose.',
-          W.chose(15, 0)
+          (W.chose(15, 0) || W.chose(15, 2))
             ? 'I told you I would look for the next star, Silvia. I did not expect it so small, or a message I fear to read to the end.'
             : 'I used to ask who walks ahead of me. Tonight I ask what they want me to find, and I am afraid to read it to the end.'
         ])
@@ -161,7 +161,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           'My pack is already by the door of the chamber, and I will sleep with my boots on.',
           'The reeds still sing in my head, SUN, ECHO, STONE, like a score I cannot stop reading.'
         ], W.choice(19)) || 'The pillars have gone quiet, and I miss them already.',
-        'One cairn left: Cairn V, above the Arch of the Solstice (Station 17). Its seal sleeps in the Solar Altar, on the raiders’ road.'
+        (g ? 'One cairn left: ' : 'One cairn left on this road: ') + 'Cairn V, above the Arch of the Solstice (Station 17). Its seal sleeps in the Solar Altar, on the raiders’ road.'
       ]);
     }
   };
@@ -180,7 +180,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       'The autumn sun rises far to the south, so its first ray falls elsewhere. If the courtyard stays blind, the last seal waits until June.',
       'I do not have until June. And the raiders’ ruts on the road east are fresh: eighteen hours to the Arch, and no sleep.',
       { ask: [
-        { text: 'Rest an hour first, please.', silviaMsg: 'Hermes, you have not slept since the pillars. Please rest an hour.', reply: ['An hour is what the raiders need to gain a day on me.', 'I will rest at the Arch, once the mirrors are set and I have earned it.'] },
+        { text: 'Rest an hour first, please.', silviaMsg: 'Eighteen hours with no sleep, Hermes? Please rest an hour first.', reply: ['An hour is what the raiders need to gain a day on me.', 'I will rest at the Arch, once the mirrors are set and I have earned it.'] },
         { text: 'Eat and drink as you go.', silviaMsg: 'Eat and drink as you walk, Hermes. Do not forget.', reply: ['Water at every ridge, dates in my left pocket, and a cloth over my mouth against the dust. The shepherd taught me.', 'Do not worry. I have been rationing water since before you could walk.'] },
         { text: 'How fresh are the ruts?', silviaMsg: 'How fresh are those ruts, Hermes? Hours? A day?', reply: ['Sharp edges, no wind on them yet: this morning, I would say.', 'They do not wander, Silvia. The raiders know this road, and they are not exploring.'] }
       ] },
@@ -231,7 +231,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           'I will turn bronze mirrors in my head all the way. ',
           'I will glance north-east at every ridge, in case a fire rises at Tower II. ',
           'My back has carried heavier things than a few men on foot. '
-        ], W.choice(21)) || '') + sealsWord(g + 3) + ' with me; the fifth waits under the Arch.',
+        ], W.choice(21)) || '') + sealsWord(g + 3) + ' with me; the seal of Cairn V waits under the Arch.',
         'Eighteen hours east without sleep: the Natural Bridge, the Lower Wash, then the dunes of Cairn V at 163°. Noon at the Arch, and a night to spare.',
         'Keep the page “Arch of the Solstice & The Solar Altar” close: the midsummer ray and its eight sun-stones.'
       ]);
@@ -262,12 +262,12 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
             ? 'Five seals, Silvia. The gates of Tower II can no longer refuse me, if there are still gates to open.'
             : 'Four seals, and the first still sleeps by the dry wash. The Servant will want it, if he lives to want it.',
           ({
-            humble: 'I bowed to him at his gates, and he opened them with his own hands. A debt like that is paid on his steps, not over a wire.',
+            humble: 'I bowed to him at his gates, and he bowed back. A debt like that is paid on his steps, not over a wire.',
             bold: 'I came through his gates like a gale, and he answered in kind. If he lives, I owe him an apology. If he does not, I owe him more.',
             observer: 'At his gates I looked before I spoke, and he noticed. This time I will not look from a distance.'
           })[W.road()] || 'I owe him a debt, and it is paid on his steps, not over a wire.',
           W.flag('coin')
-            ? 'I still have his coin: he told me to show it to whoever finds him, if fire ever rises over his tower. I think he knew.'
+            ? 'I still have his coin. ‘If ever you cannot find me, listen for stone that knocks,’ he said. I think he knew.'
             : 'The seals go into the lining of my coat, where nobody will look. Give me an hour to sew, and another to find my legs.'
         ])
       },
@@ -287,7 +287,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         silviaMsg: 'Keep that mirror close, Hermes. If the light comes back, I want you to be able to answer it.',
         hermesReply: (W) => beats([
           W.flag('blessing')
-            ? 'It hangs from the Servant’s red cord around my neck, next to the brass box with the blue and the pebble.'
+            ? 'It hangs on a cord around my neck, by the brass box with the blue and the pebble. The Servant’s red cord stays on my wrist.'
             : 'It hangs on a cord around my neck, next to the brass box with the blue and the pebble.',
           'Blue at Cairn II, gold in the labyrinth, a painted pebble at Cairn IV, and now a polished mirror. I think they are one message.',
           'The mirror is trained on Tower II. Nothing yet, only the smoke, thinner than at dawn. If the light returns, I will answer.'
