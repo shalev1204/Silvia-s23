@@ -51,14 +51,30 @@
             this.init();
             const now = this.ctx.currentTime, osc = this.ctx.createOscillator(), gain = this.ctx.createGain(), lp = this.ctx.createBiquadFilter();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(1500, now);
-            osc.frequency.exponentialRampToValueAtTime(760, now + 0.05);
+            osc.frequency.setValueAtTime(1100, now);
+            osc.frequency.exponentialRampToValueAtTime(560, now + 0.08);
             lp.type = 'lowpass'; lp.frequency.value = 2400;
             gain.gain.setValueAtTime(0.0001, now);
-            gain.gain.exponentialRampToValueAtTime(0.028, now + 0.004);
+            gain.gain.exponentialRampToValueAtTime(0.085, now + 0.004);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
             osc.connect(lp); lp.connect(gain); gain.connect(this.ctx.destination);
             osc.start(now); osc.stop(now + 0.09);
+          } catch (e) {}
+        }
+
+        // The key of a telegraph writing: a tiny dry click, a little different each time, for the letters as Hermes types
+        playTypeKey() {
+          window.__wireKeys = (window.__wireKeys || 0) + 1;
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime, len = 0.022, buf = this.ctx.createBuffer(1, Math.ceil(this.ctx.sampleRate * len), this.ctx.sampleRate), d = buf.getChannelData(0);
+            for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
+            const src = this.ctx.createBufferSource(), bp = this.ctx.createBiquadFilter(), gain = this.ctx.createGain();
+            src.buffer = buf; bp.type = 'bandpass'; bp.frequency.value = 1700 + Math.random() * 1500; bp.Q.value = 1.4;
+            gain.gain.value = 0.16 + Math.random() * 0.05;
+            src.connect(bp); bp.connect(gain); gain.connect(this.ctx.destination);
+            src.start(now);
           } catch (e) {}
         }
 
@@ -916,7 +932,7 @@
             dels(['order_field_wire_step', 'order_field_wire_choices', 'order_field_wire_completed', 'order_dawn_step', 'order_dawn_choices',
               'order_desert_station_active', 'order_messenger_unread_count', 'order_messenger_last_read_step',
               'order_satchel_expedition_item', 'order_inventory_relics', 'order_cartographer_title',
-              'order_field_inquiries_read']);
+              'order_field_inquiries_read', 'order_wire_read2', 'order_wire_asks', 'order_wire_chapters_closed', 'order_wire_marchev', 'order_wire_rests']);
           }
         };
       })();
@@ -5809,6 +5825,7 @@
         bridge: () => (window.BridgeSpyglass && window.BridgeSpyglass.done() ? window.BridgeSpyglass.choice() : null),
         hint: (id, n) => { if (window.EclipseHints && window.EclipseHints.grant) window.EclipseHints.grant(id, n); },
         // the option she picked in an event on a march (0/1), or null if it never reached her or went unanswered
+        ask: (step, part, index) => { const v = wireAsks()[step + ':' + part + ':' + (index || 0)]; return typeof v === 'number' ? v : null; },
         event: (id) => { const st = marchEvState(); for (const k of Object.keys(st)) { const e = (st[k] || []).find((x) => x.id === id); if (e) return typeof e.pick === 'number' ? e.pick : null; } return null; }
       };
       (function applyWireScript() {
@@ -6338,12 +6355,75 @@
         },
         seal_cairn_1: {
           id: "seal_cairn_1",
-          name: "Wash River Seal · Cairn I",
+          name: "The Seal of Cairn I · Wash River",
           category: "Sacred Seal",
           image: "assets/chat/sketch_cairn_one.webp",
           origin: "Wadi al-Hajar · Under Foundation of Cairn I",
           summary: "A flat sandstone disc carved with the radiant sun above a wavy water line.",
           lore: "Discovered inside the hollow bedrock beneath the third foundation of Cairn I after solving the ancient river stone trial. Its purpose is still unknown."
+        },
+        seal_cairn_2: {
+          id: "seal_cairn_2",
+          name: "The Seal of Cairn II · Sun Monolith",
+          category: "Sacred Seal",
+          image: "assets/items/item_seal_cairn_2.svg",
+          origin: "The Ridge of the Sun · Station 14 · Oct 2026",
+          summary: "A sandstone disc carved with a sun over a standing stone, with seven noon marks around the rim.",
+          lore: "It came out of the foot of the Sun Monolith once the seven noons had been set right. The stone makes the shadow, and the shadow tells the hour: that is all the carving says, and it says it plainly. Hermes keeps it next to the Seal of Cairn I."
+        },
+        seal_cairn_3: {
+          id: "seal_cairn_3",
+          name: "The Seal of Cairn III · Sandstone Labyrinth",
+          category: "Sacred Seal",
+          image: "assets/items/item_seal_cairn_3.svg",
+          origin: "The foot of Cairn III · Station 15 · Oct 2026",
+          summary: "A sandstone disc cut with a square spiral that ends in a single dot.",
+          lore: "The labyrinth does not trap anyone who walks its true road: the road is the spiral on this seal, read from the outside in. Hermes lifted it from the copper plate in the dark, with the raiders' torches moving somewhere above him."
+        },
+        seal_cairn_4: {
+          id: "seal_cairn_4",
+          name: "The Seal of Cairn IV · Natural Bridge",
+          category: "Sacred Seal",
+          image: "assets/items/item_seal_cairn_4.svg",
+          origin: "The singing pillars · Station 16 · Oct 2026",
+          summary: "A sandstone disc carved with a bridge, two pillars and three arcs of sound above them.",
+          lore: "The pillars of Cairn IV turn the night wind into a tune, and this seal is the tune written down. It was won at the end of a night of listening, after the dawn that Hermes and Silvia watched from the Natural Bridge."
+        },
+        seal_cairn_5: {
+          id: "seal_cairn_5",
+          name: "The Seal of Cairn V · Arch of the Solstice",
+          category: "Sacred Seal",
+          image: "assets/items/item_seal_cairn_5.svg",
+          origin: "The Solar Altar · Station 17 · Oct 2026",
+          summary: "A sandstone disc carved with an arch and eight rays that meet under it.",
+          lore: "The last of the five lay under the Solar Altar, where the midsummer ray falls on eight sun-stones. With it in the satchel the five Cairns are answered, and the door of the Oracle can be asked to open."
+        },
+        mirror_fragment_1: {
+          id: "mirror_fragment_1",
+          name: "Fragment I of the Mirror · The Gate of Masks",
+          category: "Mirror Fragment",
+          image: "assets/items/item_mirror_fragment_1.svg",
+          origin: "Behind the wall of masks · Tower III · Station 20",
+          summary: "A shard of silvered glass with a half-lit face scratched into its back.",
+          lore: "Set into the wall behind the masks, where only the one who named the right mask could reach it. The glass is old, but its edge is clean: someone has been looking after it. Nine pieces make the whole mirror, and this is the first."
+        },
+        mirror_fragment_2: {
+          id: "mirror_fragment_2",
+          name: "Fragment II of the Mirror · The Camera Obscura",
+          category: "Mirror Fragment",
+          image: "assets/items/item_mirror_fragment_2.svg",
+          origin: "The dark room · Tower III · Station 21",
+          summary: "A shard of silvered glass that holds the outline of a city of small towers.",
+          lore: "The city that fell on the dark wall of the Camera Obscura is still faintly in the glass, the way a candle leaves its flame on the eye. Hermes carried it down the narrow stair wrapped in his scarf."
+        },
+        mirror_fragment_3: {
+          id: "mirror_fragment_3",
+          name: "Fragment III of the Mirror · The Whispering Gallery",
+          category: "Mirror Fragment",
+          image: "assets/items/item_mirror_fragment_3.svg",
+          origin: "The Whispering Gallery · Tower III · Station 22",
+          summary: "A shard of silvered glass etched with a wave that comes back on itself.",
+          lore: "It answered the tune played backwards: the gallery gives every word back, and the mirror gives back every face. Three of the nine pieces are home now."
         },
         water_skins: {
           id: "water_skins",
@@ -6484,6 +6564,10 @@
         if (localStorage.getItem('order_seal_cairn_1') === 'true' || localStorage.getItem('order_cairn1_completed') === 'true') {
           if (!list.includes('seal_cairn_1')) list.push('seal_cairn_1');
         }
+        // the Seals of Cairns II to V and the Fragments of the Mirror are in the satchel as soon as they are won (their flags are the truth)
+        [2, 3, 4, 5].forEach((n) => { if (localStorage.getItem('order_seal_cairn_' + n) === 'true' && !list.includes('seal_cairn_' + n)) list.push('seal_cairn_' + n); });
+        [['order_masks_gate_completed', 'mirror_fragment_1'], ['order_camera_obscura_completed', 'mirror_fragment_2'], ['order_whispering_gallery_completed', 'mirror_fragment_3']]
+          .forEach(([flag, id]) => { if (localStorage.getItem(flag) === 'true' && !list.includes(id)) list.push(id); });
         if (localStorage.getItem('order_cairn_iv_completed') === 'true' && !list.includes('tuning_pebble')) list.push('tuning_pebble');
         if (localStorage.getItem('order_arch_solstice_completed') === 'true' && !list.includes('signal_mirror')) list.push('signal_mirror');
         if (localStorage.getItem('order_polybius_stele_completed') === 'true' && !list.includes('servant_key')) list.push('servant_key');
@@ -6494,8 +6578,13 @@
         }
         // The night on the Erg spends this flask. It is in the satchel only while Hermes still has oil.
         syncLampOil(list);
-        return list;
+        // in the order the expedition found them (anything unknown keeps its place at the end)
+        const rank = (id) => { const k = INVENTORY_ORDER.indexOf(id); return k < 0 ? 999 : k; };
+        return list.map((id, i) => [id, i]).sort((a, b) => (rank(a[0]) - rank(b[0])) || (a[1] - b[1])).map((x) => x[0]);
       }
+      const INVENTORY_ORDER = ['gilded_feather', 'order_wax_seal', 'surveyor_compass', 'flint_tinder', 'spyglass_lens', 'seal_cairn_1', 'water_skins', 'falcon_weight', 'lamp_oil',
+        'red_cord', 'servant_coin', 'statue_seal', 'ibis_figure', 'seal_cairn_2', 'seal_cairn_3', 'tuning_pebble', 'seal_cairn_4', 'signal_mirror', 'seal_cairn_5',
+        'servant_key', 'gilded_star', 'mirror_fragment_1', 'mirror_fragment_2', 'mirror_fragment_3'];
 
       // Hermes finds the flask in the nomads' cache at Camp VIII and says so on the Field Wire (step 7). A save that is
       // already past that step has it too. It stays until the oil is spent on the road (the fire, the duel, the night).
@@ -6702,7 +6791,7 @@
         grid.innerHTML = '';
 
         const owned = getOwnedRelicIds();
-        const TOTAL_SLOTS = 16;
+        const TOTAL_SLOTS = Math.max(16, Math.ceil(owned.length / 4) * 4);   // the satchel grows with the expedition
         if (countPill) countPill.textContent = `${owned.length} / ${TOTAL_SLOTS} SLOTS`;
 
         if (!owned.includes(selectedInventoryItemId) && owned.length > 0) {
@@ -6945,30 +7034,56 @@
       }
       // The expedition is told in chapters, one for each place Hermes goes to (a mission and its debrief). The chat shows the
       // chapter we are in; the earlier ones are one click away. A divider is always drawn; one that starts a chapter is bigger.
-      const WIRE_CHAPTERS = { 5: 'The Nomad Ruins and the Four Wells', 9: 'The Sun Monolith · Cairn II', 13: 'The Sandstone Labyrinth · Cairn III', 17: 'The Natural Bridge · Cairn IV', 21: 'The Arch of the Solstice · Cairn V',
-        25: 'Tower II in Flames · The Polybius Stele', 29: 'The Oracle of Tower II', 33: 'The Plateau and the Gate of Tower III', 37: 'The Camera Obscura', 41: 'The Whispering Gallery' };
-      let wireChapterList = [{ name: 'The Dawn · The Whispering Chasm' }], wireChapterIdx = 0, wireFirstChapter = 0;
-      function resetWireChapters() { wireChapterList = [{ name: 'The Dawn · The Whispering Chasm' }]; wireChapterIdx = 0; wireFirstChapter = 0; }
+      const WIRE_CHAPTER_ZERO = 'The Red Storm · The Salt Road and the Four Wells';
+      // Desert Path in three chapters, Stage Path in two (the Operator's division, 15 Nov 2026). The key is the first wire step of the chapter.
+      const WIRE_CHAPTERS = { 9: 'The Five Cairns · Seals of the Sun', 25: 'Tower II in Flames · The Oracle', 33: 'The Mirror Sanctuary · Tower III', 41: 'The Whispering Gallery' };
+      let wireChapterList = [{ name: WIRE_CHAPTER_ZERO }], wireChapterIdx = 0, wireFirstChapter = 0;
+      function resetWireChapters() { wireChapterList = [{ name: WIRE_CHAPTER_ZERO }]; wireChapterIdx = 0; wireFirstChapter = 0; }
       // The card that closes a chapter: what Hermes brought back, how it ended, and what Silvia chose. It opens the next chapter (so it is
-      // the first thing she sees there), before the divider.
+      // the first thing she sees there), before the divider. Keyed by the index of the chapter it closes.
       const WIRE_CHAPTER_CARDS = {
-        5: { prize: 'The Al-Qibla bearing · the water of Camp VIII', note: 'The wells were a mirage, and the real spring was under the falcon.' },
-        9: { prize: 'The Seal of Cairn II', note: 'Seven noons, and a smear of blue nobody can explain yet.' },
-        13: { prize: 'The Seal of Cairn III', note: 'Eight arches in the dark, and a gold star painted over blue.' },
-        17: { prize: 'The Seal of Cairn IV', note: 'The pillars sang the code of Aurelia’s disc.' },
-        21: { prize: 'The Seal of Cairn V', note: 'The light on Tower II answered, and then came the smoke.' },
-        25: { prize: 'The Servant alive · the Oracle’s charts safe', note: 'The Polybius Stele opened a way through the fire.' },
-        29: { prize: 'The first truth: the WHEN', note: 'The Oracle was Aurelia, alive since 1971.' },
-        33: { prize: 'Fragment I of the mirror', note: 'The Gate of a Thousand Masks.' },
-        37: { prize: 'Fragment II of the mirror', note: 'The city on the dark wall.' },
-        41: { prize: 'Fragment III of the mirror', note: 'The pins of the ellipse, and an echo played backwards.' }
+        0: { prize: 'The Al-Qibla bearing · the water of Camp VIII', note: 'The storm, the salt and a mirage of four wells: the real spring was under the falcon.' },
+        1: { prize: 'The Seals of Cairns II, III, IV and V', note: 'Seven noons, eight arches, a singing bridge and a ray of midsummer, and then the smoke.', relics: ['seal_cairn_2', 'seal_cairn_3', 'seal_cairn_4', 'seal_cairn_5'] },
+        2: { prize: 'The first truth: the WHEN', note: 'The Oracle was Aurelia, alive since 1971.', relics: ['servant_key', 'gilded_star'] },
+        3: { prize: 'Fragments I and II of the mirror', note: 'The wall of masks and the city on the dark wall.', relics: ['mirror_fragment_1', 'mirror_fragment_2'] }
       };
+      // The ceremony (hub/js/wire-ceremony.js) that closes a chapter waits at the end of it, for the new chapters from Tower II on.
+      const WIRE_CLOSED_KEY = 'order_wire_chapters_closed';
+      function wireClosedList() { try { const l = JSON.parse(localStorage.getItem(WIRE_CLOSED_KEY) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
+      function wireChapterClosed(step) { return wireClosedList().indexOf(step) >= 0; }
+      // the tester's rewind: what was decided from `step` on is forgotten (her answers in the chat, the chapters she closed, the events on the road)
+      function wireForgetFrom(step) {
+        try { localStorage.setItem(WIRE_CLOSED_KEY, JSON.stringify(wireClosedList().filter((x) => x <= step))); } catch (e) {}
+        try { localStorage.setItem(WIRE_RESTS_KEY, JSON.stringify(wireRestList().filter((x) => x < step))); } catch (e) {}
+        try { const a = wireAsks(); Object.keys(a).forEach((k) => { if (parseInt(k, 10) >= step) delete a[k]; }); localStorage.setItem(WIRE_ASKS_KEY, JSON.stringify(a)); } catch (e) {}
+        try { const m = marchEvState(); Object.keys(m).forEach((k) => { if (parseInt(k, 10) >= step) delete m[k]; }); marchEvSave(m); } catch (e) {}
+      }
+      // The rests between two talks with no station between them (see wireRestHold): which ones she has waited through
+      const WIRE_RESTS = {
+        12: { title: 'Night under the Sun Monolith · Hermes Sleeps', desc: 'He is asleep at the foot of the Monolith, with the Seal of Cairn II under his head. He will wire you at first light, before he walks down to the Sandstone Labyrinth.', button: '☾ Wait for first light ➔' },
+        20: { title: 'Between the Singing Pillars · Hermes Rests Through the Heat', desc: 'He is asleep in the shade of the pillars of Cairn IV, with the pebble in his hand. He will wire you at dusk, before he sets out for the Arch of the Solstice.', button: '☀ Wait for dusk ➔' }
+      };
+      const WIRE_RESTS_KEY = 'order_wire_rests';
+      function wireRestList() { try { const l = JSON.parse(localStorage.getItem(WIRE_RESTS_KEY) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
+      function wireRested(step) { return wireRestList().indexOf(step) >= 0; }
+      function wireRest(step) { const l = wireRestList(); if (l.indexOf(step) < 0) { l.push(step); try { localStorage.setItem(WIRE_RESTS_KEY, JSON.stringify(l)); } catch (e) {} } }
+      function wireCloseChapter(step) { const l = wireClosedList(); if (l.indexOf(step) < 0) { l.push(step); try { localStorage.setItem(WIRE_CLOSED_KEY, JSON.stringify(l)); } catch (e) {} } }
+      // what the chapter that ends before `step` holds: her choices in it (one for each station) and the relics it gave
+      function wireCeremonyContext(step) {
+        const starts = [0].concat(Object.keys(WIRE_CHAPTERS).map(Number)).sort((x, y) => x - y), at = starts.indexOf(step), from = starts[at - 1] || 0, picks = [];
+        for (let st = from; st < step; st++) {
+          const c = EXPEDITION_THREAD[st] && EXPEDITION_THREAD[st].choices, i = wireHistory[st];
+          if (c && typeof i === 'number' && c[i] && st >= 10) picks.push(String(c[i].text).replace(/<[^>]*>/g, '').replace(/[“”]/g, '').replace(/\s+/g, ' ').trim().slice(0, 90));
+        }
+        const card = WIRE_CHAPTER_CARDS[at - 1] || {};
+        return { picks: picks.slice(-4), relics: (card.relics || []).filter((id) => getOwnedRelicIds().includes(id)) };
+      }
       const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
       function wireChapterCard(prevIdx) {
-        const prev = wireChapterList[prevIdx], data = prev && WIRE_CHAPTER_CARDS[prev.step];
+        const prev = wireChapterList[prevIdx], data = prev && WIRE_CHAPTER_CARDS[prevIdx];
         if (!prev || !data) return null;
-        const from = prev.step, nextStart = (wireChapterList[prevIdx + 1] || {}).step || (from + 4), picks = [];
-        for (let st = from; st < nextStart; st++) {
+        const from = prev.step || 0, nextStart = (wireChapterList[prevIdx + 1] || {}).step || (from + 4), picks = [];
+        for (let st = Math.max(from, 10); st < nextStart; st++) {
           const c = EXPEDITION_THREAD[st] && EXPEDITION_THREAD[st].choices, i = wireHistory[st];
           if (c && typeof i === 'number' && c[i]) {
             let t = String(c[i].text).replace(/<[^>]*>/g, '').replace(/[“”]/g, '').replace(/\s+/g, ' ').trim();
@@ -6978,7 +7093,7 @@
         }
         const card = document.createElement('div');
         card.className = 'wire-chapter-card';
-        if (picks.length > 3) picks.length = 3;
+        if (picks.length > 4) picks.splice(0, picks.length - 4);
         const num = ROMAN[prevIdx + 1] || String(prevIdx + 1);
         card.innerHTML = '<svg class="wcc-seal" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="1.2 2.6"/>' +
           '<circle cx="50" cy="50" r="31" fill="none" stroke="currentColor" stroke-width="1"/><path d="M50 19 A31 31 0 0 1 50 81 Z" fill="currentColor" opacity="0.28"/><text x="50" y="57" text-anchor="middle" font-size="19" font-family="Cinzel, serif" fill="currentColor">' + num + '</text></svg>' +
@@ -6999,10 +7114,10 @@
         if (step != null && WIRE_CHAPTERS[step]) {
           wireChapterList.push({ name: WIRE_CHAPTERS[step], step });
           wireChapterIdx = wireChapterList.length - 1;
-          const card = wireChapterIdx >= 2 ? wireChapterCard(wireChapterIdx - 1) : null;
+          const card = wireChapterIdx >= 1 ? wireChapterCard(wireChapterIdx - 1) : null;
           if (card) { card.dataset.chapter = String(wireChapterIdx); wireMessagesStream.appendChild(card); carded = true; if (!wireMessagesStream.classList.contains('is-restoring')) card.classList.add('is-new'); }
           pill.classList.add('wire-chapter-start');
-          pill.dataset.kicker = 'CHAPTER ' + (wireChapterIdx + 1);
+          pill.dataset.kicker = 'CHAPTER ' + (ROMAN[wireChapterIdx + 1] || (wireChapterIdx + 1)) + ' · ' + WIRE_CHAPTERS[step];
           if (!wireMessagesStream.classList.contains('is-restoring')) wireFirstChapter = wireChapterIdx;   // a chapter that opens now is the one on screen
         }
         pill.dataset.chapter = String(wireChapterIdx);
@@ -7059,7 +7174,7 @@
       // What she has read: for each chapter, how many of Hermes's messages she has seen with the chat open. A chapter with more
       // messages than that gets a “NEW” tag in the strip and a “New messages” line where the unread ones begin. The first time
       // (no record yet) everything already there counts as read.
-      const WIRE_READ_KEY = 'order_wire_read';
+      const WIRE_READ_KEY = 'order_wire_read2';   // (the chapters were re-divided on 15 Nov 2026: the old counts mean nothing now)
       let wireRead = null, wireNew = {};
       try { wireRead = JSON.parse(localStorage.getItem(WIRE_READ_KEY) || 'null'); } catch (e) { wireRead = null; }
       const wireIncoming = (ch) => (wireMessagesStream ? wireMessagesStream.querySelectorAll('.chat-bubble-wrap.incoming:not(.chat-typing-wrap)[data-chapter="' + ch + '"]') : []);
@@ -7284,9 +7399,26 @@
         setTimeout(() => playHermesBeats(marchText(c.reply), meta, () => { updateMessengerBadge(); renderWireChoices(); }), window.__wireFast ? 30 : 700);
       }
 
+      // When Hermes says he has the seal or the fragment, it is in her satchel too: a line in the chat that opens it
+      const WIRE_FINAL_RELIC = { 12: 'seal_cairn_2', 16: 'seal_cairn_3', 20: 'seal_cairn_4', 24: 'seal_cairn_5', 36: 'mirror_fragment_1', 40: 'mirror_fragment_2', 44: 'mirror_fragment_3' };
+      function appendWireRelicChip(stepIdx) {
+        const id = WIRE_FINAL_RELIC[stepIdx], relic = id && SATCHEL_RELICS[id];
+        if (!relic || !wireMessagesStream || !getOwnedRelicIds().includes(id)) return;
+        const el = document.createElement('div');
+        el.className = 'chat-bubble-wrap system-event wire-relic-chip';
+        el.innerHTML = '<button type="button" class="wire-relic-btn"><img alt=""><span class="wrb-text"><span class="wrb-kicker">ADDED TO THE SATCHEL</span><span class="wrb-name"></span></span><span class="wrb-open">Open ➔</span></button>';
+        el.querySelector('img').src = relic.image;
+        el.querySelector('.wrb-name').textContent = relic.name;
+        el.querySelector('button').addEventListener('click', () => openSatchelInventoryModal(id));
+        el.dataset.chapter = String(wireChapterIdx);
+        wireMessagesStream.appendChild(el);
+        updateInventoryBadge();
+      }
       function appendStepFinal(stepIdx) {
-        (stepIdx >= 10 ? wireBeats(EXPEDITION_THREAD[stepIdx].hermesFinal) : [EXPEDITION_THREAD[stepIdx].hermesFinal]).forEach((b) => appendWireMessage(getCartographerTitle(), b, false, false, null, null, { type: 'expedition', step: stepIdx }));
+        if (stepIdx >= 10) drawWireSeq(EXPEDITION_THREAD[stepIdx].hermesFinal, { type: 'expedition', step: stepIdx, part: 'f' });
+        else appendWireMessage(getCartographerTitle(), EXPEDITION_THREAD[stepIdx].hermesFinal, false, false, null, null, { type: 'expedition', step: stepIdx });
         appendWireMessage('SYSTEM TELEMETRY', WIRE_FINAL_TELEMETRY[stepIdx](), true, false, null, null, { type: 'expedition', step: stepIdx });
+        appendWireRelicChip(stepIdx);
         if (stepIdx === 36) appendWireIntercept();
         appendLetterNotes(stepIdx);
         if (MARCH_LEGS[stepIdx]) appendMarchEvents(stepIdx);   // what happened on the road
@@ -7328,8 +7460,8 @@
           const initial = EXPEDITION_THREAD[stepIdx].hermesInitial;
           if (stepIdx >= 10) {
             // history draws every beat at once; a step that has just opened is spoken live, and the deck waits
-            if (live) { setTimeout(() => playHermesBeats(initial, { type: 'expedition', step: stepIdx }, () => renderWireChoices()), window.__wireFast ? 30 : (carded ? 3800 : 900)); wireBeatsPlaying = true; }
-            else wireBeats(initial).forEach((b) => appendWireMessage('HERMES · CARTOGRAPHER', b, false, false, null, null, { type: 'expedition', step: stepIdx }));
+            if (live) { setTimeout(() => playHermesBeats(initial, { type: 'expedition', step: stepIdx, part: 'i' }, () => renderWireChoices()), window.__wireFast ? 30 : 450); wireBeatsPlaying = true; }
+            else drawWireSeq(initial, { type: 'expedition', step: stepIdx, part: 'i' }, 'HERMES · CARTOGRAPHER');
           } else {
             appendWireMessage('HERMES · CARTOGRAPHER', initial, false, false, null, null, { type: 'expedition', step: stepIdx });
           }
@@ -7356,6 +7488,7 @@
         targetStep = Math.max(isSilvia ? 4 : 0, Math.min(WIRE_LAST_STEP, Number(targetStep) || 0));
         wireCurrentStep = targetStep;
         wireHistory = wireHistory.slice(0, targetStep);
+        wireForgetFrom(targetStep);
 
         try {
           localStorage.setItem('order_field_wire_step', targetStep.toString());
@@ -7490,6 +7623,7 @@
       const WIRE_BEAT_MAX = 150;
       function wireBeats(text) {
         if (Array.isArray(text)) return text.reduce((all, t) => all.concat(wireBeats(t)), []);
+        if (text && typeof text === 'object') return [];   // an interjection (see wireSeq): not a message
         const out = [];
         String(text == null ? '' : text).split(/\n\s*\n/).forEach((para) => {
           para = para.trim();
@@ -7503,31 +7637,96 @@
         });
         return out;
       }
-      let wireBeatsPlaying = false;
-      const typingLead = (t) => window.__wireFast ? 30 : Math.min(2200, 650 + t.length * 11);   // the dots, before the bubble opens
-      const readingGap = (t) => window.__wireFast ? 30 : Math.min(2600, 500 + t.length * 14);   // a breath after it, so it can be read
-      // Hermes says `texts` (a string or beats) as live messages; `onDone` runs after the last one has been typed and read
+      let wireBeatsPlaying = false, wireAskPending = false;
+      const typingLead = (t) => window.__wireFast ? 30 : Math.min(800, 260 + t.length * 4);   // the dots, before the bubble opens
+      const readingGap = (t) => window.__wireFast ? 30 : Math.min(800, 200 + t.length * 4);   // a breath after it
+      // A sequence is beats (strings) and interjections: { ask: [{ text, silviaMsg, reply, onPick }] } where Silvia says something in
+      // one tap and Hermes answers. The answer is saved by place (step:part:index) so the history draws it again.
+      const WIRE_ASKS_KEY = 'order_wire_asks';
+      function wireAsks() { try { return JSON.parse(localStorage.getItem(WIRE_ASKS_KEY) || '{}') || {}; } catch (e) { return {}; } }
+      function wireAskSave(key, i) { const o = wireAsks(); o[key] = i; try { localStorage.setItem(WIRE_ASKS_KEY, JSON.stringify(o)); } catch (e) {} }
+      function wireSeq(text) {
+        if (Array.isArray(text)) return text.reduce((all, t) => all.concat(wireSeq(t)), []);
+        if (text && typeof text === 'object' && Array.isArray(text.ask)) return [text];
+        return wireBeats(text);
+      }
+      function wireAskReply(opt) { try { return wireBeats(typeof opt.reply === 'function' ? opt.reply(window.WireScript) : opt.reply); } catch (e) { return []; } }
+      // The history: the beats at once, and for each interjection what she answered (none recorded = it did not happen)
+      function drawWireSeq(texts, meta, sender) {
+        const picks = wireAsks(); let n = 0;
+        wireSeq(texts).forEach((it) => {
+          if (typeof it === 'string') { appendWireMessage(sender || getCartographerTitle(), it, false, false, null, null, meta); return; }
+          const idx = picks[meta.step + ':' + meta.part + ':' + (n++)], opt = typeof idx === 'number' ? it.ask[idx] : null;
+          if (!opt) return;
+          appendWireMessage('SILVIA · NAVIGATOR', opt.silviaMsg, false, false, null, null, meta);
+          wireAskReply(opt).forEach((b) => appendWireMessage(sender || getCartographerTitle(), b, false, false, null, null, meta));
+        });
+      }
+      // Hermes says `texts` as live messages; `onDone` runs after the last one has been typed and read. meta.part tells where the
+      // sequence belongs ('i' opening, 'f' final, 'r0'..'r2' reply to a main choice) so that its interjections can be remembered.
       function playHermesBeats(texts, meta, onDone) {
-        const beats = wireBeats(texts), token = window.__wireTypewriterToken || 0;
+        const items = wireSeq(texts), token = window.__wireTypewriterToken || 0;
         wireBeatsPlaying = true;
-        let i = 0;
+        let i = 0, askN = 0;
         const alive = () => token === (window.__wireTypewriterToken || 0);
+        const say = (beats, then) => {
+          let k = 0;
+          const one = () => {
+            if (!alive()) return;
+            if (k >= beats.length) { then(); return; }
+            const text = beats[k++];
+            showTyping(true);
+            setTimeout(() => {
+              if (!alive()) return;
+              showTyping(false);
+              appendWireMessage(getCartographerTitle(), text, false, true, () => setTimeout(one, readingGap(text)), null, Object.assign({ slow: true }, meta || {}));
+            }, typingLead(text));
+          };
+          one();
+        };
+        const ask = (it, n, resume) => {
+          const key = (meta && meta.step) + ':' + ((meta && meta.part) || 'i') + ':' + n;
+          const choose = (idx) => {
+            const opt = it.ask[idx];
+            wireAskPending = false;
+            wireAskSave(key, idx);
+            if (wirePromptBox) wirePromptBox.style.display = 'none';
+            appendWireMessage('SILVIA · NAVIGATOR', opt.silviaMsg, false, false, null, null, meta);
+            if (typeof opt.onPick === 'function') { try { opt.onPick(window.WireScript); } catch (e) { console.warn('wire ask onPick', e); } }
+            say(wireAskReply(opt), resume);
+          };
+          if (window.__wireFast && window.__wireAsk !== 'manual') { choose(0); return; }
+          if (!wirePromptBox || !wireChoicesGrid) { choose(0); return; }
+          wireAskPending = true;
+          const header = document.getElementById('wire-prompt-header-text');
+          if (header) header.textContent = 'Say something';
+          if (wireCompletedBar) wireCompletedBar.style.display = 'none';
+          wireChoicesGrid.innerHTML = '';
+          it.ask.forEach((o, idx) => wireChoicesGrid.appendChild(makeChoicePill('💬', formatJournalCallouts(o.text), () => {
+            if (!wireAskPending) return;
+            if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+            wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+            choose(idx);
+          })));
+          wirePromptBox.style.display = 'block';
+          if (typeof scrollChatToActivePrompt === 'function') scrollChatToActivePrompt(false);
+        };
         const next = () => {
           if (!alive()) return;
-          if (i >= beats.length) { showTyping(false); wireBeatsPlaying = false; if (typeof onDone === 'function') onDone(); return; }
-          const text = beats[i++];
-          showTyping(true);
-          setTimeout(() => {
-            if (!alive()) return;
-            showTyping(false);
-            appendWireMessage(getCartographerTitle(), text, false, true, () => setTimeout(next, readingGap(text)), null, Object.assign({ slow: true }, meta || {}));
-          }, typingLead(text));
+          wireBeatsPlaying = true;
+          if (i >= items.length) { showTyping(false); wireBeatsPlaying = false; if (typeof onDone === 'function') onDone(); return; }
+          const it = items[i++];
+          if (typeof it === 'string') {
+            // run of plain beats up to the next interjection
+            const run = [it]; while (i < items.length && typeof items[i] === 'string') run.push(items[i++]);
+            say(run, next);
+          } else ask(it, askN++, next);
         };
         next();
       }
       // From Station 14 on Hermes speaks in beats; the earlier chapters keep their single messages
-      function speakHermes(text, step, onDone) {
-        if (step >= 10) { playHermesBeats(text, { type: 'expedition', step }, onDone); return; }
+      function speakHermes(text, step, onDone, part) {
+        if (step >= 10) { playHermesBeats(text, { type: 'expedition', step, part: part || 'i' }, onDone); return; }
         appendWireMessage(getCartographerTitle(), Array.isArray(text) ? text.join('\n\n') : text, false, true, onDone, null, { type: 'expedition', step });
       }
 
@@ -7657,7 +7856,7 @@
         function typeTick() {
           if (!targetSpan || !targetSpan.isConnected || myToken !== window.__wireTypewriterToken) return;
           const beat = !!(meta && meta.slow), slow = beat && !window.__wireFast;
-          const chunk = slow ? Math.min(1, totalChars - charIdx) : Math.min(Math.max(5, Math.ceil(totalChars / 70)), totalChars - charIdx);
+          const chunk = slow ? Math.min(2, totalChars - charIdx) : Math.min(Math.max(5, Math.ceil(totalChars / 70)), totalChars - charIdx);
           charIdx += (beat && (skipTyping || window.__wireFast)) ? totalChars : chunk;
           const currentSub = text.substring(0, charIdx);
 
@@ -7672,8 +7871,9 @@
             lastSoundTime = now;
           }
 
+          if (beat && !skipTyping && !window.__wireFast && sfx && sfx.playTypeKey && (charIdx % 4 < 2)) sfx.playTypeKey();
           if (charIdx < totalChars) {
-            setTimeout(typeTick, slow ? 24 : 16);
+            setTimeout(typeTick, slow ? 15 : 16);
           } else {
             if (cursorSpan) cursorSpan.remove();
             const finalFormatted = formatJournalCallouts(text).split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
@@ -8782,7 +8982,7 @@
               }
               appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg, false, false, null, null, { type: 'expedition', step: s });
               if (s >= 10 && choice.hermesReply) {
-                wireBeats(choice.hermesReply).forEach((b) => appendWireMessage(getCartographerTitle(), b, false, false, null, null, { type: 'expedition', step: s }));
+                drawWireSeq(choice.hermesReply, { type: 'expedition', step: s, part: 'r' + choiceIdx });
               } else if (choice.beats && choice.beats.length === 3) {
                 appendWireMessage(getCartographerTitle(), choice.beats[0], false, false, null, null, { type: 'expedition', step: s });
                 appendWireMessage(getCartographerTitle(), choice.beats[1], false, false, null, null, { type: 'expedition', step: s });
@@ -8838,6 +9038,7 @@
         const showWaypointBar = (title, desc, persistStep) => {
           wirePromptBox.style.display = 'none';
           wireCompletedBar.style.display = 'flex';
+          { const mapB = document.getElementById('btn-wire-to-map'), cerB = document.getElementById('btn-wire-ceremony'); if (mapB) mapB.hidden = false; if (cerB) cerB.hidden = true; }
           const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
           const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
           if (titleEl) titleEl.textContent = title;
@@ -8888,7 +9089,48 @@
           }
           return false;
         };
+        // The end of a chapter is a moment of its own: the last message has been read, the bar offers "Close the chapter", and the
+        // ceremony (hub/js/wire-ceremony.js) tells how it ended and how the next one opens. Only then does the next chapter speak.
+        const showChapterClose = (step) => {
+          const closing = window.WireCeremony.closing(step), opening = window.WireCeremony.opening(step);
+          showWaypointBar('Chapter ' + closing.num + ' complete · ' + closing.title, 'Hermes has closed the book on this chapter. When you are ready, close it too and begin Chapter ' + opening.num + ': ' + opening.title + '.', wireCurrentStep);
+          const mapB = document.getElementById('btn-wire-to-map'), cerB = document.getElementById('btn-wire-ceremony'), tx = document.getElementById('btn-wire-ceremony-text');
+          if (mapB) mapB.hidden = true;
+          if (tx) tx.textContent = 'Close the chapter ➔';
+          if (cerB) {
+            cerB.hidden = false;
+            cerB.onclick = () => {
+              if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+              cerB.disabled = true;
+              window.WireCeremony.open(step, wireCeremonyContext(step), () => { cerB.disabled = false; wireCloseChapter(step); renderWireChoices(); });
+            };
+          }
+        };
+        // A night (or a day) passes where no station stands between two talks: Hermes said "I will wire you at first light", so the
+        // next talk waits for her tap on the bar instead of arriving in the same breath.
+        const wireRestHold = (step) => {
+          const r = WIRE_RESTS[step];
+          if (!r || wireRested(step)) return false;
+          const descEl = showWaypointBar(r.title, '', step);
+          { const mapB = document.getElementById('btn-wire-to-map'); if (mapB) mapB.hidden = true; }
+          if (descEl) {
+            descEl.innerHTML = r.desc + '<div><button type="button" class="btn-wire-dream btn-wire-rest" id="btn-wire-rest">' + r.button + '</button></div>';
+            const b = descEl.querySelector('#btn-wire-rest');
+            if (b) b.onclick = (e) => {
+              e.stopPropagation();
+              if (b.disabled) return;
+              b.disabled = true;
+              if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+              wireRest(step);
+              const win = document.getElementById('view-field-wire');
+              if (win && !window.__wireFast) { win.classList.remove('wire-timeskip'); void win.offsetWidth; win.classList.add('wire-timeskip'); setTimeout(() => win.classList.remove('wire-timeskip'), 1700); }
+              setTimeout(() => renderWireChoices(), window.__wireFast ? 0 : 800);
+            };
+          }
+          return true;
+        };
         const advanceTo = (step) => {
+          if (WIRE_CHAPTERS[step] && window.WireCeremony && window.WireCeremony.has(step) && !wireChapterClosed(step)) { showChapterClose(step); return; }
           wireCurrentStep = step;
           try { localStorage.setItem('order_field_wire_step', String(step)); } catch (e) {}
           applyWireMood();
@@ -8915,7 +9157,7 @@
           }, 30000);
           return true;
         };
-        if (wireBeatsPlaying) { wirePromptBox.style.display = 'none'; wireCompletedBar.style.display = 'none'; return; }   // Hermes is still speaking: the deck waits for him
+        if (wireBeatsPlaying) { if (!wireAskPending) { wirePromptBox.style.display = 'none'; wireCompletedBar.style.display = 'none'; } return; }   // Hermes is still speaking: the deck waits for him
         if (wireCurrentStep === 36) {
           if (holdForDoor(41, 'Fragment I Is Set · 1 of 9', 'The Camera Obscura (Station 21)', 36)) return;
           advanceTo(37);   // the candles have burned down: the stair to the dark room
@@ -8973,6 +9215,7 @@
           advanceTo(11);   // Station 14 solved: the debrief (and the blue on the rim of the niche)
         }
         if (wireCurrentStep === 12) {
+          if (wireRestHold(12)) return;   // the night under the Monolith
           advanceTo(13);   // first light at the Sun Monolith, before the walk down to the labyrinth
         }
         if (wireCurrentStep === 14) {
@@ -9005,6 +9248,7 @@
           advanceTo(19);   // Station 16 solved: the song, the pebble and the raiders splitting up
         }
         if (wireCurrentStep === 20) {
+          if (wireRestHold(20)) return;   // the day of heat between the pillars
           advanceTo(21);   // dusk at Cairn IV: the October sun and the midsummer courtyard
         }
         if (wireCurrentStep === 22) {
@@ -9211,7 +9455,7 @@
           }
         }
 
-        if (wireBeatsPlaying) { wirePromptBox.style.display = 'none'; wireCompletedBar.style.display = 'none'; return; }
+        if (wireBeatsPlaying) { if (!wireAskPending) { wirePromptBox.style.display = 'none'; wireCompletedBar.style.display = 'none'; } return; }
         const currentData = EXPEDITION_THREAD[wireCurrentStep];
         if (!currentData || !currentData.choices) {
           wirePromptBox.style.display = 'none';
@@ -9411,11 +9655,11 @@
           return;
         }
 
-        showTyping(true);
+        if (justAnsweredStep < 10) showTyping(true);
 
         setTimeout(() => {
           showTyping(false);
-          if (sfx) sfx.playChimeHover();
+          if (sfx && justAnsweredStep < 10) sfx.playChimeHover();
 
           speakHermes(choice.hermesReply, justAnsweredStep, () => {
             if (justAnsweredStep === 3) {
@@ -9512,22 +9756,22 @@
                 showTyping(true);
                 setTimeout(() => {
                   showTyping(false);
-                  if (sfx) sfx.playCelestialChime();
                   speakHermes(EXPEDITION_THREAD[finalStep].hermesFinal, finalStep, () => {
                     appendWireMessage('SYSTEM TELEMETRY', WIRE_FINAL_TELEMETRY[finalStep](), true, false, null, null, { type: 'expedition', step: finalStep });
+                    appendWireRelicChip(finalStep);
                     if (finalStep === 36) setTimeout(() => { appendWireIntercept(); scrollChatToActivePrompt(true); }, 2600);
                     if (window.Desert3D && typeof window.Desert3D.refresh === 'function') window.Desert3D.refresh();
                     renderWireChoices();
                     updateMessengerBadge();
-                  });
-                }, 600);
-              }, 400);
+                  }, 'f');
+                }, 250);
+              }, 200);
             } else {
               renderWireChoices();
               updateMessengerBadge();
             }
-          });
-        }, 650);
+          }, 'r' + choiceIdx);
+        }, justAnsweredStep < 10 ? 650 : 200);
       }
 
       const wireScrollMem = {};

@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '59acdb32f995';  // 210 files, 49.2 MB
+var VERSION = '0f7b24558c2c';  // 219 files, 49.3 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -41,11 +41,18 @@ var PRECACHE = [
   "./assets/items/item_lamp_oil.png",
   "./assets/items/item_lamp_oil_half.jpg",
   "./assets/items/item_lamp_oil_half.png",
+  "./assets/items/item_mirror_fragment_1.svg",
+  "./assets/items/item_mirror_fragment_2.svg",
+  "./assets/items/item_mirror_fragment_3.svg",
   "./assets/items/item_order_wax_seal.jpg",
   "./assets/items/item_order_wax_seal.png",
   "./assets/items/item_red_cord.jpg",
   "./assets/items/item_red_cord.png",
   "./assets/items/item_scorched_lens.jpg",
+  "./assets/items/item_seal_cairn_2.svg",
+  "./assets/items/item_seal_cairn_3.svg",
+  "./assets/items/item_seal_cairn_4.svg",
+  "./assets/items/item_seal_cairn_5.svg",
   "./assets/items/item_servant_coin.jpg",
   "./assets/items/item_servant_coin.png",
   "./assets/items/item_servant_key.webp",
@@ -161,6 +168,7 @@ var PRECACHE = [
   "./hub/css/view-trail.css",
   "./hub/css/view-transmissions.css",
   "./hub/css/view-workshop.css",
+  "./hub/css/wire-ceremony.css",
   "./hub/css/wire-chapters.css",
   "./hub/css/workshop-chat.css",
   "./hub/js/a11y.js",
@@ -212,6 +220,7 @@ var PRECACHE = [
   "./hub/js/stations/s22-whispering-gallery.js",
   "./hub/js/story-point.js",
   "./hub/js/tester-panel.js",
+  "./hub/js/wire-ceremony.js",
   "./hub/js/wire-script-bridge.js",
   "./hub/js/wire-script-marches.js",
   "./hub/js/wire-script-monolith.js",

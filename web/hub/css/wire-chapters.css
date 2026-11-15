@@ -149,3 +149,82 @@
 
 /* The chat keeps its own place when she leaves and comes back, so the browser must not also adjust it when the strip or a card above changes */
 #view-field-wire, #view-field-wire * { overflow-anchor: none; }
+
+/* ---- Compact and calm: one bar at a time, no dead space at the foot, narrower messages ---- */
+/* The Hub's own bar (cairns, inventory, seeker) is an ordinary bar at the top of the page here: it scrolls away instead of floating,
+   hiding and showing over the chat head, so the two bars never overlap or animate against each other. */
+body[data-active-view="view-field-wire"] .hub-viewport-header,
+body[data-active-view="view-field-wire"] .hub-viewport-header.header-nav-floating,
+body[data-active-view="view-field-wire"] .hub-viewport-header.header-nav-hidden {
+  position: static !important; transform: none !important; transition: none !important; pointer-events: auto !important;
+  background: none !important; border: 0 !important; box-shadow: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+  padding: 0 !important; margin-bottom: 10px;
+}
+/* the page ends where the window ends */
+body[data-active-view="view-field-wire"] .hub-main-viewport { padding-bottom: 0; }
+body[data-active-view="view-field-wire"] #view-field-wire { padding-bottom: 0; }
+#view-field-wire .messenger-app-window { min-height: calc(100dvh - 70px); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+/* narrower window, narrower messages, tighter rhythm */
+#view-field-wire .camp-messenger-container { max-width: min(1040px, 100%); margin-left: auto; margin-right: auto; }
+#view-field-wire .chat-bubble-wrap { max-width: min(700px, 86%); }
+#view-field-wire .chat-bubble-wrap.outgoing { max-width: min(520px, 76%); }
+#view-field-wire .chat-bubble-wrap.system-event { max-width: min(760px, 94%); }
+#wire-messages-stream .chat-bubble-wrap.system-event { margin: 10px 0 16px; }
+#view-field-wire .messenger-reply-deck { padding: 10px 18px; }
+.wire-chapter-card { margin: 18px 0 6px; padding: 16px 20px; }
+
+/* ---- Tight vertically: a message is one slim row (text and time), a run of messages from the same voice is one block ---- */
+#view-field-wire .messenger-chat-body { padding: 12px clamp(14px, 2.5vw, 28px) 8px; gap: 5px; }
+#view-field-wire .chat-bubble-wrap .chat-bubble {
+  display: flex; align-items: flex-end; gap: 12px;
+  padding: 5px 11px 5px 13px; border-radius: 7px;
+  font-size: 0.95rem; line-height: 1.36; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+#view-field-wire .chat-bubble-wrap .chat-bubble-text { flex: 1 1 auto; min-width: 0; }
+#view-field-wire .chat-bubble-wrap .chat-bubble-text p { margin: 0 0 4px; }
+#view-field-wire .chat-bubble-wrap .chat-bubble-text p:last-child { margin-bottom: 0; }
+#view-field-wire .chat-bubble-wrap .chat-bubble-time { flex: 0 0 auto; margin: 0 0 1px; line-height: 1; font-size: 0.62rem; opacity: 0.75; white-space: nowrap; }
+#view-field-wire .chat-bubble-wrap.system-event .chat-bubble { display: block; padding: 6px 16px; font-size: 0.8rem; }
+#view-field-wire .chat-sender-name { margin: 8px 0 2px 3px; font-size: 0.62rem; line-height: 1.2; }
+/* the name is said once for a run of messages from the same voice */
+#view-field-wire .chat-bubble-wrap.incoming + .chat-bubble-wrap.incoming .chat-sender-name,
+#view-field-wire .chat-bubble-wrap.outgoing + .chat-bubble-wrap.outgoing .chat-sender-name { display: none; }
+/* like a phone chat: messages of one voice sit close (a few px apart), and the voice changing opens a real gap */
+#view-field-wire .chat-bubble-wrap.incoming + .chat-bubble-wrap.outgoing, #view-field-wire .chat-bubble-wrap.outgoing + .chat-bubble-wrap.incoming { margin-top: 12px; }
+#wire-messages-stream .chat-bubble-wrap.system-event { margin: 6px 0 8px; }
+#view-field-wire .chat-bubble-row { gap: 6px; }
+#view-field-wire .messenger-date-pill { margin: 8px 0 4px; }
+#view-field-wire .messenger-reply-deck { padding: 8px 16px; }
+#view-field-wire .messenger-app-window { min-height: calc(100dvh - 56px); }
+.wire-chapter-card { margin: 10px 0 4px; padding: 12px 18px; }
+#view-field-wire .messenger-waypoint-card { padding: 8px 14px; gap: 10px 16px; flex-wrap: nowrap; border-radius: 10px; }
+#view-field-wire .messenger-waypoint-info { flex: 1 1 auto; min-width: 0; }
+#view-field-wire .messenger-waypoint-title { font-size: 0.92rem; }
+#view-field-wire .messenger-waypoint-desc { font-size: 0.84rem; line-height: 1.35; margin-top: 2px; }
+#view-field-wire .btn-messenger-to-map { flex: 0 0 auto; padding: 7px 14px; font-size: 0.8rem; white-space: nowrap; }
+@media (max-width: 900px) { #view-field-wire .messenger-waypoint-card { flex-wrap: wrap; } }
+
+/* the line that says a seal or a fragment is now in her satchel */
+.wire-relic-chip { align-self: center; }
+.wire-relic-btn { display: flex; align-items: center; gap: 12px; padding: 6px 14px 6px 8px; cursor: pointer; color: #f3e2bd;
+  background: linear-gradient(180deg, rgba(76, 56, 34, 0.96), rgba(46, 32, 20, 0.98)); border: 1px solid rgba(214, 178, 108, 0.7); border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5), 0 0 14px rgba(214, 178, 108, 0.18); transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.wire-relic-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(0, 0, 0, 0.55), 0 0 18px rgba(214, 178, 108, 0.32); }
+.wire-relic-btn img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)); }
+.wrb-text { display: flex; flex-direction: column; text-align: left; }
+.wrb-kicker { font: 600 0.58rem 'Cinzel', serif; letter-spacing: 0.24em; color: #b9a47a; }
+.wrb-name { font: 700 0.92rem 'Cinzel', serif; letter-spacing: 0.04em; color: #fde68a; }
+.wrb-open { font: 600 0.72rem 'Cinzel', serif; letter-spacing: 0.12em; color: #d6b26c; margin-left: 6px; }
+
+.btn-wire-ceremony { background: linear-gradient(180deg, #f6dc9a, #c99a4a) !important; color: #2a1a0c !important; border-color: #f0d28a !important; animation: wcerPulse 2.4s ease-in-out infinite; }
+.btn-wire-ceremony[hidden] { display: none !important; }
+
+/* a night (or a day) passes between two talks (hub-core wireRestHold): a veil of dusk opens on the next light */
+#view-field-wire.wire-timeskip::after { content: ''; position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 40%, rgba(24, 20, 48, 0.82), rgba(4, 3, 10, 0.94)); animation: wireTimeskip 1.7s ease forwards; }
+@keyframes wireTimeskip { 0% { opacity: 0; } 35% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { #view-field-wire.wire-timeskip::after { animation: none; opacity: 0; } }
+
+/* a bar can hide its map button (the rest, the close of a chapter): [hidden] must win over the button display */
+#view-field-wire .btn-messenger-to-map[hidden] { display: none !important; }

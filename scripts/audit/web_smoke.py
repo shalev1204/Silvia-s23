@@ -88,6 +88,8 @@ SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done",
           "order_silvia_north_portal_v1": "done"}
 DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true",
                "order_gates_scene_completed": "true"}   # the gates of Tower II are behind her (the wire waits for that scene)
+# the pauses of the Field Wire she has already passed (the rest at 12 and 20, the chapter ceremonies at 25, 33, 41): for sections that start past them
+WIRE_PASSED = {"order_wire_rests": "[12,20]", "order_wire_chapters_closed": "[25,33,41]"}
 DESERT_BASE = dict(SILVIA, order_dawn_step="3", order_cairn1_completed="true", order_seal_cairn_1="true",
                    order_chasm_march_start="1", order_whispering_chasm_completed="true",
                    order_salt_playa_completed="true", order_field_wire_step="4",
@@ -401,8 +403,12 @@ def test_sun_monolith(browser):
     open_wire()
     check(get("order_field_wire_step") == "11" and choices() == 3 and "Cobalt blue" in wire_text(), "debrief at the niche: step 11 with 3 replies")
     answer_first()
-    check(get("order_field_wire_step") == "13" and "SEALS 2 / 5 · [D] + [F] = 24" in wire_text() and choices() == 3,
-          "step 12 records Seals 2 / 5, then first light at the Monolith (step 13) opens")
+    rest = js("(() => { const b = document.getElementById('btn-wire-rest'); return { b: !!b, map: document.getElementById('btn-wire-to-map').hidden, title: document.querySelector('.messenger-waypoint-title').textContent }; })()")
+    check(get("order_field_wire_step") == "12" and "SEALS 2 / 5 · [D] + [F] = 24" in wire_text() and rest["b"] and rest["map"] and "Night under the Sun Monolith" in rest["title"]
+          and "First light, Silvia" not in wire_text(), "step 12 records Seals 2 / 5, then the night under the Monolith waits for her tap", str(rest))
+    js("document.getElementById('btn-wire-rest').click()"); page.wait_for_timeout(6000)
+    check(get("order_field_wire_step") == "13" and get("order_wire_rests") == "[12]" and choices() == 3 and "First light, Silvia" in wire_text(),
+          "she waits for first light: the Monolith at dawn (step 13) opens")
 
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
@@ -484,7 +490,7 @@ def test_sandstone_labyrinth(browser):
     print("\n6. Station 15 · The Sandstone Labyrinth, end to end")
     seed = dict(DESERT_BASE, **DESERT_DONE, order_sun_monolith_completed="true", order_sun_monolith_awake="true",
                 order_seal_cairn_2="true", order_monolith_gate_seal1="true",
-                order_field_wire_step="12", order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0]")
+                order_field_wire_step="12", order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0]", **WIRE_PASSED)
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -689,8 +695,10 @@ def test_cairn_four(browser):
     open_wire()
     check(get("order_field_wire_step") == "19" and choices() == 3 and "Toward Tower II" in wire_text(), "debrief: step 19 (the code, the pebble, the raiders) with 3 replies")
     answer_first()
-    check(get("order_field_wire_step") == "21" and "SEALS 4 / 5 · [S] + [U] = 17" in wire_text() and choices() == 3,
-          "step 20 records Seals 4 / 5, then dusk at Cairn IV (step 21) opens")
+    check(get("order_field_wire_step") == "20" and "SEALS 4 / 5 · [S] + [U] = 17" in wire_text() and js("!!document.getElementById('btn-wire-rest')") and "Dusk again" not in wire_text(),
+          "step 20 records Seals 4 / 5, then the day between the pillars waits for her tap")
+    js("document.getElementById('btn-wire-rest').click()"); page.wait_for_timeout(6000)
+    check(get("order_field_wire_step") == "21" and choices() == 3 and "Dusk again" in wire_text(), "she waits for dusk: leaving Cairn IV (step 21) opens")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
     check(text.count("Dusk, Silvia") == 1 and text.count("I have not slept") == 1 and "Four seals of five" in text
@@ -741,7 +749,7 @@ def test_solstice_arch(browser):
     seed = dict(DESERT_BASE, **DESERT_DONE, order_sun_monolith_completed="true", order_seal_cairn_2="true",
                 order_sandstone_labyrinth_completed="true", order_seal_cairn_3="true", order_monolith_gate_seal1="true",
                 order_cairn_iv_completed="true", order_seal_cairn_4="true", order_cairn4_sound="off", order_field_wire_step="20",
-                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]")
+                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0]", order_wire_rests="[12,20]")   # the ceremony at 25 is part of this section
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -861,8 +869,10 @@ def test_solstice_arch(browser):
     open_wire()
     check(get("order_field_wire_step") == "23" and choices() == 3 and "smoke" in wire_text(), "debrief: step 23 (the light, the smoke) with 3 replies")
     answer_first()
-    check(get("order_field_wire_step") == "25" and "SEALS 5 / 5 · [Y] − [O] = 2" in wire_text() and choices() == 3,
-          "step 24 records Seals 5 / 5, and noon under the Arch (step 25) follows with 3 replies")
+    check(get("order_field_wire_step") == "24" and "SEALS 5 / 5 · [Y] − [O] = 2" in wire_text() and js("!document.getElementById('btn-wire-ceremony').hidden"),
+          "step 24 records Seals 5 / 5, and the bar offers to close Chapter II")
+    js("document.getElementById('btn-wire-ceremony').click()"); page.wait_for_timeout(6000)
+    check(get("order_field_wire_step") == "25" and choices() == 3 and "I meant to leave at dawn" in wire_text(), "after the ceremony, noon under the Arch (step 25) follows with 3 replies")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
     check(text.count("Dusk again, Silvia") == 1 and text.count("it is dawn again and I have not slept") == 1 and "Five seals of five" in text
@@ -951,7 +961,7 @@ def test_polybius_stele(browser):
                 order_cairn_iv_completed="true", order_seal_cairn_4="true", order_cairn4_sound="off",
                 order_arch_solstice_completed="true", order_seal_cairn_5="true", order_five_seals_celebrated="true",
                 order_cairn5_seals_at_altar="5", order_stele_sound="off", order_field_wire_step="24",
-                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]")
+                order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]", **WIRE_PASSED)
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -1289,6 +1299,10 @@ def test_oracle_horizon(browser):
           "debrief: step 31 (Aurelia) with 3 replies")
     answer_first()
     bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
+    check(get("order_field_wire_step") == "32" and "Chapter III complete" in bar and js("!document.getElementById('btn-wire-ceremony').hidden"),
+          "step 32 ends Chapter III: the bar offers to close it before Tower III", bar)
+    js("document.getElementById('btn-wire-ceremony').click()"); page.wait_for_timeout(6000)
+    bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
     check(get("order_field_wire_step") == "33" and "THE DESERT PATH IS COMPLETE" in wire_text() and "[Z] + [D] = 23" in wire_text()
           and "The Unsent Letter" in wire_text() and choices() == 3,
           "step 32 closes the Desert Path, and the morning of departure for Tower III follows (step 33)", bar)
@@ -1468,7 +1482,7 @@ MIRROR_JS = """() => ({
 
 
 def stage_page(browser, extra):
-    seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_field_wire_step": "32", **extra}
+    seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, **WIRE_PASSED, "order_field_wire_step": "32", **extra}
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -1517,7 +1531,7 @@ def test_stage_mirror(browser):
 def test_masks_gate(browser):
     print("\n14. Station 20 · The Gate of a Thousand Masks, end to end")
     seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true",
-            "order_field_wire_step": "32", "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 28)}
+            "order_field_wire_step": "32", "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 28), **WIRE_PASSED}
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
@@ -2822,7 +2836,7 @@ def test_whispering_gallery(browser):
     seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true",
             "order_masks_gate_awake": "true", "order_masks_carved": "3", "order_masks_march_bypassed": "true",
             "order_camera_obscura_completed": "true", "order_sheet_seal_41": "true",
-            "order_field_wire_step": "40", "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 36),
+            "order_field_wire_step": "40", "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 36), **WIRE_PASSED,
             "order_journal": json.dumps({"s21": {"at": now_ms - 3600 * 1000, "fails": 0, "notes": 0}})}
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
@@ -4567,7 +4581,7 @@ def test_wire_chapters(browser):
     page.add_init_script("window.__wireAllChapters = false")
     page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
     js = page.evaluate
-    js("TesterDesert.jumpTo('s17')"); page.reload(); page.wait_for_timeout(2500)
+    js("TesterDesert.jumpTo('s17'); localStorage.removeItem('order_wire_read2')"); page.reload(); page.wait_for_timeout(2500)
     js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
     st = js("""(() => { const s = document.getElementById('wire-messages-stream'), deck = document.querySelector('.messenger-reply-deck'), head = document.querySelector('.wire-fixed-head');
@@ -4579,15 +4593,17 @@ def test_wire_chapters(browser):
     js("window.scrollTo(0, 400)"); page.wait_for_timeout(300)
     pos = js("(() => ({ head: document.querySelector('.wire-fixed-head').getBoundingClientRect().top, deck: document.querySelector('.messenger-reply-deck').getBoundingClientRect().bottom, vh: innerHeight }))()")
     check(pos["head"] <= 2 and pos["deck"] <= pos["vh"] + 1, "scrolled up through the chat, the head is still at the top of the screen and the deck at the foot", str(pos))
-    check(st["num"] == st["total"] and int(st["total"]) >= 6 and "Arch of the Solstice" in st["name"] and st["hidden"] > 50 and st["earlier"],
-          "only the chapter in course is shown, with its name, its number and a way back", str(st))
+    check(st["num"] == st["total"] and int(st["total"]) == 2 and "Five Cairns" in st["name"] and st["hidden"] > 20 and st["earlier"],
+          "only the chapter in course is shown, with its name, its number and a way back (the Desert Path is told in three chapters)", str(st))
+    hub = js("(() => { const h = document.querySelector('.hub-viewport-header'); window.scrollTo(0, 900); const a = getComputedStyle(h).position; window.scrollTo(0, 200); const b = getComputedStyle(h).position; const t = getComputedStyle(h).transform; window.scrollTo(0, 0); return [a, b, t]; })()")
+    check(hub[0] == "static" and hub[1] == "static" and hub[2] == "none", "the Hub's own bar does not float over the chat: it scrolls away like the page, and only the chat head stays", str(hub))
     cards = js("[...document.querySelectorAll('.wire-chapter-card')].map(c => c.innerText.replace(/\\s+/g, ' '))")
     mood = js("document.querySelector('.messenger-app-window').dataset.mood")
-    check(len(cards) >= 4 and all("COMPLETE" in c and "✦" in c for c in cards) and any("Seal of Cairn III" in c for c in cards) and mood in ("dawn", "noon", "dusk", "night", "fire", "lamp"),
+    check(len(cards) >= 1 and all("COMPLETE" in c and "✦" in c for c in cards) and any("Al-Qibla" in c for c in cards) and mood in ("dawn", "noon", "dusk", "night", "fire", "lamp"),
           "each chapter opens with the card that closes the one before (what he brought back and what she chose), and the chat takes the light of the place", str(cards[:1]) + " / " + str(mood))
     js("document.getElementById('btn-wire-earlier').click()"); page.wait_for_timeout(500)
     st2 = js("(() => ({ name: document.getElementById('wcs-name').textContent, num: document.getElementById('wcs-num').textContent, card: !!document.getElementById('wire-earlier-card'), top: (document.querySelector('#wire-messages-stream .wire-chapter-start:not([hidden])') || document.getElementById('wire-messages-stream').firstElementChild).getBoundingClientRect().top }))()")
-    check("Natural Bridge" in st2["name"] and int(st2["num"]) == int(st["num"]) - 1 and 0 <= st2["top"] <= 400,
+    check("Red Storm" in st2["name"] and int(st2["num"]) == int(st["num"]) - 1 and 0 <= st2["top"] <= 400,
           "the earlier chapter opens above it, one at a time, and the page scrolls to its start", str(st2))
     js("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(300)
     strip_hidden = js("document.getElementById('wire-chapter-strip').hidden")
@@ -4604,16 +4620,16 @@ def test_wire_chapters(browser):
     top = js("Math.round(window.scrollY)")
     check(abs(top - before) < 8, "back from Ask Hermes the conversation is where she left it", "%s -> %s" % (before, top))
     # what is new: the first visit counts everything as read; later, messages she has not seen are marked
-    read = js("JSON.parse(localStorage.getItem('order_wire_read') || 'null')")
+    read = js("JSON.parse(localStorage.getItem('order_wire_read2') || 'null')")
     last = max(int(k) for k in read) if read else -1
-    check(read and last >= 5 and not js("!!document.getElementById('wire-new-marker')") and js("document.getElementById('wcs-new').hidden"),
+    check(read and last >= 1 and not js("!!document.getElementById('wire-new-marker')") and js("document.getElementById('wcs-new').hidden"),
           "the first time everything already there is read: no marker", str(read))
     read[str(last)] = max(0, read[str(last)] - 3)
-    js("r => localStorage.setItem('order_wire_read', JSON.stringify(r))", read)
+    js("r => localStorage.setItem('order_wire_read2', JSON.stringify(r))", read)
     page.reload(); page.wait_for_timeout(2500)
     js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2500)
-    st = js("(() => ({ marker: !!document.getElementById('wire-new-marker'), tag: !document.getElementById('wcs-new').hidden, read: JSON.parse(localStorage.getItem('order_wire_read')) }))()")
+    st = js("(() => ({ marker: !!document.getElementById('wire-new-marker'), tag: !document.getElementById('wcs-new').hidden, read: JSON.parse(localStorage.getItem('order_wire_read2')) }))()")
     check(st["marker"] and st["tag"] and st["read"][str(last)] == read[str(last)] + 3,
           "three messages she had not seen: a “New messages” line where they begin, a NEW tag on the chapter, and then they count as read", str(st))
     # the cut of a text into beats
@@ -4635,7 +4651,9 @@ def test_wire_chapters(browser):
       clearInterval(poll); return { ms: Math.round(performance.now() - t0), dots, grew, bubbles: document.querySelectorAll('.chat-bubble-wrap.incoming').length }; }""")
     ticks = js("window.__wireTicks || 0")
     check(ticks == 3, "one soft tick for each message, not a burst and not a click for every letter", str(ticks))
-    check(res["dots"] and res["grew"] and res["ms"] > 6000,
+    keys = js("window.__wireKeys || 0")
+    check(keys >= 12, "while he types there is the soft sound of a key now and then, and each message opens with its own tick", str(keys))
+    check(res["dots"] and res["grew"] and 1500 < res["ms"] < 9000,
           "Hermes's messages come one by one: the typing dots, the text typed slowly, a breath between them", str(res))
     check(not errors, "no JS errors in the chat window", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
@@ -4706,6 +4724,88 @@ def test_wire_march_events(browser):
     ctx.close()
 
 
+def test_wire_ux(browser):
+    print("\n49. The Field Wire: interjections by Silvia inside Hermes's messages, the ceremony that closes a chapter, and the satchel with every seal and fragment")
+    # --- interjections: she speaks in one tap in the middle of his messages, and the history remembers what she said
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.add_init_script("window.__wireAsk = 'manual'")
+    page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("TesterDesert.jumpTo('s14')"); page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
+    js("""() => { window.__done = false; window.__wireTest.play(['First beat.', 'Second beat.', { ask: [
+        { text: 'Be careful', silviaMsg: 'Be careful, Hermes.', reply: ['I will.', 'Promise.'] }, { text: 'Go on', silviaMsg: 'Go on!', reply: ['Right.'] }] }, 'Third beat.'], 11).then(() => { window.__done = true; }); }""")
+    page.wait_for_timeout(800)
+    st = js("""(() => ({ pills: [...document.querySelectorAll('#wire-choices-grid .messenger-choice-pill')].length, box: document.getElementById('wire-prompt-box').style.display, done: window.__done }))()""")
+    check(st["pills"] == 2 and st["box"] == "block" and not st["done"], "in the middle of his messages two quick replies wait for her and he does not go on without her", str(st))
+    js("document.querySelectorAll('#wire-choices-grid .messenger-choice-pill')[0].click()"); page.wait_for_timeout(1200)
+    tail = js("[...document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap')].slice(-6).map(n => (n.className.includes('outgoing') ? 'S: ' : 'H: ') + n.querySelector('.chat-bubble').innerText.replace(/\\s+/g, ' '))")
+    check(js("window.__done") and any(t.startswith("S: Be careful") for t in tail) and any("Promise" in t for t in tail) and "Third beat" in tail[-1] and json_has(js("localStorage.getItem('order_wire_asks')"), "11:i:0", 0),
+          "her line appears, he answers differently to each option, the talk goes on, and her answer is saved", str(tail))
+    check(not errors, "no JS errors with the interjections", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # --- the ceremony: the chapter ends, the bar offers to close it, and the next one opens after
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("TesterDesert.jumpTo('s17')"); page.reload(); page.wait_for_timeout(2500)
+    js("""() => { localStorage.setItem('order_field_wire_step', '24'); localStorage.setItem('order_field_wire_completed', 'true');
+      const c = JSON.parse(localStorage.getItem('order_field_wire_choices') || '[]'); while (c.length < 24) c.push(0); c.length = 24; localStorage.setItem('order_field_wire_choices', JSON.stringify(c));
+      localStorage.removeItem('order_wire_chapters_closed'); }""")
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
+    bar = js("""(() => ({ cer: !document.getElementById('btn-wire-ceremony').hidden, map: document.getElementById('btn-wire-to-map').hidden,
+      title: document.querySelector('.messenger-waypoint-title').textContent, step: localStorage.getItem('order_field_wire_step'), closed: localStorage.getItem('order_wire_chapters_closed') }))()""")
+    check(bar["cer"] and bar["map"] and "Chapter II complete" in bar["title"] and bar["step"] == "24" and not bar["closed"],
+          "at the end of a chapter the next one waits: the bar offers “Close the chapter” and nothing new is said yet", str(bar))
+    js("document.getElementById('btn-wire-ceremony').click()"); page.wait_for_timeout(2500)
+    res = js("""(() => ({ closed: JSON.parse(localStorage.getItem('order_wire_chapters_closed') || '[]'), step: localStorage.getItem('order_field_wire_step'), overlay: document.getElementById('wire-ceremony').hidden,
+      divider: [...document.querySelectorAll('#wire-messages-stream .wire-chapter-start')].map(d => d.textContent + '|' + d.dataset.kicker).pop() }))()""")
+    check(res["closed"] == [25] and res["step"] == "25" and res["overlay"] and "CHAPTER III" in (res["divider"] or "") and "TOWER II IN FLAMES" in (res["divider"] or "").upper(),
+          "the ceremony plays, the chapter is closed for good, and Chapter III opens with its title in the chat", str(res))
+    check(not errors, "no JS errors in the ceremony", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+    # --- the satchel: the Seals of Cairns II to V and the three Fragments of the Mirror are real objects, in order, and the chat says so
+    ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
+    page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
+    js = page.evaluate
+    js("TesterDesert.jumpTo('s17')"); page.reload(); page.wait_for_timeout(2500)
+    js("""() => { ['order_seal_cairn_1', 'order_seal_cairn_2', 'order_seal_cairn_3', 'order_seal_cairn_4', 'order_seal_cairn_5', 'order_masks_gate_completed', 'order_camera_obscura_completed', 'order_whispering_gallery_completed'].forEach((k) => localStorage.setItem(k, 'true')); }""")
+    page.reload(); page.wait_for_timeout(2500)
+    js("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
+    owned = js("window.getOwnedRelicIds()")
+    want = ["seal_cairn_1", "seal_cairn_2", "seal_cairn_3", "seal_cairn_4", "seal_cairn_5", "mirror_fragment_1", "mirror_fragment_2", "mirror_fragment_3"]
+    idx = [owned.index(w) if w in owned else -1 for w in want]
+    check(all(i >= 0 for i in idx) and idx == sorted(idx), "the five seals and the three fragments are in the satchel, in the order the expedition found them", str(owned))
+    info = js("""(() => window.getOwnedRelicIds().filter((id) => /^(seal_cairn_[2-5]|mirror_fragment_[1-3])$/.test(id)).map((id) => { const r = window.SATCHEL_RELICS[id]; return [id, !!(r && r.name && r.image && r.lore && r.origin && r.summary && r.category)]; }))()""")
+    check(len(info) == 7 and all(x[1] for x in info), "each new object has a name, a picture, an origin and its story", str(info))
+    imgs = js("""async () => Promise.all(window.getOwnedRelicIds().filter((id) => /^(seal_cairn_[2-5]|mirror_fragment_[1-3])$/.test(id)).map((id) => fetch(window.SATCHEL_RELICS[id].image).then((r) => r.ok)))""")
+    check(all(imgs) and len(imgs) == 7, "their pictures load", str(imgs))
+    js("window.openSatchelInventoryModal('seal_cairn_2')"); page.wait_for_timeout(500)
+    inv = js("""(() => ({ filled: document.querySelectorAll('#si-items-grid .si-mc-slot.is-filled').length, slots: document.querySelectorAll('#si-items-grid .si-mc-slot').length, pill: document.getElementById('si-count-pill').textContent,
+      title: (document.querySelector('.si-mc-slot.active') || {}).title || '' }))()""")
+    check(inv["filled"] >= 12 and inv["slots"] >= inv["filled"] and "Seal of Cairn II" in inv["title"], "the satchel opens with the seal she was told about, and it has room for all of them", str(inv))
+    js("window.closeSatchelInventoryModal()")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(2000)
+    chips = js("[...document.querySelectorAll('.wire-relic-chip .wrb-name')].map(e => e.textContent)")
+    check(any("Cairn II " in c for c in chips) and any("Cairn III" in c for c in chips) and any("Cairn IV" in c for c in chips),
+          "when Hermes says he has a seal in his satchel, the chat shows it is in hers too, and opens it", str(chips))
+    check(not errors, "no JS errors with the satchel", "; ".join(sorted(set(errors))[:3]))
+    ctx.close()
+
+
+def json_has(raw, key, value):
+    import json
+    try:
+        return json.loads(raw or "{}").get(key) == value
+    except Exception:
+        return False
+
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -4726,7 +4826,7 @@ SECTIONS = {
     "gamecine": test_game_cinematics,
     "visions": test_clepsydra_visions, "gatesmarch": test_gates_march, "testerworld": test_tester_world,
     "balance": test_balance,
-    "dream": test_stones_dream, "spyglass": test_bridge_spyglass, "wirechat": test_wire_chapters, "wiremarch": test_wire_march_events,
+    "dream": test_stones_dream, "spyglass": test_bridge_spyglass, "wirechat": test_wire_chapters, "wiremarch": test_wire_march_events, "wireux": test_wire_ux,
 }
 # The short pass skips the long desert games; keep the newest built station at the end of this list
 QUICK = ["pages", "views", "wire", "ledger", "profiles", "tester", "cloud", "hints", "early", "previously", "notebook", "pause", "ambience", "ashes", "speaker", "letters", "journey", "seals", "a11y", "offline", "mirror", "gallery", "chasm", "veil", "portal", "playahold", "playa", "balance", "lexicon", "reduced", "cinematic", "road", "gamecine"]

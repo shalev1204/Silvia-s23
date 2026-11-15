@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Fragment of the broken mirror">
+<defs>
+<linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="0.35" stop-color="#b9c2cb"/><stop offset="0.6" stop-color="#e8edf1"/><stop offset="1" stop-color="#a8b9a6"/></linearGradient>
+<filter id="sh"><feDropShadow dx="3" dy="6" stdDeviation="5" flood-color="#000" flood-opacity="0.55"/></filter>
+</defs>
+<g filter="url(#sh)"><polygon points="92,168 258,84 420,150 448,330 300,432 128,380" fill="url(#m)" stroke="#8a6a44" stroke-width="9" stroke-linejoin="round"/></g>
+<polygon points="92,168 258,84 420,150 448,330 300,432 128,380" fill="none" stroke="#e5cfa1" stroke-width="2.5" stroke-linejoin="round" transform="translate(256 256) scale(0.94) translate(-256 -256)"/>
+<path d="M120 190 L250 110" stroke="#fff" stroke-opacity="0.7" stroke-width="7" stroke-linecap="round"/>
+<path d="M150 250 L200 214" stroke="#fff" stroke-opacity="0.45" stroke-width="4" stroke-linecap="round"/>
+<g fill="none" stroke="#2f3b48" stroke-opacity="0.75" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M170 330 V250 H206 V292 H240 V220 H278 V270 H312 V200 H350 V330 Z"/><path d="M160 330 H360"/><circle cx="330" cy="168" r="14"/></g>
+</svg>
