@@ -238,4 +238,5 @@ button.spy-chip:disabled { cursor: default; opacity: 0.5; }
 @media (prefers-reduced-motion: reduce) {
   .dream-film .df-scratch, .dream-film .df-leak, .dream-film .df-specks, .dream-film .df-hair, .dream-film .df-flick, #dream-stage .gates-canvas, .dream-mote i, .spy-hint-btn.is-pulse { animation: none; }
   .dream-film { transition-duration: 0.01s; }
+  .dream-film .df-flash.is-on { animation: none; opacity: 0; }   /* no white flashes for anyone who asked for calm */
 }

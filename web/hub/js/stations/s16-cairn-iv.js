@@ -84,7 +84,7 @@
       const isDone = () => get(KEYS.done) === 'true';
       const versesSung = () => (isDone() ? VERSES.length : Math.max(0, Math.min(VERSES.length, parseInt(get(KEYS.verses) || '0', 10) || 0)));
       const countHintOn = () => get(KEYS.countHint) === 'true';
-      const soundOn = () => get(KEYS.sound) !== 'off';
+      const soundOn = () => get(KEYS.sound) !== 'off' && get('order_ambience_muted') !== 'true';   // the global speaker button silences the pillars too
 
       // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
       const hints = window.EclipseHints;
@@ -657,7 +657,7 @@
         const pebbleStone = new T.Mesh(new T.SphereGeometry(0.16, 18, 12), new T.MeshStandardMaterial({ map: P.canvasTex(128, 64, (g, w, h) => {
           g.fillStyle = '#2a4f8f'; g.fillRect(0, 0, w, h);
           g.fillStyle = '#f2c14e'; g.beginPath();
-          for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 6 : 15; g.lineTo(w * 0.75 + Math.cos(a) * r, h / 2 + Math.sin(a) * r); }
+          for (let i = 0; i < 16; i++) { const a = -Math.PI / 2 + i * Math.PI / 8, r = i % 2 ? 7 : 15; g.lineTo(w * 0.75 + Math.cos(a) * r, h / 2 + Math.sin(a) * r); }
           g.closePath(); g.fill();
         }), roughness: 0.55, metalness: 0.05, emissive: 0x1a2a50, emissiveIntensity: 0.4 }));
         pebbleStone.scale.set(1, 0.62, 0.85); pebbleStone.rotation.y = -0.5;   // the star faces the close-up

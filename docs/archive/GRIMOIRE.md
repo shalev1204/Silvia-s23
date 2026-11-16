@@ -1,5 +1,7 @@
 # Grimoire · El Diario de Cuero del Cartógrafo
 
+> 🗄️ **ARCHIVO HISTÓRICO (archivado el 16-nov-2026).** Ya no es una fuente vigente: puede contradecir el estado actual. Consulte [docs/GAME_MASTER_GUIDE.md](../GAME_MASTER_GUIDE.md).
+
 > **Estado:** Artefacto físico adquirido y en preparación para entrega.  
 > **Fecha de entrega:** 11 de septiembre de 2026 (Italia).  
 > **Método de entrega:** Aparición física junto al alféizar de una ventana, como dejado por la última paloma mensajera.  

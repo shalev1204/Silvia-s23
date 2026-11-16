@@ -1,7 +1,9 @@
 # Session Log — Sesión 1 (1 sep 2026)
 
+> 🗄️ **ARCHIVO HISTÓRICO (archivado el 16-nov-2026).** Ya no es una fuente vigente: puede contradecir el estado actual. Consulte [docs/GAME_MASTER_GUIDE.md](../GAME_MASTER_GUIDE.md).
+
 > Cronología de todo lo decidido en la primera sesión de planificación.  
-> Para datos estructurados → [PROJECT_MASTER.md](../PROJECT_MASTER.md)
+> Para datos estructurados → [PROJECT_MASTER.md](../../PROJECT_MASTER.md)
 
 ---
 
@@ -132,4 +134,4 @@ YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.
 
 ## Archivos generados en sesión 1
 
-Ver [docs/ASSETS.md](ASSETS.md)
+Ver [docs/ASSETS.md](../ASSETS.md)

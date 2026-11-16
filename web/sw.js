@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '60fc1eb4950b';  // 219 files, 49.3 MB
+var VERSION = '31077f3b65a8';  // 223 files, 49.4 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -32,6 +32,7 @@ var PRECACHE = [
   "./assets/items/item_falcon_weight.png",
   "./assets/items/item_flint_juniper.jpg",
   "./assets/items/item_flint_tinder.png",
+  "./assets/items/item_founders_lamp.svg",
   "./assets/items/item_gilded_feather.jpg",
   "./assets/items/item_gilded_feather.png",
   "./assets/items/item_gilded_star.webp",
@@ -46,6 +47,7 @@ var PRECACHE = [
   "./assets/items/item_mirror_fragment_3.svg",
   "./assets/items/item_order_wax_seal.jpg",
   "./assets/items/item_order_wax_seal.png",
+  "./assets/items/item_raiders_survey.svg",
   "./assets/items/item_red_cord.jpg",
   "./assets/items/item_red_cord.png",
   "./assets/items/item_scorched_lens.jpg",
@@ -131,6 +133,7 @@ var PRECACHE = [
   "./hub/css/hint-ladder.css",
   "./hub/css/layout.css",
   "./hub/css/ledger-balance.css",
+  "./hub/css/ledger-complete.css",
   "./hub/css/living-mirror.css",
   "./hub/css/path-themes.css",
   "./hub/css/previously.css",
@@ -190,6 +193,7 @@ var PRECACHE = [
   "./hub/js/hub-core.js",
   "./hub/js/journey-profile.js",
   "./hub/js/ledger-balance.js",
+  "./hub/js/ledger-complete.js",
   "./hub/js/mirror-speaker.js",
   "./hub/js/offline.js",
   "./hub/js/previously.js",

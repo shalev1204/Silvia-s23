@@ -1451,10 +1451,20 @@
     returnFocusTo = document.activeElement;
     modal.style.display = 'flex';
     modal.classList.remove('closing');
-    setup3D();
-    handleResize();
-    startLoop();
-    start();
+    try {
+      setup3D();
+      handleResize();
+      startLoop();
+      start();
+    } catch (err) {
+      // a device that cannot draw the scene must not trap the story: the scene counts as lived and the road goes on
+      try { console.warn('scene could not start', err); } catch (e) {}
+      try { stopLoop(); } catch (e) {}
+      if (!ns.replay) { try { localStorage.setItem(KEY, JSON.stringify({ done: true, choice: 'skipped', failed: true })); } catch (e) {} }
+      modal.style.display = 'none';
+      var cb = ns.onDone; ns.onDone = null;
+      if (cb) cb();
+    }
   }
   function close(andContinue) {
     if (modal.style.display === 'none') return;

@@ -1,5 +1,7 @@
 # HANDOFF · Stage Path (para continuar en una sesión local)
 
+> 🗄️ **ARCHIVO HISTÓRICO (archivado el 16-nov-2026).** Ya no es una fuente vigente: puede contradecir el estado actual. Consulte [docs/GAME_MASTER_GUIDE.md](../GAME_MASTER_GUIDE.md).
+
 > Estado a 20-10-2026. Léelo junto con `docs/STAGE_PATH_BIBLE.md` (diseño y canon) y `CLAUDE.md` / `AGENTS.md`.
 
 ## Dónde está todo

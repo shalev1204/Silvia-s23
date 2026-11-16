@@ -485,7 +485,7 @@
   color: var(--gl-c, #ccc);
   font-weight: 700;
 }
-:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-name small { opacity: 0.65; font-weight: 400; letter-spacing: 0.04em; text-transform: none; margin-left: 4px; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-name small { opacity: 0.88; font-weight: 400; letter-spacing: 0.04em; text-transform: none; margin-left: 4px; }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-bubble {
   padding: 8px 12px;
   border-radius: 14px;

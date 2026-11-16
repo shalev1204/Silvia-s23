@@ -389,7 +389,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
   };
 
   // =========================================================================================
-  // 43 · Station 22 debrief: the words of the Ashes, the mirrored tune, Fragment III and the Line of the Echo
+  // 43 · Station 22 debrief: the words of the Ashes, the mirrored tune, Fragment III and Aurelia's three words
   // =========================================================================================
   S[43] = {
     hermesInitial: (W) => [
@@ -408,7 +408,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       ] },
       "Before they left I heard their last words: ‘Leave it. She will come.’ They are not hunting us, Silvia. They are waiting for you.",
       "You played it from the last note to the first, the way a mirror would, and a little door opened in the wall.",
-      "Inside the door, scratched in Aurelia’s own old hand, there was a line for your Ledger: [J] × 2 = [T]. Three questions, and only one of me. Pick."
+      "Inside the door, scratched in Aurelia’s own old hand, there were three words: ‘Listen, and answer.’ Three questions, and only one of me. Pick."
     ],
     choices: [
       {
@@ -421,12 +421,12 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         ]
       },
       {
-        text: "I will solve the line.",
-        silviaMsg: "I will put [J] × 2 = [T] in my Ledger and solve it.",
+        text: "What do the words mean?",
+        silviaMsg: "What does ‘Listen, and answer’ mean, Hermes?",
         hermesReply: [
-          "Twice J is T. And you found T long ago, before the sand.",
-          "I could do the sum on my fingers, and I will not. This one is yours.",
-          "Aurelia says the Order liked its echoes exact: a sound that comes back twice as strong is not an echo. It is an answer."
+          "Aurelia says the Order liked its echoes exact: a sound that comes back is not an echo. It is an answer.",
+          "The Ashes played the tune the right way round, and the niche stayed shut. You listened, and then you answered, backwards.",
+          "I think that is the whole lesson of this hall, Silvia. Whoever listens well is already answering."
         ]
       },
       {
@@ -447,7 +447,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       return clean([
         "We sleep by the west pin, in our coats on the cold floor. Only drops of water now, and the columns settling.",
         c === 0 ? "‘She will come.’ I fall asleep on those words, and I wake up on them."
-          : c === 1 ? "The line is in your Ledger, and I will not peek at the sum. I will only lie here and guess, badly, until I sleep."
+          : c === 1 ? "‘Listen, and answer.’ I will not ask what she meant. I will only lie here and listen, badly, until I sleep."
           : c === 2 ? "Aurelia is whispering toward the east end again, very softly, in her sleep. It comes back to me clear as a bell."
           : W.ask(43, 'i', 0) === 2 ? "I keep hearing the Ashes’ dreadful notes, every one correct, and none of them felt."
           : null,

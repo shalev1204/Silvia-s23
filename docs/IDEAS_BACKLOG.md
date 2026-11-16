@@ -1,5 +1,8 @@
 # IDEAS BACKLOG · mejoras propuestas (20-10-2026)
 
+> ⚠️ **HISTÓRICO (20-10-2026). El estado real de las 22 ideas está en [docs/guide/03_STAGE_PATH_AND_FINALE.md](guide/03_STAGE_PATH_AND_FINALE.md) §5; las decisiones del 16-nov-2026 (final, Torre I, Ledger) están en [docs/GAME_MASTER_GUIDE.md](GAME_MASTER_GUIDE.md) §5.0. Las referencias «idea #N» del código siguen apuntando aquí**
+
+
 > Lista de 22 ideas aportada por el Operador, agrupadas por tipo. Se especifican **una a una, en conversación con el Operador**, y después se implementan. Este documento es el registro vivo: cada idea pasa por `propuesta → especificada → implementada → verificada`.
 > Esfuerzo: S (horas) · M (una sesión) · L (varias). Si algo choca con la Biblia Maestra o con `AGENTS.md`, manda la Biblia.
 
@@ -311,7 +314,7 @@ La frase del Email 1 (*You were never only the seeker, you were always the treas
 - `web/index.html`: **29.247 → 4.039 líneas**. 27 hojas en `web/hub/css/` (8 de estación en `stations/`) y 18 scripts en `web/hub/js/` (`hub-core.js` de 7.868 líneas, `profiles.js`, 11 de estación en `stations/` y 5 piezas: mapa del amanecer, alforja y Cairn I, tester, atajos y tormenta). El pequeño script del `<head>` que fija el tema antes de pintar sigue en línea.
 - **Prueba de identidad**: al volver a meter cada archivo en línea sale, byte a byte, el `index.html` anterior. Único cambio de texto: 3 `url('./assets/…')` del CSS pasan a `../../assets/…`, porque en una hoja externa la ruta se resuelve desde su carpeta.
 - Smoke completo: **206 comprobaciones en verde** (382 s). `lint_lore_and_vocabulary.py` limpio y ahora también revisa `.css` (antes el CSS estaba dentro del HTML y sí se revisaba). Por `file://`: carga sin errores, 30 hojas, perfiles y Espejo Vivo presentes.
-- Actualizados `docs/HANDOFF_STAGE_PATH.md` (patrón por estación), `docs/WEB_ECOSYSTEM.md`, `docs/REPOSITORY_STRUCTURE.md` y `web/README.md`.
+- Actualizados `docs/archive/HANDOFF_STAGE_PATH.md` (patrón por estación), `docs/WEB_ECOSYSTEM.md`, `docs/REPOSITORY_STRUCTURE.md` y `web/README.md`.
 - Nota: un error en un archivo ya no detiene a los siguientes (antes, un fallo en el núcleo paraba todo el `<script>`).
 
 ### 18. Smoke más rápido (M) · implementada y verificada (20-10-2026)

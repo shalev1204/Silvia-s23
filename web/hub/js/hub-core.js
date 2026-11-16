@@ -779,7 +779,9 @@
           {
             id: 's15', tag: 'Station 15', label: 'The Sandstone Labyrinth · Cairn III', flag: 'order_sandstone_labyrinth_completed', built: true,
             complete() { set('order_labyrinth_march_start', '1'); set('order_labyrinth_awake', 'true'); set('order_labyrinth_star_seen', 'true'); set('order_labyrinth_camp_seen', 'true'); set('order_sandstone_labyrinth_completed', 'true'); set('order_seal_cairn_3', 'true'); },
-            reset() { dels(['order_stones_dream', 'order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed', 'order_five_seals_celebrated']); }
+            reset() { dels(['order_labyrinth_howto', 'order_labyrinth_cine_intro', 'order_stones_dream', 'order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed', 'order_five_seals_celebrated',
+              'order_labyrinth_finds', 'order_labyrinth_overheard', 'order_labyrinth_escape', 'order_labyrinth_cine_outro']);
+              if (typeof window.removeRelicFromInventory === 'function') { window.removeRelicFromInventory('founders_lamp'); window.removeRelicFromInventory('raiders_survey'); } }
           },
           {
             id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', flag: 'order_cairn_iv_completed', built: true,
@@ -787,7 +789,7 @@
               if (!get('order_stones_dream')) set('order_stones_dream', JSON.stringify({ done: true, skipped: true }));
               if (!get('order_bridge_spyglass')) set('order_bridge_spyglass', JSON.stringify({ done: true, choice: 'skipped' }));
               set('order_cairn4_march_start', '1'); set('order_cairn4_awake', 'true'); set('order_cairn4_verses', '3'); set('order_cairn_iv_completed', 'true'); set('order_seal_cairn_4', 'true'); },
-            reset() { dels(['order_bridge_spyglass', 'order_cairn_iv_completed', 'order_cairn4_awake', 'order_cairn4_verses', 'order_cairn4_key_fails', 'order_cairn4_hint', 'order_cairn4_song_fails', 'order_cairn4_count_hint', 'order_seal_cairn_4', 'order_cairn4_march_start', 'order_cairn4_march_bypassed', 'order_five_seals_celebrated']); dropRelic('tuning_pebble'); }
+            reset() { dels(['order_cairn4_howto', 'order_cairn4_cine_intro', 'order_bridge_spyglass', 'order_cairn_iv_completed', 'order_cairn4_awake', 'order_cairn4_verses', 'order_cairn4_key_fails', 'order_cairn4_hint', 'order_cairn4_song_fails', 'order_cairn4_count_hint', 'order_seal_cairn_4', 'order_cairn4_march_start', 'order_cairn4_march_bypassed', 'order_five_seals_celebrated']); dropRelic('tuning_pebble'); }
           },
           {
             id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', flag: 'order_arch_solstice_completed', built: true,
@@ -2064,7 +2066,8 @@
               rewards: [
                 { icon: '📅', label: 'The WHEN', desc: '18 – 20 December' },
                 { icon: '⭐', label: 'The Gilded Star', desc: 'Painted for the navigator' },
-                { icon: '🧮', label: '2 New Equations', desc: '[Z] + [D] = 23 · [I] + [E] = 12' }
+                { icon: '🧮', label: '2 New Equations', desc: '[I] + [E] = 12 · [I] + [J] = 18' },
+                { icon: '🔣', label: '2 New Glyphs', desc: 'I and J, for the Order’s alphabet' }
               ],
               btnText: 'Revisit the Inner Chamber ➔',
               action: open
@@ -3312,9 +3315,8 @@
         { id: 'cairn5-lg', station: 'Station 17 · The light on Tower II', name: 'The Second Line of Light', expr: 'L + G', l1: 'L', op: '+', l2: 'G', target: 23, unit: '', requires: 'order_arch_solstice_completed' },
         { id: 'stele-hu', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Well', expr: 'H − U', l1: 'H', op: '-', l2: 'U', target: 16, unit: '', requires: 'order_polybius_stele_completed' },
         { id: 'stele-mt', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Hatch', expr: 'M + T', l1: 'M', op: '+', l2: 'T', target: 25, unit: '', requires: 'order_polybius_stele_completed' },
-        { id: 'oracle-zd', station: 'Station 19 · The back of the disc', name: 'The Line of the Rim', expr: 'Z + D', l1: 'Z', op: '+', l2: 'D', target: 23, unit: '', requires: 'order_oracle_horizon_completed' },
         { id: 'oracle-ie', station: 'Station 19 · The back of the disc', name: 'The Line of the Heart', expr: 'I + E', l1: 'I', op: '+', l2: 'E', target: 12, unit: '', requires: 'order_oracle_horizon_completed' },
-        { id: 'gallery-jt', station: 'Station 22 · Inside the door of the niche', name: 'The Line of the Echo', expr: 'J × 2', l1: 'J', op: 'x2', l2: 'T', target: null, unit: '', requires: 'order_whispering_gallery_completed' }
+        { id: 'oracle-ij', station: 'Station 19 · The back of the disc', name: 'The Line of the Shared Cell', expr: 'I + J', l1: 'I', op: '+', l2: 'J', target: 18, unit: '', requires: 'order_oracle_horizon_completed' }
       ];
 
       // Desert equations only appear once their station is solved, so the Ledger never spoils them
@@ -5026,7 +5028,7 @@
           step: 32,
           completed: true,
           get hermesFinal() {
-            return "Two lines were scratched on the back of the disc, Silvia, under my old engraving, in a hand I would know anywhere: [Z] + [D] = 23 and [I] + [E] = 12. Into your Cipher Ledger with them.\n\nAnd she sent you something: a star of gold leaf on a card of lapis blue, painted while we talked. 'For the navigator who brought him back,' she said.\n\nThe Desert Path is done. The first truth is yours: the WHEN, the eighteenth to the twentieth of December. The second waits at the Stage Tower, with the Mirror Speaker. The road ends where the curtain rises.";
+            return "Two lines were scratched on the back of the disc, Silvia, under my old engraving, in a hand I would know anywhere: [I] + [E] = 12 and [I] + [J] = 18. Into your Cipher Ledger with them.\n\nAnd she sent you something: a star of gold leaf on a card of lapis blue, painted while we talked. 'For the navigator who brought him back,' she said.\n\nThe Desert Path is done. The first truth is yours: the WHEN, the eighteenth to the twentieth of December. The second waits at the Stage Tower, with the Mirror Speaker. The road ends where the curtain rises.";
           }        },
         {
           // The Stage Path begins: the morning of departure from Tower II, with the unsent letter and the new sheets
@@ -5179,9 +5181,9 @@
           hermesFinal: "We are at the foot of the stair, at the door of a long hall with no corners. Columns all round it, and the dark in the middle. At the far end two voices are whispering, and I cannot make out one word.\n\nOpen Path III on your Quest Map, Silvia, and stand with me in the gallery. You have the page. I have two ears, and they are not as young as yours."
         },
         {
-          // Station 22 debrief: the words of the Ashes, the mirrored tune, Fragment III and the Line of the Echo
+          // Station 22 debrief: the words of the Ashes, the mirrored tune, Fragment III and Aurelia's three words
           step: 43,
-          hermesInitial: "Fragment III is in my scarf with the other two, Silvia. They do not hum any more when they touch: they sing, very softly, the five bells of the niche, backwards.\n\nAnd we heard the Ashes. 'Leave it. She will come.' I have been turning those five words over all night. They are not hunting us. They are waiting for you. Aurelia says the line in the niche is for your Ledger: [J] × 2 = [T].",
+          hermesInitial: "Fragment III is in my scarf with the other two, Silvia. They do not hum any more when they touch: they sing, very softly, the five bells of the niche, backwards.\n\nAnd we heard the Ashes. 'Leave it. She will come.' I have been turning those five words over all night. They are not hunting us. They are waiting for you. Aurelia says the three words scratched inside the niche door are for you: ‘Listen, and answer.’",
           choices: [
             {
               id: "choice-43-she",
@@ -5191,9 +5193,9 @@
             },
             {
               id: "choice-43-line",
-              text: "I will solve the line.",
-              silviaMsg: "I will put [J] × 2 = [T] in my Ledger and solve it, Hermes.",
-              hermesReply: "Twice J is T. You found T long ago, in the desert. Aurelia says the Order liked its echoes exact: a sound that comes back twice as strong is not an echo, it is an answer."
+              text: "What do the words mean?",
+              silviaMsg: "What does ‘Listen, and answer’ mean, Hermes?",
+              hermesReply: "Aurelia says the Order liked its echoes exact: a sound that comes back is not an echo, it is an answer. And whoever listens well is already answering."
             },
             {
               id: "choice-43-aurelia",
@@ -5773,7 +5775,7 @@
           title: "What was in the niche of the gallery?",
           category: "Tower III",
           group: "stage",
-          answer: "The niche at the west pin opens to a tune of six bells, played from its last note to its first: the gallery is a mirror for sound, and a mirror gives everything back in reverse. The Ashes played it note for note, the right way round, and it stayed shut for them. Inside, on grey velvet, lay Fragment III, with an arch and the edge of a balcony in it, and inside its little door Aurelia had scratched a line for your Ledger: [J] × 2 = [T]."
+          answer: "The niche at the west pin opens to a tune of six bells, played from its last note to its first: the gallery is a mirror for sound, and a mirror gives everything back in reverse. The Ashes played it note for note, the right way round, and it stayed shut for them. Inside, on grey velvet, lay Fragment III, with an arch and the edge of a balcony in it, and inside its little door Aurelia had scratched three words: ‘Listen, and answer.’"
         }
       ];
       window.FIELD_INQUIRIES = FIELD_INQUIRIES;
@@ -6378,16 +6380,34 @@
           image: "assets/items/item_seal_cairn_3.svg",
           origin: "The foot of Cairn III · Station 15 · Oct 2026",
           summary: "A sandstone disc cut with a square spiral that ends in a single dot.",
-          lore: "The labyrinth does not trap anyone who walks its true road: the road is the spiral on this seal, read from the outside in. Hermes lifted it from the copper plate in the dark, with the raiders' torches moving somewhere above him."
+          lore: "The labyrinth does not trap anyone who walks its true road: the road is the spiral on this seal, read from the outside in. Hermes lifted it from the copper plate in the dark, with the raiders' torches moving somewhere in the dark."
+        },
+        founders_lamp: {
+          id: "founders_lamp",
+          name: "The Founders' Lamp",
+          category: "Expedition Supply",
+          image: "assets/items/item_founders_lamp.svg",
+          origin: "A niche in the Sandstone Labyrinth · Station 15",
+          summary: "A small bronze oil lamp with a lid shaped like a shell and a long curled handle.",
+          lore: "The founders left lamps in niches along their labyrinth, for whoever came after them to measure the stone. This one still held oil, thick as honey. Hermes filled his own lamp from it and walked the rest of the night with three steps of light around him instead of two."
+        },
+        raiders_survey: {
+          id: "raiders_survey",
+          name: "The Raiders' Copy of the Survey",
+          category: "Evidence",
+          image: "assets/items/item_raiders_survey.svg",
+          origin: "The sand by the Southern Mouth · Station 15",
+          summary: "A folded copy of the founders' survey, tied with string round an iron bar, the five cairns ringed in soot.",
+          lore: "The BC Ashes dropped it by the Southern Mouth: an iron bar like the ones that scarred the lid of Cairn II, and round it a copy of the founders' survey, with all five cairns ringed in soot. It explains how they knew where the seals were. It does not explain who copied it for them."
         },
         seal_cairn_4: {
           id: "seal_cairn_4",
-          name: "The Seal of Cairn IV · Natural Bridge",
+          name: "The Seal of Cairn IV · Sentry of the Canyon",
           category: "Sacred Seal",
           image: "assets/items/item_seal_cairn_4.svg",
           origin: "The singing pillars · Station 16 · Oct 2026",
           summary: "A sandstone disc carved with a bridge, two pillars and three arcs of sound above them.",
-          lore: "The pillars of Cairn IV turn the night wind into a tune, and this seal is the tune written down. It was won at the end of a night of listening, after the dawn that Hermes and Silvia watched from the Natural Bridge."
+          lore: "The pillars of Cairn IV turn the night wind into a tune, and this seal is the tune written down. It was won at the end of a night of listening, in the gorge below the Sentinel Mesa."
         },
         seal_cairn_5: {
           id: "seal_cairn_5",
@@ -6583,7 +6603,7 @@
         return list.map((id, i) => [id, i]).sort((a, b) => (rank(a[0]) - rank(b[0])) || (a[1] - b[1])).map((x) => x[0]);
       }
       const INVENTORY_ORDER = ['gilded_feather', 'order_wax_seal', 'surveyor_compass', 'flint_tinder', 'spyglass_lens', 'seal_cairn_1', 'water_skins', 'falcon_weight', 'lamp_oil',
-        'red_cord', 'servant_coin', 'statue_seal', 'ibis_figure', 'seal_cairn_2', 'seal_cairn_3', 'tuning_pebble', 'seal_cairn_4', 'signal_mirror', 'seal_cairn_5',
+        'red_cord', 'servant_coin', 'statue_seal', 'ibis_figure', 'seal_cairn_2', 'seal_cairn_3', 'founders_lamp', 'raiders_survey', 'tuning_pebble', 'seal_cairn_4', 'signal_mirror', 'seal_cairn_5',
         'servant_key', 'gilded_star', 'mirror_fragment_1', 'mirror_fragment_2', 'mirror_fragment_3'];
 
       // Hermes finds the flask in the nomads' cache at Camp VIII and says so on the Field Wire (step 7). A save that is
@@ -7280,13 +7300,13 @@
         26: () => '✦ SEALS ' + sealsAtAltar() + ' / 5 · TO TOWER II, TOWARD THE SMOKE (6 H) · ARRIVAL AFTER DARK ✦',
         28: () => '✦ THE SERVANT IS SAFE · [H] − [U] = 16 · [M] + [T] = 25 RECORDED · BEARING 348° NNW · SEALS ' + sealsAtWell() + ' / 5 ✦',
         30: () => '✦ SEALS 5 / 5 · DOWN THE INNER STAIR OF TOWER II · AUDIENCE WITH THE ORACLE ✦',
-        32: () => '✦ THE FIRST TRUTH · WHEN: 18 – 20 DECEMBER · [Z] + [D] = 23 · [I] + [E] = 12 RECORDED · THE DESERT PATH IS COMPLETE ✦',
+        32: () => '✦ THE FIRST TRUTH · WHEN: 18 – 20 DECEMBER · [I] + [E] = 12 · [I] + [J] = 18 RECORDED · THE DESERT PATH IS COMPLETE ✦',
         34: () => '✦ EIGHT NEW JOURNAL PAGES RECEIVED · EAST ACROSS THE PLATEAU TO TOWER III (18 H) · KEEP “THE GATE OF A THOUSAND MASKS” CLOSE ✦',
         36: () => '✦ THE GATE OPENED · SILVER · FRAGMENT I SET · 1 / 9 · A NOTE SEALED IN ASH ✦',
         38: () => '✦ THE DARK ROOM · A HOLE IN THE WALL · “THE CAMERA OBSCURA” READY · FOUR CHANGES TO FIND ✦',
         40: () => '✦ THE HIDEOUT FOUND · THE NARROW HOUSE · FRAGMENT II SET · 2 / 9 ✦',
         42: () => '✦ THE GALLERY · TWO PINS NOBODY DREW · “THE WHISPERING GALLERY” READY · LISTEN AT THE WEST ONE ✦',
-        44: () => '✦ THE NICHE OPENED · THE TUNE MIRRORED · FRAGMENT III SET · 3 / 9 · [J] × 2 = [T] RECORDED ✦'
+        44: () => '✦ THE NICHE OPENED · THE TUNE MIRRORED · FRAGMENT III SET · 3 / 9 ✦'
       };
 
       // ---- Events on the march ----
@@ -9231,7 +9251,7 @@
           if (!dreamt && localStorage.getItem('order_sandstone_labyrinth_completed') === 'true') {
             const descEl = showWaypointBar('Hermes Sleeps in the Rocks · A Dream of 1998', '', 16);
             if (descEl) {
-              descEl.innerHTML = 'He will not cross the hardpan before dark. While he sleeps he dreams of his first expedition, and at dusk he will tell it to you: the page “The Five Geodetic Cairns”.'
+              descEl.innerHTML = 'He will not cross the hardpan before dark. While he sleeps he dreams of his first expedition, and at dusk he will tell it to you. Next: enter the dream of 1998, the page “The Five Geodetic Cairns”.'
                 + '<div><button type="button" class="btn-wire-dream" id="btn-wire-dream">🕰️ Enter the dream of 1998 ➔</button></div>'
                 + (isCarlesTester() ? '<div style="margin-top:8px;"><button type="button" class="btn-admin-skip-dream" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:\'Cinzel\',serif; font-size:0.72rem; cursor:pointer;">⏩ Skip the dream (tester)</button></div>' : '');
               const enter = descEl.querySelector('#btn-wire-dream');

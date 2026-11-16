@@ -9,6 +9,8 @@
 
 Antes de responder o realizar cualquier modificación de código, texto o maquetación, **TODO AGENTE DEBE CONSULTAR**:
 
+0. **[`docs/GAME_MASTER_GUIDE.md`](docs/GAME_MASTER_GUIDE.md)** — **LEER PRIMERO**:
+   - **Guía definitiva y global del juego**: estado de las 28 estaciones y de cada hoja, recompensas, Cipher Ledger, calendario, **qué falta para terminar el juego**, decisiones pendientes del Operador y resolución de conflictos entre guías. Anexos detallados en [`docs/guide/`](docs/guide/). Ante discrepancia: papel impreso > código > esta guía > Biblias.
 1. **[`docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md`](docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)**:
    - **La Biblia Maestra Canónica (Versión 6.0)**: Fuente de verdad absoluta e inmutable.
    - Contiene el 100% de la historia cronológica (1970–2026), todos los emails enviados, las 6 transmisiones de audio literales palabra por palabra, las 9 estaciones iniciales, la arquitectura del bloqueo de 48h del Hub Central por la tormenta de arena roja, las deducciones algebraicas completas de *The Cipher Ledger* y el vocabulario canónico blindado.
@@ -17,9 +19,9 @@ Antes de responder o realizar cualquier modificación de código, texto o maquet
 3. **[`docs/DESERT_ODYSSEY_BIBLE.md`](docs/DESERT_ODYSSEY_BIBLE.md)**:
    - Desert Path (Estaciones 10 a 19, Hojas 08 a 18): travesía por los 5 Cairns, el Monolito Solar y *The Oracle's Horizon*.
 4. **[`docs/STAGE_PATH_BIBLE.md`](docs/STAGE_PATH_BIBLE.md)**:
-   - Stage Path (Estaciones 20 a 28, Hojas 19 a 26): los 8 fragmentos de espejo, el Espejo Roto Vivo, el Cuaderno de Aurelia y la Torre del Escenario.
-5. **[`docs/HANDOFF_STAGE_PATH.md`](docs/HANDOFF_STAGE_PATH.md)**:
-   - Estado de entrega, inventario de maquetación de 16 caras A5 y verificación de impresión.
+   - Stage Path (Estaciones 20 a 28, Hojas 19 a 26): los 9 fragmentos de espejo, el Espejo Roto Vivo, el Cuaderno de Aurelia y la Torre del Escenario.
+5. **[`docs/guide/03_STAGE_PATH_AND_FINALE.md`](docs/guide/03_STAGE_PATH_AND_FINALE.md)**:
+   - Estado real de las Estaciones 20 a 28 (lo impreso en las 16 caras A5 y lo que falta por construir), Torre I, Bóveda y final. *(El antiguo `HANDOFF_STAGE_PATH.md` está archivado en `docs/archive/`.)*
 6. **[`docs/REPOSITORY_STRUCTURE.md`](docs/REPOSITORY_STRUCTURE.md)**:
    - Mapa de directorios actualizado con las 26 hojas del diario y herramientas.
 7. **[`.agents/rules/user-preferences.md`](.agents/rules/user-preferences.md)**:
@@ -30,7 +32,7 @@ Antes de responder o realizar cualquier modificación de código, texto o maquet
 ## 2. 📖 RESUMEN EJECUTIVO DEL LORE Y UNIVERSO NARRATIVO
 
 ### ¿Qué es Silvia's 23?
-Una caza del tesoro inmersiva no lineal de ~56 días creada para el 23.º cumpleaños de **Silvia**.
+Una caza del tesoro inmersiva no lineal (arrancó el 1-sep-2026; los «56 días» del Email 1 son su primera fase y el cierre es el WHEN, 18–20 dic) creada para el 23.º cumpleaños de **Silvia**.
 - **La Protagonista:** Silvia. Extraordinaria resolviendo acertijos y descifrando códigos. Interactúa en **inglés**. Ella es la única y absoluta protagonista que resuelve cada misterio.
 - **El Operador / Creador:** Carles. Diseña y programa el ecosistema.
 - **La Orden Ficticia:** **The Eclipse Order** (símbolo sagrado: **◐** disco mitad luz / mitad penumbra; contacto sagrado: **22:22**; correo oficial: `theeclipseorder.quest@gmail.com`).
@@ -42,14 +44,14 @@ Para revelar la ubicación y fecha del regalo, Silvia debe recorrer los tres cam
 | Camino | Torre Antigua | Guardián Canónico | Misterio Revelado | Puzles y Eventos Clave |
 |---|---|---|---|---|
 | ✨ **Constellation Path** | **Tower I: The Alpine Observatory** | **The Cartographer of Distant Light** | **WHAT**<br>(Las 2 entradas de ballet) | Asalto al observatorio; robo del Astrolabio; despertar de la Flor Celeste; 6 transmisiones de audio; cartas astrales. |
-| 🏜️ **Desert Path** | **Tower II: The Sandstone Sanctuary** | **The Oracle**<br>*(guía del desierto sin rostro)* | **WHEN**<br>(Fecha y hora del evento) | Los 5 Cairns; bloqueo de 48h por la gran tormenta de arena roja; el Monolito Solar; el Laberinto de Arenisca; *The Oracle's Horizon*. |
-| 🎭 **Stage Path** | **Tower III: The Stage Tower**<br>*(The Mirror Sanctuary)* | **The Mirror Speaker**<br>*(guardiana del reflejo)* | **WHERE**<br>(Ciudad y teatro) | Los 8 fragmentos de espejo; el Espejo Roto Vivo; la Sala de Máscaras; la Linterna Caleidoscópica; el Cuaderno de Aurelia (1974). |
+| 🏜️ **Desert Path** | **Tower II: The Sandstone Sanctuary** | **The Oracle**<br>*(guía del desierto sin rostro)* | **WHEN**<br>(18–20 dic 2026, sin hora) | Los 5 Cairns; bloqueo de 48h por la gran tormenta de arena roja; el Monolito Solar; el Laberinto de Arenisca; *The Oracle's Horizon*. |
+| 🎭 **Stage Path** | **Tower III: The Stage Tower**<br>*(The Mirror Sanctuary)* | **The Mirror Speaker**<br>*(guardiana del reflejo)* | **WHERE**<br>(Ciudad y teatro) | Los 9 fragmentos de espejo; el Espejo Roto Vivo; la Sala de Máscaras; la Linterna Caleidoscópica; el Cuaderno de Aurelia (cartas de 1970–71). |
 
 ### El Mito de Hermes y Aurelia (El Secreto de la Orden)
 - **1970–1971**: En el Alpine Observatory (Tower I), el joven y soberbio astrónomo **Hermes** intentaba forzar los secretos de las bóvedas cósmicas. Su compañera, la artista y astrónoma **Aurelia**, le enseñó que el amor era la única luz verdadera (*"You were always the treasure"*). Hermes le entregó un disco de latón grabado a mano como voto sagrado.
 - **El Cataclismo de 1971**: Un violento terremoto partió el puente colgante de granito sobre el abismo de *Deserti Limen*. Aurelia cayó al vacío abrazando el disco para salvar las cartas celestes del incendio.
 - **Los 45 años de soledad de « The Cartographer » (1971–2016)**: Creyéndola muerta y consumido por la culpa, Hermes renunció para siempre a su nombre, vistió ropas de nómada alpino y se convirtió en **The Cartographer**. Pasó décadas reconstruyendo el observatorio y buscando los restos de Aurelia sin éxito.
-- **La Supervivencia de Aurelia (1974)**: Aurelia no pereció en la caída; sobrevivió en las ruinas del cañón y halló refugio en **The Stage Tower (Tower III)**. Allí investigó el Espejo Roto y dejó su cuaderno manuscrito (*Cuaderno de Aurelia*, Hojas 21B, 23B, 25B del diario) con sus memorias antes de desaparecer en las cumbres.
+- **La Supervivencia de Aurelia (1971)**: Aurelia no pereció en la caída; el Servant la halló y desde entonces es **The Oracle** de la Torre II (canon secreto hasta la Estación 19; Biblia Maestra §12). Sus cartas y bocetos de 1970–71 (*Cuaderno de Aurelia*, hojas impresas 21A, 23B y 25B del diario) acompañan el Stage Path.
 - **Septiembre 2026**: Silvia despierta *The Celestial Flower*. Fuerzas hostiles asaltan el Alpine Observatory y roban **The Astrolabe of Distant Light**. El Cartógrafo escapa al desierto por el acueducto y envía el diario físico a Italia. Juntos rastrean a los asaltantes, cruzan la tormenta y descifran las Tres Torres para abrir **The Vault of the Grand Eclipse**.
 
 ---

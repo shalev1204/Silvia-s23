@@ -1,4 +1,6 @@
 # LORE & GAMEPLAY BIBLE — SILVIA'S 23RD BIRTHDAY
+
+> ⚠️ **PARCIALMENTE HISTÓRICO (sep-2026).** Valen los principios y reglas de diseño (§1–§5); el estado de los juegos (§6), la tabla del alfabeto (§7, valores antiguos) y la «Fase D» son anteriores a la Biblia Maestra y a [docs/GAME_MASTER_GUIDE.md](GAME_MASTER_GUIDE.md), que mandan.
 **Versión**: 1.0 · **Estado**: Canon Oficial · **Fecha**: Septiembre 2026
 
 Este documento constituye la referencia absoluta y vinculante para el diseño de puzzles, guión narrativo y desarrollo web en el ecosistema de *Silvia's 23*. Ningún agente o desarrollador puede alterar o contradecir estos principios sin aprobación expresa del Operador.

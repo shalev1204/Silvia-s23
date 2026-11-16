@@ -154,6 +154,7 @@ def start_server(port=PORT, override=None):
 
 def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
     ctx = browser.new_context(viewport={"width": 1280, "height": 900}, reduced_motion="reduce" if reduced_motion else "no-preference")
+    ctx.set_default_timeout(60000); ctx.set_default_navigation_timeout(120000)   # a busy machine loads the Hub slowly: a slow load is not a failure
     page = ctx.new_page()
     errors = []
     page.on("pageerror", lambda e: errors.append("JS error: " + str(e)[:200]))
@@ -165,7 +166,7 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
         # the openings and endings of the Salt Playa and the Desert Lexicon play once: the tests that are not about them find them seen
         if cine_seen:
             seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen",
-                         "order_labyrinth_cine_intro": "seen", "order_labyrinth_howto": "seen",
+                         "order_labyrinth_cine_intro": "seen", "order_labyrinth_cine_outro": "seen", "order_labyrinth_howto": "seen",
                          "order_cairn4_cine_intro": "seen", "order_cairn4_howto": "seen",
                          "order_cairn5_cine_intro": "seen", "order_cairn5_howto": "seen",
                          "order_stele_cine_intro": "seen", "order_stele_howto": "seen",
@@ -436,9 +437,9 @@ def test_sun_monolith(browser):
     ctx.close()
 
 
-def solve_escape(level, reach):
-    """Shortest list of moves (dx, dy) out of the labyrinth, by search over (square, turn mod period).
-    Independent of the page's own code: it only reads the level and the torch rule."""
+def solve_escape(level, reach, start=None, goal=None, t0=0):
+    """Shortest list of moves (dx, dy) out of the labyrinth (or from `start` at turn `t0` to `goal`), by search over
+    (square, turn mod period). Independent of the page's own code: it only reads the level and the torch rule."""
     from collections import deque
     from math import gcd
     cols, rows = level["cols"], level["rows"]
@@ -462,8 +463,9 @@ def solve_escape(level, reach):
                 out.add((x, y))
         return out
 
-    start, goal = tuple(level["start"]), tuple(level["exit"])
-    prev, queue = {(start, 0): None}, deque([(start, 0)])
+    start = tuple(start or level["start"])
+    goal = tuple(goal or level["exit"])
+    prev, queue = {(start, t0 % period): None}, deque([(start, t0 % period)])
     while queue:
         (x, y), t = queue.popleft()
         if (x, y) == goal:
@@ -546,7 +548,11 @@ def test_sandstone_labyrinth(browser):
     js("window.__labyrinth.settle()")
     w = js("window.__labyrinth.world()")
     guards_now = [r[st["t"] % len(r)] for r in level["guards"]]
-    check(w["gl"] and 0 < w["walls"] < w["wallsTotal"] and w["tiles"] == 15 and w["lit"] > 0 and w["hermes"] == [6, 0]
+    lamp = js("window.__labyrinth.lamp()")
+    sx, sy = level["start"]
+    tiles = sum(1 for y in range(level["rows"]) for x in range(level["cols"]) if abs(x - sx) <= lamp and abs(y - sy) <= lamp)
+    tiles += 1 if json.loads(get("order_field_wire_choices"))[13] == 0 else 0
+    check(w["gl"] and 0 < w["walls"] < w["wallsTotal"] and w["tiles"] == tiles and w["lit"] > 0 and w["hermes"] == [6, 0]
           and w["raiders"] == guards_now and w["rings"] >= 1 and w["post"],
           "3D: the lamp has raised only the walls near the cairn, the torches stand on their squares and light the ground",
           f"walls {w['walls']}/{w['wallsTotal']}, tiles {w['tiles']}, lit {w['lit']}, raiders {w['raiders']} vs {guards_now}")
@@ -575,6 +581,51 @@ def test_sandstone_labyrinth(browser):
     w = js("window.__labyrinth.world()")
     check(w["walls"] == w["wallsTotal"] and w["lit"] == 0 and w["star"] and w["camp"] and w["rings"] == 0,
           "3D: out through the cleft, the whole labyrinth stands up and the torchlight goes", str({k: w[k] for k in ("walls", "wallsTotal", "lit", "rings")}))
+
+    # The reward rises over the labyrinth: his road in gold on the founders' plan, the seal, the two lines, the finds still in the dark
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-sandstone-labyrinth .chasm3d-reward'))")
+    rq = lambda sel: js("(s => [...document.querySelectorAll('#modal-sandstone-labyrinth .chasm3d-reward ' + s)].length)", sel)
+    check("The Third Seal" in reward() and "Sheet" not in reward()
+          and js("[...document.querySelectorAll('#modal-sandstone-labyrinth .rw-eq')].map(e => e.getAttribute('aria-label')).join('|')") == "W plus A equals 26|N minus E equals 9"
+          and js("document.querySelector('#modal-sandstone-labyrinth .laby-rw-road').points.length") >= 40
+          and rq(".laby-rw-find") == 3 and rq(".laby-rw-find.is-have") == 0 and "0/3" in reward() and rq(".laby-rw-again") == 1
+          and "Never seen" in reward() and rq(".laby-rw-mark.is-star") == 1 and rq(".laby-rw-mark.is-camp") == 1
+          and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')"),
+          "the reward rises: his road in gold, Seal III, [W] + [A] = 26 and [N] − [E] = 9, three finds still in the dark", reward()[:200].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and modal_open(), "Escape puts the reward away, the labyrinth stays open")
+    js("document.getElementById('btn-laby-reward').click()"); page.wait_for_timeout(300)
+    check("The Third Seal" in reward(), "🏆 See your reward opens it again")
+
+    # Back into the dark for the three finds: each in its dead end, each reached and left without standing in torchlight
+    js("document.querySelector('#modal-sandstone-labyrinth .laby-rw-again').click()"); page.wait_for_timeout(400)
+    check(js("window.__labyrinth.replaying()") and not reward() and js("window.__labyrinth.state().x") == level["start"][0]
+          and not js("document.getElementById('btn-laby-up').disabled"), "Back into the dark: Hermes is at the cairn again and the torches walk")
+    finds = js("window.__labyrinth.finds")
+    pos, t, caught = tuple(level["start"]), 0, False
+    for goal in [tuple(f["at"]) for f in finds] + [tuple(level["exit"])]:
+        road = solve_escape(level, reach, start=pos, goal=goal, t0=t)
+        for dx, dy in road:
+            js(f"window.__labyrinth.step({dx}, {dy})")
+        pos, t = goal, t + len(road)
+        if goal != tuple(level["exit"]) and js("window.__labyrinth.state().lives") != 3:
+            caught = True
+    check(not caught and sorted(js("window.__labyrinth.found()")) == ["chalk", "lamp", "survey"] and js("window.__labyrinth.lamp()") == 3
+          and not js("window.__labyrinth.replaying()"), "the solver walks him to the chalk, the founders' lamp and the survey unseen, and out again",
+          str(js("window.__labyrinth.found()")))
+    inv = json.loads(get("order_inventory_relics") or "[]")
+    check("founders_lamp" in inv and "raiders_survey" in inv, "the Founders' Lamp and the Raiders' Copy of the Survey are in the satchel")
+    page.wait_for_timeout(3200)
+    check("3/3" in reward() and rq(".laby-rw-find.is-have") == 3 and rq("button.laby-rw-find.is-new") == 2 and rq(".laby-rw-again") == 0
+          and rq(".laby-rw-mark.is-find") == 3, "the reward again: 3/3 finds, two new relics to open, nothing left in the dark", reward()[:160].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(js("document.getElementById('modal-item-acquired').style.display") == "flex" and "Founders" in js("document.getElementById('iac-title').textContent"),
+          "leaving the reward shows the new relic cards, one after the other")
+    js("window.closeItemAcquiredModal()"); page.wait_for_timeout(200)
+    check("Survey" in js("document.getElementById('iac-title').textContent"), "then the second card")
+    js("window.closeItemAcquiredModal()"); page.wait_for_timeout(200)
+    heard = js("window.__labyrinth.heard()")
+    check(len(heard) >= 1, "Hermes overheard the raiders from the dark", str(heard))
     page.click("#btn-close-labyrinth"); page.wait_for_timeout(300)
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
@@ -583,9 +634,11 @@ def test_sandstone_labyrinth(browser):
 
     open_wire()
     check(get("order_field_wire_step") == "15" and choices() == 3 and "gold leaf" in wire_text(), "debrief: step 15 with the gold star and 3 replies")
+    check("H · 98" in wire_text() and "copy of the founders’ survey" in wire_text(), "what the dark gave up is on the Field Wire: the survey and his own chalk")
     answer_first()
-    check(get("order_field_wire_step") == "17" and "SEALS 3 / 5 · [W] + [A] = 26" in wire_text() and choices() == 3,
-          "step 16 records Seals 3 / 5, then dusk at the hardpan (step 17) opens")
+    check(get("order_field_wire_step") == "17" and "SEALS 3 / 5 · [W] + [A] = 26" in wire_text() and choices() == 3
+          and "dream of 1998" in wire_text() and "founders’ lamp" in wire_text(),
+          "step 16 records Seals 3 / 5 (with the lamp and the chalk), then dusk at the hardpan (step 17) opens")
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
     check(text.count("First light, Silvia") == 1 and text.count("I am out, Silvia") == 1 and "Three seals of five" in text
@@ -1284,6 +1337,8 @@ def test_oracle_horizon(browser):
     w = js("window.__oracle.world()")
     check(w.get("phase") == "end" and w.get("onAltar"), "3D: she lays the disc on the altar and the camera steps back", w)
     check("gilded_star" in js("window.getOwnedRelicIds()"), "the Gilded Star is in the satchel")
+    check(js("document.querySelectorAll('#oracle-victory .rw-glyph').length") == 2 and js("[...document.querySelectorAll('#oracle-victory .rw-letter')].map(e => e.textContent).join('')") == "IJ",
+          "the reward gives the two last glyphs of the Desert Path: I and J")
     page.click("#btn-oracle-finish"); page.wait_for_timeout(1200)
     check(js("getComputedStyle(document.getElementById('stage-passage-overlay')).display") != "none" and get("order_stage_passage_seen") == "true",
           "from the desert to the stage: the passage plays once")
@@ -1292,7 +1347,26 @@ def test_oracle_horizon(browser):
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
     ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
-    check("eq-item-oracle-zd" in ids and "eq-item-oracle-ie" in ids, "Ledger shows [Z] + [D] = 23 and [I] + [E] = 12")
+    check("eq-item-oracle-ie" in ids and "eq-item-oracle-ij" in ids and "eq-item-oracle-zd" not in ids, "Ledger shows [I] + [E] = 12 and [I] + [J] = 18")
+    # the last two letters complete the alphabet: with the 26 numbers in her Ledger a short scene plays once and never shows a number
+    check(js("window.EclipseLedgerComplete.complete()") is False, "the Ledger is not complete before she has her numbers")
+    VALUES = dict(O=23, A=7, K=26, G=22, P=21, B=17, V=12, E=2, T=16, F=6, X=15, Q=14, Z=5, R=3, D=18, C=24,
+                  W=19, N=11, S=13, U=4, Y=25, L=1, H=20, M=9, I=10, J=8)
+    for ch, n in VALUES.items():
+        js(f"window.EclipseLedger.set('{ch}', {n})")
+    check(js("window.EclipseLedgerComplete.complete()") is True, "with all 26 numbers the Ledger reads as complete")
+    page.wait_for_timeout(2500)
+    check(js("!!document.getElementById('ledger-complete-overlay')") and get("order_ledger_complete_seen") == "true"
+          and "The Alphabet Is Whole" in js("document.getElementById('ledger-complete-overlay').textContent"),
+          "the scene of the whole alphabet plays once she completes the Ledger")
+    page.wait_for_timeout(11000)
+    scene = js("document.querySelector('#ledger-complete-overlay .ledger-complete-lines').textContent")
+    check("Aurelia" in scene and "Hermes" in scene and "key" in scene and not any(ch.isdigit() for ch in scene.replace("1971", "")),
+          "Aurelia and Hermes speak, and no number from the Ledger is shown", scene[:120])
+    page.click("#btn-ledger-complete-close"); page.wait_for_timeout(300)
+    check(js("!document.getElementById('ledger-complete-overlay')"), "the scene closes")
+    js("window.EclipseLedger.set('J', 9)"); js("window.EclipseLedger.set('J', 8)"); page.wait_for_timeout(2500)
+    check(js("!document.getElementById('ledger-complete-overlay')"), "it never plays a second time")
 
     open_wire()
     check(get("order_field_wire_step") == "31" and choices() == 3 and "She did not die in 1971" in wire_text(),
@@ -1303,7 +1377,7 @@ def test_oracle_horizon(browser):
           "step 32 ends Chapter III: the bar offers to close it before Tower III", bar)
     js("document.getElementById('btn-wire-ceremony').click()"); page.wait_for_timeout(6000)
     bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
-    check(get("order_field_wire_step") == "33" and "THE DESERT PATH IS COMPLETE" in wire_text() and "[Z] + [D] = 23" in wire_text()
+    check(get("order_field_wire_step") == "33" and "THE DESERT PATH IS COMPLETE" in wire_text() and "[I] + [J] = 18" in wire_text()
           and "The Unsent Letter" in wire_text() and choices() == 3,
           "step 32 closes the Desert Path, and the morning of departure for Tower III follows (step 33)", bar)
     page.reload(); page.wait_for_timeout(2500); open_wire()
@@ -1401,7 +1475,7 @@ def test_tester_play(browser):
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
-    for gid in ["s22", "s21", "s20", "s19", "s18", "s17", "s14", "gates", "cairn1", "s16", "clepsydra"]:
+    for gid in ["s22", "s21", "s20", "s19", "s18", "s17", "s15", "s14", "gates", "cairn1", "s16", "clepsydra"]:
         page.evaluate("document.getElementById('tester-panel').open = true")
         page.evaluate(PLAY_JS, gid)
         page.wait_for_timeout(600)
@@ -2831,7 +2905,7 @@ def test_camera_obscura(browser):
 
 
 def test_whispering_gallery(browser):
-    print("\n30. Station 22 · The Whispering Gallery, from the pause and the seal to Fragment III and [J] × 2 = [T]")
+    print("\n30. Station 22 · The Whispering Gallery, from the pause and the seal to Fragment III and Aurelia's three words")
     now_ms = int(time.time() * 1000)
     seed = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_horizon_completed": "true", "order_masks_gate_completed": "true",
             "order_masks_gate_awake": "true", "order_masks_carved": "3", "order_masks_march_bypassed": "true",
@@ -2953,14 +3027,14 @@ def test_whispering_gallery(browser):
     check(opened > 0.9 and not shown("btn-gallery-listen") and not shown("gallery-where") and "Chronicles" in text("gallery-victory"),
           "in the hall the little door swings open; the search controls leave the panel and the card points to Aurelia's letter", str(opened))
     check(js("window.EclipseAmbience.state().hushed") is False, "with the niche open the music comes back")
-    check(js("document.getElementById('gallery-fragment-svg').childNodes.length") > 3 and "[J] × 2 = [T]" in text("gallery-victory"),
-          "Fragment III and the line of the niche are in the victory card")
+    check(js("document.getElementById('gallery-fragment-svg').childNodes.length") > 3 and "Listen, and answer" in text("gallery-victory"),
+          "Fragment III and Aurelia's three words are in the victory card")
     page.click("#btn-gallery-finish-station"); page.wait_for_timeout(1200)
     st = js(MIRROR_JS)
     check(not modal_open() and st["set"] == 3 and st["next"] == "43", "closing the room sets Fragment III and the mirror points at the Automaton Orchestra", str(st)[:160])
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
     ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
-    check("eq-item-gallery-jt" in ids, "the Ledger shows [J] × 2 = [T]")
+    check("eq-item-gallery-jt" not in ids, "the Stage Path adds no equation to the Ledger")
 
     # the debrief on the wire, and the next door
     open_wire()
@@ -3162,7 +3236,7 @@ def test_whispering_chasm(browser):
     check("The Line of the Gate" in reward() and "Sheet" not in reward() and js("document.querySelectorAll('.chasm3d-reward .chasm3d-medal').length") == 6
           and js("document.querySelector('.chasm3d-reward-word strong').getAttribute('aria-label')") == "MIRAGE"
           and js("document.querySelector('.rw-eq').getAttribute('aria-label')") == "X plus E equals 17"
-          and js("document.querySelectorAll('.rw-seal svg line').length") == 2 and " ".join(js("document.querySelector('.rw-glyph figcaption').innerText").split()).upper() == "GLYPH = X"
+          and js("document.querySelectorAll('#modal-whispering-chasm .chasm3d-reward .rw-seal svg line').length") == 2 and " ".join(js("document.querySelector('#modal-whispering-chasm .chasm3d-reward .rw-glyph figcaption').innerText").split()).upper() == "GLYPH = X"
           and js("document.querySelectorAll('.rw-map .rw-cairn').length") == 6 and js("document.querySelector('.rw-road').points.length") > 40
           and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')"),
           "the reward rises over the canyon: her road on the map, six relics, MIRAGE, the glyph = X and the Ledger line [X] + [E] = 17", reward()[:200].replace("\n", " "))
@@ -4809,6 +4883,9 @@ def json_has(raw, key, value):
         return False
 
 
+# Chromium flags: the 3D rooms are WebGL; in a headless shell they fall back to a CPU renderer unless asked to use the GPU (SMOKE_CHROMIUM_ARGS overrides)
+CHROMIUM_ARGS = os.environ.get("SMOKE_CHROMIUM_ARGS", "--use-angle=metal --enable-gpu-rasterization --ignore-gpu-blocklist --disable-background-timer-throttling --disable-renderer-backgrounding").split()
+
 SECTIONS = {
     "pages": test_pages, "views": test_hub_views, "wire": test_wire_gating, "ledger": test_ledger_gating,
     "s14": test_sun_monolith, "s15": test_sandstone_labyrinth, "s16": test_cairn_four, "s17": test_solstice_arch,
@@ -4843,7 +4920,7 @@ def run_section(key, chromium):
     with contextlib.redirect_stdout(out):
         try:
             with sync_playwright() as p:
-                browser = p.chromium.launch(executable_path=chromium) if chromium else p.chromium.launch()
+                browser = p.chromium.launch(executable_path=chromium, args=CHROMIUM_ARGS) if chromium else p.chromium.launch(args=CHROMIUM_ARGS)
                 SECTIONS[key](browser)
                 browser.close()
         except Exception:

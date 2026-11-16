@@ -9,7 +9,7 @@
     // shut: the gallery is a mirror for sound, so Silvia plays it from its last note to its first.
     // Without sound every whisper is written and every bell glows as it rings.
     // The plan comes from web/assets/js/whisper-gallery-data.js (scripts/journal/whisper_gallery.py), the same
-    // geometry as the sheet. Reward: Fragment III of the mirror of Tower III, and the Ledger line [J] × 2 = [T].
+    // geometry as the sheet. Reward: Fragment III of the mirror of Tower III (no Ledger line: the Stage Path gives no equations).
     // =========================================================================
     (function initWhisperingGallery() {
       const modal = document.getElementById('modal-whispering-gallery');
@@ -400,7 +400,7 @@
         } else {
           showMirror();
         }
-        say("It opened, Silvia. Backwards, the way a mirror would sing it. In the niche, on a bed of velvet gone grey with dust, lay Fragment III. In it there is an arch, and the edge of a balcony, and nothing in this tower looks like either. And scratched into the inside of the little door, in Aurelia's old hand, one line for your Ledger: [J] × 2 = [T]. She traced it with her finger and did not say a word.");
+        say("It opened, Silvia. Backwards, the way a mirror would sing it. In the niche, on a bed of velvet gone grey with dust, lay Fragment III. In it there is an arch, and the edge of a balcony, and nothing in this tower looks like either. And scratched into the inside of the little door, in Aurelia's old hand, three words: ‘Listen, and answer.’ She traced them with her finger and did not say a word.");
       }
       let justSet = false;
       function drawFragment() {
@@ -602,9 +602,9 @@
           const outTex = P.canvasTex(256, 320, planks);
           const inTex = P.canvasTex(256, 320, (c, w, h) => {
             planks(c, w, h);
-            if (west) {   // only on its inner side, scratched in Aurelia's old hand: the line for the Ledger
-              c.fillStyle = 'rgba(255,236,190,0.92)'; c.font = 'italic 600 34px Georgia, serif'; c.textAlign = 'center';
-              c.fillText('[J] × 2 = [T]', w / 2, h * 0.52);
+            if (west) {   // only on its inner side, scratched in Aurelia's old hand: her three words
+              c.fillStyle = 'rgba(255,236,190,0.92)'; c.font = 'italic 600 30px Georgia, serif'; c.textAlign = 'center';
+              c.fillText('Listen,', w / 2, h * 0.46); c.fillText('and answer.', w / 2, h * 0.56);
             }
           });
           const outMat = paint({ map: outTex, color: 0xffffff }), inMat = paint({ map: inTex, color: 0xffffff });
@@ -1027,7 +1027,7 @@
         view.endTimers.forEach(clearTimeout);
         view.endTimers = [
           setTimeout(() => { if (modal.style.display !== 'none') subtitle('Far across the hall, the two Ashes lift their heads toward the sound, and slip away into the dark.', 4.6, 'act'); }, reduced() ? 4800 : 5000),
-          setTimeout(() => { if (modal.style.display !== 'none') { aureliaDoes('offer'); subtitle('Inside the little door, in Aurelia\'s old hand, one line for the Ledger. She traces it with her finger and says nothing.', 5.5, 'act'); } }, reduced() ? 9800 : 9800)
+          setTimeout(() => { if (modal.style.display !== 'none') { aureliaDoes('offer'); subtitle('Inside the little door, in Aurelia\'s old hand, three words. She traces them with her finger and says nothing.', 5.5, 'act'); } }, reduced() ? 9800 : 9800)
         ];
       }
 
@@ -1196,7 +1196,7 @@
             lore: 'Silvia found where the pins of the gallery had stood and heard every word the raiders whispered at the far end. They had played the niche its tune note for note; she played it back the way a mirror would, and the third piece of the mirror of Tower III was hers.',
             rewards: [
               { icon: '🪞', label: 'Fragment III', desc: 'Set in the mirror of Tower III' },
-              { icon: '📐', label: 'The Line of the Echo', desc: '[J] × 2 = [T] · in the Cipher Ledger' }
+              { icon: '✉', label: 'Aurelia’s three words', desc: '“Listen, and answer.” · scratched inside the niche door' }
             ],
             btnText: 'Revisit the gallery ➔',
             action: openGalleryModal,

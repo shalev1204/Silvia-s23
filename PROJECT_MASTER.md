@@ -1,5 +1,7 @@
 # Silvia's 23 — Índice maestro del proyecto
 
+> ⚠️ **DOCUMENTO MEDIO HISTÓRICO (16-nov-2026).** El estado vigente del juego, las decisiones del Operador y lo que falta para terminarlo están en **[docs/GAME_MASTER_GUIDE.md](docs/GAME_MASTER_GUIDE.md)** (anexos en [docs/guide/](docs/guide/)). Este archivo conserva el registro de decisiones del 1-sep y la lista de «Descartado».
+
 > **SSOT (Single Source of Truth):** este archivo + los documentos enlazados abajo.  
 > **Última actualización:** octubre 2026 (estado del juego y mapa de documentación). El detalle del 1 sep 2026 se conserva abajo como histórico.  
 > **Fuente de verdad del lore:** [docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md) (Biblia 6.0)  
@@ -12,7 +14,7 @@
 
 ## En una frase
 
-Caza del tesoro no lineal de ~56 días para el 23.º cumpleaños de Silvia. Regalo final: **2 entradas de ballet** (obra/lugar/fecha TBD). Universo ficticio: **The Eclipse Order**.
+Caza del tesoro no lineal (arrancó el 1-sep-2026; los «56 días» fueron su primera fase y el cierre es el WHEN, 18–20 dic) para el 23.º cumpleaños de Silvia. Regalo final: **2 entradas de ballet**; el WHERE es Viena · Wiener Staatsoper y el **WHAT se entrega como extra posterior al juego, en persona el día del WHEN** (decisión del Operador, 16-nov-2026). Universo ficticio: **The Eclipse Order**.
 
 ---
 
@@ -23,10 +25,10 @@ Caza del tesoro no lineal de ~56 días para el 23.º cumpleaños de Silvia. Rega
 | **[PROJECT_MASTER.md](PROJECT_MASTER.md)** | Este archivo: visión, decisiones, índice maestro |
 | **[docs/REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md)** | Arquitectura y organización del repositorio |
 | **[docs/LORE.md](docs/LORE.md)** | Mito, Orden, guardianes, relaciones, profecía, hilos futuros |
-| **[docs/PATHS_AND_CHARACTERS.md](docs/PATHS_AND_CHARACTERS.md)** | 3 caminos, personajes, puzzles, dispatches |
-| **[docs/GRIMOIRE.md](docs/GRIMOIRE.md)** | Diario de bolsillo: entrega 11 sep en Italia |
+| **[docs/archive/PATHS_AND_CHARACTERS.md](docs/archive/PATHS_AND_CHARACTERS.md)** *(archivo)* | 3 caminos, personajes, puzzles, dispatches |
+| **[docs/archive/GRIMOIRE.md](docs/archive/GRIMOIRE.md)** *(archivo)* | Diario de bolsillo: entrega 11 sep en Italia |
 | **[docs/WEB_ECOSYSTEM.md](docs/WEB_ECOSYSTEM.md)** | Catálogo de juegos web, URLs y guía Cloudflare |
-| **[docs/EMAIL_SETUP.md](docs/EMAIL_SETUP.md)** | Gmail, assets email, perfil |
+| **[docs/archive/EMAIL_SETUP.md](docs/archive/EMAIL_SETUP.md)** *(archivo)* | Gmail, assets email, perfil |
 | **[docs/TIMELINE.md](docs/TIMELINE.md)** | Calendario día a día / semana a semana |
 | **[puzzles/general/cipher-alphabet/ECLIPSE_SCRIPT.md](puzzles/general/cipher-alphabet/ECLIPSE_SCRIPT.md)** | Alfabeto, profecía, revelado gradual |
 | **[emails/general/01-opening-dispatch/](emails/general/01-opening-dispatch/)** | Email 1: texto pergamino, checklist 22:22 |
@@ -35,7 +37,7 @@ Caza del tesoro no lineal de ~56 días para el 23.º cumpleaños de Silvia. Rega
 | **[docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)** | Biblia Maestra 6.0: lore, emails, transmisiones, estaciones 01–09, tormenta, Cipher Ledger |
 | **[docs/DESERT_ODYSSEY_BIBLE.md](docs/DESERT_ODYSSEY_BIBLE.md)** | Desert Path: hojas 08–18, juegos, Cairns y Estaciones 10–19 |
 | **[docs/STAGE_PATH_BIBLE.md](docs/STAGE_PATH_BIBLE.md)** | Stage Path: hojas 19–26, fragmentos de espejo, Estaciones 20–28, mapa del Espejo Roto Vivo |
-| **[docs/HANDOFF_STAGE_PATH.md](docs/HANDOFF_STAGE_PATH.md)** | Auditoría, estado de entrega y verificación de las Hojas 19–26 |
+| **[docs/archive/HANDOFF_STAGE_PATH.md](docs/archive/HANDOFF_STAGE_PATH.md)** *(archivo)* | Auditoría, estado de entrega y verificación de las Hojas 19–26 |
 | **[docs/lore_and_puzzle_bible.md](docs/lore_and_puzzle_bible.md)** | Diseño de puzzles, astronomía y mecánicas |
 | **[AGENTS.md](AGENTS.md)** | Reglas de trabajo del Operador (Capa 2) |
 
@@ -116,7 +118,7 @@ YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.
 
 - **Constellation Path (Estaciones 01–09):** completado. La Estación 09 terminó con el voto de Hermes y la gran tormenta de arena (Hub bloqueado 48 h; después, el telégrafo *Ask Hermes*).
 - **Desert Path (Estaciones 10–19, Hojas 08–18):** jugables en el Hub. Estaciones 10 a 19 cubren la travesía hacia The Oracle's Horizon y los 5 Cairns.
-- **Stage Path (Estaciones 20–28, Hojas 19–26, Torre III):** diario manuscrito completado al 100% (16 páginas A5 con estética renacentista Da Vinci/Kepler, sellos criptográficos QR verificados y PDFs de imprenta compilados en `journal/impresion/`). Mecánica del Espejo Roto Vivo implementada en el Hub (`web/hub/js/stations/stage-mirror.js`).
+- **Stage Path (Estaciones 20–28, Hojas 19–26, Torre III):** Estaciones 20, 21 y 22 construidas; 23–28 pendientes. Diario manuscrito completado al 100% (16 páginas A5 con estética renacentista Da Vinci/Kepler, sellos criptográficos QR verificados y PDFs de imprenta compilados en `journal/impresion/`). Mecánica del Espejo Roto Vivo implementada en el Hub (`web/assets/js/stage-mirror.js`).
 - **Final:** alinear las tres torres abre *The Vault of the Grand Eclipse* (entradas de ballet).
 - **Web:** Hub en `web/index.html`; mapa completo en [docs/WEB_ECOSYSTEM.md](docs/WEB_ECOSYSTEM.md).
 
@@ -179,4 +181,4 @@ YOU WERE NEVER ONLY THE SEEKER YOU WERE ALWAYS THE TREASURE.
 
 ## Notas de sesión
 
-Ver **[docs/SESSION_LOG.md](docs/SESSION_LOG.md)** — transcripción cronológica de todo lo hablado en sesión 1.
+Ver **[docs/archive/SESSION_LOG.md](docs/archive/SESSION_LOG.md)** — transcripción cronológica de todo lo hablado en sesión 1.

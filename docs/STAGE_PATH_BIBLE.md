@@ -1,5 +1,7 @@
 # STAGE PATH BIBLE · La Torre III (The Stage Tower / The Mirror Sanctuary)
 
+> ⚠️ **ACTUALIZACIÓN 16-nov-2026.** Las decisiones del Operador de esa fecha (§11 de este documento y [docs/GAME_MASTER_GUIDE.md](GAME_MASTER_GUIDE.md) §5.0) **mandan sobre lo que sigue cuando lo contradicen**. En particular: **el Stage Path no tiene operaciones matemáticas como recompensa** (la J pasa a la Estación 19; no hay ecuación de Q ni de X en las salas), las «marcas de los márgenes» ya no existen, y el nombre de Pope-E en 1970 es el de un enemigo leyenda, no Carles.
+
 > Especificación del Stage Path (Estaciones 20 a 28, Hojas 19 a 26 del diario). Este documento depende de la Biblia Maestra (`docs/CANONICAL_LORE_AND_VOCABULARY_AUDIT.md`): si algo choca, manda la Biblia Maestra. Decisiones del Operador fijadas el 20-10-2026.
 
 ---
@@ -55,16 +57,16 @@ La Torre III es un **teatro-santuario vivo** de la Orden: autómatas, una orques
 | **19A** | 📜 | *The Unsent Letter*: la carta de la Oráculo a la Mirror Speaker, en escritura de espejo | — | — |
 | **19B** | ◆ | *The Gate of a Thousand Masks* | **20** | I |
 | **20A** | ◆ | *The Camera Obscura* | **21** | II |
-| **20B** | ◆ | *The Whispering Gallery* | **22** | III · ecuación J |
+| **20B** | ◆ | *The Whispering Gallery* | **22** | III |
 | **21A** | 🎨 | *Aurelia's Sketchbook I*: el observatorio, 1970 | — | — |
 | **21B** | ◆ | *The Automaton Orchestra* | **23** | IV |
-| **22A** | ◆ | *The Fly Tower* | **24** | V · ecuación Q |
+| **22A** | ◆ | *The Fly Tower* | **24** | V |
 | **22B** | 📜 | *The Ashes Before Christ*: la secta y el sello de Pope-E | — | — |
 | **23A** | ◆ | *The Shadow Theatre* | **25** | VI · reliquia |
 | **23B** | 🎨 | *Aurelia's Sketchbook II*: el disco y el voto | — | — |
 | **24A** | ◆ | *The Hall of Mirrors* | **26** | VII |
 | **24B** | 📜 | *The Doctrine of the Mirror Speaker* | — | — |
-| **25A** | ◆ | *The Kaleidoscope Lantern* | **27** | VIII · ecuación X |
+| **25A** | ◆ | *The Kaleidoscope Lantern* | **27** | VIII |
 | **25B** | 🎨 | *Aurelia's Sketchbook III*: la terraza bajo las estrellas | — | — |
 | **26A** | ◆ | *The Stage of the Mirror Speaker* | **28** | IX · **el WHERE** |
 | **26B** | 🎨 | *Back to the Peaks*: transición a la Torre I | — | — |
@@ -108,15 +110,15 @@ Las 16 caras están **impresas y entregadas** (decisión del Operador): la web s
 | :---: | :---: | :--- | :--- | :--- | :--- |
 | **20** | 19B | The Gate of a Thousand Masks | Máscaras simétricas y la que no lo es | Máscaras que hablan a la luz de una vela; elegir el reflejo verdadero | Fragmento I |
 | **21** | 20A | The Camera Obscura | La ciudad dibujada boca abajo | La ciudad proyectada invertida: girarla y encontrar el escondite de los asaltantes | Fragmento II |
-| **22** | 20B | The Whispering Gallery | Plano elíptico y sus dos focos | Escuchar en estéreo, en los focos, susurros y una melodía en espejo | Fragmento III · J |
+| **22** | 20B | The Whispering Gallery | Plano elíptico y sus dos focos | Escuchar en estéreo, en los focos, susurros y una melodía en espejo | Fragmento III |
 | **23** | 21B | The Automaton Orchestra | El cilindro de púas y su partitura | Clavar las púas para que los autómatas toquen la canción (sonido) | Fragmento IV |
-| **24** | 22A | The Fly Tower | Poleas y contrapesos (Serlio / Sabbatini) | Los asaltantes cortan cuerdas: equilibrar contrapesos contra el reloj | Fragmento V · Q |
+| **24** | 22A | The Fly Tower | Poleas y contrapesos (Serlio / Sabbatini) | Los asaltantes cortan cuerdas: equilibrar contrapesos contra el reloj | Fragmento V |
 | **25** | 23A | The Shadow Theatre | Figuras de sombra y sus lámparas | Representar en directo una obra de sombras para distraer a los asaltantes | Fragmento VI · reliquia |
 | **26** | 24A | The Hall of Mirrors | Plano del laberinto de espejos | Laberinto donde los asaltantes solo se ven reflejados; el reflejo de Pope-E | Fragmento VII |
-| **27** | 25A | The Kaleidoscope Lantern | Los cristales del gran farol | Alinear los cristales para que la luz deletree una palabra | Fragmento VIII · X |
+| **27** | 25A | The Kaleidoscope Lantern | Los cristales del gran farol | Alinear los cristales para que la luz deletree una palabra | Fragmento VIII |
 | **28** | 26A | The Stage of the Mirror Speaker | La ceremonia del espejo | Encajar los 9 fragmentos: el WHERE | Fragmento IX · **WHERE** |
 
-**Cipher Ledger**: $J = 8$ quedó fijada en la Estación 22 con $[J] \times 2 = [T]$ (Biblia Maestra §7.B.13); $X = 15$ se adelantó a la Estación 10 (The Line of the Gate, $[X] + [E] = 17$, §7.B.14, decisión del Operador 23-10-2026); queda $Q$ con el valor libre $14$, que se fijará al construir la Estación 24 con una ecuación de una sola incógnita (estilo de las estaciones 17 a 19). La Estación 27 ya no da letra del Ledger.
+**Cipher Ledger (actualizado 16-11-2026)**: el Stage Path **no da letras ni ecuaciones**. La $J = 8$ se entrega en la **Estación 19** con $[I] + [J] = 18$ (Biblia Maestra §7.B.12) y la Estación 22 pierde $[J] \times 2 = [T]$; $Q$ pasó a la Estación 11 y $X$ a la Estación 10. *(Texto anterior, superado: $J = 8$ quedó fijada en la Estación 22 con $[J] \times 2 = [T]$; $X = 15$ se adelantó a la Estación 10 (The Line of the Gate, $[X] + [E] = 17$, §7.B.14, decisión del Operador 23-10-2026); queda $Q$ con el valor libre $14$, que se fijará al construir la Estación 24 con una ecuación de una sola incógnita (estilo de las estaciones 17 a 19). La Estación 27 ya no da letra del Ledger.)*
 
 **Field Wire**: continúa desde el paso 33. Patrón por estación: escena de salida con respuestas (inicia el viaje), viaje, balance tras la estación y cierre. Las caras de historia se citan en el chat en su momento (*«Open Sheet 22B…»*).
 
@@ -170,7 +172,7 @@ Tres datos del Stage Path **solo existen en las hojas impresas**: la web los pid
 - **Hermes**: guía principal en el Field Wire; ahora viaja acompañado.
 - **Aurelia**: viaja con Hermes; su memoria vuelve por partes (cuaderno I a III). Pinta, comenta, a veces escribe ella en el chat.
   - **Sus cartas** (idea #12): tres cartas de 1970–71 a Hermes, nunca entregadas, que encuentra cosidas en el forro de su viejo abrigo. Se leen en Chronicles al ganar las Estaciones 22, 25 y 27 (junto a los cuadernos I, II y III). Ninguna habla del puente.
-- **The Mirror Speaker**: guardiana de la Torre III. **Nunca se ve; solo se refleja.** Voz elegante, pausada y ceremonial; frases breves y perfectas. Firma: una línea horizontal. Habla de luz, umbral, reflejo y de lo que se ve cuando dejas de buscar (`docs/PATHS_AND_CHARACTERS.md`).
+- **The Mirror Speaker**: guardiana de la Torre III. **Nunca se ve; solo se refleja.** Voz elegante, pausada y ceremonial; frases breves y perfectas. Firma: una línea horizontal. Habla de luz, umbral, reflejo y de lo que se ve cuando dejas de buscar (`docs/archive/PATHS_AND_CHARACTERS.md`).
   - **Reacciona al estilo de Silvia** (idea #11): al abrirse cada sala escribe en el cristal, en espejo, una línea breve sobre cómo resolvió la anterior (hora, fallos y notas, ritmo, tono con Hermes), firmada con su línea. Cada sala nueva la muestra arriba de su juego con `EclipseMirrorSpeaker.render(nodo, elemento)`.
 - **The BC Ashes**: secta antiquísima (*Before Christ*), guardianes del «primer fuego», con túnicas manchadas de ceniza.
 - **Pope-E**: jefe enmascarado de la secta (máscara de plata ennegrecida). Nunca hace daño. Deja tres notas firmadas con un sello de ceniza, aparece una vez como reflejo de espaldas (Estación 26) e intercepta el Field Wire para escribir a Silvia directamente. Siempre la llama *the key*.
@@ -224,7 +226,7 @@ Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{
 | Hojas 19 a 26 (impresión) | ✅ Hojas 19 a 26 impresas y entregadas (ver §4.1) · paquete `journal/impresion/01_STAGE_PATH_HOJAS_19_A_26_A5.pdf` |
 | Estaciones 20 a 28 | ✅ Estaciones 20, 21 y 22 · ⏳ Estaciones 23 a 28 |
 
-### Estación 22 · The Whispering Gallery (Hoja 20B · Fragmento III · J) · construida el 23-10-2026
+### Estación 22 · The Whispering Gallery (Hoja 20B · Fragmento III) · construida el 23-10-2026 (su ecuación de J se retira el 16-11-2026; ver §11)
 
 **Decisiones del Operador (23-10-2026)**: dos tiempos, **focos y eco en espejo**; la hoja es **la elipse del jardinero** sin los alfileres; la ecuación es $[J] \times 2 = [T]$; la sala abre **6 h** después del Fragmento II. Ficha §6.1: escuchar y tocar, oído, dificultad 4, acaba tocando notas.
 
@@ -258,3 +260,27 @@ Las fechas de la página de la revelación salen de `order_ashes_clues` (JSON `{
 - **Web**: palabra `SILVER` (tolerante con espacios y guiones; 6 fallos → pista en Ask Hermes (nivel 2 de la escalera 3/6/9)). Después, **The Missing Halves**: tres máscaras talladas en una mitad; Silvia dibuja la otra mitad, en espejo, con el dedo o el ratón. Se acepta si el dibujo cubre el 72 % de la mitad reflejada, cada línea al menos el 45 % y el 70 % de lo dibujado cae sobre una línea (tolerancia 15 unidades sobre 300). Un pulso tembloroso pasa; copiar sin reflejar, desplazar, agrandar o garabatear no. Tras 3 intentos: guía punteada y el botón «Let the Mirror Speaker carve it» (camino de teclado).
 - **Premio**: Fragmento I (destella en el Espejo Vivo al cerrar el modal). Sin ecuación (J, Q y X llegan en 22, 24 y 27).
 - **Field Wire**: 33 partida (las hojas 19–26 llegan con una paloma de la Orden) → 18 h → 35 balance: el reflejo de la Mirror Speaker (firma con una línea), el Fragmento I y **la primera nota de Pope-E**, clavada en la última máscara: *«Let her through.»*, sello de ceniza (círculo cruzado por una línea). 36 cierre.
+
+
+---
+
+## 11. Decisiones de diseño del Operador (16-nov-2026)
+
+Estas decisiones fijan lo que falta de S23 a S28 y de la Torre I. Registro completo y estado en [docs/GAME_MASTER_GUIDE.md](GAME_MASTER_GUIDE.md) §5.0; el detalle por sala y las restricciones del papel, en [docs/guide/03_STAGE_PATH_AND_FINALE.md](guide/03_STAGE_PATH_AND_FINALE.md).
+
+| Sala | Decisión |
+| :---: | :--- |
+| **Todas** | Sin recompensas matemáticas. Pausas de **3 a 8 h** entre salas. **Solo S25 usa sello QR** (23A impresa, hash `77d1d1fa` en `SEALS[45]`); S23, S24, S26, S27 y S28 se abren solo por la pausa. |
+| **22** | Pierde la ecuación $[J] \times 2 = [T]$ (la J se descubre en la Estación 19). |
+| **23** | *The Automaton Orchestra*: **colocar púas** en la rejilla del cilindro hasta que suene la partitura espejada. La melodía deletrea **FACADE** (F-A-C-A-D-E; invertida, E-D-A-C-A-F): pista sutil hacia la fachada de la Ópera. Pope-E, **nota 2** (cita «You were never only the seeker»). |
+| **24** | *The Fly Tower*: tiempo real; **los asaltantes siguen cortando cuerdas** (una cada 20–30 s baja la cortina de hierro); clinómetro a 38° (±2° bloquea); sacos y lingotes en el cesto oeste hasta igualar la masa de la cortina (la masa la fija la web); modo sin reloj en accesibilidad. |
+| **25** | *The Shadow Theatre*: secuencia de escenas con el truco al trasluz (23A + 23B); palabra tecleada: **ALWAYS**. Reliquia (por diseñar). Carta II de Aurelia. Los discos son **gemelos**: Hermes grabó el original (S19); Aurelia fundió su copia de bronce con tres aberturas (23B). |
+| **26** | *The Hall of Mirrors*: laberinto (dificultad 5, pico); el **reflejo de espaldas de Pope-E** camina un tramo por delante, sin girarse, por el camino correcto y deja una pluma dorada en la salida (`clue('reflection')`). |
+| **27** | *The Kaleidoscope Lantern*: girar y alinear cristales; la luz deletrea **NORTH**. Pope-E, **nota 3**. Carta III de Aurelia. |
+| **28** | *The Stage of the Mirror Speaker*: Silvia encaja los **9 fragmentos en el orden en que los ganó**, guiada por el dibujo de cada uno (sin teclear; no hay marcas de margen). El espejo muestra la fachada de la Wiener Staatsoper y, al fondo, a **Pope-E subiendo con el Astrolabio**. |
+| **Pope-E** | El Pope-E de 1970 (22B, 24B, 25A impresas) es un **enemigo leyenda**; en 2026 **Carles adopta su nombre y su sello** para jugar con Silvia. Revelación en la Torre I (escena del Wire + página del cuaderno de Hermes con las fechas reales de cada pista). |
+| **Torre I** | 3 estaciones con juego: *Observatorio* (restaurar la cúpula con luz), *Cartas celestes* (reconstruir una carta quemada con las seis estrellas nativas) y *Alineación* (tres diales contra Pope-E; la memoria del puente de Aurelia ocurre aquí; Silvia gana el Astrolabio). Bóveda: cerradura de 6 diales con el valor de cada letra de **SILVIA** (13 · 10 · 1 · 12 · 10 · 7). 4 caras impresas nuevas (hojas 27 y 28) que llegan juntas al empezar la Torre I. El **WHAT es un extra posterior** y el Hub termina con la carta de Carles y un sobre sellado. |
+
+**Glifos (A-39):** el Stage entrega 8 glifos nuevos por la web, uno por sala y sin valores: **W en S20, N en S21, S en S22, U en S23, Y en S24, L en S25, H en S26, M en S27**; S28 solo el espejo. La Torre I entrega A, E, O y T. Las salas no dan ecuaciones.
+
+**Detalles de sala fijados (16-nov, segunda ronda):** S24: saco = 3, lingote = 5, cortina = 14 (placa de bronce). S25: reliquia *The Twin Disc*. S26: 3D en tercera persona, pasos en rejilla, sin tiempo. S28: cada fragmento lleva el dibujo ganado y se coloca en su hueco; sin penalización por error; pista de la Mirror Speaker tras 3 fallos. Pope-E: nota 2 «You were never only the seeker.», nota 3 «The last door does not need me. Walk.»
