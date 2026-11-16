@@ -82,7 +82,7 @@ Wire pasos 0–32. Letras del Ledger por estación en §3.
 | 13 | The Oasis Clepsydra | 12B (**congelada 3-nov**) | 4 odres, Falcon Weight; solo comprobaciones | marcha 6 h Camp VIII → Puertas |
 | 13B | At the Gates of Tower II (escena) | 13A | Red Cord / Servant's Coin / Statue Seal | — |
 | (Erg) | The Night on the Erg (escena) | — | Overture de S14 | — |
-| 14 | The Sun Monolith & Cairn II | 13B | Seal II · **D, C** | 6 h a S15 |
+| 14 | The Sun Monolith & Cairn II | 13B | Seal II · **D, C** | ~0 (espera de 6 h quitada el 16-nov, `LABYRINTH_MARCH_HOURS`) |
 | (14A) | The Memory of the Stones (sueño 1998; **entre S15 y S16**, Wire 16→17) | 14A | Escena | lore aprobado 16-nov (A-16) |
 | 15 | The Sandstone Labyrinth & Cairn III (recompensa animada, película de salida, 3 destellos, voces y «Back into the dark»: 16-nov) | 14B | Seal III · **W, N** (+ Founders' Lamp, Raiders' Copy of the Survey) | 18 h a S16 |
 | 16 | Cairn IV · Sentry of the Canyon | 15A | Seal IV · **S, U** | 18 h a S17 |

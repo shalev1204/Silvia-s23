@@ -8166,7 +8166,10 @@
       window.skipMonolithMarch = monolithMarch.skip;
 
       // Station 15: the 6-hour walk down from the Sun Monolith to the Sandstone Labyrinth (wire step 13 starts it)
-      const labyrinthMarch = makeMarch(6, { start: 'order_labyrinth_march_start', bypassed: 'order_labyrinth_march_bypassed', done: 'order_sandstone_labyrinth_completed' });
+      // The Operator removed the 6-hour wait on 16-11-2026 (Silvia was at the gate): Hermes is at the Southern Mouth as soon as she answers.
+      // Set it back to 6 to restore the walk; the smoke sets window.__labyrinthMarchHours = 6 to test the sealed card.
+      const LABYRINTH_MARCH_HOURS = 0.0003;
+      const labyrinthMarch = makeMarch(() => (typeof window.__labyrinthMarchHours === 'number' ? window.__labyrinthMarchHours : LABYRINTH_MARCH_HOURS), { start: 'order_labyrinth_march_start', bypassed: 'order_labyrinth_march_bypassed', done: 'order_sandstone_labyrinth_completed' });
       window.getLabyrinthMarchProgress = labyrinthMarch.progress;
       window.isLabyrinthMarchStarted = labyrinthMarch.started;
       window.isLabyrinthMarchOver = labyrinthMarch.over;

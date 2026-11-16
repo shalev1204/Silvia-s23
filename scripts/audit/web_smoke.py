@@ -494,6 +494,7 @@ def test_sandstone_labyrinth(browser):
                 order_seal_cairn_2="true", order_monolith_gate_seal1="true",
                 order_field_wire_step="12", order_field_wire_choices="[2,0,1,0,0,0,1,0,0,0,0,0]", **WIRE_PASSED)
     ctx, page, errors = new_page(browser, seed)
+    page.add_init_script("window.__labyrinthMarchHours = 6")   # the Operator removed the wait for Silvia (16-nov); this test is about the sealed walk
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
     get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
