@@ -8170,6 +8170,17 @@
       // Set it back to 6 to restore the walk; the smoke sets window.__labyrinthMarchHours = 6 to test the sealed card.
       const LABYRINTH_MARCH_HOURS = 0.0003;
       const labyrinthMarch = makeMarch(() => (typeof window.__labyrinthMarchHours === 'number' ? window.__labyrinthMarchHours : LABYRINTH_MARCH_HOURS), { start: 'order_labyrinth_march_start', bypassed: 'order_labyrinth_march_bypassed', done: 'order_sandstone_labyrinth_completed' });
+      // 16-11-2026, by the Operator's order: Silvia stands at the gate and sees Station 15 as if she had never entered (opening film, How to play,
+      // sigil, hints), once. Hermes stays at the Southern Mouth (the march key is kept) and a finished station is never touched.
+      try {
+        if (!localStorage.getItem('order_labyrinth_fresh_v1') && localStorage.getItem('order_sandstone_labyrinth_completed') !== 'true') {
+          ['order_labyrinth_howto', 'order_labyrinth_cine_intro', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures',
+           'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_labyrinth_finds', 'order_labyrinth_overheard',
+           'order_labyrinth_escape', 'order_labyrinth_cine_outro'].forEach(k => localStorage.removeItem(k));
+          Object.keys(localStorage).filter(k => k.indexOf('order_hint_s15-') === 0).forEach(k => localStorage.removeItem(k));
+          localStorage.setItem('order_labyrinth_fresh_v1', 'done');
+        }
+      } catch (e) {}
       window.getLabyrinthMarchProgress = labyrinthMarch.progress;
       window.isLabyrinthMarchStarted = labyrinthMarch.started;
       window.isLabyrinthMarchOver = labyrinthMarch.over;

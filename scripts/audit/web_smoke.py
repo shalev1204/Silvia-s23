@@ -166,7 +166,7 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
         # the openings and endings of the Salt Playa and the Desert Lexicon play once: the tests that are not about them find them seen
         if cine_seen:
             seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen",
-                         "order_labyrinth_cine_intro": "seen", "order_labyrinth_cine_outro": "seen", "order_labyrinth_howto": "seen",
+                         "order_labyrinth_cine_intro": "seen", "order_labyrinth_cine_outro": "seen", "order_labyrinth_howto": "seen", "order_labyrinth_fresh_v1": "done",
                          "order_cairn4_cine_intro": "seen", "order_cairn4_howto": "seen",
                          "order_cairn5_cine_intro": "seen", "order_cairn5_howto": "seen",
                          "order_stele_cine_intro": "seen", "order_stele_howto": "seen",
