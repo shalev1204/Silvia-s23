@@ -435,6 +435,9 @@
 
         if (typeof window.resetStickyHeader === 'function') window.resetStickyHeader();
         if (targetView === 'view-trail' && typeof window.updateDawnMapLayer === 'function') window.updateDawnMapLayer();
+        if (targetView === 'view-trail' && window.__inspNodeId != null && typeof window.selectMapNode === 'function') {
+          try { window.selectMapNode(window.__inspNodeId, false, true); } catch (e) {}
+        }
 
         if (targetView === 'view-field-wire') {
           if (typeof syncSilviaWaypointBaseline === 'function') syncSilviaWaypointBaseline();
@@ -492,6 +495,11 @@
         }
       }
       window.activateHubView = activateHubView;
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && document.body.getAttribute('data-active-view') === 'view-trail' && window.__inspNodeId != null && typeof window.selectMapNode === 'function') {
+          try { window.selectMapNode(window.__inspNodeId, false, true); } catch (e) {}
+        }
+      });
 
       // Nav menu button click handlers
       navButtons.forEach(btn => {
@@ -2259,10 +2267,11 @@
       const inspRelicsBox = document.getElementById('insp-relics-box');
       const inspRelicsChips = document.getElementById('insp-relics-chips');
 
-      window.selectMapNode = function (id, shouldScroll = false) {
-        sfx.playMechanicalClick();
+      window.selectMapNode = function (id, shouldScroll = false, quiet = false) {
+        if (!quiet) sfx.playMechanicalClick();
         const data = (typeof nodesData[id] === 'function') ? nodesData[id]() : nodesData[id];
         if (!data) return;
+        window.__inspNodeId = id;   // the card on show: drawn again, silently, when the Quest Map is opened or the tab comes back (a sealed card must not outlive the walk)
 
         // Switch to trail view if not already there
         const trailNavBtn = document.querySelector('[data-view="view-trail"]');

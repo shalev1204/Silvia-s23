@@ -521,7 +521,16 @@ def test_sandstone_labyrinth(browser):
     js("window.selectDesertStation(24)"); page.wait_for_timeout(500)
     check(not modal_open(), "labyrinth sealed during the walk")
 
+    # The sealed card on the Quest Map must not outlive the walk: she leaves for the wire, Hermes arrives, she comes back
+    js("window.selectMapNode(24, false)"); page.wait_for_timeout(300)
+    check("Sealed" in js("document.getElementById('insp-title').innerText"),
+          "while Hermes walks, the card of Station 15 is still veiled")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(400)
     js("localStorage.setItem('order_labyrinth_march_start', String(Date.now() - 7 * 3600 * 1000))")
+    js("document.querySelector('[data-view=\"view-trail\"]').click()"); page.wait_for_timeout(500)
+    check(js("document.getElementById('insp-title').innerText") == "The Sandstone Labyrinth & Cairn III"
+          and "ENTER THE LABYRINTH" in js("document.getElementById('insp-btn-primary').innerText"),
+          "back on the Quest Map after the walk, the card of Station 15 is unlocked and opens the labyrinth")
     js("window.openLabyrinthModal()"); page.wait_for_timeout(500)
     check(modal_open() and js("document.querySelector('#laby-game .monolith-game-inner').inert") is True,
           "after 6 h it opens, escape locked until the sigil")
