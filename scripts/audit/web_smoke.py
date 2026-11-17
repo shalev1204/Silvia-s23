@@ -82,8 +82,8 @@ BASE = f"http://127.0.0.1:{PORT}"
 VIEWS = ["view-trail", "view-transmissions", "view-archives", "view-chronicles", "view-cipher", "view-field-wire"]
 
 # Seeds a profile once per tab (sessionStorage guard), so reloads keep whatever the page writes
-# order_story_monolith_v1: hub/js/story-point.js would replace a seeded journey with Silvia's 12 Nov story point
-SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;if(s.__nostory)delete s.__nostory;else if(!('order_story_monolith_v1' in s))s.order_story_monolith_v1='done';for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
+# order_story_monolith_v1 / order_story_dream_v2: hub/js/story-point.js would replace a seeded journey with Silvia's story point (17 Nov)
+SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;if(s.__nostory)delete s.__nostory;else{if(!('order_story_monolith_v1' in s))s.order_story_monolith_v1='done';if(!('order_story_dream_v2' in s))s.order_story_dream_v2='done';}for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
 SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done", "order_silvia_live_v3": "done",
           "order_silvia_north_portal_v1": "done"}
 DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true",
@@ -1427,7 +1427,7 @@ def test_oracle_horizon(browser):
 
 
 def login(page, name):
-    # Silvia's saved point is stamped on 12 Nov (story-point.js): once she has been "away" for 12 hours the recap card
+    # Silvia's saved point is stamped on 17 Nov (story-point.js): once she has been "away" for 12 hours the recap card
     # opens over the page, as it should for her. A test that is not about it puts it away first.
     page.evaluate("document.querySelectorAll('.previously-overlay').forEach(o => o.remove())")
     page.click("#btn-seeker-switch")
@@ -1450,8 +1450,8 @@ def test_profiles(browser):
     page.wait_for_timeout(2500)
     check(seals() == 4, "Carles reaches Cairn IV with the tester")
     login(page, "Silvia")
-    # Her own canonical point (12 Nov, hub/js/story-point.js): only the Wash River Seal of Cairn I, at the foot of the Sun Monolith
-    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 1 and get("order_seal_cairn_1") == "true" and get("order_field_wire_step") == "10"
+    # Her own canonical point (17 Nov, hub/js/story-point.js): Seals I to III, the labyrinth and the dream behind her, Hermes on the march to Cairn IV
+    check(get("the_eclipse_active_seeker") == "Silvia" and seals() == 3 and get("order_seal_cairn_3") == "true" and get("order_field_wire_step") == "18"
           and get("order_cairn_iv_completed") is None and "tuning_pebble" not in page.evaluate("window.getOwnedRelicIds()"),
           "Silvia does not inherit Carles's seals, inventory or chat")
     page.evaluate("localStorage.setItem('seeker_silvia_cipher_ledger', JSON.stringify({O: 23, A: 7, R: 3}))")
@@ -1459,7 +1459,7 @@ def test_profiles(browser):
     check(seals() == 4 and get("order_cairn_iv_completed") == "true" and get("order_dawn_step") == "3",
           "Carles's adventure comes back untouched")
     login(page, "Silvia")
-    check('"R":3' in (get("seeker_silvia_cipher_ledger") or "") and seals() == 1 and get("order_dawn_choices") == "[1,1]",
+    check('"R":3' in (get("seeker_silvia_cipher_ledger") or "") and seals() == 3 and get("order_dawn_choices") == "[1,1]",
           "Silvia's own progress comes back")
     check(not errors, "no JS errors while switching seekers", "; ".join(sorted(set(errors))[:3]))
     ctx.close()

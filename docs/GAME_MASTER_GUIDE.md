@@ -142,9 +142,10 @@ Sin estaciones, sin nodos (>48), sin pasos de Wire (≥ 45 para S23; la Torre I 
 - Ledger real de Silvia: sembrado con O=23 y A=7 (excepción deliberada a la Regla 9, `hub-core.js:1101`); su guardado del 12-nov lleva 14 letras.
 - Tabla completa con ecuaciones, ids y `requires`: [guide/01 §3.3–3.4](guide/01_FOUNDATIONS_AND_CONSTELLATION.md) y [guide/04 §2.1](guide/04_SYSTEMS_AND_DOC_AUDIT.md).
 
-### 3.1 Estado de Silvia en el Ledger (guardado en Supabase del 16-nov-2026, 11:39)
+### 3.1 Estado de Silvia en el Ledger (guardado en Supabase del 17-nov-2026, 12:27 CET)
 
-- **Dónde está:** S14 (Sun Monolith) completado el **13-nov 00:34**; sellos I y II; Wire en el paso 13; **S15 sin abrir** (la marcha de 6 h ya pasó). Última visita: 15-nov 20:46 (solo miró el mapa).
+- **Dónde está:** S15 (Sandstone Labyrinth) completada el **16-nov 23:38** con los 3 hallazgos, las 4 voces y 0 close calls; **sueño de 1998 visto**; sellos I, II y III; Wire en el paso 18, en la marcha de 18 h a Cairn IV, que llega el **17-nov 17:58 CET**. Lo siguiente: **The Spyglass on the Natural Bridge** y **S16**. Detalle y respuestas en [`SILVIA_PLAYTHROUGH_LOG.md` §5](SILVIA_PLAYTHROUGH_LOG.md). Este punto se copia en el perfil de Carles y en el de Silvia sin nube (`story-point.js`, bandera `order_story_dream_v2`).
+- **Pendiente en su Ledger:** aún no ha escrito `[W]+[A]=26` ni `[N]−[E]=9` (Cairn III), aunque ya los tiene.
 - **Valores que ya ha descubierto (16 de 26):** O 23 · A 7 · K 26 · G 22 · P 21 · B 17 · V 12 · E 2 · T 16 · F 6 · X 15 · Q 14 · Z 5 · R 3 · D 18 · C 24.
 - **Ecuaciones resueltas: 19 de 30.** Pendientes (aparecen al completar su estación): `cairn3-wa`, `cairn3-ne` (S15) · `cairn4-sum`, `cairn4-diff` (S16) · `cairn5-yo`, `cairn5-lg` (S17) · `stele-hu`, `stele-mt` (S18) · `oracle-ie` y la nueva `[I]+[J]=18` (S19). `oracle-zd` y `gallery-jt` desaparecen (A-01, A-02).
 - **Letras sin valor todavía y cuándo se dan:**

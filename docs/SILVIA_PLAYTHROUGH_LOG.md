@@ -77,3 +77,22 @@
 - Dejar que cuide de Hermes en momentos con peso emocional.
 - Reconocer su precisión cuando acierte a la primera.
 - En el final, Hermes puede recordarle, con sus propias palabras, «companions, not strangers», la tiza cada cien pasos y «no fire tonight».
+
+---
+
+## 5. Del Sun Monolith al Cairn IV (16 y 17 de noviembre, horas CET)
+
+> Fuente: guardado en la nube del 17-nov 12:27 CET (143 claves). Es el punto canónico que `web/hub/js/story-point.js` copia en el perfil de Carles y en el de Silvia sin nube (bandera `order_story_dream_v2`).
+
+| Fecha y hora | Momento |
+|---|---|
+| 16-11, 23:07 | Responde a Hermes al amanecer (paso 13): **«Walk the reverse of the 348° groove.»** (índice 0). Por esa línea vio el humo del campamento: lo tiene marcado en el mapa del laberinto. La marcha de 6 h se quitó por orden del Operador. |
+| 16-11, ~23:10–23:38 | **Station 15 · The Sandstone Labyrinth**, desde cero (película, How to play y sigilo). Sigilo WINDROSE en 205 s, sin fallos ni notas. Huida: **133 turnos, 0 close calls**, los **3 hallazgos** (lámpara de los fundadores, tiza «H · 98», copia del levantamiento) y las **4 voces** de los asaltantes. 430 s con las antorchas. Sello III. |
+| 16-11, después | Paso 15: pregunta «Did you see their faces?» y responde **«Tell me about Aurelia’s stars.»** (índice 2). |
+| 16-11, después | **El sueño de 1998** completo (10 de 10 luces). Respuestas: por qué levantó el montón, **«For whoever would come after you.»**; qué le dice por el receptor, **«You are not alone out here.»**; qué hace con lo que sabe, **«Your hands remembered before you did.»**. |
+| 16-11, 23:58 | Paso 17, al anochecer junto al pastor: **«Ask him about the veiled woman.»** (índice 0). Empieza la marcha de 18 h hacia Cairn IV. En el camino deja pasar el búho (`hp-owl`); la tormenta (`hp-storm`) aún espera su respuesta. |
+| 17-11, 17:58 | Hermes llega al Cairn IV: se abren **The Spyglass on the Natural Bridge** (el catalejo) y **Station 16**. |
+
+**Ledger.** Tiene 16 letras (O A K G P B V E T F X Q Z R D C) y 19 ecuaciones. **Aún no ha escrito** las dos líneas del Cairn III (`[W]+[A]=26`, `[N]−[E]=9`): las tiene en la recompensa y en la faltriquera, pero W y N siguen vacías en su Ledger web.
+
+**Lectura.** Va a por todo: los tres hallazgos y las cuatro voces sin un solo close call, en 133 turnos (la ruta mínima son 55), así que exploró cada callejón a propósito. Cuando Hermes le habla de los asaltantes, ella pregunta por las estrellas de Aurelia, y junto al pastor, por la mujer velada: le interesa el misterio de Aurelia más que el peligro. En el sueño eligió las tres respuestas más cálidas: la huella para quien venga después, «no estás solo» y la memoria de las manos.
