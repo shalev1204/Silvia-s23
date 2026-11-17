@@ -746,8 +746,10 @@
     .satchel-inventory-body {
       display: grid;
       grid-template-columns: 350px 1fr;
+      grid-template-columns: 332px 1fr;
       gap: 20px;
       padding: 14px 20px;
+      padding: 12px 20px;
       overflow-y: auto;
       overscroll-behavior: contain;
       flex: 1;
@@ -827,6 +829,8 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       padding: 14px;
+      gap: 8px;
+      padding: 10px;
       background: rgba(10, 15, 26, 0.95);
       border: 2px solid #060910;
       border-top-color: #04060b;
@@ -928,6 +932,7 @@
     }
     .si-grid-legend {
       margin-top: 10px;
+      margin-top: 7px;
       padding: 0 4px;
       display: flex;
       align-items: center;
@@ -941,6 +946,7 @@
     /* ---- Collection Sets Panel (Left Column) ---- */
     .si-sets-panel {
       margin-top: 12px;
+      margin-top: 8px;
       display: flex;
       flex-direction: column;
       gap: 8px;
