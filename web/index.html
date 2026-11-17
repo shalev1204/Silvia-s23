@@ -1932,44 +1932,127 @@
           <div class="view-tagline">✦ Celestial Arithmetic ✦</div>
           <h2 class="view-title">The Cipher Ledger</h2>
           <p class="view-desc">
-            Record the numerical values you discover for the 26 letters of the Order alphabet and balance the coordinates of the ancient sanctuaries.
+            Assign a unique value (1–26) to each letter of the Order alphabet and balance the sanctuary formulas directly in place.
           </p>
         </header>
 
         <div class="cipher-ledger-container">
 
-          <!-- 26-Letter Alphabet Vault -->
+          <!-- Tactical Ledger HUD -->
+          <div class="ledger-hud-bar" id="ledger-hud-bar">
+            <div class="ledger-hud-metrics">
+              <div class="ledger-hud-pill" id="hud-letters-pill">
+                <span class="hud-pill-label">Letters</span>
+                <strong class="hud-pill-value" id="hud-letters-count">0 / 26</strong>
+              </div>
+              <div class="ledger-hud-pill" id="hud-equations-pill">
+                <span class="hud-pill-label">Equations</span>
+                <strong class="hud-pill-value" id="hud-equations-count">0 / 10</strong>
+              </div>
+              <div class="ledger-hud-pill is-warn" id="hud-conflicts-pill" hidden>
+                <span class="hud-pill-label">Alerts</span>
+                <strong class="hud-pill-value" id="hud-conflicts-count">0</strong>
+              </div>
+              <div class="ledger-progress-track" aria-hidden="true">
+                <div class="ledger-progress-fill" id="ledger-progress-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="ledger-hud-actions">
+              <button type="button" class="ledger-util-btn" id="btn-copy-ledger" title="Copy cipher summary to clipboard">
+                <span>📋</span>
+                <span id="copy-btn-text">Copy Notes</span>
+              </button>
+              <button type="button" class="ledger-util-btn is-danger" id="btn-reset-ledger" title="Reset all letter assignments for this sandbox">
+                <span>↺</span>
+                <span>Reset</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 26-Letter Alphabet Vault + Available Numbers Pool -->
           <div class="cipher-alphabet-card">
             <div class="cipher-card-header">
               <div class="cipher-card-title">
                 <span>Alphabet Numerical Assignment (A – Z)</span>
+              </div>
+              <div class="cipher-header-right">
+                <span class="alphabet-status-pill" id="alphabet-status-pill">0 / 26 Assigned</span>
+                <button type="button" class="ledger-chip-clear" id="btn-clear-letter-filter" hidden>Clear Letter Filter ×</button>
               </div>
             </div>
 
             <div class="alphabet-grid-26" id="alphabet-grid">
               <!-- Dynamically populated A to Z letter boxes -->
             </div>
+
+            <div class="number-pool-wrap" id="ledger-number-pool-wrap">
+              <div class="number-pool-head">
+                <span class="number-pool-title">Available Numbers (1 – 26)</span>
+                <span class="number-pool-hint" id="number-pool-summary">26 free · focus any letter box, then click a free number to assign</span>
+              </div>
+              <div class="number-pool-grid" id="ledger-number-pool" aria-label="Numbers 1 to 26 status">
+                <!-- Dynamically populated 1 to 26 chips -->
+              </div>
+            </div>
           </div>
 
-          <!-- Coordinate Equations -->
-          <div class="sanctuary-equations-card">
+          <!-- Coordinate Equations / The Surveyor's Balance (Option C + Live Balance after Station 11) -->
+          <div class="sanctuary-equations-card" id="sanctuary-equations-card">
             <div class="cipher-card-header">
-              <div class="cipher-card-title">
-                <span>📜</span>
-                <span>Coordinate Equations</span>
+              <div class="sanctuary-title-stack">
+                <div class="cipher-card-title">
+                  <svg class="sb-head-emblem" id="sanctuary-emblem" viewBox="0 0 48 48" aria-hidden="true" focusable="false" hidden>
+                    <defs><linearGradient id="sb-head-brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe099"/><stop offset="1" stop-color="#8a5f22"/></linearGradient></defs>
+                    <circle cx="24" cy="24" r="21" fill="url(#sb-head-brass)" stroke="#3b280a" stroke-width="1.5"/>
+                    <path d="M24 9 A15 15 0 0 0 24 39 Z" fill="#17110a"/>
+                    <path d="M24 9 A15 15 0 0 1 24 39 Z" fill="#f7f0dd"/>
+                    <circle cx="24" cy="24" r="15" fill="none" stroke="#3b280a" stroke-width="1.2"/>
+                  </svg>
+                  <span id="sanctuary-title-icon" aria-hidden="true">📜</span>
+                  <span id="sanctuary-title-text">Coordinate Equations</span>
+                </div>
+                <p class="sb-lore" id="balance-lore-sub" hidden>
+                  Found in the marker on the south shore of the Salt Playa: a brass balance of the Order, with the half-black, half-white circle set on its beam.
+                </p>
               </div>
               <div class="sanctuary-status-pill" id="sanctuary-status-pill">
-                0 / 6 Equations Resolved
+                0 / 10 Equations Resolved
               </div>
             </div>
 
-            <div class="clue-equations-list" id="clue-equations-container">
-              <!-- 6 Clue Equations dynamically populated -->
+            <!-- Live Reactive Brass Balance (js/ledger-balance.js, shown once the Salt Playa is crossed) -->
+            <div class="live-balance-stage" id="balance-stage-host" hidden></div>
+
+            <div class="eq-toolbar" id="eq-toolbar">
+              <div class="eq-filter-tabs" role="tablist" aria-label="Filter coordinate equations">
+                <button type="button" role="tab" class="eq-filter-tab" id="eq-tab-pending" data-eq-filter="pending" aria-selected="false">
+                  Pending <span class="eq-tab-count" id="eq-count-pending">0</span>
+                </button>
+                <button type="button" role="tab" class="eq-filter-tab is-active" id="eq-tab-all" data-eq-filter="all" aria-selected="true">
+                  All <span class="eq-tab-count" id="eq-count-all">0</span>
+                </button>
+                <button type="button" role="tab" class="eq-filter-tab" id="eq-tab-resolved" data-eq-filter="resolved" aria-selected="false">
+                  Resolved <span class="eq-tab-count" id="eq-count-resolved">0</span>
+                </button>
+                <button type="button" role="tab" class="eq-filter-tab is-warn-tab" id="eq-tab-conflicts" data-eq-filter="conflicts" aria-selected="false" hidden>
+                  Alerts <span class="eq-tab-count" id="eq-count-conflicts">0</span>
+                </button>
+              </div>
+              <div class="eq-toolbar-right">
+                <button type="button" class="eq-letter-filter-badge" id="eq-letter-filter-badge" hidden title="Remove letter filter"></button>
+                <span class="eq-drag-tip" id="eq-drag-tip">Edit numbers directly in each formula · Drag ⋮⋮ to reorder</span>
+              </div>
+            </div>
+
+            <div class="clue-equations-list clue-equations-grid" id="clue-equations-container">
+              <!-- Unlocked Clue Equations dynamically populated -->
+            </div>
+
+            <div class="eq-empty-state" id="eq-empty-state" hidden>
+              <p class="eq-empty-msg" id="eq-empty-msg">All unlocked equations are balanced.</p>
+              <button type="button" class="ledger-util-btn" id="btn-show-all-eq">Show All Equations</button>
             </div>
           </div>
-
-          <!-- The Surveyor's Balance (Station 11 reward): js/ledger-balance.js, shown once the Salt Playa is crossed -->
-          <div class="surveyors-balance-card" id="surveyors-balance" hidden></div>
 
         </div>
       </section>
@@ -2504,13 +2587,6 @@
           </div>
 
           <div class="si-sets-panel" id="si-sets-panel" aria-label="Expedition Collections & Synergies">
-            <div class="si-set-card" id="si-set-cairns">
-              <div class="si-set-head">
-                <span class="si-set-title">🪨 The Five Seals</span>
-                <span class="si-set-count" id="si-set-cairns-count">0 / 5</span>
-              </div>
-              <div class="si-cairn-pips" id="si-cairn-pips"></div>
-            </div>
             <div class="si-set-card" id="si-set-keepers">
               <div class="si-set-head">
                 <span class="si-set-title">⚖️ Two Keepers Tribute</span>

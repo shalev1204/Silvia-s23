@@ -1373,7 +1373,7 @@
           + (unseen && captures === 0 ? '<div class="rw-flawless">✦ Never seen ✦</div>' : unseen ? '<div class="rw-flawless">✦ Unseen on the last road ✦</div>' : '')
           + '</section>'
           + '<section class="rw-loot">'
-          + '<figure class="laby-rw-seal"><img src="./assets/items/item_seal_cairn_3.svg" alt="" width="84" height="84"><figcaption>The Seal of Cairn III · ' + (function () { let n = 0; for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') n++; return n; })() + ' of 5</figcaption></figure>'
+          + '<figure class="laby-rw-seal"><img src="./assets/items/item_seal_cairn_3.png" alt="" width="84" height="84"><figcaption>The Seal of Cairn III · ' + (function () { let n = 0; for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') n++; return n; })() + ' of 5</figcaption></figure>'
           + '<div class="laby-rw-eqs">'
           + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut on the founders’ stone</div><div class="rw-ledger-title">The West Wind Line</div><div class="rw-eq" aria-label="W plus A equals 26"><i>W</i><u>+</u><i>A</i><u>=</u><b>26</b></div><p>A line for your Cipher Ledger.</p></div></div>'
           + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut beneath it</div><div class="rw-ledger-title">The Wind Rose Line</div><div class="rw-eq" aria-label="N minus E equals 9"><i>N</i><u>−</u><i>E</i><u>=</u><b>9</b></div><p>The second line. Record both in your Ledger.</p></div></div>'

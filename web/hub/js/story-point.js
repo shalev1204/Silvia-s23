@@ -22,7 +22,6 @@
         "cartographer_radio_active_slide": "0",
         "order_active_map_path": "desert",
         "order_ambience_muted": "false",
-        "order_balance_state": "{\"silvia\":{\"open\":\"lon-sec|diff-tf\",\"pairs\":{\"lat-deg|diff-kg\":{\"step\":3,\"entries\":[52,26,22]},\"lon-deg|diff-pb\":{\"step\":3,\"entries\":[42,21,17]},\"lon-min|diff-ve\":{\"step\":3,\"entries\":[24,12,2]},\"lon-sec|diff-tf\":{\"step\":3,\"entries\":[32,16,6]}}},\"carles\":{\"open\":\"lon-sec|diff-tf\",\"pairs\":{\"lat-deg|diff-kg\":{\"step\":3,\"entries\":[52,26,22]},\"lon-deg|diff-pb\":{\"step\":3,\"entries\":[42,21,17]},\"lon-min|diff-ve\":{\"step\":3,\"entries\":[24,12,2]},\"lon-sec|diff-tf\":{\"step\":3,\"entries\":[32,16,6]}}}}",
         "order_cairn1_completed": "true",
         "order_cairn1_found": "true",
         "order_cairn4_march_start": "1794869911910",

@@ -2933,7 +2933,7 @@ float shNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 
                 <div class="rw-ledger-text">
                   <div class="rw-ledger-kicker">Found in the marker · a new instrument</div>
                   <div class="rw-ledger-title">The Surveyor's Balance</div>
-                  <p>A little brass balance of the Order, now in your Cipher Ledger. Lay a sum on one pan and a difference on the other, and it shows you how to weigh out the two letters.</p>
+                  <p>A little brass balance of the Order, now set in your Cipher Ledger. Focus any formula to lay its letters on the pans and watch the beam weigh your own numbers live.</p>
                 </div>
               </div>
               <div class="rw-next">Next · Station 12 · The Desert Lexicon</div>

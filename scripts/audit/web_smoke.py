@@ -3715,7 +3715,7 @@ def test_salt_playa(browser):
 
 
 def test_balance(browser):
-    print("\n36. The Surveyor's Balance (Station 11 reward): the pairs, three steps she types herself, her letters in her Ledger")
+    print("\n36. The Surveyor's Balance (Station 11 reward): unified with Coordinate Equations, live tilting scale, zero auto-solve")
     import re
     seed = dict(DESERT_BASE, order_silvia_oa_ledger_v1="done", seeker_silvia_cipher_ledger="{}")
     ctx, page, errors = new_page(browser, seed)
@@ -3723,94 +3723,63 @@ def test_balance(browser):
     page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
     js("window.activateHubView('view-cipher')"); page.wait_for_timeout(700)
     shown = lambda sel: js("s => { const e = document.querySelector(s); return !!e && !e.closest('[hidden]') && e.getClientRects().length > 0; }", sel)
-    feedback = lambda: js("document.querySelector('#surveyors-balance .sb-feedback').innerText")
-    weigh = lambda i, n: (page.fill(f"#sb-in-{i}", str(n)), page.press(f"#sb-in-{i}", "Enter"), page.wait_for_timeout(350))
+    verdict = lambda: js("document.querySelector('#balance-stage-host .sb-readout-verdict').innerText")
 
-    check(shown("#surveyors-balance") and "The Surveyor's Balance" in js("document.getElementById('surveyors-balance').innerText"),
-          "Salt Playa crossed: the balance shows in the Ledger, after the Coordinate Equations")
-    chips = js("[...document.querySelectorAll('#surveyors-balance .sb-chip')].map(c => c.innerText.replace(/\\s+/g, ' '))")
-    check(len(chips) == 5 and any("K + G = 48" in c and "K − G = 4" in c for c in chips),
-          "it lists the five pairs of lines, K and G among them", str(chips))
-    check(js("EclipseLedger.value('K') === undefined && EclipseLedger.value('G') === undefined")
-          and not js("[...document.querySelectorAll('#surveyors-balance .sb-chip-done')].some(e => !e.closest('[hidden]'))"),
-          "K and G start empty, and no pair carries a ✓")
+    check(shown("#balance-stage-host") and js("document.getElementById('sanctuary-title-text').innerText.trim()") == "The Surveyor's Balance"
+          and shown("#balance-lore-sub"),
+          "Salt Playa crossed: Coordinate Equations renames to The Surveyor's Balance and shows the live brass balance")
+    check(js("EclipseLedger.value('K') === undefined && EclipseLedger.value('G') === undefined"),
+          "Rule 9: K and G start empty; the balance never preloads or computes values")
 
-    page.click("#surveyors-balance .sb-chip[data-pair='lat-deg|diff-kg']"); page.wait_for_timeout(500)
-    bench = js("document.querySelector('#surveyors-balance .sb-bench').innerText")
-    check(shown("#surveyors-balance .sb-bench") and "K + G = 48" in bench and "K − G = 4" in bench
-          and not re.search(r"\b(52|26|22)\b", bench) and js("document.activeElement.id") == "sb-in-0",
-          "the K and G pair goes on the beam: both lines shown, no total or letter given away, the first box has the focus", bench[:200].replace("\n", " "))
-    check(js("document.getElementById('sb-in-1').disabled && document.getElementById('sb-in-2').disabled"), "steps II and III wait their turn")
+    # Focus Latitude Degrees (K + G = 48) directly in the inline grid
+    page.focus("#eq-item-lat-deg input.eq-input-K"); page.wait_for_timeout(350)
+    readout_title = js("document.getElementById('sb-readout-title').innerText")
+    check("LATITUDE DEGREES" in readout_title.upper()
+          and js("document.querySelector('#sb-pan-left .sb-weight-letter').textContent") == "K"
+          and js("document.querySelector('#sb-pan-right .sb-weight-letter').textContent") == "G"
+          and not re.search(r"\b(26|22)\b", js("document.getElementById('balance-stage-host').innerText")),
+          "focusing K + G = 48 puts K and G on the pans without revealing their values", readout_title)
 
-    weigh(0, 50)
-    hint = feedback()
-    check(js("document.getElementById('sb-in-0') && !document.getElementById('sb-in-0').disabled")
-          and js("document.querySelector('#surveyors-balance .sb-feedback').classList.contains('is-hint')")
-          and "Not quite" in hint and not re.search(r"\d", hint),
-          "a wrong total: the sum shakes and a hint explains the step in words, with no number", hint)
-    weigh(0, 52)
-    check(js("!document.getElementById('sb-in-1').disabled") and "52 ÷ 2" in js("document.querySelector('label[for=\"sb-in-1\"]').innerText"),
-          "52 is right: step II opens with her own total")
-    weigh(1, 26)
-    weigh(2, 22)
-    page.wait_for_timeout(400)
-    write = "#surveyors-balance .sb-finish .sb-btn-primary"
-    check(shown("#surveyors-balance .sb-finish") and js(f"document.querySelector('{write}').innerText") == "Write K and G in my Ledger"
-          and js("EclipseLedger.value('K') === undefined"),
-          "the beam rests level and offers to write K and G, without writing them yet")
-    state = js("JSON.parse(localStorage.getItem('order_balance_state') || '{}')").get("silvia", {})
-    check(state.get("open") == "lat-deg|diff-kg" and state.get("pairs", {}).get("lat-deg|diff-kg", {}).get("step") == 3,
-          "order_balance_state keeps the open pair and her step", str(state))
+    # Enter an imbalanced pair: K=25, G=22 -> 47 != 48, beam tilts and must NOT mark resolved
+    page.fill("#eq-item-lat-deg input.eq-input-K", "25")
+    page.fill("#eq-item-lat-deg input.eq-input-G", "22")
+    page.wait_for_timeout(350)
+    check(js("!document.getElementById('sb-stage').classList.contains('is-level')")
+          and "Tilted" in verdict()
+          and js("!document.getElementById('eq-item-lat-deg').classList.contains('is-resolved')"),
+          "imbalanced values (25 + 22 = 47) tilt the brass beam and stay unresolved", verdict())
 
-    page.reload(wait_until="load"); page.wait_for_timeout(2500)
-    js("window.activateHubView('view-cipher')"); page.wait_for_timeout(600)
-    check(shown("#surveyors-balance .sb-finish") and js("document.querySelector('#surveyors-balance .sb-chip.is-open').dataset.pair") == "lat-deg|diff-kg",
-          "after a reload she finds the same pair, still level")
-    page.click(write); page.wait_for_timeout(400)
-    check(js("EclipseLedger.value('K')") == 26 and js("EclipseLedger.value('G')") == 22,
-          "“Write K and G in my Ledger” writes her own 26 and 22")
-    check(js("!document.querySelector(\"#surveyors-balance .sb-chip[data-pair='lat-deg|diff-kg'] .sb-chip-done\").hidden")
-          and js(f"document.querySelector('{write}').disabled"),
-          "the pair now carries a ✓ and the button says they are in her Ledger")
+    # Enter matching numbers manually: K=26, G=22 -> beam levels and card resolves
+    page.fill("#eq-item-lat-deg input.eq-input-K", "26")
+    page.wait_for_timeout(350)
+    check(js("document.getElementById('sb-stage').classList.contains('is-level')")
+          and "Level" in verdict()
+          and js("document.getElementById('sb-stage').getAttribute('data-beam-angle') === '0'")
+          and js("document.getElementById('eq-item-lat-deg').classList.contains('is-resolved')"),
+          "matching values (26 + 22 = 48) level the beam at 0 deg and resolve the formula", verdict())
 
-    js("EclipseLedger.set('K', 25)"); page.wait_for_timeout(300)
-    check("different value for K" in js("document.querySelector('#surveyors-balance .sb-conflict').innerText"),
-          "a different K in her Ledger: the balance warns her")
-    page.click(write); page.wait_for_timeout(300)
-    check(shown("#surveyors-balance .sb-confirm") and js("EclipseLedger.value('K')") == 25,
-          "it does not overwrite silently: it asks first")
-    page.click("#surveyors-balance .sb-confirm .sb-btn-primary"); page.wait_for_timeout(300)
-    check(js("EclipseLedger.value('K')") == 26 and not shown("#surveyors-balance .sb-confirm"), "she chooses to replace it: K is 26 again")
-
-    # The Line of the Salt, from her own Ledger values only
-    page.click("#surveyors-balance .sb-chip[data-pair='lat-min|zod-diff']"); page.wait_for_timeout(400)
-    weigh(0, 46); weigh(1, 23); weigh(2, 7)
-    salt = "#surveyors-balance .sb-finish .sb-actions .sb-btn:not(.sb-btn-primary):not(.sb-btn-quiet)"
-    check(shown(salt) and "Line of the Salt" in js(f"document.querySelector('{salt}').innerText"), "the A and O pair offers to check with The Line of the Salt")
-    page.click(salt); page.wait_for_timeout(300)
-    out = js("document.querySelector('#surveyors-balance .sb-salt').innerText")
-    check("needs both letters" in out and not re.search(r"\b(16|7)\b", out), "without T and A in her Ledger it only says what is missing", out)
-    js("EclipseLedger.set('T', 16); EclipseLedger.set('A', 7)"); page.wait_for_timeout(200)
-    page.click(salt); page.wait_for_timeout(300)
-    check("holds" in js("document.querySelector('#surveyors-balance .sb-salt').innerText"), "with her T and A, T − A = 9 holds")
-
-    # A phone: no sideways scroll
-    page.set_viewport_size({"width": 375, "height": 812}); page.wait_for_timeout(500)
+    # Narrow phone: zero sideways spill
+    page.set_viewport_size({"width": 375, "height": 812}); page.wait_for_timeout(450)
     wide = js("""() => { const vw = document.documentElement.clientWidth, out = [];
-      document.querySelectorAll('#surveyors-balance, #surveyors-balance *').forEach(e => { const r = e.getBoundingClientRect();
+      document.querySelectorAll('#balance-stage-host, #balance-stage-host *').forEach(e => { const r = e.getBoundingClientRect();
         if (r.width && (r.right > vw + 1 || r.left < -1)) out.push(e.className.baseVal ?? e.className); });
       return out.slice(0, 3); }""")
-    check(not wide, "at 375 px the balance fits the screen", str(wide))
+    check(not wide, "at 375 px the live balance fits the screen", str(wide))
 
+    # Before Salt Playa: title returns to Coordinate Equations and balance illustration/subtitle hide
     js("localStorage.setItem('order_salt_playa_completed', 'false'); document.dispatchEvent(new CustomEvent('ledger:changed'))"); page.wait_for_timeout(200)
-    check(not shown("#surveyors-balance"), "the Playa not crossed: the card hides")
+    check(not shown("#balance-stage-host") and js("document.getElementById('sanctuary-title-text').innerText.trim()") == "Coordinate Equations"
+          and not shown("#balance-lore-sub"),
+          "the Playa not crossed: card stays Coordinate Equations and the balance hides")
     check(not errors, "no JS errors at the balance", "; ".join(errors[:2]))
     ctx.close()
 
     ctx, page, errors = new_page(browser, dict(SILVIA, order_whispering_chasm_completed="true"))
     page.goto(f"{BASE}/index.html", wait_until="load"); page.wait_for_timeout(2500)
     page.evaluate("window.activateHubView('view-cipher')"); page.wait_for_timeout(500)
-    check(page.evaluate("document.getElementById('surveyors-balance').hidden"), "before the Salt Playa, the Ledger has no balance")
+    check(page.evaluate("document.getElementById('balance-stage-host').hidden")
+          and page.evaluate("document.getElementById('sanctuary-title-text').innerText.trim()") == "Coordinate Equations",
+          "before the Salt Playa, the Ledger has no balance illustration and reads Coordinate Equations")
     check(not errors, "no JS errors before the Playa", "; ".join(errors[:2]))
     ctx.close()
 

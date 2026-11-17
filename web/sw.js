@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '503833db8fd1';  // 227 files, 46.8 MB
+var VERSION = '8d8029b82aa2';  // 233 files, 51.2 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -32,6 +32,8 @@ var PRECACHE = [
   "./assets/items/item_falcon_weight.png",
   "./assets/items/item_flint_juniper.jpg",
   "./assets/items/item_flint_tinder.png",
+  "./assets/items/item_founders_lamp.jpg",
+  "./assets/items/item_founders_lamp.png",
   "./assets/items/item_founders_lamp.svg",
   "./assets/items/item_gilded_feather.jpg",
   "./assets/items/item_gilded_feather.png",
@@ -47,6 +49,8 @@ var PRECACHE = [
   "./assets/items/item_mirror_fragment_3.svg",
   "./assets/items/item_order_wax_seal.jpg",
   "./assets/items/item_order_wax_seal.png",
+  "./assets/items/item_raiders_survey.jpg",
+  "./assets/items/item_raiders_survey.png",
   "./assets/items/item_raiders_survey.svg",
   "./assets/items/item_red_cord.jpg",
   "./assets/items/item_red_cord.png",
@@ -56,6 +60,8 @@ var PRECACHE = [
   "./assets/items/item_seal_cairn_2.jpg",
   "./assets/items/item_seal_cairn_2.png",
   "./assets/items/item_seal_cairn_2.svg",
+  "./assets/items/item_seal_cairn_3.jpg",
+  "./assets/items/item_seal_cairn_3.png",
   "./assets/items/item_seal_cairn_3.svg",
   "./assets/items/item_seal_cairn_4.svg",
   "./assets/items/item_seal_cairn_5.svg",

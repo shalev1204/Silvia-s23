@@ -6,6 +6,11 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0;
+      max-width: 100%;
+    }
+    @media (max-width: 640px) {
+      .viewport-header-left { flex-wrap: wrap; gap: 8px; }
     }
 
     .btn-header-messenger {
@@ -723,6 +728,9 @@
     }
 
     /* ---- Satchel Relics Inventory Modal (AAA Upgraded) ---- */
+    .satchel-inventory-backdrop {
+      overscroll-behavior: contain;
+    }
     .satchel-inventory-window {
       position: relative;
       width: min(920px, 96vw);
@@ -741,6 +749,7 @@
       gap: 20px;
       padding: 14px 20px;
       overflow-y: auto;
+      overscroll-behavior: contain;
       flex: 1;
     }
     @media (max-width: 780px) {
@@ -808,8 +817,6 @@
     .si-filter-btn:focus-visible,
     .si-tool-btn:focus,
     .si-tool-btn:focus-visible,
-    .si-cairn-pip:focus,
-    .si-cairn-pip:focus-visible,
     .si-mc-slot:focus,
     .si-mc-slot:focus-visible {
       outline: 2px solid #ffd8a8;
@@ -976,42 +983,6 @@
       font-size: 0.88rem;
       color: #cbd5e1;
       text-align: left;
-    }
-    .si-cairn-pips {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-    }
-    .si-cairn-pip {
-      appearance: none;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(156, 179, 216, 0.4);
-      background: #0d1422;
-      color: #cbd5e1;
-      font-family: 'Cinzel', serif;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.16s ease;
-    }
-    .si-cairn-pip.is-owned {
-      border-color: #fbbf24;
-      background: radial-gradient(circle, #f6ad55 0%, #a36a22 100%);
-      color: #0b0f18;
-      box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
-    }
-    .si-cairn-pip.is-owned:hover {
-      transform: scale(1.08);
-    }
-    .si-cairn-pip:disabled {
-      cursor: default;
-      opacity: 0.72;
     }
 
     /* ---- Tactile 3D Inspector Panel (Right Column) ---- */

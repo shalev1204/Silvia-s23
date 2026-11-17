@@ -430,6 +430,7 @@
        ========================================================================= */
     .hub-main-viewport {
       flex: 1;
+      min-width: 0;
       padding: 30px 38px 60px;
       overflow-y: visible;
       max-width: 1200px;
