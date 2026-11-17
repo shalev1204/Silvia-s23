@@ -4568,7 +4568,7 @@ def test_bridge_spyglass(browser):
     js = page.evaluate
     shown = lambda i: js("i => getComputedStyle(document.getElementById(i)).display !== 'none'", i)
     state = lambda: js("window.__spyglass.state()")
-    chips = lambda: js("[...document.querySelectorAll('#spy-sights .spy-chip')].map(c => c.textContent)")
+    chips = lambda: js("[...document.querySelectorAll('#spy-sights .spy-chip')].map(c => c.getAttribute('aria-label') || c.textContent)")
 
     def settle(stages, limit=60, seen=None):
         for _ in range(limit * 5):
@@ -4587,7 +4587,7 @@ def test_bridge_spyglass(browser):
     st = settle(["glass"]); page.wait_for_timeout(900)
     st = state()
     if gl:
-        check(st["mode"] == "glass" and st["lens"] and st["zoom"] == 0 and js("!document.getElementById('btn-spy-hint').hidden"), "Hermes hands over the spyglass: the eye is at the lens", str(st))
+        check(st["mode"] == "glass" and st["lens"] and st["zoom"] == 1 and js("!document.getElementById('btn-spy-hint').hidden"), "Hermes hands over the spyglass: the eye is at the lens", str(st))
         # the lens finds what it rests on
         js("window.__spyglass.aim('wagons', false)"); st = settle(["glass"], 20, "wagons")
         check("wagons" in st["seen"] and any("wedged wagon" in c for c in chips()) and js("document.getElementById('spy-sights-count').textContent").startswith("1 / 7"),
@@ -4597,14 +4597,14 @@ def test_bridge_spyglass(browser):
         note = js("document.getElementById('spy-note').textContent")
         check("oilcloth" not in state()["seen"] and "closer" in note, "the covered wagon is too far for the first draw of the tube: the lens says to bring it closer", f"note '{note}' {state()}")
         js("document.getElementById('btn-spy-in').click()"); st = settle(["glass"], 20, "oilcloth")
-        check("oilcloth" in st["seen"] and st["zoom"] == 1 and "three flames" in js("document.getElementById('spy-log').innerText"), "one draw closer, the mark of the BC Ashes on the oilcloth can be read")
+        check("oilcloth" in st["seen"] and st["zoom"] == 2 and "three flames" in js("document.getElementById('spy-log').innerText"), "one draw closer, the mark of the BC Ashes on the oilcloth can be read")
         # the keyboard moves the glass too
         b0 = state()["bearing"]
         js("document.getElementById('spy-stage').focus()")
         for _ in range(6): page.keyboard.press("ArrowRight")
         page.keyboard.press("-"); page.wait_for_timeout(700)
         st = state()
-        check(st["bearing"] != b0 and st["zoom"] == 0, "the arrow keys turn the glass and − pushes the tube in", f"{b0} -> {st['bearing']} zoom {st['zoom']}")
+        check(st["bearing"] != b0 and st["zoom"] == 1, "the arrow keys turn the glass and − pushes the tube in", f"{b0} -> {st['bearing']} zoom {st['zoom']}")
         # Hermes points, then turns the glass himself
         js("document.getElementById('btn-spy-hint').click()"); page.wait_for_timeout(500)
         sub = js("document.getElementById('spy-subtitle').textContent")
