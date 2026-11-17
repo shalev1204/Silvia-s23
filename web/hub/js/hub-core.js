@@ -9483,8 +9483,9 @@
         // "5 h 12 min" while Hermes walks; '' before he sets out or once he has arrived
         const eta = () => {
           if (!started() || progress() >= 1.0) return '';
-          const remMin = Math.max(1, Math.ceil(msNow() * (1 - progress()) / 60000));   // never "0 h 00 min" while he is still walking
-          return Math.floor(remMin / 60) + ' h ' + String(remMin % 60).padStart(2, '0') + ' min';
+          const remMs = Math.max(0, msNow() * (1 - progress()));
+          if (remMs < 60000) return 'under a minute';   // never "0 h 00 min" while he is still walking
+          return Math.floor(remMs / 3600000) + ' h ' + String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0') + ' min';
         };
         const start = () => {
           if (localStorage.getItem(keys.start)) return;
