@@ -196,7 +196,7 @@ button.spy-chip:disabled { cursor: default; opacity: 0.5; }
 .dream-five-cairn svg { width: 58px; height: 47px; fill: rgba(58, 38, 20, 0.07); stroke: #3a2614; stroke-width: 1.4; stroke-linejoin: round; }
 .dream-five-cairn.has-seal svg { fill: rgba(212, 160, 60, 0.42); stroke: #7a4e10; }
 .dream-five-cairn b { display: block; font: 600 0.74rem 'Cinzel', Georgia, serif; }
-.dream-five-cairn small { display: block; max-width: 92px; font: italic 0.7rem 'EB Garamond', Georgia, serif; color: #6a4a2c; }
+.dream-five-cairn small { display: block; max-width: 92px; font: italic 0.7rem 'EB Garamond', Georgia, serif; color: #4a311b; }
 .dream-five-cairn.is-standing small { color: #2c5a3a; }
 
 @keyframes dreamScratch { 0% { transform: translateX(0); } 20% { transform: translateX(-31px); } 40% { transform: translateX(17px); } 60% { transform: translateX(-9px); } 80% { transform: translateX(41px); } 100% { transform: translateX(0); } }

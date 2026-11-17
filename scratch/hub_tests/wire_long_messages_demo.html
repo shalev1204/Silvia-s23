@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Field Wire Message Grouping Demo — Before vs Options A, B, C</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0907;
+      --panel: #15100c;
+      --border: rgba(212, 168, 83, 0.34);
+      --gold: #f3d79b;
+      --gold-soft: #d4a853;
+      --text: #efe3d2;
+      --muted: #b9a792;
+      --time: #d7c7ad;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 26px 28px 40px;
+      background: radial-gradient(circle at 50% 0%, #231810 0%, #0b0806 70%);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    .demo-header {
+      max-width: 1520px;
+      margin: 0 auto 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.25);
+      padding-bottom: 14px;
+    }
+    .demo-kicker {
+      font: 700 0.72rem 'Cinzel', serif;
+      letter-spacing: 0.22em;
+      color: var(--gold-soft);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .demo-title {
+      margin: 0;
+      font: 700 1.45rem 'Cinzel', serif;
+      color: #fff6e5;
+      letter-spacing: 0.04em;
+    }
+    .demo-sub {
+      margin: 4px 0 0;
+      font-size: 0.88rem;
+      color: #cab9a3;
+    }
+    .demo-legend {
+      font: 500 0.78rem 'JetBrains Mono', monospace;
+      color: var(--gold);
+      background: rgba(212, 168, 83, 0.1);
+      border: 1px solid rgba(212, 168, 83, 0.3);
+      padding: 7px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+    .grid-2x2 {
+      max-width: 1520px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      align-items: start;
+    }
+    .wire-card {
+      background: linear-gradient(180deg, rgba(28, 21, 16, 0.96) 0%, rgba(16, 12, 9, 0.98) 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65);
+    }
+    .wire-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: linear-gradient(180deg, rgba(46, 33, 22, 0.95), rgba(30, 22, 15, 0.95));
+      border-bottom: 1px solid rgba(212, 168, 83, 0.28);
+    }
+    .head-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .head-left img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid var(--gold-soft);
+    }
+    .opt-badge {
+      font: 700 0.72rem 'Cinzel', serif;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .opt-badge.is-current {
+      background: rgba(239, 68, 68, 0.16);
+      border: 1px solid rgba(248, 113, 113, 0.45);
+      color: #fecaca;
+    }
+    .opt-badge.is-opt {
+      background: rgba(212, 168, 83, 0.16);
+      border: 1px solid rgba(212, 168, 83, 0.5);
+      color: #fde68a;
+    }
+    .opt-badge.is-rec {
+      background: rgba(52, 211, 153, 0.15);
+      border: 1px solid rgba(52, 211, 153, 0.48);
+      color: #a7f3d0;
+    }
+    .head-title {
+      font: 700 0.96rem 'Cinzel', serif;
+      color: #fff6e6;
+    }
+    .head-stat {
+      font: 600 0.7rem 'JetBrains Mono', monospace;
+      color: #e8cfa8;
+      opacity: 0.92;
+    }
+    .stream {
+      padding: 16px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background:
+        radial-gradient(circle at 80% 10%, rgba(212, 168, 83, 0.05), transparent 45%),
+        linear-gradient(180deg, rgba(16, 12, 9, 0.9), rgba(12, 9, 7, 0.96));
+    }
+    .sender-label {
+      font: 700 0.62rem 'Cinzel', serif;
+      letter-spacing: 0.14em;
+      color: #d4a76a;
+      margin: 2px 0 2px 3px;
+      text-transform: uppercase;
+    }
+    .sender-label.is-silvia {
+      text-align: right;
+      margin: 6px 3px 2px 0;
+      color: #cbd5e1;
+    }
+    .bubble {
+      position: relative;
+      padding: 9px 13px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.42);
+      border: 1px solid rgba(212, 168, 83, 0.16);
+    }
+    .bubble.incoming {
+      max-width: 94%;
+      align-self: flex-start;
+      border-left: 2.5px solid rgba(212, 168, 83, 0.62);
+      background: linear-gradient(145deg, rgba(29, 23, 18, 0.95), rgba(19, 15, 11, 0.98));
+    }
+    .bubble.outgoing {
+      max-width: 78%;
+      align-self: flex-end;
+      border-right: 2.5px solid rgba(232, 207, 168, 0.56);
+      background: linear-gradient(145deg, rgba(46, 36, 25, 0.95), rgba(33, 25, 17, 0.97));
+    }
+    .bubble p {
+      margin: 0 0 8px;
+    }
+    .bubble p:last-of-type {
+      margin-bottom: 0;
+    }
+    .bubble-foot {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+    .btime {
+      font: 500 0.62rem 'JetBrains Mono', monospace;
+      color: var(--time);
+    }
+    .pill-ref {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 7px;
+      border-radius: 6px;
+      background: rgba(212, 168, 83, 0.13);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      color: #fde68a;
+      font-size: 0.85em;
+      font-weight: 500;
+    }
+    .pill-eq {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 7px;
+      border-radius: 6px;
+      border: 1px dashed rgba(212, 168, 83, 0.52);
+      background: rgba(212, 168, 83, 0.11);
+      color: #f3d79b;
+      font: 600 0.84em 'JetBrains Mono', monospace;
+    }
+
+    /* Current comparison compact cascade */
+    .stream.is-compact .bubble {
+      padding: 6px 11px;
+      font-size: 0.86rem;
+      line-height: 1.4;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .stream.is-compact .bubble-foot {
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+
+    /* Option A: Thematic Subheaders inside 1 rich dispatch */
+    .dispatch-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid rgba(212, 168, 83, 0.22);
+    }
+    .dispatch-kicker {
+      font: 700 0.68rem 'Cinzel', serif;
+      letter-spacing: 0.16em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .dispatch-count {
+      font: 500 0.65rem 'JetBrains Mono', monospace;
+      color: #bfa98e;
+    }
+    .topic-block + .topic-block {
+      margin-top: 12px;
+      padding-top: 11px;
+      border-top: 1px dashed rgba(212, 168, 83, 0.22);
+    }
+    .topic-heading {
+      font: 700 0.7rem 'Cinzel', serif;
+      letter-spacing: 0.14em;
+      color: #e4bc72;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topic-heading::before {
+      content: '✦';
+      font-size: 0.68rem;
+      opacity: 0.85;
+    }
+
+    /* Option B: Collapsible Dossier + Pinned Key Takeaways */
+    .dossier-card {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+      overflow: hidden;
+    }
+    .dossier-top {
+      padding: 11px 14px 8px;
+      background: linear-gradient(180deg, rgba(58, 43, 28, 0.45), rgba(29, 23, 18, 0.2));
+      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .dossier-title {
+      font: 700 0.82rem 'Cinzel', serif;
+      letter-spacing: 0.08em;
+      color: #fde68a;
+    }
+    .dossier-toggle {
+      appearance: none;
+      background: rgba(212, 168, 83, 0.14);
+      border: 1px solid rgba(212, 168, 83, 0.42);
+      color: #f3d79b;
+      border-radius: 999px;
+      padding: 4px 11px;
+      font: 600 0.68rem 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
+    .dossier-toggle:hover {
+      background: rgba(212, 168, 83, 0.26);
+    }
+    .dossier-body {
+      padding: 11px 14px;
+      font-size: 0.89rem;
+      line-height: 1.52;
+    }
+    .dossier-extra[hidden] {
+      display: none;
+    }
+    .dossier-fade-hint {
+      margin-top: 8px;
+      font: italic 0.85rem 'EB Garamond', Georgia, serif;
+      color: #cbb598;
+    }
+    .dossier-attachments {
+      padding: 8px 14px 10px;
+      background: rgba(12, 9, 7, 0.55);
+      border-top: 1px solid rgba(212, 168, 83, 0.22);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+    }
+    .att-label {
+      font: 700 0.62rem 'Cinzel', serif;
+      letter-spacing: 0.14em;
+      color: #b7a289;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    /* Option C: Pure Long-Form Conversational + Footnote Reaction Chips */
+    .bubble.is-long-chat {
+      padding: 12px 15px 10px;
+      line-height: 1.56;
+    }
+    .bubble.is-long-chat p + p {
+      margin-top: 9px;
+    }
+    .aside-bar {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid rgba(212, 168, 83, 0.18);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .aside-label {
+      font: 600 0.66rem 'JetBrains Mono', monospace;
+      color: #bfa98e;
+      margin-right: 4px;
+    }
+    .aside-chip {
+      appearance: none;
+      background: rgba(46, 36, 26, 0.88);
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      color: #e9d7bf;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      cursor: pointer;
+    }
+    .aside-chip:hover {
+      border-color: #fde68a;
+      color: #fff;
+    }
+    .aside-reply-inline {
+      margin-top: 8px;
+      padding: 8px 11px;
+      border-left: 2px solid #94a3b8;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.83rem;
+      color: #dfd2c2;
+    }
+
+    .choice-preview {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid rgba(212, 168, 83, 0.22);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .choice-kicker {
+      font: 700 0.62rem 'Cinzel', serif;
+      letter-spacing: 0.16em;
+      color: #d4a76a;
+      text-transform: uppercase;
+    }
+    .choice-btn {
+      text-align: left;
+      padding: 7px 11px;
+      border-radius: 7px;
+      background: rgba(28, 22, 16, 0.9);
+      border: 1px solid rgba(212, 168, 83, 0.35);
+      color: #f3e6d3;
+      font-size: 0.83rem;
+    }
+    .pros-cons {
+      padding: 10px 16px 12px;
+      background: rgba(10, 8, 6, 0.85);
+      border-top: 1px solid rgba(212, 168, 83, 0.18);
+      font-size: 0.79rem;
+      line-height: 1.45;
+      color: #cbbaa5;
+    }
+    .pros-cons strong { color: #fde68a; }
+  </style>
+</head>
+<body>
+  <header class="demo-header">
+    <div>
+      <div class="demo-kicker">The Field Wire · Propuesta de Rediseño de Ritmo y Agrupación</div>
+      <h1 class="demo-title">Estación 14 (Nicho de Cairn II) · Comparativa Visual de 3 Opciones</h1>
+      <p class="demo-sub">Mismo contenido narrativo real agrupado por temas para evitar micro-burbujas continuas y reducir drásticamente la saturación de Silvia.</p>
+    </div>
+    <div class="demo-legend">Actual: 8–12 burbujas/escena &rarr; Propuestas: 1 despacho largo por tema</div>
+  </header>
+
+  <main class="grid-2x2">
+    <!-- CURRENT -->
+    <section class="wire-card" aria-label="Estado actual">
+      <div class="wire-card-head">
+        <div class="head-left">
+          <img src="../../web/assets/cartographer_distant_light_elder.jpg" alt="Hermes" />
+          <div>
+            <span class="opt-badge is-current">Estado Actual</span>
+            <div class="head-title">Micro-beats de 150 caracteres + cortes</div>
+          </div>
+        </div>
+        <div class="head-stat">9 burbujas · 6 pausas</div>
+      </div>
+      <div class="stream is-compact">
+        <div class="sender-label">Hermes</div>
+        <div class="bubble incoming"><span>Silvia, the sun is down and the Seal of Cairn II is in my satchel. Now I can finally look at the niche properly.</span><div class="bubble-foot"><span class="btime">22:14</span></div></div>
+        <div class="bubble incoming"><span>On the inner rim, right where the Seal was resting, there is a smear of blue.</span><div class="bubble-foot"><span class="btime">22:14</span></div></div>
+        <div class="bubble incoming"><span>Cobalt blue, ground so fine it shines like the night sky. Pigment, not dust.</span><div class="bubble-foot"><span class="btime">22:14</span></div></div>
+        <div class="sender-label is-silvia">Silvia (Navigator)</div>
+        <div class="bubble outgoing"><span>Touch it, but gently. Tell me what it feels like.</span><div class="bubble-foot"><span class="btime">22:14 ✓✓</span></div></div>
+        <div class="sender-label">Hermes</div>
+        <div class="bubble incoming"><span>Dry and chalky, with a faint smell of crushed stone.</span><div class="bubble-foot"><span class="btime">22:15</span></div></div>
+        <div class="bubble incoming"><span>Somebody ground this slowly, Silvia. With patience.</span><div class="bubble-foot"><span class="btime">22:15</span></div></div>
+        <div class="bubble incoming"><span>I have seen that blue exactly once, Silvia. Aurelia ground her lapis like this, by the fire, for her star charts.</span><div class="bubble-foot"><span class="btime">22:15</span></div></div>
+        <div class="bubble incoming"><span>It cannot be. Fifty-five years, and the sand keeps everything. Tired men see ghosts.</span><div class="bubble-foot"><span class="btime">22:15</span></div></div>
+        <div class="bubble incoming"><span>Two lines carved inside the lid: <span class="pill-eq">[D] + [F] = 24</span> and <span class="pill-eq">[C] − [T] = 8</span>.</span><div class="bubble-foot"><span class="btime">22:15</span></div></div>
+      </div>
+      <div class="pros-cons">
+        <strong>Problema observado:</strong> Cada frase de ≤ 150 caracteres genera una burbuja nueva con puntos suspensivos y timbre telegráfico. Una sola escena genera entre 8 y 15 burbujas seguidas.
+      </div>
+    </section>
+
+    <!-- OPTION A -->
+    <section class="wire-card" aria-label="Opción A: Partes Telegráficos Temáticos">
+      <div class="wire-card-head">
+        <div class="head-left">
+          <img src="../../web/assets/cartographer_distant_light_elder.jpg" alt="Hermes" />
+          <div>
+            <span class="opt-badge is-rec">Opción A · Recomendada</span>
+            <div class="head-title">Partes Telegráficos Temáticos</div>
+          </div>
+        </div>
+        <div class="head-stat">1 mensaje · −88% burbujas</div>
+      </div>
+      <div class="stream">
+        <div class="sender-label">Hermes</div>
+        <div class="bubble incoming">
+          <div class="dispatch-meta-bar">
+            <span class="dispatch-kicker">Field Dispatch · Niche of Cairn II</span>
+            <span class="dispatch-count">3 temas agrupados</span>
+          </div>
+
+          <div class="topic-block">
+            <div class="topic-heading">I. The Niche &amp; The Cobalt Smear</div>
+            <p>The sun is down and the Seal of Cairn II is safely in my satchel. Now that the stone has cooled, I could finally inspect the inner rim of the niche—and right where the Seal was resting there is a thumb-length smear of cobalt blue, ground so fine it catches the starlight like crushed sky. Pigment, not desert dust.</p>
+          </div>
+
+          <div class="topic-block">
+            <div class="topic-heading">II. Aurelia's Pigment</div>
+            <p>I touched it lightly: dry, chalky, with a faint scent of crushed lapis. I have only ever seen that exact shade once in my life—when Aurelia ground her pigment by the fire for her star charts. Fifty-five years have passed and tired men see ghosts in the sand, yet a brushed stroke like this means a steady hand.</p>
+          </div>
+
+          <div class="topic-block">
+            <div class="topic-heading">III. Raiders, Ledger Clues &amp; Next Step</div>
+            <p>The raiders came here with iron bars and still failed; whoever painted this knew how to wait for the sun. Inside the lid of the niche I copied two lines for your Cipher Ledger: <span class="pill-eq">[D] + [F] = 24</span> and <span class="pill-eq">[C] − [T] = 8</span>. Keep <span class="pill-ref">📖 The Sun Monolith &amp; Cairn II</span> close before we choose our next move.</p>
+          </div>
+
+          <div class="bubble-foot"><span class="btime">22:15 CET</span></div>
+        </div>
+
+        <div class="choice-preview">
+          <div class="choice-kicker">Choose your reply</div>
+          <div class="choice-btn">1. Keep a sample of the blue—we'll investigate at Tower II.</div>
+          <div class="choice-btn">2. Don't dwell on ghosts yet; focus on the sandstone steps ahead.</div>
+        </div>
+      </div>
+      <div class="pros-cons">
+        <strong>Por qué funciona:</strong> 1 única burbuja estructurada por tema con subtítulos discretos en latón. Permite leer de corrido como una carta de campo sin fatiga visual y con cero micro-cortes.
+      </div>
+    </section>
+
+    <!-- OPTION B -->
+    <section class="wire-card" aria-label="Opción B: Crónicas Expandibles con Adjuntos">
+      <div class="wire-card-head">
+        <div class="head-left">
+          <img src="../../web/assets/cartographer_distant_light_elder.jpg" alt="Hermes" />
+          <div>
+            <span class="opt-badge is-opt">Opción B</span>
+            <div class="head-title">Dossier Expandible + Banda de Pistas</div>
+          </div>
+        </div>
+        <div class="head-stat">1 tarjeta · Historial compacto</div>
+      </div>
+      <div class="stream">
+        <div class="sender-label">Hermes · Campamentos Anteriores (Plegado por defecto)</div>
+        <div class="bubble incoming dossier-card">
+          <div class="dossier-top">
+            <div class="dossier-title">📜 Oasis Gate · The Mirage &amp; The Falcon Weir</div>
+            <button type="button" class="dossier-toggle" onclick="toggleDossier(this, 'extra-prev')">▾ Read full (3 topics)</button>
+          </div>
+          <div class="dossier-body">
+            <p>We broke free of the Whispering Chasm, watered the skins at the carved Falcon, and exposed the ashes' false cairn before crossing onto the salt basin.</p>
+            <div class="dossier-extra" id="extra-prev" hidden>
+              <p style="margin-top:8px;">Under the falcon's beak ran a cold cleft holding the brass falcon weight and the nomads' flask of lamp oil. Behind the weir, their water clock stood frozen in the dry limestone.</p>
+            </div>
+          </div>
+          <div class="dossier-attachments">
+            <span class="att-label">Key Clues:</span>
+            <span class="pill-eq">[P] − [A] = 14</span>
+            <span class="pill-eq">[Q] + [Z] = 19</span>
+            <span class="pill-ref">📖 The Salt Playa</span>
+          </div>
+        </div>
+
+        <div class="sender-label" style="margin-top:6px;">Hermes · Mensaje Actual (Expandido)</div>
+        <div class="bubble incoming dossier-card">
+          <div class="dossier-top">
+            <div class="dossier-title">☀️ Niche of Cairn II · The Cobalt Smear</div>
+            <button type="button" class="dossier-toggle" onclick="toggleDossier(this, 'extra-now')">▴ Collapse</button>
+          </div>
+          <div class="dossier-body">
+            <p>The Seal of Cairn II is in my satchel. Right where it rested sits a thumb-length brush stroke of ground cobalt blue—the exact lapis Aurelia once prepared by the fire for her star charts.</p>
+            <div class="dossier-extra" id="extra-now">
+              <p style="margin-top:8px;">Dry and chalky to the touch, no trap or needle. Whoever painted this did not force the lock with iron like the raiders; they knew how to wait for the midday sun and walk the meridian.</p>
+            </div>
+          </div>
+          <div class="dossier-attachments">
+            <span class="att-label">Recorded:</span>
+            <span class="pill-eq">[D] + [F] = 24</span>
+            <span class="pill-eq">[C] − [T] = 8</span>
+            <span class="pill-ref">🏺 Seal of Cairn II</span>
+          </div>
+        </div>
+      </div>
+      <div class="pros-cons">
+        <strong>Ventaja / Contrapartida:</strong> Limpia el historial al máximo manteniendo visibles las ecuaciones y reliquias en una banda fija. Añade un clic (<em>Read full</em>) si quiere releer mensajes antiguos.
+      </div>
+    </section>
+
+    <!-- OPTION C -->
+    <section class="wire-card" aria-label="Opción C: Párrafos Largos Consolidados">
+      <div class="wire-card-head">
+        <div class="head-left">
+          <img src="../../web/assets/cartographer_distant_light_elder.jpg" alt="Hermes" />
+          <div>
+            <span class="opt-badge is-opt">Opción C</span>
+            <div class="head-title">Burbujas Largas Naturales + Notas al Pie</div>
+          </div>
+        </div>
+        <div class="head-stat">1–2 burbujas · 100% chat íntimo</div>
+      </div>
+      <div class="stream">
+        <div class="sender-label">Hermes</div>
+        <div class="bubble incoming is-long-chat">
+          <p>Silvia, the sun is down and the Seal of Cairn II is finally resting in my satchel. Now that the stone has cooled I looked inside the niche properly—and right where the seal sat, there is a thumb-length smear of cobalt blue pigment, ground too fine to be desert dust.</p>
+          <p>I have only seen that shade once in my life: Aurelia used to grind her own lapis by the fire for her star charts. Fifty-five years is too long, and tired men see ghosts in the sand, yet nobody brushes pigment onto sandstone by accident. Whoever left it never used iron like the raiders; they waited for the sun just like us.</p>
+          <p>Inside the lid I copied two lines for your Cipher Ledger: <span class="pill-eq">[D] + [F] = 24</span> and <span class="pill-eq">[C] − [T] = 8</span>. Keep <span class="pill-ref">📖 The Sun Monolith &amp; Cairn II</span> nearby before we move down toward the labyrinth.</p>
+
+          <div class="aside-bar">
+            <span class="aside-label">Optional ask:</span>
+            <button type="button" class="aside-chip" onclick="showAside(this, 'Dry and chalky, with a faint smell of crushed stone. No trap—just steady brushwork.')">💬 What does it feel like?</button>
+            <button type="button" class="aside-chip" onclick="showAside(this, 'Fifty-five years is a long shadow, Silvia, yet I noted the hour and bearing in my log anyway.')">💬 Could it be someone who knew her?</button>
+          </div>
+          <div class="aside-reply-inline" id="aside-out" hidden></div>
+
+          <div class="bubble-foot"><span class="btime">22:15 CET</span></div>
+        </div>
+      </div>
+      <div class="pros-cons">
+        <strong>Ventaja / Contrapartida:</strong> Respeta al 100% el aspecto clásico de conversación humana en chat (sin títulos formales), juntando párrafos por tema y dejando las preguntas secundarias como chips opcionales sin partir la escena.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function toggleDossier(btn, id) {
+      const box = document.getElementById(id);
+      if (!box) return;
+      const open = box.hidden;
+      box.hidden = !open;
+      btn.textContent = open ? '▴ Collapse' : '▾ Read full';
+    }
+    function showAside(btn, reply) {
+      const out = document.getElementById('aside-out');
+      if (!out) return;
+      out.textContent = 'Hermes: “' + reply + '”';
+      out.hidden = false;
+    }
+  </script>
+</body>
+</html>
