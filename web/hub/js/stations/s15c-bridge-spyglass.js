@@ -21,7 +21,7 @@
 
   var canvas = $('spy-canvas'), stage = $('spy-stage'), logEl = $('spy-log'), choicesBox = $('spy-choices');
   var subtitle = $('spy-subtitle'), closeBtn = $('btn-close-spy'), finishCard = $('spy-finish-card'), finishBtn = $('btn-spy-finish');
-  var finishBody = $('spy-finish-body'), sightsEl = $('spy-sights'), sightsCount = $('spy-sights-count'), hintBtn = $('btn-spy-hint');
+  var finishBody = $('spy-finish-body'), sightsEl = $('spy-sights'), sightsCount = $('spy-sights-count'), hintBtn = $('btn-spy-hint'), lastEl = $('spy-last');
   var hudTime = $('spy-hud-time');
 
   var KEY = 'order_bridge_spyglass';
@@ -59,19 +59,19 @@
   function grant(id, n) { if (ns.replay) return; if (window.EclipseHints && window.EclipseHints.grant && window.EclipseHints.grant(id, n)) ns.boon.push(id); }
 
   // What the glass can find. dir is filled by the scene (where it lies from Hermes's eye); zoom is the least
-  // magnification that shows it (0, 1, 2); r the half-angle (degrees) inside which the lens is "on" it.
+  // magnification that shows it (1, 2, 3; draw 0 is the wide look, for finding one's way); r the half-angle (degrees) inside which the lens is "on" it.
   var SIGHTS = {
     wagons: {
-      icon: '🛞', name: 'The wedged wagon', zoom: 0, r: 2.6, where: 'the terraces under us, a little east of south',
+      icon: '🛞', name: 'The wedged wagon', zoom: 1, r: 2.6, where: 'the terraces in the bay below us, to the south-east',
       lines: function () { return [
-        H('Three wagons on the terraces, Silvia, and the first is wedged across the second turn. One wheel hangs over the drop.'),
+        H('Three wagons on the terraces, Silvia, and the first is wedged across the second turn, against a fallen block. One wheel hangs over the drop.'),
         (window.WireScript && window.WireScript.choice(17) === 1)
           ? H('The shepherd said it, and your page “The Eastern Buttress & Lower Wash” says it: the turns are too tight for a loaded wagon.')
           : H('Your page “The Eastern Buttress & Lower Wash” says it: the turns are too tight for a loaded wagon.')
       ]; }
     },
     oilcloth: {
-      icon: '🔥', name: 'The mark on the oilcloth', zoom: 1, r: 1.7, where: 'the last wagon, higher up the same terrace',
+      icon: '🔥', name: 'The mark on the oilcloth', zoom: 2, r: 1.7, where: 'the last wagon, higher up the same terrace',
       lines: function () { return [
         H('The last wagon is covered with oilcloth, and two men guard it with their backs to the others.'),
         H('There is a mark burned into the cloth: a bird with its wings up, rising out of three flames. The BC Ashes.'),
@@ -79,14 +79,14 @@
       ]; }
     },
     stone: {
-      icon: '◐', name: 'Survey stone 980', zoom: 1, r: 1.6, where: 'the eastern rim, to the north-east',
+      icon: '◐', name: 'Survey stone 980', zoom: 2, r: 1.6, where: 'the eastern rim, to the north-east',
       lines: function () { return [
         H('On the eastern rim, a survey stone of the founders: the half-lit disc of the Order, and under it 980.'),
         H('Nine hundred and eighty varas, the height of the Mesa across the gorge. They levelled this whole gorge by eye, and my brass and glass can find no fault in it.')
       ]; }
     },
     boulders: {
-      icon: '🪨', name: 'The boulders of 1971', zoom: 0, r: 4.5, where: 'straight down, in the Lower Wash',
+      icon: '🪨', name: 'The boulders of 1971', zoom: 1, r: 4.5, where: 'straight down, in the Lower Wash',
       lines: function () { return [
         H('Straight down: 380 varas of air, and the Lower Wash full of boulders. Each one is the size of a house.', { fx: fx('vertigo') }),
         H('They fell in the autumn of 1971. The same earthquake that broke the hanging bridge at my Observatory.'),
@@ -94,14 +94,14 @@
       ]; }
     },
     tower: {
-      icon: '🏛️', name: 'Tower II, far away', zoom: 1, r: 1.5, where: 'the horizon, exactly north-east',
+      icon: '🏛️', name: 'Tower II, far away', zoom: 2, r: 1.5, where: 'the horizon, exactly north-east',
       lines: function () { return [
         H('North-east, on the edge of the world: the Sandstone Sanctuary. From here it is no bigger than a grain of rice.'),
         H('The Servant is alone in there, by his brazier, waiting for five seals.')
       ]; }
     },
     pillars: {
-      icon: '🎶', name: 'The pillars of Cairn IV', zoom: 2, r: 1.1, where: 'the far end of the gorge, due south',
+      icon: '🎶', name: 'The pillars of Cairn IV', zoom: 3, r: 1.1, where: 'the far end of the gorge, due south',
       lines: function () { return [
         nar('Far to the south, where the gorge opens, two pale columns stand in the first light. The wind carries a low note up the canyon, and then a higher one.', { fx: fx('pillarsSing') }),
         H('Cairn IV. The twin pillars, still standing. And listen, Silvia: one pillar calls, and a moment later the cliff answers it.'),
@@ -110,7 +110,7 @@
       done: function () { grant('s16-song', 1); }
     },
     hairpin: {
-      icon: '👣', name: 'Four men on foot', zoom: 1, r: 2.4, event: true, where: 'the second turn of the terraces, where the wagon is wedged',
+      icon: '👣', name: 'Four men on foot', zoom: 2, r: 2.4, event: true, where: 'the second turn of the terraces, where the wagon is wedged',
       lines: function () { return [
         nar('Their leader points at the wheel over the drop, then up at the rim. Four men shoulder their packs.', { fx: fx('splitStart') }),
         H('They are giving up the terraces. Four of them are coming back up on foot. Up here, Silvia. Toward the bridge.'),
@@ -120,7 +120,7 @@
       ]; }
     },
     blue: {
-      icon: '💙', name: 'A smear of blue', zoom: 2, r: 0.9, secret: true, where: '',
+      icon: '💙', name: 'A smear of blue', zoom: 3, r: 0.9, secret: true, where: '',
       lines: function () { return [
         H('Wait. On the survey stone at the western end of the bridge... a smear of blue, no wider than my thumb.'),
         H('The same blue as the rim of the niche at Cairn II. Somebody crossed this bridge before me, Silvia, and wanted it known.')
@@ -168,29 +168,52 @@
   };
 
   // ---- the tracker: what the glass has found ----
+  // With the lens, one brass medallion per thing (its icon once found) and one line under them with a name: the last
+  // find, or the one she taps. Without WebGL there is no lens, and the things to look at are a list of buttons.
+  var picked = null;
+  function showLast() {
+    if (!lastEl) return;
+    var id = picked && ns.seen[picked] ? picked : ns.order[ns.order.length - 1];
+    lastEl.textContent = '';
+    if (!id || !SIGHTS[id]) { lastEl.textContent = S3 ? 'Hold the glass still on something to find it.' : ''; lastEl.classList.add('is-empty'); return; }
+    lastEl.classList.remove('is-empty');
+    var label = document.createElement('span'); label.textContent = id === picked ? 'Found: ' : 'Last found: ';
+    var b = document.createElement('b'); b.textContent = SIGHTS[id].icon + ' ' + SIGHTS[id].name;
+    lastEl.appendChild(label); lastEl.appendChild(b);
+  }
   function renderSights() {
     if (!sightsEl) return;
     sightsEl.innerHTML = '';
+    sightsEl.classList.toggle('is-list', !S3);
     var list = ORDER.slice(); if (ns.seen.blue) list.push('blue');
     var n = 0;
     list.forEach(function (id) {
-      var s = SIGHTS[id], on = !!ns.seen[id];
+      var s = SIGHTS[id], on = !!ns.seen[id], waiting = s.event && !ns.eventDue;
       if (on && !s.secret) n++;
-      var el = document.createElement(S3 || on ? 'span' : 'button');
-      el.className = 'spy-chip' + (on ? ' is-found' : '') + (s.secret ? ' is-secret' : '') + (ns.hintAt === id && !on ? ' is-hinted' : '');
-      el.id = 'spy-chip-' + id;
-      el.textContent = on ? s.icon + ' ' + s.name : (s.event && !ns.eventDue ? '· · ·' : '?');
-      // without WebGL there is no lens: the things to look at are buttons, and Hermes still tells what he sees
-      if (!S3 && !on) {
-        el.type = 'button';
-        el.textContent = s.event && ns.stage !== 'event' ? '· · ·' : '🔭 ' + (s.event ? 'The second turn' : s.name);
-        el.disabled = ns.busy || (s.event ? ns.stage !== 'event' : !(ns.stage === 'glass' || ns.stage === 'event'));
-        el.addEventListener('click', function () { discover(id); });
+      var el;
+      if (S3) {
+        el = document.createElement('button'); el.type = 'button';
+        el.className = 'spy-chip spy-med' + (on ? ' is-found' : '') + (s.secret ? ' is-secret' : '') + (ns.hintAt === id && !on ? ' is-hinted' : '') + (on && picked === id ? ' is-picked' : '');
+        el.textContent = on ? s.icon : (waiting ? '·' : '?');
+        el.setAttribute('aria-label', on ? s.name : (waiting ? 'Not yet: something has still to happen' : 'Not found yet'));
+        if (on) el.title = s.name;
+        el.addEventListener('click', function () { if (!ns.seen[id]) return; picked = picked === id ? null : id; renderSights(); });
+      } else {
+        el = document.createElement(on ? 'span' : 'button');
+        el.className = 'spy-chip' + (on ? ' is-found' : '') + (s.secret ? ' is-secret' : '');
+        el.textContent = on ? s.icon + ' ' + s.name : (waiting && ns.stage !== 'event' ? '· · ·' : '🔭 ' + (s.event ? 'The second turn' : s.name));
+        if (!on) {
+          el.type = 'button';
+          el.disabled = ns.busy || (s.event ? ns.stage !== 'event' : !(ns.stage === 'glass' || ns.stage === 'event'));
+          el.addEventListener('click', function () { discover(id); });
+        }
       }
+      el.id = 'spy-chip-' + id;
       sightsEl.appendChild(el);
     });
     if (sightsCount) sightsCount.textContent = n + ' / ' + ORDER.length + (ns.seen.blue ? ' ✦' : '');
     if (hintBtn) hintBtn.hidden = !(ns.stage === 'glass' || ns.stage === 'event') || !S3;
+    showLast();
   }
 
   function persist(extra) {
@@ -208,7 +231,7 @@
     if (!s || ns.seen[id] || ns.busy) return false;
     if (s.event ? ns.stage !== 'event' : !(ns.stage === 'glass' || ns.stage === 'event')) return false;
     var token = chat.token;
-    ns.busy = true; ns.seen[id] = true; ns.order.push(id); ns.hintAt = null; ns.lastFind = performance.now();
+    ns.busy = true; ns.seen[id] = true; ns.order.push(id); ns.hintAt = null; picked = null; ns.lastFind = performance.now();
     if (s.event) ns.stage = 'split';
     renderSights();
     cue(s.secret ? 'reveal' : 'lens');
@@ -315,7 +338,7 @@
 
   async function start() {
     var token = chat.reset();
-    ns.stage = 'intro'; ns.busy = true; ns.seen = {}; ns.order = []; ns.boon = []; ns.choice = null; ns.hintAt = null; ns.hintN = 0; ns.eventDue = false;
+    picked = null; ns.stage = 'intro'; ns.busy = true; ns.seen = {}; ns.order = []; ns.boon = []; ns.choice = null; ns.hintAt = null; ns.hintN = 0; ns.eventDue = false;
     logEl.innerHTML = '';
     choicesBox.innerHTML = ''; choicesBox.parentNode.style.display = 'none';
     if (finishCard) finishCard.style.display = 'none';
@@ -371,8 +394,8 @@
   function lcg(seed) { var s = seed >>> 0; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
   var DEG = Math.PI / 180;
   var EYE = { x: 105, y: 0.95, z: 10.4 };          // where the glass is: the southern lip of the span, east of the middle
-  var FOVS = [20, 8.2, 3.4];                       // the three draws of the brass tube
-  var TRACK = [[151, 0, 30], [131, -45, 232], [113, -95, 48], [95, -145, 226], [77, -195, 58], [59, -245, 216], [41, -297, 92]];
+  var FOVS = [46, 20, 8.2, 3.4];                   // the tube pushed all the way in (a wide look), then its three draws
+  var ROAD = [];                                   // the cart track down the eastern bay, point by point (built with the gorge)
 
   function buildLens() {
     if (lens || !stage) return;
@@ -388,7 +411,8 @@
       '<div class="sl-note" id="spy-note" role="status" aria-live="polite"></div>' +
       '<div class="sl-found" id="spy-found"></div>' +
       '<div class="sl-arrow" id="spy-arrow" hidden>➤</div>' +
-      '<div class="sl-zoom"><button type="button" id="btn-spy-out" aria-label="Push the spyglass in: see wider">−</button><span class="sl-pips"><i></i><i></i><i></i></span><button type="button" id="btn-spy-in" aria-label="Draw the spyglass out: see closer">＋</button></div>';
+      '<div class="sl-zoom"><button type="button" id="btn-spy-out" aria-label="Push the spyglass in: see wider">−</button><span class="sl-pips"><i></i><i></i><i></i><i></i></span><button type="button" id="btn-spy-in" aria-label="Draw the spyglass out: see closer">＋</button></div>';
+    if (hintBtn) d.appendChild(hintBtn);   // asking Hermes belongs at the glass, not in the list of finds
     stage.appendChild(d);
     var fade = document.createElement('div'); fade.className = 'spy-fade'; stage.appendChild(fade);
     lens = { box: d, fade: fade, focus: d.querySelector('.sl-focus'), bearing: d.querySelector('#spy-bearing'), tape: d.querySelector('.sl-tape'), note: d.querySelector('#spy-note'),
@@ -490,6 +514,53 @@
       g.fillStyle = 'rgba(255,236,200,0.25)'; g.fillRect(w * 0.22 + 5, 0, 2, h); g.fillRect(w * 0.7 + 5, 0, 2, h);
     });
     dustTex.wrapS = dustTex.wrapT = T.RepeatWrapping;
+    // the cart road: packed dust with two ruts worn by iron tyres, a paler crown, gravel and loose stones toward the
+    // edge (u runs across from the foot of the slope, 0, to the outer edge of the widest landing, 1)
+    var roadTex = P.canvasTex(256, 512, function (g, w, h) {
+      g.fillStyle = '#d6b285'; g.fillRect(0, 0, w, h);
+      var r = lcg(57), i;
+      for (i = 0; i < 2600; i++) { var v = r(); g.fillStyle = v < 0.5 ? 'rgba(255,236,204,0.18)' : 'rgba(118,82,52,0.16)'; g.fillRect(r() * w, r() * h, 1 + r() * 3, 1 + r() * 3); }
+      // the crown between the ruts, a little paler; the gravel shoulder beyond the wheels
+      g.fillStyle = 'rgba(255,240,210,0.12)'; g.fillRect(w * 0.27, 0, w * 0.2, h);
+      g.fillStyle = 'rgba(120,86,56,0.16)'; g.fillRect(w * 0.66, 0, w * 0.34, h); g.fillRect(0, 0, w * 0.06, h);
+      // two ruts, wandering a little: a dark groove and the pale lip the wheel threw up
+      [0.2, 0.52].forEach(function (u0, n) {
+        for (var y = 0; y < h; y += 2) {
+          var x = w * u0 + Math.sin(y * 0.021 + n * 2) * 2.5 + Math.sin(y * 0.07 + n) * 1.2;
+          g.fillStyle = 'rgba(92,60,38,0.42)'; g.fillRect(x - 5, y, 10, 2);
+          g.fillStyle = 'rgba(70,44,28,0.35)'; g.fillRect(x - 2, y, 4, 2);
+          g.fillStyle = 'rgba(255,238,206,0.3)'; g.fillRect(x + 5, y, 2, 2); g.fillRect(x - 7, y, 2, 2);
+        }
+      });
+      // hoofprints of the camels between the ruts, and the odd dropped stone
+      for (i = 0; i < 70; i++) { var hx = w * (0.3 + r() * 0.14), hy = r() * h; g.fillStyle = 'rgba(96,64,40,0.3)'; g.beginPath(); g.ellipse(hx, hy, 3.2, 4.2, 0, 0, Math.PI * 2); g.fill(); }
+      for (i = 0; i < 260; i++) { var sx = r() < 0.6 ? w * (0.62 + r() * 0.38) : r() * w, sy = r() * h, sr = 1 + Math.pow(r(), 2) * 5;
+        g.fillStyle = 'rgba(' + (120 + r() * 70 | 0) + ',' + (80 + r() * 40 | 0) + ',' + (52 + r() * 30 | 0) + ',0.85)'; g.beginPath(); g.ellipse(sx, sy, sr, sr * 0.75, r() * 3, 0, Math.PI * 2); g.fill();
+        g.fillStyle = 'rgba(255,232,196,0.35)'; g.fillRect(sx - sr * 0.5, sy - sr * 0.6, sr, 1); g.fillStyle = 'rgba(50,30,18,0.4)'; g.fillRect(sx - sr * 0.6, sy + sr * 0.6, sr * 1.2, 1); }
+    });
+    roadTex.wrapS = roadTex.wrapT = T.RepeatWrapping; roadTex.anisotropy = 8;
+    // dry stone: courses of rough-dressed sandstone without mortar, the joints in deep shadow (one tile is seven varas)
+    var wallTex = P.canvasTex(512, 512, function (g, w, h) {
+      g.fillStyle = '#4a2c1c'; g.fillRect(0, 0, w, h);
+      var r = lcg(61), pal = [[196, 128, 84], [184, 116, 76], [206, 142, 96], [172, 106, 70], [214, 156, 110], [190, 122, 82]], y = 0;
+      while (y < h) {
+        var ch = 18 + Math.floor(r() * 22), x = -r() * 40;
+        while (x < w) {
+          var bw = 26 + r() * 64, c = pal[Math.floor(r() * pal.length)], k = 0.86 + r() * 0.26, gx = 1.5 + r() * 2, gy = 1.5 + r() * 2;
+          var x0 = x + gx, y0 = y + gy, x1 = x + bw - gx, y1 = Math.min(h, y + ch - gy);
+          g.fillStyle = 'rgb(' + (c[0] * k | 0) + ',' + (c[1] * k | 0) + ',' + (c[2] * k | 0) + ')';
+          g.beginPath(); g.moveTo(x0 + r() * 3, y0); g.lineTo(x1 - r() * 3, y0 + r() * 2); g.lineTo(x1, y1 - r() * 3); g.lineTo(x0 + r() * 2, y1); g.closePath(); g.fill();
+          g.fillStyle = 'rgba(255,230,190,0.32)'; g.fillRect(x0 + 2, y0, x1 - x0 - 4, 2);            // the lit top of each stone
+          g.fillStyle = 'rgba(40,20,10,0.35)'; g.fillRect(x0 + 1, y1 - 3, x1 - x0 - 2, 3);           // its shadowed foot
+          for (var t2 = 0; t2 < 6; t2++) { g.fillStyle = 'rgba(' + (r() < 0.5 ? '255,226,186' : '70,40,24') + ',0.18)'; g.fillRect(x0 + r() * (x1 - x0), y0 + r() * (y1 - y0), 2 + r() * 5, 1 + r() * 2); }
+          x += bw;
+        }
+        y += ch;
+      }
+      // pale streaks where rain ran down the face, and a little varnish
+      for (var q = 0; q < 40; q++) { g.fillStyle = r() < 0.5 ? 'rgba(255,232,200,0.07)' : 'rgba(40,20,12,0.08)'; g.fillRect(r() * w, 0, 2 + r() * 8, h); }
+    });
+    wallTex.wrapS = wallTex.wrapT = T.RepeatWrapping; wallTex.anisotropy = 8;
     // A material that takes no light of its own: what it shows is its texture, times the grain, times the light that was
     // baked into its vertices (sun, the shadow of the gorge, how much sky each point sees).
     function baked(map, grainScale, extra) {
@@ -502,7 +573,7 @@
       };
       return m;
     }
-    var rockMat = baked(strata, 6.3), sandMat = baked(sandTex, 4.7), trackMat = baked(dustTex, 3.1), deckMat = baked(sandTex, 3.9);
+    var rockMat = baked(strata, 6.3), sandMat = baked(sandTex, 4.7), trackMat = baked(dustTex, 3.1), deckMat = baked(sandTex, 3.9), roadMat = baked(roadTex, 2.6), wallMat = baked(wallTex, 2.2);
 
     // ---- the shape of the gorge ----
     var sm = U.smooth, lerp = U.lerp, clamp = U.clamp;
@@ -510,7 +581,11 @@
     // the gorge opens like a funnel toward its southern mouth (where Cairn IV stands) and closes a little to the north
     function flare(z) { return sm(300, 720, z) * 380 + sm(720, 1100, z) * 360 + sm(-500, -1500, z) * -30; }
     // the eastern wall leans back into terraces south of the bridge: that is where the cart track goes down
-    function terr(z) { return sm(14, 40, z) * (1 - sm(244, 300, z)); }
+    function terr(z) { return sm(14, 40, z) * (1 - sm(300, 360, z)); }
+    // south of the bridge the wall falls back into a bay (as the page “The Eastern Buttress & Lower Wash” draws it,
+    // behind the eastern pier): at its middle the rim stands 134 varas further east, and the wall between rim and
+    // foot is a slope a road can be built on (about 50 degrees), not a cliff
+    function bay(z) { return sm(10, 140, z) * (1 - sm(270, 350, z)); }
     // A wall is never a plane. From the rim down it falls in cliffs and steps out in benches (so the gorge is narrower
     // at its floor than at its rim); it stands in buttresses from top to bottom; it bulges; and at its foot the scree of
     // ten thousand years leans out into the wash. inward(z, y): how far the face stands in from the rim line.
@@ -522,7 +597,7 @@
         + (fbm(z * 0.085, y * 0.1, seed + 6, 3, 0, 0) - 0.5) * -6                            // broken faces, blocks, hollows
         + sm(-212, -300, y) * (34 + fbm(z * 0.02, 0.1, seed + 4, 2, 0, 0) * 30);             // the scree at the foot
     }
-    function eastX(z, y) { var m = terr(z); return 150 + flare(z) - inward(z, y, 23, 1 - m) * (1 - 0.8 * m) - m * 0.4 * (-y); }
+    function eastX(z, y) { var m = terr(z); return 150 + flare(z) - inward(z, y, 23, 1 - m) * (1 - 0.8 * m) - m * 0.4 * (-y) + bay(z) * 0.45 * (297 + y); }
     function westX(z, y) { return -(150 + flare(z) - inward(z, y, 11, 1)); }
     // the Sentinel Mesa proper: a second wall set back on the western shelf, a hundred varas higher
     function mesaX(z, y) { return -(232 + fbm(z * 0.008, y * 0.03, 31, 4, 0, 0) * 44 + flare(z) * 0.7 + (fbm(z * 0.05, y * 0.06, 33, 3, 0, 0) - 0.5) * 9 - (Math.floor(y / 24) + sm(0.7, 1, (y / 24) % 1)) * 3.4); }
@@ -691,41 +766,117 @@
     var deckPts = []; for (var dx0 = -260; dx0 <= 420; dx0 += 10) deckPts.push([dx0, 0.12, dx0 > 170 ? -(dx0 - 170) * 0.22 : 0]);
     ribbon(deckPts.filter(function (q) { return Math.abs(q[0]) <= 180; }).map(function (q) { return [q[0], 0.05, q[2]]; }), 15.5, deckMat);
     ribbon(deckPts, 5.2, trackMat);
-    // the switchback terraces: six legs down the leaning wall, each a shelf cut into it (the knots are heights and
-    // places along the gorge; the shelf follows the wall)
-    TRACK = [[0, 30], [-45, 232], [-95, 48], [-145, 226], [-195, 58], [-245, 216], [-297, 92]].map(function (k) { return [eastX(k[1], k[0]) - 3.6, k[0], k[1]]; });
-    function trackAt(s) {   // s in varas along the cart track from the rim; returns [x, y, z, heading]
-      var left = s;
-      for (var i = 0; i < TRACK.length - 1; i++) {
-        var a = TRACK[i], b = TRACK[i + 1], l = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
-        if (left <= l || i === TRACK.length - 2) { var k = Math.max(0, Math.min(1, left / l)), y = lerp(a[1], b[1], k), z = lerp(a[2], b[2], k); return [eastX(z, y) - 3.6, y, z, Math.atan2(-(b[0] - a[0]), -(b[2] - a[2]))]; }
-        left -= l;
+    // ---- the cart road down the eastern bay ----
+    // Twelve legs go down the slope of the bay at about one in seven, each a shelf of packed dust ten varas wide held
+    // up by a wall of dry stone. At every turn the road swings out round a landing wide enough to turn a wagon, its
+    // wall going down to the rock as a bastion; near each turn the lower leg runs beside the upper one, built out on
+    // fill, until the slope has put a terrace between them. (The 1971 quake left a block on the second landing: that is
+    // where the loaded wagon has wedged.)
+    var RW = 10, RC = 4.6, RR = 5, RX = 4, RLB = 60, NLEG = 12, RZN = 110, RZS = 285, RD = 297 / NLEG, TURNS = [];
+    function natX(z, y) { return eastX(z, y) - RC; }   // the centre of a shelf whose inner edge just meets the slope
+    // from the end of the old track on the bridge, over the plateau, to the head of the first leg
+    [[168, 0.14, 4], [176, 0.12, 20], [192, 0.1, 38], [214, 0.08, 56], [238, 0.05, 76], [256, 0.03, 96]].forEach(function (q) { ROAD.push({ x: q[0], y: q[1] - 0.25, z: q[2], o: 1, ext: 0, fill: 0, rim: true }); });
+    for (var li = 0; li < NLEG; li++) {
+      var south = li % 2 === 0, zA = south ? RZN : RZS, zB = south ? RZS : RZN, y0 = -li * RD, y1 = -(li + 1) * RD, MQ = 64;
+      for (var q = 0; q <= MQ; q++) {
+        var tq = q / MQ, rz = lerp(zA, zB, tq), ry = lerp(y0, y1, tq), off = li ? 2 * RR * Math.max(0, 1 - Math.abs(rz - zA) / RLB) : 0;
+        ROAD.push({ x: natX(rz, ry) - off, y: ry, z: rz, o: south ? 1 : -1, ext: 0, fill: off, rim: false });
       }
-      return TRACK[0].concat([0]);
+      if (li < NLEG - 1) {   // the turn: half a circle round the landing, beyond the end of the leg
+        var xa = natX(zB, y1), xc = xa - RR, dir = south ? 1 : -1;
+        TURNS.push({ i: ROAD.length - 1, x: xc, y: y1, z: zB, dir: dir });
+        for (var ta = 1; ta < 14; ta++) { var th = ta / 14 * Math.PI; ROAD.push({ x: xc + RR * Math.cos(th), y: y1, z: zB + dir * RR * Math.sin(th), o: -dir, ext: RX * Math.pow(Math.sin(th), 0.6), fill: 2 * RR, rim: false, turn: true }); }
+      }
     }
-    var LEG1 = Math.hypot(TRACK[1][0] - TRACK[0][0], TRACK[1][1] - TRACK[0][1], TRACK[1][2] - TRACK[0][2]);
-    for (var li = 0; li < TRACK.length - 1; li++) {
-      var A = TRACK[li], B = TRACK[li + 1], seg = [];
-      for (var q = 0; q <= 22; q++) { var kq = q / 22, ty = lerp(A[1], B[1], kq), tz = lerp(A[2], B[2], kq); seg.push([eastX(tz, ty) - 3.6, ty + 0.25, tz]); }
-      ribbon(seg, 6.8, trackMat, 11);
+    // each point: the way out (toward the drop) and the distance along the road
+    var RS = [0];
+    ROAD.forEach(function (pt, i) {
+      var pa = ROAD[Math.max(0, i - 1)], pb = ROAD[Math.min(ROAD.length - 1, i + 1)], dx = pb.x - pa.x, dz = pb.z - pa.z, l = Math.hypot(dx, dz) || 1;
+      pt.ox = -dz / l * pt.o; pt.oz = dx / l * pt.o;
+      if (i) RS.push(RS[i - 1] + Math.hypot(pt.x - ROAD[i - 1].x, pt.y - ROAD[i - 1].y, pt.z - ROAD[i - 1].z));
+    });
+    var ROAD_LEN = RS[RS.length - 1];
+    function roadIdx(s) { var lo = 0, hi = RS.length - 1; while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (RS[mid] <= s) lo = mid; else hi = mid; } return lo; }
+    function trackAt(s) {   // s in varas along the road from the end of the bridge; returns [x, y, z, heading] (y: the foot of the road)
+      if (s <= 0) return [168 + -s * 0.97, -0.11, 4 + s * 0.23, Math.atan2(0.97, -0.23)];   // before its head: the old track, north-east over the plateau
+      s = Math.min(s, ROAD_LEN - 0.01);
+      var i = roadIdx(s), a = ROAD[i], b = ROAD[i + 1], k = (s - RS[i]) / ((RS[i + 1] - RS[i]) || 1);
+      return [lerp(a.x, b.x, k), lerp(a.y, b.y, k), lerp(a.z, b.z, k), Math.atan2(-(b.x - a.x), -(b.z - a.z))];
     }
-    ribbon([[168, 0.14, 4], [162, 0.14, 14], [(TRACK[0][0] + 162) / 2, 0.14, 23], [TRACK[0][0], 0.2, 30]], 5.2, trackMat);
+    function sideAt(s) { var i = roadIdx(Math.max(0.01, Math.min(s, ROAD_LEN - 0.01))); return ROAD[i]; }   // its way out and its landing
+    var TURN2 = RS[TURNS[1].i];   // the end of the second leg: the second landing (the second turn) begins
+    // where the face of the slope is, going straight down from a point in the air (the foot of a wall)
+    function footOf(x, y, z) { for (var yy = y; yy > FLOOR; yy -= 1.5) if (eastX(z, yy) <= x) return yy; return FLOOR; }
+    function bakedMesh(pos, uv, idx, mat, tint, probe) {
+      var geo = new T.BufferGeometry();
+      geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new T.Float32BufferAttribute(uv, 2));
+      geo.setIndex(idx); geo.computeVertexNormals();
+      if (probe) {   // the light of a flat road: taken at a point above it, off the slope, looking up
+        var col = new Float32Array(pos.length), c = [1, 1, 1], l = [1, 1, 1];
+        for (var i = 0; i < pos.length; i += 3) { tint(pos[i], pos[i + 1], pos[i + 2], c); lightAt(probe[i], probe[i + 1], probe[i + 2], 0, 1, 0, l); for (var j = 0; j < 3; j++) col[i + j] = c[j] * l[j]; }
+        geo.setAttribute('color', new T.BufferAttribute(col, 3));
+      } else bakeLight(geo, tint, { flip: 'air' });
+      var m = new T.Mesh(geo, mat); m.frustumCulled = false; scene.add(m); return m;
+    }
+    (function () {
+      var RU = RW + RX, sp = [], sq = [], su = [], si = [], wp = [], wu = [], wi = [], pp = [], pu = [], pi2 = [], cp = [], cu = [], ci = [], L2 = 0, wn = 0, pn = 0, cn = 0;
+      ROAD.forEach(function (pt, i) {
+        if (i) L2 += Math.hypot(pt.x - ROAD[i - 1].x, pt.z - ROAD[i - 1].z);
+        var yt = pt.y + 0.25, hw = RW / 2, ix = pt.x - pt.ox * hw, iz = pt.z - pt.oz * hw, bx = pt.x + pt.ox * hw, bz = pt.z + pt.oz * hw, ex = pt.x + pt.ox * (hw + pt.ext), ez = pt.z + pt.oz * (hw + pt.ext);
+        // the road: from the foot of the slope across to the edge (and on round the landing)
+        sp.push(ix, yt, iz, pt.x, yt + 0.06, pt.z, bx, yt, bz, ex, yt - 0.02, ez);
+        [[ix, iz, 0.55], [pt.x, pt.z, 0.8], [bx, bz, 1], [ex, ez, 1]].forEach(function (v) { sq.push(v[0] + pt.ox * 3.2, yt + 1.6 + 1.6 * (1 - v[2]), v[1] + pt.oz * 3.2); });
+        su.push(0, L2 / 12, (hw) / RU, L2 / 12, RW / RU, L2 / 12, (RW + pt.ext) / RU, L2 / 12);
+        if (i) { var k = i * 4; for (var c = 0; c < 3; c++) si.push(k - 4 + c, k - 3 + c, k + c, k + c, k - 3 + c, k + 1 + c); }
+        if (pt.rim) return;
+        // the wall under its edge, down to the rock (leaning back a little into its fill), in four rows for the light
+        var fy = footOf(ex, yt, ez), dd = yt - fy + 3;
+        for (var rw = 0; rw <= 3; rw++) { var f = rw / 3, d = dd * f; wp.push(ex - pt.ox * 0.12 * d, yt - d, ez - pt.oz * 0.12 * d); wu.push(L2 / 7, -d / 7); }
+        if (wn) { var b0 = (wn - 1) * 4, b1 = wn * 4; for (var r2 = 0; r2 < 3; r2++) wi.push(b0 + r2, b0 + r2 + 1, b1 + r2, b1 + r2, b0 + r2 + 1, b1 + r2 + 1); }
+        wn++;
+        // a low parapet on the landings and wherever the road is built out
+        var par = pt.fill > 1 || pt.turn ? 1 : 0;
+        pp.push(ex, yt - 0.3, ez, ex - pt.ox * 0.25, yt + 0.9 * par, ez - pt.oz * 0.25); pu.push(L2 / 7, 0.18, L2 / 7, 0);
+        if (pn) { var c0 = (pn - 1) * 2, c1 = pn * 2; pi2.push(c0, c0 + 1, c1, c1, c0 + 1, c1 + 1); }
+        pn++;
+        // the cut bank on the inner side, where the shelf meets the slope
+        var bank = pt.fill < 1 ? 1 : 0;
+        cp.push(ix + pt.ox * 0.1, yt - 0.2, iz + pt.oz * 0.1, ix - pt.ox * 1.8 * bank, yt + 3.2 * bank, iz - pt.oz * 1.8 * bank); cu.push(pt.z / 52, yt / 52, pt.z / 52, (yt + 3.2) / 52);
+        if (cn) { var e0 = (cn - 1) * 2, e1 = cn * 2; ci.push(e0, e0 + 1, e1, e1, e0 + 1, e1 + 1); }
+        cn++;
+      });
+      bakedMesh(sp, su, si, roadMat, function (x, y, z, c) { var n = 0.95 + 0.1 * fbm(x * 0.08, z * 0.08, 73, 2, 0, 0); c[0] = 1.02 * n; c[1] = 0.98 * n; c[2] = 0.92 * n; }, sq);
+      bakedMesh(wp, wu, wi, wallMat, function (x, y, z, c) { var n = 0.9 + 0.2 * fbm(x * 0.05, y * 0.05 + z * 0.05, 71, 2, 0, 0); c[0] = n; c[1] = n * 0.97; c[2] = n * 0.93; });
+      bakedMesh(pp, pu, pi2, wallMat, function (x, y, z, c) { c[0] = 1.06; c[1] = 1.0; c[2] = 0.94; });
+      bakedMesh(cp, cu, ci, rockMat, tintAt);
+    })();
+    // the block the quake of 1971 left on the second landing, which narrows the turn
+    var T2 = TURNS[1], WEDGE = { x: 0, z: T2.dir };   // the way out of the second landing, at its apex (the block is laid with the stones)
 
     // ---- stones ----
     // one great stone, shaped by noise and lit where it lies
     var boulderMat = baked(sandTex, 2.3, { color: 0xd9966a });
+    // a block of sandstone breaks along its bedding and its joints: cut a rounded stone flat on a few planes
+    function cleave(geo, r, n, d0) {
+      var pa = geo.attributes.position;
+      for (var c = 0; c < n; c++) {
+        var a = r() * Math.PI * 2, e = (r() - 0.35) * 1.4, nx = Math.cos(a) * Math.cos(e), ny = Math.sin(e), nz = Math.sin(a) * Math.cos(e), d = d0 + r() * 0.3;
+        for (var i = 0; i < pa.count; i++) { var k = pa.getX(i) * nx + pa.getY(i) * ny + pa.getZ(i) * nz - d; if (k > 0) pa.setXYZ(i, pa.getX(i) - nx * k, pa.getY(i) - ny * k, pa.getZ(i) - nz * k); }
+      }
+    }
     function boulder(x, y, z, s, seed, tint, lit3d) {
-      var r = lcg(seed), geo = new T.IcosahedronGeometry(1, 2), pa = geo.attributes.position, c = [1, 1, 1], l = [1, 1, 1], colr = new Float32Array(pa.count * 3), sq = 0.6 + r() * 0.3;
+      var r = lcg(seed), geo = new T.IcosahedronGeometry(1, s > 3 ? 3 : 2), pa = geo.attributes.position, c = [1, 1, 1], l = [1, 1, 1], colr = new Float32Array(pa.count * 3), sq = 0.6 + r() * 0.3;
       for (var i = 0; i < pa.count; i++) {
         var px = pa.getX(i), py = pa.getY(i), pz = pa.getZ(i), n = 0.74 + 0.56 * fbm(px * 1.3 + seed, py * 1.3 + pz, seed, 3, 0, 0), fl = Math.max(-0.55, py * n * sq);   // flat where it rests
         pa.setXYZ(i, px * n, fl, pz * n);
       }
+      cleave(geo, r, 3 + (r() * 2 | 0), 0.5);
       geo.computeVertexNormals();
       var na = geo.attributes.normal;
       for (var j = 0; j < pa.count; j++) {
         var wx = x + pa.getX(j) * s, wy = y + pa.getY(j) * s, wz = z + pa.getZ(j) * s;
         tintAt(wx, wy * 3, wz, c);
-        if (lit3d === false) { l[0] = l[1] = l[2] = 1; } else lightAt(wx, wy, wz, na.getX(j), na.getY(j), na.getZ(j), l);
+        if (lit3d === false) { l[0] = l[1] = l[2] = 1; } else { var sun1 = lightAt(wx, wy, wz, na.getX(j), na.getY(j), na.getZ(j), l), kd = 1 - 0.42 * sun1; l[0] *= kd; l[1] *= kd; l[2] *= kd; }
         var ground = 0.62 + 0.38 * sm(-0.55, 0.1, pa.getY(j));   // dark where it meets the ground
         colr[j * 3] = c[0] * l[0] * ground * (tint || 1); colr[j * 3 + 1] = c[1] * l[1] * ground * (tint || 1); colr[j * 3 + 2] = c[2] * l[2] * ground * (tint || 1);
       }
@@ -741,6 +892,7 @@
     // (to the west of Hermes and behind him: nothing stands between the glass and the gorge)
     var blocks = [[100.0, 0.75, 7.7, 1.7, 11], [97.8, 0.55, 5.3, 1.3, 12], [101.6, 0.42, 4.4, 1.0, 13], [103.3, 0.36, 5.9, 0.8, 14], [96.4, 0.36, 8.6, 0.9, 15], [-178.5, 1.0, -6.5, 2.4, 16], [-181, 0.7, -1.5, 1.7, 17], [-176.5, 0.5, -8.6, 1.2, 18]];
     blocks.forEach(function (b) { boulder(b[0], b[1], b[2], b[3], b[4], 1.02); });
+    boulder(T2.x - 0.6, T2.y + 1.0, T2.z + T2.dir * 1.2, 2.1, 87, 0.95);   // the block of 1971 on the second landing
     // the ledge under the lip, where a man can lie out of sight
     var ledge = boulder(110.2, -5.5, 12.4, 1, 21, 0.9); ledge.scale.set(4.4, 1.3, 2.6); ledge.rotation.set(0, 0.15, 0);
 
@@ -748,12 +900,13 @@
     var rubbleGeo = (function () {
       var g = new T.IcosahedronGeometry(1, 1), pa = g.attributes.position, col = new Float32Array(pa.count * 3);
       for (var i = 0; i < pa.count; i++) { var px = pa.getX(i), py = pa.getY(i), pz = pa.getZ(i), n = 0.7 + 0.6 * fbm(px * 1.9 + 4, py * 1.9 + pz, 7, 2, 0, 0); pa.setXYZ(i, px * n, Math.max(-0.4, py * n * 0.7), pz * n); }
+      cleave(g, lcg(91), 3, 0.42);
       g.computeVertexNormals();
       for (var j = 0; j < pa.count; j++) { var k = 0.55 + 0.5 * sm(-0.4, 0.6, pa.getY(j)) + 0.1 * g.attributes.normal.getX(j); col[j * 3] = k; col[j * 3 + 1] = k; col[j * 3 + 2] = k; }
       g.setAttribute('color', new T.BufferAttribute(col, 3));
       return g;
     })();
-    var RUB = 1500, rubble = new T.InstancedMesh(rubbleGeo, new T.MeshBasicMaterial({ map: sandTex, vertexColors: true }), RUB), dummy = new T.Object3D(), rc = new T.Color(), rl = [1, 1, 1], rt = [1, 1, 1], ri = 0;
+    var RUB = 2900, rubble = new T.InstancedMesh(rubbleGeo, new T.MeshBasicMaterial({ map: sandTex, vertexColors: true }), RUB), dummy = new T.Object3D(), rc = new T.Color(), rl = [1, 1, 1], rt = [1, 1, 1], ri = 0;
     rubble.frustumCulled = false;
     var KEEP = [[216, -72, 9], [-157, 9.5, 7], [105, 9, 8]];   // nothing is strewn round the survey stones or where Hermes lies
     function kept(x, z) { return KEEP.some(function (k) { return Math.hypot(x - k[0], z - k[1]) < k[2]; }); }
@@ -761,8 +914,8 @@
       if (ri >= RUB || kept(x, z)) return;
       dummy.position.set(x, y + s * 0.25, z); dummy.rotation.set(rb() * 0.6, rb() * 6.3, rb() * 0.6); dummy.scale.set(s * (0.8 + rb() * 0.5), s * (flat || (0.6 + rb() * 0.5)), s * (0.8 + rb() * 0.5)); dummy.updateMatrix();
       rubble.setMatrixAt(ri, dummy.matrix);
-      tintAt(x, y * 3 + rb() * 40, z, rt); lightAt(x, y + s * 0.5, z, 0, 1, 0, rl);
-      var v = 0.86 + rb() * 0.3;
+      tintAt(x, y * 3 + rb() * 40, z, rt); var sun2 = lightAt(x + 0.8, y + s * 0.5 + 0.8, z, 0, 1, 0, rl);
+      var v = (0.86 + rb() * 0.3) * (1 - 0.4 * sun2);
       rubble.setColorAt(ri, rc.setRGB(rt[0] * rl[0] * v * 0.82, rt[1] * rl[1] * v * 0.68, rt[2] * rl[2] * v * 0.56)); ri++;
     }
     // scree along the feet of both walls; stones in the dry bed; fallen blocks on the terraces and along the rims
@@ -772,7 +925,9 @@
       stone(gx, yy - 2.5, gz, 1.2 + Math.pow(rb(), 3) * 7);
     }
     for (var sj = 0; sj < 380; sj++) { var wz = lerp(-300, 620, rb()), wx = bedX(wz) + (rb() - 0.5) * (rb() < 0.6 ? 60 : 150); stone(wx, floorY(wx, wz), wz, 0.5 + Math.pow(rb(), 3) * 3.4, 0.5); }
-    for (var sk = 0; sk < 230; sk++) { var s3 = rb() * LEG1 * 5.6, tp = trackAt(s3), inn = rb() < 0.7; stone(tp[0] + (inn ? 2.6 + rb() * 1.2 : -3.2 + rb() * 0.6), tp[1] + 0.2, tp[2] + (rb() - 0.5) * 3, 0.14 + Math.pow(rb(), 2) * 0.5); }
+    // along the road: what has rolled down onto it against the slope, and a kerb of stones on its edge where it has no parapet
+    for (var sk = 0; sk < 420; sk++) { var s3 = 40 + rb() * (ROAD_LEN - 40), tp = trackAt(s3), sd = sideAt(s3), ac = rb() < 0.8 ? -(RW / 2 - 0.6 - rb() * 1.4) : (rb() - 0.5) * 6; stone(tp[0] + sd.ox * ac, tp[1] + 0.25, tp[2] + sd.oz * ac, 0.16 + Math.pow(rb(), 2.2) * 0.9); }
+    for (var sk2 = 0; sk2 < ROAD_LEN; sk2 += 2.6) { var sd2 = sideAt(sk2); if (sd2.rim || sd2.turn || sd2.fill > 1 || rb() < 0.18) continue; var tk = trackAt(sk2), ec = RW / 2 - 0.3; stone(tk[0] + sd2.ox * ec, tk[1] + 0.25, tk[2] + sd2.oz * ec, 0.32 + rb() * 0.28, 0.8); }
     for (var sl = 0; sl < 270; sl++) { var rz = lerp(-420, 520, rb()), east = rb() < 0.6, rx = east ? eastX(rz, 0) + 2 + Math.pow(rb(), 2) * 60 : westX(rz, 0) - 2 - Math.pow(rb(), 2) * 46; if (Math.abs(rz) < 16 && Math.abs(rx) < 200) continue; stone(rx, 0, rz, 0.3 + Math.pow(rb(), 3) * 2.2); }
     rubble.count = ri; rubble.instanceMatrix.needsUpdate = true; if (rubble.instanceColor) rubble.instanceColor.needsUpdate = true;
     scene.add(rubble);
@@ -806,7 +961,7 @@
     }
     for (var b1 = 0; b1 < 330; b1++) { var bz2 = lerp(-520, 640, rb()), be = rb() < 0.6, bx2 = be ? eastX(bz2, 0) + 3 + Math.pow(rb(), 1.6) * 150 : westX(bz2, 0) - 3 - Math.pow(rb(), 1.6) * 60; if (Math.abs(bz2) < 12) continue; bush(bx2, be ? fbm(bx2 * 0.012, bz2 * 0.012, 43, 3, 0, 0) * 14 * sm(0.2, 0.7, Math.sqrt(Math.max(0, bx2 - eastX(bz2, 0)) / 2450)) - 0.2 : 0, bz2, 0.7 + rb() * 1.5); }
     for (var b2 = 0; b2 < 210; b2++) { var bz3 = lerp(-300, 640, rb()), bx3 = bedX(bz3) + (rb() < 0.5 ? -1 : 1) * (14 + rb() * 70); bush(bx3, floorY(bx3, bz3), bz3, 1.2 + rb() * 2.6); }
-    for (var b3 = 0; b3 < 70; b3++) { var tq = trackAt(rb() * LEG1 * 5.6); bush(tq[0] + 2.8 + rb(), tq[1] + 0.2, tq[2] + (rb() - 0.5) * 2, 0.5 + rb() * 0.8); }
+    for (var b3 = 0; b3 < 110; b3++) { var sb = 40 + rb() * (ROAD_LEN - 40), tq = trackAt(sb), sq = sideAt(sb), ib = -(RW / 2 + 0.6 + rb() * 2.2); bush(tq[0] + sq.ox * ib, tq[1] + 0.25 + 0.4, tq[2] + sq.oz * ib, 0.5 + rb() * 0.9); }
     bushes.count = bn; bushes.instanceMatrix.needsUpdate = true; if (bushes.instanceColor) bushes.instanceColor.needsUpdate = true;
     scene.add(bushes);
 
@@ -898,7 +1053,7 @@
         g.strokeStyle = 'rgba(52,32,20,0.9)'; g.lineWidth = 4; g.beginPath(); g.arc(w / 2, 78, 34, 0, Math.PI * 2); g.stroke();
         g.fillStyle = 'rgba(52,32,20,0.9)'; g.font = '700 54px Cinzel, Georgia, serif'; g.textAlign = 'center'; g.fillText('980', w / 2, 186);
         g.fillRect(34, 206, w - 68, 4);
-        if (blue) { g.fillStyle = 'rgba(38,84,178,0.92)'; g.beginPath(); g.ellipse(w * 0.66, 226, 15, 7, -0.3, 0, Math.PI * 2); g.fill(); g.fillStyle = 'rgba(70,120,214,0.8)'; g.beginPath(); g.ellipse(w * 0.6, 229, 6, 3, -0.3, 0, Math.PI * 2); g.fill(); }
+        if (blue) { g.fillStyle = 'rgba(38,84,178,0.92)'; g.beginPath(); g.ellipse(w * 0.74, 106, 19, 9, -0.35, 0, Math.PI * 2); g.fill(); g.fillStyle = 'rgba(70,120,214,0.8)'; g.beginPath(); g.ellipse(w * 0.68, 112, 8, 4, -0.35, 0, Math.PI * 2); g.fill(); g.fillRect(w * 0.78, 110, 3, 14); }
       });
       var side = paint({ color: 0xc09a76 });
       var m = new T.Mesh(new T.BoxGeometry(1.5, 2.6, 0.7), [side, side, side, side, paint({ map: tx, color: 0xffffff }), side]);
@@ -935,13 +1090,6 @@
     // ---- the raiders' wagons ----
     var woodTex = SC.tex.wood ? SC.tex.wood(0x6a4a2c, 3) : null;
     var woodMat = paint(woodTex ? { map: woodTex, color: 0xffffff } : { color: 0x6a4a2c });
-    var wheelTex = P.canvasTex(128, 128, function (g, w) {
-      g.clearRect(0, 0, w, w); g.translate(w / 2, w / 2);
-      g.strokeStyle = '#3a2614'; g.lineWidth = 12; g.beginPath(); g.arc(0, 0, 54, 0, Math.PI * 2); g.stroke();
-      g.lineWidth = 6; for (var i = 0; i < 8; i++) { g.rotate(Math.PI / 4); g.beginPath(); g.moveTo(0, 0); g.lineTo(0, 50); g.stroke(); }
-      g.fillStyle = '#2a1a0c'; g.beginPath(); g.arc(0, 0, 11, 0, Math.PI * 2); g.fill();
-    });
-    var wheelMat = new T.MeshLambertMaterial({ map: wheelTex, transparent: true, alphaTest: 0.4, side: T.DoubleSide });
     var canvasTexA = SC.tex.cloth ? SC.tex.cloth(0xd9c7a0, 0xc4b088, 6, 3) : null;
     // the oilcloth: u runs over the hoops from one flank to the other, so the mark is burned once into each flank,
     // its head toward the ridge of the cover
@@ -959,23 +1107,54 @@
       g.save(); g.translate(w * 0.15, h / 2); g.rotate(Math.PI / 2); g.scale(0.74, 1.0); mark(); g.restore();
       g.save(); g.translate(w * 0.85, h / 2); g.rotate(-Math.PI / 2); g.scale(0.74, 1.0); mark(); g.restore();
     });
+    // one drawing out of many parts (the spokes of a wheel), so a wagon is a handful of meshes and not a hundred
+    function merged(parts) {
+      var pos = [], nor = [], uv = [], idx = [], base = 0;
+      parts.forEach(function (q) {
+        var g = q.g; g.applyMatrix4(q.m);
+        var pa = g.attributes.position, na = g.attributes.normal, ua = g.attributes.uv;
+        for (var i = 0; i < pa.count; i++) { pos.push(pa.getX(i), pa.getY(i), pa.getZ(i)); nor.push(na.getX(i), na.getY(i), na.getZ(i)); uv.push(ua ? ua.getX(i) : 0, ua ? ua.getY(i) : 0); }
+        if (g.index) for (var j = 0; j < g.index.count; j++) idx.push(g.index.getX(j) + base); else for (var k = 0; k < pa.count; k++) idx.push(k + base);
+        base += pa.count;
+      });
+      var out = new T.BufferGeometry();
+      out.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); out.setAttribute('normal', new T.Float32BufferAttribute(nor, 3)); out.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); out.setIndex(idx);
+      return out;
+    }
+    var M4 = function () { return new T.Matrix4(); }, ironMat = paint({ color: 0x2a2420 });
+    // a wheel in the plane of x and y (it is turned on its axle by the wagon): an iron tyre on a wooden felloe, twelve
+    // spokes and a hub
+    var wheelGeo = (function () {
+      var parts = [{ g: new T.TorusGeometry(0.86, 0.07, 6, 28), m: M4() }, { g: new T.CylinderGeometry(0.15, 0.17, 0.34, 10), m: M4().makeRotationX(Math.PI / 2) }];
+      for (var i = 0; i < 12; i++) { var a = i / 12 * Math.PI * 2; parts.push({ g: new T.CylinderGeometry(0.03, 0.042, 0.72, 5), m: M4().makeRotationZ(a).multiply(M4().makeTranslation(0, 0.48, 0)) }); }
+      return merged(parts);
+    })();
+    var tyreGeo = new T.TorusGeometry(0.93, 0.03, 4, 32);
     function buildWagon(oil) {
       var g = new T.Group();
-      var bed = new T.Mesh(new T.BoxGeometry(2.3, 0.7, 4.4), woodMat); bed.position.y = 1.35; g.add(bed);
-      var pole = new T.Mesh(new T.CylinderGeometry(0.07, 0.07, 3.2, 6), woodMat); pole.rotation.x = Math.PI / 2; pole.position.set(0, 1.1, -3.7); g.add(pole);
+      var bed = new T.Mesh(new T.BoxGeometry(2.3, 0.62, 4.4), woodMat); bed.position.y = 1.35; g.add(bed);
+      // side rails and the boards that close the ends, the driver's bench at the front
+      var rails = merged([-1.12, 1.12].map(function (x) { return { g: new T.BoxGeometry(0.1, 0.34, 4.5), m: M4().makeTranslation(x, 1.82, 0) }; }).concat([-2.2, 2.2].map(function (z) { return { g: new T.BoxGeometry(2.3, 0.4, 0.1), m: M4().makeTranslation(0, 1.82, z) }; })).concat([{ g: new T.BoxGeometry(2.1, 0.12, 0.5), m: M4().makeTranslation(0, 2.05, -2.45) }, { g: new T.BoxGeometry(0.1, 0.5, 0.1), m: M4().makeTranslation(-0.95, 1.8, -2.55) }, { g: new T.BoxGeometry(0.1, 0.5, 0.1), m: M4().makeTranslation(0.95, 1.8, -2.55) }]));
+      g.add(new T.Mesh(rails, woodMat));
+      var pole = new T.Mesh(new T.CylinderGeometry(0.07, 0.08, 3.2, 6), woodMat); pole.rotation.x = Math.PI / 2; pole.position.set(0, 1.1, -3.7); g.add(pole);
+      var axles = new T.Mesh(merged([-1.45, 1.45].map(function (z) { return { g: new T.CylinderGeometry(0.08, 0.08, 2.7, 6), m: M4().makeTranslation(0, 0.95, z).multiply(M4().makeRotationZ(Math.PI / 2)) }; })), ironMat); g.add(axles);
       var tarpMat = oil ? new T.MeshLambertMaterial({ map: phoenixTex, side: T.DoubleSide }) : paint(canvasTexA ? { map: canvasTexA, color: 0xffffff, side: T.DoubleSide } : { color: 0xd9c7a0, side: T.DoubleSide });
-      // the cover: half a barrel of cloth over three hoops, open at both ends
-      var tarp = new T.Mesh(new T.CylinderGeometry(1.22, 1.22, 4.3, 14, 1, true, Math.PI / 2, Math.PI), tarpMat);
+      // the cover: half a barrel of cloth over three hoops, open at both ends, the hoops showing through where it sags
+      var tarp = new T.Mesh(new T.CylinderGeometry(1.22, 1.22, 4.3, 18, 1, true, Math.PI / 2, Math.PI), tarpMat);
       tarp.rotation.x = Math.PI / 2; tarp.position.y = 1.7; tarp.scale.set(1, 1, 1.3); g.add(tarp);
+      g.add(new T.Mesh(merged([-2.05, 0, 2.05].map(function (z) { return { g: new T.TorusGeometry(1.25, 0.045, 5, 18, Math.PI), m: M4().makeTranslation(0, 1.7, z).multiply(M4().makeScale(1, 1.3, 1)) }; })), woodMat));
+      // a water barrel lashed to the near side
+      var barrel = new T.Mesh(new T.CylinderGeometry(0.34, 0.34, 0.8, 12), woodMat); barrel.position.set(-1.38, 1.45, 0.9); g.add(barrel);
+      var hoopsB = new T.Mesh(merged([-0.26, 0.26].map(function (y) { return { g: new T.TorusGeometry(0.35, 0.025, 4, 14), m: M4().makeTranslation(-1.38, 1.45 + y, 0.9).multiply(M4().makeRotationX(Math.PI / 2)) }; })), ironMat); g.add(hoopsB);
       var wheels = [];
-      [-1.45, 1.45].forEach(function (z) { [-1.26, 1.26].forEach(function (x) { var wh = new T.Mesh(new T.CircleGeometry(0.95, 20), wheelMat); wh.rotation.y = Math.PI / 2; wh.position.set(x, 0.95, z); g.add(wh); wheels.push(wh); }); });
+      [-1.45, 1.45].forEach(function (z) { [-1.3, 1.3].forEach(function (x) { var wh = new T.Group(); wh.add(new T.Mesh(wheelGeo, woodMat), new T.Mesh(tyreGeo, ironMat)); wh.rotation.y = Math.PI / 2; wh.position.set(x, 0.95, z); g.add(wh); wheels.push(wh); }); });
       g.userData = { wheels: wheels, oil: !!oil };
       g.traverse(function (o) { if (o.isMesh) { o.frustumCulled = false; o.material = o.material.clone(); } });
       scene.add(g); return g;
     }
     function onTrack(obj, s, yaw, lift) { var p = trackAt(s); obj.position.set(p[0] - 0.4, p[1] + 0.25 + (lift || 0), p[2]); obj.rotation.y = yaw == null ? p[3] : yaw; return p; }
     var wagonA = buildWagon(false), wagonB = buildWagon(false), wagonC = buildWagon(true);
-    var WA = { s: LEG1 - 1.5, s0: LEG1 - 1.5 }, WB = { s: LEG1 * 0.72, s0: LEG1 * 0.72 }, WC = { s: LEG1 * 0.44, s0: LEG1 * 0.44 };
+    var WA = { s: TURN2 + RR * Math.PI / 2, s0: TURN2 + RR * Math.PI / 2 }, WB = { s: TURN2 - 46, s0: TURN2 - 46 }, WC = { s: TURN2 - 100, s0: TURN2 - 100 };   // A at the apex of the second landing; B and C behind it, higher up the second leg
     // the pack camels that draw them (one each: the terraces are narrow)
     var camels = [];
     function addCamel(seed) { var c = SC.chars.camel ? SC.chars.camel(paint, { seed: seed }) : new T.Group(); c.scale.setScalar(1.5); scene.add(c); camels.push(c); return c; }
@@ -988,8 +1167,8 @@
     var footmen = [leader, second, heavers[0], heavers[1]];   // the four who come back up
     raiders.forEach(function (r) { walker(r.g, 2.3); }); camels.forEach(function (c) { walker(c, 2.9); }); [wagonA, wagonB, wagonC].forEach(function (w) { walker(w, 2.6); });
 
-    // ---- the raiders' camp on the first terrace: last night's fire still smoking, and their gear beside the wagons ----
-    var CAMP = trackAt(LEG1 * 0.58), campG = new T.Group();
+    // ---- the raiders' camp on the second terrace, between the wagons: last night's fire still smoking, and their gear beside the wagons ----
+    var CAMP = trackAt(TURN2 - 74), campG = new T.Group();
     campG.position.set(CAMP[0] + 2.3, CAMP[1] + 0.25, CAMP[2]);
     (function () {
       var ash = new T.Mesh(new T.CircleGeometry(0.8, 14), new T.MeshBasicMaterial({ color: 0x241c18 })); ash.rotation.x = -Math.PI / 2; ash.position.y = 0.03; campG.add(ash);
@@ -1037,11 +1216,11 @@
     walker(hermes, 1.9);
     var brass = new T.MeshStandardMaterial({ color: 0xc9973a, metalness: 0.85, roughness: 0.32 });
     var glassTube = new T.Group();
-    [[0.045, 0.3, 0], [0.036, 0.28, 0.27], [0.028, 0.26, 0.52]].forEach(function (s) { var m = new T.Mesh(new T.CylinderGeometry(s[0], s[0], s[1], 12), brass); m.rotation.x = Math.PI / 2; m.position.z = -s[2]; glassTube.add(m); });
-    // it rides with his head, at his right eye; the hand comes up to it
+    [[0.028, 0.26, 0], [0.036, 0.28, 0.25], [0.045, 0.3, 0.52]].forEach(function (s) { var m = new T.Mesh(new T.CylinderGeometry(s[0], s[0], s[1], 12), brass); m.rotation.x = Math.PI / 2; m.position.z = -s[2]; glassTube.add(m); });
+    // it rides with his head: the thin eyepiece at his right eye, the wide end of the lens out toward the gorge; the hand comes up to it
     if (Hh.head) { Hh.head.add(glassTube); glassTube.position.set(0.075, 0.05, -0.2); glassTube.rotation.set(0, 0, 0); }
     glassTube.visible = false;
-    var HOME = { x: 105.6, z: 8.5, rot: Math.PI - 0.25 };   // facing south-south-east, over the lip
+    var HOME = { x: 105.6, z: 6.6, rot: Math.PI - 0.25 };   // facing south-south-east, kneeling a stride back from the lip (the rock ends at z 7.5)
     var dot = new T.Sprite(new T.SpriteMaterial({ color: 0x1d3f9c, fog: false })); dot.scale.set(3.2, 5.2, 1); dot.visible = false; scene.add(dot);   // Hermes seen from half a league away
     var pebble = boulder(0, -1000, 0, 0.9, 77, 0.8, false);   // the stone that turns under his boot
 
@@ -1064,12 +1243,13 @@
     function walkPath(obj, pts, speed, then) { walks = walks.filter(function (w) { return w.obj !== obj; }); walks.push({ obj: obj, pts: pts.slice(), speed: speed, then: then || null }); }
     function place() {
       onTrack(wagonA, WA.s, trackAt(WA.s)[3] + 0.95, 0); wagonA.rotation.z = 0.16;        // wedged across the turn, one wheel over the drop
+      wagonA.position.x += WEDGE.x * 3.4; wagonA.position.z += WEDGE.z * 3.4;            // (out at the edge of the landing, past the block)
       onTrack(wagonB, WB.s); onTrack(wagonC, WC.s); wagonB.rotation.z = wagonC.rotation.z = 0;
       var pb = onTrack(camB, WB.s - 6.2); camB.rotation.y = pb[3]; var pc = onTrack(camC, WC.s - 6.2); camC.rotation.y = pc[3];
       camels.forEach(function (c) { if (c.userData.walk) c.userData.walk(false); if (c.userData.kneel) c.userData.kneel(0, true); });
       heavers.forEach(function (r, i) { var p = trackAt(WA.s - 3.6 - i * 1.5); r.g.position.set(p[0] + (i - 1) * 1.1, p[1] + 0.25, p[2]); r.g.rotation.y = p[3] + Math.PI; r.role = 'heave'; r.g.visible = true; });
       guards.forEach(function (r, i) { var p = trackAt(WC.s + (i ? 3.4 : -3.8)); r.g.position.set(p[0] - 1.6, p[1] + 0.25, p[2]); r.g.rotation.y = i ? 0.4 : 2.6; r.role = 'guard'; r.g.visible = true; });
-      var ph = trackAt(LEG1 + 4); leader.g.position.set(ph[0] + 1.5, ph[1] + 0.25, ph[2] - 1); leader.g.rotation.y = 0.6; leader.role = 'lead';
+      var ph = trackAt(TURN2 + 4); leader.g.position.set(ph[0] + 1.5, ph[1] + 0.25, ph[2] - 1); leader.g.rotation.y = 0.6; leader.role = 'lead';
       second.g.position.set(ph[0] - 0.6, ph[1] + 0.25, ph[2] + 1.4); second.g.rotation.y = -2.2; second.role = 'lead';
       raiders.forEach(function (r) { r.walk = null; r.g.visible = true; });
       WA.s = WA.s0; WB.s = WB.s0; WC.s = WC.s0;
@@ -1081,7 +1261,7 @@
     // ---- the camera: a told shot (wide), or the eye at the glass ----
     var PRINT = { p: [40, 46, 800], l: [0, -112, 0] };   // the view of the two printed pages: from the south, a little above the rim
     var cam = { mode: 'wide', p: new T.Vector3(0, -70, 640), l: new T.Vector3(0, -120, 0), gp: new T.Vector3(0, -70, 640), gl: new T.Vector3(0, -120, 0), fov: 46, gfov: 46, k: 0.5, follow: null };
-    var G = { yaw: 196 * DEG, pitch: -13 * DEG, tYaw: 196 * DEG, tPitch: -13 * DEG, zoom: 0, fov: FOVS[0], rack: 0, speed: 0, focusId: null, focusT: 0, noteT: 0, point: null, auto: null, drag: null, pinch: 0, blur: -1 };
+    var G = { yaw: 196 * DEG, pitch: -13 * DEG, tYaw: 196 * DEG, tPitch: -13 * DEG, zoom: 1, fov: FOVS[1], rack: 0, speed: 0, focusId: null, focusT: 0, noteT: 0, point: null, auto: null, drag: null, pinch: 0, blur: -1, vel: { y: 0, p: 0, at: 0 }, fling: null };
     function shot(p, l, fov, k, snap) { cam.gp.set(p[0], p[1], p[2]); cam.gl.set(l[0], l[1], l[2]); cam.gfov = fov || 46; cam.k = k || 0.5; cam.follow = null; if (snap) { cam.p.copy(cam.gp); cam.l.copy(cam.gl); cam.fov = cam.gfov; } }
     function dirOf(yaw, pitch, out) { var c = Math.cos(pitch); return out.set(Math.sin(yaw) * c, Math.sin(pitch), -Math.cos(yaw) * c); }
     var tmp = new T.Vector3(), tmp2 = new T.Vector3(), vdir = new T.Vector3();
@@ -1089,7 +1269,7 @@
       if (id === 'wagons' || id === 'hairpin') return out.copy(wagonA.position).setY(wagonA.position.y + 1.4);
       if (id === 'oilcloth') return out.copy(wagonC.position).setY(wagonC.position.y + 2.2);
       if (id === 'stone') return out.set(STONE.x, 1.5, STONE.z);
-      if (id === 'blue') return out.set(WSTONE.x, 0.7, WSTONE.z);
+      if (id === 'blue') return out.set(WSTONE.x, 1.5, WSTONE.z);   // the smear sits on the face, by the sign (the deck of the bridge hides the foot of the stone)
       if (id === 'boulders') return out.set(-8, FLOOR + 12, 78);
       if (id === 'tower') return out.set(TOWER.x, 38, TOWER.z);
       if (id === 'pillars') return out.set(PILLARS.x, FLOOR + 7, PILLARS.z);
@@ -1097,7 +1277,7 @@
     }
     function aimAt(id) { sightPos(id, tmp).sub(tmp2.set(EYE.x, EYE.y, EYE.z)); var h = Math.hypot(tmp.x, tmp.z); return { yaw: Math.atan2(tmp.x, -tmp.z), pitch: Math.atan2(tmp.y, h) }; }
     function setZoom(z) {
-      z = Math.max(0, Math.min(2, z | 0));
+      z = Math.max(0, Math.min(FOVS.length - 1, z | 0));
       if (z === G.zoom) return;
       G.zoom = z; G.rack = 1; cue('lens');
       if (lens) lens.pips.forEach(function (p, i) { p.classList.toggle('is-on', i <= z); });
@@ -1115,13 +1295,17 @@
       lens.box.style.setProperty('--lr', r + 'px');
       lens.r = r;
     }
+    // raise and lower each wait for the fade; a token keeps a late one from undoing the other (Hermes back in front of his own eye)
+    var lensTok = 0;
     function raise() {      // the eye goes to the glass
       fadeTo(1, 380);
-      setTimeout(function () { cam.mode = 'glass'; G.zoom = 0; G.fov = FOVS[0]; var a0 = aimAt('wagons'); G.yaw = G.tYaw = a0.yaw - 7 * DEG; G.pitch = G.tPitch = a0.pitch + 2 * DEG; G.focusT = 0; hermes.visible = false; G.point = null; G.auto = null; glassTube.visible = true; showLens(true); fadeTo(0, 520); cue('lens'); if (stage) stage.focus(); }, reducedMotion ? 0 : 400);
+      var tok = ++lensTok;
+      setTimeout(function () { if (tok !== lensTok) return; cam.mode = 'glass'; G.zoom = 1; G.fov = FOVS[1]; var a0 = aimAt('wagons'); G.yaw = G.tYaw = a0.yaw - 7 * DEG; G.pitch = G.tPitch = a0.pitch + 2 * DEG; G.focusT = 0; hermes.visible = false; G.point = null; G.auto = null; G.fling = null; glassTube.visible = true; showLens(true); fadeTo(0, 520); cue('lens'); if (stage) stage.focus(); }, reducedMotion ? 0 : 400);
     }
     function lower() {      // and comes away from it
       fadeTo(1, 380);
-      setTimeout(function () { cam.mode = 'wide'; hermes.visible = true; hold('kneel'); showLens(false); shot([99.8, 2.1, 15.4], [106.0, 0.7, 8.4], 34, 1, true); fadeTo(0, 520); }, reducedMotion ? 0 : 400);
+      var tok = ++lensTok;
+      setTimeout(function () { if (tok !== lensTok) return; cam.mode = 'wide'; hermes.visible = true; hold('kneel'); showLens(false); shot([99.8, 2.1, 13.5], [106.0, 0.7, 6.5], 34, 1, true); fadeTo(0, 520); }, reducedMotion ? 0 : 400);
     }
     function cut(fn, hold) { fadeTo(1, 420); later(reducedMotion ? 0.02 : 0.5, function () { fn(); later(hold || 0.12, function () { fadeTo(0, 600); }); }); }
 
@@ -1130,18 +1314,28 @@
     canvas.style.touchAction = 'none';
     var ptrs = {};
     function span() { var k = Object.keys(ptrs); if (k.length < 2) return 0; return Math.hypot(ptrs[k[0]].x - ptrs[k[1]].x, ptrs[k[0]].y - ptrs[k[1]].y); }
-    canvas.addEventListener('pointerdown', function (e) { if (!glassOn()) return; ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; G.pinch = span(); G.auto = null; try { canvas.setPointerCapture(e.pointerId); } catch (err) {} });
+    canvas.addEventListener('pointerdown', function (e) { if (!glassOn()) return; ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; G.pinch = span(); G.auto = null; G.fling = null; G.vel = { y: 0, p: 0, at: performance.now() }; try { canvas.setPointerCapture(e.pointerId); } catch (err) {} });
     canvas.addEventListener('pointermove', function (e) {
       var q = ptrs[e.pointerId]; if (!q || !glassOn()) return;
       var dx = e.clientX - q.x, dy = e.clientY - q.y; q.x = e.clientX; q.y = e.clientY;
       if (Object.keys(ptrs).length >= 2) { var sp = span(); if (G.pinch > 0 && sp > 0) { if (sp > G.pinch * 1.25) { setZoom(G.zoom + 1); G.pinch = sp; } else if (sp < G.pinch * 0.8) { setZoom(G.zoom - 1); G.pinch = sp; } } return; }
-      var k = (G.fov * DEG) / Math.max(1, canvas.clientHeight);   // the lens moves with the hand, one to one
-      G.tYaw += dx * k; G.tPitch = Math.max(-84 * DEG, Math.min(24 * DEG, G.tPitch - dy * k));
+      // the hand takes hold of the world: drag it left and the glass turns right, drag it down and the glass looks up
+      var k = (G.fov * DEG) / Math.max(1, canvas.clientHeight), ddy = -dx * k, ddp = dy * k;
+      G.tYaw += ddy; G.tPitch = Math.max(-84 * DEG, Math.min(24 * DEG, G.tPitch + ddp));
+      var now = performance.now(), ms = Math.max(4, now - G.vel.at), a = Math.min(1, ms / 40);   // the speed of the hand, for the glide when it lets go
+      G.vel.y += (ddy / ms * 1000 - G.vel.y) * a; G.vel.p += (ddp / ms * 1000 - G.vel.p) * a; G.vel.at = now;
     });
-    function up(e) { delete ptrs[e.pointerId]; G.pinch = span(); }
+    function up(e) {
+      var was = !!ptrs[e.pointerId]; delete ptrs[e.pointerId]; G.pinch = span();
+      // a flick lets the glass glide on a little and settle, the way a brass tube swings on its own weight
+      if (was && !Object.keys(ptrs).length && G.vel && performance.now() - G.vel.at < 70 && !reducedMotion) {
+        var cap = G.fov * DEG * 3;
+        G.fling = { y: Math.max(-cap, Math.min(cap, G.vel.y)), p: Math.max(-cap, Math.min(cap, G.vel.p)) };
+      }
+    }
     canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
     var wheelAt = 0;
-    canvas.addEventListener('wheel', function (e) { if (!glassOn()) return; e.preventDefault(); var now = performance.now(); if (now - wheelAt < 260) return; wheelAt = now; setZoom(G.zoom + (e.deltaY < 0 ? 1 : -1)); }, { passive: false });
+    canvas.addEventListener('wheel', function (e) { if (!glassOn()) return; e.preventDefault(); var now = performance.now(); if (now - wheelAt < 220) return; wheelAt = now; setZoom(G.zoom + (e.deltaY < 0 ? 1 : -1)); }, { passive: false });
     stage.addEventListener('keydown', function (e) {
       if (!glassOn()) return;
       var st = G.fov * DEG * 0.12, used = true;
@@ -1149,7 +1343,7 @@
       else if (e.key === 'ArrowUp') G.tPitch = Math.min(24 * DEG, G.tPitch + st); else if (e.key === 'ArrowDown') G.tPitch = Math.max(-84 * DEG, G.tPitch - st);
       else if (e.key === '+' || e.key === '=') setZoom(G.zoom + 1); else if (e.key === '-' || e.key === '_') setZoom(G.zoom - 1);
       else used = false;
-      if (used) { e.preventDefault(); G.auto = null; }
+      if (used) { e.preventDefault(); G.auto = null; G.fling = null; }
     });
 
     // ---- what the frame does ----
@@ -1187,11 +1381,11 @@
       if (world.phase === 'turn') {
         [[wagonB, WB, camB, 0], [wagonC, WC, camC, 4], [wagonA, WA, null, 9]].forEach(function (w) {
           if (t - world.t0 < w[3]) return;
-          w[1].s = Math.max(-40, w[1].s - dt * 1.5);
-          var p = w[1].s >= 0 ? trackAt(w[1].s) : [151 + (-w[1].s) * 0.8, 0, 30 + w[1].s * 0.7, 2.3];
-          w[0].position.set(p[0] - 0.4, p[1] + 0.25, p[2]); w[0].rotation.y += adiff(p[3], w[0].rotation.y) * Math.min(1, dt * 1.5); w[0].rotation.z *= 0.96;
+          w[1].s = Math.max(-60, w[1].s - dt * 1.7);
+          var p = trackAt(w[1].s), wo = w[0] === wagonA ? 3.4 * Math.max(0, 1 - (t - world.t0 - w[3]) / 3) : 0;   // the wedged one comes back off the edge first
+          w[0].position.set(p[0] - 0.4 + WEDGE.x * wo, p[1] + 0.25, p[2] + WEDGE.z * wo); w[0].rotation.y += adiff(p[3], w[0].rotation.y) * Math.min(1, dt * 1.5); w[0].rotation.z *= 0.96;
           w[0].userData.wheels.forEach(function (wh) { wh.rotation.x -= dt * 1.6; });
-          if (w[2]) { var cp = w[1].s - 6.2 >= 0 ? trackAt(w[1].s - 6.2) : [151 + (6.2 - w[1].s) * 0.8, 0, 30 + (w[1].s - 6.2) * 0.7, 2.3]; w[2].position.set(cp[0] - 0.4, cp[1] + 0.25, cp[2]); w[2].rotation.y = cp[3] + Math.PI; }
+          if (w[2]) { var cp = trackAt(w[1].s - 6.2); w[2].position.set(cp[0] - 0.4, cp[1] + 0.25, cp[2]); w[2].rotation.y = cp[3] + Math.PI; }
         });
       }
       camels.forEach(function (c) { if (c.userData.update) c.userData.update(t); });
@@ -1252,15 +1446,22 @@
         camera.position.copy(cam.p); camera.lookAt(cam.l);
         if (Math.abs(camera.fov - cam.fov) > 0.01) { camera.fov = cam.fov; camera.updateProjectionMatrix(); }
       } else {
+        hermes.visible = false;   // the eye is at the glass: nothing of Hermes may stand in front of it, whichever way it turns
         if (G.auto) { G.tYaw += adiff(G.auto.yaw, G.tYaw) * Math.min(1, dt * 1.8); G.tPitch += (G.auto.pitch - G.tPitch) * Math.min(1, dt * 1.8); if (Math.abs(adiff(G.auto.yaw, G.tYaw)) < 0.002 && Math.abs(G.auto.pitch - G.tPitch) < 0.002) G.auto = null; }
-        var py = G.yaw, pp = G.pitch, kk = Math.min(1, dt * 11);
+        if (G.fling) {
+          G.tYaw += G.fling.y * dt; G.tPitch = Math.max(-84 * DEG, Math.min(24 * DEG, G.tPitch + G.fling.p * dt));
+          var fk = Math.exp(-dt * 4.2); G.fling.y *= fk; G.fling.p *= fk;
+          if (Math.hypot(G.fling.y, G.fling.p) < G.fov * DEG * 0.05) G.fling = null;
+        }
+        // light in the hand: the glass keeps up with a dragging finger almost at once, and eases only a touch
+        var py = G.yaw, pp = G.pitch, kk = Math.min(1, dt * (Object.keys(ptrs).length ? 28 : 16));
         G.yaw += adiff(G.tYaw, G.yaw) * kk; G.pitch += (G.tPitch - G.pitch) * kk;
         G.speed = Math.hypot(adiff(G.yaw, py) * Math.cos(G.pitch), G.pitch - pp) / Math.max(0.001, dt);   // radians a second
         G.fov += (FOVS[G.zoom] - G.fov) * Math.min(1, dt * 6);
         G.rack = Math.max(0, G.rack - dt * 1.9);
-        if (efx && efx.post) { var gp = efx.post.params; gp.haze = reducedMotion ? 0 : [0.25, 0.7, 1.25][G.zoom]; gp.hazeY = 0.5; gp.ca = 0.34 + 0.16 * G.zoom; gp.vignette = 0.2; }
+        if (efx && efx.post) { var gp = efx.post.params; gp.haze = reducedMotion ? 0 : [0.15, 0.25, 0.7, 1.25][G.zoom]; gp.hazeY = 0.5; gp.ca = 0.26 + 0.14 * G.zoom; gp.vignette = 0.2; }
         // a hand is never still: the more the tube is drawn out, the more it shows
-        var sw = reducedMotion ? 0 : (0.0009 + 0.0007 * G.zoom) * (G.fov / 20) * 3;
+        var sw = reducedMotion ? 0 : (0.0009 + 0.0007 * Math.max(0, G.zoom - 1)) * Math.min(1, G.fov / 20) * 3;
         var sy = Math.sin(t * 1.3) * sw + Math.sin(t * 2.9) * sw * 0.4 + world.shake * Math.sin(t * 31) * 0.004, sp = Math.sin(t * 1.7 + 1) * sw * 0.8 + world.vert * Math.sin(t * 2.2) * 0.012;
         world.shake = reducedMotion ? 0 : Math.max(0, world.shake - dt); world.vert = reducedMotion ? 0 : Math.max(0, world.vert - dt * 0.4);
         camera.position.set(EYE.x, EYE.y, EYE.z);
@@ -1285,8 +1486,8 @@
       var txt = Math.round(deg) + '° · ' + NAMES16[Math.round(deg / 22.5) % 16];
       if (lens.bearing.textContent !== txt) lens.bearing.textContent = txt;
       lens.tape.style.backgroundPositionX = (-deg * 6) + 'px';
-      // blur: the rack of the tube after a draw, and the smear of a glass that moves
-      var blur = reducedMotion ? 0 : Math.round(Math.min(7, G.rack * 6 + Math.max(0, G.speed / (G.fov * DEG) - 0.35) * 1.6) * 2) / 2;
+      // blur: only the rack of the tube after a draw (a glass that moves stays sharp: smearing it made it feel heavy)
+      var blur = reducedMotion ? 0 : Math.round(Math.min(3, G.rack * 3.5) * 2) / 2;
       if (blur !== G.blur) { G.blur = blur; canvas.style.filter = blur ? 'blur(' + blur + 'px)' : ''; }
       // what is under the cross?
       var best = null, bestA = 9, canFind = (ns.stage === 'glass' || ns.stage === 'event') && !ns.busy;
@@ -1336,22 +1537,23 @@
         G.point = null;
         if (lens) { lens.found.textContent = SIGHTS[id].icon + ' ' + SIGHTS[id].name; lens.found.classList.remove('is-on'); void lens.found.offsetWidth; lens.found.classList.add('is-on'); lens.box.classList.remove('is-flash'); void lens.box.offsetWidth; lens.box.classList.add('is-flash'); }
       },
-      point: function (id, swing) { G.point = id; if (swing) { G.auto = aimAt(id); if (SIGHTS[id].zoom > G.zoom) later(1.6, function () { setZoom(SIGHTS[id].zoom); }); } },
-      aim: function (id, zoomToo) { var a = aimAt(id); G.yaw = G.tYaw = a.yaw; G.pitch = G.tPitch = a.pitch; if (zoomToo) { G.zoom = SIGHTS[id].zoom; G.fov = FOVS[G.zoom]; G.rack = 0; } },
+      point: function (id, swing) { G.point = id; if (swing) { G.fling = null; G.auto = aimAt(id); if (SIGHTS[id].zoom > G.zoom) later(1.6, function () { setZoom(SIGHTS[id].zoom); }); } },
+      aim: function (id, zoomToo) { var a = aimAt(id); G.fling = null; G.yaw = G.tYaw = a.yaw; G.pitch = G.tPitch = a.pitch; if (zoomToo) { G.zoom = SIGHTS[id].zoom; G.fov = FOVS[G.zoom]; G.rack = 0; } },
       state: function () {
         return { mode: cam.mode, zoom: G.zoom, bearing: Math.round(((G.yaw / DEG) % 360 + 360) % 360), pitch: +(G.pitch / DEG).toFixed(1), fov: +camera.fov.toFixed(1), phase: world.phase, focus: +G.focusT.toFixed(2),
           hermes: [+hermes.position.x.toFixed(1), +hermes.position.y.toFixed(1), +hermes.position.z.toFixed(1)], footmen: footmen.map(function (r) { return [+r.g.position.x.toFixed(0), +r.g.position.y.toFixed(0), +r.g.position.z.toFixed(0)]; }), wagonC: +WC.s.toFixed(0), walks: walks.length, lens: !!(lens && !lens.box.hidden) };
       },
       gfx: function () { return { T: T, scene: scene, camera: camera, renderer: renderer, hermes: hermes, raiders: raiders, wagons: [wagonA, wagonB, wagonC] }; },
       frames: function (n, dt) { for (var i = 0; i < (n || 1); i++) { clock.t += dt || 1 / 30; scene.userData.updaters.forEach(function (u) { u(clock.t, dt || 1 / 30); }); } },
-      test: { hold: hold, shot: shot, raise: raise, zoom: function (z) { G.zoom = z; G.fov = FOVS[z]; G.rack = 0; }, gaitOn: function () { return !!(efx && efx.gait && efx.gait.hold); } },
+      test: { hold: hold, shot: shot, raise: raise, sight: function (id) { return sightPos(id, new T.Vector3()).toArray(); }, eye: EYE, look: function (yd, pd) { G.fling = null; G.auto = null; G.yaw = G.tYaw = yd * DEG; G.pitch = G.tPitch = pd * DEG; }, zoom: function (z) { G.zoom = z; G.fov = FOVS[z]; G.rack = 0; }, gaitOn: function () { return !!(efx && efx.gait && efx.gait.hold); } },
       fx: {
         // the view of the two printed pages: from the south, the Mesa on the left, the arch, the terraces on the right
+        // (shotTerraces: from the lip of the bridge down into the bay, where the cart road goes down)
         shotPrint: function () { shot(PRINT.p, PRINT.l, 44, 0.5, true); shot([70, 20, 700], [6, -118, 0], 44, 0.1); cue('whoosh', { dur: 2.2 }); },
-        shotTerraces: function () { shot([36, 26, -46], [134, -44, 226], 30, 0.55); cue('groan', { v: 0.5 }); later(1.4, function () { cue('stone', { dur: 1.6 }); }); },
+        shotTerraces: function () { shot([98, 9, 6], [205, -48, 150], 44, 0.55); cue('groan', { v: 0.5 }); later(1.4, function () { cue('stone', { dur: 1.6 }); }); },
         shotHermes: function () {
           hermesTo([[HOME.x, 0, HOME.z]], 1.2); hermes.rotation.y = HOME.rot;
-          shot([99.8, 2.1, 15.4], [106.0, 0.7, 8.4], 34, 0.9);
+          shot([99.8, 2.1, 13.5], [106.0, 0.7, 6.5], 34, 0.9);
           later(1.2, function () { hold('kneel'); }); later(2.6, function () { glassTube.visible = true; cue('lens'); });
         },
         shout: function () { cue('echo', { deg: 9, n: 3 }); world.shake = 0.5; raiders.forEach(function (r) { if (r.role === 'heave') r.role = 'idle'; }); world.phase = 'halt'; leader.role = 'point'; },
@@ -1361,9 +1563,9 @@
         // the four shoulder their packs and start back up the terrace
         splitStart: function () {
           world.phase = 'split';
-          var up = []; for (var s = LEG1 - 6; s >= 0; s -= 14) { var p = trackAt(s); up.push([p[0], p[1] + 0.25, p[2], 0]); }
-          up.push([153, 0.1, 27, 0]); up.push([160, 0.1, 16, 0]);
-          footmenTo(up, 2.1, function () { world.phase = world.phase === 'gone' ? 'gone' : 'rim'; });
+          var up = []; for (var s = WA.s0 - 8; s >= 10; s -= 9) { var p = trackAt(s); up.push([p[0], p[1] + 0.25, p[2], 0]); }
+          up.push([171, 0.1, 12, 0]); up.push([160, 0.1, 16, 0]);
+          footmenTo(up, 2.6, function () { world.phase = world.phase === 'gone' ? 'gone' : 'rim'; });
           heavers[2].role = 'idle';
           cue('step');
         },
@@ -1421,7 +1623,7 @@
         },
         trailBack: function () {
           world.prints = false;
-          cut(function () { walks = walks.filter(function (w) { return w.obj !== hermes; }); rag.visible = true; hermes.position.set(124, 0, 3); hermes.rotation.y = Math.PI / 2; hermesTo([[HOME.x + 2.4, 0, HOME.z - 2.6]], 1.4, function () { hermes.rotation.y = 0.9; hold('kneel'); world.low = true; }); shot([100, 3.6, 15], [112, 0.8, 5], 42, 0.7, true); });
+          cut(function () { walks = walks.filter(function (w) { return w.obj !== hermes; }); rag.visible = true; hermes.position.set(124, 0, 3); hermes.rotation.y = Math.PI / 2; hermesTo([[HOME.x + 2.4, 0, HOME.z - 0.7]], 1.4, function () { hermes.rotation.y = 0.9; hold('kneel'); world.low = true; }); shot([100, 3.6, 15], [112, 0.8, 5], 42, 0.7, true); });
         },
         trailFooled: function () {
           cut(function () {
