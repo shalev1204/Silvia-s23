@@ -1214,6 +1214,23 @@
     hermes.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     scene.add(hermes);
     walker(hermes, 1.9);
+    // when he kneels or crouches his whole upper body goes down, and the robe with it would sink into the rock: below the sash
+    // the cloth gathers instead, its hem kept on the ground and a little wider, as a robe folds when its wearer goes down on a knee
+    var robeGeo = Hh.cloak && Hh.cloak.children[0] && Hh.cloak.children[0].geometry, robe0 = robeGeo ? robeGeo.attributes.position.array.slice() : null, robeD = 0;
+    var WAIST = 0.98, HEM = 0.12;
+    function settleRobe(d) {
+      if (!robe0 || Math.abs(d - robeD) < 0.004) return;
+      robeD = d;
+      var lift = 0.18 * Math.min(1, d / 0.4);   // he leans forward over the lip: the front of the hem would dip, so the gathered cloth sits a little higher
+      var a = robeGeo.attributes.position.array, s = Math.max(0.15, (WAIST - HEM - d - lift) / (WAIST - HEM));
+      for (var i = 0; i < a.length; i += 3) {
+        var y = robe0[i + 1];
+        if (y >= WAIST || d <= 0) { a[i] = robe0[i]; a[i + 1] = y; a[i + 2] = robe0[i + 2]; continue; }
+        var u = (WAIST - y) / (WAIST - HEM), wide = 1 + 0.22 * (1 - s) * Math.min(1, u);
+        a[i] = robe0[i] * wide; a[i + 1] = WAIST - (WAIST - y) * s; a[i + 2] = robe0[i + 2] * wide;
+      }
+      robeGeo.attributes.position.needsUpdate = true; robeGeo.computeVertexNormals(); robeGeo.computeBoundingSphere();
+    }
     var brass = new T.MeshStandardMaterial({ color: 0xc9973a, metalness: 0.85, roughness: 0.32 });
     var glassTube = new T.Group();
     [[0.028, 0.26, 0], [0.036, 0.28, 0.25], [0.045, 0.3, 0.52]].forEach(function (s) { var m = new T.Mesh(new T.CylinderGeometry(s[0], s[0], s[1], 12), brass); m.rotation.x = Math.PI / 2; m.position.z = -s[2]; glassTube.add(m); });
@@ -1436,6 +1453,14 @@
         if (Hh.head) Hh.head.rotation.x += (world.low ? 0.75 : 0.5) * world.crouch;   // chin up: the glass looks out over the gorge, not at his boots
         if (Hh.armR && glassTube.visible) { Hh.armR.rotation.x += (1.75 - Hh.armR.rotation.x) * world.crouch; Hh.armR.rotation.z += (-0.2 - Hh.armR.rotation.z) * world.crouch; if (Hh.foreR) Hh.foreR.rotation.x += (1.15 - Hh.foreR.rotation.x) * world.crouch; }
       }
+      // he is down a stride from the lip: nothing of him may go through the rock and show out of the cliff face below it
+      var drop = efx && efx.gait && efx.gait.body ? Math.max(0, -efx.gait.body.position.y) : 0;
+      if (drop > 0) {
+        var up = 0.16 * Math.min(1, drop / 0.3);
+        if (Hh.staff) Hh.staff.position.y += drop + 0.14;   // the staff slides up through his hand, its iron foot on the stone
+        if (Hh.legL) Hh.legL.position.y = Math.max(up, Hh.legL.position.y); if (Hh.legR) Hh.legR.position.y = Math.max(up, Hh.legR.position.y);   // the knees fold under the robe
+      }
+      settleRobe(drop);
 
       // the camera
       if (cam.mode === 'wide') {
