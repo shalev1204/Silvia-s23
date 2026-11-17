@@ -12,7 +12,7 @@ src = open(os.path.join(W.WEB, "hub/js/story-point.js")).read(); i = src.index("
 save = {k: v for k, v in json.loads(src[i + 11: src.index("\n        };", i) + 10].strip().rstrip(";")).items() if not k.startswith("__")}
 save.update({"the_eclipse_active_seeker": "Silvia", "order_story_dream_v3": "done", "order_cairn4_march_start": str(int(time.time() * 1000) - 18 * 3600 * 1000 - 300000)})
 SHOTS = [("front", [99.8, 2.1, 15.4], [106.0, 0.7, 8.4], 34), ("side_w", [96, 1.2, 8.5], [105.6, 0.6, 8.5], 30), ("side_e", [115, 1.2, 9], [105.6, 0.6, 8.5], 30),
-         ("below", [104, -6, 22], [105.6, 0.2, 8.5], 34), ("behind", [106.5, 2.4, 1.0], [105.6, 0.8, 9.5], 40), ("close", [103.6, 1.1, 10.6], [105.6, 0.9, 8.5], 30)]
+         ("below", [104, -6, 22], [105.6, 0.2, 8.5], 34), ("behind", [106.5, 2.4, 1.0], [105.6, 0.8, 9.5], 40), ("close", [103.6, 1.1, 10.6], [105.6, 0.9, 8.5], 30), ("tight", [104.2, 0.9, 11.2], [105.6, 0.4, 6.6], 22), ("tight_w", [101.0, 0.5, 6.0], [105.6, 0.4, 6.6], 22)]
 with sync_playwright() as p:
     b = p.chromium.launch(args=W.CHROMIUM_ARGS)
     ctx, page, errors = W.new_page(b, save)
