@@ -54,7 +54,16 @@
         s15: {
           note: 'The Sandstone Labyrinth, Cairn III. Torches in the passages, and Silvia always one turn ahead of them. The seal is wrapped in my scarf, and they never saw my face.',
           quote: 'Either the sun is cooking my mind, or someone walks these cairns ahead of me.',
-          earned: ['Seal of Cairn III'], ledger: ['The West Wind Line', 'The Wind Rose Line'], sketch: T + 'sandstone_labyrinth_preview.webp'
+          // the finds of the dark go into the log only if she sent him to them
+          get earned() {
+            var f = []; try { f = JSON.parse(localStorage.getItem('order_labyrinth_finds') || '[]') || []; } catch (e) { f = []; }
+            var out = ['Seal of Cairn III'];
+            if (f.indexOf('lamp') >= 0) out.push('The Founders’ Lamp');
+            if (f.indexOf('survey') >= 0) out.push('The Raiders’ Copy of the Survey');
+            if (f.indexOf('chalk') >= 0) out.push('My own chalk of 1998, found again');
+            return out;
+          },
+          ledger: ['The West Wind Line', 'The Wind Rose Line'], sketch: T + 'sandstone_labyrinth_preview.webp'
         },
         s16: {
           note: 'Cairn IV, between the singing pillars. The song opened the chamber, and in the throat of the Left pillar lay a pebble painted with a gold star on blue.',
@@ -74,7 +83,7 @@
         s19: {
           note: 'The inner chamber of Tower II. Behind the door, humming, was Aurelia. Fifty-five years. And her disc gave Silvia the first truth.',
           quote: 'When she says my name she says it carefully, the way you carry something full to the brim.',
-          earned: ['The Gilded Star', 'The WHEN'], ledger: ['The Line of the Rim', 'The Line of the Heart'], sketch: T + 'oracle_horizon_preview.webp'
+          earned: ['The Gilded Star', 'The WHEN'], ledger: ['The Line of the Heart', 'The Line of the Shared Cell'], sketch: T + 'oracle_horizon_preview.webp'
         },
         s20: {
           note: 'Tower III, the Gate of a Thousand Masks. The wall opened like a curtain, and the first piece of the Mirror Speaker’s mirror is in my hands.',
@@ -89,7 +98,7 @@
         s22: {
           note: 'Tower III, the Whispering Gallery. A bronze rose lost in the dark, a string of ten varas, and the Ashes whispering at the far end. Silvia knew where to stand.',
           quote: 'A mirror gives everything back, but the last thing first.',
-          earned: ['Fragment III of the mirror'], ledger: ['The Line of the Echo'], sketch: T + 'whispering_gallery_preview.webp'
+          earned: ['Fragment III of the mirror', 'Aurelia’s three words: “Listen, and answer.”'], sketch: T + 'whispering_gallery_preview.webp'
         }
       };
 

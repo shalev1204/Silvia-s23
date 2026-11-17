@@ -23,11 +23,12 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       return beats([
         echo,
         'Dusk, Silvia. The hardpan begins at the last rocks, and an old shepherd with twelve black goats has shared his water with me.',
+        'While I drank, the oldest of his goats ate a corner of my log and looked me in the eye. I think it was a review.',
         'He says one night is enough to cross it, if you walk toward the singing: the pillars of Cairn IV, heard from the Natural Bridge.',
         { ask: [
           { text: 'Drink, and fill every flask.', silviaMsg: 'Drink up, Hermes, and fill every flask you own. The hardpan has no springs.', reply: ['Two cups, and every flask to the brim. The seep gives slowly, and the shepherd waited without a word.', 'He says the cracked clay drinks a man’s water by midnight. I believe him.'] },
           { text: 'Can you trust him?', silviaMsg: 'Can you trust him, Hermes? Nobody just hands water to a stranger.', reply: ['I watched his hands. He never looked at my satchel, only at my boots.', 'A man with a plan stares at the bag. He asked for nothing, and that unsettles me more.'] },
-          { text: 'And how are the goats?', silviaMsg: 'And the goats, Hermes? Did they approve of you?', reply: ['The oldest one ate a corner of my log and looked me in the eye. I think it was a review.', 'The rest ignored me. Goats judge character very well.'] }
+          { text: 'And how are the goats?', silviaMsg: 'And the goats, Hermes? Did they approve of you?', reply: ['The oldest one kept an eye on my log for the rest of the evening, in case I wrote anything worth eating.', 'The rest ignored me. Goats judge character very well.'] }
         ] },
         'Then he told me something I cannot shake off: every autumn, on clear nights, a veiled woman comes down from the sandstone and sings to the stars.',
         'The herders leave her milk and dates on a flat stone. Nobody has ever seen her face.',
@@ -99,10 +100,10 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
     hermesInitial: (W) => {
       const b = W.bridge();
       const split = {
-        cross: 'And what we saw through the glass was true: the raiders split. The four on foot heard my stone fall in the gorge and are on my tracks.',
-        hide: 'And what we saw through the glass was true: the raiders split. The four on foot, one limping, walked over my head and found nothing.',
-        trail: 'And what we saw through the glass was true: the raiders split. The four on foot still hunt the blue cloth, and it will not fool them long.'
-      }[b] || 'This morning at dawn, from the Natural Bridge, I saw the raiders stuck at the switchbacks. They split, and a few men on foot follow my tracks.';
+        cross: 'And what we saw through the glass is what happened: the raiders split. The four on foot heard my stone fall in the gorge and are on my tracks.',
+        hide: 'And what we saw through the glass is what happened: the raiders split. The four on foot, one limping, walked over my head and found nothing.',
+        trail: 'And what we saw through the glass is what happened: the raiders split. The four on foot still hunt the blue cloth, and it will not fool them long.'
+      }[b] || 'Yesterday at dawn, from the Natural Bridge, I saw the raiders stuck at the switchbacks. They split, and a few men on foot follow my tracks.';
       return beats([
         'Silvia, I have barely slept. I am sitting between the singing pillars of Cairn IV.',
         'Cairn IV never fell: its reeds are the founders’ own. SUN, ECHO, STONE: the cairns are instruments, and the Order measured the desert with them.',
@@ -175,14 +176,14 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       { ask: [
         { text: 'Ask the Servant what to do.', silviaMsg: 'Could you ask the Servant, Hermes? He must know how the courtyard works in autumn.', reply: ['He would know in one sentence. But no wire reaches Tower II, and I will not flash a light at the very men I am avoiding.', 'The answer will have to come from the Arch itself.'] },
         { text: 'We could wait until June.', silviaMsg: 'Fine, we wait until June. I will bring snacks.', reply: ['Splendid. I will bring a chair and a very long book.', 'The raiders, on the other hand, bring wagons, and they do not read.'] },
-        { text: 'Will the seal stay locked?', silviaMsg: 'Hermes, will the last seal really stay locked? What if there is no way?', reply: ['The Order never built a lock without a key, Silvia, only keys that wait for the right hand.', 'And you have solved four of them. I trust that more than any calendar.'] }
+        { text: 'Will the seal stay locked?', silviaMsg: 'Hermes, will the last seal really stay locked? What if there is no way?', reply: ['The Order never built a lock without a key, Silvia, only keys that wait for the right hand.', 'And you have solved several of them. I trust that more than any calendar.'] }
       ] },
       'The autumn sun rises far to the south, so its first ray falls elsewhere. If the courtyard stays blind, the last seal waits until June.',
       'I do not have until June. And the raiders’ ruts on the road east are fresh: eighteen hours to the Arch, and no sleep.',
       { ask: [
         { text: 'Rest an hour first, please.', silviaMsg: 'Eighteen hours with no sleep, Hermes? Please rest an hour first.', reply: ['An hour is what the raiders need to gain a day on me.', 'I will rest at the Arch, once the mirrors are set and I have earned it.'] },
         { text: 'Eat and drink as you go.', silviaMsg: 'Eat and drink as you walk, Hermes. Do not forget.', reply: ['Water at every ridge, dates in my left pocket, and a cloth over my mouth against the dust. The shepherd taught me.', 'Do not worry. I have been rationing water since before you could walk.'] },
-        { text: 'How fresh are the ruts?', silviaMsg: 'How fresh are those ruts, Hermes? Hours? A day?', reply: ['Sharp edges, no wind on them yet: this morning, I would say.', 'They do not wander, Silvia. The raiders know this road, and they are not exploring.'] }
+        { text: 'How fresh are the ruts?', silviaMsg: 'How fresh are those ruts, Hermes? Hours? A day?', reply: ['Sharp edges, no wind on them yet: a day old, no more, I would say.', 'They do not wander, Silvia. The raiders know this road, and they are not exploring.'] }
       ] },
       'I count three problems: the courtyard, the Sanctuary, and the men on my heels. Which one keeps you awake?'
     ],

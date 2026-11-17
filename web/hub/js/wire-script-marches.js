@@ -176,7 +176,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
             reply: [
               'Stiff leather, black with soot, and on the cuff a phoenix over three flames, stitched in red. The Ashes’ mark, Silvia.',
               'Nothing in the fingers but a burnt match and a thread. A poor prize, but a fine proof: they were here, in a hurry, and gone.',
-              'It goes into the satchel. I will show it to the Servant, who will tell me I should have left it.'
+              'I will show it to the Servant, who will tell me I should have left it.'
             ] },
           { text: 'Leave it. Leave no trace.',
             silviaMsg: 'Do not touch anything, Hermes. Do not leave a trace for them to find.',
@@ -188,7 +188,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
         ] },
       { id: 'shelf-watchman',
         beats: [
-          'This heat reminds me of my first posting, Silvia: night watch on the walls of the observatory at nineteen, with a lamp and many opinions.',
+          'This heat reminds me of my first posting, Silvia: night watch on the walls of the Sanctuary library at nineteen, with a lamp and many opinions.',
           'A watchman learns one thing above all. You walk a round, and the round has a rhythm: forty steps, a turn, a pause to look, forty steps back.',
           'The raiders’ sentries will be no different. Everyone who keeps watch becomes a clock, and a clock can be read.'
         ],
@@ -486,7 +486,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
       { id: 'ret-mist',
         beats: [
           'You will not believe this, Silvia. The wash is full of mist this morning, a thin white lake lying between the boulders and reaching my knees.',
-          'It rises out of the cold stone at dawn once in a blue moon. I have walked the desert for fifty years and seen it three times.',
+          'It rises out of the cold stone at dawn once in a blue moon. I have walked this desert since before you were born and seen it three times.',
           'Every boulder is an island. My boots have vanished and I am wading like a heron, with a dripping coat and a ridiculous smile.',
           'I spread my coat on a boulder and wrung out a cup and a half of mist. It tasted of wool and wonder, and it was free.'
         ] },
@@ -517,7 +517,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
       { id: 'ret-dust-devil',
         beats: [
           'A dust devil has just crossed the dune in front of me, Silvia: a lazy brown spiral twice my height, spinning along the crest as if it owned it.',
-          'It plucked my hat clean off my head and carried it away. My hat, which has survived fifty years, three deserts and one very rude goat.',
+          'It plucked my hat clean off my head and carried it away. My hat, which has survived decades, three deserts and one very rude goat.',
           'It is rolling down the far side of the dune rather happily, and I am standing in the morning sun with a bare head and a tired mind.'
         ],
         choices: [

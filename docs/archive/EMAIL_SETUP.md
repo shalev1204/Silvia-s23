@@ -1,5 +1,7 @@
 # Email — The Eclipse Order
 
+> 🗄️ **ARCHIVO HISTÓRICO (archivado el 16-nov-2026).** Ya no es una fuente vigente: puede contradecir el estado actual. Consulte [docs/GAME_MASTER_GUIDE.md](../GAME_MASTER_GUIDE.md).
+
 ## ✅ Cuenta activa
 
 | Campo | Valor |

@@ -333,7 +333,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
 
   window.WIRE_SCRIPT[32] = {
     hermesFinal: (W) => [
-      "On the back of the disc, under my old engraving, in a hand I would know anywhere: [Z] + [D] = 23 and [I] + [E] = 12. Into your Cipher Ledger.",
+      "On the back of the disc, under my old engraving, in a hand I would know anywhere: [I] + [E] = 12 and [I] + [J] = 18. Into your Cipher Ledger.",
       "And she sent you a star of gold leaf on a card of lapis blue, painted while we talked. 'For the navigator who brought him back,' she said.",
       { ask: [
         { text: "Thank her for me.", silviaMsg: "Thank her for me, Hermes. Properly.",

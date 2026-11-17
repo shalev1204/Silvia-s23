@@ -1,5 +1,7 @@
 # Caminos, personajes y tipos de puzzle — v2
 
+> 🗄️ **ARCHIVO HISTÓRICO (archivado el 16-nov-2026).** Ya no es una fuente vigente: puede contradecir el estado actual. Consulte [docs/GAME_MASTER_GUIDE.md](../GAME_MASTER_GUIDE.md).
+
 > **Regla de oro:** Los **tres caminos se recorren todos**. Hoy elige **por cuál empieza**. Cada camino → **pista final**. Las **3 juntas** = ballet. Con **2/3** = intuición parcial.
 
 ---

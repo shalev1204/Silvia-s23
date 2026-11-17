@@ -13,6 +13,12 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
     try { saved = localStorage.getItem('order_monolith_gate_seal1'); now = localStorage.getItem('order_seal_cairn_1') === 'true'; } catch (e) {}
     return (saved !== null ? saved === 'true' : now) ? 1 : 0;
   }
+  // What the dark of the labyrinth gave up (Station 15): the finds she sent him to, and the raiders' voices he overheard
+  function labyList(key) {
+    try { var v = JSON.parse(localStorage.getItem(key) || '[]'); return Object.prototype.toString.call(v) === '[object Array]' ? v : []; } catch (e) { return []; }
+  }
+  function labyFound(id) { return labyList('order_labyrinth_finds').indexOf(id) >= 0; }
+  function labyHeard(i) { return labyList('order_labyrinth_overheard').indexOf(i) >= 0; }
   function marchKind() { return window.GatesRoad && window.GatesRoad.marchKind ? window.GatesRoad.marchKind() : 'steady'; }
   // the option she took in an ask (0/1/2), or null if it never came up (W.ask may not exist in an older hub-core.js)
   function asked(W, step, part, i) {
@@ -259,7 +265,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           {
             text: 'Did you see their faces?',
             silviaMsg: 'Did you see any of their faces?',
-            reply: ['Only shapes around the fires. Nobody spoke, which frightened me more than shouting would.']
+            reply: [labyList('order_labyrinth_overheard').length ? 'Only shapes behind the torches. I heard their voices, low and bored, and that frightened me more than shouting would.' : 'Only shapes behind the torches. Nobody spoke, which frightened me more than shouting would.']
           },
           {
             text: 'We make a good team.',
@@ -268,13 +274,16 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           }
         ] },
         'First, their camp: cold ashes, a broken wagon wheel, and a phoenix over three flames, the mark of the BC Ashes, cut into the rock.',
-        'They had slept there for days, waiting for someone to open the cairn for them. Now they know someone did.',
+        'They had slept there for days, waiting for someone to open the cairn for them. Now they know someone did.'
+      ].concat(labyHeard(1) ? ['And one of them talked, two turns from me: their chief wants the Order to open the cairns, and then to take the seals out of our hands.'] : [])
+       .concat(labyFound('survey') ? ['By the Mouth they had dropped an iron bar with a copy of the founders’ survey tied round it, all five cairns ringed in soot. Now I know how they found the seals. I do not know who copied it for them.'] : [])
+       .concat([
         'Second, a star on the wall of a fissure: eight points in gold leaf over a ground of blue, the gold still bright.',
         { ask: [
           {
             text: 'What did it look like?',
             silviaMsg: 'Describe the star, Hermes. What did it look like?',
-            reply: ['Even as a wind rose, and so bright I thought a torch had caught it.', 'Gold dulls fast out here. Somebody painted it recently, Silvia.']
+            reply: ['Eight points, like a wind rose, and so bright I thought a torch had caught it.', 'Gold dulls fast out here. Somebody painted it recently, Silvia.']
           },
           {
             text: 'Maybe the raiders painted it.',
@@ -288,7 +297,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           }
         ] },
         'Aurelia gilded her stars exactly like that: blue first, so the gold seems to burn.' + end
-      ];
+      ]).concat(labyFound('chalk') ? ['One more thing, Silvia. In a dead end near the cairn, my own chalk: an arrow, and “H · 98”. I had forgotten I was ever down there.'] : []);
     },
     choices: [
       {
@@ -329,11 +338,15 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       else if (c === 1) note = 'I brushed out my own tracks at the Cleft as I left. Let them hunt the labyrinth for a ghost.';
       else if (c === 2) note = 'I keep seeing Aurelia’s hands over the lapis. It is a long march, and I will need all of it to get sensible again.';
       else note = 'The gold star is in my log, point by point.';
+      var extra = [];
+      if (labyFound('lamp')) extra.push('The founders’ lamp rides in my satchel. Three steps of light instead of two: in the dark, that is a fortune.');
+      if (labyFound('chalk')) extra.push('That chalk arrow will not leave me alone. Tonight, I think, I will dream of 1998.');
       return [
         seals(g + 2) + ' of five, Silvia, with the Seal of Cairn III in my satchel. For your Cipher Ledger: [W] + [A] = 26 and [N] − [E] = 9.',
-        note,
+        note
+      ].concat(extra).concat([
         'Next is Cairn IV, the Sentry of the Canyon (Station 16), far south-west. I sleep through tomorrow’s heat and wire you at dusk.'
-      ];
+      ]);
     }
   };
 })();

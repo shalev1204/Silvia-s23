@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="The Founders' Lamp">
+<defs>
+<radialGradient id="bz" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#f0c98a"/><stop offset="0.5" stop-color="#b07a3c"/><stop offset="1" stop-color="#5a3a18"/></radialGradient>
+<radialGradient id="fl" cx="50%" cy="60%" r="55%"><stop offset="0" stop-color="#fff6d0"/><stop offset="0.45" stop-color="#ffc14a"/><stop offset="1" stop-color="#ff7a1a" stop-opacity="0"/></radialGradient>
+<radialGradient id="halo" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd27a" stop-opacity="0.45"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+<pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V7" stroke="#3a2410" stroke-opacity="0.28" stroke-width="1.1"/></pattern>
+<filter id="sh" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1a0f05" flood-opacity="0.55"/></filter>
+</defs>
+<circle cx="300" cy="150" r="130" fill="url(#halo)"/>
+<ellipse cx="250" cy="430" rx="170" ry="26" fill="#1a1008" opacity="0.35"/>
+<g filter="url(#sh)" stroke="#3a2410" stroke-width="5" stroke-linejoin="round">
+<path d="M120 360 Q250 410 380 360 L360 395 Q250 432 140 395 Z" fill="url(#bz)"/>
+<path d="M118 360 Q120 255 250 248 Q372 252 384 330 L418 300 Q448 285 452 300 Q440 330 392 360 Q250 408 118 360 Z" fill="url(#bz)"/>
+<path d="M118 360 Q120 255 250 248 Q372 252 384 330 L418 300 Q448 285 452 300 Q440 330 392 360 Q250 408 118 360 Z" fill="url(#hatch)"/>
+<path d="M118 330 Q60 318 70 268 Q80 236 116 250" fill="none" stroke-width="12" stroke="#5a3a18"/>
+<path d="M118 330 Q60 318 70 268 Q80 236 116 250" fill="none" stroke-width="5" stroke="#c99a5a"/>
+<path d="M190 262 Q250 196 312 262 Z" fill="url(#bz)"/>
+<path d="M200 260 Q250 214 300 260 M214 260 Q250 226 286 260 M228 260 Q250 238 272 260 M250 218 V260" fill="none" stroke-width="3"/>
+</g>
+<path d="M150 330 Q250 352 360 322" fill="none" stroke="#fde6b0" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round"/>
+<path d="M436 292 Q446 236 430 196 Q414 236 424 292 Z" fill="url(#fl)"/>
+<path d="M432 286 Q438 252 430 226 Q422 252 428 286 Z" fill="#fff8e0"/>
+<g fill="none" stroke="#3a2410" stroke-width="3" stroke-opacity="0.7"><path d="M150 375 h200"/><path d="M160 384 h180" stroke-dasharray="6 8"/></g>
+</svg>

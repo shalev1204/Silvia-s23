@@ -80,10 +80,11 @@ Silvia's23/
     ├── CANONICAL_LORE_AND_VOCABULARY_AUDIT.md   ← Biblia Maestra 6.0 (fuente de verdad)
     ├── DESERT_ODYSSEY_BIBLE.md                  ← Desert Path: hojas 08–18, juegos y estaciones 10–19
     ├── STAGE_PATH_BIBLE.md                      ← Stage Path: hojas 19–26, fragmentos, Espejo Vivo y estaciones 20–28
-    ├── HANDOFF_STAGE_PATH.md                    ← Informe de entrega y auditoría del Stage Path
+    ├── GAME_MASTER_GUIDE.md · guide/            ← GUÍA MAESTRA: estado, decisiones y lo que falta (leer primero)
+    ├── archive/                                 ← Históricos: SESSION_LOG, PATHS_AND_CHARACTERS, GRIMOIRE, EMAIL_SETUP, HANDOFF_STAGE_PATH
     ├── lore_and_puzzle_bible.md                 ← Diseño de puzzles, astronomía y mecánicas
-    ├── LORE.md · PATHS_AND_CHARACTERS.md · GRIMOIRE.md · TIMELINE.md
-    ├── WEB_ECOSYSTEM.md · EMAIL_SETUP.md · ASSETS.md · SESSION_LOG.md
+    ├── LORE.md · TIMELINE.md
+    ├── WEB_ECOSYSTEM.md · ASSETS.md
     └── REPOSITORY_STRUCTURE.md                  ← Este documento
 ```
 

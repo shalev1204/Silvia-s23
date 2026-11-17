@@ -1,5 +1,8 @@
 # Lore — The Eclipse Order
 
+> ⚠️ **HISTÓRICO (plan del 1-sep-2026). El lore vigente está en la Biblia Maestra ([CANONICAL](CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)) y en [docs/GAME_MASTER_GUIDE.md](GAME_MASTER_GUIDE.md). Las «semanas 2/3/4» y los hilos futuros no se ejecutaron así**
+
+
 > Universo de fantasía para la caza del tesoro. Los personajes comparten historia; Silvia la descubre poco a poco.
 
 ---

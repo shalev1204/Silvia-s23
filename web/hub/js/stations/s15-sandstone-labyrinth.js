@@ -31,13 +31,43 @@
         captures: 'order_labyrinth_captures',
         torchHint: 'order_labyrinth_torch_hint',
         star: 'order_labyrinth_star_seen',
-        camp: 'order_labyrinth_camp_seen'
+        camp: 'order_labyrinth_camp_seen',
+        finds: 'order_labyrinth_finds',        // the three things the dark gives up, if she goes looking (JSON list of ids)
+        heard: 'order_labyrinth_overheard',    // the raiders' voices Hermes overheard from the dark (JSON list of indexes)
+        escape: 'order_labyrinth_escape'       // the road of the last escape, for the reward card (JSON)
       };
-      const HOWTO_KEY = 'order_labyrinth_howto', CINE_INTRO = 'order_labyrinth_cine_intro';
+      const HOWTO_KEY = 'order_labyrinth_howto', CINE_INTRO = 'order_labyrinth_cine_intro', CINE_OUTRO = 'order_labyrinth_cine_outro';
       const SIGIL = 'WINDROSE';
       const LIVES = 3;              // close calls per run
-      const LAMP = 2;               // Hermes's lamp: squares around him (in both axes)
       const REACH = 2;              // a torch lights its square and this many squares ahead
+
+      // Three things lie in dead ends off the road out, and a glint shows where once the lamp has found the square.
+      // None of them is needed to escape. scratch/verifications/s15_finds_solver.js checks that each can be reached
+      // and left again without ever standing in torchlight. The lamp sits inside the ring of the fourth torch.
+      const FINDS = [
+        { id: 'chalk', at: [1, 1], icon: '✎', name: 'Hermes’s chalk of 1998', where: 'a dead end near the cairn',
+          sub: 'A chalk arrow on the rock, and under it: H · 98.',
+          say: 'Silvia, look at the wall. A chalk arrow, and under it two letters and a number: H · 98. That is my hand. I came down this fissure in the autumn of 1998, with a younger back and a worse hat, and I marked the way for nobody. I had forgotten it until now.' },
+        { id: 'lamp', at: [5, 7], icon: '🪔', name: 'The Founders’ Lamp', relic: 'founders_lamp', where: 'a niche inside the ring of a torch',
+          sub: 'A bronze lamp in a niche of the founders. The oil is old, but it burns.',
+          say: 'A niche cut square in the rock, and inside it a lamp of the founders: bronze, with a lid shaped like a shell. There is still oil in it, thick as honey. I have filled my own lamp from it, Silvia. Now I see further into the dark.' },
+        { id: 'survey', at: [6, 10], icon: '📜', name: 'The Raiders’ Copy of the Survey', relic: 'raiders_survey', where: 'the sand by the Southern Mouth',
+          sub: 'An iron bar dropped in the sand, and tied round it, a copy of the founders’ survey.',
+          say: 'By the Southern Mouth, dropped in the sand: an iron bar, the kind that scarred the lid of Cairn II. A paper is tied round it with string. It is a copy of the founders’ survey, Silvia, with the five cairns ringed in soot. That is how they knew where to dig. It goes in my satchel.' }
+      ];
+      // What Hermes overhears when a raider passes close to him in the dark (one line per torch, once)
+      const VOICES = [
+        '“Five nights in this oven. That stone at the Monolith broke two of our bars and opened for nobody.”',
+        '“The chief says the Order will send someone. Let him open the cairn for us. Then we take the seal out of his hand.”',
+        '“Did you hear that? … Only the wind in the arches. Walk on, and keep the torch high.”',
+        '“Five stones, five seals. With all five in hand, the doors of the sandstone tower open by themselves. That is what the chief says.”'
+      ];
+      const readList = (k) => { try { const v = JSON.parse(get(k) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } };
+      const hasFind = (id) => readList(KEYS.finds).indexOf(id) >= 0;
+      const findAt = (x, y) => FINDS.find((f) => f.at[0] === x && f.at[1] === y) || null;
+      // Hermes's lamp: squares around him, in both axes. A full flask of oil (kept on the Erg) or the founders' lamp turns the wick up.
+      const road = () => { try { return window.GatesRoad && window.GatesRoad.flags ? window.GatesRoad.flags() || {} : {}; } catch (e) { return {}; } };
+      const lampR = () => (hasFind('lamp') || road().nightOil === 'kept' ? 3 : 2);
 
       // Walls: one hex digit per square (0x1 north, 0x2 east, 0x4 south, 0x8 west). Torches: their rounds, square by square.
       const LEVEL = {
@@ -107,11 +137,17 @@
         hint: $('laby-hint'), victory: $('laby-victory'), victoryText: $('laby-victory-text'), finish: $('btn-laby-finish'),
         dispatch: $('laby-dispatch-text'), pad: { up: $('btn-laby-up'), down: $('btn-laby-down'), left: $('btn-laby-left'), right: $('btn-laby-right'), wait: $('btn-laby-wait') },
         stage: $('laby3d-stage'), canvas: $('laby3d-canvas'), subtitle: $('laby3d-subtitle'), fade: $('laby3d-fade'), danger: $('laby3d-danger'),
-        howto: $('laby3d-howto'), help: $('btn-laby-howto')
+        howto: $('laby3d-howto'), help: $('btn-laby-howto'), finds: $('laby-finds'), replay: $('btn-laby-replay'), rewardBtn: $('btn-laby-reward'),
+        replayNote: $('laby-replay-note')
       };
 
       const isAwake = () => get(KEYS.awake) === 'true';
       const isDone = () => get(KEYS.done) === 'true';
+      // Once he is out, the labyrinth is calm (torches searching far behind him) unless she sends him back into the dark
+      // for what the dark still holds: then the torches walk their rounds again and the escape is played once more.
+      const replaying = () => !!(view && view.replay);
+      const calm = () => isDone() && !replaying();
+      const playing = () => isAwake() && !calm();
       const torchHintOn = () => get(KEYS.torchHint) === 'true';
 
       // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
@@ -141,15 +177,22 @@
       function newRun() {
         run = { x: LEVEL.start[0], y: LEVEL.start[1], t: 0, moves: 0, lives: LIVES, trail: [] };
         reveal();
+        smokeSeen();
+      }
+      // sent down the straight 168° line (Field Wire, step 13), he saw their smoke at dusk: the camp is on his map from the start
+      function smokeSeen() { if (wireChoice(13) === 0) seen.add(cellKey(LEVEL.camp[0], LEVEL.camp[1])); }
+      function wireChoice(step) {
+        try { const h = JSON.parse(get('order_field_wire_choices') || '[]'); return Array.isArray(h) ? h[step] : null; } catch (e) { return null; }
       }
       function reveal() {
-        for (let y = run.y - LAMP; y <= run.y + LAMP; y++) {
-          for (let x = run.x - LAMP; x <= run.x + LAMP; x++) {
+        const L = lampR();
+        for (let y = run.y - L; y <= run.y + L; y++) {
+          for (let x = run.x - L; x <= run.x + L; x++) {
             if (x >= 0 && y >= 0 && x < LEVEL.cols && y < LEVEL.rows) seen.add(cellKey(x, y));
           }
         }
       }
-      const inLamp = (x, y) => Math.abs(x - run.x) <= LAMP && Math.abs(y - run.y) <= LAMP;
+      const inLamp = (x, y) => { const L = lampR(); return Math.abs(x - run.x) <= L && Math.abs(y - run.y) <= L; };
 
       const svgEl = (tag, attrs) => {
         const n = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -184,7 +227,7 @@
         const b = el.board;
         if (!b || !run) return;
         b.textContent = '';
-        const done = isDone();
+        const done = isDone(), still = calm();   // done: the whole plan is known; still: no torch is hunting him
         const lit = litAt(run.t);
         b.appendChild(svgEl('rect', { x: 0, y: 0, width: LEVEL.cols * CELL, height: LEVEL.rows * CELL, fill: '#050302', stroke: '#5c4524', 'stroke-width': 0.6 }));
 
@@ -193,7 +236,7 @@
         for (let y = 0; y < LEVEL.rows; y++) {
           for (let x = 0; x < LEVEL.cols; x++) {
             if (!done && !seen.has(cellKey(x, y))) continue;
-            const near = done || inLamp(x, y);
+            const near = still || inLamp(x, y);
             b.appendChild(svgEl('rect', { x: x * CELL, y: y * CELL, width: CELL, height: CELL, fill: near ? '#5a3f1e' : '#1a1109' }));
             const bits = wallBits(x, y), x0 = x * CELL, y0 = y * CELL;
             let d = '';
@@ -208,7 +251,7 @@
         if (walls.near) b.appendChild(svgEl('path', { d: walls.near, stroke: '#fcd34d', 'stroke-width': 1.4, 'stroke-linecap': 'square', fill: 'none' }));
 
         // The torches' rounds, once Hermes has learnt them (hint)
-        if (torchHintOn() && !done) {
+        if (torchHintOn() && !still) {
           LEVEL.guards.forEach((route) => {
             const pts = route.map(([x, y]) => cx(x) + ',' + cy(y)).join(' ');
             b.appendChild(svgEl('polyline', { points: pts + ' ' + cx(route[0][0]) + ',' + cy(route[0][1]), fill: 'none', stroke: '#fb923c', 'stroke-opacity': 0.45, 'stroke-width': 0.8, 'stroke-dasharray': '1.5 1.5' }));
@@ -216,14 +259,14 @@
         }
 
         // the round of the torch she clicked, bright for a few seconds
-        if (view.peek && !done) {
+        if (view.peek && !still) {
           const route = LEVEL.guards[view.peek.n];
           const pts = route.map(([x, y]) => cx(x) + ',' + cy(y)).join(' ');
           b.appendChild(svgEl('polyline', { points: pts + ' ' + cx(route[0][0]) + ',' + cy(route[0][1]), fill: 'none', stroke: '#fde68a', 'stroke-opacity': 0.95, 'stroke-width': 1.3, 'stroke-dasharray': '2 1.2', 'stroke-linejoin': 'round' }));
         }
 
         // Torchlight is visible from anywhere in the dark
-        if (!done) {
+        if (!still) {
           lit.forEach((k) => {
             const x = k % LEVEL.cols, y = Math.floor(k / LEVEL.cols);
             b.appendChild(svgEl('rect', { x: x * CELL + 0.6, y: y * CELL + 0.6, width: CELL - 1.2, height: CELL - 1.2, fill: 'rgba(251, 146, 60, 0.32)' }));
@@ -237,9 +280,15 @@
         const [stx, sty] = LEVEL.star, [cpx, cpy] = LEVEL.camp;
         if (done || seen.has(cellKey(stx, sty))) b.appendChild(svgText(cx(stx), cy(sty) + 2.6, '✶', { fill: '#fbbf24', 'font-size': 7.5 }));
         if (done || seen.has(cellKey(cpx, cpy))) b.appendChild(svgText(cx(cpx), cy(cpy) + 2.2, '⨁', { fill: '#a8a29e', 'font-size': 6.5 }));
+        // the finds: a glint once the lamp has found the square, a small mark once it is in his hands
+        FINDS.forEach((f) => {
+          const [fx, fy] = f.at;
+          if (hasFind(f.id)) b.appendChild(svgText(cx(fx), cy(fy) + 2, '✓', { fill: '#86efac', 'font-size': 5, opacity: 0.8 }));
+          else if (seen.has(cellKey(fx, fy))) b.appendChild(svgText(cx(fx), cy(fy) + 2.6, '✧', { fill: '#fff1b8', 'font-size': 7.5, class: 'laby-glint' }));
+        });
 
         // Torches, with an arrowhead showing where they walk next
-        if (!done) {
+        if (!still) {
           LEVEL.guards.forEach((route) => {
             const [x, y] = guardAt(route, run.t), [nx, ny] = guardAt(route, run.t + 1);
             const dx = nx - x, dy = ny - y, ox = cx(x) + dx * 4.4, oy = cy(y) + dy * 4.4;
@@ -270,7 +319,7 @@
       const CLEFT = { x: wx(LEVEL.exit[0]) - S * 1.25, z: wz(LEVEL.exit[1]) };
       const CAIRN = { x: wx(LEVEL.start[0]), z: wz(LEVEL.start[1]) - S * 0.36 };
       let G = null, raf = 0, lastT = 0, cine = null, howtoPage = 0;
-      const view = { snapNext: true, ending: 0, prevLives: LIVES, sigilT: 0, hover: -1, wasDone: false, peek: null, idleT: 0, whispers: 0 };
+      const view = { snapNext: true, ending: 0, prevLives: LIVES, sigilT: 0, hover: -1, wasDone: false, peek: null, idleT: 0, whispers: 0, replay: false, searchT: 0, searchAt: 0, sealShow: 0, newRelics: [] };
       // the torch standing on a square right now, if any (its index in LEVEL.guards)
       const torchOn = (cell) => (run && cell >= 0 ? LEVEL.guards.findIndex((route) => { const [x, y] = guardAt(route, run.t); return cellKey(x, y) === cell; }) : -1);
 
@@ -453,6 +502,46 @@
         cleft.position.set(wx(LEVEL.exit[0]) - S / 2, 0, wz(LEVEL.exit[1]));
         scene.add(cleft);
 
+        // ---- The three finds, each in its dead end, against the one wall that closes it; a glint hangs over each until it is taken ----
+        const finds = FINDS.map((f) => {
+          const [fx, fy] = f.at, bits = wallBits(fx, fy);
+          // the closed side that faces the way in: the wall opposite the only opening
+          const open = DIRS.find((d) => !(bits & d.bit)) || DIRS[0];
+          const back = DIRS.find((d) => d.dx === -open.dx && d.dy === -open.dy) || DIRS[0];
+          const g = new T.Group();
+          g.position.set(wx(fx), 0, wz(fy));
+          const wallOff = (k) => [back.dx * (S / 2 - k), back.dy * (S / 2 - k)];
+          const faceIn = Math.atan2(-back.dx, -back.dy);   // a plane on the back wall looks back down the dead end
+          if (f.id === 'chalk') {
+            const tex = P.canvasTex(256, 256, (c, w, h) => {
+              c.clearRect(0, 0, w, h);
+              c.strokeStyle = 'rgba(244,240,226,0.92)'; c.lineWidth = 9; c.lineCap = 'round'; c.lineJoin = 'round';
+              c.beginPath(); c.moveTo(60, 92); c.lineTo(196, 92); c.moveTo(150, 52); c.lineTo(196, 92); c.lineTo(150, 132); c.stroke();
+              c.fillStyle = 'rgba(244,240,226,0.9)'; c.font = 'bold 64px Georgia, serif'; c.textAlign = 'center'; c.fillText('H · 98', w / 2, 210);
+            });
+            const chalk = new T.Mesh(new T.PlaneGeometry(1.2, 1.2), new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.85 }));
+            const [ox, oz] = wallOff(0.27); chalk.position.set(ox, 1.15, oz); chalk.rotation.y = faceIn; g.add(chalk);
+          } else if (f.id === 'lamp') {
+            const [ox, oz] = wallOff(0.42);
+            const niche = new T.Mesh(new T.BoxGeometry(0.62, 0.5, 0.36), paint({ color: 0x1a1410 }));
+            niche.position.set(ox, 1.0, oz); niche.rotation.y = faceIn; g.add(niche);
+            const bronze = paint({ color: 0xa8743a, emissive: 0xffb04a, emissiveIntensity: 0.08 });
+            const [lx, lz] = wallOff(0.8);   // on the sill, just in front of the niche
+            const body = new T.Mesh(new T.SphereGeometry(0.13, 14, 10), bronze); body.scale.set(1.3, 0.7, 1); body.position.set(lx, 0.86, lz); g.add(body);
+            const spout = new T.Mesh(new T.ConeGeometry(0.045, 0.22, 8), bronze); spout.rotation.z = Math.PI / 2; spout.position.set(lx + 0.16, 0.88, lz); g.add(spout);
+            g.userData.bronze = bronze;
+          } else {
+            const iron = new T.Mesh(new T.CylinderGeometry(0.045, 0.05, 1.3, 7), paint({ color: 0x2a2a2e }));
+            iron.rotation.set(Math.PI / 2, 0, 0.6); iron.position.set(0.1, 0.12, 0.1); iron.castShadow = true; g.add(iron);
+            const paper = new T.Mesh(new T.PlaneGeometry(0.42, 0.3), paint({ color: 0xd9c9a0 }));
+            paper.rotation.set(-Math.PI / 2, 0, 0.35); paper.position.set(-0.25, 0.13, 0.25); g.add(paper);
+          }
+          const glint = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: 0xfff1b8, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+          glint.scale.set(0.9, 0.9, 1); glint.position.set(0, 0.9, 0); g.add(glint);
+          g.visible = false; scene.add(g);
+          return { f, g, glint, ph: f.at[0] * 0.7 + f.at[1] };
+        });
+
         // ---- The squares a torch lights, glowing on the ground, and the arrow of where each torch goes next ----
         const litMat = new T.MeshBasicMaterial({ map: P.canvasTex(64, 64, (g, w) => {
           const gr = g.createRadialGradient(w / 2, w / 2, 4, w / 2, w / 2, w * 0.72);
@@ -527,7 +616,7 @@
         } catch (e) { fx = null; }
 
         return { T, renderer, scene, camera, lowPower, plan, walls, pillars, floor, tiles, cairn, plate, oldPlate, copperMat, sealHalo, star, starMat, camp, cleft, cleftGlow, cleftLight,
-          litMesh, rounds, raiders, seal, H, hermes: H && H.hermes, lamp, rings, fx, dummy: new T.Object3D(), ray: new T.Raycaster(), floorPlane: new T.Plane(new T.Vector3(0, 1, 0), 0),
+          litMesh, rounds, raiders, seal, finds, H, hermes: H && H.hermes, lamp, rings, fx, dummy: new T.Object3D(), ray: new T.Raycaster(), floorPlane: new T.Plane(new T.Vector3(0, 1, 0), 0),
           hMove: null, cam: { dist: 16, pitch: 1.02, tDist: 16, tPitch: 1.02, p: null, l: null } };
       }
 
@@ -610,9 +699,9 @@
         step(G.tiles, 4); step(G.plan.segs, 2.6); step(G.plan.pillars, 2.4);
       }
       function placeLit() {
-        const d = G.dummy, done = isDone();
+        const d = G.dummy;
         let n = 0;
-        if (!done) litAt(run.t).forEach((k) => {
+        if (!calm()) litAt(run.t).forEach((k) => {
           d.position.set(wx(k % LEVEL.cols), 0, wz(Math.floor(k / LEVEL.cols))); d.rotation.set(0, 0, 0); d.scale.set(1, 1, 1); d.updateMatrix();
           G.litMesh.setMatrixAt(n++, d.matrix);
         });
@@ -624,10 +713,10 @@
         if (!G || !run) return;
         const snap = view.snapNext;
         if (snap) finishMoves();
-        const done = isDone();
+        const done = calm();
         // before the sigil he stands aside, so the copper plates on the cairn can be seen
         const asleep = !isAwake();
-        const hx = done && !view.ending ? CLEFT.x : wx(run.x) + (asleep ? 0.85 : 0), hz = done && !view.ending ? CLEFT.z : wz(run.y) + (asleep ? 0.55 : 0);
+        const hx = done ? CLEFT.x : wx(run.x) + (asleep ? 0.85 : 0), hz = done ? CLEFT.z : wz(run.y) + (asleep ? 0.55 : 0);
         if (G.hermes) {
           const h = G.hermes, dx = hx - h.position.x, dz = hz - h.position.z;
           if (Math.abs(dx) + Math.abs(dz) > 0.01) {
@@ -637,7 +726,9 @@
           } else if (snap && asleep) h.rotation.y = faceYaw(CAIRN.x - hx, CAIRN.z - hz);
         }
         G.raiders.forEach((r) => {
-          const [x, y] = guardAt(r.route, run.t), [nx, ny] = guardAt(r.route, run.t + 1);
+          // once he is out they search on, walking their rounds in the dark behind him
+          const rt = done ? view.searchT : run.t;
+          const [x, y] = guardAt(r.route, rt), [nx, ny] = guardAt(r.route, rt + 1);
           const tx = wx(x), tz = wz(y), yaw = (nx !== x || ny !== y) ? faceYaw(nx - x, ny - y) : r.g.rotation.y;
           if (r.mv) { stepMv(r.g, r.mv, 99); r.mv = null; }
           const far = Math.hypot(tx - r.g.position.x, tz - r.g.position.z) > S * 1.5;
@@ -658,14 +749,16 @@
           line.material.color.setHex(on ? 0xfde68a : 0xfb923c);
           line.material.opacity = on ? 1 : 0.7;
         });
-        G.star.visible = done || seen.has(cellKey(LEVEL.star[0], LEVEL.star[1]));
-        G.camp.visible = done || seen.has(cellKey(LEVEL.camp[0], LEVEL.camp[1]));
+        G.star.visible = isDone() || seen.has(cellKey(LEVEL.star[0], LEVEL.star[1]));
+        G.camp.visible = isDone() || seen.has(cellKey(LEVEL.camp[0], LEVEL.camp[1]));
+        G.finds.forEach((it) => { it.g.visible = seen.has(cellKey(it.f.at[0], it.f.at[1])) || isDone(); it.taken = hasFind(it.f.id); });
+        G.lamp.distance = S * (lampR() + 1.1);
         placeRings();
         paintDanger();
         view.snapNext = false;
       }
       function openNeighbours() {
-        if (!run || !isAwake() || isDone()) return [];
+        if (!run || !playing()) return [];
         return DIRS.filter((d) => canStep(run.x, run.y, d)).map((d) => [run.x + d.dx, run.y + d.dy]);
       }
       function placeRings() {
@@ -679,7 +772,7 @@
       function paintDanger() {
         if (!el.danger) return;
         let near = false;
-        if (run && isAwake() && !isDone()) litAt(run.t).forEach((k) => { const x = k % LEVEL.cols, y = Math.floor(k / LEVEL.cols); if (Math.abs(x - run.x) + Math.abs(y - run.y) === 1) near = true; });
+        if (run && playing()) litAt(run.t).forEach((k) => { const x = k % LEVEL.cols, y = Math.floor(k / LEVEL.cols); if (Math.abs(x - run.x) + Math.abs(y - run.y) === 1) near = true; });
         el.danger.textContent = near ? '🔥 Torchlight next to you' : '';
         el.danger.classList.toggle('is-on', near);
       }
@@ -707,7 +800,7 @@
           const cell = cellUnder(e);
           const tn = raiderUnder(e);
           if (tn >= 0 || torchOn(cell) >= 0) { peekRound(tn >= 0 ? tn : torchOn(cell)); return; }
-          if (cell >= 0 && run && isAwake() && !isDone()) {
+          if (cell >= 0 && run && playing()) {
             const x = cell % LEVEL.cols, y = Math.floor(cell / LEVEL.cols), dx = x - run.x, dy = y - run.y;
             if (Math.abs(dx) + Math.abs(dy) <= 1) takeTurn(dx, dy);
           }
@@ -719,7 +812,7 @@
         c.addEventListener('dblclick', () => { if (G) { G.cam.tDist = 16; G.cam.tPitch = 1.02; } });
       }
       function raiderUnder(e) {
-        if (!G || !run || isDone()) return -1;
+        if (!G || !run || calm()) return -1;
         const r = el.canvas.getBoundingClientRect();
         const ndc = new G.T.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
         G.ray.setFromCamera(ndc, G.camera);
@@ -729,7 +822,7 @@
       }
       // Watching a torch costs no turn: its round is drawn on the ground and on the map for a few seconds
       function peekRound(n) {
-        if (n < 0 || isDone() || !run) return;
+        if (n < 0 || calm() || !run) return;
         const route = LEVEL.guards[n];
         view.peek = { n, until: performance.now() + 6500 };
         view.idleT = performance.now();
@@ -775,7 +868,7 @@
       function openingShots() {
         return [
           { from: { p: [0, 58, 44], l: [0, 0, 0] }, to: { p: [0, 40, 30], l: [0, 0, -2] }, dur: 6, kicker: 'STATION 15', title: 'THE SANDSTONE LABYRINTH', line: 'Night over the Sandstone Labyrinth. Far below, four torches move between the pillars.' },
-          { from: { p: [6, 6, 24], l: [3, 1, 10] }, to: { p: [2, 5, 21], l: [3, 1.2, 8] }, dur: 5, line: 'The BC Ashes got here first. They have been camped in the fissures for days, waiting for someone to open the cairn.' },
+          { from: { p: [6, 6, 24], l: [3, 1, 10] }, to: { p: [2, 5, 21], l: [3, 1.2, 8] }, dur: 7, line: 'The BC Ashes got here first. They have been camped in the fissures for days, waiting for someone to open the cairn.' },
           { from: { p: [CAIRN.x + 5, 3.2, CAIRN.z + 7], l: [CAIRN.x, 1, CAIRN.z] }, to: { p: [CAIRN.x + 3, 2.4, CAIRN.z + 5], l: [CAIRN.x, 1.1, CAIRN.z] }, dur: 5, line: 'And at the foot of Cairn III, his lamp turned low, Hermes.' }
         ];
       }
@@ -796,7 +889,15 @@
         // the lamp sways with Hermes; out on the hardpan he lets it burn bright
         if (G.H && G.H.flame) { G.H.flame.getWorldPosition(G.lamp.position); }
         else if (G.hermes) G.lamp.position.set(G.hermes.position.x, 1.4, G.hermes.position.z);
-        G.lamp.intensity = (isDone() ? 3.0 : 2.5) + (rm ? 0 : Math.sin(t * 11) * 0.12);
+        G.lamp.intensity = (calm() ? 3.0 : lampR() > 2 ? 2.9 : 2.5) + (rm ? 0 : Math.sin(t * 11) * 0.12);
+        // a glint over every find the lamp has found and nobody has taken
+        G.finds.forEach((it) => {
+          it.glint.material.opacity = it.g.visible && !it.taken ? (rm ? 0.8 : 0.55 + 0.4 * Math.max(0, Math.sin(t * 2.6 + it.ph))) : 0;
+          it.glint.scale.setScalar(0.7 + (rm ? 0 : 0.25 * Math.sin(t * 2.6 + it.ph)));
+          if (it.g.userData.bronze) it.g.userData.bronze.emissiveIntensity = it.taken ? 0.02 : 0.08 + (rm ? 0 : 0.06 * Math.sin(t * 3 + it.ph));
+        });
+        // out on the hardpan he can hear them: the torches go on searching the fissures, one square a beat
+        if (calm() && !rm && now - (view.searchAt || 0) > 900) { view.searchAt = now; view.searchT++; syncWorld(); }
         // the light of the torches breathes on the ground
         G.litMesh.material.opacity = rm ? 0.5 : 0.42 + 0.12 * Math.sin(t * 5);
         G.rings.forEach((m) => {
@@ -822,7 +923,18 @@
           G.seal.rotation.y = se * 5;
           G.seal.scale.setScalar(1 - 0.55 * fe);
         }
-        if (isAwake() && !isDone() && !(cine && cine.active) && (!el.howto || el.howto.hidden) && view.idleT && now - view.idleT > 40000 && view.whispers < 3) whisper();
+        if (view.sealShow && G.hermes) {
+          const k = (now - view.sealShow) / 1000;
+          if (k < 6.5) {
+            const hp = G.hermes.position, up = Math.min(1, k / 1.2);
+            G.seal.visible = true;
+            // beside his open hand (screen right from the hardpan camera), rising to shoulder height: never in front of his face
+            G.seal.position.set(hp.x - 0.15, 0.85 + 0.55 * up * (2 - up) + (rm ? 0 : Math.sin(k * 2.2) * 0.04), hp.z + 0.55);
+            G.seal.rotation.y = k * 1.4;
+            G.seal.scale.setScalar(0.75 + 0.2 * up);
+          } else { view.sealShow = 0; G.seal.visible = false; }
+        }
+        if (playing() && !(cine && cine.active) && (!el.howto || el.howto.hidden) && !rewardOpen() && view.idleT && now - view.idleT > 40000 && view.whispers < 3) whisper();
         G.starMat.emissiveIntensity = 0.12 + (rm ? 0 : 0.08 * Math.sin(t * 1.7));
         G.cleftGlow.material.opacity = (isDone() ? 0.95 : 0.6) + (rm ? 0 : 0.12 * Math.sin(t * 1.3));
         growRises(dt);
@@ -849,7 +961,7 @@
 
       // Hermes whispers when she has left him still in the dark for a long while (three times at most per visit)
       const WHISPERS = [
-        "I can hear their boots, Silvia. Hold me still in a dark passage with the space bar, and count the turns until a torch comes back to the same square.",
+        "I can hear their boots, Silvia. Hold me still in a dark passage with the HOLD button (or the space bar), and count the turns until a torch comes back to the same square.",
         "Point at a torch, on my map or down here in the dark, and I will watch it for you: you will see its whole round.",
         "Behind a torch is the safest place in this labyrinth. Let it pass me, then follow it while it walks away."
       ];
@@ -861,7 +973,7 @@
         view.whispers++;
       }
       function render() {
-        const awake = isAwake(), done = isDone();
+        const awake = isAwake(), done = calm();
         if (run) drawBoard();
         if (el.lives) {
           el.lives.textContent = '';
@@ -876,6 +988,15 @@
           view.prevLives = left;
         }
         if (el.turnLabel) el.turnLabel.textContent = done ? '✦ Escaped' : 'Turn ' + (run ? run.moves : 0);
+        if (el.finds) {
+          const got = FINDS.filter((f) => hasFind(f.id)).length;
+          el.finds.hidden = !awake;
+          el.finds.textContent = '✧ ' + got + ' of ' + FINDS.length + ' finds';
+          el.finds.setAttribute('aria-label', got + ' of ' + FINDS.length + ' hidden finds in the labyrinth');
+          el.finds.classList.toggle('is-all', got === FINDS.length);
+        }
+        if (el.replay) el.replay.hidden = !done;
+        if (el.replayNote) el.replayNote.hidden = !replaying();
         if (el.game) el.game.classList.toggle('is-locked', !awake);
         if (el.gameInner) el.gameInner.inert = !awake;
         if (el.sigilCard) el.sigilCard.classList.toggle('is-collapsed', awake);
@@ -894,7 +1015,17 @@
         const amb = window.EclipseAmbience;
         if (!amb || !amb.intensity) return;
         const marks = (get(KEYS.star) === 'true' ? 1 : 0) + (get(KEYS.camp) === 'true' ? 1 : 0);
-        amb.intensity(isDone() ? 0.6 : !isAwake() ? 0.3 : 0.38 + 0.08 * marks + (run && run.lives < LIVES ? 0.04 : 0));
+        amb.intensity(calm() ? 0.6 : !isAwake() ? 0.3 : 0.38 + 0.08 * marks + (run && run.lives < LIVES ? 0.04 : 0));
+      }
+
+      // What the road down left him with, in his own voice: the oil in his flask and the way Silvia sent him
+      function arrivalNote() {
+        const out = [], oil = road().nightOil;
+        if (oil === 'kept') out.push('My flask is still full from the Erg, so I can turn the wick up: my lamp reaches three steps into the dark.');
+        else if (oil === 'shared') out.push('Half a flask of oil since the Erg, so I keep the wick low: my lamp shows two steps of rock around me, no more.');
+        else if (oil === 'all') out.push('My flask has been dry since the Erg; I filled the lamp from a jar the raiders left at the Mouth. It burns low.');
+        if (wireChoice(13) === 0) out.push('Coming down the straight line I saw their smoke at dusk, rising out of the fissures to the south-east: their camp is on my map already.');
+        return out.length ? ' ' + out.join(' ') : '';
       }
 
       // ---- Part I: the sigil from Sheet 14B ----
@@ -931,7 +1062,7 @@
 
       // ---- Part II: the escape ----
       function takeTurn(dx, dy) {
-        if (!isAwake() || isDone() || !run) return;
+        if (!playing() || !run) return;
         if (dx || dy) {
           const dir = dirOf(dx, dy);
           if (!dir || !canStep(run.x, run.y, dir)) {
@@ -956,25 +1087,64 @@
         if (litAt(run.t).has(here)) { caught('A torch came round the corner and found him.'); return; }
         reveal();
         feedback(el.moveFeedback, dx || dy ? '' : 'Hermes holds his breath in the dark.', '');
-        landmarks();
-        if (run.x === LEVEL.exit[0] && run.y === LEVEL.exit[1]) { completeStation(); return; }
+        if (!landmarks()) overhear();
+        if (run.x === LEVEL.exit[0] && run.y === LEVEL.exit[1]) { if (replaying()) endReplay(); else completeStation(); return; }
         render();
       }
 
+      // A raider passing within two squares of Hermes, without seeing him: he hears what they say (once for each torch)
+      function overhear() {
+        const heard = readList(KEYS.heard);
+        const n = LEVEL.guards.findIndex((route, i) => {
+          if (heard.indexOf(i) >= 0) return false;
+          const [x, y] = guardAt(route, run.t);
+          return Math.abs(x - run.x) + Math.abs(y - run.y) <= 2;
+        });
+        if (n < 0) return false;
+        heard.push(n);
+        set(KEYS.heard, JSON.stringify(heard));
+        cue('tick', { f: 330, v: 0.05 });
+        subtitle('From the dark, a raider’s voice: ' + VOICES[n], 7, 'act');
+        if (heard.length === 1) say('Shh. Silvia, one of them is talking, two turns from me. I am holding my breath and writing it all down.');
+        if (G && G.fx && G.fx.gait) G.fx.gait.react('worry');
+        return true;
+      }
+
+      // A find, picked up the moment Hermes stands on its square
+      function pickUp() {
+        const f = findAt(run.x, run.y);
+        if (!f || hasFind(f.id)) return false;
+        const list = readList(KEYS.finds); list.push(f.id);
+        set(KEYS.finds, JSON.stringify(list));
+        cue('bell', { f: 659.25 * Math.pow(2, list.length / 12), v: 0.09, len: 2.4 });
+        cue('shimmer', { deg: 10 + list.length * 3 });
+        say(f.say);
+        subtitle(f.sub, 6, 'act');
+        if (f.relic && typeof window.addRelicToInventory === 'function') { window.addRelicToInventory(f.relic); view.newRelics.push(f.relic); }
+        if (f.id === 'lamp') reveal();   // the brighter wick shows more rock at once
+        if (G && G.fx) { G.fx.triumph({ x: wx(run.x), y: 1, z: wz(run.y) }, 0.55); if (G.fx.gait) G.fx.gait.react('wonder'); }
+        feedback(el.moveFeedback, '✧ ' + f.name + ' (' + list.length + ' of ' + FINDS.length + ')', 'ok');
+        return true;
+      }
+
       function landmarks() {
+        if (pickUp()) return true;
         if (run.x === LEVEL.star[0] && run.y === LEVEL.star[1] && get(KEYS.star) !== 'true') {
           set(KEYS.star, 'true');
           cue('shimmer', { deg: 14 });
           say("Silvia... on the wall of this fissure there is a star, painted in gold leaf. Eight points, laid over a ground of blue. The gold is bright: it has not been here long. I know only one hand that gilded stars like this. I cannot stop now.");
           subtitle('On the rock, a star of gold leaf: eight points on a ground of blue. Fresh.', 5, 'act');
           if (G && G.fx) { G.fx.triumph({ x: wx(LEVEL.star[0]), y: 1.4, z: wz(LEVEL.star[1]) - S / 2 + 0.5 }, 0.6); if (G.fx.gait) G.fx.gait.react('wonder'); }
+          return true;
         } else if (run.x === LEVEL.camp[0] && run.y === LEVEL.camp[1] && get(KEYS.camp) !== 'true') {
           set(KEYS.camp, 'true');
           cue('crack', { v: 0.16 });
-          say("Their camp. Cold ashes, a broken wagon wheel, and the charred circle of the BC Ashes scratched on the rock. They have been sleeping in this labyrinth for days, waiting for someone to open the cairn for them.");
-          subtitle('Cold ashes, a broken wheel, a charred circle on the rock: the raiders\' camp.', 5, 'act');
+          say("Their camp. Cold ashes in a ring of stones, a broken wagon wheel, and the mark of the BC Ashes cut into the rock: a phoenix over three flames. They have been sleeping in this labyrinth for days, waiting for someone to open the cairn for them.");
+          subtitle('Cold ashes, a broken wheel, a phoenix over three flames cut into the rock: the raiders\' camp.', 5, 'act');
           if (G && G.fx && G.fx.gait) G.fx.gait.react('worry');
+          return true;
         }
+        return false;
       }
 
       function caught(how) {
@@ -1020,7 +1190,45 @@
         view.snapNext = false;
       }
 
+      // The road of the escape, square by square, kept for the reward card
+      function recordEscape() {
+        const trail = run.trail.concat([[run.x, run.y]]).filter((p, i, a) => i === 0 || p[0] !== a[i - 1][0] || p[1] !== a[i - 1][1]);
+        set(KEYS.escape, JSON.stringify({ moves: run.moves, used: LIVES - run.lives, trail }));
+      }
+      // He squeezes through the cleft; the whole labyrinth stands up out of the dark behind him, from the cleft outwards
+      function walkOut(film, then) {
+        if (G && !reduced()) {
+          view.ending = 1;
+          finishMoves();
+          setTimeout(() => { if (G && G.fx) G.fx.triumph({ x: CLEFT.x, y: 1, z: CLEFT.z }, 1); }, 1500);
+        }
+        if (film) {
+          set(CINE_OUTRO, 'seen');
+          view.outroFilm = true;
+          if (el.stage) el.stage.classList.add('is-cine');
+          cine.start(endingShots(), () => {
+            view.outroFilm = false; view.ending = 0; view.overview = true;
+            if (el.stage) el.stage.classList.remove('is-cine');
+            if (el.subtitle) el.subtitle.classList.remove('is-on');
+            syncWorld();
+            then();
+          }, { fade: true });
+        } else {
+          setTimeout(() => { view.ending = 0; view.overview = true; if (G) syncWorld(); then(); }, G && !reduced() ? 2600 : 250);
+        }
+      }
+      function endingShots() {
+        return [
+          { from: { p: [CLEFT.x + 3.4, 2.3, CLEFT.z + 3.6], l: [CLEFT.x + 0.8, 1.1, CLEFT.z] }, to: { p: [CLEFT.x + 1.8, 1.9, CLEFT.z + 2.8], l: [CLEFT.x - 0.4, 1.1, CLEFT.z] }, dur: 4.5,
+            kicker: 'STATION 15', title: 'THE WESTERN CLEFT', line: 'The Western Cleft: two slabs of sandstone, and a gap a man can only pass sideways.' },
+          { from: { p: [8, 30, 32], l: [0, 0, 2] }, to: { p: [0, 54, 26], l: [-2, 0, 0] }, dur: 6, line: 'Behind him the torches search the fissures, one by one. They will find an empty labyrinth.' },
+          { from: { p: [CLEFT.x - 5.6, 1.5, CLEFT.z + 1.7], l: [CLEFT.x, 1.2, CLEFT.z] }, to: { p: [CLEFT.x - 4.1, 1.35, CLEFT.z + 0.8], l: [CLEFT.x, 1.25, CLEFT.z] }, dur: 5.5,
+            line: 'Out on the open hardpan, Hermes unwraps his scarf. The Seal of Cairn III catches the moon.' }
+        ];
+      }
+
       function completeStation() {
+        recordEscape();
         set(KEYS.done, 'true');
         cue('whoosh', { dur: 1.4 });
         if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
@@ -1029,19 +1237,40 @@
         feedback(el.moveFeedback, 'The Western Cleft. Hermes is out.', 'ok');
         say("I am out, Silvia! Through the Western Cleft and out to the edge of the hardpan. The torches are still searching the fissures behind me.");
         subtitle('Through the Western Cleft, and out onto the open hardpan. Behind him the torches search the dark.', 6, 'act');
-        if (G && !reduced()) {
-          // he squeezes through the cleft; then the whole labyrinth stands up out of the dark, from the cleft outwards
-          view.ending = 1;
-          finishMoves();
-          G.hMove = moveTo(G.hermes, CLEFT.x, CLEFT.z, 1.6, faceYaw(-1, 0));
-          setTimeout(() => { if (G && G.fx) G.fx.triumph({ x: CLEFT.x, y: 1, z: CLEFT.z }, 1); }, 1500);
-          setTimeout(() => { view.ending = 0; view.overview = true; }, 5200);
-        }
+        const film = !!(G && cine && !reduced() && get(CINE_OUTRO) !== 'seen');
         applyVictory();
         render();
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
-        if (el.finish) setTimeout(() => el.finish.focus({ preventScroll: true }), 60);
+        walkOut(film, showReward);
+      }
+      // She sent him back in for what the dark still holds, and he is out again
+      function endReplay() {
+        recordEscape();
+        view.replay = false;
+        cue('whoosh', { dur: 1.2 });
+        if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        const got = FINDS.filter((f) => hasFind(f.id)).length;
+        say(got === FINDS.length ? 'Out again, Silvia, and this time the dark has nothing left to give: all three finds are in my satchel.' : 'Out again, Silvia. The torches never knew I came back.');
+        subtitle('Out through the Western Cleft once more. Behind him the torches search on.', 5, 'act');
+        applyVictory();
+        render();
+        walkOut(false, showReward);
+      }
+      function startReplay() {
+        if (!isDone() || replaying() || (cine && cine.active)) return;
+        hideReward(true);
+        view.replay = true; view.overview = false; view.ending = 0; view.peek = null; view.idleT = performance.now(); view.whispers = 0;
+        newRun();
+        view.snapNext = true;
+        if (G) { G.cam.p = null; G.cam.dist = G.cam.tDist = 16; G.cam.pitch = G.cam.tPitch = 1.02; }
+        const left = FINDS.filter((f) => !hasFind(f.id));
+        say(left.length ? 'Back into the dark, Silvia, from the foot of the cairn. The raiders will never expect a thief to come back. My map remembers every passage; somewhere down there is still ' + left.map((f) => f.where).join(', and ') + '.'
+          : 'Back into the dark, Silvia, for the pleasure of it. The torches walk the same rounds; let us see if I can pass them all unseen.');
+        subtitle('Hermes slips back in by the cairn. The torches have not stopped their rounds.', 5, 'act');
+        feedback(el.moveFeedback, '', '');
+        render();
+        if (el.pad.wait) setTimeout(() => el.pad.wait.focus({ preventScroll: true }), 60);
       }
 
       function applyVictory() {
@@ -1053,9 +1282,151 @@
         if (run) { run.x = LEVEL.exit[0]; run.y = LEVEL.exit[1]; }
       }
 
+      // ---- The reward: a central card, as on the Chasm, the Salt, the Lexicon, the Wells and the Ridge ----
+      const reward = { box: null, back: null };
+      const rewardOpen = () => !!reward.box && !reward.box.hidden;
+      function escapeRecord() {
+        try { const e = JSON.parse(get(KEYS.escape) || 'null'); if (e && Array.isArray(e.trail)) return e; } catch (err) {}
+        return null;
+      }
+      // Hermes's road on the founders' plan: the walls in ink, the rounds of the torches, the road drawn in gold as the card opens
+      function rewardMap(esc) {
+        const W = LEVEL.cols * CELL, H = LEVEL.rows * CELL;
+        let walls = '';
+        for (let y = 0; y < LEVEL.rows; y++) for (let x = 0; x < LEVEL.cols; x++) {
+          const bits = wallBits(x, y), x0 = x * CELL, y0 = y * CELL;
+          if (bits & 1) walls += `M${x0} ${y0}h${CELL}`;
+          if ((bits & 8) && !(x === LEVEL.exit[0] && y === LEVEL.exit[1])) walls += `M${x0} ${y0}v${CELL}`;
+          if (y === LEVEL.rows - 1 && (bits & 4)) walls += `M${x0} ${y0 + CELL}h${CELL}`;
+          if (x === LEVEL.cols - 1 && (bits & 2)) walls += `M${x0 + CELL} ${y0}v${CELL}`;
+        }
+        const rounds = LEVEL.guards.map((r) => '<polyline class="laby-rw-round" points="' + r.concat([r[0]]).map(([x, y]) => cx(x) + ',' + cy(y)).join(' ') + '"/>').join('');
+        const trail = esc && esc.trail.length > 1 ? esc.trail : null;
+        const pts = trail ? trail.map(([x, y]) => cx(x) + ',' + cy(y)).join(' ') + ' ' + (cx(LEVEL.exit[0]) - CELL) + ',' + cy(LEVEL.exit[1]) : '';
+        const dd = trail ? Math.min(4.2, 1.2 + trail.length * 0.035).toFixed(2) : '0';
+        const mark = (x, y, glyph, cls, t, label) => '<g class="laby-rw-mark ' + cls + '" style="--t:' + t.toFixed(2) + 's"><title>' + label + '</title><circle cx="' + cx(x) + '" cy="' + cy(y) + '" r="4.2"/><text x="' + cx(x) + '" y="' + (cy(y) + 2.3) + '">' + glyph + '</text></g>';
+        // each landmark pops when the gold road reaches it
+        const at = (x, y) => { if (!trail) return 1; const i = trail.findIndex((p) => p[0] === x && p[1] === y); return 0.7 + (i < 0 ? trail.length : i) / trail.length * +dd; };
+        let marks = mark(LEVEL.start[0], LEVEL.start[1], '△', 'is-cairn', 0.5, 'Cairn III')
+          + mark(LEVEL.star[0], LEVEL.star[1], '✶', 'is-star', at(LEVEL.star[0], LEVEL.star[1]), 'The gold star')
+          + mark(LEVEL.camp[0], LEVEL.camp[1], '⨁', 'is-camp', at(LEVEL.camp[0], LEVEL.camp[1]), 'The raiders’ camp');
+        FINDS.forEach((f) => { if (hasFind(f.id)) marks += mark(f.at[0], f.at[1], '✧', 'is-find', at(f.at[0], f.at[1]), f.name); });
+        marks += mark(LEVEL.exit[0], LEVEL.exit[1], '⇦', 'is-exit', 0.75 + +dd, 'The Western Cleft');
+        return '<svg viewBox="-6 -6 ' + (W + 12) + ' ' + (H + 12) + '" role="img" aria-label="Hermes’s road through the labyrinth, from Cairn III to the Western Cleft">'
+          + '<rect x="0" y="0" width="' + W + '" height="' + H + '" class="laby-rw-floor"/>'
+          + '<g class="laby-rw-rounds">' + rounds + '</g>'
+          + '<path class="laby-rw-walls" d="' + walls + '"/>'
+          + (trail ? '<polyline class="rw-road-glow laby-rw-road-glow" pathLength="1" style="--dd:' + dd + 's;--d0:0.7s" points="' + pts + '"/><polyline class="rw-road laby-rw-road" pathLength="1" style="--dd:' + dd + 's;--d0:0.7s" points="' + pts + '"/>' : '')
+          + marks + '</svg>';
+      }
+      function showReward() {
+        const body = modal.querySelector('.chasm3d-body');
+        if (!body || !isDone() || modal.style.display === 'none') return;
+        if (!reward.box) {
+          reward.box = document.createElement('div');
+          reward.box.className = 'chasm3d-reward laby3d-reward';
+          reward.box.setAttribute('role', 'dialog');
+          reward.box.setAttribute('aria-label', 'Your reward for the Sandstone Labyrinth');
+          reward.box.hidden = true;
+          body.appendChild(reward.box);
+          reward.box.addEventListener('pointerdown', (e) => { if (!(e.target.closest && e.target.closest('button'))) reward.box.classList.add('is-fast'); });
+          reward.box.addEventListener('click', (e) => {
+            const med = e.target.closest && e.target.closest('[data-relic]');
+            if (med && typeof window.openItemAcquiredModal === 'function') {
+              const id = med.getAttribute('data-relic');
+              view.newRelics = view.newRelics.filter((r) => r !== id);
+              med.classList.remove('is-new');
+              window.openItemAcquiredModal({ id });
+            }
+          });
+        }
+        const esc = escapeRecord() || { moves: 0, used: 0, trail: [] };
+        const got = FINDS.filter((f) => hasFind(f.id)), heard = readList(KEYS.heard).length;
+        const captures = parseInt(get(KEYS.captures) || '0', 10) || 0;
+        const unseen = (esc.used | 0) === 0;
+        const sub = unseen ? 'Eight arches gave you the word, and the dark gave Hermes back. Out through the Western Cleft, and not one torch saw him.'
+          : 'Eight arches gave you the word, and the dark gave Hermes back. Out through the Western Cleft, with ' + esc.used + ' close call' + (esc.used === 1 ? '' : 's') + ' behind him.';
+        const findRows = FINDS.map((f, i) => {
+          const have = hasFind(f.id), isNew = have && view.newRelics.indexOf(f.relic) >= 0;
+          const inner = '<span class="laby-rw-icon" aria-hidden="true">' + (have ? f.icon : '✧') + '</span><span class="laby-rw-fname"><b>' + (have ? f.name : 'Still in the dark') + '</b><small>' + (have ? f.where : 'A glint Hermes never reached') + '</small></span>';
+          const style = ' style="--t:' + (4.3 + i * 0.18).toFixed(2) + 's"';
+          if (have && f.relic) return '<li' + style + '><button type="button" class="laby-rw-find is-have' + (isNew ? ' is-new' : '') + '" data-relic="' + f.relic + '" aria-label="' + f.name + ': open the card">' + inner + '</button></li>';
+          return '<li' + style + '><div class="laby-rw-find' + (have ? ' is-have' : ' is-missing') + '">' + inner + '</div></li>';
+        }).join('');
+        reward.box.innerHTML = '<div class="rw-rays" aria-hidden="true"></div>'
+          + '<div class="rw-sparks" aria-hidden="true">' + Array.from({ length: 18 }, (_, i) => '<i style="--a:' + ((i * 360 / 18) | 0) + 'deg;--d:' + (120 + (i % 5) * 36) + 'px;--t:' + (0.9 + (i % 4) * 0.2).toFixed(2) + 's"></i>').join('') + '</div>'
+          + '<div class="chasm3d-reward-card">'
+          + '<div class="chasm3d-reward-kicker">Station 15 · The Sandstone Labyrinth &amp; Cairn III</div>'
+          + '<h3 class="chasm3d-reward-title">The Third Seal</h3>'
+          + '<p class="rw-sub">' + sub + '</p>'
+          + '<div class="rw-grid">'
+          + '<section class="rw-map laby-rw-page" aria-label="Hermes’s road through the dark">'
+          + '<div class="rw-label">Hermes’s road through the dark</div>'
+          + rewardMap(esc)
+          + '<div class="rw-ends"><span>△ Cairn III</span><span>Western Cleft ⇦</span></div>'
+          + '<div class="chasm3d-reward-stats">'
+          + '<div><b>' + (esc.moves | 0) + '</b><span>turns</span></div>'
+          + '<div><b>' + (esc.used | 0) + '</b><span>close calls</span></div>'
+          + '<div><b>' + got.length + '/' + FINDS.length + '</b><span>finds</span></div>'
+          + '<div><b>' + heard + '/' + VOICES.length + '</b><span>voices</span></div>'
+          + '</div>'
+          + (unseen && captures === 0 ? '<div class="rw-flawless">✦ Never seen ✦</div>' : unseen ? '<div class="rw-flawless">✦ Unseen on the last road ✦</div>' : '')
+          + '</section>'
+          + '<section class="rw-loot">'
+          + '<figure class="laby-rw-seal"><img src="./assets/items/item_seal_cairn_3.svg" alt="" width="84" height="84"><figcaption>The Seal of Cairn III · ' + (function () { let n = 0; for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') n++; return n; })() + ' of 5</figcaption></figure>'
+          + '<div class="laby-rw-eqs">'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut on the founders’ stone</div><div class="rw-ledger-title">The West Wind Line</div><div class="rw-eq" aria-label="W plus A equals 26"><i>W</i><u>+</u><i>A</i><u>=</u><b>26</b></div><p>A line for your Cipher Ledger.</p></div></div>'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut beneath it</div><div class="rw-ledger-title">The Wind Rose Line</div><div class="rw-eq" aria-label="N minus E equals 9"><i>N</i><u>−</u><i>E</i><u>=</u><b>9</b></div><p>The second line. Record both in your Ledger.</p></div></div>'
+          + '</div>'
+          + '<div class="rw-label laby-rw-finds-label">What the dark gave up</div>'
+          + '<ul class="laby-rw-finds">' + findRows + '</ul>'
+          + '<div class="rw-next">Next · Hermes on the Field Wire, then a dream of 1998</div>'
+          + '</section></div>'
+          + '<div class="chasm3d-reward-actions">'
+          + '<button type="button" class="chasm3d-reward-wire">📻 Hermes is calling on the Field Wire</button>'
+          + (got.length < FINDS.length ? '<button type="button" class="chasm3d-btn laby-rw-again">✧ Back into the dark for what is missing</button>' : '')
+          + '<button type="button" class="chasm3d-btn chasm3d-reward-stay">Stay in the Labyrinth</button>'
+          + '</div></div>';
+        if (!rewardOpen()) reward.back = document.activeElement;
+        reward.box.hidden = false;
+        reward.box.classList.remove('is-fast', 'is-on');
+        void reward.box.offsetWidth;
+        reward.box.classList.add('is-on');
+        const wireBtn = reward.box.querySelector('.chasm3d-reward-wire'), stayBtn = reward.box.querySelector('.chasm3d-reward-stay'), againBtn = reward.box.querySelector('.laby-rw-again');
+        if (wireBtn) wireBtn.addEventListener('click', () => { hideReward(true); afterRelics(finishAndLeave); });
+        if (stayBtn) stayBtn.addEventListener('click', () => { hideReward(); afterRelics(null); });
+        if (againBtn) againBtn.addEventListener('click', () => afterRelics(startReplay));
+        if (wireBtn) wireBtn.focus({ preventScroll: true });
+      }
+      // The relics found in the dark show their own cards once the reward is left, one after the other
+      function afterRelics(then) {
+        const id = view.newRelics.shift();
+        if (id && typeof window.openItemAcquiredModal === 'function') window.openItemAcquiredModal({ id }, () => afterRelics(then));
+        else { view.newRelics = []; if (then) then(); }
+      }
+      function hideReward(quietly) {
+        if (!rewardOpen()) return;
+        reward.box.hidden = true;
+        const back = reward.back; reward.back = null;
+        if (quietly) return;
+        if (back && document.contains(back) && back.focus) back.focus({ preventScroll: true });
+      }
+      function finishAndLeave() {
+        closeLabyrinthModal();
+        if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+        if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+        const wireTab = document.querySelector('[data-view="view-field-wire"]');
+        if (wireTab) wireTab.click();
+        if (typeof window.showDesertToast === 'function') {
+          let seals = 0;
+          for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
+          window.showDesertToast('✦ Seal of Cairn III secured (' + seals + ' of 5) ✦ Hermes is waiting for you on the Field Wire.');
+        }
+      }
+
       // ---- Controls: pad, keyboard, clicking a square next to Hermes (in the scene or on his map) ----
       const STEPS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0], wait: [0, 0] };
-      const busyOverlay = () => (cine && cine.active) || (el.howto && !el.howto.hidden);
+      const busyOverlay = () => (cine && cine.active) || (el.howto && !el.howto.hidden) || !!document.querySelector('.journal-page-viewer');   // the printed page open on top: the keys do not walk Hermes behind it
       function press(k) {
         const b = el.pad[k];
         if (b) { b.classList.add('is-pressed'); clearTimeout(b.__t); b.__t = setTimeout(() => b.classList.remove('is-pressed'), 130); }
@@ -1064,7 +1435,7 @@
       Object.keys(STEPS).forEach((k) => { if (el.pad[k]) el.pad[k].addEventListener('click', () => takeTurn(STEPS[k][0], STEPS[k][1])); });
       const KEYMAP = { ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down', ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right', ' ': 'wait' };
       document.addEventListener('keydown', (e) => {
-        if (modal.style.display === 'none' || !isAwake() || isDone()) return;
+        if (modal.style.display === 'none' || !playing() || rewardOpen()) return;
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
         const k = KEYMAP[e.key];
         if (!k) return;
@@ -1080,7 +1451,7 @@
       });
       if (el.board) {
         el.board.addEventListener('click', (e) => {
-          if (!run || !isAwake() || isDone()) return;
+          if (!run || !playing()) return;
           const ctm = el.board.getScreenCTM();
           if (!ctm) return;
           const pt = el.board.createSVGPoint();
@@ -1108,10 +1479,12 @@
       function hideHowto() {
         if (el.howto) el.howto.hidden = true;
         set(HOWTO_KEY, 'seen');
-        const target = isDone() ? el.finish : isAwake() ? el.pad.wait : el.keyInput;
+        const target = calm() ? el.finish : isAwake() ? el.pad.wait : el.keyInput;
         if (target && modal.style.display !== 'none') target.focus({ preventScroll: true });
       }
       if (el.help) el.help.addEventListener('click', () => showHowto(0));
+      if (el.rewardBtn) el.rewardBtn.addEventListener('click', showReward);
+      if (el.replay) el.replay.addEventListener('click', startReplay);
       const hb = $('btn-laby-howto-back'), hn = $('btn-laby-howto-next'), hs = $('btn-laby-howto-skip');
       if (hb) hb.addEventListener('click', () => { if (howtoPage === 0) hideHowto(); else showHowto(howtoPage - 1); });
       if (hn) hn.addEventListener('click', () => { if (howtoPage >= 3) hideHowto(); else showHowto(howtoPage + 1); });
@@ -1166,21 +1539,28 @@
         modal.addEventListener('touchmove', stopHubScroll, { passive: false });
         returnFocusTo = document.activeElement;
         if (!run) newRun();
+        smokeSeen();
         if (!G && el.canvas) G = buildWorld();
         bindPointer();
         if (G && !cine && el.stage && P.cinema) {
           cine = P.cinema(el.stage, {
             reduced,
-            onShot: (i, sh) => { if (sh.line) subtitle(sh.line, sh.dur - 0.4); if (i === 0) cue('whoosh', { dur: 1.8 }); }
+            onShot: (i, sh) => {
+              if (sh.line) subtitle(sh.line, sh.dur - 0.4);
+              if (i === 0) cue('whoosh', { dur: 1.8 });
+              // the last shot of the way out: the seal comes out of the scarf and catches the moon
+              if (view.outroFilm && i === 2) { view.sealShow = performance.now(); setTimeout(() => cue('bell', { f: 783.99, v: 0.08, len: 2.6 }), 1200); if (G && G.fx) setTimeout(() => G.fx.triumph({ x: CLEFT.x - 0.5, y: 1.3, z: CLEFT.z }, 0.7), 1200); }
+            }
           });
         }
         if (el.stage) el.stage.classList.toggle('is-flat', !G);
         if (G && 'ResizeObserver' in window && !el.stage.__labyFit) { el.stage.__labyFit = true; new ResizeObserver(fit).observe(el.stage); }
         fit();
         view.ending = 0; view.overview = isDone(); view.sigilT = 0; view.snapNext = true; view.peek = null; view.idleT = performance.now(); view.whispers = 0;
+        view.replay = false; view.outroFilm = false; view.sealShow = 0;
         if (G) { G.cam.p = null; G.cam.dist = G.cam.tDist = 16; G.cam.pitch = G.cam.tPitch = 1.02; }
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I reached the Southern Mouth at noon and waited in the rocks for dark. Now I am inside, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road, the one on the page “The Sandstone Labyrinth & Cairn III” of your journal.");
+        else if (!isAwake()) say("Silvia, I reached the Southern Mouth at noon and waited in the rocks for dark. Now I am inside, at the foot of Cairn III. A pyramid of dry stone, and on its face my own copper benchmark from 1998. Beneath it there is an older copper plate, with eight empty letter slots. It wants the name of the true road, the one on the page “The Sandstone Labyrinth & Cairn III” of your journal." + arrivalNote());
         else say("The torches are still out there. Watch their rounds, Silvia, and take me to the Western Cleft.");
         render();
         // The bed starts at its own level when the modal appears; set ours once it has
@@ -1207,6 +1587,7 @@
       }
       function closeLabyrinthModal() {
         if (modal.style.display === 'none') return;
+        hideReward(true);
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         if (cine && cine.active) cine.skip();
         modal.classList.add('closing');
@@ -1225,6 +1606,9 @@
         if (e.key !== 'Escape' || modal.style.display === 'none') return;
         if (cine && cine.active) { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); return; }
         if (el.howto && !el.howto.hidden) { e.stopImmediatePropagation(); hideHowto(); return; }
+        const card = document.getElementById('modal-item-acquired');
+        if (card && card.style.display === 'flex') return;   // the relic card on top closes first
+        if (rewardOpen()) { e.stopImmediatePropagation(); hideReward(); afterRelics(null); return; }
         closeLabyrinthModal();
       }, true);
       if (el.finish) {
@@ -1246,6 +1630,9 @@
         reach: REACH,
         state: () => (run ? { x: run.x, y: run.y, t: run.t, moves: run.moves, lives: run.lives } : null),
         step: (dx, dy) => takeTurn(dx, dy),
+        finds: FINDS.map((f) => ({ id: f.id, at: f.at.slice(), relic: f.relic || null })),
+        found: () => readList(KEYS.finds), heard: () => readList(KEYS.heard), lamp: () => lampR(),
+        replay: () => startReplay(), replaying: () => replaying(), rewardOpen: () => rewardOpen(), showReward: () => showReward(),
         gfx: () => G,
         cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
         world: () => {
@@ -1256,7 +1643,7 @@
             gl: true, walls: up(G.plan.segs), wallsTotal: G.plan.segs.length, tiles: up(G.tiles), lit: G.litMesh.count,
             raiders: G.raiders.map((r) => [+(r.g.position.x / S + (LEVEL.cols - 1) / 2).toFixed(2), +(r.g.position.z / S + (LEVEL.rows - 1) / 2).toFixed(2)]),
             hermes: hp ? [+(hp.x / S + (LEVEL.cols - 1) / 2).toFixed(2), +(hp.z / S + (LEVEL.rows - 1) / 2).toFixed(2)] : null,
-            star: G.star.visible, camp: G.camp.visible, rounds: G.rounds.visible, rings: G.rings.filter((m) => m.visible).length,
+            star: G.star.visible, camp: G.camp.visible, finds: G.finds.filter((it) => it.g.visible).length, glints: G.finds.filter((it) => it.g.visible && !it.taken).length, rounds: G.rounds.visible, rings: G.rings.filter((m) => m.visible).length,
             danger: !!(el.danger && el.danger.classList.contains('is-on')), post: !!(G.fx && G.fx.post), gait: !!(G.fx && G.fx.gait)
           };
         },

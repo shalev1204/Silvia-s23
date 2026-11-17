@@ -1,4 +1,6 @@
 # CANONICAL LORE, VOCABULARY & CIPHER LEDGER MASTER BIBLE
+
+> **ACTUALIZACIÓN 16-nov-2026 (decisiones del Operador; mandan sobre el texto de abajo cuando lo contradicen):** (1) **La J se descubre en la Estación 19** con $[I] + [J] = 18$, que sustituye a la comprobación $[Z] + [D] = 23$; la Estación 22 ya no lleva ecuación y **el Stage Path no tiene operaciones matemáticas como recompensa**. (2) El **WHAT** (las entradas de ballet) es un **extra posterior al juego**, en persona el día del WHEN; el Hub termina con la carta de Carles y un sobre sellado. (3) El Ledger completo es la **llave de la Bóveda**: cerradura de 6 diales con el valor de cada letra de **SILVIA** (13 · 10 · 1 · 12 · 10 · 7); no se usa la frase del Email 1 ni los glifos. (3b) Los 14 glifos que la web aún no entrega se reparten así: I y J en la Estación 19; W N S U Y L H M en las salas 20–27 del Stage; A E O T en la Torre I. (4) El estado real y lo que falta están en [docs/GAME_MASTER_GUIDE.md](GAME_MASTER_GUIDE.md) §5.0.
 **Version**: 6.0 · **Status**: Permanent Architectural Source of Truth & Cryptographic Standard  
 **Date**: October 2026 · **Scope**: Complete, exhaustive documentation of all lore, every sent email, every voice transmission transcript, all puzzle stations (01–09), the current Sandstorm Hub Lockdown, the cryptographic ledger, mathematical derivations, characters, and locations.
 
@@ -542,7 +544,7 @@ La Estación 13 no entrega letra nueva. Si la entregara, el alfabeto se cerrarí
 
 Letras con valor al terminar la Estación 12 (y por tanto antes de la 13): \(O, A, K, G, P, B, V, E, T, F, R, X, Q, Z\).
 
-Letras que aún deben aparecer **entre la Estación 14 y la 19**: \(D, C, W, N, S, U, Y, L, H, M, I\), y también **\(J\)**. Hoy la \(J\) sigue programada en la Estación 22 (§7.B.13, Stage Path). Hay que adelantarla a una estación del desierto entre la 14 y la 19 antes de dar el Desert Path por cerrado. No se mueve en la Estación 13.
+Letras que aún deben aparecer **entre la Estación 14 y la 19**: \(D, C, W, N, S, U, Y, L, H, M, I\), y también **\(J\)**. **Decisión 16-11-2026: la \(J\) se entrega en la Estación 19** (§7.B.12), no en la 22; así Silvia tiene los 26 valores al cerrar el Desert Path (el WHEN es 18–20 dic). No se mueve en la Estación 13.
 
 La web no muestra ningún valor (Regla 9). El diario impreso no se reescribe: las hojas 08 a 18 ya están impresas.
 
@@ -704,7 +706,9 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Asignación en el Ledger**: $\mathbf{H = 20, \quad M = 9}$. Valores libres; ninguna letra repite valor.
 - **Letras aún sin ecuación (solo Operador)**: tras la §7.B.12, $J, Q, X$; quedan libres exactamente los valores $8, 14, 15$.
 
-#### 12. DEDUCCIÓN DE $Z$ E $I$ (Estación 19 · El dorso del disco de Aurelia, solo en la web)
+#### 12. DEDUCCIÓN DE $I$ Y $J$ (Estación 19 · El dorso del disco de Aurelia, solo en la web)
+- **ACTUALIZACIÓN 16-11-2026:** las dos líneas del dorso son ahora $[I] + [E] = 12$ (The Line of the Heart) y $[I] + [J] = 18$ (nombre provisional: *The Line of the Shared Cell*; en la cuadrícula de Polibio de la Estación 18, $I$ y $J$ comparten casilla). La línea $[Z] + [D] = 23$ **desaparece** del Ledger. Resolución: $I = 12 - 2 = 10$; $J = 18 - 10 = 8$. Valores libres: ninguna letra repite valor. Con esto Silvia cierra el Desert Path con **los 26 valores**. *(Implementado en código el 16-11-2026, pendiente de despliegue.)*
+- *Texto histórico (hasta el 16-11-2026):*
 - **Origen**: tras la audiencia con la Oráculo (Estación 19), en el dorso del disco de latón, bajo el grabado antiguo de Hermes, hay dos líneas arañadas con la letra de Aurelia; aparecen en el Ledger con `requires: 'order_oracle_horizon_completed'`.
 - **Ecuación 1 (The Line of the Rim)**:
   $$[Z] + [D] = 23$$
@@ -716,7 +720,7 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Asignación en el Ledger**: $\mathbf{Z = 5, \quad I = 10}$. Valores libres; ninguna letra repite valor.
 - **Letras aún sin ecuación (solo Operador)**: $J, Q, X$, con los valores libres $8, 14, 15$ (para el Stage Path). *(Actualización 25-10-2026: $X$ pasó a la Estación 10, $Q$ a la Estación 11 y $Z$ a la Estación 12; aquí la línea $[Z] + [D] = 23$ queda como comprobación de una letra que Silvia ya tiene, y $I$ sigue siendo la letra nueva de esta estación.)*
 
-#### 13. DEDUCCIÓN DE $J$ (Estación 22 · La puertecilla del nicho de la Whispering Gallery, solo en la web)
+#### 13. DEDUCCIÓN DE $J$ (Estación 22 · La puertecilla del nicho de la Whispering Gallery, solo en la web) — SUPERADO el 16-11-2026: la $J$ se entrega en la Estación 19 (§7.B.12) y la Estación 22 no lleva ecuación
 - **Origen**: al tocar en espejo la melodía de seis campanas (Estación 22), el nicho del foco oeste se abre; en el interior de su puertecilla Aurelia arañó una línea, que aparece en el Ledger con `requires: 'order_whispering_gallery_completed'` (decisión del Operador, 23-10-2026).
 - **Ecuación (The Line of the Echo)**:
   $$[J] \times 2 = [T]$$

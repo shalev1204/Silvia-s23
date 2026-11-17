@@ -1,5 +1,8 @@
 # Timeline — Silvia's 23
 
+> ⚠️ **PARCIALMENTE HISTÓRICO. El calendario real y la cuenta atrás hasta el WHEN (18–20 dic) están en [docs/GAME_MASTER_GUIDE.md](GAME_MASTER_GUIDE.md) §4; las tablas de «Semanas (borrador)» y «Alfabeto» son el plan original**
+
+
 > Calendario del juego. Ajustable según ritmo real.  
 > ⚠️ Las tablas «Semanas (borrador)» y «Alfabeto» son el **plan original** (1 sep 2026). El estado real y las fechas de cada despacho están en la sección siguiente y en la Biblia Maestra 6.0 ([CANONICAL_LORE_AND_VOCABULARY_AUDIT.md](CANONICAL_LORE_AND_VOCABULARY_AUDIT.md)).
 

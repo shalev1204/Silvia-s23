@@ -102,6 +102,7 @@
   <link rel="stylesheet" href="./hub/css/workshop-chat.css">
   <link rel="stylesheet" href="./hub/css/wire-chapters.css">
   <link rel="stylesheet" href="./hub/css/wire-ceremony.css">
+  <link rel="stylesheet" href="./hub/css/ledger-complete.css">
   <link rel="stylesheet" href="./hub/css/sandstorm.css">
   <link rel="stylesheet" href="./hub/css/a11y.css">
 </head>
@@ -4158,10 +4159,21 @@
             <div class="chasm-victory-text" id="oracle-victory-text"></div>
             <div class="oracle-when">The First Truth · the WHEN<strong>18 – 20 December</strong></div>
             <div class="laby3d-eqs">
-              <span class="monolith-equation">[Z] + [D] = 23</span>
               <span class="monolith-equation">[I] + [E] = 12</span>
+              <span class="monolith-equation">[I] + [J] = 18</span>
             </div>
             <p class="laby3d-eq-note">Scratched on the back of the disc, in a hand Hermes knows. Write both in your Cipher Ledger.</p>
+            <div class="laby3d-eqs oracle-glyphs">
+              <figure class="rw-glyph" aria-label="The glyph of the letter I in the Order's secret alphabet equals the letter I">
+                <div class="rw-seal" aria-hidden="true"><svg viewBox="0 0 48 64" style="color:#ffe9d6" fill="none"><line x1="24" y1="8" x2="24" y2="56" stroke="currentColor" stroke-width="2.5"/><ellipse cx="24" cy="22" rx="14" ry="5" stroke="currentColor" stroke-width="1.8"/><ellipse cx="24" cy="42" rx="14" ry="5" stroke="currentColor" stroke-width="1.8"/><circle cx="24" cy="32" r="3" fill="currentColor"/></svg></div>
+                <figcaption><span>Glyph</span><u>=</u><i class="rw-letter">I</i></figcaption>
+              </figure>
+              <figure class="rw-glyph" aria-label="The glyph of the letter J in the Order's secret alphabet equals the letter J">
+                <div class="rw-seal" aria-hidden="true"><svg viewBox="0 0 48 64" style="color:#ffe9d6" fill="none"><path d="M34 16 Q14 20 14 36 Q14 52 28 52 Q36 52 36 42" stroke="currentColor" stroke-width="2.2"/><polygon points="24,8 28,12 24,16 20,12" fill="currentColor"/><line x1="10" y1="26" x2="38" y2="26" stroke="currentColor" stroke-width="1.8"/></svg></div>
+                <figcaption><span>Glyph</span><u>=</u><i class="rw-letter">J</i></figcaption>
+              </figure>
+            </div>
+            <p class="laby3d-eq-note">Two new glyphs for your alphabet: <strong>I</strong> and <strong>J</strong>. They share one cell in the Polybius square, and now they share the back of the disc.</p>
             <p class="laby3d-eq-note">⭐ <strong>The Gilded Star</strong> is in your satchel: she painted it for you.</p>
             <button type="button" class="btn-chasm-finish" id="btn-oracle-finish"><span>✦ From the Desert to the Stage ➔</span></button>
           </div>
@@ -4536,7 +4548,7 @@
               <svg class="masks-fragment" id="gallery-fragment-svg" viewBox="0 0 100 100" role="img" aria-label="Fragment III of the mirror of Tower III, with an arch and the edge of a balcony in it."></svg>
               <div>
                 <strong class="masks-fragment-name">Fragment III</strong>
-                <span>Three ninths of the mirror of Tower III. Inside the niche's little door: [J] × 2 = [T], now in the Cipher Ledger.</span>
+                <span>Three ninths of the mirror of Tower III. Inside the niche's little door, in Aurelia's hand: “Listen, and answer.”</span>
               </div>
             </div>
             <p class="gallery-letter-note">✉ And one more thing came back to Aurelia tonight: her first letter is waiting, sealed, in the Chronicles.</p>
@@ -4762,7 +4774,7 @@
             <ol class="chasm3d-howto-steps">
               <li>Press <strong>▶ Let the wind play</strong>. A pillar calls (its mouth flares and a ring runs over the sand) and, a few beats later, <strong>its echo comes home</strong> (a softer glow).</li>
               <li>Count the beats between the call and its echo, by ear or on the <strong>tape</strong> at the top. Every beat is 5 paces: the paces are written on the stones across the gorge and under each fissure.</li>
-              <li>Click the fissure that answered, on its own cliff. Do it for every call, in the order they were played.</li>
+              <li>Click the fissure that answered, on its own cliff. Do it for every call, in the order they were played. <em>From the keyboard:</em> open “The gorge from above”, Tab to the fissure and press Enter.</li>
             </ol>
           </section>
           <section class="chasm3d-howto-page" data-page="3" hidden>
@@ -4815,6 +4827,7 @@
             <div class="chasm3d-status">
               <div class="chasm3d-clock" id="laby-turn-label">Turn 0</div>
               <div class="laby-lives" id="laby-lives" role="img" aria-label="3 of 3 close calls left"></div>
+              <div class="laby-finds" id="laby-finds" role="img" aria-label="0 of 3 hidden finds in the labyrinth" hidden>✧ 0 of 3 finds</div>
             </div>
           </div>
           <div class="chasm3d-subtitle" id="laby3d-subtitle" role="status" aria-live="polite"></div>
@@ -4837,6 +4850,7 @@
           <div class="laby3d-game is-locked" id="laby-game">
             <div class="monolith-game-inner">
               <div class="chasm3d-where">II · Guide Hermes to the Western Cleft, down at the bottom left</div>
+              <p class="laby-replay-note" id="laby-replay-note" hidden>✧ Back in the dark for what is missing. The finds glint on his map; the way out is the Western Cleft again.</p>
               <div class="laby-pad" role="group" aria-label="Move Hermes">
                 <button type="button" class="chasm3d-btn laby-up" id="btn-laby-up" aria-label="Move north">▲</button>
                 <button type="button" class="chasm3d-btn laby-left" id="btn-laby-left" aria-label="Move west">◀</button>
@@ -4859,6 +4873,8 @@
             </div>
             <p class="laby3d-eq-note">Carved on the founders' stone under the copper plate. Write both in your Cipher Ledger.</p>
             <button type="button" class="btn-chasm-finish" id="btn-laby-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-laby-reward">🏆 See your reward</button>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-laby-replay" hidden>✧ Back into the dark</button>
           </div>
           <button type="button" class="chasm3d-btn chasm3d-help" id="btn-laby-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
@@ -4870,6 +4886,8 @@
               <li>Hermes's lamp shows only the rock right around him. The squares he has seen stay on his map, in the corner.</li>
               <li>Caught in the light, Hermes uses up a close call (🏮). With none left, he runs back to the shadow of Cairn III.</li>
               <li>Move him with the arrows below, the arrow keys or W A S D, or click a square next to him. The space bar holds still.</li>
+              <li>A glint (✧) in a dead end is something left in the dark. Step on its square to take it. None of them is needed to get out.</li>
+              <li>When a torch passes close to him without seeing him, Hermes hears what the raiders say.</li>
             </ul>
           </details>
         </div>
@@ -4902,6 +4920,7 @@
             <h3>Close calls and the way out</h3>
             <p>If a torch finds him, Hermes presses into a crack in the rock and spends a <strong>close call</strong> (🏮). When all three are gone he runs back to Cairn III and you start the escape again.</p>
             <p>The way out is the <strong>Western Cleft</strong>, at the bottom left. Move him with the arrows, the keyboard, or by clicking a square next to him. Hints wait under <em>Ask Hermes</em>.</p>
+            <p>Three things lie hidden in dead ends: when his lamp finds one, a <strong>glint ✧</strong> marks it, on the ground and on his map. They are not needed to escape, but the dark is worth searching.</p>
           </section>
           <div class="chasm3d-howto-nav">
             <button type="button" class="chasm3d-btn" id="btn-laby-howto-back">← Back</button>
@@ -5128,6 +5147,7 @@
   <script src="./hub/js/cinematic.js"></script>
   <script src="./hub/js/mirror-speaker.js"></script>
   <script src="./hub/js/aurelia-letters.js"></script>
+  <script src="./hub/js/ledger-complete.js"></script>
   <script src="./hub/js/journey-profile.js"></script>
   <script src="./hub/js/a11y.js"></script>
   <script src="./hub/js/offline.js"></script>
