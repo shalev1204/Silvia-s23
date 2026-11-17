@@ -2,34 +2,67 @@
    inside it, and the reply deck always at the foot. One chapter at a time; the earlier ones are one click away.
    Loaded after view-workshop.css and workshop-chat.css. */
 
-/* The page scrolls, not the chat (the Operator's choice): the window grows with the conversation. What stays put while it scrolls
-   is the head (who, the tabs, the chapter), under the Hub's own bar, and the reply deck at the foot of the screen. */
+/* The Wire is one screen tall and its conversation scrolls inside it (the Operator's choice of 17 Nov 2026, replacing the page scroll):
+   the Hub's menu is one small flick of the page away. The head stays at the top of the window; the reply deck sits at its foot and
+   folds into a thin bar (.is-folded) while she reads back up the conversation. */
 #view-field-wire .view-header { display: none; }
 #view-field-wire .camp-messenger-container { max-width: min(1360px, 100%); }
 #view-field-wire .messenger-app-window {
-  overflow: clip;                 /* the rounded frame, without becoming a scroll container (that would stop the head and the deck from sticking) */
-  height: auto; max-height: none;
-  min-height: calc(100dvh - 120px);
+  overflow: clip;
+  height: calc(100dvh - 16px); max-height: none; min-height: 560px;
   display: flex; flex-direction: column;
 }
-.wire-fixed-head { position: sticky; top: 0; z-index: 40; flex: 0 0 auto; background: linear-gradient(180deg, rgba(30, 22, 16, 0.98), rgba(24, 17, 12, 0.98)); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45); }
+.wire-fixed-head { position: relative; z-index: 40; flex: 0 0 auto; background: linear-gradient(180deg, rgba(30, 22, 16, 0.98), rgba(24, 17, 12, 0.98)); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45); }
 #view-field-wire .messenger-chat-body {
-  flex: 1 0 auto; min-height: 0; overflow: visible; scroll-behavior: auto;
+  flex: 1 1 0; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: auto;
   padding: 20px clamp(20px, 4vw, 56px); gap: 14px;
+  scrollbar-width: thin; scrollbar-color: rgba(201, 162, 92, 0.45) transparent;
 }
-#view-field-wire .messenger-chat-body#wire-inquiries-stream { min-height: 120px; }
-#view-field-wire #wire-messages-stream > * { scroll-margin-bottom: 250px; scroll-margin-top: 150px; }   /* a message brought into view stays clear of the head and the deck */
+#view-field-wire #wire-messages-stream > * { scroll-margin-bottom: 24px; scroll-margin-top: 16px; }
 #view-field-wire .chat-bubble-wrap { max-width: 78%; }
 #view-field-wire .messenger-typing-bar { flex: 0 0 auto; }
-/* the reply deck stays at the foot of the screen while she reads the expedition; Ask Hermes (a tall list of questions) flows with the page */
-#view-field-wire .messenger-reply-deck { flex: 0 0 auto; padding: 14px 22px; overflow: visible; max-height: none; }
-#view-field-wire .messenger-app-window.is-expedition .messenger-reply-deck { position: sticky; bottom: 0; z-index: 24; box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.5); }
+#view-field-wire .messenger-reply-deck { flex: 0 0 auto; padding: 14px 22px; overflow: visible; max-height: none; position: relative; z-index: 24; box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.5); }
+/* Ask Hermes: a long list of questions, so its deck keeps to the lower part of the window and scrolls on its own */
+#view-field-wire .messenger-app-window:not(.is-expedition) .messenger-reply-deck:not(.is-folded) { max-height: 60%; overflow-y: auto; overscroll-behavior: contain; }
+#wire-back-present-wrap { display: none !important; }   /* replaced by the fold bar of the deck */
+/* before her first question the Ask Hermes conversation is empty: the questions take the whole window */
+#view-field-wire .messenger-app-window:not(.is-expedition):not(:has(#wire-inquiries-stream > *)) #wire-inquiries-stream { flex: 0 0 auto; min-height: 0; padding-top: 6px; padding-bottom: 6px; }
+#view-field-wire .messenger-app-window:not(.is-expedition):not(:has(#wire-inquiries-stream > *)) .messenger-reply-deck { flex: 1 1 0; max-height: none; overflow-y: auto; }
+
+/* the folded deck: one line, who is waiting, Hermes's last words, the march, and the way back down */
+.messenger-reply-deck .wire-fold-bar { display: none; }
+#view-field-wire .messenger-reply-deck.is-folded { padding: 8px 72px 8px 22px; }   /* clear of the sound button in the corner */
+#view-field-wire .messenger-reply-deck.is-folded > :not(.wire-fold-bar) { display: none !important; }
+#view-field-wire .messenger-reply-deck.is-folded .wire-fold-bar {
+  display: flex; align-items: center; gap: 16px; width: 100%; min-height: 46px; padding: 8px 10px 8px 16px; cursor: pointer; text-align: left;
+  border-radius: 12px; border: 1px solid rgba(201, 162, 92, 0.45); background: rgba(40, 28, 18, 0.92); color: #f0decc;
+  font: 0.9rem Inter, system-ui, sans-serif; animation: wfbIn 0.28s ease;
+}
+.wire-fold-bar:hover { border-color: rgba(242, 196, 109, 0.85); background: rgba(52, 37, 22, 0.95); }
+.wire-fold-bar:focus-visible { outline: 2px solid #f2c46d; outline-offset: 2px; }
+.wire-fold-bar .wfb-dot { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; background: #f2c46d; box-shadow: 0 0 10px #f2c46d; animation: wfbPulse 1.8s ease-in-out infinite; }
+.wire-fold-bar .wfb-state { flex: 0 0 auto; color: #f2c46d; font: 600 0.78rem 'Cinzel', Georgia, serif; letter-spacing: 0.1em; text-transform: uppercase; }
+.wire-fold-bar .wfb-line { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #d9c7ad; font-style: italic; }
+.wire-fold-bar .wfb-trip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 10px; color: #d9c3a3; font: 0.74rem 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 0.06em; }
+.wire-fold-bar .wfb-trip[hidden] { display: none; }
+.wire-fold-bar .wfb-track { width: 96px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+.wire-fold-bar .wfb-track i { display: block; height: 100%; background: linear-gradient(90deg, #c38a35, #f2c46d); }
+.wire-fold-bar .wfb-go { flex: 0 0 auto; padding: 7px 16px; border-radius: 999px; background: #d9a24b; color: #2a1a0a; font: 600 0.76rem 'Cinzel', Georgia, serif; letter-spacing: 0.08em; }
+@keyframes wfbIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes wfbPulse { 50% { opacity: 0.45; } }
+@media (prefers-reduced-motion: reduce) { .wire-fold-bar, .wire-fold-bar .wfb-dot { animation: none !important; } }
+
+/* the All / Clues / Relics filters, moved into the chapter index */
+#view-field-wire .wire-chapter-strip > .wire-milestone-filters { display: none; }
+.wcp-filters { display: flex; align-items: center; gap: 10px; padding: 4px 4px 10px; margin-bottom: 8px; border-bottom: 1px solid rgba(201, 162, 92, 0.22); }
+.wcp-filters-label { font: 600 0.66rem 'Cinzel', Georgia, serif; letter-spacing: 0.14em; color: #b89c76; text-transform: uppercase; }
+.wcs-picker-btn.has-filter { border-color: #f2c46d; color: #f2c46d; }
 
 /* the chapter strip: where we are in the expedition, under the tabs */
 .wire-chapter-strip {
   flex: 0 0 auto;
   display: flex; align-items: center; gap: 14px;
-  padding: 8px 22px;
+  padding: 5px 22px;
   background: linear-gradient(180deg, rgba(40, 30, 22, 0.96), rgba(28, 20, 15, 0.96));
   border-bottom: 1px solid rgba(196, 168, 138, 0.3);
   font-family: 'Cinzel', serif; color: #d9c7ae;

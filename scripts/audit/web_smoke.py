@@ -4675,11 +4675,28 @@ def test_wire_chapters(browser):
       return { ov: getComputedStyle(s).overflowY, inner: s.scrollHeight > s.clientHeight + 4, docH: document.documentElement.scrollHeight, vh: innerHeight, hidden: [...s.children].filter(c => c.hidden).length,
                name: document.getElementById('wcs-name').textContent, num: document.getElementById('wcs-num').textContent, total: document.getElementById('wcs-total').textContent,
                earlier: !document.getElementById('btn-wire-earlier').hidden, headPos: getComputedStyle(head).position, deckPos: getComputedStyle(deck).position, deckOv: getComputedStyle(deck).overflowY }; })()""")
-    check(st["ov"] == "visible" and not st["inner"] and st["docH"] > st["vh"] and st["headPos"] == "sticky" and st["deckPos"] == "sticky" and st["deckOv"] == "visible",
-          "the page scrolls, not the chat: the window grows with the conversation, and the head and the reply deck stay put", str(st))
-    js("window.scrollTo(0, 400)"); page.wait_for_timeout(300)
-    pos = js("(() => ({ head: document.querySelector('.wire-fixed-head').getBoundingClientRect().top, deck: document.querySelector('.messenger-reply-deck').getBoundingClientRect().bottom, vh: innerHeight }))()")
-    check(pos["head"] <= 2 and pos["deck"] <= pos["vh"] + 1, "scrolled up through the chat, the head is still at the top of the screen and the deck at the foot", str(pos))
+    check(st["ov"] == "auto" and st["inner"] and st["docH"] - st["vh"] < 200 and st["headPos"] == "relative" and st["deckPos"] != "sticky",
+          "the Wire is one screen tall and the chat scrolls inside it: the Hub's menu is one small flick of the page away", str(st))
+    win = js("(r => ({ top: r.top, bottom: r.bottom, vh: innerHeight, y: Math.round(scrollY) }))(document.querySelector('#view-field-wire .messenger-app-window').getBoundingClientRect())")
+    check(win["bottom"] <= win["vh"] + 1 and win["bottom"] >= win["vh"] - 40 and win["y"] > 0, "on entering, the window fills the screen with the latest message in view", str(win))
+    js("(s => s.scrollTop = Math.max(0, s.scrollTop - 1600))(document.getElementById('wire-messages-stream'))"); page.wait_for_timeout(400)
+    pos = js("""(() => { const d = document.querySelector('#view-field-wire .messenger-reply-deck'), b = d.querySelector('.wire-fold-bar');
+      return { head: document.querySelector('.wire-fixed-head').getBoundingClientRect().top, folded: d.classList.contains('is-folded'), deckH: d.offsetHeight,
+               bar: b ? b.innerText.replace(/\s+/g, ' ') : '', barBottom: b ? b.getBoundingClientRect().bottom : 0, vh: innerHeight }; })()""")
+    check(pos["head"] >= 0 and pos["head"] <= 70 and pos["folded"] and pos["deckH"] < 80 and pos["barBottom"] <= pos["vh"] and "↓" in pos["bar"],
+          "reading back up the chat, the head stays at the top and the replies fold into one thin bar at the foot", str(pos))
+    js("window.scrollTo(0, 0)"); page.wait_for_timeout(200)
+    menu = js("(r => r.top >= 0 && r.bottom <= innerHeight)(document.getElementById('btn-open-inventory').getBoundingClientRect())")
+    check(menu, "one small scroll of the page up shows the Hub's menu (inventory, cairns, seeker)")
+    js("window.wireFitWindow(); document.querySelector('#view-field-wire .wire-fold-bar').click()"); page.wait_for_timeout(1500)
+    back = js("(s => ({ folded: document.querySelector('#view-field-wire .messenger-reply-deck').classList.contains('is-folded'), dist: Math.round(s.scrollHeight - s.scrollTop - s.clientHeight) }))(document.getElementById('wire-messages-stream'))")
+    check(not back["folded"] and back["dist"] < 12, "the fold bar brings her back to the end, with the replies open again", str(back))
+    js("document.getElementById('btn-wire-chapter-picker').click()"); page.wait_for_timeout(300)
+    filt = js("(() => { const p = document.getElementById('wire-chapter-popover'); return { inside: !!p.querySelector('.wcp-filters #wire-milestone-filters'), shown: !p.hidden }; })()")
+    js("document.querySelector('.wcp-filters .wmf-btn[data-wire-filter=\"clues\"]').click()"); page.wait_for_timeout(200)
+    label = js("document.getElementById('btn-wire-chapter-picker').textContent")
+    js("document.querySelector('.wcp-filters .wmf-btn[data-wire-filter=\"all\"]').click(); document.body.click()"); page.wait_for_timeout(200)
+    check(filt["inside"] and filt["shown"] and "Clues" in label, "the All / Clues / Relics filters live in the index, and the index says which one is on", str(filt) + " " + label)
     check(st["num"] == st["total"] and int(st["total"]) == 2 and "Five Cairns" in st["name"] and st["hidden"] > 20 and st["earlier"],
           "only the chapter in course is shown, with its name, its number and a way back (the Desert Path is told in three chapters)", str(st))
     hub = js("(() => { const h = document.querySelector('.hub-viewport-header'); window.scrollTo(0, 900); const a = getComputedStyle(h).position; window.scrollTo(0, 200); const b = getComputedStyle(h).position; const t = getComputedStyle(h).transform; window.scrollTo(0, 0); return [a, b, t]; })()")
@@ -4699,13 +4716,15 @@ def test_wire_chapters(browser):
     check(strip_hidden and tabs_visible and not js("document.getElementById('wire-chapter-strip').hidden"),
           "Ask Hermes is one click from anywhere in the chat (the header never scrolls away), and the chapter strip belongs to the expedition")
     # the scroll is remembered when she goes to Ask Hermes and comes back
-    js("window.scrollTo(0, 350)"); page.wait_for_timeout(300)
-    before = js("Math.round(window.scrollY)")
+    js("document.getElementById('wire-messages-stream').scrollTop = 350"); page.wait_for_timeout(300)
+    before = js("Math.round(document.getElementById('wire-messages-stream').scrollTop)")
     js("document.getElementById('tab-wire-inquiries').click()"); page.wait_for_timeout(300)
-    js("window.scrollTo(0, 0)"); page.wait_for_timeout(200)
     js("document.getElementById('tab-wire-expedition').click()"); page.wait_for_timeout(500)
-    top = js("Math.round(window.scrollY)")
+    top = js("Math.round(document.getElementById('wire-messages-stream').scrollTop)")
     check(abs(top - before) < 8, "back from Ask Hermes the conversation is where she left it", "%s -> %s" % (before, top))
+    js("window.scrollTo(0, document.documentElement.scrollHeight); document.querySelector('[data-view=\"view-trail\"]').click()"); page.wait_for_timeout(600)
+    check(js("Math.round(window.scrollY)") == 0, "back on the Quest Map from the Wire, the page opens at the top")
+    js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1200)
     # what is new: the first visit counts everything as read; later, messages she has not seen are marked
     read = js("JSON.parse(localStorage.getItem('order_wire_read2') || 'null')")
     last = max(int(k) for k in read) if read else -1

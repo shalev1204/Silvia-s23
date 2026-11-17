@@ -761,6 +761,8 @@
 
         const viewBefore = document.body.getAttribute('data-active-view');
         if (viewBefore && viewBefore !== targetView) previousHubView = viewBefore;
+        // every view opens at the top of the page (the Quest Map used to inherit where she had scrolled the Wire)
+        if (viewBefore !== targetView) window.scrollTo({ top: 0, behavior: 'instant' });
 
         document.body.setAttribute('data-active-view', targetView);
         document.body.classList.toggle('constellation-trail', targetView === 'view-trail');
@@ -789,6 +791,15 @@
           if (typeof renderInquiriesGrid === 'function') renderInquiriesGrid();
           if (typeof markMessengerAsRead === 'function') markMessengerAsRead();
           if (typeof scrollChatToActivePrompt === 'function') scrollChatToActivePrompt(false);
+          if (typeof window.wireFitWindow === 'function') {
+            // once now and again when the bars above have settled (unless she has moved the page herself meanwhile)
+            window.wireFitWindow();
+            requestAnimationFrame(() => {
+              window.wireFitWindow();
+              const y = window.scrollY;
+              setTimeout(() => { if (window.scrollY === y && document.body.getAttribute('data-active-view') === 'view-field-wire') window.wireFitWindow(); }, 450);
+            });
+          }
         }
 
         // On-Demand Fast Loading & Ghost Skeleton: Archives Parchment
@@ -7946,7 +7957,7 @@
         }
         box.dataset.chapter = String(wireChapterIdx);
         wireMessagesStream.appendChild(box);
-        box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        wireScrollEnd(wireMessagesStream);
 
         function updateShelterCountdown() {
           const target = typeof window.getStormTargetTime === 'function' ? window.getStormTargetTime() : (window.SUNDAY_OCT_18_2026_2PM || 1792324800000);
@@ -8015,7 +8026,7 @@
           </div>
         `;
         stream.appendChild(wrap);
-        wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        wireScrollEnd(stream);
       }
 
       function noteNewMessage() {}
@@ -8267,15 +8278,27 @@
       window.__wireShowAllChapters = () => { window.__wireAllChapters = true; applyWireChapters(); };
       window.__wireTest = { beats: (t) => wireBeats(t), play: (t, step) => new Promise((res) => playHermesBeats(t, { type: 'expedition', step: step || 11 }, res)) };   // for scripts/audit/web_smoke.py
 
-      // the newest message is always in view, inside the chat (never by scrolling the page)
-      // The page scrolls (not the chat): the newest message is brought into view above the reply deck, which stays at the foot of the screen.
+      // The Wire is one screen tall and its conversation scrolls inside it (the Operator's choice of 17 Nov 2026, replacing the page
+      // scroll): the Hub's menu is one small flick of the page away, and the reply deck folds into a thin bar while she reads back.
+      const wireStream = () => (currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream) || wireMessagesStream;
       function wireScrollEnd(stream, smooth = true) {
-        const st = stream || wireMessagesStream, last = st && st.lastElementChild;
-        if (!last) return;
-        try { last.scrollIntoView({ behavior: smooth && !window.__wireFast ? 'smooth' : 'auto', block: 'end' }); } catch (e) { last.scrollIntoView(false); }
+        const st = stream || wireStream();
+        if (st) st.scrollTo({ top: st.scrollHeight, behavior: smooth && !window.__wireFast ? 'smooth' : 'auto' });
       }
-      const wireNearEnd = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 320;
-      const wireJumpTo = (el, behavior = 'auto') => { if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 150), behavior }); };
+      const wireDistEnd = (st) => { st = st || wireStream(); return st ? st.scrollHeight - st.scrollTop - st.clientHeight : 0; };
+      const wireNearEnd = () => wireDistEnd() < 320;
+      const wireJumpTo = (el, behavior = 'auto') => {
+        const st = el && el.closest('.messenger-chat-body');
+        if (st) st.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top - st.getBoundingClientRect().top + st.scrollTop - 16), behavior });
+      };
+      // on entering the Wire, the page settles so that the window fills the screen (the Hub's menu just above it)
+      function wireFitWindow() {
+        const win = document.querySelector('#view-field-wire .messenger-app-window');
+        if (!win || !win.getClientRects().length) return;
+        const r = win.getBoundingClientRect();
+        window.scrollTo({ top: Math.max(0, r.bottom + window.scrollY - window.innerHeight + 8), behavior: 'instant' });
+      }
+      window.wireFitWindow = wireFitWindow;
 
       // ---- Improvements 1 & 3: Live Field Telemetry HUD, Signal Diagnostic Popover, Chapter Index, Milestone Filter & Back to Present ----
       const WIRE_MOOD_LABELS = { dawn: 'First Light', noon: 'High Desert Sun', dusk: 'Canyon Dusk', night: 'Starlight Watch', fire: 'Watchfire & Smoke', lamp: 'Sanctuary Oil Lamp' };
@@ -8379,6 +8402,15 @@
             `<span class="wcp-item-title">${ch.name}</span>` +
             `<span class="wcp-item-sub">${sub}</span></button>`;
         }).join('') + '</div>';
+        // the All / Clues / Relics filters live in the index (the chapter strip stays one slim line)
+        const wireFilterBarEl = window.__wireFilterBar || (window.__wireFilterBar = document.getElementById('wire-milestone-filters'));
+        if (wireFilterBarEl) {
+          const head = document.createElement('div');
+          head.className = 'wcp-filters';
+          head.innerHTML = '<span class="wcp-filters-label">Highlight</span>';
+          head.appendChild(wireFilterBarEl);
+          pop.insertBefore(head, pop.firstChild);
+        }
       }
       function closeWireHeadPopovers() {
         const sigPop = document.getElementById('wire-signal-popover'), sigBtn = document.getElementById('btn-wire-signal-meter');
@@ -8390,7 +8422,9 @@
       }
       function applyWireMilestoneFilter() {
         if (!wireMessagesStream) return;
-        const bar = document.getElementById('wire-milestone-filters');
+        const bar = window.__wireFilterBar || document.getElementById('wire-milestone-filters');
+        const pick = document.getElementById('btn-wire-chapter-picker');
+        if (pick) { pick.classList.toggle('has-filter', wireMilestoneFilter !== 'all'); pick.textContent = '▾ Index' + (wireMilestoneFilter === 'clues' ? ' · Clues' : wireMilestoneFilter === 'relics' ? ' · Relics' : ''); }
         if (bar) bar.querySelectorAll('.wmf-btn').forEach((b) => {
           const on = b.getAttribute('data-wire-filter') === wireMilestoneFilter;
           b.classList.toggle('active', on);
@@ -8413,13 +8447,80 @@
           el.classList.toggle('is-filter-dimmed', !hit);
         });
       }
-      function updateWireBackPresentBtn() {
-        const wrap = document.getElementById('wire-back-present-wrap');
-        if (!wrap) return;
-        const inWire = document.body.getAttribute('data-active-view') === 'view-field-wire' && currentWireTab === 'expedition';
-        const show = inWire && ((wireFirstChapter < wireChapterIdx && !window.__wireAllChapters) || !wireNearEnd());
-        wrap.hidden = !show;
+      // The reply deck folds into one thin bar while she reads back up the conversation (and opens again at the end, or with its
+      // button): who is waiting, Hermes's last line and where the march stands. It replaces the old “Back to Present” button.
+      let wireFolded = false;
+      const wireDeck = () => document.querySelector('#view-field-wire .messenger-reply-deck');
+      function renderWireFoldBar() {
+        const deck = wireDeck();
+        if (!deck) return;
+        let bar = deck.querySelector('.wire-fold-bar');
+        if (!bar) {
+          bar = document.createElement('button');
+          bar.type = 'button';
+          bar.className = 'wire-fold-bar';
+          bar.innerHTML = '<span class="wfb-dot" aria-hidden="true"></span><span class="wfb-state"></span><span class="wfb-line"></span>'
+            + '<span class="wfb-trip"><span class="wfb-trip-text"></span><span class="wfb-track"><i></i></span></span><span class="wfb-go"></span>';
+          bar.addEventListener('click', () => wireBackToPresent());
+          deck.appendChild(bar);
+        }
+        const visible = (el) => !!(el && el.style.display !== 'none' && !el.hidden);   // the folded deck hides its panels with CSS, so only their own state counts
+        const q = (sel) => deck.querySelector(sel);
+        let state, go, line = '';
+        if (currentWireTab === 'inquiries') {
+          const n = deck.querySelectorAll('#wire-inquiries-panel button:not(:disabled)').length;
+          state = n ? `Ask Hermes · ${n} question${n === 1 ? '' : 's'}` : 'Ask Hermes';
+          go = '↓ Ask';
+        } else {
+          const typing = visible(document.getElementById('messenger-typing-bar'));
+          const n = visible(q('#wire-prompt-box')) ? deck.querySelectorAll('#wire-choices-grid button:not(:disabled)').length : 0;
+          state = typing ? 'Hermes is writing…' : n ? `Hermes is waiting · ${n} repl${n === 1 ? 'y' : 'ies'}`
+            : visible(q('#wire-completed-bar')) ? ((q('.messenger-waypoint-title') || {}).textContent || 'The latest').replace(/^✦\s*|\s*✦$/g, '') : 'The latest';
+          go = n ? '↓ Answer' : '↓ Latest';
+          const bubbles = wireMessagesStream ? wireMessagesStream.querySelectorAll('.chat-bubble-wrap.incoming .chat-bubble-text') : [];
+          const last = bubbles.length ? bubbles[bubbles.length - 1] : null;
+          const ps = last ? last.querySelectorAll('p') : [];
+          line = ((ps.length ? ps[ps.length - 1] : last) || {}).textContent || '';
+        }
+        const eta = q('.wmt-eta'), pct = q('.wmt-pct');
+        const p = pct ? parseInt(pct.textContent, 10) : NaN;
+        const showTrip = currentWireTab === 'expedition' && visible(q('#wire-completed-bar')) && !isNaN(p);
+        bar.querySelector('.wfb-state').textContent = state;
+        bar.querySelector('.wfb-line').textContent = line.trim() ? '“' + line.trim() + '”' : '';
+        bar.querySelector('.wfb-trip').hidden = !showTrip;
+        if (showTrip) {
+          bar.querySelector('.wfb-trip-text').textContent = '🧭 ' + p + '% · ' + (eta ? eta.textContent.replace(/^\S+\s*ARRIVAL AT\s*/i, '').replace(/ IN /i, ' · ').toLowerCase() : '');
+          bar.querySelector('.wfb-track i').style.width = p + '%';
+        }
+        bar.querySelector('.wfb-go').textContent = go;
+        bar.setAttribute('aria-label', state + ' · ' + go.replace('↓ ', '') + ': back to the end of the conversation');
       }
+      function setWireFold(on) {
+        const deck = wireDeck();
+        wireFolded = !!on;
+        if (!deck) return;
+        if (wireFolded) renderWireFoldBar();
+        deck.classList.toggle('is-folded', wireFolded);
+      }
+      function updateWireBackPresentBtn() {
+        const inWire = document.body.getAttribute('data-active-view') === 'view-field-wire';
+        const deck = wireDeck();
+        if (!deck || !inWire) return;
+        const d = wireDistEnd();
+        if (!wireFolded && d > deck.offsetHeight + 40) setWireFold(true);   // folding adds the deck's height to the chat: only once she is that far up
+        else if (wireFolded && d < 6) { setWireFold(false); wireScrollEnd(null, false); }
+        else if (wireFolded) renderWireFoldBar();
+      }
+      function wireBackToPresent() {
+        if (sfx && sfx.playTelemetryLock) sfx.playTelemetryLock();
+        if (currentWireTab === 'expedition' && wireFirstChapter < wireChapterIdx && !window.__wireAllChapters) {
+          wireFirstChapter = wireChapterIdx;
+          applyWireChapters();
+        }
+        setWireFold(false);
+        wireScrollEnd(null, true);
+      }
+      window.wireBackToPresent = wireBackToPresent;
       function initWireToolbarInteractions() {
         const sigBtn = document.getElementById('btn-wire-signal-meter'), sigPop = document.getElementById('wire-signal-popover');
         const chBtn = document.getElementById('btn-wire-chapter-picker'), chPop = document.getElementById('wire-chapter-popover');
@@ -8473,16 +8574,7 @@
             applyWireMilestoneFilter();
           });
         }
-        if (backBtn) {
-          backBtn.addEventListener('click', () => {
-            if (sfx && sfx.playTelemetryLock) sfx.playTelemetryLock();
-            window.__wireAllChapters = false;
-            wireFirstChapter = wireChapterIdx;
-            applyWireChapters();
-            scrollChatToActivePrompt(true);
-            updateWireBackPresentBtn();
-          });
-        }
+        if (backBtn) backBtn.addEventListener('click', () => wireBackToPresent());
         document.addEventListener('click', (e) => {
           if (!e.target.closest('.wire-fixed-head')) closeWireHeadPopovers();
         });
@@ -8523,9 +8615,9 @@
           }
         });
         let backRaf = 0;
-        window.addEventListener('scroll', () => {
+        [wireMessagesStream, wireInquiriesStream].forEach((st) => st && st.addEventListener('scroll', () => {
           if (!backRaf) backRaf = requestAnimationFrame(() => { backRaf = 0; updateWireBackPresentBtn(); });
-        }, { passive: true });
+        }, { passive: true }));
       }
       const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'First Light · The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Next Evening · The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'That Evening · Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 39: 'Tower III · The Narrow House', 41: 'Tower III · The Whispering Gallery', 43: 'Tower III · The Little Door of the Gallery' };
 
@@ -9195,7 +9287,7 @@
           const currentSub = text.substring(0, charIdx);
 
           targetSpan.innerHTML = currentSub.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
-          if ((charIdx >= totalChars || charIdx % 18 === 0) && wireNearEnd() && msgEl.scrollIntoView) msgEl.scrollIntoView({ block: 'end' });   // follow the typing without per-frame reflows
+          if ((charIdx >= totalChars || charIdx % 18 === 0) && wireNearEnd()) wireScrollEnd(msgEl.closest('.messenger-chat-body'), false);   // follow the typing without per-frame reflows
 
           const now = Date.now();
           if (!(meta && meta.slow) && now - lastSoundTime > 65) {
@@ -9263,7 +9355,7 @@
         if (btn) attachRewindHandler(btn, meta || { type: 'dawn', step: 2 });
         el.dataset.chapter = String(wireChapterIdx);
         wireMessagesStream.appendChild(el);
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        wireScrollEnd(wireMessagesStream);
         noteNewMessage();
       }
 
@@ -11168,13 +11260,15 @@
         if (sfx) sfx.playMechanicalClick();
         if (typeof closeWireHeadPopovers === 'function') closeWireHeadPopovers();
         // each conversation keeps where she was reading (a hidden element forgets its scroll)
-        wireScrollMem[currentWireTab] = { top: window.scrollY, bottom: wireNearEnd() };
+        wireScrollMem[currentWireTab] = { top: wireStream().scrollTop, bottom: wireNearEnd() };
         currentWireTab = tab;
         { const win = document.querySelector('.messenger-app-window'); if (win) win.classList.toggle('is-expedition', tab === 'expedition'); }
         requestAnimationFrame(() => {
-          const m = wireScrollMem[tab];
-          if (!m) return;
-          window.scrollTo({ top: m.bottom ? document.documentElement.scrollHeight : m.top, behavior: 'auto' });   // back at the end if she was there: whatever arrived meanwhile is in view
+          const m = wireScrollMem[tab] || { bottom: true };
+          const st = wireStream();
+          setWireFold(false);
+          if (st) st.scrollTo({ top: m.bottom ? st.scrollHeight : m.top, behavior: 'auto' });   // back at the end if she was there: whatever arrived meanwhile is in view
+          updateWireBackPresentBtn();
         });
         if (tab === 'expedition') {
           if (tabWireExpedition) tabWireExpedition.classList.add('active');
@@ -11344,7 +11438,7 @@
         const existing = wireInquiriesStream && Array.from(wireInquiriesStream.querySelectorAll('.chat-bubble-wrap.incoming[data-inquiry-id]')).find((el) => el.dataset.inquiryId === String(inq.id));
         if (existing) {
           if (sfx) sfx.playChimeHover();
-          existing.scrollIntoView({ behavior: window.__wireFast ? 'auto' : 'smooth', block: 'center' });
+          wireJumpTo(existing, window.__wireFast ? 'auto' : 'smooth');
           const bubble = existing.querySelector('.chat-bubble');
           if (bubble) {
             bubble.classList.remove('highlight-pulse');
