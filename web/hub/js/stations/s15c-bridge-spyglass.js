@@ -54,6 +54,8 @@
   var nar = function (t, x) { var o = { narr: t }; if (x) for (var k in x) o[k] = x[k]; return o; };
   var fx = function (name) { var a = [].slice.call(arguments, 1); return function () { if (S3 && S3.fx[name]) S3.fx[name].apply(null, a); }; };
   function setMission(t) { var m = $('spy-mission-text'); if (m) m.textContent = t; }
+  // the choices and the finish card take room from the log: keep his last words in view above them
+  function logToEnd() { requestAnimationFrame(function () { if (logEl) logEl.scrollTop = logEl.scrollHeight; }); }
   function grant(id, n) { if (ns.replay) return; if (window.EclipseHints && window.EclipseHints.grant && window.EclipseHints.grant(id, n)) ns.boon.push(id); }
 
   // What the glass can find. dir is filled by the scene (where it lies from Hermes's eye); zoom is the least
@@ -63,7 +65,9 @@
       icon: '🛞', name: 'The wedged wagon', zoom: 0, r: 2.6, where: 'the terraces under us, a little east of south',
       lines: function () { return [
         H('Three wagons on the terraces, Silvia, and the first is wedged across the second turn. One wheel hangs over the drop.'),
-        H('The shepherd said it, and your page says it: the turns are too tight for a loaded wagon.')
+        (window.WireScript && window.WireScript.choice(17) === 1)
+          ? H('The shepherd said it, and your page “The Eastern Buttress & Lower Wash” says it: the turns are too tight for a loaded wagon.')
+          : H('Your page “The Eastern Buttress & Lower Wash” says it: the turns are too tight for a loaded wagon.')
       ]; }
     },
     oilcloth: {
@@ -78,7 +82,7 @@
       icon: '◐', name: 'Survey stone 980', zoom: 1, r: 1.6, where: 'the eastern rim, to the north-east',
       lines: function () { return [
         H('On the eastern rim, a survey stone of the founders: the half-lit disc of the Order, and under it 980.'),
-        H('Nine hundred and eighty varas, the height of the Mesa behind me. They levelled this whole gorge by eye, and my brass and glass can find no fault in it.')
+        H('Nine hundred and eighty varas, the height of the Mesa across the gorge. They levelled this whole gorge by eye, and my brass and glass can find no fault in it.')
       ]; }
     },
     boulders: {
@@ -118,7 +122,7 @@
     blue: {
       icon: '💙', name: 'A smear of blue', zoom: 2, r: 0.9, secret: true, where: '',
       lines: function () { return [
-        H('Wait. On the survey stone of the western abutment... a smear of blue, no wider than my thumb.'),
+        H('Wait. On the survey stone at the western end of the bridge... a smear of blue, no wider than my thumb.'),
         H('The same blue as the rim of the niche at Cairn II. Somebody crossed this bridge before me, Silvia, and wanted it known.')
       ]; }
     }
@@ -218,6 +222,7 @@
     if (s.event) { askChoice(); return true; }
     // enough has been seen: the shout from the terraces
     if (ns.stage === 'glass' && !ns.eventDue && eventReady()) startEvent();
+    else if (ns.stage === 'event') { ns.hintAt = 'hairpin'; if (S3) S3.point('hairpin'); renderSights(); setMission('Something is happening at the second turn'); }
     else { renderSights(); setMission(missionText()); }
     return true;
   }
@@ -263,7 +268,7 @@
       b.addEventListener('click', function () { pick(id); });
       choicesBox.appendChild(b);
     });
-    if (ids.length) { var f = choicesBox.querySelector('button'); if (f) f.focus(); }
+    if (ids.length) { var f = choicesBox.querySelector('button'); if (f) f.focus({ preventScroll: true }); logToEnd(); }
   }
   async function pick(id) {
     if (ns.busy || ns.stage !== 'asking') return;
@@ -286,7 +291,8 @@
     var found = ORDER.filter(function (k) { return ns.seen[k]; }).length;
     if (finishBody) finishBody.textContent = CHOICES[id].epilogue + ' The glass found ' + found + ' of ' + ORDER.length + ' things in the gorge' + (ns.seen.blue ? ', and a smear of blue that was not on any page' : '') + '.' + (ns.boon.length ? ' ✦ A new note is waiting for you at Cairn IV.' : '');
     if (finishCard) finishCard.style.display = 'flex';
-    if (finishBtn) { finishBtn.querySelector('span').textContent = ns.onDone ? '🗿 Go to Cairn IV ➔' : '✦ Close the spyglass'; finishBtn.focus(); }
+    if (finishBtn) { finishBtn.querySelector('span').textContent = ns.onDone ? '🗿 Go to Cairn IV ➔' : '✦ Close the spyglass'; finishBtn.focus({ preventScroll: true }); }
+    logToEnd();
     if (window.EclipseAmbience) window.EclipseAmbience.intensity(0.4);
     if (sfx.playCelestialChime) sfx.playCelestialChime();
     renderSights();
@@ -317,7 +323,19 @@
     if (hudTime) hudTime.textContent = '06:10 · FIRST LIGHT';
     if (S3) S3.reset();
     window.EclipseChat.subtitle.reset(subtitle, 'Dawn on the Natural Bridge of the Sentinel Mesa.');
+    var prev = ns.replay ? null : saved(), kept = (prev && !prev.done && Array.isArray(prev.seen)) ? prev.seen.filter(function (k) { return SIGHTS[k] && !SIGHTS[k].event; }) : [];
+    kept.forEach(function (k) { ns.seen[k] = true; ns.order.push(k); });
     renderSights();
+    if (kept.length) {
+      var nk = kept.filter(function (k) { return !SIGHTS[k].secret; }).length;
+      chat.card('📖 Where we were', [
+        'Dawn on the Natural Bridge. Hermes still lies at the lip of the span, behind the fallen blocks.',
+        'The glass has already found ' + nk + ' of ' + ORDER.length + ' things in the gorge. Nothing was lost.'
+      ]);
+      await chat.sleep(900);
+      if (!(await chat.play([H('The glass again, Silvia. Let us look where we have not looked yet.', { fx: fx('shotHermes') })], token))) return;
+      return toGlass();
+    }
 
     chat.card('📖 Where we are', [
       'Hermes walked the hardpan all night, toward the singing of the pillars.',
@@ -334,6 +352,9 @@
       H('They have not seen me. Take the glass, Silvia: drag it across the gorge, and hold it still on anything that matters. I will tell you what I see.')
     ], token);
     if (!ok) return;
+    toGlass();
+  }
+  function toGlass() {
     ns.stage = 'glass'; ns.busy = false; speaking = null; ns.lastFind = ns.glassSince = performance.now();
     setMission(missionText());
     if (S3) S3.raise();
@@ -344,7 +365,7 @@
   // ---------------------------------------------------------------------
   // 2. THE SCENE (three.js): the gorge at true size, and a lens to read it with
   // ---------------------------------------------------------------------
-  var renderer = null, scene = null, camera = null, animId = null, clock = { t: 0, last: 0 }, efx = null;
+  var renderer = null, scene = null, camera = null, animId = null, clock = { t: 0, last: 0 }, efx = null, adapt = null;
   var lens = null;   // the DOM of the spyglass (built once)
 
   function lcg(seed) { var s = seed >>> 0; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
@@ -415,7 +436,7 @@
       g.fillStyle = gr; g.beginPath(); g.arc(w / 2, w / 2, w / 2 - 3, 0, Math.PI * 2); g.fill();
       g.fillStyle = 'rgba(170,176,196,0.5)'; [[46, 44, 15], [74, 60, 11], [56, 80, 13], [84, 38, 7]].forEach(function (m) { g.beginPath(); g.arc(m[0], m[1], m[2], 0, Math.PI * 2); g.fill(); });
     });
-    var moon = new T.Sprite(new T.SpriteMaterial({ map: moonTex, transparent: true, opacity: 0.5, depthWrite: false, depthTest: false, fog: false }));
+    var moon = new T.Sprite(new T.SpriteMaterial({ map: moonTex, transparent: true, opacity: 0.5, depthWrite: false, depthTest: true, fog: false }));
     moon.position.set(-0.84, 0.2, -0.5).normalize().multiplyScalar(4300); moon.scale.set(210, 210, 1); moon.renderOrder = -84; skyBits.add(moon);
 
     // ---- textures: bedded sandstone, a fine grain to multiply over it, sand, the dust of the cart track ----
@@ -809,8 +830,9 @@
       geo.setAttribute('color', new T.BufferAttribute(col, 3));
       var m = new T.Mesh(geo, rockMat); m.frustumCulled = false; scene.add(m); return m;
     }
+    // (no butte at [420, 1650]: past the southern edge of the ground it hung in the sky over the terraces)
     [[980, -560, 230, 130, 3], [1350, 240, 300, 150, 5], [1180, -1350, 200, 190, 7], [1900, -640, 360, 170, 9], [900, 1000, 210, 100, 11], [1700, 1250, 320, 160, 13], [2250, 330, 260, 210, 15],
-     [-820, -900, 190, 230, 17], [-1250, 420, 260, 250, 19], [-760, 1300, 160, 200, 21], [420, 1650, 110, 90, 23], [-300, 2300, 240, 130, 25]].forEach(function (b) { butte(b[0], b[1], b[2], b[3], b[4]); });
+     [-820, -900, 190, 230, 17], [-1250, 420, 260, 250, 19], [-760, 1300, 160, 200, 21], [-300, 2300, 240, 130, 25]].forEach(function (b) { butte(b[0], b[1], b[2], b[3], b[4]); });
     SC.ridges(scene, { horizon: HORIZON, rings: [
       { R: 2700, h: 190, seed: 6, col: U.hex(0xc98860), haze: 0.55 },
       { R: 3300, h: 320, seed: 13, col: U.hex(0xb08a86), haze: 0.75 }
@@ -1095,11 +1117,11 @@
     }
     function raise() {      // the eye goes to the glass
       fadeTo(1, 380);
-      setTimeout(function () { cam.mode = 'glass'; G.zoom = 0; G.fov = FOVS[0]; G.yaw = G.tYaw = 196 * DEG; G.pitch = G.tPitch = -13 * DEG; G.focusT = 0; G.point = null; G.auto = null; glassTube.visible = true; showLens(true); fadeTo(0, 520); cue('lens'); if (stage) stage.focus(); }, reducedMotion ? 0 : 400);
+      setTimeout(function () { cam.mode = 'glass'; G.zoom = 0; G.fov = FOVS[0]; var a0 = aimAt('wagons'); G.yaw = G.tYaw = a0.yaw - 7 * DEG; G.pitch = G.tPitch = a0.pitch + 2 * DEG; G.focusT = 0; hermes.visible = false; G.point = null; G.auto = null; glassTube.visible = true; showLens(true); fadeTo(0, 520); cue('lens'); if (stage) stage.focus(); }, reducedMotion ? 0 : 400);
     }
     function lower() {      // and comes away from it
       fadeTo(1, 380);
-      setTimeout(function () { cam.mode = 'wide'; showLens(false); shot([99.8, 2.1, 15.4], [106.0, 0.7, 8.4], 34, 1, true); fadeTo(0, 520); }, reducedMotion ? 0 : 400);
+      setTimeout(function () { cam.mode = 'wide'; hermes.visible = true; hold('kneel'); showLens(false); shot([99.8, 2.1, 15.4], [106.0, 0.7, 8.4], 34, 1, true); fadeTo(0, 520); }, reducedMotion ? 0 : 400);
     }
     function cut(fn, hold) { fadeTo(1, 420); later(reducedMotion ? 0.02 : 0.5, function () { fn(); later(hold || 0.12, function () { fadeTo(0, 600); }); }); }
 
@@ -1240,7 +1262,7 @@
         // a hand is never still: the more the tube is drawn out, the more it shows
         var sw = reducedMotion ? 0 : (0.0009 + 0.0007 * G.zoom) * (G.fov / 20) * 3;
         var sy = Math.sin(t * 1.3) * sw + Math.sin(t * 2.9) * sw * 0.4 + world.shake * Math.sin(t * 31) * 0.004, sp = Math.sin(t * 1.7 + 1) * sw * 0.8 + world.vert * Math.sin(t * 2.2) * 0.012;
-        world.shake = Math.max(0, world.shake - dt); world.vert = Math.max(0, world.vert - dt * 0.4);
+        world.shake = reducedMotion ? 0 : Math.max(0, world.shake - dt); world.vert = reducedMotion ? 0 : Math.max(0, world.vert - dt * 0.4);
         camera.position.set(EYE.x, EYE.y, EYE.z);
         dirOf(G.yaw + sy, G.pitch + sp, vdir);
         camera.lookAt(EYE.x + vdir.x, EYE.y + vdir.y, EYE.z + vdir.z);
@@ -1430,6 +1452,7 @@
     clock.last = now; clock.t += dt;
     scene.userData.updaters.slice().forEach(function (u) { u(clock.t, dt); });
     if (efx) efx.render(scene, camera, dt); else renderer.render(scene, camera);
+    if (adapt) adapt(dt); else if (P && P.fitSpeed) adapt = P.fitSpeed(renderer);   // a slow GPU gets fewer pixels, not fewer frames
   }
   function handleResize() {
     if (!renderer || !camera || !canvas) return;

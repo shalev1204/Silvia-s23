@@ -10,7 +10,10 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); pointer-events: auto;
 }
 #modal-cairn-four .pillars-tape-wrap { margin-top: 0; background: rgba(239, 230, 210, 0.94); }
-#modal-cairn-four .pillars-tape { height: 74px; }
+#modal-cairn-four .pillars-tape { height: 88px; }
+#modal-cairn-four .is-shake { animation: c4Shake 0.42s ease; }
+@keyframes c4Shake { 0%, 100% { transform: none; } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+@media (prefers-reduced-motion: reduce) { #modal-cairn-four .is-shake { animation: none; } }
 #modal-cairn-four .pillars-tape-caption { color: #d6c3a0; }
 
 #modal-cairn-four .chasm3d-stage.no-tape .pillars3d-tape-box { display: none; }

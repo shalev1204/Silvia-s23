@@ -24,7 +24,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         echo,
         'Dusk, Silvia. The hardpan begins at the last rocks, and an old shepherd with twelve black goats has shared his water with me.',
         'While I drank, the oldest of his goats ate a corner of my log and looked me in the eye. I think it was a review.',
-        'He says one night is enough to cross it, if you walk toward the singing: the pillars of Cairn IV, heard from the Natural Bridge.',
+        'He says one night takes you across it, if you walk toward the singing: the pillars of Cairn IV, heard from the Natural Bridge.',
         { ask: [
           { text: 'Drink, and fill every flask.', silviaMsg: 'Drink up, Hermes, and fill every flask you own. The hardpan has no springs.', reply: ['Two cups, and every flask to the brim. The seep gives slowly, and the shepherd waited without a word.', 'He says the cracked clay drinks a man’s water by midnight. I believe him.'] },
           { text: 'Can you trust him?', silviaMsg: 'Can you trust him, Hermes? Nobody just hands water to a stranger.', reply: ['I watched his hands. He never looked at my satchel, only at my boots.', 'A man with a plan stares at the bag. He asked for nothing, and that unsettles me more.'] },
@@ -300,7 +300,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
   // ---- 24 · The Seal of Cairn V, the two lines of light, and the road to Tower II ----
   S[24] = {
     hermesFinal: (W) => beats([
-      sealsWord(altarSeals()) + ' of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. Write them in your Cipher Ledger.',
+      sealsWord(altarSeals()) + ' of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. They are in your Cipher Ledger now.',
       by([
         'The seals are sewn into my coat. Now I only have to persuade my legs.',
         'I am still turning that question over, Silvia. It will walk with me.',

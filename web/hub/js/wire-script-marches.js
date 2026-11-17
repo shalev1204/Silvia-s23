@@ -1,7 +1,7 @@
 // Field Wire: events on the march. While Hermes walks a long stretch between stations, a few small scenes reach Silvia as chat messages.
 // window.WIRE_MARCH_EVENTS[leg] = [ { at: fraction of the march, pool: [ { id, beats, choices? } x 3 ] }, ... ]
 // The engine picks one variant of each slot at random, once per march. These scenes add atmosphere and small decisions;
-// they never advance the plot and never give a puzzle answer. Three of her choices open a note in Ask Hermes (W.hint), no more.
+// they never advance the plot and never give a puzzle answer. A question can carry `lapse`: what Hermes chose alone if no answer came. Three of her choices open a note in Ask Hermes (W.hint), no more.
 // Legs: 10 the Great Erg by night, 14 down the line of 168°, 18 the hardpan, 22 east to the Arch, 26 toward the smoke, 34 the plateau with Aurelia.
 window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
 
@@ -257,11 +257,12 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
       { id: 'hp-owl',
         beats: [
           'Silvia, I have an owl. A pale one, silent as a thought. It floats over the clay a few paces ahead and settles whenever I catch up.',
-          'I think it hunts whatever my boots frighten out of the cracks. I am being used as a beater, and I have not been paid.',
+          'I think it hunts whatever my boots frighten out of the cracks. I am its hunting dog, chasing out its supper, and I have not been paid.',
           'It is hard to feel lonely in the dark beside something that looks at you like a very stern aunt.',
           'It kept me company as far as a dry thornbush, and there it turned into the dark. I raised my hat to it. One does.'
         ] },
       { id: 'hp-ticking',
+        lapse: 'No answer came, so I chose for myself: I kept to my line and let the notes go. If she sings, she will sing again.',
         beats: [
           'The hardpan is talking, Silvia. As the night cools, the clay plates of the floor crack and tick, thousands of little knocks all around me.',
           'It sounds like a roomful of clocks, or a giant cracking his knuckles. Twice I stopped, sure that someone was walking beside me.',
@@ -284,6 +285,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
             ] }
         ] },
       { id: 'hp-ruts',
+        lapse: 'No answer came, so I chose for myself: I kept forty paces off the ruts. Slow going, but nobody will find my boots in their tracks.',
         beats: [
           'I have found the raiders’ ruts on the clay, Silvia. Three wagons side by side, going south-west, crisp as a ploughed field.',
           'They came this way at first light, as the shepherd said. One pair of wheels is much deeper than the others. That is the wagon under the oilcloth.',
@@ -308,6 +310,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
     ] },
     { at: 0.5, pool: [
       { id: 'hp-storm',
+        lapse: 'No answer came, so I counted for myself: flash, then eleven seconds to the thunder. Sound is slow, Silvia. A patient man can measure distance with it.',
         beats: [
           'Far to the south a storm is playing over the horizon. Lightning crawls inside the clouds and lights the hardpan like a floor of broken plates.',
           'It never comes to the ground. It only wants to be seen, and I am its entire audience.',
@@ -331,6 +334,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
             ] }
         ] },
       { id: 'hp-peg',
+        lapse: 'No answer came, so I chose for myself: I left the peg where the founders drove it, with a little stone beside it to say thank you.',
         beats: [
           'I have found a peg, Silvia. Bronze, as tall as my hand, driven into the clay so long ago that the clay has grown around it.',
           'On its head is the Order’s wind rose, eight points, green with age. Someone measured this hardpan before there were roads.',
@@ -353,6 +357,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
             ] }
         ] },
       { id: 'hp-lonely',
+        lapse: 'No answer came, and that is all right. I talked to the stars for a while instead. They are good listeners, but you are better.',
         beats: [
           'Silvia, I will confess something. This is the loneliest hour of the night, and I would not mind a little talk.',
           'Not the cairns and not the raiders: ordinary talk. The wire is thin, but you are at the other end of it, and that is a great thing.',
@@ -391,6 +396,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
           'I crept up and looked across a mile of empty clay. Nothing. I feel like a hen who swore there was a fox.'
         ] },
       { id: 'hp-veiled-woman',
+        lapse: 'No answer came, so I chose for myself: I will believe she is real, for the sake of company. A believer sleeps better than a doubter.',
         beats: [
           'Sleep will not come. The shepherd’s veiled woman keeps walking through my head with her milk and her dates.',
           'I know what an old man’s mind does at this hour: it makes ghosts out of stories, and then complains about the ghosts.',
@@ -409,7 +415,7 @@ window.WIRE_MARCH_EVENTS = window.WIRE_MARCH_EVENTS || {};
             reply: [
               'Very likely. A herder alone with his goats needs stories as a goat needs salt.',
               'Then I will treat it as a tale, and my nerves can sleep the way stories do: on the other side of the fire.',
-              'Still, I will not step on a flat stone out here without looking at it first. Old habit.'
+              'Still, the shepherd said she leaves her gifts on flat stones. I will look at every flat stone I pass. Old habit.'
             ] }
         ] }
     ] }

@@ -67,7 +67,7 @@
         },
         s16: {
           note: 'Cairn IV, between the singing pillars. The song opened the chamber, and in the throat of the Left pillar lay a pebble painted with a gold star on blue.',
-          quote: 'SUN, ECHO, STONE: the cairns are instruments, and the Order measured the whole desert with them.',
+          quote: 'SUN, ECHO, STONE: the cairns are instruments, and the Order measured the desert with them.',
           earned: ['Seal of Cairn IV', 'The Tuning Pebble'], ledger: ['The Rising Echo', 'The Falling Echo'], sketch: T + 'cairn_iv_preview.webp'
         },
         s17: {

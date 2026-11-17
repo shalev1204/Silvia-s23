@@ -2229,8 +2229,8 @@
             };
           }
           if (!marchOver('cairnFour')) {
-            return veiledStation({ station: 16, march: 'cairnFour', thumb,
-              walking: 'Hermes walks the hardpan by night and sleeps in the rocks by day. Where he is going stays sealed until he gets there.' });
+            return veiledStation({ station: 16, march: 'cairnFour', thumb, place: 'Cairn IV · Sentry of the Canyon',
+              walking: 'Hermes walks the hardpan by night and sleeps in the rocks by day.' });
           }
           const eta = typeof window.getCairnFourMarchEta === 'function' ? window.getCairnFourMarchEta() : '';
           const arrived = (typeof window.isCairnFourMarchOver === 'function' && window.isCairnFourMarchOver()) || (typeof window.isAdminTester === 'function' && window.isAdminTester());
@@ -2241,7 +2241,7 @@
             title: 'Cairn IV · Sentry of the Canyon',
             thumb,
             lore: arrived
-              ? 'Two hollow pillars guard the southern mouth of the gorge, under the Sentinel Mesa, and the wind sings inside them. Solve the page “Cairn IV: Sentry of the Canyon” in your journal, speak the sigil, and learn the song of the pillars.'
+              ? 'Two hollow pillars guard the southern mouth of the gorge, under the Sentinel Mesa, and the wind sings inside them. ' + (typeof window.needsBridgeSpyglass === 'function' && window.needsBridgeSpyglass() ? 'First, look back at dawn on the Natural Bridge through Hermes\'s spyglass. Then solve' : 'Solve') + ' the page “Cairn IV: Sentry of the Canyon” in your journal, speak the sigil, and learn the song of the pillars.'
               : (eta
                 ? 'Hermes is crossing the hardpan by night and the Natural Bridge of the Sentinel Mesa, toward the singing pillars. Arrival in ' + eta + '. Keep the page “Cairn IV: Sentry of the Canyon” close.'
                 : 'Far to the south-west, where the canyon narrows under the Sentinel Mesa, Cairn IV has stood since the founders\' time. Hermes will set out once you answer him on the wire.'),
@@ -5260,7 +5260,7 @@
           step: 24,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtAltar()) + " of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. Write them in your Cipher Ledger; I wrote them on my sleeve.\n\nNow Tower II. If the Servant still stands, his last trial waits in the atrium: Station 18, the page “The Polybius Stele”. If he does not... then we will learn what the raiders came for. I will wire you from under the Arch before I set out.";
+            return sealsPhrase(sealsAtAltar()) + " of five, Silvia, and two lines that came to us in light: [Y] − [O] = 2 and [L] + [G] = 23. They are in your Cipher Ledger now; I wrote them on my sleeve.\n\nNow Tower II. If the Servant still stands, his last trial waits in the atrium: Station 18, the page “The Polybius Stele”. If he does not... then we will learn what the raiders came for. I will wire you from under the Arch before I set out.";
           }
         },
         {
@@ -8109,7 +8109,7 @@
       // The rests between two talks with no station between them (see wireRestHold): which ones she has waited through
       const WIRE_RESTS = {
         12: { title: 'Night under the Sun Monolith · Hermes Sleeps', desc: 'He is asleep at the foot of the Monolith, with the Seal of Cairn II under his head. He will wire you at first light, before he walks down to the Sandstone Labyrinth.', button: '☾ Wait for first light ➔' },
-        20: { title: 'Between the Singing Pillars · Hermes Rests Through the Heat', desc: 'He is asleep in the shade of the pillars of Cairn IV, with the pebble in his hand. He will wire you at dusk, before he sets out for the Arch of the Solstice.', button: '☀ Wait for dusk ➔' }
+        20: { title: 'Between the Singing Pillars · Hermes Rests Through the Heat', desc: 'He is asleep in the shade of the pillars of Cairn IV, with the brass box under his head. He will wire you at dusk, before he sets out for the Arch of the Solstice.', button: '☀ Wait for dusk ➔' }
       };
       const WIRE_RESTS_KEY = 'order_wire_rests';
       function wireRestList() { try { const l = JSON.parse(localStorage.getItem(WIRE_RESTS_KEY) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
@@ -8336,8 +8336,8 @@
           location = wireCurrentStep <= 12 ? 'Foot of the Sun Monolith' : (labyrinthMarch.over() ? 'Sandstone Labyrinth · Cairn III' : 'Arches → Sandstone Labyrinth');
           icon = wireCurrentStep <= 12 ? '⛺' : (labyrinthMarch.over() ? '📍' : '🥾'); bearing = '168° SSE';
         } else if (wireCurrentStep >= 15 && wireCurrentStep <= 18) {
-          location = wireCurrentStep <= 16 ? 'Rocks above the Hardpan' : (cairnFourMarch.over() ? 'Singing Pillars · Cairn IV' : 'Hardpan → Natural Bridge');
-          icon = wireCurrentStep <= 16 ? '💤' : (cairnFourMarch.over() ? '🌬️' : '🥾'); bearing = 'East Gorge';
+          location = wireCurrentStep <= 16 ? 'Rocks above the Hardpan' : (cairnFourMarch.over() ? 'Singing Pillars · Cairn IV' : (cairnFourMarch.progress() < 0.45 ? 'Across the Hardpan' : (cairnFourMarch.progress() < 0.6 ? 'The Natural Bridge' : 'Rocks above the Gorge')));
+          icon = wireCurrentStep <= 16 ? '💤' : (cairnFourMarch.over() ? '🌬️' : '🥾'); bearing = 'South-West';
         } else if (wireCurrentStep >= 19 && wireCurrentStep <= 22) {
           location = wireCurrentStep <= 20 ? 'Shade of the Singing Pillars' : (solsticeMarch.over() ? 'Arch of the Solstice · Cairn V' : 'East → Courtyard of Rays');
           icon = wireCurrentStep <= 20 ? '☀️' : (solsticeMarch.over() ? '🔆' : '🥾'); bearing = 'Solstice Axis';
@@ -8489,7 +8489,7 @@
         bar.querySelector('.wfb-line').textContent = line.trim() ? '“' + line.trim() + '”' : '';
         bar.querySelector('.wfb-trip').hidden = !showTrip;
         if (showTrip) {
-          bar.querySelector('.wfb-trip-text').textContent = '🧭 ' + p + '% · ' + (eta ? eta.textContent.replace(/^\S+\s*ARRIVAL AT\s*/i, '').replace(/ IN /i, ' · ').toLowerCase() : '');
+          bar.querySelector('.wfb-trip-text').textContent = '🧭 ' + p + '% · ' + (eta ? eta.textContent.replace(/^\S+\s*ARRIVAL AT\s*/i, '').replace(/ IN /i, ' · ').replace(/\b[A-Z][A-Z']*\b/g, (w) => (/^[IVX]+$/.test(w) ? w : w[0] + w.slice(1).toLowerCase())).replace(/(\d+) H (\d+) MIN/i, '$1 h $2 min') : '');
           bar.querySelector('.wfb-track i').style.width = p + '%';
         }
         bar.querySelector('.wfb-go').textContent = go;
@@ -8687,7 +8687,7 @@
       // question with two answers; the answer changes his reply. Only marches that start after MARCH_EVENTS_FROM have them.
       const MARCH_EVENTS_FROM = Date.parse('2026-11-13T00:00:00');
       const MARCH_EV_KEY = 'order_wire_marchev';   // { leg: [{ id, pick }] } pick: 0/1 = her answer, null = waiting for it, 'x' = unanswered, 'n' = no question
-      const MARCH_NOREPLY = ['No answer came through, so I chose for myself. I will tell you how it went.', 'The line stayed quiet, so I went with my gut.', 'Nothing came back. I decided alone, so do not worry.'];
+      const MARCH_NOREPLY = ['No answer came through, so I chose for myself.', 'The line stayed quiet, so I went with my gut.', 'Nothing came back. I decided alone, so do not worry.'];
       function marchEvState() { try { return JSON.parse(localStorage.getItem(MARCH_EV_KEY) || '{}') || {}; } catch (e) { return {}; } }
       function marchEvSave(st) { try { localStorage.setItem(MARCH_EV_KEY, JSON.stringify(st)); } catch (e) {} }
       function marchHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -8698,7 +8698,12 @@
         return null;
       }
       function marchText(t) { try { return wireBeats(typeof t === 'function' ? t(window.WireScript) : t); } catch (e) { console.warn('wire march event', e); return []; } }
-      function marchNoReply(id) { return MARCH_NOREPLY[marchHash(id) % MARCH_NOREPLY.length]; }
+      // what he chose alone: the event's own `lapse` line, or a plain one that promises nothing
+      function marchNoReply(id) {
+        const legs = window.WIRE_MARCH_EVENTS || {};
+        for (const k of Object.keys(legs)) { const ev = marchEvFind(k, id); if (ev && ev.lapse) { const t = marchText(ev.lapse); if (t.length) return t.join(' '); } }
+        return MARCH_NOREPLY[marchHash(id) % MARCH_NOREPLY.length];
+      }
       // The variant of a slot for this march (a slot that reaches her late, among others, avoids the ones that ask a question)
       function marchPick(legNo, leg, slotIdx, plainOnly) {
         const pool = marchSlots(legNo)[slotIdx].pool, n = pool.length;
@@ -8730,13 +8735,13 @@
         });
       }
       // His question went unanswered: he chooses for himself
-      function marchExpire(legNo, live) {
+      function marchExpire(legNo, live, onDone) {
         const pend = marchPending(legNo);
         if (!pend) return;
         const st = marchEvState(), e = (st[legNo] || []).find((x) => x.id === pend.entry.id);
         if (e) { e.pick = 'x'; marchEvSave(st); }
         const line = marchNoReply(pend.entry.id);
-        if (live) playHermesBeats([line], { type: 'expedition', step: legNo }, null);
+        if (live) playHermesBeats([line], { type: 'expedition', step: legNo }, onDone || null);
         else appendWireMessage(getCartographerTitle(), line, false, false, null, wireMessagesStream, { type: 'expedition', step: legNo });
       }
       // Delivers what the walk has reached (one slot at a time). Returns true while it is speaking.
@@ -9478,8 +9483,8 @@
         // "5 h 12 min" while Hermes walks; '' before he sets out or once he has arrived
         const eta = () => {
           if (!started() || progress() >= 1.0) return '';
-          const remMs = Math.max(0, msNow() * (1 - progress()));
-          return Math.floor(remMs / 3600000) + ' h ' + String(Math.floor((remMs % 3600000) / 60000)).padStart(2, '0') + ' min';
+          const remMin = Math.max(1, Math.ceil(msNow() * (1 - progress()) / 60000));   // never "0 h 00 min" while he is still walking
+          return Math.floor(remMin / 60) + ' h ' + String(remMin % 60).padStart(2, '0') + ' min';
         };
         const start = () => {
           if (localStorage.getItem(keys.start)) return;
@@ -9669,7 +9674,7 @@
           walkingDesc: 'Hermes walks the hardpan by night and sleeps in the rocks by day, toward the singing pillars. Keep the page “Cairn IV: Sentry of the Canyon” close.',
           etaLabel: 'ARRIVAL AT CAIRN IV',
           arrivedTitle: 'Cairn IV Reached · Station 16 Awaits',
-          arrivedDesc: 'Hermes is between the twin pillars at the southern mouth of the gorge. Open the Grand Desert Map and wake the Sentry of the Canyon (Station 16, the page “Cairn IV: Sentry of the Canyon”).'
+          arrivedDesc: 'Hermes is between the twin pillars at the southern mouth of the gorge. Open the Grand Desert Map: first look back at dawn on the Natural Bridge through his spyglass, then wake the Sentry of the Canyon (Station 16, the page “Cairn IV: Sentry of the Canyon”).'
         },
         22: {
           step: 22, march: solsticeMarch, doneKey: 'order_arch_solstice_completed',
@@ -10513,7 +10518,11 @@
         const showMarchLeg = (leg) => {
           leg.march.start();   // a save that stands here without a start time (e.g. after a tester replay) sets out now
           if (deliverMarchEvents(leg.step, leg)) return true;   // an event of the road is reaching her: the deck waits for it
-          if (leg.march.over() && marchPending(leg.step)) marchExpire(leg.step, false);
+          if (leg.march.over() && marchPending(leg.step)) {
+            // he arrived with her question still open: if she is watching he types what he chose, then the arrival shows
+            if (wireWatching() && !wireBeatsPlaying) { marchExpire(leg.step, true, () => { updateMessengerBadge(); renderWireChoices(); }); return true; }
+            marchExpire(leg.step, false);
+          }
           if (leg.campedTitle && leg.march.camped()) {
             showWaypointBar(leg.campedTitle, leg.campedDesc, leg.step);
             return true;

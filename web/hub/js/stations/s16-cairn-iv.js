@@ -110,6 +110,8 @@
 
       let verseIdx = Math.min(versesSung(), VERSES.length - 1);
       let mode = 'mark';
+      let cineClosed = false;
+      let justWon = false;   // the Tuning Pebble gets its own card when she leaves right after the last verse   // she closed the station while the opening film played: it will play again next time
       let slots = [];
       let falseIdx = new Set();   // the tokens that did not ring true at the last singing
 
@@ -254,7 +256,7 @@
         svg.appendChild(svgEl('line', { x1: 0, y1: TAPE_H / 2, x2: width, y2: TAPE_H / 2, stroke: '#8a6d3b', 'stroke-width': 0.6 }));
         for (let b = 0; b <= beats; b++) {
           svg.appendChild(svgEl('line', { x1: xb(b), y1: TAPE_H / 2 - 5, x2: xb(b), y2: TAPE_H / 2 + 5, stroke: '#5c4524', 'stroke-width': 0.8 }));
-          if (countHintOn()) svg.appendChild(svgText(xb(b), TAPE_H / 2 + 13, String(b), { 'font-size': 11, fill: '#7c5a32' }));
+          if (countHintOn()) svg.appendChild(svgText(xb(b), TAPE_H / 2 + 16, String(b), { 'font-size': 15, fill: '#7c5a32', 'font-weight': 700 }));
         }
         if (!tape) return;
         tape.events.forEach((ev) => {
@@ -265,7 +267,7 @@
           const color = top ? '#b45309' : '#0f766e';
           if (ev.kind === 'call') {
             svg.appendChild(svgEl('rect', { x: xb(ev.beat), y, width: w, height: 20, rx: 2, fill: color }));
-            if (tape.events.length > 2) svg.appendChild(svgText(xb(ev.beat) + w / 2, y + 28, String(ev.n), { 'font-size': 11, fill: color, 'font-weight': 700 }));
+            if (tape.events.length > 2) svg.appendChild(svgText(xb(ev.beat) + w / 2, y + 15, String(ev.n), { 'font-size': 14, fill: '#fff8e6', 'font-weight': 700 }));   // the call's number sits inside its block
           } else {
             svg.appendChild(svgEl('rect', { x: xb(ev.beat), y: y + 2, width: w, height: 16, rx: 2, fill: 'none', stroke: color, 'stroke-width': 1.6 }));
           }
@@ -583,8 +585,8 @@
           RINGS.forEach((d) => {
             const s = sideX(side), z = fz(d);
             const id = fissureId(side, d);
-            const plaque = new T.Mesh(new T.PlaneGeometry(1.05, 1.31), new T.MeshBasicMaterial({ map: plaqueTex(T, side, d, false), transparent: true, depthWrite: false, toneMapped: false }));
-            plaque.position.set(s * (CW - 0.95), 3.9, z + 0.95); plaque.userData.id = id;
+            const plaque = new T.Mesh(new T.PlaneGeometry(1.4, 1.75), new T.MeshBasicMaterial({ map: plaqueTex(T, side, d, false), transparent: true, depthWrite: false, toneMapped: false }));
+            plaque.position.set(s * (CW - 0.95), 4.1, z); plaque.userData.id = id;   // level with its own crack, big enough to read from the default view
             plaque.rotation.y = -s * Math.PI / 2 * 0.72;
             scene.add(plaque);
             const glow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: side === 'L' ? 0xffb35a : 0x5ef0d8, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
@@ -608,8 +610,8 @@
           const lip = new T.Mesh(new T.TorusGeometry(0.8, 0.17, 6, 20), pillarMat); lip.rotation.x = Math.PI / 2; lip.position.y = PILLAR_H; lip.castShadow = true; g.add(lip);
           [1.2, 3.6].forEach((y) => { const band = new T.Mesh(new T.TorusGeometry(1.12 - y * 0.03, 0.07, 5, 24), paint({ color: 0x8a6a40 })); band.rotation.x = Math.PI / 2; band.position.y = y; g.add(band); });
           // the throat: a dark mouth facing up the gorge, where the wind goes in
-          const throat = new T.Mesh(new T.CircleGeometry(0.42, 18), new T.MeshBasicMaterial({ color: 0x05030a }));
-          throat.scale.set(0.8, 1.6, 1); throat.position.set(0, 4.7, -1.06); throat.rotation.y = Math.PI; throat.rotation.x = -0.08; g.add(throat);
+          const throat = new T.Mesh(new T.CircleGeometry(0.42, 18), new T.MeshBasicMaterial({ color: 0x05030a, fog: false }));
+          throat.scale.set(0.8, 1.6, 1); throat.position.set(0, 4.7, -1.12); throat.rotation.y = Math.PI; g.add(throat);
           const glow = new T.Sprite(new T.SpriteMaterial({ map: glowTex, color: side === 'L' ? 0xffb35a : 0x5ef0d8, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
           glow.scale.set(2.6, 3.6, 1); glow.position.set(0, 4.7, -1.2); g.add(glow);
           const light = new T.PointLight(side === 'L' ? 0xffa64a : 0x4ae8d0, 0, 12, 1.6); light.position.set(0, 4.7, -1.6); g.add(light);
@@ -828,7 +830,8 @@
         const ndc = new G.T.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
         G.ray.setFromCamera(ndc, G.camera);
         // the carved plaque she is pointing at wins; otherwise the place where her look meets the cliff face, to the nearest ring
-        const plaque = G.ray.intersectObjects(G.plaques, false)[0];
+        // (seen from the mouth of the gorge the far plaques overlap: the one hit nearest its own centre is the one she means)
+        const plaque = G.ray.intersectObjects(G.plaques, false).sort((a, b) => a.point.distanceTo(a.object.position) - b.point.distanceTo(b.object.position))[0];
         if (plaque) return G.fissures.find((f) => f.id === plaque.object.userData.id) || null;
         const o = G.ray.ray.origin, dir = G.ray.ray.direction;
         for (const side of ['L', 'R']) {
@@ -887,7 +890,7 @@
         return [
           { from: { p: [0, 40, 30], l: [0, 0, -18] }, to: { p: [0, 30, 16], l: [0, 0, -20] }, dur: 6, kicker: 'STATION 16', title: 'CAIRN IV', line: 'Midnight at the southern mouth of the gorge. The night wind comes down between the cliffs.' },
           { from: { p: [3.5, 5, -10], l: [-CW, 3.5, -22] }, to: { p: [2.5, 4.5, -18], l: [-CW, 3.5, -30] }, dur: 5.5, line: 'Sixteen dark fissures in the rock. Each one answers a call, after its own count of beats.' },
-          { from: { p: [0.5, 9, -7], l: [0, 4, 0] }, to: { p: [2.6, 3.4, 6.5], l: [0, 2, 0] }, dur: 5.5, line: 'Two hollow pillars, taller than three men, and the wind already humming inside them.' }
+          { from: { p: [0, 9.5, -8], l: [0, 4, 0] }, to: { p: [0.6, 3.6, 7], l: [0, 2, 0] }, dur: 5.5, line: 'Two hollow pillars, taller than three men, and the wind already humming inside them.' }
         ];
       }
 
@@ -1072,12 +1075,13 @@
       }
 
       function completeStation() {
+        // the pebble first: once the station is done the inventory counts it from that flag and would never mark it new
+        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('tuning_pebble');
         set(KEYS.done, 'true');
         cue('stone', { dur: 2.2 });
         if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(4);
         else set('order_seal_cairn_4', 'true');
-        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('tuning_pebble');
         say("STONE... and listen, Silvia. Listen to how the wind played that last verse: three short calls, a pause, two long ones. That is the code I engraved on Aurelia's disc, and the rhythm of the light I saw through my telescope ten years ago, blinking far out in this desert. And in the throat of the Left pillar there is a pebble that the river never put there.");
         if (G && !reduced()) {
           view.ending = 1; view.opened = 0;
@@ -1091,6 +1095,9 @@
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
         if (el.finish) setTimeout(() => el.finish.focus({ preventScroll: true }), 60);
+        justWon = true;
+        // the reward card sits below the fold of the side panel at 1440x900: bring it into view once the pillars have spoken
+        setTimeout(() => { if (el.victory && modal.style.display !== 'none') el.victory.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' }); }, reduced() ? 60 : 1500);
       }
       function applyVictory() {
         if (el.victoryText) {
@@ -1110,7 +1117,8 @@
           set(KEYS.fails, String(fails));
           if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           if (G && G.fx) G.fx.blow(null, 0.2);
-          feedback(el.keyFeedback, 'The pillars stay mute. Count the seven echoes on the page “Cairn IV: Sentry of the Canyon” again.', 'error');
+          feedback(el.keyFeedback, ['The pillars stay mute. Count the seven echoes on the page “Cairn IV: Sentry of the Canyon” again.', 'Not a sound. Read each echo on the page again, and turn each count into its letter.', 'Silence. Check the seven echoes once more, one by one.'][(fails - 1) % 3], 'error');
+          if (el.keyInput) { el.keyInput.select(); el.keyInput.classList.remove('is-shake'); void el.keyInput.offsetWidth; el.keyInput.classList.add('is-shake'); }
           sigilHints.fail();
           return;
         }
@@ -1190,6 +1198,7 @@
         if (el.stage) el.stage.classList.toggle('is-calling', mode === 'call');
         if (done || !awake) setHover(null);
         if (el.stage) el.stage.classList.toggle('no-tape', !awake || done);
+        if (awake && !done) requestAnimationFrame(() => { if (!tape || !tape.raf) drawTape(Infinity); });   // the tape was measured while hidden: draw it again at its real width
         syncWorld();
         setMood();
         sigilHints.refresh(); songHints.refresh();
@@ -1214,7 +1223,14 @@
         el.plan.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e); } });
       }
       if (el.play) el.play.addEventListener('click', playVerse);
-      if (el.sound) el.sound.addEventListener('click', () => { set(KEYS.sound, soundOn() ? 'off' : 'on'); if (!soundOn()) silence(); render(); });
+      if (el.sound) el.sound.addEventListener('click', () => {
+        // with the Hub speaker off, this button turns the sound back on for everything (it would do nothing otherwise)
+        if (get('order_ambience_muted') === 'true') { if (window.EclipseAmbience && window.EclipseAmbience.setMuted) window.EclipseAmbience.setMuted(false); else set('order_ambience_muted', 'false'); set(KEYS.sound, 'on'); }
+        else set(KEYS.sound, soundOn() ? 'off' : 'on');
+        if (!soundOn()) silence();
+        render();
+      });
+      document.addEventListener('click', (e) => { if (modal.style.display !== 'none' && e.target.closest && e.target.closest('#ambience-toggle')) setTimeout(() => { if (!soundOn()) silence(); render(); }, 0); });
       if (el.modeMark) el.modeMark.addEventListener('click', () => { mode = 'mark'; render(); });
       if (el.modeCall) el.modeCall.addEventListener('click', () => { mode = 'call'; render(); });
       if (el.undo) el.undo.addEventListener('click', () => { if (slots.length) cue('tick', { f: 1300, v: 0.06 }); slots.pop(); falseIdx.delete(slots.length); renderSlots(); });
@@ -1282,7 +1298,7 @@
           } else if (typeof window.getCairnFourMarchEta === 'function' && window.getCairnFourMarchEta()) {
             toast('Hermes is crossing the hardpan toward Cairn IV. Arrival in ' + window.getCairnFourMarchEta() + '.');
           } else {
-            toast('Hermes is hiding in the rocks until dark. Open the Cliffside Workshop: he will wire you before he sets out.');
+            toast('Hermes is hiding in the rocks until dark. Open the Field Wire: he will call you before he sets out.');
           }
           return;
         }
@@ -1331,15 +1347,15 @@
         cancelAnimationFrame(raf);
         if (G) raf = requestAnimationFrame(frame);
         if (G && cine && !reduced() && !isDone() && get(CINE_INTRO) !== 'seen') {
-          set(CINE_INTRO, 'seen');
-          cine.start(openingShots(), finishOpen);
+          cineClosed = false;
+          cine.start(openingShots(), () => { if (!cineClosed) set(CINE_INTRO, 'seen'); finishOpen(); });
         } else finishOpen();
       }
       function closeCairnFourModal() {
         if (modal.style.display === 'none') return;
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         stopTape();
-        if (cine && cine.active) cine.skip();
+        if (cine && cine.active) { cineClosed = true; cine.skip(); }
         modal.classList.add('closing');
         modal.removeEventListener('wheel', stopHubScroll);
         modal.removeEventListener('touchmove', stopHubScroll);
@@ -1361,13 +1377,20 @@
       if (el.finish) {
         el.finish.addEventListener('click', () => {
           closeCairnFourModal();
-          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
-          if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
-          if (typeof window.showDesertToast === 'function') {
-            let seals = 0;
-            for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
-            window.showDesertToast('✦ Seal of Cairn IV secured (' + seals + ' of 5) ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
-          }
+          // as at Station 15: the new relic first, then straight to Hermes on the Field Wire
+          const go = () => {
+            if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+            if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+            const wireTab = document.querySelector('[data-view="view-field-wire"]');
+            if (wireTab) wireTab.click();
+            if (typeof window.showDesertToast === 'function') {
+              let seals = 0;
+              for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
+              window.showDesertToast('✦ Seal of Cairn IV secured (' + seals + ' of 5) ✦ Hermes is waiting for you on the Field Wire.');
+            }
+          };
+          if (justWon && typeof window.openItemAcquiredModal === 'function') { justWon = false; setTimeout(() => window.openItemAcquiredModal({ id: 'tuning_pebble' }, go), 260); }
+          else go();
         });
       }
 
