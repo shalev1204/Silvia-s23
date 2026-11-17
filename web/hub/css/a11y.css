@@ -3,6 +3,9 @@
     /* Every control shows where the keyboard is; the ones with their own focus style keep it */
     :focus-visible { outline: 3px solid var(--brass-bright, #ffd592); outline-offset: 2px; }
 
+    /* While a station's reward card is up, the laws under it are out of reach: out of sight and out of the Tab order too */
+    .chasm3d-body:has(> .chasm3d-reward.is-on) .chasm3d-laws { visibility: hidden; }
+
     /* On the iPad (a finger, not a mouse) */
     @media (pointer: coarse) {
       /* a quick double tap does not zoom the page; two fingers still do */
@@ -22,11 +25,21 @@
         transform: translate(-50%, -50%); border-radius: 50%;
       }
 
+      /* the ✕ and the speaker in the canyon headers sit at the window's top edge, where a larger touch area is cut off: they grow to 44 px */
+      :is(#modal-whispering-chasm, #modal-salt-playa, #modal-desert-lexicon) :is(.chasm-close-btn, .ambience-toggle) { position: relative; width: 44px; height: 44px; }
+
+      /* the laws of each game, the Ledger's letter counters: small words, a 44 px area to touch */
+      .chasm3d-laws summary, .letter-eq-pill { position: relative; }
+      .chasm3d-laws summary::before, .letter-eq-pill::before {
+        content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px);
+        transform: translate(-50%, -50%);
+      }
+
       /* buttons and fields with words grow to a finger's height */
       .btn-seeker-switch, .btn-satchel-inventory, .btn-launch-decoder, .btn-historical-web, .btn-inspector-back,
       .eq-action-btn, .letter-val-input, .monolith-btn, .chasm-cairn-btn, .btn-chasm-reset, .btn-carve-word,
       .lexicon-word-input, .clepsydra-select, .clepsydra-key-input, .clepsydra-cell-btn, #btn-clepsydra-reset-grid,
-      .btn-chasm-finish, .monolith-key-input, input[type="range"] {
+      .btn-chasm-finish, .monolith-key-input, input[type="range"], .cine-skip, .ledger-util-btn {
         min-height: 44px;
       }
 
