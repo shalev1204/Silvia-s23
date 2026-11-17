@@ -413,7 +413,8 @@
             <span class="messenger-btn-badge" id="messenger-counter-badge" style="display: none;">1</span>
           </button>
           <div class="satchel-wrap" id="satchel-wrap" style="display: none;" role="group" aria-label="Cairns: the Cairn seals"></div>
-          <button type="button" class="btn-satchel-inventory" id="btn-open-inventory" title="Open Expedition Inventory" aria-label="Open Inventory" style="display: none;">
+          <button type="button" class="btn-satchel-inventory" id="btn-open-inventory" title="Open Expedition Inventory (Shortcut: I)" aria-label="Open Inventory" style="display: none;">
+            <span id="bsi-new-dot" class="bsi-new-dot" style="display: none;" aria-hidden="true"></span>
             <span class="bsi-text">Inventory</span>
             <span id="bsi-badge" class="bsi-badge">3</span>
           </button>
@@ -2011,8 +2012,11 @@
                     <span class="messenger-online-badge"></span>
                   </div>
 
-                  <div class="messenger-contact-name-wrap" id="messenger-contact-name-wrap" style="display: none;">
-                    <span class="messenger-contact-name" id="messenger-contact-name"></span>
+                  <div class="messenger-contact-stack">
+                    <div class="messenger-contact-name-wrap" id="messenger-contact-name-wrap" style="display: none;">
+                      <span class="messenger-contact-name" id="messenger-contact-name"></span>
+                    </div>
+                    <span class="messenger-live-telemetry" id="messenger-live-telemetry" title="Hermes's current field position and atmospheric state">📍 Outer Watchtower VI · 112° E</span>
                   </div>
 
                   <button type="button" class="btn-hermes-status online" id="btn-hermes-status" title="Connection status · Click to toggle" aria-pressed="true">
@@ -2023,21 +2027,21 @@
 
                 <!-- Mode Controls & Restart (Grouped with Telegraph Signal Meter) -->
                 <div class="messenger-controls-group">
-                  <!-- Analog Signal Meter -->
-                  <div class="telegraph-signal-meter" title="Galvanic Telegraph Carrier Signal">
-                    <div class="signal-gauge-housing">
-                      <div class="signal-indicator-bars">
+                  <!-- Analog Signal Meter (Interactive Diagnostic Trigger) -->
+                  <button type="button" class="telegraph-signal-meter" id="btn-wire-signal-meter" aria-expanded="false" aria-controls="wire-signal-popover" title="Galvanic Telegraph Carrier Signal · Click to inspect telemetry">
+                    <span class="signal-gauge-housing">
+                      <span class="signal-indicator-bars">
                         <span class="signal-bar active pulse"></span>
                         <span class="signal-bar"></span>
                         <span class="signal-bar"></span>
                         <span class="signal-bar"></span>
-                      </div>
+                      </span>
                       <span class="signal-beacon-dot"></span>
-                    </div>
-                    <div class="signal-meta-text">
+                    </span>
+                    <span class="signal-meta-text">
                       <span class="signal-label">SIGNAL: <strong class="signal-val">24%</strong></span>
-                    </div>
-                  </div>
+                    </span>
+                  </button>
 
                   <div class="messenger-mode-switcher">
                     <button type="button" class="messenger-toggle-btn active" id="tab-wire-expedition" data-wire-tab="expedition">
@@ -2055,12 +2059,23 @@
                 </div>
               </div>
 
-              <!-- Where we are in the expedition: the chapter, and a way back to the earlier ones -->
+              <!-- Where we are in the expedition: the chapter, index picker, milestone filter, and earlier chapters -->
               <div class="wire-chapter-strip" id="wire-chapter-strip">
                 <span class="wcs-kicker">CHAPTER <b id="wcs-num">1</b> OF <span id="wcs-total">1</span></span>
                 <span class="wcs-name" id="wcs-name"></span>
+                <button type="button" class="wcs-picker-btn" id="btn-wire-chapter-picker" aria-expanded="false" aria-controls="wire-chapter-popover" title="Jump to any unlocked chapter">▾ Index</button>
+                <div class="wire-milestone-filters" id="wire-milestone-filters" role="group" aria-label="Filter conversation milestones">
+                  <button type="button" class="wmf-btn active" data-wire-filter="all">All</button>
+                  <button type="button" class="wmf-btn" data-wire-filter="clues" title="Highlight Cipher Ledger equations and journal clues">📐 Clues</button>
+                  <button type="button" class="wmf-btn" data-wire-filter="relics" title="Highlight recovered relics, sketches and chapter cards">🏺 Relics</button>
+                </div>
                 <span class="wcs-new" id="wcs-new" hidden>NEW</span>
                 <button type="button" class="wcs-earlier" id="btn-wire-earlier" hidden>↑ Earlier chapters</button>
+              </div>
+              <div class="wire-signal-popover" id="wire-signal-popover" role="region" aria-label="Galvanic Telegraph Telemetry" hidden></div>
+              <div class="wire-chapter-popover" id="wire-chapter-popover" role="region" aria-label="Expedition Chapter Index" hidden></div>
+              <div class="wire-back-present-wrap" id="wire-back-present-wrap" hidden>
+                <button type="button" class="btn-wire-back-present" id="btn-wire-back-present">↓ Back to Present</button>
               </div>
               </div>
 
@@ -2129,6 +2144,7 @@
                   <div class="inquiry-search-row">
                     <input type="search" id="inquiry-search" class="inquiry-search-input" placeholder="Search the telegraph archive…" autocomplete="off" aria-label="Search questions for Hermes">
                     <span class="inquiry-progress" id="inquiry-progress"></span>
+                    <button type="button" class="btn-inquiry-clear" id="btn-inquiry-clear" hidden title="Clear displayed answers in the stream above">Clear Log</button>
                   </div>
                   <div class="inquiry-filter-bar" id="inquiry-filter-bar"></div>
                   <div class="messenger-faq-grid" id="inquiries-questions-grid">
@@ -2466,25 +2482,76 @@
       </div>
 
       <div class="satchel-inventory-body">
-        <!-- Left Column: Minecraft-style Item Grid -->
+        <!-- Left Column: Minecraft-style Item Grid + Sets -->
         <div class="si-items-panel">
           <div class="si-panel-header">
             <span>EXPEDITION INVENTORY</span>
             <span class="si-count-pill" id="si-count-pill">2 / 16 SLOTS</span>
           </div>
+          <div class="si-filter-tabs" id="si-filter-tabs" role="tablist" aria-label="Filter inventory by category">
+            <button type="button" class="si-filter-btn active" role="tab" aria-selected="true" data-filter="all">All</button>
+            <button type="button" class="si-filter-btn" role="tab" aria-selected="false" data-filter="seal">Seals</button>
+            <button type="button" class="si-filter-btn" role="tab" aria-selected="false" data-filter="tool">Supplies</button>
+            <button type="button" class="si-filter-btn" role="tab" aria-selected="false" data-filter="relic">Relics</button>
+          </div>
           <div class="si-items-grid" id="si-items-grid">
             <!-- 4x4 Minecraft slots rendered dynamically -->
           </div>
           <div class="si-grid-legend">
-            <span>✦ 4×4 EXPEDITION GRID</span>
-            <span>SELECT TO INSPECT</span>
+            <span>✦ 4×4 GRID · ARROWS NAVIGATE</span>
+            <span>Z: ZOOM · F: FLIP</span>
+          </div>
+
+          <div class="si-sets-panel" id="si-sets-panel" aria-label="Expedition Collections & Synergies">
+            <div class="si-set-card" id="si-set-cairns">
+              <div class="si-set-head">
+                <span class="si-set-title">🪨 The Five Seals</span>
+                <span class="si-set-count" id="si-set-cairns-count">0 / 5</span>
+              </div>
+              <div class="si-cairn-pips" id="si-cairn-pips"></div>
+            </div>
+            <div class="si-set-card" id="si-set-keepers">
+              <div class="si-set-head">
+                <span class="si-set-title">⚖️ Two Keepers Tribute</span>
+                <span class="si-set-count" id="si-set-keepers-count">0 / 2</span>
+              </div>
+              <div class="si-set-sub" id="si-set-keepers-sub">Falcon Weight &amp; Brass Ibis</div>
+            </div>
+            <div class="si-set-card" id="si-set-mirror" style="display: none;">
+              <div class="si-set-head">
+                <span class="si-set-title">🪞 The Living Mirror</span>
+                <span class="si-set-count" id="si-set-mirror-count">0 / 9</span>
+              </div>
+              <div class="si-set-sub" id="si-set-mirror-sub">Silvered glass shards of Tower III</div>
+            </div>
           </div>
         </div>
 
-        <!-- Right Column: Detail Inspector -->
+        <!-- Right Column: Tactile 3D Detail Inspector -->
         <div class="si-inspect-panel" id="si-inspect-panel">
-          <div class="si-inspect-art-wrap">
+          <div class="si-inspect-art-wrap" id="si-inspect-art-wrap">
+            <div class="si-art-glint" id="si-art-glint" aria-hidden="true"></div>
+            <div class="si-loupe-ring" id="si-loupe-ring" aria-hidden="true"></div>
+            <span class="si-face-badge" id="si-face-badge" hidden>INSCRIPTION · REVERSE</span>
             <img id="si-inspect-img" src="" alt="Item Artwork" class="si-inspect-img">
+          </div>
+          <div class="si-inspect-toolbar" id="si-inspect-toolbar" role="toolbar" aria-label="Relic examination tools">
+            <button type="button" class="si-tool-btn" id="btn-si-zoom" aria-pressed="false" aria-label="Examine relic with watchmaker loupe">
+              <span aria-hidden="true">🔍</span><span>Examine</span>
+            </button>
+            <button type="button" class="si-tool-btn" id="btn-si-flip" aria-pressed="false" aria-label="Flip relic to inspect reverse inscription">
+              <span aria-hidden="true">↻</span><span>Flip</span>
+            </button>
+            <button type="button" class="si-tool-btn si-tool-special" id="btn-si-special" hidden aria-label="Relic special action">
+              <span id="btn-si-special-label">✦ Inspect</span>
+            </button>
+            <button type="button" class="si-tool-btn" id="btn-si-locate" hidden aria-label="Locate origin on map">
+              <span aria-hidden="true">📍</span><span>Map</span>
+            </button>
+          </div>
+          <div class="si-reverse-box" id="si-reverse-box" hidden>
+            <div class="si-reverse-kicker">REVERSE ENGRAVING &amp; CLOSE INSPECTION</div>
+            <div class="si-reverse-text" id="si-reverse-text"></div>
           </div>
           <div class="si-inspect-meta">
             <div class="si-inspect-category" id="si-inspect-category">Category</div>
@@ -2492,6 +2559,13 @@
             <div class="si-inspect-origin" id="si-inspect-origin">Origin</div>
           </div>
           <div class="si-inspect-desc" id="si-inspect-desc">Select an item to view its lore and field notes.</div>
+          <div class="si-hermes-note-box" id="si-hermes-note-box">
+            <div class="si-hermes-note-head">
+              <span aria-hidden="true">🧭</span>
+              <span>HERMES'S FIELD NOTE</span>
+            </div>
+            <p class="si-hermes-note-text" id="si-hermes-note"></p>
+          </div>
         </div>
       </div>
     </div>

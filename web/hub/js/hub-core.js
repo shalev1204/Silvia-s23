@@ -43,17 +43,30 @@
           return window.hubChatMuted === true && document.body.getAttribute('data-active-view') === 'view-field-wire';
         }
 
+        // Current atmosphere of the Field Wire modulates telegraph resonance
+        _wireMood() {
+          const win = document.querySelector('.messenger-app-window');
+          return (win && win.dataset && win.dataset.mood) || 'dawn';
+        }
+
         // One soft, dry tick as each of Hermes's messages opens (the beats of the Field Wire): quiet enough to be heard for an hour
         playSoftTick() {
           window.__wireTicks = (window.__wireTicks || 0) + 1;
           if (this._muted()) return;
           try {
             this.init();
+            const mood = this._wireMood();
+            const curve = mood === 'night' ? [1280, 640]
+              : mood === 'fire' ? [880, 440]
+              : mood === 'lamp' ? [980, 510]
+              : mood === 'dusk' ? [1020, 520]
+              : mood === 'noon' ? [1160, 590]
+              : [1100, 560];
             const now = this.ctx.currentTime, osc = this.ctx.createOscillator(), gain = this.ctx.createGain(), lp = this.ctx.createBiquadFilter();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(1100, now);
-            osc.frequency.exponentialRampToValueAtTime(560, now + 0.08);
-            lp.type = 'lowpass'; lp.frequency.value = 2400;
+            osc.frequency.setValueAtTime(curve[0], now);
+            osc.frequency.exponentialRampToValueAtTime(curve[1], now + 0.08);
+            lp.type = 'lowpass'; lp.frequency.value = mood === 'fire' ? 1850 : 2400;
             gain.gain.setValueAtTime(0.0001, now);
             gain.gain.exponentialRampToValueAtTime(0.085, now + 0.004);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
@@ -68,10 +81,12 @@
           if (this._muted()) return;
           try {
             this.init();
+            const mood = this._wireMood();
+            const baseHz = mood === 'night' ? 2000 : mood === 'fire' ? 1450 : mood === 'lamp' ? 1850 : mood === 'dusk' ? 1650 : 1700;
             const now = this.ctx.currentTime, len = 0.022, buf = this.ctx.createBuffer(1, Math.ceil(this.ctx.sampleRate * len), this.ctx.sampleRate), d = buf.getChannelData(0);
             for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
             const src = this.ctx.createBufferSource(), bp = this.ctx.createBiquadFilter(), gain = this.ctx.createGain();
-            src.buffer = buf; bp.type = 'bandpass'; bp.frequency.value = 1700 + Math.random() * 1500; bp.Q.value = 1.4;
+            src.buffer = buf; bp.type = 'bandpass'; bp.frequency.value = baseHz + Math.random() * 1400; bp.Q.value = mood === 'night' ? 1.7 : 1.4;
             gain.gain.value = 0.16 + Math.random() * 0.05;
             src.connect(bp); bp.connect(gain); gain.connect(this.ctx.destination);
             src.start(now);
@@ -243,6 +258,334 @@
               osc.stop(noteTime + 2.25);
             });
           } catch(e) {}
+        }
+
+        _noiseBurst(duration, filterType, freqStart, freqEnd, q, vol, delay = 0) {
+          this.init();
+          const now = this.ctx.currentTime + delay;
+          const len = Math.max(1, Math.ceil(this.ctx.sampleRate * duration));
+          const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+          const data = buf.getChannelData(0);
+          for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 1.4);
+          const src = this.ctx.createBufferSource();
+          src.buffer = buf;
+          const flt = this.ctx.createBiquadFilter();
+          flt.type = filterType;
+          flt.frequency.setValueAtTime(freqStart, now);
+          if (freqEnd !== freqStart) flt.frequency.exponentialRampToValueAtTime(Math.max(40, freqEnd), now + duration);
+          flt.Q.value = q;
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(vol, now + Math.min(0.015, duration * 0.2));
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          src.connect(flt); flt.connect(gain); gain.connect(this.ctx.destination);
+          src.start(now);
+        }
+
+        playSatchelOpen() {
+          if (this._muted()) return;
+          try {
+            this._noiseBurst(0.14, 'bandpass', 420, 980, 1.4, 0.14, 0);
+            this.init();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(620, now + 0.04);
+            osc.frequency.exponentialRampToValueAtTime(1180, now + 0.11);
+            g.gain.setValueAtTime(0.0001, now + 0.04);
+            g.gain.linearRampToValueAtTime(0.07, now + 0.055);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+            osc.connect(g); g.connect(this.ctx.destination);
+            osc.start(now + 0.04); osc.stop(now + 0.16);
+          } catch (e) {}
+        }
+
+        playSatchelClose() {
+          if (this._muted()) return;
+          try {
+            this._noiseBurst(0.11, 'bandpass', 820, 280, 1.6, 0.13, 0);
+            this.init();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(220, now + 0.03);
+            osc.frequency.exponentialRampToValueAtTime(95, now + 0.13);
+            g.gain.setValueAtTime(0.11, now + 0.03);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+            osc.connect(g); g.connect(this.ctx.destination);
+            osc.start(now + 0.03); osc.stop(now + 0.15);
+          } catch (e) {}
+        }
+
+        playZoomLoupe(opening) {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(opening ? 520 : 880, now);
+            osc.frequency.exponentialRampToValueAtTime(opening ? 940 : 480, now + 0.09);
+            g.gain.setValueAtTime(0.07, now);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+            osc.connect(g); g.connect(this.ctx.destination);
+            osc.start(now); osc.stop(now + 0.12);
+          } catch (e) {}
+        }
+
+        playFlipRelic() {
+          if (this._muted()) return;
+          try {
+            this._noiseBurst(0.13, 'bandpass', 550, 1400, 1.8, 0.11, 0);
+          } catch (e) {}
+        }
+
+        playAureliaCodePulse() {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const base = this.ctx.currentTime;
+            // Canon pattern: 3 short, pause, 2 long (... --)
+            const beats = [[0, 0.075], [0.14, 0.075], [0.28, 0.075], [0.52, 0.24], [0.84, 0.24]];
+            beats.forEach(([off, dur]) => {
+              const osc = this.ctx.createOscillator();
+              const g = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(739.99, base + off);
+              g.gain.setValueAtTime(0.0001, base + off);
+              g.gain.linearRampToValueAtTime(0.085, base + off + 0.012);
+              g.gain.exponentialRampToValueAtTime(0.0001, base + off + dur);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(base + off); osc.stop(base + off + dur + 0.03);
+            });
+          } catch (e) {}
+        }
+
+        playRelicFoley(relicId, isHalfOil = false) {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            if (/^seal_cairn_|^statue_seal$|^tuning_pebble$/.test(relicId)) {
+              this._noiseBurst(0.09, 'bandpass', 380, 190, 2.1, 0.12, 0);
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(125, now);
+              osc.frequency.exponentialRampToValueAtTime(68, now + 0.11);
+              g.gain.setValueAtTime(0.16, now);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now); osc.stop(now + 0.13);
+            } else if (/^surveyor_compass$|^falcon_weight$|^ibis_figure$|^servant_coin$|^servant_key$|^signal_mirror$|^spyglass_lens$|^flint_tinder$/.test(relicId)) {
+              const partials = relicId === 'surveyor_compass' ? [980, 1520, 2340] : [760, 1180, 1890];
+              partials.forEach((f, idx) => {
+                const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+                osc.type = idx === 0 ? 'triangle' : 'sine';
+                osc.frequency.setValueAtTime(f, now);
+                g.gain.setValueAtTime(0.06 / (idx + 1), now);
+                g.gain.exponentialRampToValueAtTime(0.0001, now + (0.28 - idx * 0.06));
+                osc.connect(g); g.connect(this.ctx.destination);
+                osc.start(now); osc.stop(now + 0.3);
+              });
+              if (relicId === 'flint_tinder') this._noiseBurst(0.05, 'highpass', 2400, 3200, 1.2, 0.09, 0.01);
+            } else if (relicId === 'water_skins' || relicId === 'lamp_oil') {
+              this._noiseBurst(0.12, 'lowpass', 720, 340, 1.1, 0.10, 0);
+              const f1 = isHalfOil ? 230 : 320, f2 = isHalfOil ? 340 : 490;
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(f1, now + 0.02);
+              osc.frequency.exponentialRampToValueAtTime(f2, now + 0.10);
+              osc.frequency.exponentialRampToValueAtTime(f1 * 0.9, now + 0.17);
+              g.gain.setValueAtTime(0.0001, now + 0.02);
+              g.gain.linearRampToValueAtTime(0.08, now + 0.05);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now + 0.02); osc.stop(now + 0.19);
+            } else if (/^mirror_fragment_/.test(relicId)) {
+              [1567.98, 2093.00].forEach((f, idx) => {
+                const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(f, now + idx * 0.035);
+                g.gain.setValueAtTime(0.05, now + idx * 0.035);
+                g.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+                osc.connect(g); g.connect(this.ctx.destination);
+                osc.start(now + idx * 0.035); osc.stop(now + 0.48);
+              });
+            } else if (relicId === 'red_cord') {
+              this._noiseBurst(0.08, 'bandpass', 950, 620, 1.5, 0.08, 0);
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(196, now);
+              osc.frequency.exponentialRampToValueAtTime(145, now + 0.14);
+              g.gain.setValueAtTime(0.075, now);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now); osc.stop(now + 0.16);
+            } else if (relicId === 'order_wax_seal') {
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(340, now);
+              osc.frequency.exponentialRampToValueAtTime(115, now + 0.05);
+              g.gain.setValueAtTime(0.14, now);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now); osc.stop(now + 0.06);
+            } else {
+              // Feather, gilded star, paper artifacts
+              this._noiseBurst(0.09, 'highpass', 1900, 1200, 1.1, 0.06, 0);
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(659.25, now + 0.02);
+              g.gain.setValueAtTime(0.045, now + 0.02);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now + 0.02); osc.stop(now + 0.38);
+            }
+          } catch (e) {}
+        }
+
+        // Brass telegraph confirmation chirp when Silvia transmits a reply (✓✓)
+        playSilviaDispatch() {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            [[0, 760, 0.045], [0.065, 1020, 0.065]].forEach(([off, hz, dur]) => {
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(hz, now + off);
+              g.gain.setValueAtTime(0.0001, now + off);
+              g.gain.linearRampToValueAtTime(0.085, now + off + 0.006);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + off + dur);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now + off); osc.stop(now + off + dur + 0.02);
+            });
+          } catch (e) {}
+        }
+
+        // Analog carrier static crackle & hollow ash tone for the intercepted BC Ashes line
+        playWireInterceptStatic() {
+          if (this._muted()) return;
+          try {
+            this._noiseBurst(0.38, 'bandpass', 2600, 820, 2.2, 0.09, 0);
+            this.init();
+            const now = this.ctx.currentTime, osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(311.13, now + 0.06);
+            osc.frequency.exponentialRampToValueAtTime(220, now + 0.48);
+            g.gain.setValueAtTime(0.0001, now + 0.06);
+            g.gain.linearRampToValueAtTime(0.06, now + 0.09);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.52);
+            osc.connect(g); g.connect(this.ctx.destination);
+            osc.start(now + 0.06); osc.stop(now + 0.54);
+          } catch (e) {}
+        }
+
+        // Crisp brass vernier detents for Signal Telemetry & Chapter Index UI
+        playTelemetryLock() {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            [[0, 528], [0.035, 792]].forEach(([off, hz]) => {
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(hz, now + off);
+              g.gain.setValueAtTime(0.055, now + off);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + off + 0.045);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now + off); osc.stop(now + off + 0.055);
+            });
+          } catch (e) {}
+        }
+
+        // Gentle galvanic coil hum while Hermes is operating the telegraph coils
+        playCoilHum(active) {
+          try {
+            if (this._coilTimer) { clearTimeout(this._coilTimer); this._coilTimer = null; }
+            if (this._coilNodes) {
+              const prev = this._coilNodes;
+              this._coilNodes = null;
+              if (this.ctx) {
+                const t = this.ctx.currentTime;
+                prev.g.gain.cancelScheduledValues(t);
+                prev.g.gain.setValueAtTime(Math.max(0.0001, prev.g.gain.value), t);
+                prev.g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+                setTimeout(() => { prev.oscs.forEach((o) => { try { o.stop(); } catch (e) {} }); }, 120);
+              }
+            }
+            if (!active || this._muted()) return;
+            this.init();
+            const now = this.ctx.currentTime;
+            const o1 = this.ctx.createOscillator(), o2 = this.ctx.createOscillator();
+            const lp = this.ctx.createBiquadFilter(), g = this.ctx.createGain();
+            o1.type = 'sine'; o1.frequency.value = 110;
+            o2.type = 'triangle'; o2.frequency.value = 220;
+            lp.type = 'lowpass'; lp.frequency.value = 340;
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.linearRampToValueAtTime(0.016, now + 0.08);
+            o1.connect(lp); o2.connect(lp); lp.connect(g); g.connect(this.ctx.destination);
+            o1.start(now); o2.start(now);
+            this._coilNodes = { oscs: [o1, o2], g };
+            this._coilTimer = setTimeout(() => this.playCoilHum(false), 2600);
+          } catch (e) {}
+        }
+
+        // Parchment rustle when opening a journal sheet preview or full-page viewer
+        playPaperRustle() {
+          if (this._muted()) return;
+          try {
+            this._noiseBurst(0.11, 'bandpass', 1500, 4200, 1.0, 0.075, 0);
+            this._noiseBurst(0.09, 'bandpass', 2200, 5200, 1.1, 0.055, 0.05);
+          } catch (e) {}
+        }
+
+        // Warm bronze bell chime when a live expedition march finishes on screen
+        playMarchArrivalBell() {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            [528, 792, 1056].forEach((hz, idx) => {
+              const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(hz, now + idx * 0.05);
+              g.gain.setValueAtTime(0.0001, now + idx * 0.05);
+              g.gain.linearRampToValueAtTime(0.075 / (idx + 1), now + idx * 0.05 + 0.012);
+              g.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.05 + 1.05);
+              osc.connect(g); g.connect(this.ctx.destination);
+              osc.start(now + idx * 0.05); osc.stop(now + idx * 0.05 + 1.1);
+            });
+          } catch (e) {}
+        }
+
+        // Wax thud + warm bronze overtone when stamping a new chapter card
+        playWaxSealStamp() {
+          if (this._muted()) return;
+          try {
+            this.init();
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(135, now);
+            osc.frequency.exponentialRampToValueAtTime(52, now + 0.09);
+            g.gain.setValueAtTime(0.16, now);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+            osc.connect(g); g.connect(this.ctx.destination);
+            osc.start(now); osc.stop(now + 0.12);
+            this._noiseBurst(0.07, 'bandpass', 720, 320, 1.5, 0.08, 0.01);
+            [440, 659.25].forEach((hz, i) => {
+              const b = this.ctx.createOscillator(), bg = this.ctx.createGain();
+              b.type = 'sine'; b.frequency.setValueAtTime(hz, now + 0.05 + i * 0.04);
+              bg.gain.setValueAtTime(0.04, now + 0.05 + i * 0.04);
+              bg.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+              b.connect(bg); bg.connect(this.ctx.destination);
+              b.start(now + 0.05 + i * 0.04); b.stop(now + 0.5);
+            });
+          } catch (e) {}
         }
       }
 
@@ -5990,16 +6333,21 @@
         return localStorage.getItem(rule.key) === 'true';
       }
 
-      // Physical Journal Callout Highlight Helper: Natural Illuminated Citation
+      // Physical Journal Callout Highlight Helper: Natural Illuminated Citation + Cipher Equations
       function formatJournalCallouts(text) {
         if (!text) return '';
-        return text.replace(/\bSheet\s+([0-9]+[A-Za-z]?)\b/gi, (match, sheet) => {
+        const linked = text.replace(/\bSheet\s+([0-9]+[A-Za-z]?)\b/gi, (match, sheet) => {
           const key = sheet.toUpperCase();
           return `<span class="journal-ref-pill" role="button" tabindex="0" data-sheet="${key}" aria-haspopup="dialog" title="Open details for Sheet ${key}"><span class="pill-icon">📖</span> Sheet ${key}</span>`;
         }).replace(/“([^”<]+)”/g, (match, title) => {
           // A page named by its printed title, “The Whispering Chasm”, opens the same card
           const key = Object.keys(JOURNAL_SHEETS).find((k) => JOURNAL_SHEETS[k].title === title);
           return key ? `<span class="journal-ref-pill" role="button" tabindex="0" data-sheet="${key}" aria-haspopup="dialog" title="Open details for the page ${title}"><span class="pill-icon">📖</span> ${title}</span>` : match;
+        });
+        return linked.replace(/(<[^>]+>)|(\[[A-Z]\]\s*[+\-−×]\s*(?:\[[A-Z]\]|\d+)\s*=\s*(?:\[[A-Z]\]|\d+)|(?<!\[)\b[A-Z]\s*[+\-−×]\s*(?:[A-Z]|\d+)\s*=\s*(?:[A-Z]|\d+)\b)/g, (m, tag, eq) => {
+          if (tag) return tag;
+          const clean = eq.replace(/"/g, '&quot;');
+          return `<span class="ledger-eq-pill" role="button" tabindex="0" data-eq="${clean}" aria-haspopup="dialog" title="Inspect equation in The Cipher Ledger">${eq}</span>`;
         });
       }
 
@@ -6059,6 +6407,7 @@
       }
       function openPageViewer(info, from) {
         closeSheetPopover(); closePageViewer();
+        if (sfx && typeof sfx.playPaperRustle === 'function') { try { sfx.playPaperRustle(); } catch (e) {} }
         const v = document.createElement('div');
         v.className = 'journal-page-viewer';
         v.setAttribute('role', 'dialog');
@@ -6080,12 +6429,29 @@
       }, true);
       window.openJournalPage = (key, from) => { const info = JOURNAL_SHEETS[key]; if (info && info.page) openPageViewer(info, from); };
 
+      function positionSheetPopover(el, anchor) {
+        if (!el || !anchor || !anchor.getBoundingClientRect) return;
+        const r = anchor.getBoundingClientRect();
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        const left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
+        let top = r.bottom + 10;
+        if (top + h > window.innerHeight - 12) top = Math.max(12, r.top - h - 10);
+        el.style.left = left + 'px';
+        el.style.top = top + 'px';
+      }
+      function escapeWireHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
       function openSheetPopover(pill) {
         closeSheetPopover();
         const key = pill.getAttribute('data-sheet') || '';
         const info = JOURNAL_SHEETS[key] || JOURNAL_SHEETS[key.replace(/[A-Z]$/, '')] || null;
         // inside a game the pill opens the printed page straight away
         if (info && info.page && pill.getAttribute('data-open') === 'page') { openPageViewer(info, pill); return; }
+        if (sfx && typeof sfx.playPaperRustle === 'function') { try { sfx.playPaperRustle(); } catch (e) {} }
         // a page that became a scene (the dream of 1998, the spyglass on the bridge) can be lived again once it has been
         const sceneOpen = !info || !info.scene ? null
           : info.scene === 'dream' ? (window.StonesDream && window.StonesDream.done() ? window.openStonesDreamModal : null)
@@ -6105,15 +6471,7 @@
           ${info && info.nodeLabel ? `<button type="button" class="jsp-go">🗺️ ${info.nodeLabel} ➔</button>` : ''}
         `;
         document.body.appendChild(el);
-
-        const r = pill.getBoundingClientRect();
-        const w = el.offsetWidth;
-        const h = el.offsetHeight;
-        const left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
-        let top = r.bottom + 10;
-        if (top + h > window.innerHeight - 12) top = Math.max(12, r.top - h - 10);
-        el.style.left = left + 'px';
-        el.style.top = top + 'px';
+        positionSheetPopover(el, pill);
 
         el.querySelector('.jsp-close').addEventListener('click', closeSheetPopover);
         const pg = el.querySelector('.jsp-page:not(.jsp-scene)');
@@ -6136,7 +6494,75 @@
         sheetPopoverAnchor = pill;
       }
 
-      // Capture phase: a sheet pill inside a reply button must open its card, not send the reply
+      function openLedgerEqPopover(pill) {
+        closeSheetPopover();
+        const eq = pill.getAttribute('data-eq') || pill.textContent.trim();
+        const vars = [];
+        const reVar = /\[([A-Z])\]|\b([A-Z])\b/g;
+        let m;
+        while ((m = reVar.exec(eq)) !== null) {
+          const ch = m[1] || m[2];
+          if (ch && !vars.includes(ch)) vars.push(ch);
+        }
+        const ledger = window.EclipseLedger;
+        let solvedCount = 0;
+        const varsHtml = vars.map((ch) => {
+          const rawVal = (ledger && typeof ledger.value === 'function') ? ledger.value(ch) : undefined;
+          const isSet = (rawVal !== undefined && rawVal !== null && rawVal !== '');
+          if (isSet) solvedCount += 1;
+          return `<span class="leq-var-pill${isSet ? ' is-set' : ''}">${ch} = ${isSet ? escapeWireHtml(rawVal) : '?'}</span>`;
+        }).join('');
+        const noteText = vars.length === 0
+          ? 'Open The Cipher Ledger to record and balance this clue.'
+          : (solvedCount === vars.length
+            ? 'All letters in this equation have entries in your Cipher Ledger.'
+            : `${solvedCount} of ${vars.length} letters currently entered in your Cipher Ledger.`);
+        const el = document.createElement('div');
+        el.className = 'journal-sheet-popover ledger-eq-popover';
+        el.setAttribute('role', 'dialog');
+        el.setAttribute('aria-label', 'Cipher Ledger equation ' + eq);
+        el.innerHTML = `
+          <button type="button" class="jsp-close" aria-label="Close">✕</button>
+          <div class="jsp-kicker">🔐 Cipher Ledger · Equation</div>
+          <div class="jsp-title" style="font-family:'JetBrains Mono',monospace;">${escapeWireHtml(eq)}</div>
+          ${varsHtml ? `<div class="leq-vars">${varsHtml}</div>` : ''}
+          <div class="jsp-note">${noteText}</div>
+          <button type="button" class="jsp-go jsp-ledger">🔑 Open in Cipher Ledger ➔</button>
+        `;
+        document.body.appendChild(el);
+        positionSheetPopover(el, pill);
+        el.querySelector('.jsp-close').addEventListener('click', closeSheetPopover);
+        const goLedger = el.querySelector('.jsp-ledger');
+        if (goLedger) {
+          goLedger.addEventListener('click', () => {
+            closeSheetPopover();
+            activateHubView('view-cipher');
+          });
+        }
+        sheetPopover = el;
+        sheetPopoverAnchor = pill;
+      }
+
+      function openForensicInterceptPopover(sealBtn) {
+        closeSheetPopover();
+        const el = document.createElement('div');
+        el.className = 'journal-sheet-popover wire-forensic-popover';
+        el.setAttribute('role', 'dialog');
+        el.setAttribute('aria-label', 'Forensic carrier anomaly inspection');
+        el.innerHTML = `
+          <button type="button" class="jsp-close" aria-label="Close">✕</button>
+          <div class="jsp-kicker">⚡ Carrier Anomaly · Intrusion Seal</div>
+          <div class="jsp-title">The Mark of Ash (⊖)</div>
+          <div class="jsp-note">An inductive tap bled across the canyon carrier on 41.8 kHz. This packet did not originate from Hermes's brass key: an unknown relay bearing the Seal of Ash cut across the wire and vanished before bearing triangulation could lock.</div>
+        `;
+        document.body.appendChild(el);
+        positionSheetPopover(el, sealBtn);
+        el.querySelector('.jsp-close').addEventListener('click', closeSheetPopover);
+        sheetPopover = el;
+        sheetPopoverAnchor = sealBtn;
+      }
+
+      // Capture phase: pills or seals inside a bubble/button must open their card, not send the reply
       document.addEventListener('click', (e) => {
         const pill = e.target.closest ? e.target.closest('.journal-ref-pill') : null;
         if (pill) {
@@ -6146,15 +6572,38 @@
           else openSheetPopover(pill);
           return;
         }
+        const eqPill = e.target.closest ? e.target.closest('.ledger-eq-pill') : null;
+        if (eqPill) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (sheetPopoverAnchor === eqPill) closeSheetPopover();
+          else openLedgerEqPopover(eqPill);
+          return;
+        }
+        const sealBtn = e.target.closest ? e.target.closest('.wire-intercept-seal') : null;
+        if (sealBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (sheetPopoverAnchor === sealBtn) closeSheetPopover();
+          else openForensicInterceptPopover(sealBtn);
+          return;
+        }
         if (sheetPopover && !e.target.closest('.journal-sheet-popover')) closeSheetPopover();
       }, true);
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeSheetPopover();
-        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('journal-ref-pill')) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (sheetPopoverAnchor === e.target) closeSheetPopover();
-          else openSheetPopover(e.target);
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.classList) {
+          if (e.target.classList.contains('journal-ref-pill')) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (sheetPopoverAnchor === e.target) closeSheetPopover();
+            else openSheetPopover(e.target);
+          } else if (e.target.classList.contains('ledger-eq-pill')) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (sheetPopoverAnchor === e.target) closeSheetPopover();
+            else openLedgerEqPopover(e.target);
+          }
         }
       }, true);
       window.addEventListener('scroll', closeSheetPopover, { passive: true });
@@ -6357,19 +6806,19 @@
           id: "seal_cairn_1",
           name: "The Seal of Cairn I · Wash River",
           category: "Sacred Seal",
-          image: "assets/chat/sketch_cairn_one.webp",
+          image: "assets/items/item_seal_cairn_1.png",
           origin: "Wadi al-Hajar · Under Foundation of Cairn I",
-          summary: "A flat sandstone disc carved with the radiant sun above a wavy water line.",
-          lore: "Discovered inside the hollow bedrock beneath the third foundation of Cairn I after solving the ancient river stone trial. Its purpose is still unknown."
+          summary: "A carved sandstone medallion rimmed in weathered bronze, bearing four stacked river stones over bronze waves beneath a radiant sun.",
+          lore: "Lifted from the hollow bedrock beneath the third foundation of Cairn I after solving the river stone trial. Its ochre face is inlaid with undulating bronze river waves, the four stacked stones of the cairn, and a sunburst ringed by a graduated celestial bronze bezel marked 'I'. Deep interlocking notches along its rim mark it as the first keystone seal of the Great Circuit."
         },
         seal_cairn_2: {
           id: "seal_cairn_2",
           name: "The Seal of Cairn II · Sun Monolith",
           category: "Sacred Seal",
-          image: "assets/items/item_seal_cairn_2.svg",
+          image: "assets/items/item_seal_cairn_2.png",
           origin: "The Ridge of the Sun · Station 14 · Oct 2026",
-          summary: "A sandstone disc carved with a sun over a standing stone, with seven noon marks around the rim.",
-          lore: "It came out of the foot of the Sun Monolith once the seven noons had been set right. The stone makes the shadow, and the shadow tells the hour: that is all the carving says, and it says it plainly. Hermes keeps it next to the Seal of Cairn I."
+          summary: "A notched reddish-sandstone seal rimmed in bronze, carved with the Sun Monolith, its diagonal shadow line and a hammered bronze sun.",
+          lore: "Claimed from the sliding cavity of Cairn II once the sun walked its day across the ridge and the four shadows woke the marks. Framed in a notched bronze bezel with verdigris patina and the Roman numeral 'II', its bas-relief monolith casts a diagonal meridian shadow line under a radiant bronze sun. Hermes keeps it beside the Seal of Cairn I as the second key of the Great Circuit."
         },
         seal_cairn_3: {
           id: "seal_cairn_3",
@@ -6611,6 +7060,31 @@
         if (!own && at >= 0) list.splice(at, 1);
       }
 
+      const UNSEEN_RELICS_KEY = 'eclipse_cloud_inv_unseen';
+      function getUnseenRelics() {
+        try {
+          const p = JSON.parse(localStorage.getItem(UNSEEN_RELICS_KEY) || '[]');
+          return Array.isArray(p) ? p : [];
+        } catch (e) { return []; }
+      }
+      function setUnseenRelics(arr) {
+        try { localStorage.setItem(UNSEEN_RELICS_KEY, JSON.stringify(arr)); } catch (e) {}
+        updateInventoryNewDot();
+      }
+      function markRelicSeen(id) {
+        if (!id) return;
+        const cur = getUnseenRelics();
+        if (!cur.includes(id)) return;
+        setUnseenRelics(cur.filter((x) => x !== id));
+      }
+      function updateInventoryNewDot() {
+        const dot = document.getElementById('bsi-new-dot');
+        if (!dot) return;
+        const owned = getOwnedRelicIds();
+        const hasNew = getUnseenRelics().some((id) => owned.includes(id));
+        dot.style.display = hasNew ? 'inline-block' : 'none';
+      }
+
       function addRelicToInventory(relicId) {
         if (!relicId) return;
         const list = getOwnedRelicIds();
@@ -6619,6 +7093,11 @@
           try {
             localStorage.setItem('order_inventory_relics', JSON.stringify(list));
           } catch(e) {}
+          const unseen = getUnseenRelics();
+          if (!unseen.includes(relicId)) {
+            unseen.push(relicId);
+            setUnseenRelics(unseen);
+          }
         }
         updateInventoryBadge();
       }
@@ -6634,6 +7113,7 @@
             } catch (e) {}
           }
         });
+        markRelicSeen(relicId);
         updateInventoryBadge();
       }
       window.dropRelic = removeRelicFromInventory;
@@ -6644,6 +7124,7 @@
         if (!badge) return;
         const list = getOwnedRelicIds();
         badge.textContent = list.length.toString();
+        updateInventoryNewDot();
       }
       window.syncLampOil = function () {
         updateInventoryBadge();
@@ -6744,24 +7225,492 @@
       window.showItemRelinquishedAnimation = showItemRelinquishedAnimation;
 
       let selectedInventoryItemId = 'gilded_feather';
+      let currentInventoryFilter = 'all';
+      let isInspectZoomed = false;
+      let isInspectFlipped = false;
+      let isOilBeforePreview = false;
+      let satchelInteractionsWired = false;
+
+      const RELIC_EXTRAS = {
+        gilded_feather: {
+          filterGroup: 'relic',
+          nodeId: 2,
+          inscription: 'Gold leaf from the Alpine Observatory terrace · dipped before the September flight across the peaks.',
+          hermesNote: () => localStorage.getItem('order_masks_gate_completed') === 'true'
+            ? 'Strange, Silvia... look at this violet feather from September, and think of the tiny gilded feather we found resting on the Living Mirror in Tower III. The same gold leaf.'
+            : 'My last carrier pigeon flew over the Alps in a gale with this feather at its collar. Keep it close — gold never forgets where it was gilded.'
+        },
+        order_wax_seal: {
+          filterGroup: 'seal',
+          nodeId: 1,
+          inscription: 'Embossed brass-die impression in cinnabar wax · Half-light Eclipse (◐) ringed by the 24 celestial markings.',
+          hermesNote: () => 'The Order never writes twice, Silvia. When I broke the twin wax die in our mountain vault, I knew the binding around your journal would only yield to your hands.'
+        },
+        surveyor_compass: {
+          filterGroup: 'tool',
+          nodeId: 8,
+          inscription: 'Inside brass lid: "WADI AL-HAJAR SURVEY · OCT 1998 · BEARING 112° E TO WATCHTOWER VI"',
+          hermesNote: () => localStorage.getItem('order_sandstone_labyrinth_completed') === 'true'
+            ? 'Eight-and-twenty years in a dry rock shelf, and that blued-steel needle did not rust a hair. First it brought me out of the red storm; then it stood beside the twin plate under Cairn III.'
+            : 'I can still feel the cold 1998 copper plate under my fingers in the wash. Keep the needle steady: 112° East always brings us home.'
+        },
+        flint_tinder: {
+          filterGroup: 'tool',
+          nodeId: 8,
+          inscription: 'Stamped tang on the steel striker: "1998 BENCHMARK CACHE" · dry alpine juniper tinder root.',
+          hermesNote: () => 'That spark saved my fingers from freezing inside Watchtower VI while the storm tore at the shutters.'
+        },
+        spyglass_lens: {
+          filterGroup: 'tool',
+          nodeId: 8,
+          inscription: 'Scorched brass collar · optical curvature ground to project the eclipse path; faint ash smudge along the bevel.',
+          hermesNote: () => 'Whoever dropped this glass on the bluff knew how to calculate the Grand Eclipse curves. Hold it carefully — the edge is still sharp.'
+        },
+        seal_cairn_1: {
+          filterGroup: 'seal',
+          nodeId: 22,
+          inscription: 'Socket rim notched at 30° intervals · Chiseled base numeral: [ I ] · Four river stones above running water.',
+          hermesNote: () => localStorage.getItem('order_gates_scene_completed') === 'true'
+            ? 'At the gates of Tower II, the Servant slid this stone twin right into the first arch socket and nodded toward the dunes. Four sockets still wait across the desert.'
+            : 'I followed a strange certainty down the dry riverbed at dawn and found it buried under silt. My hand knew those stacked river stones before my memory did.'
+        },
+        water_skins: {
+          filterGroup: 'tool',
+          nodeId: 12,
+          inscription: 'Four goatskin flasks sealed with tallow, leather thongs, and turned brass spouts · Spring temperature: cold.',
+          hermesNote: () => localStorage.getItem('order_sun_monolith_completed') === 'true'
+            ? 'Half spent on the Great Erg dunes, yet every drop left in those four skins tastes of alpine rock and saved us at the Monolith.'
+            : 'Under the rock falcon at Camp VIII, cold mountain air hissed through a cleft. Four full skins are all the wealth we carry across the Great Erg.'
+        },
+        falcon_weight: {
+          filterGroup: 'relic',
+          nodeId: 12,
+          inscription: 'Weighted cylindrical base etched with tallies and eclipse notches · Twin counterweight to a bronze ibis.',
+          hermesNote: () => {
+            const hasIbis = getOwnedRelicIds().includes('ibis_figure');
+            const hasStatue = getOwnedRelicIds().includes('statue_seal');
+            if (hasStatue) return 'So the Falcon and the Ibis really were twin keys for the stone keepers at the gates of Tower II.';
+            if (hasIbis) return 'Look! The base notches on the Falcon match the Brass Ibis we pulled from the Monolith slab. Together they belong to the statues at Tower II!';
+            return 'The weight sits heavier in my palm than mere brass ought to. The horus-falcon looks as though it expects a second bird beside it in the dark.';
+          }
+        },
+        lamp_oil: {
+          filterGroup: 'tool',
+          nodeId: 12,
+          inscription: 'Astronomical meridian lines & star arcs chased around the brass belly · Sealed at Camp VIII cache.',
+          hermesNote: () => {
+            const shared = (window.GatesRoad && window.GatesRoad.flags && window.GatesRoad.flags().nightOil === 'shared') ||
+              (function () { try { return JSON.parse(localStorage.getItem('order_gates_flags') || '{}').nightOil === 'shared'; } catch (e) { return false; } })();
+            return shared
+              ? 'We unsealed the wax at 02:40 in the deep night to share light with a traveller lost on the Erg. Half a flask left — and his shadow clue at the Monolith repaid it twice over.'
+              : 'Still corked and nearly brim-full from the nomads\' cache in the cleft. On night roads without moon, every drop of this oil is hours of sight.';
+          }
+        },
+        red_cord: {
+          filterGroup: 'relic',
+          nodeId: 27,
+          inscription: '12 wool knots spaced evenly along madder-dyed cord · Brass rings chased with lunar & solar ticks.',
+          hermesNote: () => '"Red for the road," the old Servant told me as he untied it from his iron staff. Twelve evenly knotted spans — at arm\'s length, a fist plus a little measures 14° off Polaris.'
+        },
+        servant_coin: {
+          filterGroup: 'relic',
+          nodeId: 27,
+          inscription: 'Outer degree ring around a split disc: half burnished light, half hammered shadow · Keyhole center.',
+          hermesNote: () => 'The keepers are sworn to tell one falsehood to every stranger at the steps, and almost nobody catches it. Show this heavy bronze coin to whoever seeks the Servant if fire rises over his tower.'
+        },
+        ibis_figure: {
+          filterGroup: 'relic',
+          nodeId: 23,
+          inscription: 'Dark basalt base cut with three water-ripple glyphs (≈) · Beak sharpened like a reed scribe\'s pen.',
+          hermesNote: () => getOwnedRelicIds().includes('statue_seal')
+            ? 'The Ibis of the Monolith and the Falcon of Camp VIII unlocked the stone keepers\' riddle cleanly.'
+            : 'Under the Ibis slab at the Monolith! Now both desert birds sit in our satchel — I wonder what the two stone keepers at Tower II will say when we place Falcon and Ibis before them.'
+        },
+        statue_seal: {
+          filterGroup: 'seal',
+          nodeId: 27,
+          inscription: 'Twin reliefs of falcon and ibis beneath a radiant disc · Sacred sixth medallion of the Threshold.',
+          hermesNote: () => 'The five cairns open the outer road; this sixth stone medallion is for the keepers who watched whether we noticed the quiet details on the steps.'
+        },
+        seal_cairn_2: {
+          filterGroup: 'seal',
+          nodeId: 23,
+          inscription: 'Notched rim stamped [ II ] · Bas-relief obelisk casting a diagonal noon shadow line beneath hammered bronze sun.',
+          hermesNote: () => localStorage.getItem('order_sun_monolith_completed') === 'true'
+            ? 'Someone left fresh charcoal ash and scrapes around the lid before us — the BC Ashes tried to force Cairn II without waking the four shadows, and failed.'
+            : 'Cut from red desert sandstone to lock directly into the second socket of the Tower II arch.'
+        },
+        seal_cairn_3: {
+          filterGroup: 'seal',
+          nodeId: 24,
+          inscription: 'Square bronze labyrinth track coiled inward from the rim · Reverse bearing mark: 348° NNW.',
+          hermesNote: () => 'Hidden beneath my own 1998 copper plate under Cairn III! The founders aligned it strictly to 348° NNW before the earthquake ever shook the canyon.'
+        },
+        tuning_pebble: {
+          filterGroup: 'relic',
+          nodeId: 25,
+          inscription: 'Fresh ultramarine lapis paint sealed beneath beeswax with an 8-point gold leaf star · Pulses: ··· ——',
+          hermesNote: () => localStorage.getItem('order_oracle_horizon_completed') === 'true'
+            ? 'Aurelia painted this lapis pebble with her own squirrel-hair brush and wedged it into the Left Pillar throat so Cairn IV would sing our secret code to the wind.'
+            : 'The cairn bronze reeds are centuries old, Silvia, but this blue pebble is newly painted gold over crushed lapis... Only one hand I ever knew ground lapis lazuli like this.'
+        },
+        seal_cairn_4: {
+          filterGroup: 'seal',
+          nodeId: 25,
+          inscription: 'Bas-relief natural arch framing twin singing pillars and three acoustic resonance arcs.',
+          hermesNote: () => 'Won in the canyon dark by listening to echoes rebound between sandstone cliffs — SUN · ECHO · STONE, the three words of how the Order measures the world.'
+        },
+        signal_mirror: {
+          filterGroup: 'tool',
+          nodeId: 26,
+          inscription: 'Speculum bronze mirror framed in solar rays · Eclipse emblem (◐) chased at crown · Reflects ··· —— cleanly.',
+          hermesNote: () => 'Somebody polished this mirror recently under the Solar Altar, Silvia. And when I flashed the night sky across Tower II, someone on the battlements answered our exact code!'
+        },
+        seal_cairn_5: {
+          filterGroup: 'seal',
+          nodeId: 26,
+          inscription: 'Solar arch with eight converging summer dawn rays cast toward the central bronze ring.',
+          hermesNote: () => 'The fifth and final cairn seal! With I through V safe in our satchel, the bronze doors of the Oracle can no longer stay closed against us.'
+        },
+        servant_key: {
+          filterGroup: 'relic',
+          nodeId: 13,
+          inscription: 'Heavy cast-bronze warded bit · Bow perforated in a crisp 5 × 5 Polybius grid.',
+          hermesNote: () => 'Still warm from the burning library well in Tower II. Its 5 × 5 grid unlocks the inner stairwell down to the chamber beneath the sanctuary.'
+        },
+        gilded_star: {
+          filterGroup: 'relic',
+          nodeId: 14,
+          inscription: 'Hand-ground lapis lazuli card inlaid with hammered 24k gold leaf and pure lead-white tips.',
+          hermesNote: () => '"For the navigator who brought him back," Aurelia whispered while painting the white tips with held breath. Keep it beside your compass always, Silvia.'
+        },
+        mirror_fragment_1: {
+          filterGroup: 'relic',
+          nodeId: 40,
+          inscription: 'Beveled Venetian glass backed in tin-mercury amalgam · Scratched behind: half-lit face & reversed horizontal line.',
+          hermesNote: () => 'Silvered clean without tarnish despite the dust of Tower III. It mirrors truth only when you refuse to trust the golden deceits.'
+        },
+        mirror_fragment_2: {
+          filterGroup: 'relic',
+          nodeId: 41,
+          inscription: 'Silvery shard holding the ghost image of an inverted walled town of slender towers.',
+          hermesNote: () => 'Look sideways into the amalgam at candlelight — the chimney smoke from the Camera Obscura wall still lingers inside the glass.'
+        },
+        mirror_fragment_3: {
+          filterGroup: 'relic',
+          nodeId: 42,
+          inscription: 'Etched elliptical focal arcs along the bevel · Resounds softly when sung in reverse.',
+          hermesNote: () => 'Three shards recovered out of nine. Every gallery whisper and mirrored bell brings the whole Mirror of Tower III closer to waking.'
+        }
+      };
+
+      function getRelicExtra(id) {
+        return RELIC_EXTRAS[id] || {
+          filterGroup: 'relic',
+          nodeId: null,
+          inscription: 'Authentic Order artifact cataloged during the 2026 expedition.',
+          hermesNote: () => 'Keep this safely stowed in the expedition satchel — every thread connects before the Vault opens.'
+        };
+      }
+
+      function renderInventorySets(owned) {
+        const setCairns = document.getElementById('si-set-cairns');
+        const pipsWrap = document.getElementById('si-cairn-pips');
+        const cairnsCount = document.getElementById('si-set-cairns-count');
+        const cairnIds = ['seal_cairn_1', 'seal_cairn_2', 'seal_cairn_3', 'seal_cairn_4', 'seal_cairn_5'];
+        const romans = ['I', 'II', 'III', 'IV', 'V'];
+        const ownedCairns = cairnIds.filter((id) => owned.includes(id));
+
+        if (cairnsCount) cairnsCount.textContent = `${ownedCairns.length} / 5`;
+        if (setCairns) setCairns.classList.toggle('is-complete', ownedCairns.length === 5);
+
+        if (pipsWrap) {
+          pipsWrap.innerHTML = '';
+          cairnIds.forEach((cid, idx) => {
+            const has = owned.includes(cid);
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'si-cairn-pip' + (has ? ' is-owned' : '');
+            b.textContent = romans[idx];
+            if (!has) {
+              b.disabled = true;
+              b.setAttribute('aria-label', `Seal of Cairn ${romans[idx]} not yet recovered`);
+              b.title = `Cairn ${romans[idx]} Seal (Locked)`;
+            } else {
+              b.setAttribute('aria-label', `Inspect Seal of Cairn ${romans[idx]}`);
+              b.title = `Inspect Seal of Cairn ${romans[idx]}`;
+              b.addEventListener('click', () => inspectInventoryItem(cid, { playFoley: true }));
+            }
+            pipsWrap.appendChild(b);
+          });
+        }
+
+        const setKeepers = document.getElementById('si-set-keepers');
+        const keepersCount = document.getElementById('si-set-keepers-count');
+        const keepersSub = document.getElementById('si-set-keepers-sub');
+        const hasFalcon = owned.includes('falcon_weight');
+        const hasIbis = owned.includes('ibis_figure');
+        const hasStatue = owned.includes('statue_seal');
+        const kpN = (hasFalcon ? 1 : 0) + (hasIbis ? 1 : 0);
+        if (keepersCount) keepersCount.textContent = hasStatue ? 'COMPLETE' : `${kpN} / 2`;
+        if (setKeepers) setKeepers.classList.toggle('is-complete', kpN === 2 || hasStatue);
+        if (keepersSub) {
+          keepersSub.textContent = hasStatue
+            ? '✦ Two Keepers Seal earned with Falcon & Ibis'
+            : kpN === 2
+              ? '✦ Pair complete! Ready for the Tower II statues'
+              : hasFalcon
+                ? 'Falcon Weight stowed · seeks the Brass Ibis'
+                : 'Falcon Weight & Brass Ibis unlock the 6th seal';
+        }
+
+        const setMirror = document.getElementById('si-set-mirror');
+        const mirrorCount = document.getElementById('si-set-mirror-count');
+        const mirrorOwned = ['mirror_fragment_1', 'mirror_fragment_2', 'mirror_fragment_3'].filter((id) => owned.includes(id)).length;
+        if (setMirror) {
+          const showMirror = mirrorOwned > 0 || localStorage.getItem('order_oracle_horizon_completed') === 'true';
+          setMirror.style.display = showMirror ? '' : 'none';
+          setMirror.classList.toggle('is-complete', mirrorOwned >= 9);
+        }
+        if (mirrorCount) mirrorCount.textContent = `${mirrorOwned} / 9`;
+      }
+
+      function applyInventoryFilterUI() {
+        document.querySelectorAll('#si-filter-tabs .si-filter-btn').forEach((btn) => {
+          const active = btn.dataset.filter === currentInventoryFilter;
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        document.querySelectorAll('#si-items-grid .si-mc-slot.is-filled').forEach((slot) => {
+          const id = slot.dataset.id;
+          const group = getRelicExtra(id).filterGroup;
+          const dim = currentInventoryFilter !== 'all' && group !== currentInventoryFilter;
+          slot.classList.toggle('is-dimmed', dim);
+        });
+      }
+
+      function syncInspectArtStates() {
+        const wrap = document.getElementById('si-inspect-art-wrap');
+        const btnZ = document.getElementById('btn-si-zoom');
+        const btnF = document.getElementById('btn-si-flip');
+        const faceBadge = document.getElementById('si-face-badge');
+        const revBox = document.getElementById('si-reverse-box');
+
+        if (wrap) {
+          wrap.classList.toggle('is-zoomed', isInspectZoomed);
+          wrap.classList.toggle('is-flipped', isInspectFlipped);
+        }
+        if (btnZ) {
+          btnZ.classList.toggle('active', isInspectZoomed);
+          btnZ.setAttribute('aria-pressed', isInspectZoomed ? 'true' : 'false');
+        }
+        if (btnF) {
+          btnF.classList.toggle('active', isInspectFlipped);
+          btnF.setAttribute('aria-pressed', isInspectFlipped ? 'true' : 'false');
+        }
+        if (faceBadge) faceBadge.hidden = !isInspectFlipped;
+        if (revBox) revBox.hidden = !isInspectFlipped;
+      }
+
+      function initSatchelInteractions() {
+        if (satchelInteractionsWired) return;
+        satchelInteractionsWired = true;
+
+        // 3D Tilt & Specular Glint over inspection circle
+        const wrap = document.getElementById('si-inspect-art-wrap');
+        if (wrap) {
+          wrap.addEventListener('pointermove', (e) => {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const r = wrap.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            const nx = Math.max(-1, Math.min(1, ((e.clientX - r.left) / r.width) * 2 - 1));
+            const ny = Math.max(-1, Math.min(1, ((e.clientY - r.top) / r.height) * 2 - 1));
+            wrap.style.setProperty('--rx', `${(-ny * 14).toFixed(2)}deg`);
+            wrap.style.setProperty('--ry', `${(nx * 16).toFixed(2)}deg`);
+            wrap.style.setProperty('--gx', `${((nx + 1) * 50).toFixed(1)}%`);
+            wrap.style.setProperty('--gy', `${((ny + 1) * 50).toFixed(1)}%`);
+          });
+          wrap.addEventListener('pointerleave', () => {
+            wrap.style.setProperty('--rx', '0deg');
+            wrap.style.setProperty('--ry', '0deg');
+            wrap.style.setProperty('--gx', '50%');
+            wrap.style.setProperty('--gy', '50%');
+          });
+        }
+
+        // Category Filter Tabs
+        document.querySelectorAll('#si-filter-tabs .si-filter-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            currentInventoryFilter = btn.dataset.filter || 'all';
+            if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+            applyInventoryFilterUI();
+          });
+        });
+
+        // Examine (Zoom Loupe)
+        const btnZoom = document.getElementById('btn-si-zoom');
+        if (btnZoom) {
+          btnZoom.addEventListener('click', () => {
+            isInspectZoomed = !isInspectZoomed;
+            if (sfx && sfx.playZoomLoupe) sfx.playZoomLoupe(isInspectZoomed);
+            syncInspectArtStates();
+          });
+        }
+
+        // Flip (Reverse Inscription)
+        const btnFlip = document.getElementById('btn-si-flip');
+        if (btnFlip) {
+          btnFlip.addEventListener('click', () => {
+            isInspectFlipped = !isInspectFlipped;
+            if (sfx && sfx.playFlipRelic) sfx.playFlipRelic();
+            syncInspectArtStates();
+          });
+        }
+
+        // Special Contextual Action
+        const btnSpecial = document.getElementById('btn-si-special');
+        if (btnSpecial) {
+          btnSpecial.addEventListener('click', () => {
+            const id = selectedInventoryItemId;
+            if (id === 'lamp_oil') {
+              isOilBeforePreview = !isOilBeforePreview;
+              if (sfx && sfx.playRelicFoley) sfx.playRelicFoley('lamp_oil', !isOilBeforePreview);
+              inspectInventoryItem('lamp_oil', { silent: true });
+            } else if (id === 'tuning_pebble' || id === 'signal_mirror' || id === 'gilded_star') {
+              if (sfx && sfx.playAureliaCodePulse) sfx.playAureliaCodePulse();
+              const artWrap = document.getElementById('si-inspect-art-wrap');
+              if (artWrap) {
+                artWrap.classList.remove('is-aurelia-pulse');
+                void artWrap.offsetWidth;
+                artWrap.classList.add('is-aurelia-pulse');
+                setTimeout(() => artWrap.classList.remove('is-aurelia-pulse'), 1150);
+              }
+            }
+          });
+        }
+
+        // Locate Origin on Map
+        const btnLocate = document.getElementById('btn-si-locate');
+        if (btnLocate) {
+          btnLocate.addEventListener('click', () => {
+            const extra = getRelicExtra(selectedInventoryItemId);
+            if (!extra.nodeId) return;
+            closeSatchelInventoryModal();
+            if (typeof window.activateHubView === 'function') window.activateHubView('view-trail');
+            if (typeof window.switchMapPath === 'function' && Number(extra.nodeId) >= 10) {
+              window.switchMapPath(Number(extra.nodeId) >= 40 ? 'stage' : 'desert', true);
+            }
+            if (typeof window.selectMapNode === 'function') {
+              setTimeout(() => window.selectMapNode(extra.nodeId, true), 120);
+            }
+          });
+        }
+
+        // Hover set highlights
+        const highlightSet = (ids, on) => {
+          document.querySelectorAll('#si-items-grid .si-mc-slot.is-filled').forEach((s) => {
+            if (ids.includes(s.dataset.id)) s.classList.toggle('is-set-highlight', on);
+          });
+        };
+        const setCairns = document.getElementById('si-set-cairns');
+        if (setCairns) {
+          const cairnIds = ['seal_cairn_1', 'seal_cairn_2', 'seal_cairn_3', 'seal_cairn_4', 'seal_cairn_5'];
+          setCairns.addEventListener('pointerenter', () => highlightSet(cairnIds, true));
+          setCairns.addEventListener('pointerleave', () => highlightSet(cairnIds, false));
+        }
+        const setKeepers = document.getElementById('si-set-keepers');
+        if (setKeepers) {
+          const keeperIds = ['falcon_weight', 'ibis_figure', 'statue_seal'];
+          setKeepers.addEventListener('pointerenter', () => highlightSet(keeperIds, true));
+          setKeepers.addEventListener('pointerleave', () => highlightSet(keeperIds, false));
+        }
+
+        // Modal keyboard navigation + global 'i' hotkey
+        document.addEventListener('keydown', (e) => {
+          const tag = (document.activeElement && document.activeElement.tagName || '').toLowerCase();
+          if (tag === 'input' || tag === 'textarea' || tag === 'select' || (document.activeElement && document.activeElement.isContentEditable)) return;
+
+          const modal = document.getElementById('modal-satchel-inventory');
+          const isOpen = modal && modal.style.display !== 'none';
+
+          if (!isOpen) {
+            if ((e.key === 'i' || e.key === 'I') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+              const btnInv = document.getElementById('btn-open-inventory');
+              const anyOtherModal = Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"]'))
+                .some((d) => d.id !== 'modal-satchel-inventory' && getComputedStyle(d).display !== 'none');
+              if (btnInv && btnInv.style.display !== 'none' && !anyOtherModal) {
+                e.preventDefault();
+                openSatchelInventoryModal();
+              }
+            }
+            return;
+          }
+
+          if (e.key === 'i' || e.key === 'I') {
+            e.preventDefault();
+            closeSatchelInventoryModal();
+            return;
+          }
+          if (e.key === 'f' || e.key === 'F') {
+            e.preventDefault();
+            if (btnFlip) btnFlip.click();
+            return;
+          }
+          if (e.key === 'z' || e.key === 'Z') {
+            e.preventDefault();
+            if (btnZoom) btnZoom.click();
+            return;
+          }
+          if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+
+          const owned = getOwnedRelicIds();
+          if (!owned.length) return;
+          let idx = Math.max(0, owned.indexOf(selectedInventoryItemId));
+          if (e.key === 'ArrowRight') idx = (idx + 1) % owned.length;
+          else if (e.key === 'ArrowLeft') idx = (idx - 1 + owned.length) % owned.length;
+          else if (e.key === 'ArrowDown') idx = idx + 4 < owned.length ? idx + 4 : idx;
+          else if (e.key === 'ArrowUp') idx = idx - 4 >= 0 ? idx - 4 : idx;
+
+          e.preventDefault();
+          const targetId = owned[idx];
+          inspectInventoryItem(targetId, { playFoley: true });
+          const slotEl = document.querySelector(`#si-items-grid .si-mc-slot[data-id="${targetId}"]`);
+          if (slotEl) slotEl.focus({ preventScroll: true });
+        });
+      }
 
       function openSatchelInventoryModal(selectId) {
         const modal = document.getElementById('modal-satchel-inventory');
         if (!modal) return;
+        initSatchelInteractions();
+        currentInventoryFilter = 'all';
+        isInspectZoomed = false;
+        isInspectFlipped = false;
+        isOilBeforePreview = false;
         if (selectId) selectedInventoryItemId = selectId;
         renderSatchelInventory();
         modal.style.display = 'flex';
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        const closeBtn = document.getElementById('btn-close-inventory');
+        if (closeBtn) closeBtn.focus({ preventScroll: true });
+        if (sfx && sfx.playSatchelOpen) sfx.playSatchelOpen();
+        else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
       }
 
       function closeSatchelInventoryModal() {
         const modal = document.getElementById('modal-satchel-inventory');
         if (!modal) return;
         modal.style.display = 'none';
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (sfx && sfx.playSatchelClose) sfx.playSatchelClose();
+        else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
       }
 
-      function inspectInventoryItem(id) {
+      function inspectInventoryItem(id, opts) {
+        opts = opts || {};
+        if (selectedInventoryItemId !== id) {
+          isOilBeforePreview = false;
+          isInspectFlipped = false;
+          isInspectZoomed = false;
+        }
         selectedInventoryItemId = id;
         const relic = SATCHEL_RELICS[id];
         if (!relic) return;
@@ -6771,17 +7720,70 @@
         const title = document.getElementById('si-inspect-title');
         const origin = document.getElementById('si-inspect-origin');
         const desc = document.getElementById('si-inspect-desc');
+        const revText = document.getElementById('si-reverse-text');
+        const hermesEl = document.getElementById('si-hermes-note');
+        const btnSpecial = document.getElementById('btn-si-special');
+        const btnSpecialLbl = document.getElementById('btn-si-special-label');
+        const btnLocate = document.getElementById('btn-si-locate');
 
-        if (img) img.src = relic.image;
+        const isSharedOil = id === 'lamp_oil' && (
+          (window.GatesRoad && window.GatesRoad.flags && window.GatesRoad.flags().nightOil === 'shared') ||
+          (function () { try { return JSON.parse(localStorage.getItem('order_gates_flags') || '{}').nightOil === 'shared'; } catch (e) { return false; } })()
+        );
+
+        let displayImage = relic.image;
+        let displayOrigin = relic.origin;
+        let displayLore = relic.lore;
+        if (id === 'lamp_oil' && isSharedOil && isOilBeforePreview) {
+          displayImage = 'assets/items/item_lamp_oil.png';
+          displayOrigin = "The nomads' cache · Camp VIII (Sealed State)";
+          displayLore = 'Sealed with crimson cord and dripping red wax as Hermes originally unearthed it beside the falcon weight before sharing light on the Erg.';
+        }
+
+        if (img) img.src = displayImage;
         if (cat) cat.textContent = relic.category;
         if (title) title.textContent = relic.name;
-        if (origin) origin.textContent = relic.origin;
-        if (desc) desc.textContent = relic.lore;
+        if (origin) origin.textContent = displayOrigin;
+        if (desc) desc.textContent = displayLore;
 
-        document.querySelectorAll('.si-mc-slot').forEach(slot => {
-          if (slot.dataset.id === id) slot.classList.add('active');
-          else slot.classList.remove('active');
+        const extra = getRelicExtra(id);
+        if (revText) revText.textContent = extra.inscription;
+        if (hermesEl) hermesEl.textContent = typeof extra.hermesNote === 'function' ? extra.hermesNote() : String(extra.hermesNote || '');
+
+        if (btnSpecial && btnSpecialLbl) {
+          if (id === 'lamp_oil' && isSharedOil) {
+            btnSpecial.hidden = false;
+            btnSpecialLbl.textContent = isOilBeforePreview ? '◐ After the Erg' : '◐ Before the Erg';
+          } else if (id === 'tuning_pebble' || id === 'signal_mirror' || id === 'gilded_star') {
+            btnSpecial.hidden = false;
+            btnSpecialLbl.textContent = '✦ Signal ··· ——';
+          } else {
+            btnSpecial.hidden = true;
+          }
+        }
+
+        if (btnLocate) {
+          btnLocate.hidden = !extra.nodeId;
+        }
+
+        syncInspectArtStates();
+
+        if (!opts.silent) {
+          markRelicSeen(id);
+        }
+
+        document.querySelectorAll('#si-items-grid .si-mc-slot').forEach(slot => {
+          const isMatch = slot.dataset.id === id;
+          slot.classList.toggle('active', isMatch);
+          if (isMatch && !opts.silent) {
+            const pip = slot.querySelector('.si-new-pip');
+            if (pip) pip.remove();
+          }
         });
+
+        if (opts.playFoley && sfx && sfx.playRelicFoley) {
+          sfx.playRelicFoley(id, isSharedOil && !isOilBeforePreview);
+        }
       }
 
       function renderSatchelInventory() {
@@ -6791,6 +7793,7 @@
         grid.innerHTML = '';
 
         const owned = getOwnedRelicIds();
+        const unseen = getUnseenRelics();
         const TOTAL_SLOTS = Math.max(16, Math.ceil(owned.length / 4) * 4);   // the satchel grows with the expedition
         if (countPill) countPill.textContent = `${owned.length} / ${TOTAL_SLOTS} SLOTS`;
 
@@ -6799,26 +7802,22 @@
         }
 
         for (let i = 0; i < TOTAL_SLOTS; i++) {
-          const slot = document.createElement('div');
+          const isFilled = i < owned.length && SATCHEL_RELICS[owned[i]];
+          const slot = document.createElement(isFilled ? 'button' : 'div');
           slot.className = 'si-mc-slot';
 
-          if (i < owned.length) {
+          if (isFilled) {
             const id = owned[i];
             const relic = SATCHEL_RELICS[id];
-            if (relic) {
-              slot.classList.add('is-filled');
-              if (id === selectedInventoryItemId) slot.classList.add('active');
-              slot.dataset.id = id;
-              slot.title = `${relic.name} · ${relic.category}`;
-              slot.setAttribute('aria-label', relic.name);
-              slot.innerHTML = `
-                <img src="${relic.image}" alt="${relic.name}" class="si-mc-thumb">
-              `;
-              slot.addEventListener('click', () => {
-                if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-                inspectInventoryItem(id);
-              });
-            }
+            slot.type = 'button';
+            slot.classList.add('is-filled');
+            if (id === selectedInventoryItemId) slot.classList.add('active');
+            slot.dataset.id = id;
+            slot.title = `${relic.name} · ${relic.category}`;
+            slot.setAttribute('aria-label', relic.name);
+            slot.innerHTML = `<img src="${relic.image}" alt="${relic.name}" class="si-mc-thumb">` +
+              (unseen.includes(id) && id !== selectedInventoryItemId ? '<span class="si-new-pip" aria-hidden="true">NEW</span>' : '');
+            slot.addEventListener('click', () => inspectInventoryItem(id, { playFoley: true }));
           } else {
             slot.classList.add('is-empty');
             slot.title = 'Empty Slot';
@@ -6829,8 +7828,11 @@
           grid.appendChild(slot);
         }
 
+        renderInventorySets(owned);
+        applyInventoryFilterUI();
+
         if (selectedInventoryItemId && SATCHEL_RELICS[selectedInventoryItemId]) {
-          inspectInventoryItem(selectedInventoryItemId);
+          inspectInventoryItem(selectedInventoryItemId, { silent: true });
         }
       }
 
@@ -6842,6 +7844,7 @@
       window.getOwnedRelicIds = getOwnedRelicIds;
       window.updateInventoryBadge = updateInventoryBadge;
       window.SATCHEL_RELICS = SATCHEL_RELICS;
+      initSatchelInteractions();
 
       function getHermesFinalForWatchtower() {
         const item = getSatchelExpeditionItem();
@@ -6967,9 +7970,10 @@
       function showTyping(show = true) {
         document.querySelectorAll('.chat-typing-wrap').forEach((el) => el.remove());
         if (messengerTypingBar) messengerTypingBar.style.display = 'none';
-        if (!show) return;
         const stream = currentWireTab === 'inquiries' ? wireInquiriesStream : wireMessagesStream;
-        if (!stream) return;
+        const coilOn = !!(show && stream && document.body.getAttribute('data-active-view') === 'view-field-wire' && !window.__wireFast);
+        if (sfx && typeof sfx.playCoilHum === 'function') { try { sfx.playCoilHum(coilOn); } catch (e) {} }
+        if (!show || !stream) return;
         const wrap = document.createElement('div');
         wrap.className = 'chat-bubble-wrap incoming chat-typing-wrap';
         wrap.dataset.chapter = String(wireChapterIdx);
@@ -7025,19 +8029,23 @@
         const win = document.querySelector('.messenger-app-window');
         if (!win) return;
         const mood = wireMoodFor(wireCurrentStep);
-        if (win.dataset.mood === mood) return;
-        const fx = document.getElementById('wire-mood-fx');
-        if (fx && !window.__wireFast && win.dataset.mood) {   // the light changes slowly: a fade out and in
-          fx.classList.add('is-shifting');
-          setTimeout(() => { win.dataset.mood = mood; fx.classList.remove('is-shifting'); }, 650);
-        } else win.dataset.mood = mood;
+        if (win.dataset.mood !== mood) {
+          const fx = document.getElementById('wire-mood-fx');
+          if (fx && !window.__wireFast && win.dataset.mood) {   // the light changes slowly: a fade out and in
+            fx.classList.add('is-shifting');
+            setTimeout(() => { win.dataset.mood = mood; fx.classList.remove('is-shifting'); updateWireLiveTelemetryUI(); }, 650);
+          } else {
+            win.dataset.mood = mood;
+          }
+        }
+        if (typeof updateWireLiveTelemetryUI === 'function') updateWireLiveTelemetryUI();
       }
       // The expedition is told in chapters, one for each place Hermes goes to (a mission and its debrief). The chat shows the
       // chapter we are in; the earlier ones are one click away. A divider is always drawn; one that starts a chapter is bigger.
       const WIRE_CHAPTER_ZERO = 'The Red Storm · The Salt Road and the Four Wells';
       // Desert Path in three chapters, Stage Path in two (the Operator's division, 15 Nov 2026). The key is the first wire step of the chapter.
       const WIRE_CHAPTERS = { 9: 'The Five Cairns · Seals of the Sun', 25: 'Tower II in Flames · The Oracle', 33: 'The Mirror Sanctuary · Tower III', 41: 'The Whispering Gallery' };
-      let wireChapterList = [{ name: WIRE_CHAPTER_ZERO }], wireChapterIdx = 0, wireFirstChapter = 0;
+      let wireChapterList = [{ name: WIRE_CHAPTER_ZERO }], wireChapterIdx = 0, wireFirstChapter = 0, wireMilestoneFilter = 'all';
       function resetWireChapters() { wireChapterList = [{ name: WIRE_CHAPTER_ZERO }]; wireChapterIdx = 0; wireFirstChapter = 0; }
       // The card that closes a chapter: what Hermes brought back, how it ended, and what Silvia chose. It opens the next chapter (so it is
       // the first thing she sees there), before the divider. Keyed by the index of the chapter it closes.
@@ -7115,7 +8123,15 @@
           wireChapterList.push({ name: WIRE_CHAPTERS[step], step });
           wireChapterIdx = wireChapterList.length - 1;
           const card = wireChapterIdx >= 1 ? wireChapterCard(wireChapterIdx - 1) : null;
-          if (card) { card.dataset.chapter = String(wireChapterIdx); wireMessagesStream.appendChild(card); carded = true; if (!wireMessagesStream.classList.contains('is-restoring')) card.classList.add('is-new'); }
+          if (card) {
+            card.dataset.chapter = String(wireChapterIdx);
+            wireMessagesStream.appendChild(card);
+            carded = true;
+            if (!wireMessagesStream.classList.contains('is-restoring')) {
+              card.classList.add('is-new');
+              if (sfx && typeof sfx.playWaxSealStamp === 'function') { try { sfx.playWaxSealStamp(); } catch (e) {} }
+            }
+          }
           pill.classList.add('wire-chapter-start');
           pill.dataset.kicker = 'CHAPTER ' + (ROMAN[wireChapterIdx + 1] || (wireChapterIdx + 1)) + ' · ' + WIRE_CHAPTERS[step];
           if (!wireMessagesStream.classList.contains('is-restoring')) wireFirstChapter = wireChapterIdx;   // a chapter that opens now is the one on screen
@@ -7163,6 +8179,9 @@
           const earlierNew = Object.keys(wireNew).some((k) => parseInt(k, 10) < first);
           if (btn) { btn.hidden = first <= 0; btn.onclick = () => showEarlierWireChapter(); btn.classList.toggle('has-new', earlierNew); btn.textContent = earlierNew ? '↑ Earlier chapters · ● new' : '↑ Earlier chapters'; }
         }
+        if (typeof renderWireChapterPopover === 'function') renderWireChapterPopover();
+        if (typeof applyWireMilestoneFilter === 'function') applyWireMilestoneFilter();
+        if (typeof updateWireBackPresentBtn === 'function') updateWireBackPresentBtn();
       }
       function showEarlierWireChapter() {
         if (wireFirstChapter <= 0) return;
@@ -7228,6 +8247,257 @@
       }
       const wireNearEnd = () => window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 320;
       const wireJumpTo = (el, behavior = 'auto') => { if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 150), behavior }); };
+
+      // ---- Improvements 1 & 3: Live Field Telemetry HUD, Signal Diagnostic Popover, Chapter Index, Milestone Filter & Back to Present ----
+      const WIRE_MOOD_LABELS = { dawn: 'First Light', noon: 'High Desert Sun', dusk: 'Canyon Dusk', night: 'Starlight Watch', fire: 'Watchfire & Smoke', lamp: 'Sanctuary Oil Lamp' };
+      function getWireLiveTelemetry() {
+        const mood = wireMoodFor(wireCurrentStep);
+        const moodLabel = WIRE_MOOD_LABELS[mood] || 'Desert Light';
+        const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
+        const isPlayaDone = localStorage.getItem('order_salt_playa_completed') === 'true';
+        const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
+        const isClepsydraDone = localStorage.getItem('order_oasis_clepsydra_completed') === 'true';
+        let location = 'Outer Watchtower VI · Storm Shelter';
+        let icon = '📍';
+        let bearing = '112° E';
+        if (wireCurrentStep < 3) { location = 'Canyon Bluff · Red Sandstorm'; icon = '🌪️'; }
+        else if (wireCurrentStep === 4 && dawnStep < DAWN_DONE) { location = 'Wadi al-Hajar · River Stones'; icon = '🪨'; }
+        else if (wireCurrentStep === 4 && !isChasmDone) {
+          location = isChasmMarchOver() ? 'The North Portal · Canyon Mouth' : 'Wadi al-Hajar → North Portal';
+          icon = isChasmMarchOver() ? '📍' : '🥾'; bearing = 'South Gorge';
+        } else if (wireCurrentStep === 4 && isChasmDone && !isPlayaDone) {
+          location = playaMarch.over() ? 'North Edge · The Salt Playa' : 'Oasis Gate · Waiting First Light';
+          icon = playaMarch.over() ? '🧂' : '⛺'; bearing = 'South Across Salt';
+        } else if (wireCurrentStep === 4 && isPlayaDone && !isLexiconDone) {
+          location = lexiconMarch.over() ? 'Camp VII · The Nomad Ruins' : 'Dunes → Nomad Ruins';
+          icon = lexiconMarch.over() ? '📜' : '🥾'; bearing = 'South Dunes';
+        } else if (wireCurrentStep >= 5 && wireCurrentStep <= 6 && !isClepsydraDone) {
+          location = clepsydraMarch.started() && !clepsydraMarch.over() ? 'Great Erg → Camp VIII' : 'Camp VII · Al-Qibla Stele';
+          icon = clepsydraMarch.started() && !clepsydraMarch.over() ? '🥾' : '🧭'; bearing = '14° NNE';
+        } else if (wireCurrentStep >= 7 && wireCurrentStep <= 8) {
+          location = wireCurrentStep === 8 && !gatesMarch.over() ? 'Camp VIII → Gates of Tower II' : 'Camp VIII · The Four Wells';
+          icon = wireCurrentStep === 8 && !gatesMarch.over() ? '🥾' : '💧'; bearing = '14° NNE';
+        } else if (wireCurrentStep >= 9 && wireCurrentStep <= 10) {
+          location = wireCurrentStep === 10 && !monolithMarch.over() ? 'Great Erg → Sun Monolith' : (wireCurrentStep === 10 ? 'Ridge of the Sun · Cairn II' : 'Tower II · The Gates');
+          icon = wireCurrentStep === 10 && !monolithMarch.over() ? '🥾' : '☀️'; bearing = 'NNE';
+        } else if (wireCurrentStep >= 11 && wireCurrentStep <= 14) {
+          location = wireCurrentStep <= 12 ? 'Foot of the Sun Monolith' : (labyrinthMarch.over() ? 'Sandstone Labyrinth · Cairn III' : 'Arches → Sandstone Labyrinth');
+          icon = wireCurrentStep <= 12 ? '⛺' : (labyrinthMarch.over() ? '📍' : '🥾'); bearing = '168° SSE';
+        } else if (wireCurrentStep >= 15 && wireCurrentStep <= 18) {
+          location = wireCurrentStep <= 16 ? 'Rocks above the Hardpan' : (cairnFourMarch.over() ? 'Singing Pillars · Cairn IV' : 'Hardpan → Natural Bridge');
+          icon = wireCurrentStep <= 16 ? '💤' : (cairnFourMarch.over() ? '🌬️' : '🥾'); bearing = 'East Gorge';
+        } else if (wireCurrentStep >= 19 && wireCurrentStep <= 22) {
+          location = wireCurrentStep <= 20 ? 'Shade of the Singing Pillars' : (solsticeMarch.over() ? 'Arch of the Solstice · Cairn V' : 'East → Courtyard of Rays');
+          icon = wireCurrentStep <= 20 ? '☀️' : (solsticeMarch.over() ? '🔆' : '🥾'); bearing = 'Solstice Axis';
+        } else if (wireCurrentStep >= 23 && wireCurrentStep <= 26) {
+          location = wireCurrentStep <= 24 ? 'Arch of the Solstice · Smoke' : (steleMarch.over() ? 'Tower II Atrium · Flames' : 'Dry Bed → Tower II');
+          icon = steleMarch.over() ? '🔥' : '🥾'; bearing = 'Smoke Column';
+        } else if (wireCurrentStep >= 27 && wireCurrentStep <= 32) {
+          location = wireCurrentStep <= 28 ? 'Tower II · Well of the Atrium' : 'Tower II · Inner Chamber';
+          icon = wireCurrentStep <= 28 ? '🗝️' : '🕯️'; bearing = 'Inner Stair';
+        } else if (wireCurrentStep >= 33 && wireCurrentStep <= 36) {
+          location = masksMarch.over() ? 'Tower III · Gate of Masks' : 'Plateau → Tower III';
+          icon = masksMarch.over() ? '🎭' : '🥾'; bearing = 'East Plateau';
+        } else if (wireCurrentStep >= 37 && wireCurrentStep <= 40) {
+          location = 'Tower III · Camera Obscura'; icon = '🕯️'; bearing = 'Narrow House';
+        } else if (wireCurrentStep >= 41) {
+          location = 'Tower III · Whispering Gallery'; icon = '🎶'; bearing = 'West Focus';
+        }
+        const oilFlag = (window.GatesRoad && window.GatesRoad.flags && window.GatesRoad.flags().nightOil) || '';
+        const oilDesc = oilFlag === 'given' ? 'Oil: Given' : oilFlag === 'shared' ? 'Oil: Half' : (localStorage.getItem('order_oasis_clepsydra_completed') === 'true' ? 'Oil: Full' : 'Water Skins');
+        const frags = ['order_masks_gate_completed', 'order_camera_obscura_completed', 'order_whispering_gallery_completed'].filter((k) => localStorage.getItem(k) === 'true').length;
+        const pctEl = document.querySelector('.signal-val');
+        const signalPct = pctEl ? pctEl.textContent : '24%';
+        const freq = wireCurrentStep < 4 ? '14.2 MHz · Dust Fade' : (mood === 'fire' ? '14.2 MHz · Thermal Drift' : '14.2 MHz · Locked');
+        return {
+          pill: `${icon} ${location}`,
+          location, bearing, moodLabel, signalPct, freq,
+          satchel: `Seals ${countCairnSeals()}/5 · Mirror ${frags}/9 · ${oilDesc}`
+        };
+      }
+      function updateWireLiveTelemetryUI() {
+        const t = getWireLiveTelemetry();
+        const badge = document.getElementById('messenger-live-telemetry');
+        if (badge) {
+          badge.textContent = t.pill;
+          badge.setAttribute('title', `${t.location} · Bearing ${t.bearing} · ${t.moodLabel}`);
+        }
+        const pop = document.getElementById('wire-signal-popover');
+        if (pop && !pop.hidden) renderWireSignalPopover(t);
+      }
+      function renderWireSignalPopover(t) {
+        const pop = document.getElementById('wire-signal-popover');
+        if (!pop) return;
+        const info = t || getWireLiveTelemetry();
+        pop.innerHTML = `
+          <div class="wsp-grid">
+            <div class="wsp-stat"><div class="wsp-kicker">CARRIER &amp; LINK</div><div class="wsp-val">${info.signalPct} · ${info.freq}</div></div>
+            <div class="wsp-stat"><div class="wsp-kicker">FIELD POSITION</div><div class="wsp-val">${info.location} (${info.bearing})</div></div>
+            <div class="wsp-stat"><div class="wsp-kicker">ATMOSPHERE</div><div class="wsp-val">${info.moodLabel}</div></div>
+            <div class="wsp-stat"><div class="wsp-kicker">HERMES'S SATCHEL</div><div class="wsp-val">${info.satchel}</div></div>
+          </div>`;
+      }
+      function renderWireChapterPopover() {
+        const pop = document.getElementById('wire-chapter-popover');
+        if (!pop) return;
+        const activeFirst = window.__wireAllChapters ? 0 : Math.min(wireFirstChapter, wireChapterIdx);
+        pop.innerHTML = '<div class="wcp-list">' + wireChapterList.map((ch, idx) => {
+          const num = ROMAN[idx + 1] || String(idx + 1);
+          const sub = (WIRE_CHAPTER_CARDS[idx] && WIRE_CHAPTER_CARDS[idx].prize) || 'Ongoing transmission';
+          const isCur = idx === activeFirst;
+          return `<button type="button" class="wcp-item${isCur ? ' is-active' : ''}" data-chapter-idx="${idx}">` +
+            `<span class="wcp-item-kicker">CHAPTER ${num}${wireNew[idx] != null ? ' · NEW' : ''}</span>` +
+            `<span class="wcp-item-title">${ch.name}</span>` +
+            `<span class="wcp-item-sub">${sub}</span></button>`;
+        }).join('') + '</div>';
+      }
+      function closeWireHeadPopovers() {
+        const sigPop = document.getElementById('wire-signal-popover'), sigBtn = document.getElementById('btn-wire-signal-meter');
+        const chPop = document.getElementById('wire-chapter-popover'), chBtn = document.getElementById('btn-wire-chapter-picker');
+        if (sigPop) sigPop.hidden = true;
+        if (sigBtn) sigBtn.setAttribute('aria-expanded', 'false');
+        if (chPop) chPop.hidden = true;
+        if (chBtn) chBtn.setAttribute('aria-expanded', 'false');
+      }
+      function applyWireMilestoneFilter() {
+        if (!wireMessagesStream) return;
+        const bar = document.getElementById('wire-milestone-filters');
+        if (bar) bar.querySelectorAll('.wmf-btn').forEach((b) => {
+          const on = b.getAttribute('data-wire-filter') === wireMilestoneFilter;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        Array.prototype.forEach.call(wireMessagesStream.children, (el) => {
+          if (wireMilestoneFilter === 'all') { el.classList.remove('is-filter-dimmed', 'is-filter-match'); return; }
+          if (el.classList.contains('messenger-date-pill') || el.id === 'wire-earlier-card' || el.id === 'wire-new-marker' || el.classList.contains('chat-protocol-banner')) {
+            el.classList.remove('is-filter-dimmed', 'is-filter-match');
+            return;
+          }
+          let hit = false;
+          if (wireMilestoneFilter === 'clues') {
+            hit = !!el.querySelector('.journal-ref-pill') || el.classList.contains('system-event') || /\[[A-Z]\]\s*[+\-−×]/.test(el.textContent || '');
+          } else if (wireMilestoneFilter === 'relics') {
+            hit = el.classList.contains('wire-relic-chip') || el.classList.contains('wire-chapter-card') || el.classList.contains('wire-intercept') ||
+              !!el.querySelector('.chat-sketch-bubble') || /\b(satchel|seal of cairn|fragment|falcon weight|lamp oil|tuning pebble|signal mirror|gilded star|servant'?s key)\b/i.test(el.textContent || '');
+          }
+          el.classList.toggle('is-filter-match', hit);
+          el.classList.toggle('is-filter-dimmed', !hit);
+        });
+      }
+      function updateWireBackPresentBtn() {
+        const wrap = document.getElementById('wire-back-present-wrap');
+        if (!wrap) return;
+        const inWire = document.body.getAttribute('data-active-view') === 'view-field-wire' && currentWireTab === 'expedition';
+        const show = inWire && ((wireFirstChapter < wireChapterIdx && !window.__wireAllChapters) || !wireNearEnd());
+        wrap.hidden = !show;
+      }
+      function initWireToolbarInteractions() {
+        const sigBtn = document.getElementById('btn-wire-signal-meter'), sigPop = document.getElementById('wire-signal-popover');
+        const chBtn = document.getElementById('btn-wire-chapter-picker'), chPop = document.getElementById('wire-chapter-popover');
+        const filterBar = document.getElementById('wire-milestone-filters'), backBtn = document.getElementById('btn-wire-back-present');
+        if (sigBtn && sigPop) {
+          sigBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = sigPop.hidden;
+            closeWireHeadPopovers();
+            if (open) {
+              if (sfx && sfx.playTelemetryLock) sfx.playTelemetryLock();
+              renderWireSignalPopover();
+              sigPop.hidden = false;
+              sigBtn.setAttribute('aria-expanded', 'true');
+            }
+          });
+        }
+        if (chBtn && chPop) {
+          chBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = chPop.hidden;
+            closeWireHeadPopovers();
+            if (open) {
+              if (sfx && sfx.playTelemetryLock) sfx.playTelemetryLock();
+              renderWireChapterPopover();
+              chPop.hidden = false;
+              chBtn.setAttribute('aria-expanded', 'true');
+            }
+          });
+          chPop.addEventListener('click', (e) => {
+            const item = e.target.closest('.wcp-item');
+            if (!item) return;
+            const idx = parseInt(item.getAttribute('data-chapter-idx'), 10);
+            if (!isNaN(idx)) {
+              if (sfx && sfx.playTelemetryLock) sfx.playTelemetryLock();
+              window.__wireAllChapters = false;
+              wireFirstChapter = idx;
+              closeWireHeadPopovers();
+              applyWireChapters();
+              const target = idx === 0 ? wireMessagesStream.firstElementChild : wireMessagesStream.querySelector(`.wire-chapter-start[data-chapter="${idx}"]:not([hidden])`);
+              wireJumpTo(target || wireMessagesStream.firstElementChild, 'smooth');
+            }
+          });
+        }
+        if (filterBar) {
+          filterBar.addEventListener('click', (e) => {
+            const b = e.target.closest('.wmf-btn');
+            if (!b) return;
+            if (sfx && sfx.playTelemetryLock) sfx.playTelemetryLock();
+            wireMilestoneFilter = b.getAttribute('data-wire-filter') || 'all';
+            applyWireMilestoneFilter();
+          });
+        }
+        if (backBtn) {
+          backBtn.addEventListener('click', () => {
+            if (sfx && sfx.playTelemetryLock) sfx.playTelemetryLock();
+            window.__wireAllChapters = false;
+            wireFirstChapter = wireChapterIdx;
+            applyWireChapters();
+            scrollChatToActivePrompt(true);
+            updateWireBackPresentBtn();
+          });
+        }
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.wire-fixed-head')) closeWireHeadPopovers();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (document.body.getAttribute('data-active-view') !== 'view-field-wire') return;
+          if (e.ctrlKey || e.metaKey || e.altKey) return;
+          const anyModalOpen = sheetPopover || pageViewer || Array.prototype.some.call(
+            document.querySelectorAll('[aria-modal="true"], .journal-sheet-popover'),
+            (el) => {
+              if (!el.isConnected || !el.getClientRects().length) return false;
+              const s = getComputedStyle(el);
+              return s.display !== 'none' && s.visibility !== 'hidden' && parseFloat(s.opacity) !== 0;
+            }
+          );
+          if (window.__eclipseGameOpen || anyModalOpen) return;
+          const t = e.target;
+          if (t && t.closest && t.closest('input, textarea, select, [contenteditable="true"]')) return;
+          if (e.key === ' ' || e.code === 'Space') {
+            if (t && t.closest && t.closest('button, a, [role="button"]')) return;
+            if (typeof window.__finishActiveWireTyping === 'function') {
+              e.preventDefault();
+              window.__finishActiveWireTyping();
+            }
+            return;
+          }
+          if (!e.repeat && (e.key === '1' || e.key === '2' || e.key === '3') && currentWireTab === 'expedition') {
+            const box = document.getElementById('wire-choices-grid');
+            if (!box) return;
+            const btns = Array.prototype.filter.call(
+              box.querySelectorAll('button:not(:disabled)'),
+              (b) => b.getClientRects().length > 0
+            );
+            const targetBtn = btns[parseInt(e.key, 10) - 1];
+            if (targetBtn) {
+              e.preventDefault();
+              targetBtn.click();
+            }
+          }
+        });
+        let backRaf = 0;
+        window.addEventListener('scroll', () => {
+          if (!backRaf) backRaf = requestAnimationFrame(() => { backRaf = 0; updateWireBackPresentBtn(); });
+        }, { passive: true });
+      }
       const WIRE_STEP_DIVIDERS = { 5: 'Camp VII · The Nomad Ruins', 7: 'Camp VIII · The Four Wells', 9: 'Tower II · The Gates', 11: 'The Ridge of the Sun · Cairn II', 13: 'First Light · The Arches of the West Wind', 15: 'The Sandstone Labyrinth · Cairn III', 17: 'The Next Evening · The Edge of the Hardpan', 19: 'The Southern Mouth of the Gorge · Cairn IV', 21: 'That Evening · Leaving the Singing Pillars', 23: 'The Arch of the Solstice · Cairn V', 25: 'Under the Arch · Smoke over Tower II', 27: 'Tower II · The Well of the Atrium', 29: 'Tower II · The Inner Stair', 31: 'Tower II · The Inner Chamber', 33: 'Tower II · The Morning of Departure', 35: 'Tower III · The Gate of a Thousand Masks', 37: 'Tower III · The Dark Room', 39: 'Tower III · The Narrow House', 41: 'Tower III · The Whispering Gallery', 43: 'Tower III · The Little Door of the Gallery' };
 
       // Seals of the five Cairns in Hermes's satchel (order_seal_cairn_1..5)
@@ -7386,7 +8656,8 @@
       function pickMarchChoice(legNo, id, i) {
         const ev = marchEvFind(legNo, id), c = ev && ev.choices && ev.choices[i];
         if (!c || wireBeatsPlaying) return;
-        if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
+        else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         const st = marchEvState(), e = (st[legNo] || []).find((x) => x.id === id);
         if (!e || e.pick !== null) return;
         e.pick = i; marchEvSave(st);
@@ -7444,13 +8715,14 @@
             <div class="chat-bubble">
               <span class="wire-intercept-tag">✶ STATIC ON THE LINE · UNKNOWN SENDER ✶</span>
               <span class="wire-intercept-text"></span>
-              <span class="wire-intercept-seal" aria-label="A seal of ash: a circle with a line across it">⊖</span>
+              <button type="button" class="wire-intercept-seal" aria-haspopup="dialog" aria-label="Inspect ash seal carrier anomaly" title="Inspect the Mark of Ash">⊖</button>
             </div>
           </div>
         `;
         el.querySelector('.wire-intercept-text').textContent = WIRE_INTERCEPT;
         el.dataset.chapter = String(wireChapterIdx);
         wireMessagesStream.appendChild(el);
+        if (!wireMessagesStream.classList.contains('is-restoring') && sfx && sfx.playWireInterceptStatic) sfx.playWireInterceptStatic();
         if (window.EclipseNotebook && window.EclipseNotebook.clue) window.EclipseNotebook.clue('intercept');
       }
 
@@ -7638,8 +8910,8 @@
         return out;
       }
       let wireBeatsPlaying = false, wireAskPending = false;
-      const typingLead = (t) => window.__wireFast ? 30 : Math.min(800, 260 + t.length * 4);   // the dots, before the bubble opens
-      const readingGap = (t) => window.__wireFast ? 30 : Math.min(800, 200 + t.length * 4);   // a breath after it
+      const typingLead = (t) => window.__wireFast ? 30 : window.__wireAsk === 'manual' ? 110 : Math.min(800, 260 + t.length * 4);   // the dots, before the bubble opens
+      const readingGap = (t) => window.__wireFast ? 30 : window.__wireAsk === 'manual' ? 90 : Math.min(800, 200 + t.length * 4);   // a breath after it
       // A sequence is beats (strings) and interjections: { ask: [{ text, silviaMsg, reply, onPick }] } where Silvia says something in
       // one tap and Hermes answers. The answer is saved by place (step:part:index) so the history draws it again.
       const WIRE_ASKS_KEY = 'order_wire_asks';
@@ -7704,7 +8976,8 @@
           wireChoicesGrid.innerHTML = '';
           it.ask.forEach((o, idx) => wireChoicesGrid.appendChild(makeChoicePill('💬', formatJournalCallouts(o.text), () => {
             if (!wireAskPending) return;
-            if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+            if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
+            else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
             wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
             choose(idx);
           })));
@@ -7850,18 +9123,23 @@
         let charIdx = 0;
         const totalChars = text.length;
         let lastSoundTime = 0, skipTyping = false;
-        if (bubble) bubble.addEventListener('click', () => { skipTyping = true; });   // a click on the message finishes it
+        const finishFn = () => { skipTyping = true; };
+        window.__finishActiveWireTyping = finishFn;
+        if (bubble) bubble.addEventListener('click', finishFn);   // a click or Space finishes the message
         const myToken = (window.__wireTypewriterToken = (window.__wireTypewriterToken || 0));
 
         function typeTick() {
-          if (!targetSpan || !targetSpan.isConnected || myToken !== window.__wireTypewriterToken) return;
+          if (!targetSpan || !targetSpan.isConnected || myToken !== window.__wireTypewriterToken) {
+            if (window.__finishActiveWireTyping === finishFn) window.__finishActiveWireTyping = null;
+            return;
+          }
           const beat = !!(meta && meta.slow), slow = beat && !window.__wireFast;
-          const chunk = slow ? Math.min(2, totalChars - charIdx) : Math.min(Math.max(5, Math.ceil(totalChars / 70)), totalChars - charIdx);
-          charIdx += (beat && (skipTyping || window.__wireFast)) ? totalChars : chunk;
+          const chunk = slow ? Math.min(2, totalChars - charIdx) : Math.min(Math.max(5, Math.ceil(totalChars / 50)), totalChars - charIdx);
+          charIdx += (skipTyping || window.__wireFast) ? totalChars : chunk;
           const currentSub = text.substring(0, charIdx);
 
           targetSpan.innerHTML = currentSub.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
-          if (wireNearEnd() && msgEl.scrollIntoView) msgEl.scrollIntoView({ block: 'end' });   // follow the typing
+          if ((charIdx >= totalChars || charIdx % 18 === 0) && wireNearEnd() && msgEl.scrollIntoView) msgEl.scrollIntoView({ block: 'end' });   // follow the typing without per-frame reflows
 
           const now = Date.now();
           if (!(meta && meta.slow) && now - lastSoundTime > 65) {
@@ -7875,6 +9153,7 @@
           if (charIdx < totalChars) {
             setTimeout(typeTick, slow ? 15 : 16);
           } else {
+            if (window.__finishActiveWireTyping === finishFn) window.__finishActiveWireTyping = null;
             if (cursorSpan) cursorSpan.remove();
             const finalFormatted = formatJournalCallouts(text).split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
             if (bubble) {
@@ -7904,13 +9183,25 @@
           <div class="chat-sender-name">${getCartographerTitle()}</div>
           <div class="chat-bubble-row">
             <div class="chat-bubble chat-sketch-bubble">
-              <img src="${src}" alt="${caption}" loading="lazy">
+              <img src="${src}" alt="${caption}" loading="lazy" role="button" tabindex="0" aria-haspopup="dialog" title="Inspect sketch">
               <div class="chat-sketch-cap">${caption}</div>
               <span class="chat-bubble-time">${getWireTimestamp()}</span>
             </div>
             ${rewindBtnHtml}
           </div>
         `;
+        const img = el.querySelector('.chat-sketch-bubble img');
+        if (img) {
+          const zoomSketch = () => openPageViewer({ title: caption || 'Field Sketch', page: src }, img);
+          img.addEventListener('click', zoomSketch);
+          img.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              zoomSketch();
+            }
+          });
+        }
         const btn = el.querySelector('.carles-rewind-btn');
         if (btn) attachRewindHandler(btn, meta || { type: 'dawn', step: 2 });
         el.dataset.chapter = String(wireChapterIdx);
@@ -8469,7 +9760,8 @@
       }
 
       function handleDawnChoice(choice, idx) {
-        if (sfx) sfx.playMechanicalClick();
+        if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
+        else if (sfx) sfx.playMechanicalClick();
         const currentDawnStep = dawnStep;
         appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg, false, false, null, null, { type: 'dawn', step: currentDawnStep });
         wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
@@ -8716,12 +10008,13 @@
             updateMessengerBadge();
             scrollChatToActivePrompt(true);
           }, null, { type: 'chasm', step: i });
-        }, 900);
+        }, 650);
       }
 
       function handleChasmWireChoice(i, idx) {
         const choice = CHASM_WIRE[i].choices[idx];
-        if (sfx) sfx.playMechanicalClick();
+        if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
+        else if (sfx) sfx.playMechanicalClick();
         wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
         appendWireMessage('SILVIA · NAVIGATOR', choice.silviaMsg, false, false, null, null, { type: 'chasm', step: i });
         const w = chasmWire();
@@ -9025,6 +10318,7 @@
         const promptHeader = document.getElementById('wire-prompt-header-text');
         if (promptHeader) promptHeader.textContent = 'Choose your reply';
         if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
+        if (typeof updateWireLiveTelemetryUI === 'function') updateWireLiveTelemetryUI();
 
         const isChasmDone = localStorage.getItem('order_whispering_chasm_completed') === 'true';
         const isLexiconDone = localStorage.getItem('order_desert_lexicon_completed') === 'true';
@@ -9042,14 +10336,17 @@
           const titleEl = wireCompletedBar.querySelector('.messenger-waypoint-title');
           const descEl = wireCompletedBar.querySelector('.messenger-waypoint-desc');
           if (titleEl) titleEl.textContent = title;
-          if (descEl) descEl.textContent = desc;
+          if (descEl) {
+            delete descEl.dataset.marchLegStep;
+            descEl.textContent = desc || '';
+          }
           try {
             localStorage.setItem('order_field_wire_completed', 'true');
             localStorage.setItem('order_field_wire_step', String(persistStep));
           } catch (e) {}
           return descEl;
         };
-        // Steps 10, 14, 18 and 22: Hermes walks to the next station. The trek bar shows the countdown (refreshed every 30 s),
+        // Steps 10, 14, 18 and 22: Hermes walks to the next station. The trek bar renders a live cartographic progress route,
         // then the arrival bar stays until the station is solved. Returns true while that leg is not finished.
         const showMarchLeg = (leg) => {
           leg.march.start();   // a save that stands here without a start time (e.g. after a tester replay) sets out now
@@ -9062,25 +10359,59 @@
           if (!leg.march.over()) {
             const descEl = showWaypointBar(leg.walkingTitle, '', leg.step);
             showMarchChoice(leg.step);   // a question from the road waits above the trek bar
+            let wasWalking = false;
             const updateTrek = () => {
               if (!wireBeatsPlaying && deliverMarchEvents(leg.step, leg)) return;
               const arrived = leg.march.over() || leg.march.camped();
               if (!wireCompletedBar || wireCompletedBar.style.display === 'none' || arrived) {
                 if (window.__wireMarchTimer) { clearInterval(window.__wireMarchTimer); window.__wireMarchTimer = null; }
+                if (arrived && wasWalking) {
+                  wasWalking = false;
+                  if (sfx && typeof sfx.playMarchArrivalBell === 'function') { try { sfx.playMarchArrivalBell(); } catch (e) {} }
+                }
                 if (arrived) renderWireChoices();
                 return;
               }
+              wasWalking = true;
               if (!descEl) return;
-              descEl.innerHTML = leg.walkingDesc
-                + '<div style="margin-top:6px; color:#fde68a; font-family:\'Cinzel\',serif; font-size:0.84rem; letter-spacing:0.05em;">⏱️ ' + leg.etaLabel + ' IN ' + leg.march.eta().toUpperCase() + '</div>'
-                + (isCarlesTester() ? '<div style="margin-top:8px;"><button type="button" class="btn-admin-skip-march" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:\'Cinzel\',serif; cursor:pointer;">⏩ Tester: skip the walk</button></div>' : '');
-              const skipBtn = descEl.querySelector('.btn-admin-skip-march');
-              if (skipBtn) skipBtn.onclick = (e) => { e.stopPropagation(); leg.march.skip(); };
-              if (leg.cinematic && window.EclipseCinematic) window.EclipseCinematic.attach(descEl, leg.cinematic);
+              const prog = leg.march.progress();
+              const pct = Math.max(0, Math.min(100, Math.round(prog * 100)));
+              const slots = marchSlots(leg.step);
+              const evState = marchEvState()[leg.step] || [];
+              if (descEl.dataset.marchLegStep !== String(leg.step)) {
+                descEl.dataset.marchLegStep = String(leg.step);
+                const pipsHtml = slots.map((sl, idx) => {
+                  const leftPct = Math.round((sl.at || 0.5) * 100);
+                  return `<span class="wmt-event-pip" data-pip-idx="${idx}" style="left:${leftPct}%;" title="En-route dispatch (${leftPct}%)"></span>`;
+                }).join('');
+                descEl.innerHTML = leg.walkingDesc
+                  + `<div class="wire-march-track-wrap" aria-label="Expedition march progress: ${pct}%">`
+                  + `<div class="wmt-head"><span class="wmt-eta"></span><span class="wmt-pct"></span></div>`
+                  + `<div class="wire-march-track"><div class="wmt-fill"></div>${pipsHtml}<span class="wmt-walker" aria-hidden="true">🥾</span></div>`
+                  + `</div>`
+                  + (isCarlesTester() ? '<div style="margin-top:8px;"><button type="button" class="btn-admin-skip-march" style="padding:4px 12px; background:rgba(251,191,36,0.18); border:1px solid #fbbf24; border-radius:4px; color:#fde68a; font-family:\'Cinzel\',serif; cursor:pointer;">⏩ Tester: skip the walk</button></div>' : '');
+                const skipBtn = descEl.querySelector('.btn-admin-skip-march');
+                if (skipBtn) skipBtn.onclick = (e) => { e.stopPropagation(); leg.march.skip(); };
+                if (leg.cinematic && window.EclipseCinematic) window.EclipseCinematic.attach(descEl, leg.cinematic);
+              }
+              const etaEl = descEl.querySelector('.wmt-eta');
+              const pctEl = descEl.querySelector('.wmt-pct');
+              const fillEl = descEl.querySelector('.wmt-fill');
+              const walkerEl = descEl.querySelector('.wmt-walker');
+              const wrapEl = descEl.querySelector('.wire-march-track-wrap');
+              if (etaEl) etaEl.textContent = '⏱️ ' + leg.etaLabel + ' IN ' + leg.march.eta().toUpperCase();
+              if (pctEl) pctEl.textContent = pct + '% ROUTE';
+              if (fillEl) fillEl.style.width = pct + '%';
+              if (walkerEl) walkerEl.style.left = pct + '%';
+              if (wrapEl) wrapEl.setAttribute('aria-label', `Expedition march progress: ${pct}%`);
+              slots.forEach((sl, idx) => {
+                const pip = descEl.querySelector(`.wmt-event-pip[data-pip-idx="${idx}"]`);
+                if (pip) pip.classList.toggle('is-done', evState.some((e) => (sl.pool || []).some((p) => p.id === e.id)));
+              });
             };
             updateTrek();
             if (window.__wireMarchTimer) clearInterval(window.__wireMarchTimer);
-            window.__wireMarchTimer = setInterval(updateTrek, 30000);
+            window.__wireMarchTimer = setInterval(updateTrek, window.__wireFast ? 30000 : 1000);
             return true;
           }
           if (localStorage.getItem(leg.doneKey) !== 'true') {
@@ -9575,7 +10906,8 @@
       }
 
       function handleWireChoiceSelection(choice, choiceIdx) {
-        if (sfx) sfx.playMechanicalClick();
+        if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
+        else if (sfx) sfx.playMechanicalClick();
         const justAnsweredStep = wireCurrentStep;
         if (choice.nameTitle) {
           setCartographerTitle(choice.nameTitle);
@@ -9777,6 +11109,7 @@
       const wireScrollMem = {};
       function switchWireTab(tab) {
         if (sfx) sfx.playMechanicalClick();
+        if (typeof closeWireHeadPopovers === 'function') closeWireHeadPopovers();
         // each conversation keeps where she was reading (a hidden element forgets its scroll)
         wireScrollMem[currentWireTab] = { top: window.scrollY, bottom: wireNearEnd() };
         currentWireTab = tab;
@@ -9804,19 +11137,47 @@
           { const st = document.getElementById('wire-chapter-strip'); if (st) st.hidden = true; }
           renderInquiriesGrid();
         }
+        if (typeof updateWireBackPresentBtn === 'function') updateWireBackPresentBtn();
       }
       window.switchWireTab = switchWireTab;
 
       if (tabWireExpedition) tabWireExpedition.addEventListener('click', () => switchWireTab('expedition'));
       if (tabWireInquiries) tabWireInquiries.addEventListener('click', () => switchWireTab('inquiries'));
 
+      function isInquiryStageRelevant(inq) {
+        if (!inq || !inq.id) return false;
+        if (inq.id.startsWith('hint-')) return true;
+        const done = (k) => localStorage.getItem(k) === 'true';
+        const st = typeof wireCurrentStep === 'number' ? wireCurrentStep : 0;
+        const tags = new Set();
+        if (st < 5 && !done('order_whispering_chasm_completed')) ['inq-chasm', 'inq-great-silence', 'inq-wadi', 'inq-stacking-rule', 'inq-seal-one', 'inq-river-hunch', 'inq-satchel', 'inq-signal-meter'].forEach((x) => tags.add(x));
+        else if (st < 5 && !done('order_salt_playa_completed')) ['inq-salt-playa', 'inq-ledger-how', 'inq-chasm'].forEach((x) => tags.add(x));
+        else if (st < 6 && !done('order_desert_lexicon_completed')) ['inq-oasis-steles', 'inq-bc-ashes', 'inq-al-qibla', 'inq-phoenix-sigil', 'inq-desert-oracle', 'inq-salt-playa', 'inq-ledger-how'].forEach((x) => tags.add(x));
+        else if (st < 8 && !done('order_oasis_clepsydra_completed')) ['inq-four-wells', 'inq-shadow-hours', 'inq-falcon-weir', 'inq-bc-ashes', 'inq-oasis-steles', 'inq-al-qibla'].forEach((x) => tags.add(x));
+        else if (st < 13 && !done('order_sun_monolith_completed')) ['inq-monolith-shadows', 'inq-walking-sun', 'inq-cairn2-niche', 'inq-cairns', 'inq-falcon-weir', 'inq-bc-ashes'].forEach((x) => tags.add(x));
+        else if (st < 17 && !done('order_sandstone_labyrinth_completed')) ['inq-labyrinth-arches', 'inq-torch-rounds', 'inq-cairn3-plate', 'inq-cairn2-niche', 'inq-cairns'].forEach((x) => tags.add(x));
+        else if (st < 21 && !done('order_cairn_iv_completed')) ['inq-seven-echoes', 'inq-count-echo', 'inq-tuning-pebble', 'inq-cairn3-plate', 'inq-cairns'].forEach((x) => tags.add(x));
+        else if (st < 25 && !done('order_arch_solstice_completed')) ['inq-midsummer-ray', 'inq-autumn-dawn', 'inq-light-code', 'inq-light-on-tower', 'inq-tuning-pebble', 'inq-cairns'].forEach((x) => tags.add(x));
+        else if (st < 29 && !done('order_polybius_stele_completed')) ['inq-stele-stanzas', 'inq-stele-knocks', 'inq-burning-atrium', 'inq-servant-well', 'inq-light-on-tower', 'inq-bc-ashes'].forEach((x) => tags.add(x));
+        else if (st < 33 && !done('order_oracle_horizon_completed')) ['inq-oracle-mirrors', 'inq-oracle-disc', 'inq-oracle-vow', 'inq-oracle-aurelia', 'inq-servant-well', 'inq-desert-oracle'].forEach((x) => tags.add(x));
+        else if (st < 37 && !done('order_masks_gate_completed')) ['inq-unsent-letter', 'inq-masks-lie', 'inq-masks-halves', 'inq-ash-note', 'inq-oracle-aurelia', 'inq-three-towers'].forEach((x) => tags.add(x));
+        else ['inq-camera-upside', 'inq-camera-house', 'inq-gallery-pins', 'inq-gallery-niche', 'inq-ash-note', 'inq-three-towers'].forEach((x) => tags.add(x));
+        return tags.has(inq.id);
+      }
+
       function renderInquiryFilterBar() {
         const filterBar = document.getElementById('inquiry-filter-bar');
         if (!filterBar) return;
         const visibleList = allInquiries().filter(i => isInquiryUnlocked(i));
-        filterBar.innerHTML = INQUIRY_GROUPS.map((g) => {
-          const count = g.id === 'all' ? visibleList.length : visibleList.filter(i => i.group === g.id).length;
-          return `<button type="button" class="inquiry-filter-pill${g.id === currentInquiryFilter ? ' active' : ''}" data-filter="${g.id}">${g.label} (${count})</button>`;
+        const relevantCount = visibleList.filter(i => isInquiryStageRelevant(i)).length;
+        const groups = [{ id: 'all', label: 'All Questions', count: visibleList.length }];
+        if (relevantCount > 0) groups.push({ id: 'current', label: '✦ Current Stage', count: relevantCount });
+        INQUIRY_GROUPS.forEach((g) => {
+          if (g.id === 'all') return;
+          groups.push({ id: g.id, label: g.label, count: visibleList.filter(i => i.group === g.id).length });
+        });
+        filterBar.innerHTML = groups.map((g) => {
+          return `<button type="button" class="inquiry-filter-pill${g.id === currentInquiryFilter ? ' active' : ''}" data-filter="${g.id}">${g.label} (${g.count})</button>`;
         }).join('');
       }
 
@@ -9830,16 +11191,31 @@
         // Only visible, unlocked inquiries are displayed (no spoilers or locked placeholders)
         const visibleList = allInquiries().filter(inq => isInquiryUnlocked(inq));
         const filtered = visibleList.filter((inq) => {
-          if (filter !== 'all' && inq.group !== filter) return false;
+          if (filter === 'current') {
+            if (!isInquiryStageRelevant(inq)) return false;
+          } else if (filter !== 'all' && inq.group !== filter) {
+            return false;
+          }
           if (!query) return true;
           return (inq.title + ' ' + inq.category).toLowerCase().includes(query);
         });
+        const ordered = (!query && filter === 'all')
+          ? filtered.slice().sort((a, b) => {
+              if (String(a.id).startsWith('inq-previously')) return -1;
+              if (String(b.id).startsWith('inq-previously')) return 1;
+              const aRel = isInquiryStageRelevant(a), bRel = isInquiryStageRelevant(b);
+              const aScore = aRel ? (readInquiriesSet.has(a.id) ? 0.5 : 1) : 0;
+              const bScore = bRel ? (readInquiriesSet.has(b.id) ? 0.5 : 1) : 0;
+              return bScore - aScore;
+            })
+          : filtered;
 
-        filtered.forEach((inq) => {
+        ordered.forEach((inq) => {
           const isRead = readInquiriesSet.has(inq.id);
+          const isRel = isInquiryStageRelevant(inq);
           const card = document.createElement('button');
           card.type = 'button';
-          card.className = 'messenger-faq-chip' + (isRead ? ' is-read' : '');
+          card.className = 'messenger-faq-chip' + (isRead ? ' is-read' : '') + (isRel ? ' is-stage-relevant' : '');
           card.id = `inq-card-${inq.id}`;
           card.innerHTML = `
             <div class="messenger-faq-chip-title">
@@ -9848,6 +11224,7 @@
             </div>
             <div class="messenger-faq-chip-cat">
               <span>${inq.category}</span>
+              ${isRel ? '<span class="inquiry-stage-badge">✦ Current Stage</span>' : ''}
               ${isRead ? '<span class="inquiry-read-badge">✓ Answered</span>' : ''}
             </div>
           `;
@@ -9857,7 +11234,7 @@
           inquiriesQuestionsGrid.appendChild(card);
         });
 
-        if (filtered.length === 0) {
+        if (ordered.length === 0) {
           const empty = document.createElement('div');
           empty.className = 'messenger-faq-empty';
           empty.textContent = query ? 'No question matches "' + currentInquirySearch.trim() + '". Try another word.' : 'No questions available in this section yet.';
@@ -9869,11 +11246,16 @@
           const answered = visibleList.filter(i => readInquiriesSet.has(i.id)).length;
           progressEl.textContent = answered + ' / ' + visibleList.length + ' ANSWERED';
         }
+        const clearBtn = document.getElementById('btn-inquiry-clear');
+        if (clearBtn && wireInquiriesStream) {
+          clearBtn.hidden = wireInquiriesStream.children.length === 0;
+        }
       }
 
       function initInquiryFilters() {
         const filterBar = document.getElementById('inquiry-filter-bar');
         const searchInput = document.getElementById('inquiry-search');
+        const clearBtn = document.getElementById('btn-inquiry-clear');
         renderInquiryFilterBar();
         if (filterBar) {
           filterBar.addEventListener('click', (e) => {
@@ -9889,11 +11271,34 @@
             renderInquiriesGrid(currentInquiryFilter);
           });
         }
+        if (clearBtn) {
+          clearBtn.addEventListener('click', () => {
+            if (sfx) sfx.playMechanicalClick();
+            if (wireInquiriesStream) wireInquiriesStream.innerHTML = '';
+            clearBtn.hidden = true;
+          });
+        }
       }
 
       function handleInquiryClick(inq) {
         if (!isInquiryUnlocked(inq)) return;
-        if (sfx) sfx.playMechanicalClick();
+
+        // Deduplicate: if this answer is already displayed in the Inquiries stream, scroll to it and highlight it instead of repeating
+        const existing = wireInquiriesStream && Array.from(wireInquiriesStream.querySelectorAll('.chat-bubble-wrap.incoming[data-inquiry-id]')).find((el) => el.dataset.inquiryId === String(inq.id));
+        if (existing) {
+          if (sfx) sfx.playChimeHover();
+          existing.scrollIntoView({ behavior: window.__wireFast ? 'auto' : 'smooth', block: 'center' });
+          const bubble = existing.querySelector('.chat-bubble');
+          if (bubble) {
+            bubble.classList.remove('highlight-pulse');
+            void bubble.offsetWidth;
+            bubble.classList.add('highlight-pulse');
+          }
+          return;
+        }
+
+        if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
+        else if (sfx) sfx.playMechanicalClick();
 
         // 1. Persist read state
         readInquiriesSet.add(inq.id);
@@ -9923,14 +11328,18 @@
         }
 
         // 3. Silvia posts question into inquiries stream
-        appendWireMessage('SILVIA · NAVIGATOR', inq.title, false, false, null, wireInquiriesStream);
+        const qEl = appendWireMessage('SILVIA · NAVIGATOR', inq.title, false, false, null, wireInquiriesStream);
+        if (qEl) qEl.dataset.inquiryId = inq.id;
+        const clearBtn = document.getElementById('btn-inquiry-clear');
+        if (clearBtn) clearBtn.hidden = false;
         showTyping(true);
 
         // 4. Hermes telegraph answer with live typewriter effect and smooth focus
         setTimeout(() => {
           showTyping(false);
           if (sfx) sfx.playChimeHover();
-          appendWireMessage('HERMES · CARTOGRAPHER', inq.answer, false, true, null, wireInquiriesStream);
+          const aEl = appendWireMessage('HERMES · CARTOGRAPHER', inq.answer, false, true, null, wireInquiriesStream);
+          if (aEl) aEl.dataset.inquiryId = inq.id;
         }, 550);
       }
 
@@ -10048,6 +11457,7 @@
             const p = Math.floor(Math.random() * (maxP - minP + 1)) + minP;
             valEl.textContent = p + '%';
           }
+          if (typeof updateWireLiveTelemetryUI === 'function') updateWireLiveTelemetryUI();
         }
 
         function updateSignalCycle() {
@@ -10114,6 +11524,7 @@
       renderWireExpedition();
       renderInquiriesGrid();
       initInquiryFilters();
+      initWireToolbarInteractions();
       updateMessengerBadge();
       initTelegraphSignalMeter();
       initHermesOnlineToggle();

@@ -36,7 +36,13 @@
         gates: { root: 130.81, mode: 'hijaz', bpm: 58, drum: 'slow', pluck: 0.26, ney: 0.45, level: 0.5 },
         labyrinth: { root: 164.81, mode: 'kurd', bpm: 70, drum: 'walk', pluck: 0.34, ney: 0.3, level: 0.45 },
         sanctum: { root: 196, mode: 'lydian', bpm: 54, drum: 'none', pluck: 0.2, ney: 0.5, level: 0.42 },
-        stage: { root: 174.61, mode: 'nahawand', bpm: 60, drum: 'none', pluck: 0.28, ney: 0.4, level: 0.4 }
+        stage: { root: 174.61, mode: 'nahawand', bpm: 60, drum: 'none', pluck: 0.28, ney: 0.4, level: 0.4 },
+        wireDawn: { root: 146.83, mode: 'majorPent', bpm: 52, drum: 'none', pluck: 0.22, ney: 0.28, level: 0.28 },
+        wireNoon: { root: 146.83, mode: 'hijaz', bpm: 58, drum: 'none', pluck: 0.24, ney: 0.22, level: 0.26 },
+        wireDusk: { root: 164.81, mode: 'kurd', bpm: 50, drum: 'none', pluck: 0.20, ney: 0.32, level: 0.28 },
+        wireNight: { root: 196.00, mode: 'minorPent', bpm: 46, drum: 'none', pluck: 0.16, ney: 0.36, level: 0.26 },
+        wireFire: { root: 130.81, mode: 'hijaz', bpm: 54, drum: 'slow', pluck: 0.24, ney: 0.24, level: 0.28 },
+        wireLamp: { root: 174.61, mode: 'nahawand', bpm: 50, drum: 'none', pluck: 0.20, ney: 0.32, level: 0.26 }
       };
 
       // Which bed goes with which game. Parts: wind [level, centre Hz, Q, sway/s, echo?], drone [level, Hz…],
@@ -49,8 +55,6 @@
         'modal-oasis-clepsydra': { name: 'four wells', wind: [0.15, 420, 0.8, 0.05], drips: [0.32, 1.2], rumble: [0.1, 800], music: 'wells' },
         'modal-oasis-visions': { name: 'four wells', wind: [0.15, 420, 0.8, 0.05], drips: [0.32, 1.2], rumble: [0.1, 800], music: 'wells' },
         'modal-gates-tower-ii': { name: 'gates of tower ii', wind: [0.32, 480, 0.8, 0.05], drone: [0.08, 65.41, 98], crackle: [0.1, 1.4], music: 'gates' },
-        // the Field Wire (its probe is only on screen while the chat is): a very quiet wind under the conversation, no music
-        'wire-ambient-probe': { name: 'the wire', wind: [0.1, 520, 0.7, 0.03] },
         'modal-night-erg': { name: 'night on the erg', wind: [0.3, 380, 0.7, 0.05], drone: [0.06, 98, 147], music: 'night' },
         'modal-stones-dream': { name: 'a dream of 1998', wind: [0.22, 520, 0.6, 0.04], drone: [0.07, 73.4, 110, 146.8], crackle: [0.05, 0.7], music: 'dawn' },
         'modal-bridge-spyglass': { name: 'dawn on the natural bridge', wind: [0.55, 360, 1.1, 0.07, true], drone: [0.05, 55, 82.4], music: 'canyon' },
@@ -62,10 +66,20 @@
         'modal-oracle-horizon': { name: 'inner chamber', wind: [0.12, 600, 0.8, 0.04], drone: [0.13, 98, 147, 196], music: 'sanctum' },
         'modal-masks-gate': { name: 'theatre gate', wind: [0.1, 500, 0.9, 0.03], drone: [0.11, 65.4, 98], crackle: [0.07, 0.5], music: 'stage' },
         'modal-camera-obscura': { name: 'dark room', wind: [0.05, 380, 1.1, 0.02], drone: [0.1, 55, 82.4], drips: [0.14, 0.35] },
-        'modal-whispering-gallery': { name: 'stone gallery', wind: [0.04, 700, 0.9, 0.02], drone: [0.05, 73.4, 110], drips: [0.08, 0.2], music: 'stage' }
+        'modal-whispering-gallery': { name: 'stone gallery', wind: [0.04, 700, 0.9, 0.02], drone: [0.05, 73.4, 110], drips: [0.08, 0.2], music: 'stage' },
+        // Field Wire sits last so any open station modal keeps priority over the chat ambience
+        'wire-ambient-probe': { name: 'the wire', wind: [0.13, 520, 0.7, 0.04], drone: [0.045, 73.42, 110], music: 'wireDawn' }
+      };
+      var WIRE_MOOD_BEDS = {
+        dawn:  { name: 'the wire', wind: [0.13, 520, 0.7, 0.04], drone: [0.045, 73.42, 110], music: 'wireDawn' },
+        noon:  { name: 'the wire', wind: [0.15, 760, 0.6, 0.05], drone: [0.045, 73.42, 146.83], music: 'wireNoon' },
+        dusk:  { name: 'the wire', wind: [0.14, 380, 1.0, 0.04, true], drone: [0.05, 65.41, 98], music: 'wireDusk' },
+        night: { name: 'the wire', wind: [0.10, 420, 0.8, 0.03], drone: [0.05, 98, 147], music: 'wireNight' },
+        fire:  { name: 'the wire', wind: [0.08, 360, 0.9, 0.03], rumble: [0.11, 280], crackle: [0.14, 1.8], drone: [0.055, 65.41, 98], music: 'wireFire' },
+        lamp:  { name: 'the wire', wind: [0.06, 540, 0.9, 0.02], drips: [0.07, 0.22], drone: [0.055, 87.31, 130.81], music: 'wireLamp' }
       };
 
-      var ctx = null, master = null, noise = null, verb = null, fxBus = null, current = null, bed = null;
+      var ctx = null, master = null, noise = null, verb = null, fxBus = null, current = null, currentWireMood = null, bed = null;
       var muted = false, intensity = 0.5, notes = 0, hushed = false;
       try { muted = localStorage.getItem(MUTE_KEY) === 'true'; } catch (e) {}
 
@@ -455,15 +469,22 @@
         }
         return null;
       }
+      function wireMood() {
+        var w = document.querySelector('.messenger-app-window');
+        return (w && w.dataset && w.dataset.mood) || 'dawn';
+      }
       function sync() {
         var id = onScreen();
-        if (id === current) return;
+        var wm = id === 'wire-ambient-probe' ? wireMood() : null;
+        if (id === current && wm === currentWireMood) return;
         if (bed) { fadeOut(bed); bed = null; }
         current = id;
+        currentWireMood = wm;
         // back to neutral only when the game closes: a game that set its level as it opened keeps it
         if (!id) { intensity = 0.5; hushed = false; }
         if (!id || !audio()) return;
-        bed = build(BEDS[id]);
+        var def = id === 'wire-ambient-probe' ? (WIRE_MOOD_BEDS[wm] || BEDS[id]) : BEDS[id];
+        bed = build(def);
         bed.out.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_S);
         if (ctx.state === 'suspended' && !document.hidden) ctx.resume().catch(function () {});
       }
