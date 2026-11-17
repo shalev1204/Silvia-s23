@@ -1,0 +1,10 @@
+/* Option A · the Wire is one screen tall; the chat scrolls inside it; replies and the mission sit at the end of the conversation */
+#view-field-wire .messenger-app-window.is-expedition { height: calc(100vh - 16px); display: flex; flex-direction: column; position: relative; }
+#view-field-wire .wire-fixed-head { position: relative; }
+#view-field-wire .messenger-app-window.is-expedition #wire-messages-stream { flex: 1 1 0 !important; min-height: 0 !important; height: auto !important; max-height: none !important; overflow-y: auto !important; overscroll-behavior: contain; }
+#view-field-wire .messenger-app-window.is-expedition .messenger-reply-deck { position: static !important; box-shadow: none; margin: 26px -4px 8px; border-top: 1px solid rgba(201, 162, 92, 0.25); }
+#wire-back-present-wrap { display: none !important; }
+.demo-pill { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 50; display: none;
+  padding: 10px 22px; border-radius: 999px; border: 1px solid rgba(232, 190, 110, 0.7); cursor: pointer;
+  background: linear-gradient(180deg, #e8b75f, #c38a35); color: #2a1a0a; font: 600 0.82rem 'Cinzel', Georgia, serif; letter-spacing: 0.08em;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55); }

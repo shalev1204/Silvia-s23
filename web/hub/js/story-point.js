@@ -9,7 +9,7 @@
     // The previous point (12 Nov, flag order_story_monolith_v1) is replaced by this one. Rebuilt by scratch/utils/build_story_point.py.
     (function () {
       'use strict';
-      var FLAG = 'order_story_dream_v2';
+      var FLAG = 'order_story_dream_v3';
       var DEVICE_KEYS = ['the_eclipse_active_seeker', 'the_eclipse_gate_ok_at', 'hub_sidebar_collapsed'];
       function isDeviceKey(k) {
         return DEVICE_KEYS.indexOf(k) >= 0 || k.indexOf('eclipse_profile_vault_') === 0 || k.indexOf('eclipse_cloud_') === 0;
@@ -22,7 +22,7 @@
         "cartographer_radio_active_slide": "0",
         "order_active_map_path": "desert",
         "order_ambience_muted": "false",
-        "order_balance_state": "{\"silvia\":{\"open\":\"lon-sec|diff-tf\",\"pairs\":{\"lat-deg|diff-kg\":{\"step\":3,\"entries\":[52,26,22]},\"lon-deg|diff-pb\":{\"step\":3,\"entries\":[42,21,17]},\"lon-min|diff-ve\":{\"step\":3,\"entries\":[24,12,2]},\"lon-sec|diff-tf\":{\"step\":3,\"entries\":[32,16,6]}}}}",
+        "order_balance_state": "{\"silvia\":{\"open\":\"lon-sec|diff-tf\",\"pairs\":{\"lat-deg|diff-kg\":{\"step\":3,\"entries\":[52,26,22]},\"lon-deg|diff-pb\":{\"step\":3,\"entries\":[42,21,17]},\"lon-min|diff-ve\":{\"step\":3,\"entries\":[24,12,2]},\"lon-sec|diff-tf\":{\"step\":3,\"entries\":[32,16,6]}}},\"carles\":{\"open\":\"lon-sec|diff-tf\",\"pairs\":{\"lat-deg|diff-kg\":{\"step\":3,\"entries\":[52,26,22]},\"lon-deg|diff-pb\":{\"step\":3,\"entries\":[42,21,17]},\"lon-min|diff-ve\":{\"step\":3,\"entries\":[24,12,2]},\"lon-sec|diff-tf\":{\"step\":3,\"entries\":[32,16,6]}}}}",
         "order_cairn1_completed": "true",
         "order_cairn1_found": "true",
         "order_cairn4_march_start": "1794869911910",
@@ -89,7 +89,7 @@
         "order_labyrinth_march_start": "1794866865449",
         "order_labyrinth_overheard": "[1,0,3,2]",
         "order_labyrinth_star_seen": "true",
-        "order_last_seen_at": "1794914860460",
+        "order_last_seen_at": "1794922181747",
         "order_lexicon_cine_intro": "seen",
         "order_lexicon_cine_outro": "seen",
         "order_lexicon_howto": "seen",
@@ -98,7 +98,6 @@
         "order_lexicon_walk": "{\"carved\":[\"ac-2\",\"dn-2\",\"dn-4\",\"ac-6\",\"ac-8\",\"dn-7\",\"ac-9\",\"ac-3\",\"dn-5\",\"dn-1\"],\"watch\":4,\"min\":1412,\"wrong\":0,\"heard\":0,\"waits\":4,\"atDial\":true,\"sigil\":true,\"locked\":true,\"dialWrong\":0,\"bearWrong\":0,\"flee\":[0,1,-1,1,0,-1,1],\"dead\":0,\"tried\":{},\"hidden\":true,\"hearts\":3,\"tries\":1}",
         "order_matrix_completed": "true",
         "order_messenger_last_read_step": "18",
-        "order_messenger_unread_count": "2",
         "order_midnight_completed": "true",
         "order_monolith_cine_intro": "seen",
         "order_monolith_cine_outro": "seen",
@@ -147,11 +146,14 @@
         "order_whispering_chasm_completed": "true",
         "order_wire10_arrived": "false",
         "order_wire_asks": "{\"15:i:0\":1,\"15:i:1\":0,\"17:i:0\":0,\"17:i:1\":0}",
-        "order_wire_marchev": "{\"14\":[{\"id\":\"shelf-lizard\",\"pick\":\"n\"},{\"id\":\"shelf-arches-hum\",\"pick\":\"n\"}],\"18\":[{\"id\":\"hp-owl\",\"pick\":\"n\"},{\"id\":\"hp-storm\",\"pick\":null}]}",
+        "order_wire_marchev": "{\"14\":[{\"id\":\"shelf-lizard\",\"pick\":\"n\"},{\"id\":\"shelf-arches-hum\",\"pick\":\"n\"}],\"18\":[{\"id\":\"hp-owl\",\"pick\":\"n\"},{\"id\":\"hp-storm\",\"pick\":\"x\"},{\"id\":\"hp-veiled-woman\",\"pick\":null}]}",
         "order_wire_read": "{\"0\":29,\"1\":6,\"2\":26,\"3\":10}",
-        "order_wire_read2": "{\"0\":35,\"1\":72}",
+        "order_wire_read2": "{\"0\":35,\"1\":83}",
         "order_zodiac_completed": "true",
         "seeker_carles_cipher_completed": "true",
+        "seeker_carles_cipher_ledger": "{\"O\":23,\"A\":7,\"K\":26,\"G\":22,\"P\":21,\"B\":17,\"V\":12,\"E\":2,\"T\":16,\"F\":6,\"X\":15,\"Q\":14,\"Z\":5,\"R\":3,\"D\":18,\"C\":24}",
+        "seeker_carles_equations_open_editors": "{\"chasm-xe\":false,\"playa-qe\":false,\"stele-oz\":false,\"stele-rf\":false,\"cairn2-df\":false,\"cairn2-ct\":false}",
+        "seeker_carles_equations_resolved": "{\"lat-min\":true,\"zod-diff\":true,\"playa-qe\":true,\"lat-deg\":true,\"diff-kg\":true,\"lon-deg\":true,\"diff-pb\":true,\"lon-min\":true,\"diff-ve\":true,\"playa-ta\":true,\"lon-sec\":true,\"diff-tf\":true,\"falcon-pa\":true,\"chasm-xe\":true,\"stele-oz\":true,\"falcon-qz\":true,\"stele-rf\":true,\"cairn2-df\":true,\"cairn2-ct\":true}",
         "seeker_carles_inventory_relics": "[\"gilded_feather\",\"order_wax_seal\",\"surveyor_compass\",\"seal_cairn_1\",\"water_skins\",\"falcon_weight\",\"lamp_oil\",\"red_cord\",\"seal_cairn_2\",\"founders_lamp\",\"raiders_survey\"]",
         "seeker_carles_midnight_completed": "true",
         "seeker_carles_satchel_expedition_item": "{\"id\":\"surveyor_compass\",\"name\":\"1998 Brass Surveyor's Compass\",\"icon\":\"🧭\",\"desc\":\"Precision surveyor compass left in 1998 beside the copper benchmark at the foot of the Watchtower VI trail.\"}",

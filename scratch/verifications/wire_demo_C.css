@@ -1,0 +1,19 @@
+/* Option C · like A (one-screen Wire, chat scrolls inside, menu one flick away) + a slimmer head + the replies fold into a thin bar while reading back */
+#view-field-wire .messenger-app-window.is-expedition { height: calc(100vh - 16px); display: flex; flex-direction: column; position: relative; }
+#view-field-wire .wire-fixed-head { position: relative; }
+#view-field-wire .wire-chapter-strip { padding-top: 6px !important; padding-bottom: 6px !important; min-height: 0 !important; }
+#view-field-wire .wire-milestone-filters { display: none !important; }
+#view-field-wire .messenger-app-window.is-expedition #wire-messages-stream { flex: 1 1 0 !important; min-height: 0 !important; height: auto !important; max-height: none !important; overflow-y: auto !important; overscroll-behavior: contain; }
+#view-field-wire .messenger-app-window.is-expedition .messenger-reply-deck { position: relative !important; transition: max-height 0.35s ease; }
+#wire-back-present-wrap { display: none !important; }
+.messenger-reply-deck .demo-fold { display: none; }
+.messenger-reply-deck.demo-collapsed { padding: 8px 22px !important; }
+.messenger-reply-deck.demo-collapsed > :not(.demo-fold) { display: none !important; }
+.messenger-reply-deck.demo-collapsed .demo-fold { display: flex; align-items: center; gap: 18px; width: 100%; cursor: pointer;
+  padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(201, 162, 92, 0.45); background: rgba(40, 28, 18, 0.9); color: #f0decc; font: 0.9rem Inter, system-ui, sans-serif; }
+.demo-fold .df-wait { color: #f2c46d; font: 600 0.78rem 'Cinzel', Georgia, serif; letter-spacing: 0.1em; }
+.demo-fold .df-dot { width: 9px; height: 9px; border-radius: 50%; background: #f2c46d; box-shadow: 0 0 10px #f2c46d; }
+.demo-fold .df-trip { margin-left: auto; color: #d9c3a3; font: 0.74rem 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 0.08em; }
+.demo-fold .df-bar { width: 120px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
+.demo-fold .df-bar i { display: block; height: 100%; background: linear-gradient(90deg, #c38a35, #f2c46d); }
+.demo-fold .df-go { padding: 6px 14px; border-radius: 999px; background: #d9a24b; color: #2a1a0a; font: 600 0.74rem 'Cinzel', Georgia, serif; letter-spacing: 0.08em; }

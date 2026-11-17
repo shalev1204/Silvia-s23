@@ -1,0 +1,10 @@
+/* Option B · the page keeps scrolling as today; the top menu slides back in as soon as you scroll up; replies and mission are no longer pinned */
+#view-field-wire .messenger-app-window.is-expedition .messenger-reply-deck { position: static !important; box-shadow: none; }
+#wire-back-present-wrap { display: none !important; }
+.hub-viewport-header.demo-float { position: sticky !important; top: 0; z-index: 90; transform: translateY(-115%); transition: transform 0.3s ease;
+  background: linear-gradient(180deg, rgba(28, 20, 14, 0.97), rgba(22, 15, 10, 0.93)); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(201, 162, 92, 0.35); box-shadow: 0 8px 24px rgba(0,0,0,.5); }
+.hub-viewport-header.demo-float.show { transform: none; }
+body.demo-menu-on #view-field-wire .wire-fixed-head { top: var(--demo-bar, 80px); transition: top 0.3s ease; }
+.demo-pill { position: sticky; bottom: 16px; z-index: 50; align-self: center; margin: -52px auto 10px; display: none;
+  padding: 10px 22px; border-radius: 999px; border: 1px solid rgba(232, 190, 110, 0.7); cursor: pointer;
+  background: linear-gradient(180deg, #e8b75f, #c38a35); color: #2a1a0a; font: 600 0.82rem 'Cinzel', Georgia, serif; letter-spacing: 0.08em; box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55); }

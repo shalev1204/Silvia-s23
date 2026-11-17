@@ -82,8 +82,8 @@ BASE = f"http://127.0.0.1:{PORT}"
 VIEWS = ["view-trail", "view-transmissions", "view-archives", "view-chronicles", "view-cipher", "view-field-wire"]
 
 # Seeds a profile once per tab (sessionStorage guard), so reloads keep whatever the page writes
-# order_story_monolith_v1 / order_story_dream_v2: hub/js/story-point.js would replace a seeded journey with Silvia's story point (17 Nov)
-SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;if(s.__nostory)delete s.__nostory;else{if(!('order_story_monolith_v1' in s))s.order_story_monolith_v1='done';if(!('order_story_dream_v2' in s))s.order_story_dream_v2='done';}for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
+# order_story_monolith_v1 / order_story_dream_v2 / v3: hub/js/story-point.js would replace a seeded journey with Silvia's story point (17 Nov)
+SEED_JS = "(()=>{if(sessionStorage.getItem('__seeded'))return;const s=%s;if(s.__nostory)delete s.__nostory;else{if(!('order_story_monolith_v1' in s))s.order_story_monolith_v1='done';if(!('order_story_dream_v2' in s))s.order_story_dream_v2='done';if(!('order_story_dream_v3' in s))s.order_story_dream_v3='done';}for(const k in s)localStorage.setItem(k,s[k]);sessionStorage.setItem('__seeded','1')})()"
 SILVIA = {"the_eclipse_active_seeker": "Silvia", "order_silvia_live_v4": "done", "order_silvia_live_v3": "done",
           "order_silvia_north_portal_v1": "done"}
 DESERT_DONE = {"order_desert_lexicon_completed": "true", "order_oasis_clepsydra_completed": "true", "order_gates_march_bypassed": "true",
@@ -4719,13 +4719,13 @@ def test_wire_chapters(browser):
     st = js("(() => ({ marker: !!document.getElementById('wire-new-marker'), tag: !document.getElementById('wcs-new').hidden, read: JSON.parse(localStorage.getItem('order_wire_read2')) }))()")
     check(st["marker"] and st["tag"] and st["read"][str(last)] == read[str(last)] + 3,
           "three messages she had not seen: a “New messages” line where they begin, a NEW tag on the chapter, and then they count as read", str(st))
-    # the cut of a text into beats
+    # thematic grouping of a text (Option C: paragraphs stay grouped inside one long dispatch)
     beats = js("[window.__wireTest.beats('One short line.'), window.__wireTest.beats('First paragraph.\\n\\nSecond paragraph.'), window.__wireTest.beats(['A.', 'B.']), window.__wireTest.beats('" + ("This is a sentence of some length, said calmly. " * 8).strip() + "')]")
-    check(beats[0] == ["One short line."] and len(beats[1]) == 2 and beats[2] == ["A.", "B."] and len(beats[3]) >= 3 and all(len(b) <= 160 for b in beats[3]),
-          "a text is cut into short beats at its paragraphs, and long paragraphs at their sentences", str(beats)[:300])
+    check(beats[0] == ["One short line."] and beats[1] == ["First paragraph.\n\nSecond paragraph."] and beats[2] == ["A.\n\nB."] and len(beats[3]) == 1 and len(beats[3][0]) > 250,
+          "a text and beat lists stay grouped into one long dispatch without splitting every 150 chars", str(beats)[:300])
     ctx.close()
 
-    # the pace: the dots, then the message typed slowly, then a breath: never all at once
+    # the pace: the dots, then the consolidated message typed slowly, then a breath: never all at once
     ctx, page, errors = new_page(browser, {"the_eclipse_active_seeker": "Carles"})
     page.add_init_script("window.__wireFast = false")
     page.goto(f"{BASE}/index.html?tester=1", wait_until="load"); page.wait_for_timeout(2500)
@@ -4737,11 +4737,11 @@ def test_wire_chapters(browser):
       await window.__wireTest.play(['The lamp is lit, Silvia.', 'I can see the whole gorge from here.', 'Nobody has moved on the terraces.'], 11);
       clearInterval(poll); return { ms: Math.round(performance.now() - t0), dots, grew, bubbles: document.querySelectorAll('.chat-bubble-wrap.incoming').length }; }""")
     ticks = js("window.__wireTicks || 0")
-    check(ticks == 3, "one soft tick for each message, not a burst and not a click for every letter", str(ticks))
+    check(ticks == 1, "one soft tick for the grouped dispatch, not a burst per sentence", str(ticks))
     keys = js("window.__wireKeys || 0")
-    check(keys >= 12, "while he types there is the soft sound of a key now and then, and each message opens with its own tick", str(keys))
+    check(keys >= 12, "while he types there is the soft sound of a key now and then, and the dispatch opens with its tick", str(keys))
     check(res["dots"] and res["grew"] and 1500 < res["ms"] < 9000,
-          "Hermes's messages come one by one: the typing dots, the text typed slowly, a breath between them", str(res))
+          "Hermes's grouped dispatch arrives with typing dots, gradual text, and a breath at the end", str(res))
     check(not errors, "no JS errors in the chat window", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
@@ -4823,13 +4823,16 @@ def test_wire_ux(browser):
     js("document.querySelector('[data-view=\"view-field-wire\"]').click()"); page.wait_for_timeout(1500)
     js("""() => { window.__done = false; window.__wireTest.play(['First beat.', 'Second beat.', { ask: [
         { text: 'Be careful', silviaMsg: 'Be careful, Hermes.', reply: ['I will.', 'Promise.'] }, { text: 'Go on', silviaMsg: 'Go on!', reply: ['Right.'] }] }, 'Third beat.'], 11).then(() => { window.__done = true; }); }""")
-    page.wait_for_timeout(800)
-    st = js("""(() => ({ pills: [...document.querySelectorAll('#wire-choices-grid .messenger-choice-pill')].length, box: document.getElementById('wire-prompt-box').style.display, done: window.__done }))()""")
-    check(st["pills"] == 2 and st["box"] == "block" and not st["done"], "in the middle of his messages two quick replies wait for her and he does not go on without her", str(st))
-    js("document.querySelectorAll('#wire-choices-grid .messenger-choice-pill')[0].click()"); page.wait_for_timeout(1200)
-    tail = js("[...document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap')].slice(-6).map(n => (n.className.includes('outgoing') ? 'S: ' : 'H: ') + n.querySelector('.chat-bubble').innerText.replace(/\\s+/g, ' '))")
-    check(js("window.__done") and any(t.startswith("S: Be careful") for t in tail) and any("Promise" in t for t in tail) and "Third beat" in tail[-1] and json_has(js("localStorage.getItem('order_wire_asks')"), "11:i:0", 0),
-          "her line appears, he answers differently to each option, the talk goes on, and her answer is saved", str(tail))
+    page.wait_for_timeout(1200)
+    st = js("""(() => { const last = [...document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap.incoming')].pop();
+      return { chips: last ? last.querySelectorAll('.wire-aside-chip').length : 0, done: window.__done,
+               text: last && last.querySelector('.chat-bubble-text') ? last.querySelector('.chat-bubble-text').innerText : '' }; })()""")
+    check(st["chips"] == 2 and st["done"] and "First beat." in st["text"] and "Third beat." in st["text"],
+          "beats stay grouped in one long dispatch while optional asks sit at its foot", str(st))
+    js("[...document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap.incoming')].pop().querySelector('.wire-aside-chip').click()"); page.wait_for_timeout(300)
+    inline = js("([...document.querySelectorAll('#wire-messages-stream .chat-bubble-wrap.incoming')].pop().querySelector('.wire-aside-reply-inline:not([hidden])') || {}).innerText || ''")
+    check("Be careful, Hermes." in inline and "Promise." in inline and json_has(js("localStorage.getItem('order_wire_asks')"), "11:i:0", 0),
+          "her optional ask opens his answer right inside the message footer and saves it", inline)
     check(not errors, "no JS errors with the interjections", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 

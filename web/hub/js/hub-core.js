@@ -8917,116 +8917,141 @@
         });
       }
 
-      // ---- The chat of the Field Wire from Station 14 on (docs/DESERT_ODYSSEY_BIBLE.md, "Estándar del chat del Field Wire") ----
-      // Hermes talks in short messages, one after another, like a person at the other end of a wire: each is announced by
-      // the typing dots, typed slowly, and followed by a breath. A text is a string (cut here into beats at its paragraphs and,
-      // when a paragraph is long, at its sentences) or an array of beats.
-      const WIRE_BEAT_MAX = 150;
-      function wireBeats(text) {
-        if (Array.isArray(text)) return text.reduce((all, t) => all.concat(wireBeats(t)), []);
-        if (text && typeof text === 'object') return [];   // an interjection (see wireSeq): not a message
-        const out = [];
-        String(text == null ? '' : text).split(/\n\s*\n/).forEach((para) => {
-          para = para.trim();
-          if (!para) return;
-          const sentences = para.replace(/([.!?…]["”’']?)\s+(?=["“‘'(]?[A-Z0-9])/g, '$1\u0001').split('\u0001');
-          let cur = '';
-          sentences.forEach((sn) => {
-            if (cur && (cur + ' ' + sn).length > WIRE_BEAT_MAX) { out.push(cur); cur = sn; } else cur = cur ? cur + ' ' + sn : sn;
-          });
-          if (cur) out.push(cur);
+      // ---- Option C: Thematic Long-Form Field Dispatches + Optional Inline Footnote Asks ----
+      function flattenWireText(item, outParas, outAsides) {
+        if (Array.isArray(item)) {
+          item.forEach((sub) => flattenWireText(sub, outParas, outAsides));
+          return;
+        }
+        if (item && typeof item === 'object' && Array.isArray(item.ask)) {
+          outAsides.push({ n: outAsides.length, ask: item.ask });
+          return;
+        }
+        if (item == null) return;
+        String(item).split(/\n\s*\n/).forEach((p) => {
+          const clean = p.trim();
+          if (clean) outParas.push(clean);
         });
-        return out;
+      }
+      function wireBeats(text) {
+        const paras = [];
+        flattenWireText(text, paras, []);
+        return paras.length ? [paras.join('\n\n')] : [];
       }
       let wireBeatsPlaying = false, wireAskPending = false;
       const typingLead = (t) => window.__wireFast ? 30 : window.__wireAsk === 'manual' ? 110 : Math.min(800, 260 + t.length * 4);   // the dots, before the bubble opens
       const readingGap = (t) => window.__wireFast ? 30 : window.__wireAsk === 'manual' ? 90 : Math.min(800, 200 + t.length * 4);   // a breath after it
-      // A sequence is beats (strings) and interjections: { ask: [{ text, silviaMsg, reply, onPick }] } where Silvia says something in
-      // one tap and Hermes answers. The answer is saved by place (step:part:index) so the history draws it again.
+      // A sequence groups narrative runs into consolidated thematic dispatches with optional footnote asks ({ ask: [...] }).
       const WIRE_ASKS_KEY = 'order_wire_asks';
       function wireAsks() { try { return JSON.parse(localStorage.getItem(WIRE_ASKS_KEY) || '{}') || {}; } catch (e) { return {}; } }
       function wireAskSave(key, i) { const o = wireAsks(); o[key] = i; try { localStorage.setItem(WIRE_ASKS_KEY, JSON.stringify(o)); } catch (e) {} }
       function wireSeq(text) {
-        if (Array.isArray(text)) return text.reduce((all, t) => all.concat(wireSeq(t)), []);
-        if (text && typeof text === 'object' && Array.isArray(text.ask)) return [text];
-        return wireBeats(text);
+        const paras = [], asides = [];
+        flattenWireText(text, paras, asides);
+        if (!paras.length && !asides.length) return [];
+        return [{ text: paras.join('\n\n'), asides }];
       }
       function wireAskReply(opt) { try { return wireBeats(typeof opt.reply === 'function' ? opt.reply(window.WireScript) : opt.reply); } catch (e) { return []; } }
-      // The history: the beats at once, and for each interjection what she answered (none recorded = it did not happen)
+      function attachWireAsides(msgEl, asides, meta) {
+        if (!msgEl || !asides || !asides.length) return;
+        const bubble = msgEl.querySelector('.chat-bubble');
+        if (!bubble) return;
+        bubble.classList.add('is-long-chat');
+        const wrap = document.createElement('div');
+        wrap.className = 'wire-aside-bar';
+        const picks = wireAsks();
+        const stepId = meta && meta.step != null ? meta.step : wireCurrentStep;
+        const partId = (meta && meta.part) || 'i';
+
+        asides.forEach((slot) => {
+          const group = document.createElement('div');
+          group.className = 'wire-aside-group';
+          const row = document.createElement('div');
+          row.className = 'wire-aside-row';
+          row.setAttribute('role', 'group');
+          row.setAttribute('aria-label', 'Optional follow-up question');
+          const lbl = document.createElement('span');
+          lbl.className = 'wire-aside-label';
+          lbl.textContent = slot.n === 0 ? 'Optional ask:' : 'Also ask:';
+          row.appendChild(lbl);
+
+          const inlineOut = document.createElement('div');
+          inlineOut.className = 'wire-aside-reply-inline';
+          inlineOut.hidden = true;
+
+          const key = stepId + ':' + partId + ':' + slot.n;
+          const savedIdx = picks[key];
+
+          const renderAsideAnswer = (opt, activeBtn) => {
+            row.querySelectorAll('.wire-aside-chip').forEach((b) => {
+              const isCur = b === activeBtn;
+              b.classList.toggle('is-active', isCur);
+              b.setAttribute('aria-pressed', isCur ? 'true' : 'false');
+            });
+            const replyText = wireAskReply(opt).join('\n\n');
+            const replyParas = formatJournalCallouts(replyText).split('\n\n').map((p) => `<p>${p.trim()}</p>`).join('');
+            inlineOut.innerHTML =
+              `<div class="war-you"><strong>You:</strong> ${formatJournalCallouts(opt.silviaMsg || opt.text)}</div>` +
+              `<div class="war-hermes"><strong>Hermes:</strong> ${replyParas}</div>`;
+            inlineOut.hidden = false;
+          };
+
+          slot.ask.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'wire-aside-chip';
+            btn.setAttribute('aria-pressed', savedIdx === idx ? 'true' : 'false');
+            btn.textContent = '💬 ' + (opt.text || '');
+            btn.addEventListener('click', () => {
+              if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
+              else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+              wireAskSave(key, idx);
+              if (typeof opt.onPick === 'function') { try { opt.onPick(window.WireScript); } catch (e) { console.warn('wire ask onPick', e); } }
+              renderAsideAnswer(opt, btn);
+            });
+            row.appendChild(btn);
+            if (savedIdx === idx) renderAsideAnswer(opt, btn);
+          });
+
+          group.appendChild(row);
+          group.appendChild(inlineOut);
+          wrap.appendChild(group);
+        });
+
+        const timeEl = bubble.querySelector('.chat-bubble-time');
+        if (timeEl) bubble.insertBefore(wrap, timeEl);
+        else bubble.appendChild(wrap);
+      }
+      // The history: renders each thematic dispatch and restores any saved optional follow-up notes inline
       function drawWireSeq(texts, meta, sender) {
-        const picks = wireAsks(); let n = 0;
-        wireSeq(texts).forEach((it) => {
-          if (typeof it === 'string') { appendWireMessage(sender || getCartographerTitle(), it, false, false, null, null, meta); return; }
-          const idx = picks[meta.step + ':' + meta.part + ':' + (n++)], opt = typeof idx === 'number' ? it.ask[idx] : null;
-          if (!opt) return;
-          appendWireMessage('SILVIA · NAVIGATOR', opt.silviaMsg, false, false, null, null, meta);
-          wireAskReply(opt).forEach((b) => appendWireMessage(sender || getCartographerTitle(), b, false, false, null, null, meta));
+        wireSeq(texts).forEach((entry) => {
+          const msgMeta = entry.asides.length ? Object.assign({}, meta, { asides: entry.asides }) : meta;
+          appendWireMessage(sender || getCartographerTitle(), entry.text || '…', false, false, null, null, msgMeta);
         });
       }
-      // Hermes says `texts` as live messages; `onDone` runs after the last one has been typed and read. meta.part tells where the
-      // sequence belongs ('i' opening, 'f' final, 'r0'..'r2' reply to a main choice) so that its interjections can be remembered.
+      // Hermes delivers grouped thematic dispatches live; optional footnote asks attach cleanly without cutting his flow
       function playHermesBeats(texts, meta, onDone) {
         const items = wireSeq(texts), token = window.__wireTypewriterToken || 0;
         wireBeatsPlaying = true;
-        let i = 0, askN = 0;
+        wireAskPending = false;
         const alive = () => token === (window.__wireTypewriterToken || 0);
-        const say = (beats, then) => {
-          let k = 0;
-          const one = () => {
-            if (!alive()) return;
-            if (k >= beats.length) { then(); return; }
-            const text = beats[k++];
-            showTyping(true);
-            setTimeout(() => {
-              if (!alive()) return;
-              showTyping(false);
-              appendWireMessage(getCartographerTitle(), text, false, true, () => setTimeout(one, readingGap(text)), null, Object.assign({ slow: true }, meta || {}));
-            }, typingLead(text));
-          };
-          one();
-        };
-        const ask = (it, n, resume) => {
-          const key = (meta && meta.step) + ':' + ((meta && meta.part) || 'i') + ':' + n;
-          const choose = (idx) => {
-            const opt = it.ask[idx];
-            wireAskPending = false;
-            wireAskSave(key, idx);
-            if (wirePromptBox) wirePromptBox.style.display = 'none';
-            appendWireMessage('SILVIA · NAVIGATOR', opt.silviaMsg, false, false, null, null, meta);
-            if (typeof opt.onPick === 'function') { try { opt.onPick(window.WireScript); } catch (e) { console.warn('wire ask onPick', e); } }
-            say(wireAskReply(opt), resume);
-          };
-          if (window.__wireFast && window.__wireAsk !== 'manual') { choose(0); return; }
-          if (!wirePromptBox || !wireChoicesGrid) { choose(0); return; }
-          wireAskPending = true;
-          const header = document.getElementById('wire-prompt-header-text');
-          if (header) header.textContent = 'Say something';
-          if (wireCompletedBar) wireCompletedBar.style.display = 'none';
-          wireChoicesGrid.innerHTML = '';
-          it.ask.forEach((o, idx) => wireChoicesGrid.appendChild(makeChoicePill('💬', formatJournalCallouts(o.text), () => {
-            if (!wireAskPending) return;
-            if (sfx && sfx.playSilviaDispatch) sfx.playSilviaDispatch();
-            else if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-            wireChoicesGrid.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-            choose(idx);
-          })));
-          wirePromptBox.style.display = 'block';
-          if (typeof scrollChatToActivePrompt === 'function') scrollChatToActivePrompt(false);
-        };
-        const next = () => {
+        let idx = 0;
+        const playNext = () => {
           if (!alive()) return;
-          wireBeatsPlaying = true;
-          if (i >= items.length) { showTyping(false); wireBeatsPlaying = false; if (typeof onDone === 'function') onDone(); return; }
-          const it = items[i++];
-          if (typeof it === 'string') {
-            // run of plain beats up to the next interjection
-            const run = [it]; while (i < items.length && typeof items[i] === 'string') run.push(items[i++]);
-            say(run, next);
-          } else ask(it, askN++, next);
+          if (idx >= items.length) { showTyping(false); wireBeatsPlaying = false; if (typeof onDone === 'function') onDone(); return; }
+          const entry = items[idx++];
+          const text = entry.text || '…';
+          showTyping(true);
+          setTimeout(() => {
+            if (!alive()) return;
+            showTyping(false);
+            const msgMeta = Object.assign({ slow: true }, meta || {}, entry.asides.length ? { asides: entry.asides } : {});
+            appendWireMessage(getCartographerTitle(), text, false, true, () => setTimeout(playNext, readingGap(text)), null, msgMeta);
+          }, typingLead(text));
         };
-        next();
+        playNext();
       }
-      // From Station 14 on Hermes speaks in beats; the earlier chapters keep their single messages
+      // From Station 14 on Hermes speaks in grouped thematic dispatches; earlier chapters consolidate too
       function speakHermes(text, step, onDone, part) {
         if (step >= 10) { playHermesBeats(text, { type: 'expedition', step, part: part || 'i' }, onDone); return; }
         appendWireMessage(getCartographerTitle(), Array.isArray(text) ? text.join('\n\n') : text, false, true, onDone, null, { type: 'expedition', step });
@@ -9107,13 +9132,14 @@
 
         // Incoming message from Hermes
         msgEl.className = 'chat-bubble-wrap incoming';
+        const isLongDispatch = text.includes('\n\n') || text.length > 220 || !!(meta && meta.asides && meta.asides.length);
 
         if (!isLive) {
           const formattedText = formatJournalCallouts(text).split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
           msgEl.innerHTML = `
             <div class="chat-sender-name">${senderDisplay}</div>
             <div class="chat-bubble-row">
-              <div class="chat-bubble">
+              <div class="chat-bubble${isLongDispatch ? ' is-long-chat' : ''}">
                 <div class="chat-bubble-text">${formattedText}</div>
                 <span class="chat-bubble-time">${getWireTimestamp()}</span>
               </div>
@@ -9122,6 +9148,7 @@
           `;
           const btn = msgEl.querySelector('.carles-rewind-btn');
           if (btn) attachRewindHandler(btn, effectiveMeta);
+          if (meta && meta.asides && meta.asides.length) attachWireAsides(msgEl, meta.asides, effectiveMeta);
           stream.appendChild(msgEl);
           if (typeof onComplete === 'function') onComplete();
           return msgEl;
@@ -9131,7 +9158,7 @@
         msgEl.innerHTML = `
           <div class="chat-sender-name">${senderDisplay}</div>
           <div class="chat-bubble-row">
-            <div class="chat-bubble highlight-pulse">
+            <div class="chat-bubble highlight-pulse${isLongDispatch ? ' is-long-chat' : ''}">
               <div class="chat-bubble-text"><span class="telegraph-typewriter-target"></span><span class="telegraph-cursor"></span></div>
               <span class="chat-bubble-time">${getWireTimestamp()}</span>
             </div>
@@ -9163,7 +9190,7 @@
             return;
           }
           const beat = !!(meta && meta.slow), slow = beat && !window.__wireFast;
-          const chunk = slow ? Math.min(2, totalChars - charIdx) : Math.min(Math.max(5, Math.ceil(totalChars / 50)), totalChars - charIdx);
+          const chunk = slow ? Math.min(Math.max(2, Math.ceil(totalChars / 130)), totalChars - charIdx) : Math.min(Math.max(5, Math.ceil(totalChars / 50)), totalChars - charIdx);
           charIdx += (skipTyping || window.__wireFast) ? totalChars : chunk;
           const currentSub = text.substring(0, charIdx);
 
@@ -9189,6 +9216,7 @@
               const textContainer = bubble.querySelector('.chat-bubble-text');
               if (textContainer) textContainer.innerHTML = finalFormatted;
             }
+            if (meta && meta.asides && meta.asides.length) attachWireAsides(msgEl, meta.asides, effectiveMeta);
             if (typeof onComplete === 'function') onComplete();
           }
         }
@@ -10320,8 +10348,7 @@
               if (s >= 10 && choice.hermesReply) {
                 drawWireSeq(choice.hermesReply, { type: 'expedition', step: s, part: 'r' + choiceIdx });
               } else if (choice.beats && choice.beats.length === 3) {
-                appendWireMessage(getCartographerTitle(), choice.beats[0], false, false, null, null, { type: 'expedition', step: s });
-                appendWireMessage(getCartographerTitle(), choice.beats[1], false, false, null, null, { type: 'expedition', step: s });
+                appendWireMessage(getCartographerTitle(), choice.beats[0] + '\n\n' + choice.beats[1], false, false, null, null, { type: 'expedition', step: s });
                 appendWireMessage(getCartographerTitle(), choice.beats[2], false, false, null, null, { type: 'expedition', step: s });
               } else if (choice.hermesReply) {
                 appendWireMessage(getCartographerTitle(), choice.hermesReply, false, false, null, null, { type: 'expedition', step: s });
@@ -10975,56 +11002,43 @@
           window.refreshTelegraphSignal();
         }
 
-        // SPECIAL MULTI-BEAT PACING & DISCOVERY FOR STEP 2 (The 3 Routes of Sheet 7B)
+        // SPECIAL GROUPED DISCOVERY PACING FOR STEP 2 (The 3 Routes of Sheet 7B)
         if (justAnsweredStep === 2 && choice.beats && choice.beats.length === 3) {
           showTyping(true);
           setTimeout(() => {
             showTyping(false);
             if (sfx) sfx.playChimeHover();
-            // Beat 1: Descent and terrain advance
-            appendWireMessage(getCartographerTitle(), choice.beats[0], false, true, () => {
-              // Realistic traversal pause while exploring
-              setTimeout(() => {
-                showTyping(true);
+            // Consolidated exploration & relic discovery dispatch
+            appendWireMessage(getCartographerTitle(), choice.beats[0] + '\n\n' + choice.beats[1], false, true, () => {
+              if (choice.item) {
+                setSatchelExpeditionItem(choice.item);
+                addRelicToInventory(choice.item.id);
+                openItemAcquiredModal(choice.item, () => {
+                  setTimeout(() => {
+                    showTyping(true);
+                    setTimeout(() => {
+                      showTyping(false);
+                      if (sfx) sfx.playCelestialChime();
+                      // Closing prompt at the copper benchmark, asking for the bearing
+                      appendWireMessage(getCartographerTitle(), choice.beats[2], false, true, () => {
+                        renderWireChoices();
+                        updateMessengerBadge();
+                      }, null, { type: 'expedition', step: justAnsweredStep });
+                    }, 900);
+                  }, 350);
+                });
+              } else {
                 setTimeout(() => {
-                  showTyping(false);
-                  if (sfx) sfx.playChimeHover();
-                  // Beat 2: Discovery of the artifact
-                  appendWireMessage(getCartographerTitle(), choice.beats[1], false, true, () => {
-                    // Update satchel & open the cinematic modal in the center of the screen
-                    if (choice.item) {
-                      setSatchelExpeditionItem(choice.item);
-                      addRelicToInventory(choice.item.id);
-                      openItemAcquiredModal(choice.item, () => {
-                        // After player stores in satchel: Beat 3
-                        setTimeout(() => {
-                          showTyping(true);
-                          setTimeout(() => {
-                            showTyping(false);
-                            if (sfx) sfx.playCelestialChime();
-                            // Beat 3: at the copper benchmark, asking for the bearing
-                            appendWireMessage(getCartographerTitle(), choice.beats[2], false, true, () => {
-                              renderWireChoices();
-                              updateMessengerBadge();
-                            }, null, { type: 'expedition', step: justAnsweredStep });
-                          }, 900);
-                        }, 350);
-                      });
-                    } else {
-                      setTimeout(() => {
-                        showTyping(true);
-                        setTimeout(() => {
-                          showTyping(false);
-                          appendWireMessage(getCartographerTitle(), choice.beats[2], false, true, () => {
-                            renderWireChoices();
-                            updateMessengerBadge();
-                          }, null, { type: 'expedition', step: justAnsweredStep });
-                        }, 800);
-                      }, 350);
-                    }
-                  }, null, { type: 'expedition', step: justAnsweredStep });
-                }, 1800);
-              }, 700);
+                  showTyping(true);
+                  setTimeout(() => {
+                    showTyping(false);
+                    appendWireMessage(getCartographerTitle(), choice.beats[2], false, true, () => {
+                      renderWireChoices();
+                      updateMessengerBadge();
+                    }, null, { type: 'expedition', step: justAnsweredStep });
+                  }, 800);
+                }, 350);
+              }
             }, null, { type: 'expedition', step: justAnsweredStep });
           }, 1400);
           return;
