@@ -673,14 +673,14 @@ Silvia cuenta en su libreta con un banco de ecuaciones cruzadas recibidas entre 
 - **Asignación en el Ledger**: $\mathbf{W = 19, \quad N = 11}$. Valores aún libres en la tabla (todas las letras asignadas tienen valores distintos).
 
 #### 9. DEDUCCIÓN DE $S$ Y $U$ (Estación 16 · La caña de bronce de Cairn IV, solo en la web)
-- **Origen**: al cantar los tres versos del cañón (Estación 16), las dos líneas grabadas en la caña de bronce del pilar izquierdo aparecen en el Ledger (`requires: 'order_cairn_iv_completed'`). Hermes: *«Two unknowns, two lines: you know the trick.»*
-- **Ecuación 1 (The Rising Echo)**:
+- **Origen**: al cantar los tres versos del cañón (Estación 16), las dos líneas grabadas en la caña de bronce del pilar izquierdo aparecen en el Ledger (`requires: 'order_cairn_iv_completed'`). Hermes: *«Read them in that order: the first gives you U, and U opens S.»* (Decisión del Operador, 18-nov-2026: ya no se dan dos líneas sobre la misma pareja de letras.)
+- **Ecuación 1 (The Falling Echo)**:
+  $$[U] + [Z] = 9$$
+- **Ecuación 2 (The Rising Echo)**:
   $$[S] + [U] = 17$$
-- **Ecuación 2 (The Falling Echo)**:
-  $$[S] - [U] = 9$$
-- **Resolución** (sistema de dos ecuaciones, como en §7.B.1–5):
-  $$2[S] = 17 + 9 = 26 \implies \mathbf{S = 13}$$
-  $$[U] = 17 - 13 \implies \mathbf{U = 4}$$
+- **Resolución** (encadenada, con $Z = 5$ de la Estación 12):
+  $$[U] = 9 - 5 \implies \mathbf{U = 4}$$
+  $$[S] = 17 - 4 \implies \mathbf{S = 13}$$
 - **Asignación en el Ledger**: $\mathbf{S = 13, \quad U = 4}$. Valores libres hasta ahora; ninguna letra repite valor.
 
 #### 10. DEDUCCIÓN DE $Y$ Y $L$ (Estación 17 · La luz de la Torre II, solo en la web)
@@ -886,7 +886,7 @@ El diario manuscrito completo consta de **18 hojas físicas (36 caras)**. El Act
   - **Cara B (15B · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Izq · Spread 3)**. Elev. 980 varas, arco de roca y desfiladero en alta definición.
 - **Hoja 16**:
   - **Cara A (16A · Zoom Mapa)**: **Zoom Topográfico al Puente Natural de la Mesa Centinela (Panel Der · Spread 3)**.
-  - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. *(web, Estación 17)* Amanecer de octubre (espejos reorientados en 4 pasos del sol), la señal nocturna con la Torre II (código del disco), $[Y] - [O] = 2$ y $[L] + [G] = 23$, *The Signal Mirror*, ceremonia de los cinco sellos y humo sobre el Santuario (ver §12). Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
+  - **Cara B (16B · Juego D8)**: **Arch of the Solstice & The Solar Altar**. *(web, Estación 17)* Amanecer de noviembre (espejos reorientados en 4 pasos del sol), la señal nocturna con la Torre II (código del disco), $[Y] - [O] = 2$ y $[L] + [G] = 23$, *The Signal Mirror*, ceremonia de los cinco sellos y humo sobre el Santuario (ver §12). Enigma del rayo solar del cenit; obtención del **Sello de Cairn V**.
 - **Hoja 17**:
   - **Cara A (17A · Juego D9)**: **The Polybius Stele (Prueba del Sirviente)**. Cifrado $5 \times 5$ keyed con `PHOENIX`; aforismo *"STARS GUIDE THOSE WHO SEEK TRUTH"*; rumbo $348^\circ\text{ NNW}$. *(web, Estación 18)* La Torre II arde (los BC Ashes quemaron la biblioteca del atrio) y el Sirviente ha desaparecido; el proverbio gira la estela (en su dorso, 348° NNW). Segunda parte: el Sirviente, escondido en el pozo bajo el atrio, golpea en la cuadrícula de la estela con la Ley del Espejismo Invertido (WHO · SEEK, la respuesta de Silvia · WELL · ASH). Tercera parte: el atrio en llamas, por turnos, hasta la tapa del pozo. $[H] - [U] = 16$ y $[M] + [T] = 25$; la reliquia *The Servant's Key*; la frase del Sirviente sobre la Oráculo (ver §12).
   - **Cara B (17B · Lore)**: **The Desert Oracle** (impresa). Nota de la expedición de 1998: Hermes observa durante horas desde una cresta al hombre que cree el Oráculo (en realidad el Sirviente del Santuario, §8.A.5), junto a su refugio bajo un saliente de arenisca; no puede acercarse («my tools belong to the stars») y pide a Silvia: «Seek his outpost when shadows lengthen». Menciona el Astrolabio recuperado. No revela el WHEN ni menciona Vega.
@@ -966,7 +966,7 @@ El diario ya está impreso y no se reimprime. Cada aparente contradicción tiene
 | **10A / 10B** | *«Elev. 980 paces»* (el mapa dice *varas*) | En la agrimensura de la Orden el «paso» de Hermes es la vara de medir: usa ambas palabras para la misma cota. |
 | **11A** | *«Al-Qibla Vector 194* SSW»* | Rumbo de huida de los BC Ashes; la Torre II queda en el rumbo inverso, 14° NNE (ver §9, Hoja 11A). |
 | **14B** | *«North of the Sun Monolith, the open desert rises…»* (el mapa y la Hoja 14A ponen el laberinto al SSE del Monolito: la ranura de Cairn III apunta a 348° NNW hacia él) | Hermes copió esa línea del levantamiento de los fundadores. **La Orden dibujaba sus cartas con el sur arriba**, como los grandes cartógrafos de las caravanas: su «norte» es nuestro sur. Hermes lo explica en el Field Wire (paso 13, Estación 15). |
-| **16B** | *«At midsummer dawn, the sun's first ray slips beneath the arch»* (Hermes llega en octubre) | El patio se construyó para el solsticio de verano. En octubre el sol sale más al sur y el rayo entra por otro punto: Silvia reorienta los espejos para un amanecer de otoño (Estación 17, *The Autumn Dawn*). |
+| **16B** | *«At midsummer dawn, the sun's first ray slips beneath the arch»* (Hermes llega en noviembre; el Wire va en tiempo real, decisión del Operador 18-nov-2026) | El patio se construyó para el solsticio de verano. En noviembre el sol sale más al sur y el rayo entra por otro punto: Silvia reorienta los espejos para un amanecer de otoño (Estación 17, *The Autumn Dawn*). |
 | **4A / 5A** | *«stereographic»*, *«The Mater»*, *«The Tympan»* | Se imprimieron el 28-09-2026, antes de que la lista de términos prohibidos entrara en esta Biblia (10-10-2026). Son las notas técnicas del Hermes astrónomo; los textos nuevos usan el vocabulario sencillo (Regla 6 de `AGENTS.md`). |
 
 ---

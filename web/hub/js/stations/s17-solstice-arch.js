@@ -2,7 +2,7 @@
     // =========================================================================
     // 🌓 STATION 17 · THE ARCH OF THE SOLSTICE & CAIRN V (SHEET 16B)
     // Part I (journal): the eight-letter sigil of the midsummer ray opens the courtyard.
-    // Part II (web only), The Autumn Dawn: in October the sun rises further south, so the ray enters the
+    // Part II (web only), The Autumn Dawn: in November the sun rises further south, so the ray enters the
     // arch at another place and keeps sliding west as the sun climbs (four steps). Silvia turns the bronze
     // mirrors so each ray reaches the brass ring of the altar before the sun moves on. The courtyard was
     // checked offline: every step has exactly one route, no setting lights two consecutive steps, and the
@@ -44,7 +44,7 @@
       const COURT = {
         cols: 9,
         rows: 9,
-        entries: [6, 5, 3, 2],   // where the ray enters the arch at each step of the October dawn
+        entries: [6, 5, 3, 2],   // where the ray enters the arch at each step of the November dawn
         altar: [3, 8],
         mirrors: [[1, 1], [2, 1], [3, 1], [5, 1], [2, 2], [3, 2], [0, 4], [6, 4], [0, 5], [2, 5], [2, 6], [6, 8]],
         start: 'bbbbbbbffbbf',
@@ -109,7 +109,7 @@
         anchor: el.dawnFeedback, solved: dawnDone, active: isAwake, legacyKey: KEYS.dawnHint,
         texts: [
           'Do not wait for the sun to turn the mirrors, Silvia. The first ray can be set in the dark: turn the mirrors before you call the dawn, and save your haste for the other three.',
-          'I have learnt to breathe slowly: now each ray waits longer. My note on working backwards from the altar is in Ask Hermes: "How do I aim the mirrors for an October dawn?"',
+          'I have learnt to breathe slowly: now each ray waits longer. My note on working backwards from the altar is in Ask Hermes: "How do I aim the mirrors for a November dawn?"',
           'Let us set the first ray together, in the dark. Light can reach the altar from straight above it, or from the east along the bottom row. Try the first way: follow its column up to the first mirror, it must catch the light from the west and drop it down, so it leans like \\. Now look west of that mirror: the one there must send the light toward it. Ask the same question there, and walk back until you reach the arch.'
         ]
       });
@@ -537,7 +537,7 @@
       }
       function applyVictory() {
         if (el.victoryText) {
-          el.victoryText.textContent = "On the fourth ray of an October dawn the brass ring closed its locks and the altar gave up the Seal of Cairn V, the last of the five. That night a light on Tower II answered Hermes's mirror in a code he made for one person only, and spelled two lines in the old light-code of the Order. Then it went out. At dawn, smoke rose over the Sanctuary. He will tell you on the wire.";
+          el.victoryText.textContent = "On the fourth ray of a November dawn the brass ring closed its locks and the altar gave up the Seal of Cairn V, the last of the five. That night a light on Tower II answered Hermes's mirror in a code he made for one person only, and spelled two lines in the old light-code of the Order. Then it went out. At dawn, smoke rose over the Sanctuary. He will tell you on the wire.";
         }
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
@@ -566,7 +566,7 @@
         if (G && G.fx) { const [ax, ay] = COURT.altar; G.fx.triumph({ x: colX(ax), y: BEAM_Y, z: rowZ(ay) }, 0.7); }
         subtitle('The carved sun on the arch glows. The brass ring of the altar unlocks its four catches.', 4.8, 'act');
         feedback(el.keyFeedback, 'DAYBREAK. The brass ring of the altar wakes, waiting for its light.', 'ok');
-        say("DAYBREAK... and the ring of the altar unlocked its four catches, Silvia. But it wants a ray of light to close them, and this courtyard was built for a midsummer sun. In October the sun rises further south: its ray will come under the arch at the wrong place. We must turn the mirrors for an autumn dawn. Set them tonight, if you like; at dawn, be quick.");
+        say("DAYBREAK... and the ring of the altar unlocked its four catches, Silvia. But it wants a ray of light to close them, and this courtyard was built for a midsummer sun. In November the sun rises further south: its ray will come under the arch at the wrong place. We must turn the mirrors for an autumn dawn. Set them tonight, if you like; at dawn, be quick.");
         render();
         if (el.dawnBtn) setTimeout(() => el.dawnBtn.focus({ preventScroll: true }), 60);
       }
@@ -816,7 +816,7 @@
         cornice.position.set(0, outerH + 0.25, ARCH_Z); cornice.castShadow = true; scene.add(cornice);
         const keySun = new T.Mesh(new T.CircleGeometry(0.9, 24), new T.MeshStandardMaterial({ map: discTex(), metalness: 0.6, roughness: 0.4, emissive: 0xffa040, emissiveIntensity: 0.1 }));
         keySun.position.set(0, PIER_H + ARCH_R + 0.65, ARCH_Z + 0.95); scene.add(keySun);
-        // the four bronze notches in the threshold, where the October rays come in
+        // the four bronze notches in the threshold, where the November rays come in
         const notchMat = () => new T.MeshStandardMaterial({ color: 0x8a6430, metalness: 0.6, roughness: 0.45, emissive: 0x000000 });
         const notches = COURT.entries.map((col) => {
           const m = new T.Mesh(new T.ConeGeometry(0.34, 0.6, 3), notchMat());

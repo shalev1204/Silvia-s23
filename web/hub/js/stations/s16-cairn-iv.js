@@ -64,20 +64,21 @@
         'and the stone remembers them both. SUN · ECHO · STONE: so the Order measures the world.'
       ];
       const VERSE_DISPATCH = [
-        "SUN. The first verse is ours, Silvia, and where the cliffs answered, a line of the founders is carved into the rock. The pillars are breathing faster now.",
-        "ECHO. Eleven beats, twelve beats... you heard a difference my old ears could not. The wind is rising for the last verse: it will not wait for one echo before it calls again."
+        "SUN! The first verse is ours, Silvia. Where the cliffs answered, the founders carved a line.",
+        "ECHO! You heard what my old ears could not. The last verse is faster: the calls will not wait for their echoes."
       ];
 
       const el = {
         close: $('btn-close-pillars'), sigilCard: $('pillars-sigil-card'), keyInput: $('pillars-key-input'), speak: $('btn-pillars-speak'),
         keyFeedback: $('pillars-key-feedback'), game: $('pillars-game'), gameInner: document.querySelector('#pillars-game .monolith-game-inner'),
-        tabs: $('pillars-verse-tabs'), sound: $('btn-pillars-sound'), plan: $('pillars-plan'), tape: $('pillars-tape'), tapeWrap: $('pillars-tape-wrap'),
+        tabs: $('pillars-verse-tabs'), sound: $('btn-pillars-sound'), plan: $('pillars-plan'), tape: $('pillars-tape'), tapeWrap: $('pillars-tape-wrap'), tapeBox: $('pillars-tape-box'), tapeToggle: $('btn-pillars-tape'),
         tapeStatus: $('pillars-tape-status'), play: $('btn-pillars-play'), modeMark: $('btn-pillars-mode-mark'), modeCall: $('btn-pillars-mode-call'),
         slots: $('pillars-slots'), undo: $('btn-pillars-undo'), sing: $('btn-pillars-sing'), songFeedback: $('pillars-song-feedback'),
         hint: $('pillars-hint'), words: $('pillars-words'), fragments: $('pillars-fragments'), victory: $('pillars-victory'),
-        victoryText: $('pillars-victory-text'), finish: $('btn-pillars-finish'), dispatch: $('pillars-dispatch-text'),
+        rewardBtn: $('btn-pillars-reward'), finish: $('btn-pillars-finish'), dispatch: $('pillars-dispatch-text'),
         stage: $('pillars3d-stage'), canvas: $('pillars3d-canvas'), subtitle: $('pillars3d-subtitle'), fade: $('pillars3d-fade'),
-        aim: $('pillars3d-aim'), versesLabel: $('pillars3d-verses'), howto: $('pillars3d-howto'), help: $('btn-pillars-howto')
+        aim: $('pillars3d-aim'), versesLabel: $('pillars3d-verses'), howto: $('pillars3d-howto'), help: $('btn-pillars-howto'),
+        markCount: $('pillars-mark-count'), modeNote: $('pillars-mode-note')
       };
 
       const isAwake = () => get(KEYS.awake) === 'true';
@@ -274,6 +275,37 @@
         });
         if (nowBeat !== Infinity) svg.appendChild(svgEl('line', { x1: xb(nowBeat), y1: 2, x2: xb(nowBeat), y2: TAPE_H - 2, stroke: '#dc2626', 'stroke-width': 1 }));
       }
+      // The tape folds to a thin strip over the scene: it opens by itself while the wind plays and a few seconds after,
+      // and her own click opens it for good (or folds it, until the next verse)
+      const TAPE_OPEN_KEY = 'order_cairn4_tape_open';
+      const tapeView = { pinned: get(TAPE_OPEN_KEY) === 'true', until: 0, folded: false, timer: 0 };
+      function syncTapeBox() {
+        if (!el.tapeBox) return;
+        const playing = !!(tape && tape.raf);
+        const open = tapeView.pinned || (!tapeView.folded && (playing || performance.now() < tapeView.until));
+        if (el.tapeBox.classList.contains('is-open') === open) return;
+        el.tapeBox.classList.toggle('is-open', open);
+        if (el.tapeToggle) {
+          el.tapeToggle.setAttribute('aria-expanded', String(open));
+          el.tapeToggle.setAttribute('aria-label', open ? 'Fold the chronograph tape' : 'Show the whole chronograph tape');
+          el.tapeToggle.textContent = open ? '▴' : '▾';
+        }
+        // the tape is measured from its height: draw it again once it has grown or shrunk
+        const redraw = () => { if (!tape || !tape.raf) drawTape(Infinity); };
+        requestAnimationFrame(redraw); setTimeout(redraw, 300);
+      }
+      function tapeLinger() {
+        tapeView.until = performance.now() + 4000;
+        clearTimeout(tapeView.timer);
+        tapeView.timer = setTimeout(syncTapeBox, 4100);
+        syncTapeBox();
+      }
+      function toggleTape() {
+        const open = el.tapeBox && el.tapeBox.classList.contains('is-open');
+        tapeView.pinned = !open; tapeView.folded = open; tapeView.until = 0;
+        set(TAPE_OPEN_KEY, String(!open));
+        syncTapeBox();
+      }
       let record = null;   // the last verse heard to the end: a test call plays over it, then gives it back
       function stopTape() {
         const unfinished = !!(tape && tape.raf);
@@ -285,6 +317,7 @@
           if (el.tapeStatus) el.tapeStatus.textContent = record ? record.label + ' · recorded' : 'Stopped';
           drawTape(Infinity);
           setMood();
+          tapeLinger();
         }
         if (G) G.orbs.forEach((o) => { o.on = false; o.m.visible = false; });
       }
@@ -322,6 +355,7 @@
           if (G && G.fx && G.fx.gait) G.fx.gait.look(null);
           if (el.tapeWrap) el.tapeWrap.scrollLeft = 0;   // the whole verse, from its first call
           setMood();
+          tapeLinger();
           if (el.tapeStatus) el.tapeStatus.textContent = label + ' · recorded';
           if (!cur.isTest) { record = cur; return; }
           // a test call stays on the tape for a moment, then the verse's record comes back
@@ -334,6 +368,8 @@
         };
         if (el.tapeWrap) el.tapeWrap.scrollLeft = 0;
         cur.raf = requestAnimationFrame(frame);
+        tapeView.folded = false;
+        syncTapeBox();
         setMood();
       }
       function playVerse() {
@@ -577,6 +613,9 @@
           m.rotation.x = -Math.PI / 2; m.position.set(0, 0.08, fz(d)); scene.add(m);
           return m;
         });
+        // the half row of stones under her pointer glows in its pillar's colour: a click there marks that fissure
+        const rowGlow = new T.Mesh(new T.PlaneGeometry(CW - 1.0, 0.9), new T.MeshBasicMaterial({ color: 0xffb35a, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+        rowGlow.rotation.x = -Math.PI / 2; rowGlow.position.y = 0.1; rowGlow.visible = false; scene.add(rowGlow);
 
         // ---- The sixteen fissures: a carved plaque above each crack, and an invisible target for her clicks ----
         const fissures = [];
@@ -688,7 +727,7 @@
         } catch (e) { fx = null; }
 
         return { T, renderer, scene, camera, lowPower, sky, paintSky, stars, moon, hemi, moonLight, cliffs, fissures, pillars, plate, bronzeMat, beatLamp, chamberLight,
-          seal, pebble, pebbleStone, runs, waves, orbs, markers, markerTex, ringLabels, H, hermes: H && H.hermes, lamp, fx,
+          seal, pebble, pebbleStone, runs, waves, orbs, markers, markerTex, ringLabels, rowGlow, H, hermes: H && H.hermes, lamp, fx,
           ray: new T.Raycaster(), hits: fissures.map((f) => f.hit), plaques: fissures.map((f) => f.plaque),
           cam: { yaw: 0, pitch: 0.46, dist: 30, tYaw: 0, tPitch: 0.46, tDist: 30, p: null, l: null }, dawnShown: -1 };
       }
@@ -834,6 +873,15 @@
         const plaque = G.ray.intersectObjects(G.plaques, false).sort((a, b) => a.point.distanceTo(a.object.position) - b.point.distanceTo(b.object.position))[0];
         if (plaque) return G.fissures.find((f) => f.id === plaque.object.userData.id) || null;
         const o = G.ray.ray.origin, dir = G.ray.ray.direction;
+        // the rows of stones across the gorge: left of the number marks the Left cliff, right of it the Right cliff, at that many paces
+        if (dir.y < -1e-4) {
+          const tf = -o.y / dir.y, x = o.x + dir.x * tf, paces = -(o.z + dir.z * tf) / PACE;
+          if (Math.abs(x) < CW - 0.3) {
+            const d = Math.round(paces / 5) * 5;
+            if (Math.abs(x) < 0.45 || Math.abs(paces - d) > 2 || RINGS.indexOf(d) < 0) return null;
+            return G.fissures.find((q) => q.side === (x < 0 ? 'L' : 'R') && q.d === d) || null;
+          }
+        }
         for (const side of ['L', 'R']) {
           if (Math.abs(dir.x) < 1e-4) continue;
           const t = (sideX(side) * CW - o.x) / dir.x;
@@ -927,6 +975,15 @@
           const sc = 1 + (hot ? 0.12 : 0) + f.flash * 0.2;
           f.plaque.scale.set(sc, sc, 1);
         });
+        if (G.rowGlow) {
+          const h = view.hover;
+          G.rowGlow.visible = !!h;
+          if (h) {
+            G.rowGlow.position.x = sideX(h.side) * (0.7 + (CW - 1.0) / 2); G.rowGlow.position.z = fz(h.d);
+            G.rowGlow.material.color.setHex(mode === 'call' ? 0x7cc4ff : h.side === 'L' ? 0xffb35a : 0x5ef0d8);
+            G.rowGlow.material.opacity = 0.32 + (rm ? 0 : 0.1 * Math.sin(t * 6));
+          }
+        }
         G.markers.forEach((m) => {
           if (!m.visible) return;
           const age = m.userData.born ? (now - m.userData.born) / 1000 : 1;
@@ -1018,11 +1075,16 @@
           for (let i = 0; i < need; i++) {
             const div = document.createElement('div');
             const id = slots[i];
-            div.className = 'pillars-slot' + (id ? ' is-filled' : '') + (id && falseIdx.has(i) ? ' is-false' : '');
+            // each echo in the colour of its pillar, as on the tape (amber Left, teal Right), its call number in the corner
+            div.className = 'pillars-slot' + (id ? ' is-filled is-' + (id[0] === 'L' ? 'left' : 'right') : '') + (id && falseIdx.has(i) ? ' is-false' : '') + (!id && i === slots.length ? ' is-next' : '');
+            div.setAttribute('data-n', String(i + 1));
             div.textContent = id ? SIDE_NAME[id[0]][0] + ' · ' + id.slice(1) : 'Call ' + (i + 1);
+            div.title = id ? 'Call ' + (i + 1) + ': the ' + SIDE_NAME[id[0]].toLowerCase() + ' cliff, ' + id.slice(1) + ' paces' : 'Call ' + (i + 1) + ': not marked yet';
             el.slots.appendChild(div);
           }
           if (el.sing) el.sing.disabled = slots.length !== need || isDone();
+          if (el.sing) el.sing.classList.toggle('is-ready', slots.length === need && !isDone());
+          if (el.markCount) { el.markCount.textContent = slots.length + ' / ' + need; el.markCount.classList.toggle('is-full', slots.length === need); }
           if (el.undo) el.undo.disabled = !slots.length;
         }
         placeMarkers();
@@ -1082,7 +1144,7 @@
         if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         if (typeof window.grantCairnSeal === 'function') window.grantCairnSeal(4);
         else set('order_seal_cairn_4', 'true');
-        say("STONE... and listen, Silvia. Listen to how the wind played that last verse: three short calls, a pause, two long ones. That is the code I engraved on Aurelia's disc, and the rhythm of the light I saw through my telescope ten years ago, blinking far out in this desert. And in the throat of the Left pillar there is a pebble that the river never put there.");
+        say("STONE! Three short calls, a pause, two long ones, Silvia: the code I engraved on Aurelia's disc. And in the Left pillar, a pebble the river never put there.");
         if (G && !reduced()) {
           view.ending = 1; view.opened = 0;
           setTimeout(() => { if (G && G.fx) G.fx.triumph({ x: 0, y: 1.6, z: 0.4 }, 1); }, 900);
@@ -1094,17 +1156,134 @@
         render();
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
-        if (el.finish) setTimeout(() => el.finish.focus({ preventScroll: true }), 60);
         justWon = true;
-        // the reward card sits below the fold of the side panel at 1440x900: bring it into view once the pillars have spoken
-        setTimeout(() => { if (el.victory && modal.style.display !== 'none') el.victory.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' }); }, reduced() ? 60 : 1500);
+        // the reward rises once the film of the chamber and the pebble has played
+        clearTimeout(reward.timer);
+        reward.timer = setTimeout(showReward, G && !reduced() ? 10200 : 700);
       }
       function applyVictory() {
-        if (el.victoryText) {
-          el.victoryText.textContent = "Cairn IV never fell: the bronze reeds inside the pillars are the founders' own, and the chamber between them opened the old way, with a song. The Seal of Cairn IV was waiting inside. But the last verse was not the founders' alone. Wedged in the throat of the Left pillar, where it bends the wind into three short calls and two long ones, Hermes found a river pebble painted with a small gold star on blue. He will tell you on the wire.";
-        }
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
+      }
+
+      // ---- The reward: the gorge with every fissure that answered, the three words, the seal, the Ledger lines, the pebble ----
+      const reward = { box: null, back: null, timer: 0 };
+      const rewardOpen = () => !!reward.box && !reward.box.hidden;
+      const sealCount = () => { let n = 0; for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') n++; return n; };
+      function rewardMap() {
+        // the gorge from above, the pillars at the bottom: a gold ray from a pillar to each fissure that answered, its letter popping as it lands
+        const W = 120, H = 150, X = { L: 14, R: 106 }, py = 138, ry = (d) => 128 - (d - 20) * 2.6;
+        const answered = [];
+        VERSES.forEach((v, vi) => v.calls.forEach((c) => { const id = fissureId(c.side, c.d); if (!answered.some((a) => a.id === id)) answered.push({ id, side: c.side, d: c.d, v: vi }); }));
+        let rings = '', marks = '', rays = '';
+        RINGS.forEach((d) => {
+          rings += '<line class="c4rw-ring" x1="' + (X.L + 6) + '" y1="' + ry(d) + '" x2="' + (X.R - 6) + '" y2="' + ry(d) + '"/><text class="c4rw-pace" x="60" y="' + (ry(d) + 1.4) + '">' + d + '</text>';
+          ['L', 'R'].forEach((side) => {
+            if (answered.some((a) => a.side === side && a.d === d)) return;
+            marks += '<text class="c4rw-quiet" x="' + (side === 'L' ? X.L - 6 : X.R + 6) + '" y="' + (ry(d) + 1.6) + '">' + WALLS[side][d] + '</text>';
+          });
+        });
+        answered.forEach((a, i) => {
+          const t = 0.8 + i * 0.32, px = a.side === 'L' ? 52 : 68, fx = a.side === 'L' ? X.L - 6 : X.R + 6, y = ry(a.d);
+          rays += '<line class="c4rw-ray is-' + (a.side === 'L' ? 'left' : 'right') + '" pathLength="1" style="--t:' + t.toFixed(2) + 's" x1="' + px + '" y1="' + py + '" x2="' + fx + '" y2="' + y + '"/>';
+          marks += '<g class="c4rw-hit is-' + (a.side === 'L' ? 'left' : 'right') + '" style="--t:' + (t + 0.35).toFixed(2) + 's"><title>' + SIDE_NAME[a.side] + ' cliff, ' + a.d + ' paces: ' + WALLS[a.side][a.d] + '</title><circle cx="' + fx + '" cy="' + y + '" r="4.6"/><text x="' + fx + '" y="' + (y + 1.9) + '">' + WALLS[a.side][a.d] + '</text></g>';
+        });
+        return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="The gorge of Cairn IV from above: the ' + answered.length + ' fissures that answered the song">'
+          + '<rect class="c4rw-cliff" x="0" y="0" width="' + (X.L - 12) + '" height="' + H + '"/><rect class="c4rw-cliff" x="' + (X.R + 12) + '" y="0" width="' + (W - X.R - 12) + '" height="' + H + '"/>'
+          + rings + rays
+          + '<g class="c4rw-pillar"><circle cx="52" cy="' + py + '" r="4"/><circle cx="68" cy="' + py + '" r="4"/><rect x="56" y="' + (py - 3) + '" width="8" height="6" rx="1"/></g>'
+          + marks + '</svg>';
+      }
+      function showReward() {
+        clearTimeout(reward.timer);
+        const body = modal.querySelector('.chasm3d-body');
+        if (!body || !isDone() || modal.style.display === 'none') return;
+        if (!reward.box) {
+          reward.box = document.createElement('div');
+          reward.box.className = 'chasm3d-reward c4-reward';
+          reward.box.setAttribute('role', 'dialog');
+          reward.box.setAttribute('aria-label', 'Your reward for Cairn IV');
+          reward.box.hidden = true;
+          body.appendChild(reward.box);
+          reward.box.addEventListener('pointerdown', (e) => { if (!(e.target.closest && e.target.closest('button'))) reward.box.classList.add('is-fast'); });
+          reward.box.addEventListener('click', (e) => {
+            const relic = e.target.closest && e.target.closest('[data-relic]');
+            if (relic && typeof window.openItemAcquiredModal === 'function') { if (relic.classList.contains('is-pebble')) justWon = false; relic.classList.remove('is-new'); window.openItemAcquiredModal({ id: relic.getAttribute('data-relic') }); }
+          });
+        }
+        const fails = parseInt(get(KEYS.songFails) || '0', 10) || 0, keyFails = parseInt(get(KEYS.fails) || '0', 10) || 0;
+        const echoes = VERSES.reduce((n, v) => n + v.calls.length, 0);
+        const words = VERSES.map((v, i) => '<span class="c4rw-word" style="--t:' + (3.6 + i * 0.35).toFixed(2) + 's">' + v.word + '</span>').join('<u aria-hidden="true">·</u>');
+        const lines = FOUNDERS.map((l, i) => '<li style="--t:' + (5.2 + i * 0.25).toFixed(2) + 's">“' + l + '”</li>').join('');
+        reward.box.innerHTML = '<div class="rw-rays" aria-hidden="true"></div>'
+          + '<div class="rw-sparks" aria-hidden="true">' + Array.from({ length: 18 }, (_, i) => '<i style="--a:' + ((i * 360 / 18) | 0) + 'deg;--d:' + (120 + (i % 5) * 36) + 'px;--t:' + (0.9 + (i % 4) * 0.2).toFixed(2) + 's"></i>').join('') + '</div>'
+          + '<div class="chasm3d-reward-card">'
+          + '<div class="chasm3d-reward-kicker">Station 16 · Cairn IV, Sentry of the Canyon</div>'
+          + '<h3 class="chasm3d-reward-title">The Fourth Seal</h3>'
+          + '<p class="rw-sub">Three verses sung back, and the pillars opened their chamber the old way: with a song.</p>'
+          + '<div class="rw-grid">'
+          + '<section class="rw-map c4rw-page" aria-label="The song you sang back">'
+          + '<div class="rw-label">Where the cliffs answered</div>'
+          + rewardMap()
+          + '<div class="c4rw-words" aria-label="SUN, ECHO, STONE">' + words + '</div>'
+          + '<div class="chasm3d-reward-stats">'
+          + '<div><b>3/3</b><span>verses</span></div>'
+          + '<div><b>' + echoes + '</b><span>echoes</span></div>'
+          + '<div><b>' + fails + '</b><span>false notes</span></div>'
+          + '<div><b>' + (keyFails + 1) + '</b><span>sigil tries</span></div>'
+          + '</div>'
+          + (fails === 0 ? '<div class="rw-flawless">✦ Not one false note ✦</div>' : '')
+          + '</section>'
+          + '<section class="rw-loot">'
+          + '<div class="c4rw-relics">'
+          + '<button type="button" class="c4rw-relic is-seal" data-relic="seal_cairn_4" aria-label="The Seal of Cairn IV: open the card"><span class="c4rw-pic"><img src="./assets/items/item_seal_cairn_4.png" alt="" width="140" height="140"></span><span class="c4rw-name"><b>The Seal of Cairn IV</b><small>Sacred Seal · ' + sealCount() + ' of 5</small></span></button>'
+          + '<button type="button" class="c4rw-relic is-pebble' + (justWon ? ' is-new' : '') + '" data-relic="tuning_pebble" aria-label="The Tuning Pebble: open the card"><span class="c4rw-pic"><img src="./assets/items/item_tuning_pebble.png" alt="" width="140" height="140"></span><span class="c4rw-name"><b>The Tuning Pebble</b><small>Found in the Left pillar</small></span></button>'
+          + '</div>'
+          + '<div class="c4rw-eqs">'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Engraved on the bronze reed</div><div class="rw-ledger-title">The Falling Echo</div><div class="rw-eq" aria-label="U plus Z equals 9"><i>U</i><u>+</u><i>Z</i><u>=</u><b>9</b></div><p>A line for your Cipher Ledger. Read it first.</p></div></div>'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Engraved beneath it</div><div class="rw-ledger-title">The Rising Echo</div><div class="rw-eq" aria-label="S plus U equals 17"><i>S</i><u>+</u><i>U</i><u>=</u><b>17</b></div><p>Both lines are now in your Ledger.</p></div></div>'
+          + '</div>'
+          + '<div class="rw-label c4rw-label">The founders’ words</div>'
+          + '<ul class="c4rw-lines">' + lines + '</ul>'
+          + '<div class="rw-next">Next · Hermes on the Field Wire</div>'
+          + '</section></div>'
+          + '<div class="chasm3d-reward-actions">'
+          + '<button type="button" class="chasm3d-reward-wire">📻 Hermes is calling on the Field Wire</button>'
+          + '<button type="button" class="chasm3d-btn chasm3d-reward-stay">Stay at Cairn IV</button>'
+          + '</div></div>';
+        if (!rewardOpen()) reward.back = document.activeElement;
+        reward.box.hidden = false;
+        reward.box.scrollTop = 0;
+        reward.box.classList.remove('is-fast', 'is-on');
+        void reward.box.offsetWidth;
+        reward.box.classList.add('is-on');
+        if (!cue('shimmer', { deg: 21 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        const wireBtn = reward.box.querySelector('.chasm3d-reward-wire'), stayBtn = reward.box.querySelector('.chasm3d-reward-stay');
+        if (wireBtn) wireBtn.addEventListener('click', () => { hideReward(true); leaveForWire(); });
+        if (stayBtn) stayBtn.addEventListener('click', () => hideReward());
+        if (wireBtn) wireBtn.focus({ preventScroll: true });
+      }
+      function hideReward(quietly) {
+        clearTimeout(reward.timer);
+        if (!rewardOpen()) return;
+        reward.box.hidden = true;
+        const back = reward.back; reward.back = null;
+        if (quietly) return;
+        const to = back && document.contains(back) && back.offsetParent ? back : el.rewardBtn;
+        if (to && to.focus) to.focus({ preventScroll: true });
+      }
+      // as at Station 15: the new relic's card first, then straight to Hermes on the Field Wire
+      function leaveForWire() {
+        closeCairnFourModal();
+        const go = () => {
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+          if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+          const wireTab = document.querySelector('[data-view="view-field-wire"]');
+          if (wireTab) wireTab.click();
+          if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ Seal of Cairn IV secured (' + sealCount() + ' of 5) ✦ Hermes is waiting for you on the Field Wire.');
+        };
+        if (justWon && typeof window.openItemAcquiredModal === 'function') { justWon = false; setTimeout(() => window.openItemAcquiredModal({ id: 'tuning_pebble' }, go), 260); }
+        else go();
       }
 
       // ---- Part I: the sigil from Sheet 15A ----
@@ -1128,7 +1307,7 @@
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'RESOUND. The wind finds its way into the pillars.', 'ok');
-        say("RESOUND... and the pillars are singing, Silvia! Not a hum: calls, one pillar and then the other, and the cliffs answering. This cairn never fell; its voice is still whole. It sings its verses and wants them sung back. Count the echoes; I will mark the fissures you name.");
+        say("RESOUND! The pillars are singing, Silvia, and the cliffs answer. Count the echoes; I will mark the fissures you name.");
         subtitle('The bronze plate warms under his hand, and the pillars begin to sing.', 4.5, 'act');
         if (G) {
           view.sigilT = performance.now();
@@ -1161,9 +1340,15 @@
             el.tabs.appendChild(b);
           });
         }
-        if (el.sound) { el.sound.textContent = soundOn() ? '🔊 Sound' : '🔇 Sound off'; el.sound.setAttribute('aria-pressed', String(soundOn())); }
+        if (el.sound) { el.sound.textContent = soundOn() ? '🔊' : '🔇'; el.sound.setAttribute('aria-label', soundOn() ? 'Sound of the pillars: on' : 'Sound of the pillars: off'); el.sound.setAttribute('aria-pressed', String(soundOn())); }
         if (el.modeMark) el.modeMark.setAttribute('aria-pressed', String(mode === 'mark'));
         if (el.modeCall) el.modeCall.setAttribute('aria-pressed', String(mode === 'call'));
+        if (el.modeNote) {
+          el.modeNote.textContent = mode === 'call'
+            ? 'Next click: Hermes shouts at that fissure so you hear its echo. Nothing is marked.'
+            : 'For each call in turn, click its fissure, or its row of stones.';
+          el.modeNote.classList.toggle('is-call', mode === 'call');
+        }
         drawPlan();
         if (!tape || !tape.raf) drawTape(Infinity);
         renderSlots();
@@ -1180,8 +1365,9 @@
           el.fragments.textContent = '';
           FOUNDERS.forEach((line, i) => {
             const div = document.createElement('div');
-            div.className = 'monolith-fragment' + (i < sung ? '' : ' is-sealed');
-            div.textContent = i < sung ? '“' + line + '”' : 'A line of the founders, still silent in the rock.';
+            if (i >= sung) return;   // only the lines she has earned: no row of placeholders to read
+            div.className = 'monolith-fragment';
+            div.textContent = '“' + line + '”';
             el.fragments.appendChild(div);
           });
         }
@@ -1199,6 +1385,7 @@
         if (done || !awake) setHover(null);
         if (el.stage) el.stage.classList.toggle('no-tape', !awake || done);
         if (awake && !done) requestAnimationFrame(() => { if (!tape || !tape.raf) drawTape(Infinity); });   // the tape was measured while hidden: draw it again at its real width
+        syncTapeBox();
         syncWorld();
         setMood();
         sigilHints.refresh(); songHints.refresh();
@@ -1223,6 +1410,9 @@
         el.plan.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e); } });
       }
       if (el.play) el.play.addEventListener('click', playVerse);
+      if (el.tapeToggle) el.tapeToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleTape(); });
+      // a click anywhere on the folded strip opens it
+      if (el.tapeBox) el.tapeBox.addEventListener('click', () => { if (!el.tapeBox.classList.contains('is-open')) toggleTape(); });
       if (el.sound) el.sound.addEventListener('click', () => {
         // with the Hub speaker off, this button turns the sound back on for everything (it would do nothing otherwise)
         if (get('order_ambience_muted') === 'true') { if (window.EclipseAmbience && window.EclipseAmbience.setMuted) window.EclipseAmbience.setMuted(false); else set('order_ambience_muted', 'false'); set(KEYS.sound, 'on'); }
@@ -1333,8 +1523,8 @@
         view.dawn = isDone() ? 0.75 : versesSung() * 0.08;
         if (G) { G.cam.p = null; G.dawnShown = -1; }
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I reached the southern mouth of the gorge in the afternoon heat and slept in the shade until the night wind rose. Two hollow pillars, taller than three men, and now the wind hums inside them. The bronze plate between them asks for the sigil of the seven echoes, the ones on the page “Cairn IV: Sentry of the Canyon” of your journal.");
-        else say("The pillars are still singing. Let the wind play, count the echoes, and sing the verse back.");
+        else if (!isAwake()) say("Two hollow pillars, Silvia, and the night wind hums inside them. The bronze plate asks for the sigil of the seven echoes on your page “Cairn IV: Sentry of the Canyon”.");
+        else say("The pillars are still singing. Listen, mark, sing it back.");
         render();
         // The bed starts at its own level when the modal appears; set ours once it has
         setTimeout(setMood, 700);
@@ -1355,6 +1545,7 @@
         if (modal.style.display === 'none') return;
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         stopTape();
+        hideReward(true);
         if (cine && cine.active) { cineClosed = true; cine.skip(); }
         modal.classList.add('closing');
         modal.removeEventListener('wheel', stopHubScroll);
@@ -1372,27 +1563,11 @@
         if (e.key !== 'Escape' || modal.style.display === 'none') return;
         if (cine && cine.active) { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); return; }
         if (el.howto && !el.howto.hidden) { e.stopImmediatePropagation(); hideHowto(); return; }
+        if (rewardOpen() && (!$('modal-item-acquired') || $('modal-item-acquired').style.display === 'none')) { e.stopImmediatePropagation(); hideReward(); return; }
         closeCairnFourModal();
       }, true);
-      if (el.finish) {
-        el.finish.addEventListener('click', () => {
-          closeCairnFourModal();
-          // as at Station 15: the new relic first, then straight to Hermes on the Field Wire
-          const go = () => {
-            if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
-            if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
-            const wireTab = document.querySelector('[data-view="view-field-wire"]');
-            if (wireTab) wireTab.click();
-            if (typeof window.showDesertToast === 'function') {
-              let seals = 0;
-              for (let i = 1; i <= 5; i++) if (get('order_seal_cairn_' + i) === 'true') seals++;
-              window.showDesertToast('✦ Seal of Cairn IV secured (' + seals + ' of 5) ✦ Hermes is waiting for you on the Field Wire.');
-            }
-          };
-          if (justWon && typeof window.openItemAcquiredModal === 'function') { justWon = false; setTimeout(() => window.openItemAcquiredModal({ id: 'tuning_pebble' }, go), 260); }
-          else go();
-        });
-      }
+      if (el.finish) el.finish.addEventListener('click', leaveForWire);
+      if (el.rewardBtn) el.rewardBtn.addEventListener('click', showReward);
 
       // Test hook for scripts/audit/web_smoke.py: the verses (they are in this source anyway), the controls and the scene
       window.__cairn4 = {
@@ -1401,6 +1576,7 @@
         verse: () => verseIdx,
         mark: (id) => chooseFissure(id),
         sing: () => singBack(),
+        showReward: () => showReward(), rewardOpen: () => rewardOpen(),
         play: () => playVerse(),
         gfx: () => G,
         cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },

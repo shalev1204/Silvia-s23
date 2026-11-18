@@ -130,7 +130,7 @@ Sin estaciones, sin nodos (>48), sin pasos de Wire (≥ 45 para S23; la Torre I 
 | Q | 14 | S11 | `Q+E=16` (S11) |
 | Z | 5 | S12 | `O−Z=18` (S12) |
 | W · N | 19 · 11 | hoja | `W+A=26` · `N−E=9` (S15) |
-| S · U | 13 · 4 | hoja | `S+U=17`, `S−U=9` (S16) |
+| S · U | 13 · 4 | hoja | `U+Z=9`, `S+U=17` (S16) |
 | Y · L | 25 · 1 | hoja | `Y−O=2` · `L+G=23` (S17) |
 | H · M | 20 · 9 | hoja | `H−U=16` · `M+T=25` (S18) |
 | I | 10 | hoja | `I+E=12` (S19) |

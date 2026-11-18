@@ -145,7 +145,7 @@ Reglas [CÓDIGO]: campos numéricos 1–26, duplicados marcados `⚠ Dup`; las e
 | cairn3-wa | W + A = 26 | St. 15 bajo la placa de cobre de Cairn III | `order_sandstone_labyrinth_completed` | **W=19** | |
 | cairn3-ne | N − E = 9 | St. 15 | idem | **N=11** | |
 | cairn4-sum | S + U = 17 | St. 16 caña de bronce de Cairn IV | `order_cairn_iv_completed` | **S=13** | |
-| cairn4-diff | S − U = 9 | St. 16 | idem | **U=4** | |
+| cairn4-diff | U + Z = 9 | St. 16 | idem | **U=4** | |
 | cairn5-yo | Y − O = 2 | St. 17 luz sobre Torre II | `order_arch_solstice_completed` | **Y=25** | |
 | cairn5-lg | L + G = 23 | St. 17 | idem | **L=1** | |
 | stele-hu | H − U = 16 | St. 18 bajo la trampilla del pozo | `order_polybius_stele_completed` | **H=20** | |
@@ -162,7 +162,7 @@ Valores (calculados por mí a partir de las ecuaciones; coinciden con CANONICAL 
 - **No falta ninguna letra**. Hueco real de diseño [DOC] CANONICAL §7.0 (`:541-545`): "ningún valor puede quedar para el Stage Path; J hay que adelantarla a una estación del desierto 14–19" → **no está hecho** (J sigue en la 22, §7.B.13 y código). ⚠️
 - Letras del mensaje del 1-sep (CANONICAL:744 en §7.B.16): presentes `A C D E F H I K L M N O R S T U V W Y`; ausentes `B G J P Q X Z`. Los "glifos-letra nuevos" se asignaron a letras ausentes del mensaje: X (St.10), Q (St.11), Z (St.12) [memoria del proyecto; DOC §7.B.14-17].
 - **¿Para qué sirve el valor final?** [DOC] `lore_and_puzzle_bible.md:191-195` (Fase D): "aplicando los valores a la profecía inicial… se revelan las coordenadas exactas y la butaca/clave de las entradas". [CÓDIGO] No existe ninguna escena/puzzle final (grep "Grand Eclipse" en `web/`: solo texto de relic `spyglass_lens` y Ask Hermes). Los valores hoy solo sirven para **verificar ecuaciones** y las coordenadas de Vector I (48°30′ N, 38°14′22″ E = el Santuario, **no** Viena 48°12′ N 16°22′ E). **NO DEFINIDO**: el mecanismo exacto del uso final de los 26 valores. ❓
-- Mecanismo auxiliar ✅ `ledger-balance.js`: *Surveyor's Balance* (premio de la St. 11): detecta pares `+`/`−` sobre las mismas 2 letras (K±G, A±O, B±P, E±V, F±T, S±U…), 3 pasos tecleados por Silvia (suma de totales → mitad = letra mayor → resta = menor), pista en palabras sin cifras, "Write … in my Ledger" escribe SUS valores. Estado en `order_balance_state`. Se desbloquea con `order_salt_playa_completed`. Sección smoke `balance`.
+- Mecanismo auxiliar ✅ `ledger-balance.js`: *Surveyor's Balance* (premio de la St. 11): detecta pares `+`/`−` sobre las mismas 2 letras (K±G, A±O, B±P, E±V, F±T…), 3 pasos tecleados por Silvia (suma de totales → mitad = letra mayor → resta = menor), pista en palabras sin cifras, "Write … in my Ledger" escribe SUS valores. Estado en `order_balance_state`. Se desbloquea con `order_salt_playa_completed`. Sección smoke `balance`.
 
 ## 2.2 Lista de `built: true` en `TesterDesert.GAMES` (`hub-core.js:708-824`), en orden
 
