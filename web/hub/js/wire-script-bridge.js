@@ -156,7 +156,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
     hermesFinal: (W) => {
       const g = gateSeals();
       return beats([
-        sealsWord(g + 3) + ' of five, Silvia. The reed of Cairn IV gives your Cipher Ledger two lines: [S] + [U] = 17 and [S] − [U] = 9.',
+        sealsWord(g + 3) + ' of five, Silvia. The reed of Cairn IV gives your Cipher Ledger two lines: [U] + [Z] = 9 and [S] + [U] = 17.',
         by([
           'The pebble is back in its brass box, and I keep opening the lid to look at it, like a man checking a letter he cannot read.',
           'My pack is already by the door of the chamber, and I will sleep with my boots on.',
@@ -167,12 +167,12 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
     }
   };
 
-  // ---- 21 · Dusk at Cairn IV: the midsummer line, and an October sun ----
+  // ---- 21 · Dusk at Cairn IV: the midsummer line, and a November sun ----
   S[21] = {
     hermesInitial: [
       'Dusk again, Silvia, and I am leaving the pillars behind. Before the light went I read the page “Arch of the Solstice & The Solar Altar” once more.',
       '‘At midsummer dawn, the sun’s first ray slips beneath the arch.’ That line will not let me go.',
-      'The founders built the Courtyard of Rays for the longest day of the year. It is October, Silvia.',
+      'The founders built the Courtyard of Rays for the longest day of the year. It is November, Silvia.',
       { ask: [
         { text: 'Ask the Servant what to do.', silviaMsg: 'Could you ask the Servant, Hermes? He must know how the courtyard works in autumn.', reply: ['He would know in one sentence. But no wire reaches Tower II, and I will not flash a light at the very men I am avoiding.', 'The answer will have to come from the Arch itself.'] },
         { text: 'We could wait until June.', silviaMsg: 'Fine, we wait until June. I will bring snacks.', reply: ['Splendid. I will bring a chair and a very long book.', 'The raiders, on the other hand, bring wagons, and they do not read.'] },
@@ -190,7 +190,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
     choices: [
       {
         text: 'Then we’ll turn the mirrors for an autumn sun.',
-        silviaMsg: 'Then we’ll turn the mirrors ourselves, Hermes. If the founders aimed them for June, we can aim them for October.',
+        silviaMsg: 'Then we’ll turn the mirrors ourselves, Hermes. If the founders aimed them for June, we can aim them for November.',
         hermesReply: [
           'Turn the founders’ mirrors... A year ago I would have called that sacrilege.',
           'Tonight it sounds like the only sensible thing anyone has said to me. Bronze can be turned.',

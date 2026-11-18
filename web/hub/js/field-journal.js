@@ -71,7 +71,7 @@
           earned: ['Seal of Cairn IV', 'The Tuning Pebble'], ledger: ['The Rising Echo', 'The Falling Echo'], sketch: T + 'cairn_iv_preview.webp'
         },
         s17: {
-          note: 'The Arch of the Solstice, Cairn V. An October sun in a courtyard built for June, and Silvia made it reach the altar anyway. Five seals sewn into my coat.',
+          note: 'The Arch of the Solstice, Cairn V. A November sun in a courtyard built for June, and Silvia made it reach the altar anyway. Five seals sewn into my coat.',
           quote: 'The smoke still standing over Tower II like a black tree.',
           earned: ['Seal of Cairn V', 'The Signal Mirror'], ledger: ['The First Line of Light', 'The Second Line of Light'], sketch: T + 'solstice_arch_preview.webp'
         },

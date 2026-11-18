@@ -753,7 +753,7 @@ def test_cairn_four(browser):
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
     ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
-    check("eq-item-cairn4-sum" in ids and "eq-item-cairn4-diff" in ids, "Ledger shows [S] + [U] = 17 and [S] − [U] = 9")
+    check("eq-item-cairn4-sum" in ids and "eq-item-cairn4-diff" in ids, "Ledger shows [U] + [Z] = 9 and [S] + [U] = 17")
 
     open_wire()
     check(get("order_field_wire_step") == "19" and choices() == 3 and "Toward Tower II" in wire_text(), "debrief: step 19 (the code, the pebble, the raiders) with 3 replies")

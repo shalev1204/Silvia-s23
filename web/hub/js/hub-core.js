@@ -2262,7 +2262,7 @@
               lore: 'Silvia spoke the sigil of the seven echoes and then sang the canyon\'s three verses back to it: SUN, ECHO, STONE. The founders\' chamber opened. In the throat of the Left pillar, Hermes found a pebble that the river never put there.',
               rewards: [
                 { icon: '🪨', label: 'The Seal of Cairn IV', desc: 'Fourth seal of the five' },
-                { icon: '📐', label: 'Ledger: [S] + [U] = 17 · [S] − [U] = 9', desc: 'Engraved on the bronze reed' },
+                { icon: '📐', label: 'Ledger: [U] + [Z] = 9 · [S] + [U] = 17', desc: 'Engraved on the bronze reed' },
                 { icon: '✶', label: 'The Tuning Pebble', desc: 'In Hermes\'s satchel' }
               ],
               btnText: 'Review the Song of the Pillars ➔',
@@ -2307,7 +2307,7 @@
               statusClass: 'status-done-badge',
               title: 'The Arch of the Solstice & Cairn V',
               thumb,
-              lore: 'Silvia turned the founders\' mirrors for an October dawn and the brass ring of the Solar Altar closed its four locks. That night a light on Tower II answered Hermes\'s mirror, spelled two lines in the old light-code of the Order, and went out. At dawn, smoke rose over the Sanctuary.',
+              lore: 'Silvia turned the founders\' mirrors for a November dawn and the brass ring of the Solar Altar closed its four locks. That night a light on Tower II answered Hermes\'s mirror, spelled two lines in the old light-code of the Order, and went out. At dawn, smoke rose over the Sanctuary.',
               rewards: [
                 { icon: '🪨', label: 'The Seal of Cairn V', desc: 'The fifth and last seal' },
                 { icon: '📐', label: 'Ledger: [Y] − [O] = 2 · [L] + [G] = 23', desc: 'Spelled in light from Tower II' },
@@ -3713,8 +3713,8 @@
         { id: 'cairn2-ct', station: 'Station 14 · Lid of Cairn II', name: 'The Cygnus Line', expr: 'C − T', l1: 'C', op: '-', l2: 'T', target: 8, unit: '', requires: 'order_sun_monolith_completed' },
         { id: 'cairn3-wa', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The West Wind Line', expr: 'W + A', l1: 'W', op: '+', l2: 'A', target: 26, unit: '', requires: 'order_sandstone_labyrinth_completed' },
         { id: 'cairn3-ne', station: 'Station 15 · Under the copper plate of Cairn III', name: 'The Wind Rose Line', expr: 'N − E', l1: 'N', op: '-', l2: 'E', target: 9, unit: '', requires: 'order_sandstone_labyrinth_completed' },
+        { id: 'cairn4-diff', station: 'Station 16 · The bronze reed of Cairn IV', name: 'The Falling Echo', expr: 'U + Z', l1: 'U', op: '+', l2: 'Z', target: 9, unit: '', requires: 'order_cairn_iv_completed' },
         { id: 'cairn4-sum', station: 'Station 16 · The bronze reed of Cairn IV', name: 'The Rising Echo', expr: 'S + U', l1: 'S', op: '+', l2: 'U', target: 17, unit: '', requires: 'order_cairn_iv_completed' },
-        { id: 'cairn4-diff', station: 'Station 16 · The bronze reed of Cairn IV', name: 'The Falling Echo', expr: 'S − U', l1: 'S', op: '-', l2: 'U', target: 9, unit: '', requires: 'order_cairn_iv_completed' },
         { id: 'cairn5-yo', station: 'Station 17 · The light on Tower II', name: 'The First Line of Light', expr: 'Y − O', l1: 'Y', op: '-', l2: 'O', target: 2, unit: '', requires: 'order_arch_solstice_completed' },
         { id: 'cairn5-lg', station: 'Station 17 · The light on Tower II', name: 'The Second Line of Light', expr: 'L + G', l1: 'L', op: '+', l2: 'G', target: 23, unit: '', requires: 'order_arch_solstice_completed' },
         { id: 'stele-hu', station: 'Station 18 · Under the hatch of the well', name: 'The Line of the Well', expr: 'H − U', l1: 'H', op: '-', l2: 'U', target: 16, unit: '', requires: 'order_polybius_stele_completed' },
@@ -5593,18 +5593,18 @@
           step: 20,
           completed: true,
           get hermesFinal() {
-            return sealsPhrase(sealsAtGates() + 3) + " of five, Silvia. The Seal of Cairn IV rests with the others, and the two lines engraved on the bronze reed belong in your Cipher Ledger: [S] + [U] = 17 and [S] − [U] = 9. Two unknowns, two lines: you know the trick.\n\nThe last cairn watches from the dunes above the Arch of the Solstice, and its seal sleeps in the Solar Altar, not far from the Sanctuary (Station 17). The raiders' wagons are on the same road. I will wire you before I set out.";
+            return sealsPhrase(sealsAtGates() + 3) + " of five, Silvia. The Seal of Cairn IV rests with the others, and the two lines engraved on the bronze reed belong in your Cipher Ledger: [U] + [Z] = 9 and [S] + [U] = 17. Read them in that order: the first gives you U, and U opens S.\n\nThe last cairn watches from the dunes above the Arch of the Solstice, and its seal sleeps in the Solar Altar, not far from the Sanctuary (Station 17). The raiders' wagons are on the same road. I will wire you before I set out.";
           }
         },
         {
-          // Leaving Cairn IV at dusk. Covers the printed "At midsummer dawn" of Sheet 16B: Hermes arrives in October.
+          // Leaving Cairn IV at dusk. Covers the printed "At midsummer dawn" of Sheet 16B: Hermes arrives in November.
           step: 21,
-          hermesInitial: "Dusk again, Silvia, and I am leaving the pillars behind. Before the light went I read the page “Arch of the Solstice & The Solar Altar” one more time, and one line will not let me go: 'At midsummer dawn, the sun's first ray slips beneath the arch.'\n\nMidsummer. The founders built the Courtyard of Rays for the longest day of the year. We are in October. The sun rises far to the south of where it rose for them, and its first ray will strike the arch at another place. If the courtyard is blind in autumn, the last seal is locked until June.\n\nAnd the ruts of the raiders' wagons are fresh on the road east. Eighteen hours to the Arch. I will not stop to sleep.",
+          hermesInitial: "Dusk again, Silvia, and I am leaving the pillars behind. Before the light went I read the page “Arch of the Solstice & The Solar Altar” one more time, and one line will not let me go: 'At midsummer dawn, the sun's first ray slips beneath the arch.'\n\nMidsummer. The founders built the Courtyard of Rays for the longest day of the year. We are in November. The sun rises far to the south of where it rose for them, and its first ray will strike the arch at another place. If the courtyard is blind in autumn, the last seal is locked until June.\n\nAnd the ruts of the raiders' wagons are fresh on the road east. Eighteen hours to the Arch. I will not stop to sleep.",
           choices: [
             {
               id: "choice-21-mirrors",
               text: "Then we'll turn the mirrors for an autumn sun.",
-              silviaMsg: "Then we'll turn the mirrors ourselves, Hermes. If the founders aimed them for June, we can aim them for October.",
+              silviaMsg: "Then we'll turn the mirrors ourselves, Hermes. If the founders aimed them for June, we can aim them for November.",
               hermesReply: "Turn the founders' mirrors... A year ago I would have called it sacrilege. Tonight it sounds like the only sensible thing anyone has said to me. Bronze can be turned. Let us hope the dawn waits for us."
             },
             {
@@ -6409,7 +6409,7 @@
         },
         {
           id: "inq-autumn-dawn",
-          title: "How do I aim the mirrors for an October dawn?",
+          title: "How do I aim the mirrors for a November dawn?",
           category: "Cairn V",
           group: "desert",
           answer: "Work backwards, Silvia. Start at the altar and ask: from which side can light come in? Follow that line back until it meets a mirror, and ask the same question there. When your backward path reaches the top of the courtyard, it tells you where the ray must enter the arch. The four rays of the dawn enter at four places, further west each time, and each needs a few mirrors turned. You can set the first one in the dark, before you call the dawn; then you only have to be quick for the others. I have learnt to breathe slowly: now each ray waits a little longer."
@@ -9093,7 +9093,7 @@
         14: () => '✦ SEALS ' + (sealsAtGates() + 1) + ' / 5 · DOWN TO THE SANDSTONE LABYRINTH (6 H) · BEARING 168° SSE ✦',
         16: () => '✦ SEAL OF CAIRN III SECURED · SEALS ' + (sealsAtGates() + 2) + ' / 5 · [W] + [A] = 26 · [N] − [E] = 9 RECORDED ✦',
         18: () => '✦ SEALS ' + (sealsAtGates() + 2) + ' / 5 · ACROSS THE HARDPAN TO CAIRN IV (18 H) · VIA THE NATURAL BRIDGE ✦',
-        20: () => '✦ SEAL OF CAIRN IV SECURED · SEALS ' + (sealsAtGates() + 3) + ' / 5 · [S] + [U] = 17 · [S] − [U] = 9 RECORDED ✦',
+        20: () => '✦ SEAL OF CAIRN IV SECURED · SEALS ' + (sealsAtGates() + 3) + ' / 5 · [S] + [U] = 17 · [U] + [Z] = 9 RECORDED ✦',
         22: () => '✦ SEALS ' + (sealsAtGates() + 3) + ' / 5 · EAST TO THE ARCH OF THE SOLSTICE (18 H) · NO SLEEP ✦',
         24: () => '✦ SEAL OF CAIRN V SECURED · SEALS ' + sealsAtAltar() + ' / 5 · [Y] − [O] = 2 · [L] + [G] = 23 RECORDED · SMOKE OVER TOWER II ✦',
         26: () => '✦ SEALS ' + sealsAtAltar() + ' / 5 · TO TOWER II, TOWARD THE SMOKE (6 H) · ARRIVAL AFTER DARK ✦',
@@ -11181,7 +11181,7 @@
         }
         if (wireCurrentStep === 20) {
           if (wireRestHold(20)) return;   // the day of heat between the pillars
-          advanceTo(21);   // dusk at Cairn IV: the October sun and the midsummer courtyard
+          advanceTo(21);   // dusk at Cairn IV: the November sun and the midsummer courtyard
         }
         if (wireCurrentStep === 22) {
           if (showMarchLeg(MARCH_LEGS[22])) return;

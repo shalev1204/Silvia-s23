@@ -3804,7 +3804,7 @@
   <!-- ===================================================================
        STATION 17: THE ARCH OF THE SOLSTICE & CAIRN V · THE AUTUMN DAWN AND THE NIGHT SIGNAL
        Part I is the journal (Sheet 16B: the eight sun-stones on the path of the midsummer ray).
-       Part II only exists here: in October the ray misses the altar, and Silvia re-aims the bronze
+       Part II only exists here: in November the ray misses the altar, and Silvia re-aims the bronze
        mirrors for an autumn dawn as the sun climbs. Part III: that night, a light answers from Tower II.
        =================================================================== -->
   <div class="chasm-modal-backdrop" id="modal-solstice-arch" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="solstice-modal-title">
@@ -3915,9 +3915,9 @@
           <button type="button" class="chasm3d-btn chasm3d-help" id="btn-solstice-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
           <details class="chasm3d-laws">
-            <summary>The Courtyard in October</summary>
+            <summary>The Courtyard in November</summary>
             <ul class="laby-rules">
-              <li>The founders aimed this courtyard at the midsummer sun. In October the sun rises further south, and its ray slips through the arch at another place.</li>
+              <li>The founders aimed this courtyard at the midsummer sun. In November the sun rises further south, and its ray slips through the arch at another place.</li>
               <li>Turn the bronze mirrors (click one to turn it a quarter) so the ray reaches the brass ring of the altar. Fallen pillars stop the light.</li>
               <li>As the sun climbs, the ray enters the arch further west, four times. Each time the ring takes the light, one of its four locks closes. If the sun climbs before you are ready, the dawn is spent, and you wait for the next one.</li>
               <li>At night, answer the light with Hermes's mirror: a quick touch is a short flash, a long press a long one. Repeat what you saw, then send it.</li>
@@ -4739,7 +4739,8 @@
           <canvas id="pillars3d-canvas" class="chasm3d-canvas" aria-hidden="true"></canvas>
           <div class="chasm3d-flat" aria-hidden="true"><img src="./assets/thumbnails/cairn_iv_preview.webp" alt=""></div>
           <div class="chasm3d-hud">
-            <div class="pillars3d-tape-box">
+            <div class="pillars3d-tape-box" id="pillars-tape-box">
+              <button type="button" class="c4-tape-toggle" id="btn-pillars-tape" aria-expanded="false" aria-controls="pillars-tape-wrap" aria-label="Show the whole chronograph tape" title="Show or fold the tape">▾</button>
               <div class="pillars-tape-wrap" id="pillars-tape-wrap">
                 <svg class="pillars-tape" id="pillars-tape" role="img" aria-label="The chronograph tape: one tick per beat, the calls of the pillars and their echoes."></svg>
               </div>
@@ -4760,7 +4761,7 @@
 
           <div class="laby3d-sigil" id="pillars-sigil-card">
             <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="15A" data-open="page" aria-haspopup="dialog" title="See the printed page Cairn IV: Sentry of the Canyon"><span class="pill-icon">📖</span> Cairn IV: Sentry of the Canyon</span></div>
-            <div class="chasm3d-where">I · The sigil of the Sentry: the seven echoes of the survey log, read as carved letters</div>
+            <div class="chasm3d-where">I · Speak the sigil</div>
             <label class="monolith-sr-only" for="pillars-key-input">The seven-letter sigil of Cairn IV</label>
             <input type="text" class="mon3d-input laby3d-input" id="pillars-key-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · ·">
             <button type="button" class="chasm3d-btn is-way" id="btn-pillars-speak">✦ Speak the Sigil</button>
@@ -4769,23 +4770,31 @@
 
           <div class="laby3d-game is-locked" id="pillars-game">
             <div class="monolith-game-inner">
-              <div class="chasm3d-where">II · Let the wind play, count each echo, and name the fissure that answered</div>
-              <div class="pillars-row">
+              <div class="chasm3d-where">II · Sing the song back</div>
+              <div class="c4-versebar">
                 <div class="pillars-verse-tabs" id="pillars-verse-tabs" role="group" aria-label="Verses of the song"></div>
-                <button type="button" class="chasm3d-btn pillars3d-sound" id="btn-pillars-sound" aria-pressed="true">🔊 Sound</button>
+                <button type="button" class="pillars3d-sound" id="btn-pillars-sound" aria-pressed="true" aria-label="Sound of the pillars: on" title="Sound of the pillars on or off">🔊</button>
               </div>
-              <button type="button" class="chasm3d-btn is-way pillars3d-play" id="btn-pillars-play">▶ Let the wind play</button>
-              <div class="pillars-mode" role="group" aria-label="What a fissure does when you choose it">
-                <button type="button" class="chasm3d-btn" id="btn-pillars-mode-mark" aria-pressed="true">✎ Mark</button>
-                <button type="button" class="chasm3d-btn" id="btn-pillars-mode-call" aria-pressed="false">📣 Test call</button>
-              </div>
-              <div class="pillars-row">
-                <div class="pillars-slots" id="pillars-slots" aria-live="polite"></div>
-              </div>
-              <div class="pillars-row pillars3d-sing-row">
-                <button type="button" class="chasm3d-btn" id="btn-pillars-undo" aria-label="Remove the last marked echo">⌫</button>
-                <button type="button" class="chasm3d-btn is-way" id="btn-pillars-sing">✦ Sing it back</button>
-              </div>
+              <section class="c4-step" aria-labelledby="c4-step-listen">
+                <div class="c4-step-head" id="c4-step-listen"><span class="c4-step-n">1</span>Listen</div>
+                <button type="button" class="chasm3d-btn c4-play pillars3d-play" id="btn-pillars-play">▶ Let the wind play</button>
+              </section>
+              <section class="c4-step" aria-labelledby="c4-step-mark">
+                <div class="c4-step-head" id="c4-step-mark"><span class="c4-step-n">2</span>Mark each echo<span class="c4-count" id="pillars-mark-count"></span></div>
+                <div class="pillars-mode c4-seg" role="group" aria-label="What a click on a fissure does">
+                  <button type="button" class="c4-seg-btn is-mark" id="btn-pillars-mode-mark" aria-pressed="true">✎ Mark</button>
+                  <button type="button" class="c4-seg-btn is-call" id="btn-pillars-mode-call" aria-pressed="false">📣 Test call</button>
+                </div>
+                <p class="c4-mode-note" id="pillars-mode-note"></p>
+                <div class="c4-slots-row">
+                  <div class="pillars-slots" id="pillars-slots" aria-live="polite"></div>
+                  <button type="button" class="c4-undo" id="btn-pillars-undo" aria-label="Remove the last marked echo">⌫ Undo</button>
+                </div>
+              </section>
+              <section class="c4-step" aria-labelledby="c4-step-sing">
+                <div class="c4-step-head" id="c4-step-sing"><span class="c4-step-n">3</span>Sing the verse back</div>
+                <button type="button" class="chasm3d-btn c4-sing" id="btn-pillars-sing">✦ Sing it back</button>
+              </section>
               <div class="monolith-feedback" id="pillars-song-feedback" role="status" aria-live="polite"></div>
               <div class="laby-hint" id="pillars-hint" style="display: none;">✦ Hermes has numbered the beats on the tape for you.</div>
               <details class="chasm3d-laws pillars3d-plan-box">
@@ -4802,26 +4811,19 @@
             <div class="monolith-fragments" id="pillars-fragments"></div>
           </div>
 
-          <div class="chasm-victory-card" id="pillars-victory" style="display: none;">
-            <div class="chasm-victory-title"><span>🗿</span><span>The Chamber of Cairn IV Opens</span></div>
-            <div class="chasm-victory-text" id="pillars-victory-text"></div>
-            <div class="laby3d-eqs">
-              <span class="monolith-equation">[S] + [U] = 17</span>
-              <span class="monolith-equation">[S] − [U] = 9</span>
-            </div>
-            <p class="laby3d-eq-note">Engraved on the bronze reed of the Left pillar. Both lines are now in your Cipher Ledger.</p>
-            <p class="laby3d-eq-note">🪨 <strong>The Tuning Pebble</strong> is in Hermes's satchel.</p>
-            <button type="button" class="btn-chasm-finish" id="btn-pillars-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+          <div class="c4-done" id="pillars-victory" style="display: none;">
+            <div class="c4-done-title">✦ The chamber is open</div>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-pillars-reward">🏆 See your reward</button>
+            <button type="button" class="btn-chasm-finish" id="btn-pillars-finish"><span>📻 To Hermes on the Field Wire ➔</span></button>
           </div>
           <button type="button" class="chasm3d-btn chasm3d-help" id="btn-pillars-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
           <details class="chasm3d-laws">
             <summary>The Laws of the Echo</summary>
             <ul class="laby-rules">
-              <li>The wind plays one pillar at a time. The Left pillar sings only to the left cliff, the Right pillar only to the right one, each in its own voice.</li>
-              <li>Count the beats of the chronometer from the start of a call to the start of its echo: every beat is 5 paces to the fissure that answered.</li>
-              <li>A long call comes back as a long echo. Listen with headphones if you can; the tape records everything you hear.</li>
-              <li>Take the calls in the order the wind played them (they are numbered on the tape) and mark, for each one, the fissure that answered it. Then sing the verse back. <strong>Test call</strong> lets Hermes shout at a fissure to hear how it answers.</li>
+              <li>The Left pillar answers only from the left cliff, the Right pillar only from the right.</li>
+              <li>One beat from a call to its echo is <strong>5 paces</strong>.</li>
+              <li>Mark the calls in the order they were played, not the order the echoes came home.</li>
             </ul>
           </details>
         </div>
@@ -4845,14 +4847,19 @@
             <ol class="chasm3d-howto-steps">
               <li>Press <strong>▶ Let the wind play</strong>. A pillar calls (its mouth flares and a ring runs over the sand) and, a few beats later, <strong>its echo comes home</strong> (a softer glow).</li>
               <li>Count the beats between the call and its echo, by ear or on the <strong>tape</strong> at the top. Every beat is 5 paces: the paces are written on the stones across the gorge and under each fissure.</li>
-              <li>Click the fissure (the crack in the cliff) that answered, on its own cliff. Mark them in the order of the <strong>calls</strong>: call 1 is the first coloured block on the tape, so mark its fissure first, even if another echo comes home before it. <em>From the keyboard:</em> open “The gorge from above”, Tab to the fissure and press Enter.</li>
+              <li>Click the fissure (the crack in the cliff) that answered, or the row of stones on its side of the gorge at that number of paces. Mark them in the order of the <strong>calls</strong>: call 1 is the first coloured block on the tape, so mark its fissure first, even if another echo comes home before it. <em>From the keyboard:</em> open “The gorge from above”, Tab to the fissure and press Enter.</li>
             </ol>
           </section>
           <section class="chasm3d-howto-page" data-page="3" hidden>
-            <h3>Singing it back</h3>
-            <p>When every call has its fissure, press <strong>✦ Sing it back</strong>. Three verses, three words. Not sure of a fissure? Switch to <strong>📣 Test call</strong> and click it: Hermes shouts at it so you can hear how long it takes to answer.</p>
-            <p><strong>Your panel:</strong> the slots <strong>Call 1, Call 2…</strong> fill as you mark, <strong>⌫</strong> takes back the last mark, the <strong>Verse</strong> tabs switch between the three verses and <strong>🔊 Sound</strong> turns the pillars on or off. After a wrong try, the marks that were wrong turn dim.</p>
-            <p>A long call comes back long, a short one short. Drag to look around, scroll to come closer, double-click to look straight up the gorge again. Headphones help. Hints wait under <em>Ask Hermes</em>.</p>
+            <h3>Your panel, step by step</h3>
+            <ul class="chasm3d-howto-steps">
+              <li><strong>Verse I · II · III</strong> at the top: the verse you are on is gold, a sung one has a ✓, and the next one opens when this one is sung. <strong>🔊</strong> beside them turns the pillars' sound on or off.</li>
+              <li><strong>1 · Listen.</strong> The gold button <strong>▶ Let the wind play</strong> plays the verse. Play it as often as you like.</li>
+              <li><strong>2 · Mark each echo.</strong> With <strong>✎ Mark</strong> on (gold), a click on a fissure or on its row of stones fills the next card: <strong>Call 1, Call 2…</strong>, amber for the Left pillar and teal for the Right, as on the tape. The count beside the step says how many are marked. <strong>⌫ Undo</strong> takes back the last one.</li>
+              <li>Not sure of a fissure? Switch to <strong>📣 Test call</strong> (blue): the next click makes Hermes shout at that fissure so you hear how long it takes to answer. Nothing is marked, and the switch goes back to Mark by itself.</li>
+              <li><strong>3 · Sing the verse back.</strong> <strong>✦ Sing it back</strong> turns green when every call has its fissure. After a wrong try, the marks that were wrong turn dim.</li>
+            </ul>
+            <p>Drag to look around, scroll to come closer, double-click to look straight up the gorge again. Headphones help. Hints wait under <em>Ask Hermes</em>.</p>
           </section>
           <div class="chasm3d-howto-nav">
             <button type="button" class="chasm3d-btn" id="btn-pillars-howto-back">← Back</button>

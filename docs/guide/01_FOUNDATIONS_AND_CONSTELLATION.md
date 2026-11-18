@@ -231,7 +231,7 @@ Archives: `doc1` (Dispatch I · pergamino, "1 SEP 2026 · 22:22 EXACT"), `doc2` 
 | **T** | 6 | solo hojas | 2A | **16** | `F+T=22`, `T−F=10`; `C−T=8`, `M+T=25` (18); `J×2=T` (22) |
 | **W** | 7 | solo hojas | 2B | **19** | `W+A=26` (Est. 15) |
 | **N** | 5 | solo hojas | 3A | **11** | `N−E=9` (Est. 15) |
-| **S** | 6 | solo hojas | 2B | **13** | `S+U=17` + `S−U=9` (Est. 16) |
+| **S** | 6 | solo hojas | 2B | **13** | `U+Z=9` → `S+U=17` (Est. 16) |
 | **U** | 8 | solo hojas | 3A | **4** | ídem; `H−U=16` (Est. 18) |
 | **Y** | 8 | solo hojas | 2A | **25** | `Y−O=2` (Est. 17) |
 | **L** | 7 | solo hojas | 3A | **1** | `L+G=23` (Est. 17) |
@@ -271,7 +271,7 @@ Archives: `doc1` (Dispatch I · pergamino, "1 SEP 2026 · 22:22 EXACT"), `doc2` 
 | `cairn3-wa` | `[W]+[A]=26` | 15 | `order_sandstone_labyrinth_completed` | W=19 |
 | `cairn3-ne` | `[N]−[E]=9` | 15 | idem | N=11 |
 | `cairn4-sum` | `[S]+[U]=17` | 16 | `order_cairn_iv_completed` | S=13 |
-| `cairn4-diff` | `[S]−[U]=9` | 16 | idem | U=4 |
+| `cairn4-diff` | `[U]+[Z]=9` | 16 | idem | U=4 |
 | `cairn5-yo` | `[Y]−[O]=2` | 17 | `order_arch_solstice_completed` | Y=25 |
 | `cairn5-lg` | `[L]+[G]=23` | 17 | idem | L=1 |
 | `stele-hu` | `[H]−[U]=16` | 18 | `order_polybius_stele_completed` | H=20 |
