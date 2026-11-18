@@ -104,6 +104,7 @@
   <link rel="stylesheet" href="./hub/css/wire-ceremony.css">
   <link rel="stylesheet" href="./hub/css/ledger-complete.css">
   <link rel="stylesheet" href="./hub/css/sandstorm.css">
+  <link rel="stylesheet" href="./hub/css/relic-use.css">
   <link rel="stylesheet" href="./hub/css/a11y.css">
 </head>
 <body>
@@ -2619,6 +2620,9 @@
             <button type="button" class="si-tool-btn" id="btn-si-flip" aria-pressed="false" aria-label="Flip relic to inspect reverse inscription">
               <span aria-hidden="true">↻</span><span>Flip</span>
             </button>
+            <button type="button" class="si-tool-btn si-tool-use" id="btn-si-use" aria-label="Use this relic now">
+              <span aria-hidden="true">✋</span><span>Use</span>
+            </button>
           </div>
           <div class="si-reverse-box" id="si-reverse-box" hidden>
             <div class="si-reverse-kicker">REVERSE ENGRAVING &amp; CLOSE INSPECTION</div>
@@ -3884,6 +3888,7 @@
               <div class="chasm3d-where">III · The night signal: watch the light on Tower II, then answer it with Hermes's mirror</div>
               <svg class="solstice-night" id="solstice-night" viewBox="0 0 200 90" role="img" aria-label="The night desert. On the horizon, the dark shape of Tower II, and a small light."></svg>
               <div class="solstice-tower-trace" id="solstice-tower-trace" aria-live="polite"></div>
+              <button type="button" class="chasm3d-btn is-way" id="btn-solstice-raise" hidden>🎒 Hand Hermes something to answer the light</button>
               <div class="pillars-row">
                 <button type="button" class="chasm3d-btn" id="btn-solstice-watch">👁 Watch the light</button>
                 <span class="monolith-feedback" id="solstice-round-label" style="margin: 0;"></span>
@@ -5189,6 +5194,7 @@
   <script src="./hub/js/wire-script-marches.js"></script>
   <script src="./hub/js/wire-ceremony.js"></script>
   <script src="./hub/js/hub-core.js"></script>
+  <script src="./hub/js/relic-use.js"></script>
   <script src="./hub/js/stations/s10-desert-map-and-chasm.js"></script>
   <script src="./hub/js/stations/s10-whispering-chasm.js"></script>
   <script src="./hub/js/engine/eclipse-scenery.js"></script>

@@ -1,0 +1,60 @@
+    /* The satchel's tray: Hermes asks for a relic over any game (hub/js/relic-use.js) */
+    .relic-tray {
+      position: fixed; inset: 0; z-index: 100003;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 16px; box-sizing: border-box;
+      background: rgba(3, 5, 12, 0.55);
+      opacity: 0; transition: opacity 0.25s ease;
+    }
+    .relic-tray[hidden] { display: none; }
+    .relic-tray.is-on { opacity: 1; }
+    .relic-tray .rt-box {
+      width: min(720px, 100%); max-height: min(78vh, 640px); overflow: auto; box-sizing: border-box;
+      padding: 18px 20px 16px;
+      background: linear-gradient(180deg, #121a2b 0%, #0b1120 100%);
+      border: 1px solid rgba(212, 168, 83, 0.55); border-radius: 14px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 216, 168, 0.08);
+      transform: translateY(24px); transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+    }
+    .relic-tray.is-on .rt-box { transform: none; }
+    .relic-tray .rt-kicker {
+      font-family: 'Cinzel', serif; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #fbbf24;
+    }
+    .relic-tray .rt-ask {
+      margin: 8px 0 4px; font-family: 'EB Garamond', Georgia, serif; font-style: italic; font-size: 1.12rem; line-height: 1.4; color: #f1e4d2;
+    }
+    .relic-tray .rt-reply {
+      min-height: 1.4em; margin: 0 0 10px; font-family: 'EB Garamond', Georgia, serif; font-style: italic; font-size: 1rem; color: #fca5a5;
+    }
+    .relic-tray .rt-reply.is-on { animation: rt-reply-in 0.35s ease; }
+    @keyframes rt-reply-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .relic-tray .rt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+    .relic-tray .rt-empty { grid-column: 1 / -1; margin: 6px 0; color: #b8a07a; font-family: 'EB Garamond', Georgia, serif; }
+    .relic-tray .rt-item {
+      appearance: none; min-height: 44px; padding: 8px 6px 7px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      background: #0d1422; border: 1px solid rgba(212, 168, 83, 0.28); border-radius: 10px; color: #ffd8a8; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; line-height: 1.2; text-align: center;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    .relic-tray .rt-item:hover, .relic-tray .rt-item:focus-visible { transform: translateY(-2px); border-color: #fbbf24; background: #152036; }
+    .relic-tray .rt-item.is-wrong { animation: rt-shake 0.4s ease; border-color: rgba(248, 113, 113, 0.7); }
+    @keyframes rt-shake { 0%, 100% { transform: none; } 25% { transform: translateX(-5px); } 50% { transform: translateX(4px); } 75% { transform: translateX(-2px); } }
+    .relic-tray .rt-pic { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; }
+    .relic-tray .rt-pic img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)); }
+    .relic-tray .rt-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .relic-tray .rt-cancel {
+      appearance: none; min-height: 44px; padding: 8px 18px; border-radius: 22px; cursor: pointer;
+      background: transparent; border: 1px solid rgba(212, 168, 83, 0.45); color: #e4d5c4;
+      font-family: 'Cinzel', serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em;
+    }
+    .relic-tray .rt-cancel:hover, .relic-tray .rt-cancel:focus-visible { border-color: #fbbf24; color: #ffd8a8; }
+
+    /* the inspector's Use button, and Hermes's answer when it is not the moment */
+    .si-tool-btn.si-tool-use { border-color: rgba(251, 191, 36, 0.7); }
+    .si-hermes-note-box.is-flash { animation: rt-note-flash 0.6s ease; }
+    @keyframes rt-note-flash { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.6); } 100% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .relic-tray, .relic-tray .rt-box, .relic-tray .rt-item { transition: none; }
+      .relic-tray .rt-item.is-wrong, .relic-tray .rt-reply.is-on, .si-hermes-note-box.is-flash { animation: none; }
+    }

@@ -1197,7 +1197,7 @@
           {
             id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', flag: 'order_arch_solstice_completed', built: true,
             complete() { set('order_cairn5_march_start', '1'); set('order_cairn5_awake', 'true'); set('order_cairn5_dawn_done', 'true'); set('order_cairn5_signal_round', '4'); set('order_arch_solstice_completed', 'true'); set('order_seal_cairn_5', 'true'); },
-            reset() { dels(['order_arch_solstice_completed', 'order_cairn5_awake', 'order_cairn5_key_fails', 'order_cairn5_hint', 'order_cairn5_mirrors', 'order_cairn5_dawn_done', 'order_cairn5_dawn_fails', 'order_cairn5_dawn_hint', 'order_cairn5_signal_round', 'order_cairn5_signal_fails', 'order_cairn5_signal_hint', 'order_seal_cairn_5', 'order_cairn5_march_start', 'order_cairn5_march_bypassed', 'order_five_seals_celebrated', 'order_cairn5_seals_at_altar']); dropRelic('signal_mirror'); }
+            reset() { dels(['order_arch_solstice_completed', 'order_cairn5_awake', 'order_cairn5_key_fails', 'order_cairn5_hint', 'order_cairn5_mirrors', 'order_cairn5_dawn_done', 'order_cairn5_dawn_fails', 'order_cairn5_dawn_hint', 'order_cairn5_signal_round', 'order_cairn5_signal_fails', 'order_cairn5_signal_hint', 'order_seal_cairn_5', 'order_cairn5_march_start', 'order_cairn5_march_bypassed', 'order_five_seals_celebrated', 'order_cairn5_seals_at_altar', 'order_cairn5_lamp', 'order_cairn5_mirror_raised']); dropRelic('signal_mirror'); if (window.RelicUse) { window.RelicUse.unspend('lamp_oil'); window.RelicUse.unspend('signal_mirror'); window.RelicUse.unspend('water_skins'); } try { const mev = JSON.parse(localStorage.getItem('order_wire_marchev') || '{}') || {}; if (mev[22]) { delete mev[22]; localStorage.setItem('order_wire_marchev', JSON.stringify(mev)); } } catch (e) {} }
           },
           {
             id: 's18', tag: 'Station 18', label: 'The Polybius Stele · Tower II in Flames', flag: 'order_polybius_stele_completed', built: true,
@@ -6412,7 +6412,7 @@
           title: "How do I aim the mirrors for a November dawn?",
           category: "Cairn V",
           group: "desert",
-          answer: "Work backwards, Silvia. Start at the altar and ask: from which side can light come in? Follow that line back until it meets a mirror, and ask the same question there. When your backward path reaches the top of the courtyard, it tells you where the ray must enter the arch. The four rays of the dawn enter at four places, further west each time, and each needs a few mirrors turned. You can set the first one in the dark, before you call the dawn; then you only have to be quick for the others. I have learnt to breathe slowly: now each ray waits a little longer."
+          answer: "Work backwards, Silvia. Start at the altar and ask: from which side can light come in? Follow that line back until it meets a mirror, and ask the same question there. When your backward path reaches the top of the courtyard, it tells you where the ray must enter the arch. The four rays of the dawn enter at four places, further west each time, and each needs a few mirrors turned. With a light, you can set the first one in the dark, before you call the dawn; then you only have to be quick for the others. I have learnt to breathe slowly: now each ray waits a little longer."
         },
         {
           id: "inq-light-code",
@@ -7150,7 +7150,7 @@
           image: "assets/items/item_gilded_feather.png",
           origin: "Sent with the Physical Journal to Italy · Sep 2026",
           summary: "A vivid royal violet pigeon feather dipped in metallic gold leaf.",
-          lore: "Carried across the sea by the Order's last carrier pigeon when Hermes dispatched the recovery protocols and the physical journal to Silvia. Its gilded tip was dipped in the sacred gold leaf of the Alpine Observatory before the flight."
+          lore: "The last carrier pigeon of the Order flew it over the Alps with your journal. Its tip was dipped in the gold of the observatory."
         },
         order_wax_seal: {
           id: "order_wax_seal",
@@ -7159,7 +7159,7 @@
           image: "assets/items/item_order_wax_seal.png",
           origin: "Journal Package Binding Seal · Sep 2026",
           summary: "Deep crimson wax medallion stamped with the solar eclipse insignia.",
-          lore: "The official seal that bound the oilskin wrappings of the 18-sheet manuscript. It bears the radiant sunburst, the moon's shadow, and the outer degree ring of the Astrolabe."
+          lore: "It held your journal shut on its way to you: a half-lit sun inside the degree ring of the Astrolabe."
         },
         flint_tinder: {
           id: "flint_tinder",
@@ -7168,7 +7168,7 @@
           image: "assets/items/item_flint_tinder.png",
           origin: "Canyon Wash Bed · Survey of 1998",
           summary: "A hand-forged steel striker, dark flint stone and fragrant dry juniper root.",
-          lore: "Left in an oilskin pouch under a riverbed boulder during Hermes's 1998 expedition. The dry juniper wood and sparking flint provided the warm fire that keeps Hermes alive inside Outer Watchtower VI."
+          lore: "Hidden under a boulder in the wash in 1998. Twenty-eight years later, its spark kept Hermes alive through the red storm."
         },
         surveyor_compass: {
           id: "surveyor_compass",
@@ -7177,7 +7177,7 @@
           image: "assets/items/item_brass_compass.png",
           origin: "Watchtower VI Trail · Wash Survey of 1998",
           summary: "A heavy brass pocket compass engraved with celestial degree coordinates.",
-          lore: "Hermes's precision field compass from twenty-eight years ago, left in a dry stone niche beside the second copper benchmark he set at the foot of the watchtower trail (the first lies under Cairn III, far down the wash). Set to the 112° E bearing stamped on that plate, it guided Hermes through the blinding sandstorm up the ridge to Outer Watchtower VI. Its balanced blued-steel needle still responds with absolute fidelity to the desert's magnetic meridians."
+          lore: "Left in a stone niche in 1998. Set to the 112° E stamped on his copper plate, it led Hermes blind through the storm to Watchtower VI."
         },
         spyglass_lens: {
           id: "spyglass_lens",
@@ -7186,43 +7186,43 @@
           image: "assets/items/item_spyglass_lens.png",
           origin: "Northern Bluff Shelf · Dropped by Raiders",
           summary: "A convex tempered optical lens set in a charred brass ring, etched with ash sigils.",
-          lore: "Dropped on the bluff edge by the raiders' scouts while surveying the gorge. The optical curvature of the glass is ground specifically to calculate the path of the Grand Eclipse."
+          lore: "Dropped by the raiders' scouts on the bluff above the gorge. The glass is ground for one purpose: to follow the Grand Eclipse."
         },
         tuning_pebble: {
           id: "tuning_pebble",
           name: "The Tuning Pebble · Cairn IV",
           category: "Mysterious Token",
           image: "assets/items/item_tuning_pebble.png",
-          origin: "Throat of the Left Pillar · Cairn IV · Oct 2026",
+          origin: "Throat of the Left Pillar · Cairn IV",
           summary: "A smooth river pebble with a small gold star painted on a ground of lapis blue.",
-          lore: "Wedged in the throat of the Left pillar of Cairn IV, where it turns the night wind into three short calls and two long ones: the code Hermes engraved on Aurelia's brass disc. The founders' bronze reeds are ancient. The pebble is not."
+          lore: "Wedged in the Left pillar of Cairn IV, it made the wind sing Aurelia's code. The bronze reeds are ancient. The pebble is not."
         },
         signal_mirror: {
           id: "signal_mirror",
           name: "The Signal Mirror · Cairn V",
           category: "Order Relic",
           image: "assets/items/item_signal_mirror.webp",
-          origin: "Courtyard of Rays · Arch of the Solstice · Oct 2026",
+          origin: "Courtyard of Rays · Arch of the Solstice",
           summary: "A small bronze hand mirror with a sun-ray rim and an eclipse engraved at the top.",
-          lore: "A small bronze hand mirror with the Order's mark on its rim. It lay under the Seal of Cairn V in the Solar Altar, polished by a recent hand. With it Hermes answered the light on Tower II in the code he made for Aurelia, and the light answered back."
+          lore: "It lay under the Seal of Cairn V, polished by a recent hand. With it Hermes flashed Aurelia's code at Tower II, and the light answered."
         },
         gilded_star: {
           id: "gilded_star",
           name: "The Gilded Star · Tower II",
           category: "Gift of the Oracle",
           image: "assets/items/item_gilded_star.webp",
-          origin: "The Inner Chamber · Tower II · Oct 2026",
+          origin: "The Inner Chamber · Tower II",
           summary: "An eight-pointed star of gold leaf on a small card of lapis blue.",
-          lore: "Painted by Aurelia while Hermes told her about the journey, with a squirrel-hair brush and her breath held so the gold would not fly away: a ground of lapis, then the gold, then a touch of white at the tip of every point. 'For the navigator who brought him back.'"
+          lore: "Painted by Aurelia while Hermes told her of the road: lapis, then gold, then a touch of white on every point. “For the navigator who brought him back.”"
         },
         servant_key: {
           id: "servant_key",
           name: "The Servant's Key · Tower II",
           category: "Order Relic",
           image: "assets/items/item_servant_key.webp",
-          origin: "The Well of the Atrium · Tower II · Oct 2026",
+          origin: "The Well of the Atrium · Tower II",
           summary: "A heavy bronze key whose bow holds the founders' grid: five squares by five.",
-          lore: "The Servant pressed it into Hermes's hand on the rim of the well, still warm from the fire. It opens the inner stair of Tower II, the way down to the Oracle, and its bow is cut in the shape of the grid of the stele, as if the door itself could only be opened by someone who reads it."
+          lore: "The Servant pressed it, still warm, into Hermes's hand. It opens the inner stair down to the Oracle."
         },
         seal_cairn_1: {
           id: "seal_cairn_1",
@@ -7231,25 +7231,25 @@
           image: "assets/items/item_seal_cairn_1.png",
           origin: "Wadi al-Hajar · Under Foundation of Cairn I",
           summary: "A carved sandstone medallion rimmed in weathered bronze, bearing four stacked river stones over bronze waves beneath a radiant sun.",
-          lore: "Lifted from the hollow bedrock beneath the third foundation of Cairn I after solving the river stone trial. Its ochre face is inlaid with undulating bronze river waves, the four stacked stones of the cairn, and a sunburst ringed by a graduated celestial bronze bezel marked 'I'. Deep interlocking notches along its rim mark it as the first keystone seal of the Great Circuit."
+          lore: "Buried under the third stone of Cairn I, in the dry riverbed. The first of the five keys of the Great Circuit."
         },
         seal_cairn_2: {
           id: "seal_cairn_2",
           name: "The Seal of Cairn II · Sun Monolith",
           category: "Sacred Seal",
           image: "assets/items/item_seal_cairn_2.png",
-          origin: "The Ridge of the Sun · Station 14 · Oct 2026",
+          origin: "The Ridge of the Sun · Station 14",
           summary: "A notched reddish-sandstone seal rimmed in bronze, carved with the Sun Monolith, its diagonal shadow line and a hammered bronze sun.",
-          lore: "Claimed from the sliding cavity of Cairn II once the sun walked its day across the ridge and the four shadows woke the marks. Framed in a notched bronze bezel with verdigris patina and the Roman numeral 'II', its bas-relief monolith casts a diagonal meridian shadow line under a radiant bronze sun. Hermes keeps it beside the Seal of Cairn I as the second key of the Great Circuit."
+          lore: "It slid out of Cairn II once the sun had walked its day across the ridge and woken the four shadows. The second key."
         },
         seal_cairn_3: {
           id: "seal_cairn_3",
           name: "The Seal of Cairn III · Sandstone Labyrinth",
           category: "Sacred Seal",
           image: "assets/items/item_seal_cairn_3.png",
-          origin: "The foot of Cairn III · Station 15 · Oct 2026",
+          origin: "The foot of Cairn III · Station 15",
           summary: "A sandstone disc cut with a square spiral that ends in a single dot.",
-          lore: "The labyrinth does not trap anyone who walks its true road: the road is the spiral on this seal, read from the outside in. Hermes lifted it from the copper plate in the dark, with the raiders' torches moving somewhere in the dark."
+          lore: "The spiral on its face is the true road of the labyrinth, read from the outside in. Hermes lifted it in the dark, with the raiders' torches near."
         },
         founders_lamp: {
           id: "founders_lamp",
@@ -7258,7 +7258,7 @@
           image: "assets/items/item_founders_lamp.png",
           origin: "A niche in the Sandstone Labyrinth · Station 15",
           summary: "A small bronze oil lamp with a lid shaped like a shell and a long curled handle.",
-          lore: "The founders left lamps in niches along their labyrinth, for whoever came after them to measure the stone. This one still held oil, thick as honey. Hermes filled his own lamp from it and walked the rest of the night with three steps of light around him instead of two."
+          lore: "The founders left lamps in their labyrinth for whoever came after. This one still held oil, thick as honey."
         },
         raiders_survey: {
           id: "raiders_survey",
@@ -7267,25 +7267,25 @@
           image: "assets/items/item_raiders_survey.png",
           origin: "The sand by the Southern Mouth · Station 15",
           summary: "A folded copy of the founders' survey, tied with string round an iron bar, the five cairns ringed in soot.",
-          lore: "The BC Ashes dropped it by the Southern Mouth: an iron bar like the ones that scarred the lid of Cairn II, and round it a copy of the founders' survey, with all five cairns ringed in soot. It explains how they knew where the seals were. It does not explain who copied it for them."
+          lore: "Dropped by the BC Ashes at the Southern Mouth: the founders' survey, all five cairns ringed in soot. It explains how they knew. Not who copied it for them."
         },
         seal_cairn_4: {
           id: "seal_cairn_4",
           name: "The Seal of Cairn IV · Sentry of the Canyon",
           category: "Sacred Seal",
           image: "assets/items/item_seal_cairn_4.png",
-          origin: "The singing pillars · Station 16 · Oct 2026",
+          origin: "The singing pillars · Station 16",
           summary: "A sandstone disc carved with a bridge, two pillars and three arcs of sound above them.",
-          lore: "The pillars of Cairn IV turn the night wind into a tune, and this seal is the tune written down. It was won at the end of a night of listening, in the gorge below the Sentinel Mesa."
+          lore: "The pillars of Cairn IV turn the night wind into a song, and this seal is the song written down. The fourth key."
         },
         seal_cairn_5: {
           id: "seal_cairn_5",
           name: "The Seal of Cairn V · Arch of the Solstice",
           category: "Sacred Seal",
           image: "assets/items/item_seal_cairn_5.svg",
-          origin: "The Solar Altar · Station 17 · Oct 2026",
+          origin: "The Solar Altar · Station 17",
           summary: "A sandstone disc carved with an arch and eight rays that meet under it.",
-          lore: "The last of the five lay under the Solar Altar, where the midsummer ray falls on eight sun-stones. With it in the satchel the five Cairns are answered, and the door of the Oracle can be asked to open."
+          lore: "The last of the five, from under the Solar Altar. With it the Cairns are answered, and the Oracle's door can be asked to open."
         },
         mirror_fragment_1: {
           id: "mirror_fragment_1",
@@ -7294,7 +7294,7 @@
           image: "assets/items/item_mirror_fragment_1.svg",
           origin: "Behind the wall of masks · Tower III · Station 20",
           summary: "A shard of silvered glass with a half-lit face scratched into its back.",
-          lore: "Set into the wall behind the masks, where only the one who named the right mask could reach it. The glass is old, but its edge is clean: someone has been looking after it. Nine pieces make the whole mirror, and this is the first."
+          lore: "Hidden behind the wall of masks, for the one who named the true mask. Its edge is clean: someone looks after it. One of nine."
         },
         mirror_fragment_2: {
           id: "mirror_fragment_2",
@@ -7303,7 +7303,7 @@
           image: "assets/items/item_mirror_fragment_2.svg",
           origin: "The dark room · Tower III · Station 21",
           summary: "A shard of silvered glass that holds the outline of a city of small towers.",
-          lore: "The city that fell on the dark wall of the Camera Obscura is still faintly in the glass, the way a candle leaves its flame on the eye. Hermes carried it down the narrow stair wrapped in his scarf."
+          lore: "The city that fell on the dark wall of the Camera Obscura is still faintly in the glass, like a candle flame left on the eye."
         },
         mirror_fragment_3: {
           id: "mirror_fragment_3",
@@ -7312,52 +7312,52 @@
           image: "assets/items/item_mirror_fragment_3.svg",
           origin: "The Whispering Gallery · Tower III · Station 22",
           summary: "A shard of silvered glass etched with a wave that comes back on itself.",
-          lore: "It answered the tune played backwards: the gallery gives every word back, and the mirror gives back every face. Three of the nine pieces are home now."
+          lore: "It answered the tune played backwards. The gallery gives back every word; the mirror, every face. Three of nine."
         },
         water_skins: {
           id: "water_skins",
           name: "The Four Water Skins",
           category: "Expedition Supply",
           image: "assets/items/item_water_skins.png",
-          origin: "The cleft under the falcon · Camp VIII · Oct 2026",
+          origin: "The cleft under the falcon · Camp VIII",
           summary: "Four oiled goatskin flasks bound with rawhide thongs and turned brass stoppers.",
-          lore: "The four wells were a mirage of the heat. Under the rock-carved falcon, a narrow cleft breathed cold mountain air, weeping pure subterranean water into a hidden hollow. Hermes filled these four oil-cured leather skins to the brim, sealing each brass spout with wax and cork. Bound tightly across the satchel, they are the vital reserve that makes the burning crossing of the Great Erg to Tower II possible."
+          lore: "The four wells were a mirage. Under the stone falcon a cleft wept cold water, and Hermes filled all four. They make the Great Erg crossable."
         },
         falcon_weight: {
           id: "falcon_weight",
           name: "The Falcon Weight",
           category: "Nomad Relic",
           image: "assets/items/item_falcon_weight.png",
-          origin: "The cache in the cleft · Camp VIII · Oct 2026",
+          origin: "The cache in the cleft · Camp VIII",
           summary: "A heavy cast-brass clepsydra counterweight with chased feathers and deep verdigris patina.",
-          lore: "The sole surviving bronze artifact of the ancient nomadic water-clock buried in the cleft when the aquifer dropped centuries ago. Sculpted in the likeness of a watchful desert falcon with folded wings and an eclipse notch upon its crown, its calibrated mass once marked the passage of the night hours as the water sank from well to well. Hermes keeps it in the satchel beside the water skins as an enduring anchor of clarity."
+          lore: "The last brass piece of the nomads' water clock, left in the cleft when the water sank. A falcon with folded wings and a notch on its crown."
         },
         red_cord: {
           id: "red_cord",
           name: "The Servant's Red Cord",
           category: "Road Gift",
           image: "assets/items/item_red_cord.png",
-          origin: "The Gates of Tower II · Oct 2026",
+          origin: "The Gates of Tower II",
           summary: "A faded crimson cord of braided wool, knotted twelve times and threaded with engraved brass beads.",
-          lore: "Untied from the Servant's iron staff and knotted round Hermes's wrist as a blessing for the road. Red for the road, the old man said: it will not stop the sun, it will remind you who waits. The twelve knots are spaced a staff apart, which makes it the best measuring line in the satchel."
+          lore: "Untied from the Servant's staff and knotted round Hermes's wrist. “Red for the road. It will not stop the sun; it will remind you who waits.”"
         },
         servant_coin: {
           id: "servant_coin",
           name: "The Servant's Coin",
           category: "Secret of the Order",
           image: "assets/items/item_servant_coin.png",
-          origin: "The Gates of Tower II · Oct 2026",
+          origin: "The Gates of Tower II",
           summary: "A heavy struck-bronze coin cut with the half-lit eclipse emblem and a central keyhole aperture.",
-          lore: "Given only to the one who checked the old man's word. The Oracle's keepers must lie once to every visitor, and almost nobody notices. Show this coin to whoever finds the Servant if fire ever rises over his tower."
+          lore: "Given only to the one who caught the old man's lie. The keepers must lie once to every visitor, and almost nobody notices."
         },
         ibis_figure: {
           id: "ibis_figure",
           name: "The Brass Ibis",
           category: "Nomad Relic",
           image: "assets/items/item_ibis_figure.png",
-          origin: "Under the Ibis slab · Sun Monolith · Oct 2026",
+          origin: "Under the Ibis slab · Sun Monolith",
           summary: "A miniature cast-brass ibis with pen-nib beak on a stepped dark plinth engraved with water ripples.",
-          lore: "The Ibis slab at the Monolith put the marks to sleep because it was never a trap: it was a lock, and this was the key. The ibis writes the hour at the river's edge. Its twin, the falcon, already rides in the satchel."
+          lore: "The Ibis slab at the Monolith was never a trap: it was a lock, and this was its key. Its twin is a falcon."
         },
         statue_seal: {
           id: "statue_seal",
@@ -7366,7 +7366,7 @@
           image: "assets/items/item_statue_seal.png",
           origin: "The statues of Tower II · The Sandstone Sanctuary",
           summary: "A carved sandstone disc medallion with bas-relief falcon and ibis facing under a radiant sun glyph.",
-          lore: "A sixth seal, owed to the two stone keepers of the gates and paid with a falcon of brass and an ibis of the same metal. It opens nothing the five cairns have not opened. It only makes the bronze doors open for the ones who also paid attention."
+          lore: "A sixth seal, paid to the two stone keepers with a falcon and an ibis of brass. It opens nothing new. It honours the ones who paid attention."
         },
         get lamp_oil() {
           const isHalf = (function() {
@@ -7391,7 +7391,7 @@
               image: "assets/items/item_lamp_oil_half.png",
               origin: "The Erg dunes · shared with the night traveller",
               summary: "An unstoppered brass ampulla of lamp oil, opened and poured to half its measure.",
-              lore: "Hermes uncorked the wax seal on the Erg dunes to share his supply with a night traveller walking blind to the well. Only half the oil remains in the vessel now, but the nomad repaid the gift with the secret of the morning shadow at the Sun Monolith."
+              lore: "Hermes broke the seal on the dunes to light a stranger's way to the well. Half is left, and the stranger paid in secrets: the morning shadow of the Monolith."
             };
           }
 
@@ -7400,9 +7400,9 @@
             name: "The Lamp Oil",
             category: "Expedition Supply",
             image: "assets/items/item_lamp_oil.png",
-            origin: "The nomads' cache · Camp VIII · Oct 2026",
+            origin: "The nomads' cache · Camp VIII",
             summary: "A hammered brass ampulla of refined lamp oil, wrapped in crimson cord and sealed with dripping wax.",
-            lore: "Buried in the cleft beside the falcon weight when the nomads left their water clock. Nearly full, and still good. It is the only light Hermes will have on the night roads: he can feed a dying fire with it, wager it, or pour it for a traveller in the dark. Empty the flask, and the night walk is black."
+            lore: "Found beside the falcon weight, nearly full. The only light for the night roads: feed a fire with it, wager it, or share it in the dark."
           };
         }
       };
@@ -7458,7 +7458,8 @@
         [['order_masks_gate_completed', 'mirror_fragment_1'], ['order_camera_obscura_completed', 'mirror_fragment_2'], ['order_whispering_gallery_completed', 'mirror_fragment_3']]
           .forEach(([flag, id]) => { if (localStorage.getItem(flag) === 'true' && !list.includes(id)) list.push(id); });
         if (localStorage.getItem('order_cairn_iv_completed') === 'true' && !list.includes('tuning_pebble')) list.push('tuning_pebble');
-        if (localStorage.getItem('order_arch_solstice_completed') === 'true' && !list.includes('signal_mirror')) list.push('signal_mirror');
+        // the Signal Mirror lies under the Seal of Cairn V: it is hers from the dawn on
+        if ((localStorage.getItem('order_arch_solstice_completed') === 'true' || localStorage.getItem('order_cairn5_dawn_done') === 'true') && !list.includes('signal_mirror')) list.push('signal_mirror');
         if (localStorage.getItem('order_polybius_stele_completed') === 'true' && !list.includes('servant_key')) list.push('servant_key');
         if (localStorage.getItem('order_oracle_horizon_completed') === 'true' && !list.includes('gilded_star')) list.push('gilded_star');
         if (localStorage.getItem('order_oasis_clepsydra_completed') === 'true') {
@@ -7467,6 +7468,9 @@
         }
         // The night on the Erg spends this flask. It is in the satchel only while Hermes still has oil.
         syncLampOil(list);
+        // a relic used for good is gone (relic-use.js keeps the list)
+        const spent = (window.RelicUse && window.RelicUse.spent()) || [];
+        if (spent.length) list = list.filter((id) => spent.indexOf(id) < 0);
         // in the order the expedition found them (anything unknown keeps its place at the end)
         const rank = (id) => { const k = INVENTORY_ORDER.indexOf(id); return k < 0 ? 999 : k; };
         return list.map((id, i) => [id, i]).sort((a, b) => (rank(a[0]) - rank(b[0])) || (a[1] - b[1])).map((x) => x[0]);
@@ -7481,7 +7485,7 @@
       function syncLampOil(list) {
         const wireStep = parseInt(localStorage.getItem('order_field_wire_step') || '0', 10) || 0;
         const found = localStorage.getItem(LAMP_OIL_KEY) === 'true' || wireStep >= 8;
-        const own = found && !!(window.GatesRoad && window.GatesRoad.hasLantern());
+        const own = found && !!(window.GatesRoad && window.GatesRoad.hasLantern()) && !(window.RelicUse && window.RelicUse.isSpent('lamp_oil'));
         ['order_inventory_relics', 'seeker_silvia_inventory_relics', 'seeker_carles_inventory_relics'].forEach((key) => {
           const raw = localStorage.getItem(key);
           if (raw === null && key !== 'order_inventory_relics') return;
@@ -7674,172 +7678,171 @@
         gilded_feather: {
           filterGroup: 'relic',
           nodeId: 2,
-          inscription: 'Gold leaf from the Alpine Observatory terrace · dipped before the September flight across the peaks.',
+          inscription: "Gold leaf from the terrace of the Alpine Observatory.",
           hermesNote: () => localStorage.getItem('order_masks_gate_completed') === 'true'
-            ? 'Strange, Silvia... look at this violet feather from September, and think of the tiny gilded feather we found resting on the Living Mirror in Tower III. The same gold leaf.'
-            : 'My last carrier pigeon flew over the Alps in a gale with this feather at its collar. Keep it close — gold never forgets where it was gilded.'
+            ? "The tiny feather on the Living Mirror of Tower III wears the same gold. Someone has been to the Alps, Silvia."
+            : "My last pigeon crossed the Alps in a gale for you. Keep it close: gold remembers where it was laid."
         },
         order_wax_seal: {
           filterGroup: 'seal',
           nodeId: 1,
-          inscription: 'Embossed brass-die impression in cinnabar wax · Half-light Eclipse (◐) ringed by the 24 celestial markings.',
-          hermesNote: () => 'The Order never writes twice, Silvia. When I broke the twin wax die in our mountain vault, I knew the binding around your journal would only yield to your hands.'
+          inscription: "The ◐ of the Order, ringed by 24 marks.",
+          hermesNote: () => "The Order never writes twice, Silvia. I broke the die after this seal, so no hand but yours could open that journal."
         },
         surveyor_compass: {
           filterGroup: 'tool',
           nodeId: 8,
-          inscription: 'Inside brass lid: "WADI AL-HAJAR SURVEY · OCT 1998 · BEARING 112° E TO WATCHTOWER VI"',
+          inscription: "Inside the lid: “WADI AL-HAJAR · OCT 1998 · 112° E TO WATCHTOWER VI”",
           hermesNote: () => localStorage.getItem('order_sandstone_labyrinth_completed') === 'true'
-            ? 'Eight-and-twenty years in a dry rock shelf, and that blued-steel needle did not rust a hair. First it brought me out of the red storm; then it stood beside the twin plate under Cairn III.'
-            : 'I can still feel the cold 1998 copper plate under my fingers in the wash. Keep the needle steady: 112° East always brings us home.'
+            ? "Twenty-eight years in a rock shelf, and not a hair of rust. It found me the watchtower, then the twin plate under Cairn III."
+            : "I still feel that cold copper plate under my fingers. Keep the needle steady: 112° East brings us home."
         },
         flint_tinder: {
           filterGroup: 'tool',
           nodeId: 8,
-          inscription: 'Stamped tang on the steel striker: "1998 BENCHMARK CACHE" · dry alpine juniper tinder root.',
-          hermesNote: () => 'That spark saved my fingers from freezing inside Watchtower VI while the storm tore at the shutters.'
+          inscription: "Stamped on the striker: 1998 BENCHMARK CACHE.",
+          hermesNote: () => "That spark saved my fingers in Watchtower VI while the storm tore at the shutters."
         },
         spyglass_lens: {
           filterGroup: 'tool',
           nodeId: 8,
-          inscription: 'Scorched brass collar · optical curvature ground to project the eclipse path; faint ash smudge along the bevel.',
-          hermesNote: () => 'Whoever dropped this glass on the bluff knew how to calculate the Grand Eclipse curves. Hold it carefully — the edge is still sharp.'
+          inscription: "A scorched brass ring, a smudge of ash along the edge.",
+          hermesNote: () => "Whoever ground this glass knows the sky as well as I do. Careful: the edge is still sharp."
         },
         seal_cairn_1: {
           filterGroup: 'seal',
           nodeId: 22,
-          inscription: 'Socket rim notched at 30° intervals · Chiseled base numeral: [ I ] · Four river stones above running water.',
+          inscription: "Four river stones over running water · I",
           hermesNote: () => localStorage.getItem('order_gates_scene_completed') === 'true'
-            ? 'At the gates of Tower II, the Servant slid this stone twin right into the first arch socket and nodded toward the dunes. Four sockets still wait across the desert.'
-            : 'I followed a strange certainty down the dry riverbed at dawn and found it buried under silt. My hand knew those stacked river stones before my memory did.'
+            ? "At the gates of Tower II the Servant set it in the first socket of the arch. Four more were waiting."
+            : "I found it under the silt at dawn. My hand knew those stacked stones before my memory did."
         },
         water_skins: {
           filterGroup: 'tool',
           nodeId: 12,
-          inscription: 'Four goatskin flasks sealed with tallow, leather thongs, and turned brass spouts · Spring temperature: cold.',
+          inscription: "Goatskin, rawhide, brass spouts. Still cold to the touch.",
           hermesNote: () => localStorage.getItem('order_sun_monolith_completed') === 'true'
-            ? 'Half spent on the Great Erg dunes, yet every drop left in those four skins tastes of alpine rock and saved us at the Monolith.'
-            : 'Under the rock falcon at Camp VIII, cold mountain air hissed through a cleft. Four full skins are all the wealth we carry across the Great Erg.'
+            ? "Half spent on the dunes, and every drop left still tastes of mountain rock."
+            : "Four full skins: all the wealth we carry across the Great Erg."
         },
         falcon_weight: {
           filterGroup: 'relic',
           nodeId: 12,
-          inscription: 'Weighted cylindrical base etched with tallies and eclipse notches · Twin counterweight to a bronze ibis.',
+          inscription: "Tally marks on the base, and an empty place for a twin.",
           hermesNote: () => {
-            const hasIbis = getOwnedRelicIds().includes('ibis_figure');
-            const hasStatue = getOwnedRelicIds().includes('statue_seal');
-            if (hasStatue) return 'So the Falcon and the Ibis really were twin keys for the stone keepers at the gates of Tower II.';
-            if (hasIbis) return 'Look! The base notches on the Falcon match the Brass Ibis we pulled from the Monolith slab. Together they belong to the statues at Tower II!';
-            return 'The weight sits heavier in my palm than mere brass ought to. The horus-falcon looks as though it expects a second bird beside it in the dark.';
+            const owned = getOwnedRelicIds();
+            if (owned.includes('statue_seal')) return "So the falcon and the ibis were the keys of the stone keepers all along.";
+            if (owned.includes('ibis_figure')) return "Its notches match the Brass Ibis. Both birds belong to the statues of Tower II!";
+            return "Heavier than brass ought to be. It looks as if it waits for a second bird.";
           }
         },
         lamp_oil: {
           filterGroup: 'tool',
           nodeId: 12,
-          inscription: 'Astronomical meridian lines & star arcs chased around the brass belly · Sealed at Camp VIII cache.',
+          inscription: "Meridian lines and star arcs around a brass belly.",
           hermesNote: () => {
             const shared = (window.GatesRoad && window.GatesRoad.flags && window.GatesRoad.flags().nightOil === 'shared') ||
               (function () { try { return JSON.parse(localStorage.getItem('order_gates_flags') || '{}').nightOil === 'shared'; } catch (e) { return false; } })();
             return shared
-              ? 'We unsealed the wax at 02:40 in the deep night to share light with a traveller lost on the Erg. Half a flask left — and his shadow clue at the Monolith repaid it twice over.'
-              : 'Still corked and nearly brim-full from the nomads\' cache in the cleft. On night roads without moon, every drop of this oil is hours of sight.';
+              ? "Half a flask, given at 02:40 to a man walking blind. His shadow clue repaid it twice."
+              : "Nearly full. On a moonless road, every drop is an hour of sight.";
           }
         },
         red_cord: {
           filterGroup: 'relic',
           nodeId: 27,
-          inscription: '12 wool knots spaced evenly along madder-dyed cord · Brass rings chased with lunar & solar ticks.',
-          hermesNote: () => '"Red for the road," the old Servant told me as he untied it from his iron staff. Twelve evenly knotted spans — at arm\'s length, a fist plus a little measures 14° off Polaris.'
+          inscription: "Twelve knots, a staff apart · brass beads marked with sun and moon.",
+          hermesNote: () => "“Red for the road,” he said. Twelve knots a staff apart: the best measuring line in the satchel."
         },
         servant_coin: {
           filterGroup: 'relic',
           nodeId: 27,
-          inscription: 'Outer degree ring around a split disc: half burnished light, half hammered shadow · Keyhole center.',
-          hermesNote: () => 'The keepers are sworn to tell one falsehood to every stranger at the steps, and almost nobody catches it. Show this heavy bronze coin to whoever seeks the Servant if fire rises over his tower.'
+          inscription: "Half light, half shadow, and a keyhole at the heart.",
+          hermesNote: () => "If fire ever rises over his tower, show this coin to whoever finds the Servant."
         },
         ibis_figure: {
           filterGroup: 'relic',
           nodeId: 23,
-          inscription: 'Dark basalt base cut with three water-ripple glyphs (≈) · Beak sharpened like a reed scribe\'s pen.',
+          inscription: "A beak like a scribe’s reed pen · three water ripples on the base.",
           hermesNote: () => getOwnedRelicIds().includes('statue_seal')
-            ? 'The Ibis of the Monolith and the Falcon of Camp VIII unlocked the stone keepers\' riddle cleanly.'
-            : 'Under the Ibis slab at the Monolith! Now both desert birds sit in our satchel — I wonder what the two stone keepers at Tower II will say when we place Falcon and Ibis before them.'
+            ? "Ibis and falcon together: the stone keepers' riddle, answered."
+            : "Both desert birds in one satchel. I wonder what the two stone keepers will say."
         },
         statue_seal: {
           filterGroup: 'seal',
           nodeId: 27,
-          inscription: 'Twin reliefs of falcon and ibis beneath a radiant disc · Sacred sixth medallion of the Threshold.',
-          hermesNote: () => 'The five cairns open the outer road; this sixth stone medallion is for the keepers who watched whether we noticed the quiet details on the steps.'
+          inscription: "Falcon and ibis face to face under a sun.",
+          hermesNote: () => "The five cairns open the road. This one is for the ones who noticed the small things on the steps."
         },
         seal_cairn_2: {
           filterGroup: 'seal',
           nodeId: 23,
-          inscription: 'Notched rim stamped [ II ] · Bas-relief obelisk casting a diagonal noon shadow line beneath hammered bronze sun.',
+          inscription: "A monolith and its noon shadow under a bronze sun · II",
           hermesNote: () => localStorage.getItem('order_sun_monolith_completed') === 'true'
-            ? 'Someone left fresh charcoal ash and scrapes around the lid before us — the BC Ashes tried to force Cairn II without waking the four shadows, and failed.'
-            : 'Cut from red desert sandstone to lock directly into the second socket of the Tower II arch.'
+            ? "Iron scrapes on the lid: the BC Ashes tried to force it without waking the shadows, and failed."
+            : "Cut to fit the second socket of the arch of Tower II."
         },
         seal_cairn_3: {
           filterGroup: 'seal',
           nodeId: 24,
-          inscription: 'Square bronze labyrinth track coiled inward from the rim · Reverse bearing mark: 348° NNW.',
-          hermesNote: () => 'Hidden beneath my own 1998 copper plate under Cairn III! The founders aligned it strictly to 348° NNW before the earthquake ever shook the canyon.'
+          inscription: "A square spiral to a single dot · 348° NNW on the back.",
+          hermesNote: () => "It lay under my own copper plate of 1998, and I never knew. The founders aimed it at 348° long before me."
         },
         tuning_pebble: {
           filterGroup: 'relic',
           nodeId: 25,
-          inscription: 'Fresh ultramarine lapis paint sealed beneath beeswax with an 8-point gold leaf star · Pulses: ··· ——',
+          inscription: "Lapis blue under beeswax, a gold star of eight points · ··· ——",
           hermesNote: () => localStorage.getItem('order_oracle_horizon_completed') === 'true'
-            ? 'Aurelia painted this lapis pebble with her own squirrel-hair brush and wedged it into the Left Pillar throat so Cairn IV would sing our secret code to the wind.'
-            : 'The cairn bronze reeds are centuries old, Silvia, but this blue pebble is newly painted gold over crushed lapis... Only one hand I ever knew ground lapis lazuli like this.'
+            ? "Aurelia painted it with her own brush and tuned Cairn IV to sing our code. She was ahead of me all along."
+            : "The paint is fresh, Silvia. Only one hand I ever knew ground lapis like this."
         },
         seal_cairn_4: {
           filterGroup: 'seal',
           nodeId: 25,
-          inscription: 'Bas-relief natural arch framing twin singing pillars and three acoustic resonance arcs.',
-          hermesNote: () => 'Won in the canyon dark by listening to echoes rebound between sandstone cliffs — SUN · ECHO · STONE, the three words of how the Order measures the world.'
+          inscription: "An arch, two singing pillars, three arcs of sound · IV",
+          hermesNote: () => "Won by listening. SUN, ECHO, STONE: that is how the Order measures the world."
         },
         signal_mirror: {
           filterGroup: 'tool',
           nodeId: 26,
-          inscription: 'Speculum bronze mirror framed in solar rays · Eclipse emblem (◐) chased at crown · Reflects ··· —— cleanly.',
-          hermesNote: () => 'Somebody polished this mirror recently under the Solar Altar, Silvia. And when I flashed the night sky across Tower II, someone on the battlements answered our exact code!'
+          inscription: "A rim of sun rays, the ◐ of the Order at the top.",
+          hermesNote: () => "Someone polished it for me, Silvia. And someone on Tower II knew our code."
         },
         seal_cairn_5: {
           filterGroup: 'seal',
           nodeId: 26,
-          inscription: 'Solar arch with eight converging summer dawn rays cast toward the central bronze ring.',
-          hermesNote: () => 'The fifth and final cairn seal! With I through V safe in our satchel, the bronze doors of the Oracle can no longer stay closed against us.'
+          inscription: "An arch, and eight rays meeting beneath it · V",
+          hermesNote: () => "The fifth seal, Silvia. With all five, the Oracle's doors cannot stay shut."
         },
         servant_key: {
           filterGroup: 'relic',
           nodeId: 13,
-          inscription: 'Heavy cast-bronze warded bit · Bow perforated in a crisp 5 × 5 Polybius grid.',
-          hermesNote: () => 'Still warm from the burning library well in Tower II. Its 5 × 5 grid unlocks the inner stairwell down to the chamber beneath the sanctuary.'
+          inscription: "A bow cut in a grid of five squares by five.",
+          hermesNote: () => "Still warm from the fire at the well. Only someone who can read its grid deserves the door it opens."
         },
         gilded_star: {
           filterGroup: 'relic',
           nodeId: 14,
-          inscription: 'Hand-ground lapis lazuli card inlaid with hammered 24k gold leaf and pure lead-white tips.',
-          hermesNote: () => '"For the navigator who brought him back," Aurelia whispered while painting the white tips with held breath. Keep it beside your compass always, Silvia.'
+          inscription: "Gold leaf on lapis, a breath of white on every point.",
+          hermesNote: () => "She painted the tips holding her breath. Keep it beside your compass, Silvia: it is yours."
         },
         mirror_fragment_1: {
           filterGroup: 'relic',
           nodeId: 40,
-          inscription: 'Beveled Venetian glass backed in tin-mercury amalgam · Scratched behind: half-lit face & reversed horizontal line.',
-          hermesNote: () => 'Silvered clean without tarnish despite the dust of Tower III. It mirrors truth only when you refuse to trust the golden deceits.'
+          inscription: "Scratched on the back: a half-lit face.",
+          hermesNote: () => "Not a speck of tarnish after all these years. This mirror tells the truth only to those who doubt the gold."
         },
         mirror_fragment_2: {
           filterGroup: 'relic',
           nodeId: 41,
-          inscription: 'Silvery shard holding the ghost image of an inverted walled town of slender towers.',
-          hermesNote: () => 'Look sideways into the amalgam at candlelight — the chimney smoke from the Camera Obscura wall still lingers inside the glass.'
+          inscription: "The ghost of a city of slender towers, upside down.",
+          hermesNote: () => "Tilt it to the candle and the city is still there, smoke and all."
         },
         mirror_fragment_3: {
           filterGroup: 'relic',
           nodeId: 42,
-          inscription: 'Etched elliptical focal arcs along the bevel · Resounds softly when sung in reverse.',
-          hermesNote: () => 'Three shards recovered out of nine. Every gallery whisper and mirrored bell brings the whole Mirror of Tower III closer to waking.'
+          inscription: "Curved lines along the edge · it hums when sung to backwards.",
+          hermesNote: () => "Three of nine, Silvia. Each whisper brings the Mirror of Tower III closer to waking."
         }
       };
 
@@ -8225,6 +8228,8 @@
       window.closeSatchelInventoryModal = closeSatchelInventoryModal;
       window.addRelicToInventory = addRelicToInventory;
       window.getOwnedRelicIds = getOwnedRelicIds;
+      window.getRelicCard = (id) => SATCHEL_RELICS[id] || null;
+      window.getSelectedRelicId = () => selectedInventoryItemId;
       window.updateInventoryBadge = updateInventoryBadge;
       window.SATCHEL_RELICS = SATCHEL_RELICS;
       initSatchelInteractions();
@@ -9168,10 +9173,13 @@
         if (!pend) return;
         const st = marchEvState(), e = (st[legNo] || []).find((x) => x.id === pend.entry.id);
         if (e) { e.pick = 'x'; marchEvSave(st); }
+        marchLapse(pend.ev);
         const line = marchNoReply(pend.entry.id);
         if (live) playHermesBeats([line], { type: 'expedition', step: legNo }, onDone || null);
         else appendWireMessage(getCartographerTitle(), line, false, false, null, wireMessagesStream, { type: 'expedition', step: legNo });
       }
+      // a question that went unanswered can still change something (e.g. a relic spent): its onLapse(W)
+      function marchLapse(ev) { if (ev && typeof ev.onLapse === 'function') { try { ev.onLapse(window.WireScript); } catch (err) { console.warn('wire march onLapse', err); } } }
       // Delivers what the walk has reached (one slot at a time). Returns true while it is speaking.
       function deliverMarchEvents(legNo, leg) {
         if (wireBeatsPlaying || !marchActive(legNo, leg)) return false;
@@ -9184,6 +9192,7 @@
         const ev = marchPick(legNo, leg, due[0], !last), meta = { type: 'expedition', step: legNo };
         if (marchPending(legNo)) marchExpire(legNo, false);
         const st2 = marchEvState(); (st2[legNo] = st2[legNo] || []).push({ id: ev.id, pick: ev.choices ? (last ? null : 'x') : 'n' }); marchEvSave(st2);
+        if (ev.choices && !last) marchLapse(ev);
         const beats = marchText(ev.beats).concat(ev.choices && !last ? [marchNoReply(ev.id)] : []);
         if (!beats.length) return false;
         if (watching) {

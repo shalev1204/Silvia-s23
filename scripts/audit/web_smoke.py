@@ -853,6 +853,23 @@ def test_solstice_arch(browser):
     check(get("order_cairn5_awake") == "true", "forgiving sigil 'day-break' wakes the altar")
     w = js("window.__cairn5.world()")
     check(w["gl"] and w["mirrors"] == 12 and w["beam"] == 0 and w["post"], "3D: the courtyard stands with its twelve mirrors, no ray before the dawn", str(w))
+    # by night Hermes needs a light to see the pins: the satchel's tray asks for one (relic-use.js)
+    tray_open = lambda: js("!!document.getElementById('relic-tray') && !document.getElementById('relic-tray').hidden")
+    before = js("window.__cairn5.mirrors()")
+    js("window.__cairn5.turn(4)"); page.wait_for_timeout(300)
+    check(tray_open() and js("window.__cairn5.mirrors()") == before, "by night a mirror will not turn: Hermes asks the satchel for a light")
+    js("document.querySelector('#relic-tray [data-relic=\"order_wax_seal\"]').click()"); page.wait_for_timeout(150)
+    check(tray_open() and "one door" in js("document.querySelector('#relic-tray .rt-reply').textContent"), "a wrong relic gets Hermes's line and the tray stays open")
+    js("document.querySelector('#relic-tray .rt-cancel').click()"); page.wait_for_timeout(200)
+    st = js("window.__cairn5.state()")
+    check(not tray_open() and st["lamp"] == "dark" and st["stepMs"] == 45000, "no light: the first ray of the dawn will wait 45 seconds", str(st))
+    js("window.__cairn5.turn(4)"); page.wait_for_timeout(300)
+    check(tray_open() and js("!!document.querySelector('#relic-tray [data-relic=\"lamp_oil\"]')"), "the tray offers the lamp oil again while she has it")
+    js("document.querySelector('#relic-tray [data-relic=\"lamp_oil\"]').click()"); page.wait_for_timeout(600)
+    js("document.getElementById('ir-btn-continue').click()"); page.wait_for_timeout(600)
+    st = js("window.__cairn5.state()")
+    check(st["lamp"] == "lit" and st["stepMs"] == 30000 and "lamp_oil" not in js("window.getOwnedRelicIds()")
+          and "lamp_oil" in js("window.RelicUse.spent()"), "the oil is burnt: the lamp is lit and the flask leaves the satchel", str(st))
     # she can turn a mirror by clicking it in the courtyard, like the plan
     js("window.__cairn5.gfx().cam.p = null"); js("window.__cairn5.frames(2)"); page.wait_for_timeout(300)
     before = js("window.__cairn5.mirrors()")
@@ -904,6 +921,12 @@ def test_solstice_arch(browser):
     check(w["night"] and w["beam"] == 0 and w["sky"] < 0.05, "3D: then night falls under the arch, Tower II on the horizon", str(w))
 
     rounds = js("window.__cairn5.rounds")
+    check("signal_mirror" in js("window.getOwnedRelicIds()") and js("!document.getElementById('btn-solstice-raise').hidden")
+          and js("document.getElementById('btn-solstice-flash').disabled"), "the hand mirror under the seal is in the satchel; the night waits for it")
+    js("document.getElementById('btn-solstice-raise').click()"); page.wait_for_timeout(300)
+    js("document.querySelector('#relic-tray [data-relic=\"signal_mirror\"]').click()"); page.wait_for_timeout(300)
+    check(js("window.__cairn5.state().raised") and not js("document.getElementById('btn-solstice-flash').disabled")
+          and "signal_mirror" in js("window.getOwnedRelicIds()"), "she hands Hermes the Signal Mirror: he can answer the tower (and keeps it)")
     js("window.__cairn5.flash('L')"); js("window.__cairn5.send()")
     check(get("order_cairn5_signal_round") is None and get("order_cairn5_signal_fails") == "1", "a wrong answer to the light is refused")
     for _ in range(5):
@@ -4742,8 +4765,10 @@ def test_wire_march_events(browser):
     js("TesterDesert.jumpTo('s14')"); page.reload(); page.wait_for_timeout(2500)
     ev = js("window.WIRE_MARCH_EVENTS")
     slots = {k: len(v) for k, v in ev.items()}
-    check(slots == {"10": 3, "14": 2, "18": 3, "22": 3, "26": 2, "34": 3} and all(len(sl["pool"]) == 3 for v in ev.values() for sl in v),
-          "six marches have events, two or three moments each and three versions of every moment", str(slots))
+    # (the last water on the way to the Arch is one fixed moment: the Four Water Skins are spent there, whatever she answers)
+    check(slots == {"10": 3, "14": 2, "18": 3, "22": 4, "26": 2, "34": 3}
+          and all(len(sl["pool"]) == 3 or [x["id"] for x in sl["pool"]] == ["ret-last-water"] for v in ev.values() for sl in v),
+          "six marches have events, two to four moments each and three versions of every moment but the last water", str(slots))
     # a march start whose pick for the first moment of the Great Erg is a question (the pick is a hash of the start, so search for one)
     setup = """() => { const hrs = (window.GatesRoad && window.GatesRoad.marchHours) ? window.GatesRoad.marchHours() : 12;
       const pool = window.WIRE_MARCH_EVENTS[10][0].pool, want = pool.findIndex((v) => v.choices);
