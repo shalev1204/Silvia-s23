@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = '08f54a54b307';  // 233 files, 51.3 MB
+var VERSION = 'cd603af8a2f9';  // 237 files, 54.3 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -63,6 +63,8 @@ var PRECACHE = [
   "./assets/items/item_seal_cairn_3.jpg",
   "./assets/items/item_seal_cairn_3.png",
   "./assets/items/item_seal_cairn_3.svg",
+  "./assets/items/item_seal_cairn_4.jpg",
+  "./assets/items/item_seal_cairn_4.png",
   "./assets/items/item_seal_cairn_4.svg",
   "./assets/items/item_seal_cairn_5.svg",
   "./assets/items/item_servant_coin.jpg",
@@ -73,6 +75,8 @@ var PRECACHE = [
   "./assets/items/item_statue_seal.jpg",
   "./assets/items/item_statue_seal.png",
   "./assets/items/item_surveyor_compass.jpg",
+  "./assets/items/item_tuning_pebble.jpg",
+  "./assets/items/item_tuning_pebble.png",
   "./assets/items/item_tuning_pebble.webp",
   "./assets/items/item_water_skins.jpg",
   "./assets/items/item_water_skins.png",

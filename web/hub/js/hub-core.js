@@ -405,27 +405,6 @@
           } catch (e) {}
         }
 
-        playAureliaCodePulse() {
-          if (this._muted()) return;
-          try {
-            this.init();
-            const base = this.ctx.currentTime;
-            // Canon pattern: 3 short, pause, 2 long (... --)
-            const beats = [[0, 0.075], [0.14, 0.075], [0.28, 0.075], [0.52, 0.24], [0.84, 0.24]];
-            beats.forEach(([off, dur]) => {
-              const osc = this.ctx.createOscillator();
-              const g = this.ctx.createGain();
-              osc.type = 'sine';
-              osc.frequency.setValueAtTime(739.99, base + off);
-              g.gain.setValueAtTime(0.0001, base + off);
-              g.gain.linearRampToValueAtTime(0.085, base + off + 0.012);
-              g.gain.exponentialRampToValueAtTime(0.0001, base + off + dur);
-              osc.connect(g); g.connect(this.ctx.destination);
-              osc.start(base + off); osc.stop(base + off + dur + 0.03);
-            });
-          } catch (e) {}
-        }
-
         playRelicFoley(relicId, isHalfOil = false) {
           if (this._muted()) return;
           try {
@@ -7213,7 +7192,7 @@
           id: "tuning_pebble",
           name: "The Tuning Pebble · Cairn IV",
           category: "Mysterious Token",
-          image: "assets/items/item_tuning_pebble.webp",
+          image: "assets/items/item_tuning_pebble.png",
           origin: "Throat of the Left Pillar · Cairn IV · Oct 2026",
           summary: "A smooth river pebble with a small gold star painted on a ground of lapis blue.",
           lore: "Wedged in the throat of the Left pillar of Cairn IV, where it turns the night wind into three short calls and two long ones: the code Hermes engraved on Aurelia's brass disc. The founders' bronze reeds are ancient. The pebble is not."
@@ -7294,7 +7273,7 @@
           id: "seal_cairn_4",
           name: "The Seal of Cairn IV · Sentry of the Canyon",
           category: "Sacred Seal",
-          image: "assets/items/item_seal_cairn_4.svg",
+          image: "assets/items/item_seal_cairn_4.png",
           origin: "The singing pillars · Station 16 · Oct 2026",
           summary: "A sandstone disc carved with a bridge, two pillars and three arcs of sound above them.",
           lore: "The pillars of Cairn IV turn the night wind into a tune, and this seal is the tune written down. It was won at the end of a night of listening, in the gorge below the Sentinel Mesa."
@@ -7689,7 +7668,6 @@
       let currentInventoryFilter = 'all';
       let isInspectZoomed = false;
       let isInspectFlipped = false;
-      let isOilBeforePreview = false;
       let satchelInteractionsWired = false;
 
       const RELIC_EXTRAS = {
@@ -7997,45 +7975,6 @@
           });
         }
 
-        // Special Contextual Action
-        const btnSpecial = document.getElementById('btn-si-special');
-        if (btnSpecial) {
-          btnSpecial.addEventListener('click', () => {
-            const id = selectedInventoryItemId;
-            if (id === 'lamp_oil') {
-              isOilBeforePreview = !isOilBeforePreview;
-              if (sfx && sfx.playRelicFoley) sfx.playRelicFoley('lamp_oil', !isOilBeforePreview);
-              inspectInventoryItem('lamp_oil', { silent: true });
-            } else if (id === 'tuning_pebble' || id === 'signal_mirror' || id === 'gilded_star') {
-              if (sfx && sfx.playAureliaCodePulse) sfx.playAureliaCodePulse();
-              const artWrap = document.getElementById('si-inspect-art-wrap');
-              if (artWrap) {
-                artWrap.classList.remove('is-aurelia-pulse');
-                void artWrap.offsetWidth;
-                artWrap.classList.add('is-aurelia-pulse');
-                setTimeout(() => artWrap.classList.remove('is-aurelia-pulse'), 1150);
-              }
-            }
-          });
-        }
-
-        // Locate Origin on Map
-        const btnLocate = document.getElementById('btn-si-locate');
-        if (btnLocate) {
-          btnLocate.addEventListener('click', () => {
-            const extra = getRelicExtra(selectedInventoryItemId);
-            if (!extra.nodeId) return;
-            closeSatchelInventoryModal();
-            if (typeof window.activateHubView === 'function') window.activateHubView('view-trail');
-            if (typeof window.switchMapPath === 'function' && Number(extra.nodeId) >= 10) {
-              window.switchMapPath(Number(extra.nodeId) >= 40 ? 'stage' : 'desert', true);
-            }
-            if (typeof window.selectMapNode === 'function') {
-              setTimeout(() => window.selectMapNode(extra.nodeId, true), 120);
-            }
-          });
-        }
-
         // Hover set highlights
         const highlightSet = (ids, on) => {
           document.querySelectorAll('#si-items-grid .si-mc-slot.is-filled').forEach((s) => {
@@ -8154,7 +8093,6 @@
         currentInventoryFilter = 'all';
         isInspectZoomed = false;
         isInspectFlipped = false;
-        isOilBeforePreview = false;
         if (selectId) selectedInventoryItemId = selectId;
         renderSatchelInventory();
         modal.style.display = 'flex';
@@ -8181,7 +8119,6 @@
       function inspectInventoryItem(id, opts) {
         opts = opts || {};
         if (selectedInventoryItemId !== id) {
-          isOilBeforePreview = false;
           isInspectFlipped = false;
           isInspectZoomed = false;
         }
@@ -8196,49 +8133,21 @@
         const desc = document.getElementById('si-inspect-desc');
         const revText = document.getElementById('si-reverse-text');
         const hermesEl = document.getElementById('si-hermes-note');
-        const btnSpecial = document.getElementById('btn-si-special');
-        const btnSpecialLbl = document.getElementById('btn-si-special-label');
-        const btnLocate = document.getElementById('btn-si-locate');
 
         const isSharedOil = id === 'lamp_oil' && (
           (window.GatesRoad && window.GatesRoad.flags && window.GatesRoad.flags().nightOil === 'shared') ||
           (function () { try { return JSON.parse(localStorage.getItem('order_gates_flags') || '{}').nightOil === 'shared'; } catch (e) { return false; } })()
         );
 
-        let displayImage = relic.image;
-        let displayOrigin = relic.origin;
-        let displayLore = relic.lore;
-        if (id === 'lamp_oil' && isSharedOil && isOilBeforePreview) {
-          displayImage = 'assets/items/item_lamp_oil.png';
-          displayOrigin = "The nomads' cache · Camp VIII (Sealed State)";
-          displayLore = 'Sealed with crimson cord and dripping red wax as Hermes originally unearthed it beside the falcon weight before sharing light on the Erg.';
-        }
-
-        if (img) img.src = displayImage;
+        if (img) img.src = relic.image;
         if (cat) cat.textContent = relic.category;
         if (title) title.textContent = relic.name;
-        if (origin) origin.textContent = displayOrigin;
-        if (desc) desc.textContent = displayLore;
+        if (origin) origin.textContent = relic.origin;
+        if (desc) desc.textContent = relic.lore;
 
         const extra = getRelicExtra(id);
         if (revText) revText.textContent = extra.inscription;
         if (hermesEl) hermesEl.textContent = typeof extra.hermesNote === 'function' ? extra.hermesNote() : String(extra.hermesNote || '');
-
-        if (btnSpecial && btnSpecialLbl) {
-          if (id === 'lamp_oil' && isSharedOil) {
-            btnSpecial.hidden = false;
-            btnSpecialLbl.textContent = isOilBeforePreview ? '◐ After the Erg' : '◐ Before the Erg';
-          } else if (id === 'tuning_pebble' || id === 'signal_mirror' || id === 'gilded_star') {
-            btnSpecial.hidden = false;
-            btnSpecialLbl.textContent = '✦ Signal ··· ——';
-          } else {
-            btnSpecial.hidden = true;
-          }
-        }
-
-        if (btnLocate) {
-          btnLocate.hidden = !extra.nodeId;
-        }
 
         syncInspectArtStates();
 
@@ -8256,7 +8165,7 @@
         });
 
         if (opts.playFoley && sfx && sfx.playRelicFoley) {
-          sfx.playRelicFoley(id, isSharedOil && !isOilBeforePreview);
+          sfx.playRelicFoley(id, isSharedOil);
         }
       }
 

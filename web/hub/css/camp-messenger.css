@@ -1099,10 +1099,6 @@
     .si-inspect-art-wrap.is-zoomed.is-flipped .si-inspect-img {
       transform: rotateX(var(--rx)) rotateY(calc(180deg + var(--ry))) scale(1.32);
     }
-    .si-inspect-art-wrap.is-aurelia-pulse .si-art-glint {
-      opacity: 1;
-      background: radial-gradient(circle, rgba(120, 180, 255, 0.45) 0%, rgba(251, 191, 36, 0.45) 45%, transparent 72%);
-    }
 
     .si-inspect-toolbar {
       display: flex;
@@ -1133,6 +1129,7 @@
       cursor: pointer;
       transition: all 0.16s ease;
     }
+    .si-tool-btn[hidden] { display: none !important; }
     .si-tool-btn:hover {
       background: #1e2a42;
       border-color: #fbbf24;
@@ -1143,13 +1140,6 @@
       background: linear-gradient(135deg, #b88a46 0%, #7a541c 100%);
       border-color: #ffdf9e;
       color: #0b0f18;
-    }
-    .si-tool-special {
-      border-color: rgba(110, 231, 183, 0.55);
-      color: #a7f3d0;
-    }
-    .si-tool-special:hover {
-      border-color: #6ee7b7;
     }
 
     .si-reverse-box {
