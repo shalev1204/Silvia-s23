@@ -609,6 +609,7 @@ Sin ninguna nota de pista. «Skip» del tester guarda `{done:true, skipped:true}
 Recuento (24 ids): **uso mecánico 11** (`seal_cairn_1`, `seal_cairn_2..5` ×4, `lamp_oil`, `red_cord`, `servant_coin`, `mirror_fragment_1..3` ×3) · **condicionales 2** (`falcon_weight`, `ibis_figure`) · **huérfanos 11** (los de la lista de §4.3).
 
 ### 4.3 Objetos huérfanos o con promesa sin cumplir
+> **Actualización 18-nov-2026:** esta sección describe el estado anterior. Desde A-49 (`GAME_MASTER_GUIDE.md` §5.0) los objetos del Desert Path se **usan y se gastan** con `relic-use.js` (bandeja «Hermes asks» + botón Use): aceite, espejo, lente y odres (S17 y marcha 22); moneda y halcón (S18); sellos, halcón + ibis y copia de los asaltantes (regreso a Tower II); llave, lámpara de los fundadores, moneda y guijarro (S19). Siguen sin uso: `gilded_feather`, `order_wax_seal`, `statue_seal`, `gilded_star` (Stage Path y Bóveda), `surveyor_compass`, `red_cord` y `flint_tinder`.
 - **Huérfanos totales (solo texto o inventario):** `gilded_feather`, `order_wax_seal`, `surveyor_compass`, `flint_tinder`, `spyglass_lens`, `water_skins`, `statue_seal`, `tuning_pebble`, `signal_mirror`, `servant_key`, `gilded_star`.
 - **Dependen de la rama «observer»:** `falcon_weight`, `ibis_figure`, `statue_seal` — la ruta *humble* de Silvia nunca los usará.
 - **Después de S19 el Satchel no se usa para nada** (ni en S20–S22): los 3 fragmentos solo se *muestran* en el mapa. La Torre I (A-23…A-26) todavía no consume nada del inventario.

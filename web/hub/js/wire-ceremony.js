@@ -36,7 +36,7 @@
         num: 'III', title: 'Tower II in Flames', place: 'The Oracle of Tower II',
         epilogue: [
           'The fire gave way to a stone grid and the key that fitted it, and the Servant was found alive by the well.',
-          'Then came the inner stair, the five seals laid in their places, and a name the desert had not heard since 1971.',
+          'At dawn the five seals went home in the arch, the inner stair opened, and the desert heard a name it had not heard since 1971.',
           'The Oracle was never a stranger or a ghost. She was Aurelia, and she had waited for the light as long as Hermes had walked away from it.',
           'The first truth was spoken: the WHEN. Two secrets still sleep, and the road to the next tower leaves at dawn, with the two of them walking side by side.'
         ],

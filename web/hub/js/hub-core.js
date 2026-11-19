@@ -1163,6 +1163,7 @@
               dels(['order_gates_scene_completed', 'order_gates_path', 'order_gates_flags', 'order_gates_return', 'order_gates_march_start', 'order_gates_march_bypassed',
                 'order_monolith_gate_seal1', 'order_monolith_march_hours', 'order_night_erg', 'order_monolith_march_start', 'order_monolith_march_bypassed']);
               ['red_cord', 'servant_coin', 'statue_seal'].forEach(dropRelic);
+              if (window.RelicUse) ['servant_coin', 'ibis_figure'].forEach((id) => window.RelicUse.unspend(id));   // a new road gives them afresh
             }
           },
           {
@@ -1184,7 +1185,8 @@
             complete() { set('order_labyrinth_march_start', '1'); set('order_labyrinth_awake', 'true'); set('order_labyrinth_star_seen', 'true'); set('order_labyrinth_camp_seen', 'true'); set('order_sandstone_labyrinth_completed', 'true'); set('order_seal_cairn_3', 'true'); },
             reset() { dels(['order_labyrinth_howto', 'order_labyrinth_cine_intro', 'order_stones_dream', 'order_sandstone_labyrinth_completed', 'order_labyrinth_awake', 'order_labyrinth_key_fails', 'order_labyrinth_hint', 'order_labyrinth_captures', 'order_labyrinth_torch_hint', 'order_labyrinth_star_seen', 'order_labyrinth_camp_seen', 'order_seal_cairn_3', 'order_labyrinth_march_start', 'order_labyrinth_march_bypassed', 'order_five_seals_celebrated',
               'order_labyrinth_finds', 'order_labyrinth_overheard', 'order_labyrinth_escape', 'order_labyrinth_cine_outro']);
-              if (typeof window.removeRelicFromInventory === 'function') { window.removeRelicFromInventory('founders_lamp'); window.removeRelicFromInventory('raiders_survey'); } }
+              if (typeof window.removeRelicFromInventory === 'function') { window.removeRelicFromInventory('founders_lamp'); window.removeRelicFromInventory('raiders_survey'); }
+              if (window.RelicUse) { window.RelicUse.unspend('founders_lamp'); window.RelicUse.unspend('raiders_survey'); } }
           },
           {
             id: 's16', tag: 'Station 16', label: 'Cairn IV · Sentry of the Canyon', flag: 'order_cairn_iv_completed', built: true,
@@ -1197,17 +1199,41 @@
           {
             id: 's17', tag: 'Station 17', label: 'The Arch of the Solstice · Cairn V', flag: 'order_arch_solstice_completed', built: true,
             complete() { set('order_cairn5_march_start', '1'); set('order_cairn5_awake', 'true'); set('order_cairn5_dawn_done', 'true'); set('order_cairn5_signal_round', '4'); set('order_arch_solstice_completed', 'true'); set('order_seal_cairn_5', 'true'); },
-            reset() { dels(['order_arch_solstice_completed', 'order_cairn5_awake', 'order_cairn5_key_fails', 'order_cairn5_hint', 'order_cairn5_mirrors', 'order_cairn5_dawn_done', 'order_cairn5_dawn_fails', 'order_cairn5_dawn_hint', 'order_cairn5_signal_round', 'order_cairn5_signal_fails', 'order_cairn5_signal_hint', 'order_seal_cairn_5', 'order_cairn5_march_start', 'order_cairn5_march_bypassed', 'order_five_seals_celebrated', 'order_cairn5_seals_at_altar', 'order_cairn5_lamp', 'order_cairn5_mirror_raised']); dropRelic('signal_mirror'); if (window.RelicUse) { window.RelicUse.unspend('lamp_oil'); window.RelicUse.unspend('signal_mirror'); window.RelicUse.unspend('water_skins'); } try { const mev = JSON.parse(localStorage.getItem('order_wire_marchev') || '{}') || {}; if (mev[22]) { delete mev[22]; localStorage.setItem('order_wire_marchev', JSON.stringify(mev)); } } catch (e) {} }
+            reset() { dels(['order_arch_solstice_completed', 'order_cairn5_awake', 'order_cairn5_key_fails', 'order_cairn5_hint', 'order_cairn5_mirrors', 'order_cairn5_dawn_done', 'order_cairn5_dawn_fails', 'order_cairn5_dawn_hint', 'order_cairn5_signal_round', 'order_cairn5_signal_fails', 'order_cairn5_signal_hint', 'order_seal_cairn_5', 'order_cairn5_march_start', 'order_cairn5_march_bypassed', 'order_five_seals_celebrated', 'order_cairn5_seals_at_altar', 'order_cairn5_lamp', 'order_cairn5_mirror_raised', 'order_cairn5_rays']); dropRelic('signal_mirror'); if (window.RelicUse) { window.RelicUse.unspend('lamp_oil'); window.RelicUse.unspend('signal_mirror'); window.RelicUse.unspend('water_skins'); } try { const mev = JSON.parse(localStorage.getItem('order_wire_marchev') || '{}') || {}; if (mev[22]) { delete mev[22]; localStorage.setItem('order_wire_marchev', JSON.stringify(mev)); } } catch (e) {} }
           },
           {
             id: 's18', tag: 'Station 18', label: 'The Polybius Stele · Tower II in Flames', flag: 'order_polybius_stele_completed', built: true,
             complete() { set('order_stele_march_start', '1'); set('order_stele_awake', 'true'); set('order_stele_knocks', '4'); set('order_polybius_stele_completed', 'true'); },
-            reset() { dels(['order_polybius_stele_completed', 'order_stele_awake', 'order_stele_key_fails', 'order_stele_hint', 'order_stele_knocks', 'order_stele_knock_fails', 'order_stele_knock_hint', 'order_stele_fire_fails', 'order_stele_fire_hint', 'order_stele_march_start', 'order_stele_march_bypassed', 'order_stele_seals_at_well']); dropRelic('servant_key'); }
+            reset() {
+              const RU = window.RelicUse;
+              if (RU && get('order_stele_falcon') === 'used') RU.unspend('falcon_weight');
+              dels(['order_polybius_stele_completed', 'order_stele_awake', 'order_stele_key_fails', 'order_stele_hint', 'order_stele_knocks', 'order_stele_knock_fails', 'order_stele_knock_hint', 'order_stele_fire_fails', 'order_stele_fire_hint', 'order_stele_march_start', 'order_stele_march_bypassed', 'order_stele_seals_at_well',
+                'order_stele_howto', 'order_stele_cine_intro', 'order_stele_coin', 'order_stele_falcon', 'order_stele_trail', 'order_stele_finds', 'order_stele_cine_outro']);
+              dropRelic('servant_key');
+            }
           },
           {
             id: 's19', tag: 'Station 19', label: "The Oracle's Horizon · Aurelia", flag: 'order_oracle_horizon_completed', built: true,
             complete() { set('order_oracle_stair_start', '1'); set('order_oracle_awake', 'true'); set('order_oracle_disc', '000'); set('order_oracle_when_read', 'true'); set('order_oracle_horizon_completed', 'true'); },
-            reset() { dels(['order_oracle_horizon_completed', 'order_oracle_awake', 'order_oracle_key_fails', 'order_oracle_hint', 'order_oracle_disc', 'order_oracle_disc_turns', 'order_oracle_disc_hint', 'order_oracle_when_read', 'order_oracle_read_fails', 'order_oracle_vow_fails', 'order_oracle_vow_hint', 'order_oracle_stair_start', 'order_oracle_stair_bypassed', 'order_stage_passage_seen', 'order_gates_return']); dropRelic('gilded_star'); dropRelic('statue_seal'); }
+            reset() {
+              const RU = window.RelicUse;
+              if (RU) {
+                let ret = {};
+                try { ret = JSON.parse(get('order_gates_return') || '{}') || {}; } catch (e) {}
+                [1, 2, 3, 4, 5].forEach((i) => RU.unspend('seal_cairn_' + i));
+                RU.unspend('servant_key'); RU.unspend('tuning_pebble');
+                if (ret.keepers) { RU.unspend('falcon_weight'); RU.unspend('ibis_figure', true); }
+                if (ret.survey) RU.unspend('raiders_survey', true);
+                if (get('order_oracle_lamp') === 'lit') RU.unspend('founders_lamp', true);
+                if (get('order_oracle_coin') === 'set') RU.unspend('servant_coin', true);
+                if (/"flint":true/.test(get('order_desert_farewell') || '')) RU.unspend('flint_tinder', true);
+              }
+              dels(['order_oracle_horizon_completed', 'order_oracle_awake', 'order_oracle_key_fails', 'order_oracle_hint', 'order_oracle_disc', 'order_oracle_disc_turns', 'order_oracle_disc_hint', 'order_oracle_when_read', 'order_oracle_read_fails', 'order_oracle_vow_fails', 'order_oracle_vow_hint', 'order_oracle_stair_start', 'order_oracle_stair_bypassed', 'order_stage_passage_seen', 'order_gates_return',
+                'order_oracle_howto', 'order_oracle_cine_intro', 'order_oracle_cine_outro', 'order_oracle_key', 'order_oracle_lamp', 'order_oracle_coin', 'order_oracle_pebble',
+                'order_desert_farewell', 'order_desert_farewell_pending',
+                'order_oracle_weigh_step', 'order_oracle_weigh_word', 'order_oracle_word_fails', 'order_oracle_weigh_fails', 'order_oracle_weigh_hint', 'order_oracle_beams_lost']);
+              dropRelic('gilded_star'); dropRelic('statue_seal');
+            }
           },
           {
             id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
@@ -1302,7 +1328,7 @@
               dels([
                 'order_field_wire_step', 'order_field_wire_choices', 'order_field_wire_completed',
                 'order_dawn_step', 'order_dawn_choices',
-                'order_satchel_expedition_item', 'order_inventory_relics',
+                'order_satchel_expedition_item', 'order_inventory_relics', 'order_relics_spent',
                 'order_messenger_unread_count', 'order_messenger_last_read_step',
                 'order_cartographer_title', 'order_desert_station_active',
                 'order_field_inquiries_read'
@@ -1336,7 +1362,7 @@
             GAMES.forEach((g) => { if (g.reset) g.reset(); });
             dels(['order_field_wire_step', 'order_field_wire_choices', 'order_field_wire_completed', 'order_dawn_step', 'order_dawn_choices',
               'order_desert_station_active', 'order_messenger_unread_count', 'order_messenger_last_read_step',
-              'order_satchel_expedition_item', 'order_inventory_relics', 'order_cartographer_title',
+              'order_satchel_expedition_item', 'order_inventory_relics', 'order_relics_spent', 'order_cartographer_title',
               'order_field_inquiries_read', 'order_wire_read2', 'order_wire_asks', 'order_wire_chapters_closed', 'order_wire_marchev', 'order_wire_rests']);
           }
         };
@@ -2465,7 +2491,7 @@
               statusClass: 'status-done-badge',
               title: "The Oracle's Horizon · Tower II",
               thumb: './assets/thumbnails/oracle_horizon_preview.webp',
-              lore: 'Silvia sealed the horizon on the page “The Oracle\'s Horizon”, set the brass disc of 24 sightings to the sky and read the first truth on it: the WHEN. Then she gave the vow back to the Oracle, and the Oracle lifted her veil. She was Aurelia.',
+              lore: 'Silvia sealed the horizon on the page “The Oracle\'s Horizon”, set the brass disc of 24 sightings to the sky and weighed three words on the Oracle’s balance: FEAR, LUX and ERA gave the first truth, the WHEN. Then she gave the vow back to the Oracle, and the Oracle lifted her veil. She was Aurelia.',
               rewards: [
                 { icon: '📅', label: 'The WHEN', desc: '18 – 20 December' },
                 { icon: '⭐', label: 'The Gilded Star', desc: 'Painted for the navigator' },
@@ -6468,7 +6494,7 @@
           title: "How do I set the disc of 24 sightings?",
           category: "Tower II",
           group: "desert",
-          answer: "Each ring has one small gold star engraved beside one of its letters: Aldebaran on the outer ring, Capella in the middle, Polaris on the inner one. Look at the sky I drew beside the disc, with north at the top, and turn each ring until its star points the same way as the real star. When all three point true, the jewel answers. Then read it the way I engraved it: start at the north spoke, read rim, middle, heart, then move clockwise to the next spoke. Three letters a spoke, eight spokes."
+          answer: "Each ring has one small gold star engraved beside one of its letters: Aldebaran on the outer ring, Capella in the middle, Polaris on the inner one. Look at the sky I drew beside the disc, with north at the top, and turn each ring until its star points the same way as the real star. When all three point true, the jewel answers and each ring reads its letters in order from the north. Then comes the weighing. The Oracle sings a riddle that hides one word. Say the word, and she lays it on her balance. A word weighs what its letters weigh together: take the number of each letter from your own Cipher Ledger and add them. The balance never says whether you are over or under; it only settles for the true weight. Three words, three numbers: the first day, the last day and the month."
         },
         {
           id: "inq-oracle-vow",
@@ -6801,9 +6827,9 @@
         '15A': { title: 'Cairn IV: Sentry of the Canyon', note: 'Two singing pillars, three laws of the echo and the survey log of seven echoes: the sigil of the Sentry.', thumb: './assets/thumbnails/cairn_iv_preview.webp', page: './assets/journal_pages/page_15a_cairn_iv.webp', path: 'desert', node: 25, nodeLabel: 'Station 16 · Cairn IV' },
         '15B': { title: 'The Natural Bridge of the Sentinel Mesa', note: 'The stone span, the old cart track and the switchbacks too tight for a loaded wagon (continues on the page “The Eastern Buttress & Lower Wash”).', page: './assets/journal_pages/page_15b_natural_bridge.webp', scene: 'bridge', sceneLabel: 'Take the spyglass again' },
         '14B': { title: 'The Sandstone Labyrinth & Cairn III', note: 'One true road from the Southern Mouth to the cairn, and eight arches upon it: the sigil of Cairn III.', thumb: './assets/thumbnails/sandstone_labyrinth_preview.webp', page: './assets/journal_pages/page_14b_sandstone_labyrinth.webp', path: 'desert', node: 24, nodeLabel: 'Station 15 · The Sandstone Labyrinth' },
-        '18A': { title: "The Oracle's Horizon", note: 'Eight beacons sent east across the three mirrors of the horizon: the sigil of the Oracle, and the first truth.', thumb: './assets/thumbnails/oracle_horizon_preview.webp', path: 'desert', node: 14, nodeLabel: "Station 19 · The Oracle's Horizon" },
+        '18A': { title: "The Oracle's Horizon", note: 'Eight beacons sent east across the three mirrors of the horizon: the sigil of the Oracle, and the first truth.', page: './assets/journal_pages/page_18a_oracle_horizon.webp', thumb: './assets/thumbnails/oracle_horizon_preview.webp', path: 'desert', node: 14, nodeLabel: "Station 19 · The Oracle's Horizon" },
         '18B': { title: 'From the Desert to the Stage', note: 'Curtains, columns and the floor of a stage: the passage to the third tower.' },
-        '17A': { title: 'The Polybius Stele', note: "The Servant's trial: the founders' 5 × 5 grid, keyed with PHOENIX, and six stanzas carved in the atrium of Tower II.", thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' },
+        '17A': { title: 'The Polybius Stele', note: "The Servant's trial: the founders' 5 × 5 grid, keyed with PHOENIX, and six stanzas carved in the atrium of Tower II.", page: './assets/journal_pages/page_17a_polybius_stele.webp', thumb: './assets/thumbnails/polybius_stele_preview.webp', path: 'desert', node: 13, nodeLabel: 'Station 18 · The Polybius Stele' },
         '17B': { title: 'The Desert Oracle', note: 'An audience with the Oracle of Tower II, and the Servant Hermes once watched from a ridge in 1998.' },
         '19A': { title: 'The Unsent Letter', note: 'A letter written backwards and never sent. Read it in a mirror.' },
         '19B': { title: 'The Gate of a Thousand Masks', note: 'A thousand faces guard the theatre of the Order, and six of them lie.', path: 'stage', node: 40, nodeLabel: 'Station 20 · The Gate of a Thousand Masks' },
@@ -7693,7 +7719,9 @@
           filterGroup: 'tool',
           nodeId: 8,
           inscription: "Inside the lid: “WADI AL-HAJAR · OCT 1998 · 112° E TO WATCHTOWER VI”",
-          hermesNote: () => localStorage.getItem('order_sandstone_labyrinth_completed') === 'true'
+          hermesNote: () => /"compass":true/.test(localStorage.getItem('order_desert_farewell') || '')
+            ? "It reads true now. Aurelia set it two degrees east at the gates of Tower II, with her thumbnail, and laughed at me."
+            : localStorage.getItem('order_sandstone_labyrinth_completed') === 'true'
             ? "Twenty-eight years in a rock shelf, and not a hair of rust. It found me the watchtower, then the twin plate under Cairn III."
             : "I still feel that cold copper plate under my fingers. Keep the needle steady: 112° East brings us home."
         },
@@ -7752,7 +7780,9 @@
           filterGroup: 'relic',
           nodeId: 27,
           inscription: "Twelve knots, a staff apart · brass beads marked with sun and moon.",
-          hermesNote: () => "“Red for the road,” he said. Twelve knots a staff apart: the best measuring line in the satchel."
+          hermesNote: () => /"cord":true/.test(localStorage.getItem('order_desert_farewell') || '')
+            ? "Thirteen knots now. The Servant tied the last one at the gates: “one for the road you have not walked.”"
+            : "“Red for the road,” he said. Twelve knots a staff apart: the best measuring line in the satchel."
         },
         servant_coin: {
           filterGroup: 'relic',
@@ -9341,6 +9371,7 @@
           try {
             localStorage.removeItem('order_satchel_expedition_item');
             localStorage.setItem('order_inventory_relics', JSON.stringify(['gilded_feather', 'order_wax_seal']));
+            localStorage.removeItem('order_relics_spent');
           } catch(e) {}
           if (typeof window.renderSatchel === 'function') window.renderSatchel(0);
           if (typeof window.updateSatchelVisibility === 'function') window.updateSatchelVisibility();
@@ -11037,13 +11068,17 @@
           showWaypointBar('Chapter ' + closing.num + ' complete · ' + closing.title, 'Hermes has closed the book on this chapter. When you are ready, close it too and begin Chapter ' + opening.num + ': ' + opening.title + '.', wireCurrentStep);
           const mapB = document.getElementById('btn-wire-to-map'), cerB = document.getElementById('btn-wire-ceremony'), tx = document.getElementById('btn-wire-ceremony-text');
           if (mapB) mapB.hidden = true;
-          if (tx) tx.textContent = 'Close the chapter ➔';
+          // The Desert Path ends with a scene of its own before the book of the chapter closes (hub/js/desert-farewell.js)
+          const farewell = step === 33 && window.DesertFarewell && window.DesertFarewell.pending();
+          if (farewell) showWaypointBar('Dawn at the gates of Tower II', 'Hermes and Aurelia leave for the third tower at first light, and the Servant has come to the bronze doors. Be there to say goodbye.', wireCurrentStep);
+          if (tx) tx.textContent = farewell ? '🌅 Dawn at the gates ➔' : 'Close the chapter ➔';
           if (cerB) {
             cerB.hidden = false;
             cerB.onclick = () => {
               if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
-              cerB.disabled = true;
-              window.WireCeremony.open(step, wireCeremonyContext(step), () => { cerB.disabled = false; wireCloseChapter(step); renderWireChoices(); });
+              const ceremony = () => { cerB.disabled = true; window.WireCeremony.open(step, wireCeremonyContext(step), () => { cerB.disabled = false; wireCloseChapter(step); renderWireChoices(); }); };
+              if (step === 33 && window.DesertFarewell && window.DesertFarewell.pending()) window.DesertFarewell.open(ceremony);
+              else ceremony();
             };
           }
         };
@@ -11979,6 +12014,7 @@
             localStorage.removeItem('order_cartographer_title');
             localStorage.removeItem('order_satchel_expedition_item');
             localStorage.removeItem('order_inventory_relics');
+            localStorage.removeItem('order_relics_spent');
             localStorage.removeItem('order_messenger_unread_count');
             localStorage.removeItem('order_messenger_last_read_step');
             removeShelterStormWaitBox();

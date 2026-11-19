@@ -5,11 +5,12 @@
     // Part II (web only), The Disc of 24 Sightings: the veiled Oracle raises the brass disc Hermes engraved
     // for Aurelia. Three rings of eight letters; each ring carries a star (Aldebaran, Capella, Polaris) that
     // must point where that star stands before dawn in late October at 30° N (W, NW, N: worked out from the
-    // stars' positions, not guessed). Set true, the disc reads from the north, clockwise, rim to heart:
-    // DECEMBER EIGHTEEN TO TWENTY (24 letters), the WHEN.
+    // stars' positions, not guessed). The 24 sightings carry the 24 letters she can weigh by now (all but I and J).
+    // Then the weighing, the last game of the Desert Path: the Oracle sings three riddles, each answer is a word, and the weight of
+    // each word in Silvia's own Cipher Ledger is a number of the date: FEAR 18, LUX 20, ERA 12. The WHEN: 18 to 20 December.
     // Part III (web only), The Vow: she half remembers some words; Silvia orders them into the vow,
     // YOU WERE ALWAYS THE TREASURE, and Hermes says it. The veil comes off; her memory comes back in part.
-    // Reward: the WHEN, two Ledger equations, the Gilded Star, and the passage to the Stage Path.
+    // Reward: the WHEN, two Ledger equations and the Gilded Star. The Desert Path ends afterwards, on the Field Wire (desert-farewell.js).
     // =========================================================================
     (function initOracleHorizon() {
       const modal = document.getElementById('modal-oracle-horizon');
@@ -20,7 +21,7 @@
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
       const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      const HOWTO_KEY = 'order_oracle_howto', CINE_INTRO = 'order_oracle_cine_intro';
+      const HOWTO_KEY = 'order_oracle_howto', CINE_INTRO = 'order_oracle_cine_intro', CINE_OUTRO = 'order_oracle_cine_outro';
       const KEYS = {
         awake: 'order_oracle_awake',
         done: 'order_oracle_horizon_completed',
@@ -33,15 +34,52 @@
         readFails: 'order_oracle_read_fails',
         vowFails: 'order_oracle_vow_fails',
         vowHint: 'order_oracle_vow_hint',
-        passage: 'order_stage_passage_seen'
+        weighStep: 'order_oracle_weigh_step',   // how many of the three riddles are weighed (0 to 3)
+        weighWord: 'order_oracle_weigh_word',   // 'true' once the word of the current riddle is found
+        wordFails: 'order_oracle_word_fails',   // wrong words for the current riddle (a fourth line at 3, the first letter at 6)
+        weighFails: 'order_oracle_weigh_fails', // weighings that did not settle (all three riddles)
+        weighHint: 'order_oracle_weigh_hint',
+        beams: 'order_oracle_beams_lost',       // times the light left the altar before a word was weighed
+        key: 'order_oracle_key',        // 'turned' (she handed Hermes the Servant's Key) or 'servant' (the old man opened the stair himself)
+        lamp: 'order_oracle_lamp',      // 'lit' (the Founders' Lamp burns on the stair) or 'dark'
+        coin: 'order_oracle_coin',      // 'set': the Servant's coin is in the hollow disc of the slab
+        pebble: 'order_oracle_pebble'   // 'given': the Tuning Pebble is back in her hands
       };
       const SIGIL = 'OVERTURE';
       const TURNS_PER_MISS = 15;   // turning the rings with no result counts as a miss every 15 turns
 
       // ---- The disc: spoke k (0 = north, clockwise) reads outer, middle, inner ----
-      const WHEN_WORDS = 'DECEMBER EIGHTEEN TO TWENTY';
-      const WHEN_LETTERS = WHEN_WORDS.replace(/ /g, '');   // 24 letters, one for each sighting
-      const RINGS = [0, 1, 2].map((r) => Array.from({ length: 8 }, (_, k) => WHEN_LETTERS[3 * k + r]));
+      // The 24 sightings carry the 24 letters of the Order she can weigh by now: every letter but I and J, which this station gives.
+      // Set true, each ring reads in order from the north: A to H on the rim, K to R in the middle, S to Z at the heart.
+      const RINGS = ['ABCDEFGH', 'KLMNOPQR', 'STUVWXYZ'].map((s) => s.split(''));
+      // ---- The weighing: three riddles, three words, three numbers of the date ----
+      // (the weights are what the words weigh in the true Ledger; the page only ever compares her answer with them)
+      const RIDDLES = [
+        { word: 'FEAR', weight: 18, name: 'the first day',
+          verse: ['I walk beside the brave, and still they walk.', 'I am the cold in a man’s hands before a door.', 'Four letters. Take my first away, and what is left can hear.'],
+          extra: 'The cartographer has carried me for fifty-five years. This morning he told you my name.',
+          near: { EAR: 'She tilts her head: that is what is left of it when its first letter is gone.', AFRAID: 'Close. But she wants the thing itself, in four letters.', DREAD: 'Close. But four letters, and without its first it can hear.', FRIGHT: 'Close. But four letters, and without its first it can hear.', COLD: 'Cold is how it feels, not what it is.' },
+          found: 'FEAR. Aurelia lays four bronze letters on the pan, and the balance leans.',
+          hermes: "Fear, Silvia. The days begin with fear. The Order never wrote a date in words: it wrote the weight of a word. Weigh it: add its four letters, with the numbers of your own Cipher Ledger.",
+          memory: '“Cold,” she says, and stops singing. “A terrace, high up. Cold brass under my hands.”',
+          settled: "The balance settled, Silvia. The first day is the eighteenth. And she remembered something: a terrace, and the cold. I know that terrace." },
+        { word: 'LUX', weight: 20, name: 'the last day',
+          verse: ['I am what the lamp gives, and what the mirror sends on.', 'The founders wrote me in their old tongue, short as a spark.', 'Three letters. I end with the mark that shows where treasure lies.'],
+          extra: 'They named the cartographer after me: the cartographer of the distant kind.',
+          near: { LIGHT: 'Light, yes. But she wants it in the old tongue of the founders: three letters, and the last is the mark on a treasure map.', LUZ: 'Almost. The old tongue ends it with the mark on a treasure map.', SUN: 'Brighter than a lamp, but not her word: hers ends with the mark on a treasure map.', RAY: 'A ray is made of it. Her word is older, and ends with the mark on a treasure map.' },
+          found: 'LUX. Light, in the old tongue. Three bronze letters on the pan.',
+          hermes: "Lux, Silvia: light, as the founders wrote it. From fear to light. Weigh it: three letters this time.",
+          memory: '“Fire,” she says. “Shelves burning, and rolls of paper in my arms. I would not let them go.”',
+          settled: "Twenty, Silvia: the last day. From the eighteenth to the twentieth. And she remembered a fire, and charts in her arms. I was there. I could not reach her." },
+        { word: 'ERA', weight: 12, name: 'the month',
+          verse: ['I am longer than a year, and longer than any life.', 'Kings give me their names, and I bury every king.', 'Three letters. Turn me round, and you ARE.'],
+          extra: 'I was hiding inside her first word, in another order, once its head was gone.',
+          near: { ARE: 'The same three letters. Turn them the other way.', EAR: 'The same three letters, in another order.', AGE: 'An age, yes. But three other letters: turned round, they say ARE.', EPOCH: 'An age, yes. But three letters: turned round, they say ARE.', TIME: 'Time is what it is made of. Three letters: turned round, they say ARE.' },
+          found: 'ERA. Three letters on the pan: the same three that fear was hiding.',
+          hermes: "Era, Silvia. An age. One more weighing, and the balance will tell us the month.",
+          memory: '“A voice,” she says. “Someone counting stars aloud, and getting them wrong.” She turns her veiled face toward Hermes.',
+          settled: '' }
+      ];
       // Where each ring's star is engraved (its spoke when the ring is set true) and where that star stands in the sky
       const STARS = [
         { name: 'Aldebaran', ring: 'Outer ring', spoke: 6, where: 'west' },
@@ -59,15 +97,19 @@
       const el = {
         close: $('btn-close-oracle'), sigilCard: $('oracle-sigil-card'), keyInput: $('oracle-key-input'), speak: $('btn-oracle-speak'),
         keyFeedback: $('oracle-key-feedback'), discGame: $('oracle-disc-game'), discInner: document.querySelector('#oracle-disc-game .monolith-game-inner'),
-        disc: $('oracle-disc'), sky: $('oracle-sky'), readPanel: $('oracle-read-panel'), whenInput: $('oracle-when-input'), read: $('btn-oracle-read'),
+        disc: $('oracle-disc'), sky: $('oracle-sky'), weighPanel: $('oracle-weigh-panel'), verse: $('oracle-verse'), balance: $('oracle-balance'),
+        wordRow: $('oracle-word-row'), wordInput: $('oracle-word-input'), wordBtn: $('btn-oracle-word'),
+        weightRow: $('oracle-weight-row'), weightInput: $('oracle-weight-input'), weighBtn: $('btn-oracle-weigh'), moonBtn: $('btn-oracle-moon'),
+        lightBox: $('oracle-light'), lightBar: $('oracle-light-bar'), lightLabel: $('oracle-light-label'),
+        dateBox: $('oracle-date'), dateSlots: Array.from(document.querySelectorAll('#oracle-date .oracle-date-slot')),
         when: $('oracle-when'), discFeedback: $('oracle-disc-feedback'), vowGame: $('oracle-vow-game'), vowInner: document.querySelector('#oracle-vow-game .monolith-game-inner'),
         said: $('oracle-said'), tiles: $('oracle-tiles'), unsay: $('btn-oracle-unsay'), vow: $('btn-oracle-vow'), vowFeedback: $('oracle-vow-feedback'),
         hint: $('oracle-hint'), victory: $('oracle-victory'), victoryText: $('oracle-victory-text'), finish: $('btn-oracle-finish'), dispatch: $('oracle-dispatch-text'),
+        rewardBtn: $('btn-oracle-reward'), coinBtn: $('btn-oracle-coin'), pebbleBtn: $('btn-oracle-pebble'), stairBtn: $('btn-oracle-stair'),
         stage: $('oracle3d-stage'), canvas: $('oracle3d-canvas'), subtitle: $('oracle3d-subtitle'), fade: $('oracle3d-fade'), aim: $('oracle3d-aim'),
         status: $('oracle3d-status'), howto: $('oracle3d-howto'), help: $('btn-oracle-howto'), ringCtrls: document.querySelector('#oracle-disc-game .oracle-ring-ctrls'),
         ringBtns: [0, 1, 2].map((r) => [$('btn-oracle-r' + r + '-l'), $('btn-oracle-r' + r + '-r')]),
-        ringLabels: [0, 1, 2].map((r) => $('oracle-r' + r + '-label')),
-        passage: $('stage-passage-overlay'), passageClose: $('btn-stage-passage-close')
+        ringLabels: [0, 1, 2].map((r) => $('oracle-r' + r + '-label'))
       };
 
       const isAwake = () => get(KEYS.awake) === 'true';
@@ -86,11 +128,20 @@
       });
       const discHints = hints.define({
         id: 's19-disc', station: 'Station 19', title: 'the disc of 24 sightings', group: 'desert',
-        anchor: el.discFeedback, solved: whenRead, active: isAwake, legacyKey: KEYS.discHint,
+        anchor: el.discFeedback, solved: () => whenRead() || discTrue(), active: isAwake, legacyKey: KEYS.discHint,
         texts: [
           'Look for the little gold star on each ring, and then at the sky drawn beside the disc. The disc and the sky have to agree before the jewel answers.',
-          'Turn each ring until its star points the same way as that star in the sky. Then read from the north, rim to heart, and go clockwise. My longer note is in Ask Hermes: "How do I set the disc of 24 sightings?"',
+          'Turn each ring until its star points the same way as that star in the sky. When all three are true, each ring reads its letters in order from the north. My longer note is in Ask Hermes: "How do I set the disc of 24 sightings?"',
           'Start with the inner ring: its star is Polaris, the star that never leaves the north. Turn the inner ring until that star points straight up, to the north. Then find Capella and Aldebaran in the sky beside the disc and do the same with their rings.'
+        ]
+      });
+      const weighHints = hints.define({
+        id: 's19-weigh', station: 'Station 19', title: 'the weighing of the words', group: 'desert',
+        anchor: el.discFeedback, solved: whenRead, active: () => isAwake() && discTrue(), legacyKey: KEYS.weighHint,
+        texts: [
+          'Each riddle hides one word, and each word weighs what its letters weigh together. Find the word first. Then open your Cipher Ledger, take the number of every letter of the word, and add them.',
+          'I wrote down how the Oracle weighs a word. It is in Ask Hermes: "How do I set the disc of 24 sightings?"',
+          'Let us do the first one together. Her first word is what I felt at her door this morning: FEAR. It has four letters: F, E, A and R. Find those four numbers in your Cipher Ledger and add them. If the balance still will not settle, one of the four is not what the desert taught you: go back to the lines of that letter.'
         ]
       });
       const vowHints = hints.define({
@@ -109,6 +160,8 @@
       const discTrue = () => isDone() || get(KEYS.when) === 'true' || rot.every((r) => r === 0);
       let said = [];   // indexes into TILES
       let pulsing = null;
+      let cineClosed = false;   // she closed the station while the opening film played: it will play again next time
+      let justWon = false;      // the Gilded Star gets its own card when she leaves right after the vow
 
       function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
       function subtitle(text, secs, kind) {
@@ -204,7 +257,7 @@
 
       // ---- Turning the rings ----
       function turn(ring, dir) {
-        if (!isAwake() || whenRead() || ring < 0 || ring > 2) return;
+        if (!isAwake() || whenRead() || discTrue() || ring < 0 || ring > 2) return;   // once it is true, the disc goes on the balance
         rot[ring] = (rot[ring] + dir + 8) % 8;
         set(KEYS.disc, rot.join(''));
         const turns = (parseInt(get(KEYS.turns) || '0', 10) || 0) + 1;
@@ -217,9 +270,9 @@
         sceneTurn(ring, rot[ring] === 0, trueRings === 3);
         if (rot.every((r) => r === 0)) {
           feedback(el.discFeedback, 'The three stars point true. The jewel of the disc wakes.', 'ok');
-          say("Silvia... the jewel. Three short flashes, a pause, two long ones: the code I engraved in it, more than fifty years ago. And every sighting is lit. Read it the way I made it to be read: from the north, clockwise, each spoke from the rim to the heart.");
+          say("Silvia... the jewel. Three short flashes, a pause, two long ones: the code I engraved in it, more than fifty years ago. Twenty-four sightings, twenty-four letters in their order, and it spells nothing. It was never written to be read. She has set it beside a bronze balance on the altar, in the beam of light, and she has begun to sing.");
           pulseCode();
-          if (el.whenInput) setTimeout(() => el.whenInput.focus({ preventScroll: true }), 60);
+          startWeighing();
         } else {
           feedback(el.discFeedback, STARS[ring].ring + ': ' + STARS[ring].name + ' points ' + SPOKE_NAMES[starSpoke(ring)] + '.', '');
         }
@@ -244,32 +297,162 @@
         pulsing = null;
         if (el.disc) el.disc.classList.remove('is-pulse');
       }
-      function readWhen() {
-        if (!isAwake() || whenRead() || !discTrue()) return;
-        const typed = letters(el.whenInput && el.whenInput.value);
-        const raw = String(el.whenInput && el.whenInput.value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
-        if (!typed && !/\d/.test(raw)) { feedback(el.discFeedback, 'Type the 24 letters of the disc, spoke by spoke.', 'error'); return; }
-        const asWords = typed === WHEN_LETTERS;
-        // ...or as a date: the days 18 and 20 (in figures or words) and December (by name, or 12 as a month)
-        const spelled = raw.replace(/EIGHTEENTH|EIGHTEEN|DIECIOCHO/g, ' 18 ').replace(/TWENTIETH|TWENTY|VEINTE/g, ' 20 ');
-        const nums = spelled.match(/\d+/g) || [];
-        const month = /\b(DEC|DECEMBER|DIC|DICIEMBRE)\b/.test(spelled.replace(/[^A-Z0-9]+/g, ' ')) || nums.filter((n) => n === '12').length > 0;
-        const asDate = month && nums.includes('18') && nums.includes('20');
-        if (!asWords && !asDate) {
-          set(KEYS.readFails, String((parseInt(get(KEYS.readFails) || '0', 10) || 0) + 1));
-          discHints.fail();
-          cue('wrong');
-          sceneRead(false);
-          feedback(el.discFeedback, 'Hermes frowns: that is not what the disc says. Start at the north spoke, read rim, middle, heart, then go clockwise.', 'error');
+      // ---- The weighing: her riddle, the word, its weight in Silvia's own Ledger ----
+      const weighStep = () => (whenRead() ? RIDDLES.length : Math.max(0, Math.min(RIDDLES.length, parseInt(get(KEYS.weighStep) || '0', 10) || 0)));
+      const riddle = () => RIDDLES[weighStep()] || null;
+      const weighing = () => isAwake() && discTrue() && !whenRead();
+      const wordFound = () => get(KEYS.weighWord) === 'true';
+      const numOf = (k) => parseInt(get(k) || '0', 10) || 0;
+      // the number she has written for a letter in her Cipher Ledger (never the true one): null when she has none yet
+      function myNumber(ch) {
+        const L = window.EclipseLedger;
+        const v = L && typeof L.value === 'function' ? L.value(ch) : null;
+        return typeof v === 'number' && v >= 1 && v <= 26 ? v : null;
+      }
+      // The beam of light from the opening in the roof crosses the altar while she weighs. When it has gone, nothing is lost:
+      // the moon comes over the opening, and the word on the pan is weighed again.
+      const LIGHT_MS = 240000, LIGHT_MS_LONG = 360000;
+      const light = { left: LIGHT_MS, gone: false, moon: false, last: 0, timer: 0 };
+      const lightTotal = () => (numOf(KEYS.beams) >= 2 ? LIGHT_MS_LONG : LIGHT_MS);
+      const lightFrac = () => (light.gone ? 0 : Math.max(0, Math.min(1, light.left / lightTotal())));
+      function lightTick() {
+        if (!weighing() || light.gone || !modalOpen() || busyOverlay() || rewardOpen() || document.hidden) { light.last = 0; return; }
+        const now = performance.now();
+        if (light.last) light.left -= now - light.last;
+        light.last = now;
+        if (light.left <= 0) lightGone(); else drawLight();
+      }
+      function lightGone() {
+        light.gone = true; light.left = 0; light.last = 0;
+        set(KEYS.beams, String(numOf(KEYS.beams) + 1));
+        cue('dusk');
+        subtitle('The beam of light slides off the altar. Aurelia covers the balance with her sleeve, and waits.', 5.5, 'act');
+        say("The light has left the altar, Silvia, and she will not weigh in the dark. Nothing is lost. The moon comes over the opening in a moment, and then we weigh this word again." + (numOf(KEYS.beams) === 2 ? " I will hold my cloak up to the draught: the light should stay with us longer." : ''));
+        if (el.weightInput) el.weightInput.value = '';
+        render();
+        if (el.moonBtn) setTimeout(() => el.moonBtn.focus({ preventScroll: true }), 60);
+      }
+      function lightBack() {
+        if (!light.gone) return;
+        light.gone = false; light.moon = true; light.left = lightTotal(); light.last = 0;
+        cue('shimmer', { deg: 6 });
+        subtitle('Moonlight finds the opening in the roof and falls, cold and white, on the balance.', 5, 'act');
+        say("The moon is over the opening, Silvia. She has uncovered the balance. Once more.");
+        render();
+        const t = wordFound() ? el.weightInput : el.wordInput;
+        if (t) setTimeout(() => t.focus({ preventScroll: true }), 60);
+      }
+      function drawLight() {
+        if (el.lightBar) el.lightBar.style.width = (lightFrac() * 100).toFixed(1) + '%';
+        if (el.lightBox) { el.lightBox.classList.toggle('is-low', !light.gone && lightFrac() < 0.25); el.lightBox.classList.toggle('is-gone', light.gone); el.lightBox.classList.toggle('is-moon', light.moon && !light.gone); }
+        if (el.lightLabel) el.lightLabel.textContent = light.gone ? 'The light has left the altar' : light.moon ? 'The moon on the altar' : 'The light on the altar';
+      }
+      // the bronze balance of the panel: her word on the left pan (with the numbers of her own Ledger), the day it weighs on the right
+      const bal = { state: 'idle', t: 0 };   // 'idle' | 'loaded' | 'swing' | 'settled'
+      function drawBalance() {
+        const box = el.balance, r = riddle();
+        if (!box) return;
+        const word = r && wordFound() ? r.word : '';
+        // on the pan, the word is a little stack of bronze; its letters stand upright under the balance, each with her own number
+        const stack = word.split('').map((ch, i) => '<rect class="ob-block" x="' + (44 - word.length * 3.5 + i * 7) + '" y="' + (33 - (i % 2) * 5) + '" width="6" height="6" rx="1"/>').join('');
+        const solved = RIDDLES.slice(0, weighStep()).map((x, i) => '<circle class="ob-gold" cx="' + (148 + i * 8) + '" cy="36" r="3.4"/>').join('');
+        const tiles = word.split('').map((ch) => {
+          const n = myNumber(ch);
+          return '<span class="ob-tile"><b>' + ch + '</b><i class="' + (n === null ? 'is-none' : '') + '">' + (n === null ? '?' : n) + '</i></span>';
+        }).join('<u aria-hidden="true">+</u>');
+        box.className = 'oracle-balance is-' + bal.state;
+        box.innerHTML = '<svg viewBox="0 0 200 62" role="img" aria-label="' + (word ? 'The bronze balance: the word ' + word + ' lies on the left pan' : 'The bronze balance of the Oracle, empty') + '">'
+          + '<path class="ob-post" d="M100 10 L100 56 M84 58 L116 58"/>'
+          + '<g class="ob-beam"><path class="ob-arm" d="M44 10 L156 10"/><path class="ob-chain" d="M44 10 L30 38 M44 10 L58 38 M156 10 L142 38 M156 10 L170 38"/>'
+          + '<path class="ob-pan" d="M26 38 Q44 49 62 38 Z"/><path class="ob-pan" d="M138 38 Q156 49 174 38 Z"/>' + stack + solved + '</g>'
+          + '<circle class="ob-pivot" cx="100" cy="10" r="3.2"/></svg>'
+          + (word ? '<div class="ob-word" aria-label="The letters of ' + word + ', each with the number written in your Cipher Ledger">' + tiles + '<u aria-hidden="true">=</u><span class="ob-tile is-sum"><b>?</b></span></div>'
+            + '<div class="ob-note">Under each letter: the number in <strong>your</strong> Cipher Ledger. A <b>?</b> means its lines are still waiting there.</div>' : '');
+      }
+      function setBalance(state) { bal.state = state; bal.t = performance.now(); drawBalance(); }
+      function singRiddle() {
+        const r = riddle();
+        if (!r) return;
+        const i = weighStep();
+        if (!wordFound()) {
+          say(i === 0 ? "She is singing a riddle, Silvia, in a voice like dry reeds. I think it is a rule of the Oracles: each riddle hides a word, and the word is weighed. Find her word."
+            : i === 1 ? "She sings again, Silvia, a second riddle. The balance is empty and waiting. Find her word."
+              : "The third riddle, Silvia, the last. She sings it more slowly, as if it cost her. Find her word.");
+        } else say(r.hermes);
+      }
+      function startWeighing() {
+        light.gone = false; light.moon = false; light.left = lightTotal(); light.last = 0;
+        setBalance(wordFound() ? 'loaded' : 'idle');
+        if (el.wordInput) setTimeout(() => { if (modalOpen()) el.wordInput.focus({ preventScroll: true }); }, 80);
+      }
+      function tryWord() {
+        const r = riddle();
+        if (!weighing() || !r || wordFound() || light.gone) return;
+        const typed = letters(el.wordInput && el.wordInput.value);
+        if (!typed) { feedback(el.discFeedback, 'Type the word her riddle hides.', 'error'); return; }
+        if (typed !== r.word) {
+          const fails = numOf(KEYS.wordFails) + 1;
+          set(KEYS.wordFails, String(fails));
+          weighHints.fail();
+          cue('wrong'); oracleDoes('shake'); react('worry');
+          feedback(el.discFeedback, r.near[typed] || (typed.length !== r.word.length
+            ? 'She shakes her head. Count the letters her riddle asks for: ' + (r.word.length === 4 ? 'four' : 'three') + '.'
+            : 'She shakes her head slowly, and sings the riddle again from the first line.'), 'error');
+          if (fails === 3) subtitle('Aurelia adds a line she had left out: “' + r.extra + '”', 7, 'act');
           render();
           return;
         }
+        set(KEYS.weighWord, 'true'); set(KEYS.wordFails, '0');
+        if (el.wordInput) el.wordInput.value = '';
+        if (!cue('shimmer', { deg: 12 + weighStep() * 2 }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
+        cue('click');
+        oracleDoes('nod'); react('wonder');
+        subtitle(r.found, 5, 'act');
+        feedback(el.discFeedback, r.word + '. Now weigh it: add the numbers of its letters in your Cipher Ledger.', 'ok');
+        say(r.hermes);
+        setBalance('loaded');
+        render();
+        if (el.weightInput) setTimeout(() => el.weightInput.focus({ preventScroll: true }), 60);
+      }
+      function tryWeight() {
+        const r = riddle();
+        if (!weighing() || !r || !wordFound() || light.gone) return;
+        const raw = String(el.weightInput && el.weightInput.value || '').trim();
+        if (!/^\d{1,3}$/.test(raw)) { feedback(el.discFeedback, 'Type what the word weighs: one number.', 'error'); return; }
+        if (parseInt(raw, 10) !== r.weight) {
+          set(KEYS.weighFails, String(numOf(KEYS.weighFails) + 1));
+          weighHints.fail();
+          cue('wrong'); react('worry');
+          setBalance('swing');
+          setTimeout(() => { if (bal.state === 'swing') setBalance('loaded'); }, 1500);
+          // (never which way: the balance does not say whether she is over or under)
+          feedback(el.discFeedback, 'The balance swings, and will not settle. Add the letters of ' + r.word + ' again, each with its number in your Cipher Ledger.', 'error');
+          render();
+          return;
+        }
+        const i = weighStep();
+        set(KEYS.weighStep, String(i + 1)); set(KEYS.weighWord, 'false'); set(KEYS.wordFails, '0');
+        if (el.weightInput) el.weightInput.value = '';
+        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('bell', { f: 392 * Math.pow(2, i / 6), v: 0.12, len: 3 });
+        oracleDoes('nod'); react('wonder');
+        sceneSettle(i);
+        setBalance('settled');
+        subtitle(r.memory, 7, 'act');
+        if (i + 1 >= RIDDLES.length) { finishWhen(); return; }
+        feedback(el.discFeedback, 'The balance settles: ' + r.name + ' is weighed.', 'ok');
+        say(r.settled);
+        light.left = lightTotal(); light.last = 0;   // a new word, and the whole beam again
+        render();
+        setTimeout(() => { if (weighing() && !wordFound()) { setBalance('idle'); singRiddle(); render(); if (el.wordInput && modalOpen()) el.wordInput.focus({ preventScroll: true }); } }, reduced() ? 600 : 5200);
+      }
+      // the three words are weighed: the first truth
+      function finishWhen() {
         set(KEYS.when, 'true');
         stopPulse();
         sceneRead(true);
-        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
-        feedback(el.discFeedback, 'DECEMBER EIGHTEEN TO TWENTY. The first truth: the WHEN.', 'ok');
-        say("December, the eighteenth to the twentieth. The hour and the season, Silvia: the first truth, written on a disc I made with my own hands, and I never knew what it would say. She is holding it out to you. And now she is looking at me through her veil, and she is saying words, very softly, as if she were trying to remember a song. Help me, Silvia. I think I know which words they are.");
+        feedback(el.discFeedback, 'From FEAR to LUX, in the twelfth month: 18 – 20 December. The first truth: the WHEN.', 'ok');
+        say("Twelve, Silvia: the twelfth month. From fear to light, the eighteenth to the twentieth of December. The first truth, hidden in the weight of three words, and you carried every weight across this desert yourself. She remembered a voice. Now she is saying words through her veil, very softly, like someone looking for a song. Help me. I think I know which words they are." + (pebbleWaits() ? " And I am carrying something of hers." : ''));
         render();
         const first = el.tiles && el.tiles.querySelector('button');
         if (first) setTimeout(() => first.focus({ preventScroll: true }), 60);
@@ -282,7 +465,7 @@
           TILES.forEach((w, i) => {
             const b = document.createElement('button');
             b.type = 'button';
-            b.className = 'chasm3d-btn oracle-tile';
+            b.className = 'chasm3d-btn oracle-tile' + (w === 'ALWAYS' && get(KEYS.pebble) === 'given' && !isDone() ? ' is-recalled' : '');
             b.textContent = w;
             b.setAttribute('aria-pressed', String(said.includes(i)));
             b.disabled = !whenRead() || isDone() || said.includes(i);
@@ -336,19 +519,265 @@
         sceneVow();
         completeStation();
         if (el.finish) setTimeout(() => el.finish.focus({ preventScroll: true }), 60);
-        say("I said it, Silvia. 'You were always the treasure.' And her hands let go of the disc, and she lifted the veil herself. It is her. It is Aurelia. Older, with a white streak in her hair and lapis blue under her nails, and her eyes are exactly the same. She does not remember everything. She remembers my voice, and the fire, and the cold of the terrace. She said her own name slowly, like a word in a language she used to speak. I cannot write any more right now.");
+        say("I said it, Silvia: 'You were always the treasure.' She let go of the disc and lifted the veil herself. It is Aurelia. Older, a white streak in her hair, lapis blue under her nails, and the same eyes. She remembers my voice, the fire, the cold of the terrace. Not everything. She said her own name slowly, like a word in a language she used to speak. I cannot write any more right now.");
       }
       function completeStation() {
+        // the star first: once the station is done the inventory counts it from that flag and would never mark it new
+        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('gilded_star');
         set(KEYS.done, 'true');
         set(KEYS.when, 'true');
         stopPulse();
         if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
-        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('gilded_star');
         applyVictory();
         render();
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
         if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
+        justWon = true;
+        // the Desert Path is not over yet: its last scene, the farewell at the gates, waits behind Hermes's talk on the Field Wire
+        if (window.DesertFarewell) window.DesertFarewell.markPending();
+        // once she has lifted the veil, a short film closes the station (the first time), and then the reward rises
+        clearTimeout(reward.timer);
+        const film = !!(G && cine && !reduced() && get(CINE_OUTRO) !== 'seen');
+        reward.timer = setTimeout(() => { if (film) outro(showReward); else showReward(); }, G && !reduced() ? 11600 : 700);
+      }
+      function endingShots() {
+        return [
+          { from: { p: [2.7, 1.9, 2.5], l: [0, 1.5, 0.1] }, to: { p: [1.8, 1.75, 1.7], l: [0, 1.55, -0.2] }, dur: 5.5,
+            kicker: 'STATION 19', title: 'THE FIRST TRUTH', line: 'Fifty-five years. For a long time, neither of them says a word.' },
+          { from: { p: [0.4, 1.4, 3.6], l: [0, 2.2, ALTAR[1]] }, to: { p: [0.2, 2.5, 2.7], l: [0, WALL_H + 2, ALTAR[1]] }, dur: 6,
+            line: 'Above the altar the grey light turns to gold. The first truth is told: the eighteenth to the twentieth of December.' },
+          { from: { p: [0, 2.1, -1.4], l: [0, 1.6, RAD] }, to: { p: [0, 2.5, 0.5], l: [0, 1.5, RAD + 2] }, dur: 5.5,
+            line: 'At the top of the inner stair the Servant puts out his lamp. In the east, the ruts of the wagons run toward the Stage.' }
+        ];
+      }
+      function outro(then) {
+        if (!modalOpen() || modal.classList.contains('closing') || !isDone()) return;
+        set(CINE_OUTRO, 'seen');
+        cue('whoosh', { dur: 1.6 });
+        cine.start(endingShots(), () => {
+          if (el.subtitle) el.subtitle.classList.remove('is-on');
+          view.snapNext = true;
+          if (modalOpen() && !modal.classList.contains('closing')) then();
+        }, { fade: true });
+      }
+
+      // ---- The satchel (relic-use.js): the key and the lamp on the inner stair, the coin in the door, the pebble for her ----
+      const RU = () => window.RelicUse || null;
+      const modalOpen = () => modal.style.display !== 'none';
+      const stairDone = () => isDone() || isAwake() || (!!get(KEYS.key) && !!get(KEYS.lamp));
+      const ARRIVE = "I am at the bottom of the inner stair, Silvia. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. It opens only for the sigil of the Oracle. Open your page “The Oracle's Horizon”, please. Someone is humming behind it.";
+      // The way down, once: the locked door of the stair (the Servant's Key), then the dark (the Founders' Lamp, if she found it)
+      function stairChain() {
+        const ru = RU();
+        if (stairDone() || !modalOpen() || busyOverlay()) return;
+        if (!ru) { set(KEYS.key, 'turned'); set(KEYS.lamp, 'dark'); render(); return; }
+        if (ru.isOpen()) return;
+        if (!get(KEYS.key)) {
+          if (!ru.has('servant_key')) { set(KEYS.key, 'servant'); stairChain(); return; }
+          ru.ask({
+            ask: 'The door of the inner stair is locked again, Silvia: every descent is asked for. The old man is watching my hands. What opens it?',
+            want: 'servant_key',
+            wrong: {
+              servant_coin: 'Not the coin. I think its turn comes further down.',
+              founders_lamp: 'A lamp for the dark, yes. First the lock.',
+              tuning_pebble: 'Not the pebble. That one I keep for someone.',
+              gilded_feather: 'A feather will not turn a lock of bronze, Silvia.'
+            },
+            cancel: 'Let the Servant open it',
+            onRight: () => {
+              set(KEYS.key, 'turned'); ru.spend('servant_key', { silent: true });
+              cue('click'); react('nod');
+              subtitle('The bronze key turns in the lock of the inner stair, as if it had been waiting. The Servant takes it back with a nod.', 4.6, 'act');
+              setTimeout(stairChain, reduced() ? 300 : 2400);
+            },
+            onCancel: () => {
+              set(KEYS.key, 'servant'); ru.spend('servant_key', { silent: true });
+              subtitle('The Servant opens the door with his own ring of keys, and holds out his palm for the one he lent.', 4.6, 'act');
+              setTimeout(stairChain, reduced() ? 300 : 2400);
+            }
+          });
+          return;
+        }
+        if (!get(KEYS.lamp)) {
+          if (!ru.has('founders_lamp')) { set(KEYS.lamp, 'dark'); say(ARRIVE + coinLine()); render(); return; }
+          ru.ask({
+            ask: 'This time he stays at the top with his lamp: she receives me, not him. The stair is dark, Silvia. Have we still got a lamp of our own?',
+            want: 'founders_lamp',
+            wrong: {
+              flint_tinder: 'A spark, and nothing to feed it.',
+              signal_mirror: 'A mirror needs a light to throw. Down there, there is none.',
+              spyglass_lens: 'There is nothing to see down there yet. That is the trouble.'
+            },
+            cancel: 'Go down by touch',
+            onRight: () => {
+              set(KEYS.lamp, 'lit'); ru.spend('founders_lamp', { silent: true });
+              if (hints && hints.grant) hints.grant('s19-disc', 1);
+              cue('flame', { dur: 1.4 }); react('wonder');
+              subtitle('The Servant tips a little oil from his own lamp into the founders’ lamp. It catches at once.', 4.6, 'act');
+              say("The founders' lamp burns again, Silvia. By its light the whole stair is painted: three gold stars on blue, Polaris at the top, then Capella, then Aldebaran. I left it burning on the last step. Now the door: a slab of sandstone carved with a horizon, three mirrors and eight sockets. It opens only for the sigil of the Oracle. Open your page “The Oracle's Horizon”. Someone is humming behind it." + coinLine());
+              render();
+            },
+            onCancel: () => { set(KEYS.lamp, 'dark'); say(ARRIVE + coinLine()); render(); }
+          });
+        }
+      }
+      // The Servant's coin has the half-lit disc on one face, and the slab has the same disc, hollow, over its sockets
+      const coinWaits = () => { const ru = RU(); return !!ru && !isAwake() && !isDone() && stairDone() && get(KEYS.coin) !== 'set' && ru.has('servant_coin'); };
+      const coinLine = () => (coinWaits() ? " And there is a small hollow disc cut over the sockets, the size of my thumb." : '');
+      function setCoin() {
+        const ru = RU();
+        if (get(KEYS.coin) === 'set') return;
+        set(KEYS.coin, 'set');
+        if (ru) ru.spend('servant_coin', { silent: true });
+        if (hints && hints.grant) hints.grant('s19-sigil', 1);
+        cue('click'); cue('shimmer', { deg: 10 }); react('nod');
+        subtitle('The coin clicks into the hollow disc. For a breath, a thread of light runs from each beacon across the three mirrors.', 5, 'act');
+        say("It fits, Silvia. And I remember the old man's last word about it: 'Do not read a beacon where it stands.' Each one has to cross the three mirrors first.");
+        render();
+      }
+      function askCoin() {
+        const ru = RU();
+        if (!ru || ru.isOpen() || !coinWaits()) return;
+        ru.ask({
+          ask: 'There is a half-lit disc cut into the slab, Silvia, hollow, the size of my thumb. What have we got that would fit?',
+          want: 'servant_coin',
+          wrong: {
+            order_wax_seal: 'The Order’s sign, yes, but wax would crumble in stone.',
+            statue_seal: 'Too wide. That seal belongs to the stone keepers.',
+            tuning_pebble: 'Not the pebble. That one I keep for someone.',
+            signal_mirror: 'Too big for the hollow, and I will not leave my mirror in a door.'
+          },
+          onRight: setCoin
+        });
+      }
+      // The pebble she once hid in the pillar of Cairn IV: back in her hands it brings one word of the song
+      const pebbleWaits = () => { const ru = RU(); return !!ru && get(KEYS.when) === 'true' && !isDone() && get(KEYS.pebble) !== 'given' && ru.has('tuning_pebble'); };
+      function givePebble() {
+        const ru = RU();
+        if (get(KEYS.pebble) === 'given') return;
+        set(KEYS.pebble, 'given');
+        if (ru) ru.spend('tuning_pebble', { silent: true });
+        vowHints.grant ? vowHints.grant(1) : (hints && hints.grant && hints.grant('s19-vow', 1));
+        cue('shimmer', { deg: 14 }); oracleDoes('nod'); react('wonder');
+        subtitle('She takes the painted pebble in both hands and holds it to her ear, like a shell. Then, very softly: “…always…”', 6, 'act');
+        say("She knew it at once, Silvia. She held it to her ear and said one word: 'always'. It is one of the words she is looking for.");
+        render();
+      }
+      function askPebble() {
+        const ru = RU();
+        if (!ru || ru.isOpen() || !pebbleWaits()) return;
+        ru.ask({
+          ask: 'She is reaching for a song she has lost, Silvia. I am carrying something of hers. Which is it?',
+          want: 'tuning_pebble',
+          who: 'Hermes asks',
+          wrong: {
+            gilded_feather: 'Gold, yes. But that one came from the Alps, not from her hands.',
+            red_cord: 'The cord is the Servant’s blessing. Not hers.',
+            signal_mirror: 'The mirror answered her light. It is not what she lost.',
+            surveyor_compass: 'My compass, Silvia. She would only tell me it is two degrees off.'
+          },
+          onRight: givePebble
+        });
+      }
+
+      // ---- The reward: the disc set true and the first truth, the vow, the star, the Ledger lines and glyphs, what the satchel gave ----
+      const reward = { box: null, back: null, timer: 0 };
+      const rewardOpen = () => !!reward.box && !reward.box.hidden;
+      function rewardDisc() {
+        let out = '';
+        [52, 40, 28, 16].forEach((r) => { out += '<circle class="oracle-rw-ring" cx="0" cy="0" r="' + r + '"/>'; });
+        for (let k = 0; k < 8; k++) { const [x1, y1] = at(k + 0.5, 16), [x2, y2] = at(k + 0.5, 52); out += '<line class="oracle-rw-spoke" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '"/>'; }
+        for (let k = 0; k < 8; k++) for (let ring = 0; ring < 3; ring++) {
+          const [x, y] = at(k, R[ring]);
+          out += '<text class="oracle-rw-letter" style="--t:' + (0.8 + (k * 3 + ring) * 0.09).toFixed(2) + 's" x="' + x.toFixed(1) + '" y="' + (y + 2.2).toFixed(1) + '">' + RINGS[ring][k] + '</text>';
+        }
+        return '<svg viewBox="-58 -58 116 116" role="img" aria-label="The brass disc of 24 sightings set true: December eighteen to twenty">' + out + '<circle class="oracle-rw-jewel" cx="0" cy="0" r="7"/></svg>';
+      }
+      function showReward() {
+        clearTimeout(reward.timer);
+        const body = modal.querySelector('.chasm3d-body');
+        if (!body || !isDone() || !modalOpen()) return;
+        if (!reward.box) {
+          reward.box = document.createElement('div');
+          reward.box.className = 'chasm3d-reward oracle-reward';
+          reward.box.setAttribute('role', 'dialog');
+          reward.box.setAttribute('aria-label', "Your reward for the Oracle's Horizon");
+          reward.box.hidden = true;
+          body.appendChild(reward.box);
+          reward.box.addEventListener('pointerdown', (e) => { if (!(e.target.closest && e.target.closest('button'))) reward.box.classList.add('is-fast'); });
+          reward.box.addEventListener('click', (e) => {
+            const relic = e.target.closest && e.target.closest('[data-relic]');
+            if (relic && typeof window.openItemAcquiredModal === 'function') { justWon = false; relic.classList.remove('is-new'); window.openItemAcquiredModal({ id: relic.getAttribute('data-relic') }); }
+          });
+        }
+        const num = (k) => parseInt(get(k) || '0', 10) || 0;
+        const vowFails = num(KEYS.vowFails);
+        const words = VOW.map((w, i) => '<span class="drw-word" style="--t:' + (3.9 + i * 0.28).toFixed(2) + 's">' + w + '</span>').join(' ');
+        const gave = [];
+        if (get(KEYS.key)) gave.push(['item_servant_key.webp', "The Servant's Key", get(KEYS.key) === 'turned' ? 'It turned in the lock of the inner stair.' : 'Back on the old man’s ring.']);
+        if (get(KEYS.lamp) === 'lit') gave.push(['item_founders_lamp.png', "The Founders' Lamp", 'It burns on the last step of the inner stair.']);
+        if (get(KEYS.coin) === 'set') gave.push(['item_servant_coin.png', "The Servant's Coin", 'Set in the Oracle’s door.']);
+        if (get(KEYS.pebble) === 'given') gave.push(['item_tuning_pebble.png', 'The Tuning Pebble', 'Back in her hands.']);
+        const spent = gave.length ? '<div class="rw-label drw-label">The satchel gave</div><ul class="drw-spent">' + gave.map((g) => '<li><img src="./assets/items/' + g[0] + '" alt=""><span><b>' + g[1] + '</b>' + g[2] + '</span></li>').join('') + '</ul>' : '';
+        const glyphs = $('oracle-glyph-src');
+        reward.box.innerHTML = '<div class="rw-rays" aria-hidden="true"></div>'
+          + '<div class="rw-sparks" aria-hidden="true">' + Array.from({ length: 18 }, (_, i) => '<i style="--a:' + ((i * 360 / 18) | 0) + 'deg;--d:' + (120 + (i % 5) * 36) + 'px;--t:' + (0.9 + (i % 4) * 0.2).toFixed(2) + 's"></i>').join('') + '</div>'
+          + '<div class="chasm3d-reward-card">'
+          + "<div class=\"chasm3d-reward-kicker\">Station 19 · The Oracle's Horizon</div>"
+          + '<h3 class="chasm3d-reward-title">The Oracle Remembers</h3>'
+          + '<p class="rw-sub">The horizon was sealed, the disc told the first truth, and Hermes said the vow. She lifted the veil herself: Aurelia, alive.</p>'
+          + '<div class="rw-grid">'
+          + '<section class="rw-map oracle-rw-map" aria-label="The disc of 24 sightings, set true">'
+          + '<div class="rw-label">The disc of 24 sightings</div>'
+          + rewardDisc()
+          + '<div class="oracle-rw-when">The First Truth · the WHEN<strong>18 – 20 December</strong></div>'
+          + '<div class="drw-words oracle-rw-weighed" aria-label="Weighed on the balance: FEAR, LUX, ERA">' + RIDDLES.map((r, i) => '<span class="drw-word" style="--t:' + (3.5 + i * 0.2).toFixed(2) + 's">' + r.word + '</span>').join('<u aria-hidden="true">·</u>') + '</div>'
+          + '<div class="drw-words" aria-label="You were always the treasure">' + words + '</div>'
+          + '<div class="chasm3d-reward-stats">'
+          + '<div><b>' + num(KEYS.turns) + '</b><span>turns of the rings</span></div>'
+          + '<div><b>' + num(KEYS.weighFails) + '</b><span>unsettled weighings</span></div>'
+          + '<div><b>' + (vowFails + 1) + '</b><span>tries at the vow</span></div>'
+          + '<div><b>' + (num(KEYS.fails) + 1) + '</b><span>sigil tries</span></div>'
+          + '</div>'
+          + (vowFails === 0 ? '<div class="rw-flawless">✦ The vow, at the first breath ✦</div>' : '')
+          + '</section>'
+          + '<section class="rw-loot">'
+          + '<div class="drw-relics">'
+          + '<button type="button" class="drw-relic' + (justWon ? ' is-new' : '') + '" data-relic="gilded_star" aria-label="The Gilded Star: open the card"><span class="drw-pic"><img src="./assets/items/item_gilded_star.webp" alt="" width="140" height="140"></span><span class="drw-name"><b>The Gilded Star</b><small>She painted it for you</small></span></button>'
+          + '<div class="oracle-rw-glyphbox"><div class="rw-label">Two new glyphs</div><div class="oracle-rw-glyphs">' + (glyphs ? glyphs.innerHTML : '') + '</div></div>'
+          + '</div>'
+          + '<div class="drw-eqs">'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Scratched on the back of the disc</div><div class="rw-ledger-title">In a hand Hermes knows</div><div class="rw-eq" aria-label="I plus E equals 12"><i>I</i><u>+</u><i>E</i><u>=</u><b>12</b></div><p>A line for your Cipher Ledger.</p></div></div>'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Beneath it, the same hand</div><div class="rw-ledger-title">The Shared Cell</div><div class="rw-eq" aria-label="I plus J equals 18"><i>I</i><u>+</u><i>J</i><u>=</u><b>18</b></div><p>Both lines are now in your Ledger.</p></div></div>'
+          + '</div>'
+          + spent
+          + '<div class="rw-next">Next · Hermes on the Field Wire</div>'
+          + '</section></div>'
+          + '<div class="chasm3d-reward-actions">'
+          + '<button type="button" class="chasm3d-reward-wire">📻 Hermes is calling on the Field Wire</button>'
+          + '<button type="button" class="chasm3d-btn chasm3d-reward-stay">Stay with them</button>'
+          + '</div></div>';
+        if (!rewardOpen()) reward.back = document.activeElement;
+        reward.box.hidden = false;
+        reward.box.scrollTop = 0;
+        reward.box.classList.remove('is-fast', 'is-on');
+        void reward.box.offsetWidth;
+        reward.box.classList.add('is-on');
+        if (!cue('shimmer', { deg: 21 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        const goBtn = reward.box.querySelector('.chasm3d-reward-wire'), stayBtn = reward.box.querySelector('.chasm3d-reward-stay');
+        if (goBtn) goBtn.addEventListener('click', () => { hideReward(true); leaveForWire(); });
+        if (stayBtn) stayBtn.addEventListener('click', () => hideReward());
+        if (goBtn) goBtn.focus({ preventScroll: true });
+      }
+      function hideReward(quietly) {
+        clearTimeout(reward.timer);
+        if (!rewardOpen()) return;
+        reward.box.hidden = true;
+        const back = reward.back; reward.back = null;
+        if (quietly) return;
+        const to = back && document.contains(back) && back.offsetParent ? back : el.rewardBtn;
+        if (to && to.focus) to.focus({ preventScroll: true });
       }
       function applyVictory() {
         if (el.victoryText) {
@@ -377,7 +806,7 @@
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'OVERTURE. The horizon is sealed, and the door of the inner chamber opens.', 'ok');
-        say("OVERTURE... and the door opened, Silvia. The chamber is round, with an opening in the roof and a beam of grey light on a stone altar. She is there. Veiled, in a worn hooded robe, standing very still. She has not said a word. She is holding up a brass disc, Silvia. My disc. Twenty-four sightings, three rings. She turns it toward me as if she wanted me to read it, and its rings are all crooked.");
+        say("OVERTURE, and the door sank into the floor, Silvia. A round chamber, a beam of grey light on a stone altar. She is there: veiled, hooded, very still, without a word. She is holding up a brass disc. My disc: twenty-four sightings, three rings. She turns it toward me to be read, and its rings are all crooked.");
         render();
         const b = el.ringBtns[0] && el.ringBtns[0][1];
         if (b) setTimeout(() => b.focus({ preventScroll: true }), 60);
@@ -385,7 +814,7 @@
 
       function render() {
         const awake = isAwake(), done = isDone(), wRead = whenRead(), dTrue = discTrue();
-        sigilHints.refresh(); discHints.refresh(); vowHints.refresh();
+        sigilHints.refresh(); discHints.refresh(); weighHints.refresh(); vowHints.refresh();
         drawDisc();
         drawSky();
         drawTiles();
@@ -395,13 +824,34 @@
           n.textContent = STARS[ring].ring + ' · ' + STARS[ring].name + (awake ? ' → ' + SPOKE_NAMES[starSpoke(ring)] : '') + (awake && rot[ring] === 0 ? ' ✓' : '');
           n.classList.toggle('is-true', awake && rot[ring] === 0);
         });
-        if (el.readPanel) el.readPanel.style.display = awake && dTrue && !wRead ? '' : 'none';
+        // the weighing: her riddle, the balance, the word and its weight, and the light that is leaving
+        const wg = awake && dTrue && !wRead, rd = riddle(), found = wordFound();
+        if (el.weighPanel) el.weighPanel.style.display = wg ? '' : 'none';
+        if (wg && rd) {
+          if (el.verse) {
+            el.verse.textContent = '';
+            const head = document.createElement('div'); head.className = 'oracle-verse-head';
+            head.textContent = ['I', 'II', 'III'][weighStep()] + ' · She sings of ' + rd.name;
+            el.verse.appendChild(head);
+            rd.verse.concat(numOf(KEYS.wordFails) >= 3 && !found ? [rd.extra] : []).forEach((ln) => { const p = document.createElement('p'); p.textContent = '“' + ln + '”'; el.verse.appendChild(p); });
+            if (numOf(KEYS.wordFails) >= 6 && !found) { const p = document.createElement('p'); p.className = 'oracle-verse-help'; p.textContent = 'Hermes, under his breath: “It begins with ' + rd.word.charAt(0) + '.”'; el.verse.appendChild(p); }
+          }
+          if (el.wordRow) el.wordRow.style.display = found || light.gone ? 'none' : '';
+          if (el.weightRow) el.weightRow.style.display = found && !light.gone ? '' : 'none';
+          if (el.moonBtn) el.moonBtn.hidden = !light.gone;
+          if (el.verse) el.verse.style.display = light.gone ? 'none' : '';   // in the dark there is only the moon to wait for
+          if (bal.state === 'idle' && found) bal.state = 'loaded';
+          drawBalance();
+          drawLight();
+        }
+        if (el.dateSlots) el.dateSlots.forEach((n, k) => { const ok = wRead || weighStep() > k; n.textContent = ok ? String(RIDDLES[k].weight) : '?'; n.classList.toggle('is-set', ok); });
+        if (el.dateBox) el.dateBox.style.display = awake && dTrue && !wRead ? '' : 'none';
         if (el.when) el.when.style.display = wRead ? '' : 'none';
         if (el.unsay) el.unsay.disabled = !wRead || done || !said.length;
         if (el.vow) el.vow.disabled = !wRead || done;
         if (el.status) {
           const n = rot.filter((r) => r === 0).length;
-          el.status.textContent = done ? '✦ She remembers' : !awake ? 'The door is shut' : wRead ? 'The vow' : dTrue ? 'The disc is true · read it' : n + ' of 3 stars true';
+          el.status.textContent = done ? '✦ She remembers' : !awake ? 'The door is shut' : wRead ? 'The vow' : dTrue ? 'The weighing · ' + weighStep() + ' of 3 words' : n + ' of 3 stars true';
         }
         if (el.discGame) el.discGame.classList.toggle('is-locked', !awake);
         if (el.discInner) el.discInner.inert = !awake;
@@ -417,9 +867,15 @@
           el.hint.textContent = hint;
         }
         if (el.victory) el.victory.style.display = done ? '' : 'none';
+        if (el.coinBtn) el.coinBtn.hidden = !coinWaits();
+        if (el.pebbleBtn) el.pebbleBtn.hidden = !pebbleWaits();
+        // the sigil waits until Hermes has come down the inner stair
+        if (el.keyInput && !awake) el.keyInput.disabled = !stairDone();
+        if (el.speak && !awake) el.speak.disabled = !stairDone();
+        if (el.stairBtn) el.stairBtn.hidden = stairDone();
         // the panel shows the part she is in; the scene shows the rest
         if (el.discGame) el.discGame.style.display = done ? 'none' : '';
-        if (el.ringCtrls) el.ringCtrls.style.display = wRead ? 'none' : '';
+        if (el.ringCtrls) el.ringCtrls.style.display = wRead || dTrue ? 'none' : '';
         if (el.vowGame) el.vowGame.style.display = awake && !done ? '' : 'none';
         syncWorld();
         mood();
@@ -442,7 +898,7 @@
       const RING_R = [[0.7, 0.98], [0.46, 0.7], [0.22, 0.46]];   // each ring's band, as a share of the disc's radius
       let G = null, raf = 0, lastT = 0, cine = null, howtoPage = 0;
       const view = { snapNext: true, phase: '', sigilT: 0, endT: 0, hover: -1, endTimers: [] };
-      const busyOverlay = () => (cine && cine.active) || (el.howto && !el.howto.hidden);
+      const busyOverlay = () => (cine && cine.active) || (el.howto && !el.howto.hidden) || !!(window.RelicUse && window.RelicUse.isOpen());
       const ringTrue = (r) => rot[r] === 0;
 
       // ---- The engraved rings: brass with dark letters, and the same letters in white for when the disc shines ----
@@ -635,6 +1091,23 @@
           const p = new T.Mesh(new T.SphereGeometry(0.13, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), i ? lapis : paint({ color: 0xb8862a })); p.scale.y = 0.35; p.position.set(x, 1.1, z); altar.add(p);
         });
         const pestle = solid(new T.CylinderGeometry(0.03, 0.045, 0.32, 10), bowlMat, 0.62, 1.2, 0.2, altar); pestle.rotation.z = 0.7;
+        // ---- The Oracle's balance, on the altar in the beam of light: a word on one pan, the day it weighs on the other ----
+        const brassMat = new T.MeshStandardMaterial({ color: 0xb8893a, metalness: 0.78, roughness: 0.34, emissive: 0x2a1a04, emissiveIntensity: 0.6 });
+        const goldMat = new T.MeshStandardMaterial({ color: 0xfde68a, metalness: 0.6, roughness: 0.3, emissive: 0xb07a1c, emissiveIntensity: 0.9 });
+        const balance = new T.Group(); balance.position.set(-0.05, 1.02, -0.05); altar.add(balance);
+        solid(new T.CylinderGeometry(0.16, 0.2, 0.05, 20), brassMat, 0, 0.025, 0, balance);
+        solid(new T.CylinderGeometry(0.022, 0.03, 0.78, 10), brassMat, 0, 0.42, 0, balance);
+        solid(new T.SphereGeometry(0.045, 12, 10), brassMat, 0, 0.83, 0, balance);
+        const balBeam = new T.Group(); balBeam.position.set(0, 0.8, 0); balance.add(balBeam);
+        const arm = solid(new T.CylinderGeometry(0.014, 0.014, 1.0, 8), brassMat, 0, 0, 0, balBeam); arm.rotation.z = Math.PI / 2;
+        const balPans = [-1, 1].map((sd) => {
+          const pan = new T.Group(); pan.position.set(sd * 0.5, 0, 0); balBeam.add(pan);   // hangs from the arm; kept level in the frame
+          [[-0.11, 0], [0.11, 0], [0, 0.11], [0, -0.11]].forEach(([dx, dz]) => { const c = solid(new T.CylinderGeometry(0.004, 0.004, 0.36, 4), brassMat, dx / 2, -0.18, dz / 2, pan); c.rotation.z = -dx * 1.5; c.rotation.x = dz * 1.5; });
+          solid(new T.CylinderGeometry(0.15, 0.1, 0.035, 20), brassMat, 0, -0.36, 0, pan);
+          return pan;
+        });
+        const balBlocks = [0, 1, 2, 3].map((k) => { const m = solid(new T.BoxGeometry(0.055, 0.055, 0.055), brassMat, -0.09 + k * 0.06, -0.315, (k % 2 ? 0.03 : -0.03), balPans[0]); m.visible = false; return m; });
+        const balGold = [0, 1, 2].map((k) => { const m = solid(new T.SphereGeometry(0.035, 12, 10), goldMat, -0.06 + k * 0.06, -0.31, 0, balPans[1]); m.visible = false; return m; });
 
         // ---- The vestibule outside the door, and the stair Hermes came down ----
         const vest = new T.Group(); scene.add(vest);
@@ -707,6 +1180,7 @@
         const dp = disc.getWorldPosition(new T.Vector3());
         return { T, renderer, scene, camera, discAt: [dp.x, dp.y, dp.z], lowPower, beam, beamLight, hemi, lamps, door, slab, sockets, doorGlow, oracle, disc, rings, hover, jewel, jewelGlow, jewelLight,
           beamPath, pool, ringAng: [0, 1, 2].map((r) => -rot[r] * Math.PI / 4), H, hermes: H && H.hermes, lamp, fx, motes, moteAcc: 0, altar,
+          balBeam, balPans, balBlocks, balGold, balTilt: 0,
           ray: new T.Raycaster(), hMove: null, hGoal: null, discPlaced: 0, discFrom: null,
           cam: { yaw: 0, pitch: 0, dist: 1, tYaw: 0, tPitch: 0, tDist: 1, p: null, l: null } };
       }
@@ -830,12 +1304,13 @@
       function cameraPhase() {
         if (isDone()) return 'end';
         if (!isAwake() || (view.sigilT && performance.now() - view.sigilT < 5200)) return 'door';
-        if (!whenRead()) return 'disc';
+        if (!whenRead()) return discTrue() ? 'weigh' : 'disc';
         return 'vow';
       }
       const SHOTS = {
         door: { p: [0.85, 2.5, RAD + 5.4], l: [0.05, 1.55, RAD] },
         disc: { p: [0.16, 1.42, 0.6], l: [0, 1.28, ORACLE[1] + 0.48] },
+        weigh: { p: [2.55, 2.2, -0.75], l: [0, 1.5, ALTAR[1] + 0.12] },   // the balance on the altar, the Oracle beside it
         vow: { p: [3.3, 2.0, 1.5], l: [-0.1, 1.45, 0.0] },
         end: { p: [-3.4, 2.4, 3.2], l: [0, 1.3, -1.2] }
       };
@@ -937,11 +1412,29 @@
           if (G.oracle.userData.update) G.oracle.userData.update(t);
         }
         const warm = done ? (rm ? 1 : clamp((e - 1.2) / 3, 0, 1)) : (lit ? 0.35 : 0);
-        G.beam.material.color.setRGB(0.6 + 0.4 * warm, 0.66 + 0.2 * warm, 0.85 - 0.35 * warm);
-        G.beam.material.opacity = 0.14 + 0.1 * warm + (rm ? 0 : 0.015 * Math.sin(t * 0.7));
+        // while she weighs, the beam is leaving the altar (and comes back white with the moon)
+        const wgh = weighing(), lk = wgh ? (light.gone ? 0.08 : 0.3 + 0.7 * lightFrac()) : 1, cold = wgh && light.moon ? 1 : 0;
+        G.beam.material.color.setRGB(0.6 + 0.4 * warm - 0.05 * cold, 0.66 + 0.2 * warm + 0.06 * cold, 0.85 - 0.35 * warm + 0.12 * cold);
+        G.beam.material.opacity = (0.14 + 0.1 * warm + (rm ? 0 : 0.015 * Math.sin(t * 0.7))) * lk;
         G.beamLight.color.setRGB(0.72 + 0.28 * warm, 0.77 + 0.1 * warm, 0.91 - 0.4 * warm);
-        G.beamLight.intensity = 1.5 + 0.8 * warm;
-        G.pool.material.color.copy(G.beam.material.color); G.pool.material.opacity = 0.3 + 0.2 * warm;
+        G.beamLight.intensity = (1.5 + 0.8 * warm) * (0.35 + 0.65 * lk);
+        G.pool.material.color.copy(G.beam.material.color); G.pool.material.opacity = (0.3 + 0.2 * warm) * lk;
+        // the balance: it leans under a word, swings when the weight is wrong (never which way), and stands level when it settles
+        if (G.balBeam) {
+          const st = wgh ? bal.state : 'settled', age = (now - bal.t) / 1000;
+          let want = st === 'loaded' ? 0.2 : 0, sway = 0;
+          if (!rm) {
+            if (st === 'idle') sway = 0.035 * Math.sin(t * 1.3);
+            else if (st === 'loaded') sway = 0.03 * Math.sin(t * 1.7);
+            else if (st === 'swing') { want = 0.2; sway = 0.42 * Math.exp(-age * 1.6) * Math.sin(age * 9); }
+          }
+          G.balTilt += (want - G.balTilt) * Math.min(1, dt * 3);
+          G.balBeam.rotation.z = G.balTilt + sway;
+          G.balPans.forEach((p) => { p.rotation.z = -G.balBeam.rotation.z; });
+          const wlen = wgh && wordFound() && riddle() ? riddle().word.length : 0;
+          G.balBlocks.forEach((m, k) => { m.visible = k < wlen; });
+          G.balGold.forEach((m, k) => { m.visible = k < weighStep(); });
+        }
         // dust turning slowly in the light, oil lamps breathing in the niches
         if (G.motes && !rm) {
           G.moteAcc += dt * (G.lowPower ? 8 : 16);
@@ -996,8 +1489,13 @@
           G.fx.sparks.emit({ x: p.x, y: p.y, z: p.z + 0.05 }, 8, { color: 0xffe0a0, size: [0.015, 0.03], speed: [0.1, 0.4], up: [0.1, 0.4], life: [0.4, 0.8], alpha: 0.9, gravity: -0.6, spread: 0.4 });
         }
       }
+      function sceneSettle(i) {
+        if (!G || !G.fx || !G.balBeam) return;
+        const p = new G.T.Vector3(); G.balBeam.getWorldPosition(p);
+        G.fx.triumph({ x: p.x, y: p.y, z: p.z }, 0.3 + 0.15 * i);
+      }
       function sceneRead(ok) {
-        if (ok) { subtitle('“December, the eighteenth to the twentieth.” She lowers the disc a little, and listens.', 4.5, 'act'); oracleDoes('nod'); react('wonder'); }
+        if (ok) { setTimeout(() => { if (modalOpen()) subtitle('“December,” Hermes says. “The eighteenth to the twentieth.” She lowers the disc a little, and listens.', 5, 'act'); }, reduced() ? 200 : 6200); oracleDoes('nod'); react('wonder'); }
         else react('worry');
       }
       function sceneWord(word) {
@@ -1028,10 +1526,22 @@
       });
       if (el.speak) el.speak.addEventListener('click', speakSigil);
       if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });
-      if (el.read) el.read.addEventListener('click', readWhen);
-      if (el.whenInput) el.whenInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') readWhen(); });
+      if (el.wordBtn) el.wordBtn.addEventListener('click', tryWord);
+      if (el.wordInput) el.wordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryWord(); });
+      if (el.weighBtn) el.weighBtn.addEventListener('click', tryWeight);
+      if (el.weightInput) el.weightInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryWeight(); });
+      if (el.moonBtn) el.moonBtn.addEventListener('click', lightBack);
       if (el.unsay) el.unsay.addEventListener('click', unsay);
       if (el.vow) el.vow.addEventListener('click', speakVow);
+      if (el.coinBtn) el.coinBtn.addEventListener('click', askCoin);
+      if (el.pebbleBtn) el.pebbleBtn.addEventListener('click', askPebble);
+      if (el.stairBtn) el.stairBtn.addEventListener('click', stairChain);
+      if (el.rewardBtn) el.rewardBtn.addEventListener('click', showReward);
+      if (window.RelicUse) {
+        // the Use button of the satchel
+        window.RelicUse.register('servant_coin', () => { if (!modalOpen() || !coinWaits()) return false; setCoin(); return true; });
+        window.RelicUse.register('tuning_pebble', () => { if (!modalOpen() || !pebbleWaits()) return false; givePebble(); return true; });
+      }
 
       // ---- Open / close ----
       const fiveSeals = () => [1, 2, 3, 4, 5].every((i) => get('order_seal_cairn_' + i) === 'true');
@@ -1062,7 +1572,7 @@
       function focusTarget() {
         if (isDone()) return el.finish;
         if (!isAwake()) return el.keyInput;
-        if (!whenRead()) return discTrue() ? el.whenInput : el.ringBtns[0][1];
+        if (!whenRead()) return discTrue() ? (light.gone ? el.moonBtn : wordFound() ? el.weightInput : el.wordInput) : el.ringBtns[0][1];
         return el.tiles && el.tiles.querySelector('button:not([disabled])');
       }
       function hideHowto() {
@@ -1070,6 +1580,7 @@
         set(HOWTO_KEY, 'seen');
         const target = focusTarget();
         if (target && modal.style.display !== 'none') target.focus({ preventScroll: true });
+        if (!stairDone()) setTimeout(stairChain, 500);
       }
       if (el.help) el.help.addEventListener('click', () => showHowto(0));
       const hb = $('btn-oracle-howto-back'), hn = $('btn-oracle-howto-next'), hs = $('btn-oracle-howto-skip');
@@ -1138,8 +1649,12 @@
         if (G) { G.cam.p = null; G.hGoal = null; G.hGoal0 = false; G.hMove = null; }
         if (el.fade) el.fade.classList.remove('is-on');
         if (isDone()) { applyVictory(); say("She is grinding lapis by the altar, Silvia, and humming. Every now and then she looks up at me as if to check that I am still here. I am."); }
-        else if (!isAwake()) say("Silvia, I am at the bottom of the inner stair, with the Servant's key in my hand. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. The Servant says it opens only for the sigil of the Oracle. Open the page “The Oracle's Horizon”, please. I can hear someone humming behind it." + coinNote());
-        else if (!whenRead()) say("She is still holding the disc up for us, Silvia, patient as stone. Set the rings by the sky.");
+        else if (!isAwake() && !stairDone()) say(get(KEYS.key)
+          ? "The door is open, Silvia, and the stair goes down into the dark. The Servant stays at the top: this door is not his to open."
+          : "Silvia, we are back at the door of the inner stair, with the five seals home in the arch. The Servant locked it behind us at dawn, and he is watching my hands.");
+        else if (!isAwake()) say(ARRIVE + (RU() ? coinLine() : coinNote()));
+        else if (!whenRead() && !discTrue()) say("She is still holding the disc up for us, Silvia, patient as stone. Set the rings by the sky.");
+        else if (!whenRead()) { startWeighing(); singRiddle(); }
         else say("She is waiting, Silvia, with her lips moving on words she cannot quite find. Give them back to her.");
         render();
         setTimeout(mood, 700);   // the bed starts on its next poll (600 ms) and resets the intensity to 0.5
@@ -1147,20 +1662,26 @@
           if (get(HOWTO_KEY) !== 'seen' && !isDone()) { showHowto(0); return; }
           const target = focusTarget();
           if (target) setTimeout(() => { if (modal.style.display !== 'none') target.focus({ preventScroll: true }); }, 60);
+          if (!stairDone()) setTimeout(stairChain, 900);
         };
         lastT = 0;
         cancelAnimationFrame(raf);
         if (G) raf = requestAnimationFrame(frame);
+        clearInterval(light.timer); light.last = 0;
+        light.timer = setInterval(lightTick, 250);
         if (G && cine && !reduced() && !isDone() && get(CINE_INTRO) !== 'seen') {
-          set(CINE_INTRO, 'seen');
-          cine.start(openingShots(), finishOpen);
+          cineClosed = false;
+          cine.start(openingShots(), () => { if (!cineClosed) set(CINE_INTRO, 'seen'); finishOpen(); });
         } else finishOpen();
       }
       function closeOracleModal() {
         if (modal.style.display === 'none') return;
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         stopPulse();
-        if (cine && cine.active) cine.skip();
+        hideReward(true);
+        clearInterval(light.timer); light.last = 0;
+        if (window.RelicUse && window.RelicUse.isOpen()) window.RelicUse.close();
+        if (cine && cine.active) { cineClosed = true; cine.skip(); }
         view.endTimers.forEach(clearTimeout); view.endTimers = [];
         setHover(-1);
         if (el.fade) el.fade.classList.remove('is-on');
@@ -1174,52 +1695,31 @@
       }
       window.openOracleModal = openOracleModal;
       window.closeOracleModal = closeOracleModal;
-      if (el.close) el.close.addEventListener('click', closeOracleModal);
+      if (el.close) el.close.addEventListener('click', () => closeOracleModal());
       modal.addEventListener('click', (e) => { if (e.target === modal) closeOracleModal(); });
       document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape' || modal.style.display === 'none') return;
-        if (el.passage && el.passage.style.display !== 'none' && el.passage.style.display !== '') return;
         if (cine && cine.active) { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); return; }
         if (el.howto && !el.howto.hidden) { e.stopImmediatePropagation(); hideHowto(); return; }
+        if (rewardOpen() && (!$('modal-item-acquired') || $('modal-item-acquired').style.display === 'none')) { e.stopImmediatePropagation(); hideReward(); return; }
         closeOracleModal();
       }, true);
 
-      // ---- From the desert to the stage (once) ----
-      let passageReturnFocus = null;
-      function showStagePassage() {
-        if (!el.passage) return;
-        passageReturnFocus = document.activeElement;
-        el.passage.style.display = 'flex';
-        set(KEYS.passage, 'true');
-        setTimeout(() => { if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime(); }, 1600);
-        if (el.passageClose) setTimeout(() => el.passageClose.focus(), 80);
-      }
-      function closeStagePassage() {
-        if (!el.passage || el.passage.style.display === 'none') return;
-        el.passage.style.display = 'none';
-        if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
-        if (typeof window.switchMapPath === 'function') window.switchMapPath('stage', true);   // the curtain rises on Path III
-        const tab = document.getElementById('btn-tab-path-stage');
-        const back = tab && tab.offsetParent ? tab : passageReturnFocus;
-        if (back && document.contains(back) && typeof back.focus === 'function') back.focus();
-        passageReturnFocus = null;
-      }
-      window.showStagePassage = showStagePassage;
-      if (el.passageClose) el.passageClose.addEventListener('click', closeStagePassage);
-      document.addEventListener('keydown', (e) => {
-        if (!el.passage || el.passage.style.display === 'none') return;
-        if (e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); closeStagePassage(); }
-        else if (e.key === 'Tab') { e.preventDefault(); if (el.passageClose) el.passageClose.focus(); }   // the passage holds the focus
-      }, true);
-      if (el.finish) {
-        el.finish.addEventListener('click', () => {
-          closeOracleModal();
+      // the Gilded Star's card first (when she has just won it), then straight to Hermes on the Field Wire:
+      // the Desert Path ends there, with the farewell at the gates (hub/js/desert-farewell.js)
+      function leaveForWire() {
+        closeOracleModal();
+        const go = () => {
           if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
           if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
-          if (get(KEYS.passage) !== 'true') showStagePassage();
-          else if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ The Desert Path is complete ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
-        });
+          const wireTab = document.querySelector('[data-view="view-field-wire"]');
+          if (wireTab) wireTab.click();
+          if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ The first truth is yours ✦ Hermes is waiting for you on the Field Wire.');
+        };
+        if (justWon && typeof window.openItemAcquiredModal === 'function') { justWon = false; setTimeout(() => window.openItemAcquiredModal({ id: 'gilded_star' }, go), 260); }
+        else go();
       }
+      if (el.finish) el.finish.addEventListener('click', leaveForWire);
 
       // Test hook for scripts/audit/web_smoke.py: the disc and the vow (they are in this source anyway) and the controls
       window.__oracle = {
@@ -1229,11 +1729,19 @@
         rot: () => rot.slice(),
         letterAt: (ring, spoke) => letterAt(ring, spoke),
         turn: (ring, dir) => turn(ring, dir),
-        read: (text) => { if (el.whenInput) el.whenInput.value = text; readWhen(); },
+        riddles: RIDDLES.map((r) => ({ word: r.word, letters: r.word.length })),
+        weighState: () => ({ step: weighStep(), word: wordFound(), light: +lightFrac().toFixed(3), gone: light.gone, moon: light.moon, balance: bal.state, beams: numOf(KEYS.beams) }),
+        word: (w) => { if (el.wordInput) el.wordInput.value = w; tryWord(); },
+        weigh: (n) => { if (el.weightInput) el.weightInput.value = String(n); tryWeight(); },
+        expireLight: () => { if (weighing() && !light.gone) { light.left = 0; light.last = 0; lightGone(); } },
+        moon: () => lightBack(),
         say: (i) => sayWord(i),
         vow: () => speakVow(),
         gfx: () => G,
         cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
+        showReward: () => showReward(), rewardOpen: () => rewardOpen(),
+        relics: () => ({ key: get(KEYS.key), lamp: get(KEYS.lamp), coin: get(KEYS.coin), pebble: get(KEYS.pebble), stairDone: stairDone() }),
+        stair: () => stairChain(),
         world: () => {
           if (!G) return { gl: false };
           return {

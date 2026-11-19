@@ -21,7 +21,8 @@
         const done = (key) => localStorage.getItem(key) === 'true';
         // Path III appears once the Oracle has given the WHEN (Station 19)
         const stageTab = document.getElementById('btn-tab-path-stage');
-        const stageOpen = done('order_oracle_horizon_completed');
+        // (a journey that won Station 19 with the farewell still to come sees it only once Hermes and Aurelia have left Tower II)
+        const stageOpen = done('order_oracle_horizon_completed') && !(window.DesertFarewell && window.DesertFarewell.pending());
         if (stageTab) stageTab.style.display = stageOpen ? '' : 'none';
         const seeker = (window.currentSeeker || localStorage.getItem('the_eclipse_active_seeker') || 'Silvia').toLowerCase();
         const midnightVal = localStorage.getItem('seeker_' + seeker + '_midnight_completed');

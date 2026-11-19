@@ -241,8 +241,11 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
 
   // ---- 23 · Debrief of the Arch of the Solstice: the night signal, the code of Aurelia, the smoke ----
   S[23] = {
-    hermesInitial: [
+    hermesInitial: () => [
       'Silvia, it is dawn again and I have not slept. The courtyard lit at yesterday’s sunrise, and the Altar opened.',
+      // what the night before the dawn cost (Station 17, the lamp oil): told once, here
+      ls('order_cairn5_lamp') === 'lit' ? 'I burnt the last of the oil to set the first mirror in the dark, and I do not regret a drop of it.'
+        : ls('order_cairn5_lamp') === 'dark' ? 'We had no oil left for the night, so every mirror was set in daylight, with the sun counting my breaths.' : null,
       'Inside lay the Seal of Cairn V and a small bronze mirror, polished by a recent hand.',
       'Last night a light flashed on Tower II, far to the north-east. I answered with the mirror, and it asked again.',
       { ask: [
@@ -253,7 +256,7 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
       'Then three short flashes, a pause, two long: the code I made for Aurelia. Nobody else in the world knew it.',
       'And then it spoke in the old light-code of the Order, slow as a teacher at a blackboard: the two lines you now have. Then it went out.',
       'At grey light I saw the smoke. The wagons stand at the foot of the Sanctuary steps, and there is no sign of the Servant.'
-    ],
+    ].filter(Boolean),
     choices: [
       {
         text: 'Go now. The Servant is alone.',

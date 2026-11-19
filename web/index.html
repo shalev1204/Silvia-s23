@@ -104,7 +104,9 @@
   <link rel="stylesheet" href="./hub/css/wire-ceremony.css">
   <link rel="stylesheet" href="./hub/css/ledger-complete.css">
   <link rel="stylesheet" href="./hub/css/sandstorm.css">
+  <link rel="stylesheet" href="./hub/css/stations/desert-reward.css">
   <link rel="stylesheet" href="./hub/css/relic-use.css">
+  <link rel="stylesheet" href="./hub/css/desert-farewell.css">
   <link rel="stylesheet" href="./hub/css/a11y.css">
 </head>
 <body>
@@ -3906,16 +3908,10 @@
           </div>
           <div class="laby-hint" id="solstice-hint" style="display: none;"></div>
 
-          <div class="chasm-victory-card" id="solstice-victory" style="display: none;">
-            <div class="chasm-victory-title"><span>🌓</span><span>The Last Seal</span></div>
-            <div class="chasm-victory-text" id="solstice-victory-text"></div>
-            <div class="laby3d-eqs">
-              <span class="monolith-equation">[Y] − [O] = 2</span>
-              <span class="monolith-equation">[L] + [G] = 23</span>
-            </div>
-            <p class="laby3d-eq-note">Spelled out in light from Tower II. Both lines are now in your Cipher Ledger.</p>
-            <p class="laby3d-eq-note">🪞 <strong>The Signal Mirror</strong> is in Hermes's satchel.</p>
-            <button type="button" class="btn-chasm-finish" id="btn-solstice-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+          <div class="drw-done" id="solstice-victory" style="display: none;">
+            <div class="drw-done-title">✦ The last seal</div>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-solstice-reward">🏆 See your reward</button>
+            <button type="button" class="btn-chasm-finish" id="btn-solstice-finish"><span>📻 To Hermes on the Field Wire ➔</span></button>
           </div>
           <button type="button" class="chasm3d-btn chasm3d-help" id="btn-solstice-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
@@ -4019,10 +4015,12 @@
           <div class="chasm3d-voice" id="stele-dispatch-text" role="status" aria-live="polite"></div>
 
           <div class="laby3d-sigil" id="stele-proverb-card">
+            <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="17A" data-open="page" aria-haspopup="dialog" title="See the printed page The Polybius Stele"><span class="pill-icon">📖</span> The Polybius Stele</span></div>
             <div class="chasm3d-where">I · The proverb of the stele: read the six stanzas through the founders' grid, and mind the mirage</div>
             <label class="monolith-sr-only" for="stele-key-input">The proverb of the stele, six words</label>
             <input type="text" class="mon3d-input laby3d-input stele-text-input" id="stele-key-input" maxlength="48" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Six words, as the stele says them">
             <button type="button" class="chasm3d-btn is-way" id="btn-stele-speak">✦ Speak the Proverb</button>
+            <button type="button" class="chasm3d-btn relic-ask-btn" id="btn-stele-coin" hidden>🎒 Hand Hermes something from the satchel</button>
             <div class="monolith-feedback" id="stele-key-feedback" role="status" aria-live="polite"></div>
           </div>
 
@@ -4069,21 +4067,16 @@
                 <button type="button" class="chasm3d-btn laby-down" id="btn-stele-down" aria-label="Move south">▼</button>
               </div>
               <div class="monolith-feedback" id="stele-move-feedback" role="status" aria-live="polite"></div>
+              <button type="button" class="chasm3d-btn relic-ask-btn" id="btn-stele-replay-end" hidden>↩ Back to the well</button>
             </div>
             <div class="monolith-lock-note">Understand the Servant's four stanzas first.</div>
           </div>
           <div class="laby-hint" id="stele-hint" style="display: none;"></div>
 
-          <div class="chasm-victory-card" id="stele-victory" style="display: none;">
-            <div class="chasm-victory-title"><span>🗝️</span><span>The Servant Lives</span></div>
-            <div class="chasm-victory-text" id="stele-victory-text"></div>
-            <div class="laby3d-eqs">
-              <span class="monolith-equation">[H] − [U] = 16</span>
-              <span class="monolith-equation">[M] + [T] = 25</span>
-            </div>
-            <p class="laby3d-eq-note">Cut by the founders under the hatch of the well. Both lines are now in your Cipher Ledger.</p>
-            <p class="laby3d-eq-note">🗝️ <strong>The Servant's Key</strong> is in Hermes's satchel. On the back of the stele: <strong>348° NNW</strong>.</p>
-            <button type="button" class="btn-chasm-finish" id="btn-stele-finish"><span>🗺️ Back to the Grand Desert Map ➔</span></button>
+          <div class="drw-done" id="stele-victory" style="display: none;">
+            <div class="drw-done-title">✦ The Servant lives</div>
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-stele-reward">🏆 See your reward</button>
+            <button type="button" class="btn-chasm-finish" id="btn-stele-finish"><span>📻 To Hermes on the Field Wire ➔</span></button>
           </div>
           <button type="button" class="chasm3d-btn chasm3d-help" id="btn-stele-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
@@ -4125,6 +4118,7 @@
             <h3>III · The burning atrium</h3>
             <p>Every step Hermes takes, or every turn he holds still, the fire takes a turn too. <strong>Glowing</strong> flagstones catch next turn, <strong>bare stone</strong> never burns, and <strong>ash</strong> cannot burn again. The rings around Hermes show where he can go: gold is safe, amber is about to catch, red is burning.</p>
             <p>Reach the hatch of the well, in the far corner, before the Servant runs out of breath. Drag to look around, scroll to come closer. Hints wait under <em>Ask Hermes</em>.</p>
+            <p>A <strong>✧ glint</strong> on a flagstone is something the fire has not taken yet: step on it and Hermes picks it up. There are three, and none is needed to save the Servant.</p>
           </section>
           <div class="chasm3d-howto-nav">
             <button type="button" class="chasm3d-btn" id="btn-stele-howto-back">← Back</button>
@@ -4140,7 +4134,8 @@
        STATION 19: THE ORACLE'S HORIZON · THE AUDIENCE IN TOWER II
        Part I is the journal (Sheet 18A: eight beacons across the three mirrors of the horizon, the sigil OVERTURE).
        Part II only exists here: the Oracle raises a brass disc of 24 sightings; Silvia sets its three rings to
-       the sky over the Sanctuary and reads the WHEN from its spokes.
+       the sky over the Sanctuary; then the Oracle sings three riddles, and the weight of each word in Silvia's own
+       Cipher Ledger is a number of the WHEN (FEAR 18, LUX 20, ERA 12): the last game of the Desert Path.
        Part III: the Oracle half-remembers some words; Silvia puts the vow back together, and Hermes says it.
        =================================================================== -->
   <div class="chasm-modal-backdrop" id="modal-oracle-horizon" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="oracle-modal-title">
@@ -4187,26 +4182,41 @@
           <div class="chasm3d-voice" id="oracle-dispatch-text" role="status" aria-live="polite"></div>
 
           <div class="laby3d-sigil" id="oracle-sigil-card">
+            <div class="station-page-pill">Your page: <span class="journal-ref-pill" role="button" tabindex="0" data-sheet="18A" data-open="page" aria-haspopup="dialog" title="See the printed page The Oracle's Horizon"><span class="pill-icon">📖</span> The Oracle's Horizon</span></div>
             <div class="chasm3d-where">I · The sigil of the Oracle: send the eight beacons across the three mirrors of the page “The Oracle's Horizon”</div>
             <label class="monolith-sr-only" for="oracle-key-input">The eight-letter sigil of the Oracle</label>
             <input type="text" class="mon3d-input laby3d-input" id="oracle-key-input" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="· · · · · · · ·">
             <button type="button" class="chasm3d-btn is-way" id="btn-oracle-speak">✦ Speak the Sigil</button>
+            <button type="button" class="chasm3d-btn relic-ask-btn" id="btn-oracle-stair" hidden>🎒 Help Hermes down the inner stair</button>
+            <button type="button" class="chasm3d-btn relic-ask-btn" id="btn-oracle-coin" hidden>🎒 Hand Hermes something for the hollow disc</button>
             <div class="monolith-feedback" id="oracle-key-feedback" role="status" aria-live="polite"></div>
           </div>
 
           <div class="laby3d-game is-locked" id="oracle-disc-game">
             <div class="monolith-game-inner">
-              <div class="chasm3d-where">II · The disc of 24 sightings: turn each ring until its star points where that star stands in the sky</div>
+              <div class="chasm3d-where">II · The disc of 24 sightings: set it by the sky, then weigh the three words of the Oracle</div>
               <div class="oracle-ring-ctrls" role="group" aria-label="Turn the rings of the disc">
                 <div class="oracle-ring-ctrl"><button type="button" class="chasm3d-btn" id="btn-oracle-r0-l" aria-label="Turn the outer ring counter-clockwise">⟲</button><span id="oracle-r0-label">Outer ring · Aldebaran</span><button type="button" class="chasm3d-btn" id="btn-oracle-r0-r" aria-label="Turn the outer ring clockwise">⟳</button></div>
                 <div class="oracle-ring-ctrl"><button type="button" class="chasm3d-btn" id="btn-oracle-r1-l" aria-label="Turn the middle ring counter-clockwise">⟲</button><span id="oracle-r1-label">Middle ring · Capella</span><button type="button" class="chasm3d-btn" id="btn-oracle-r1-r" aria-label="Turn the middle ring clockwise">⟳</button></div>
                 <div class="oracle-ring-ctrl"><button type="button" class="chasm3d-btn" id="btn-oracle-r2-l" aria-label="Turn the inner ring counter-clockwise">⟲</button><span id="oracle-r2-label">Inner ring · Polaris</span><button type="button" class="chasm3d-btn" id="btn-oracle-r2-r" aria-label="Turn the inner ring clockwise">⟳</button></div>
               </div>
-              <div id="oracle-read-panel" style="display: none;">
-                <div class="stele-answer-row oracle-read-row">
-                  <label class="monolith-sr-only" for="oracle-when-input">What the disc says</label>
-                  <input type="text" class="mon3d-input oracle-text-input" id="oracle-when-input" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Read the 24 sightings">
-                  <button type="button" class="chasm3d-btn is-way" id="btn-oracle-read">✦ Read it aloud</button>
+              <div class="oracle-date" id="oracle-date" style="display: none;" aria-label="The date, as far as it is weighed: first day, last day, month">
+                <span class="oracle-date-slot" title="The first day">?</span><u aria-hidden="true">–</u><span class="oracle-date-slot" title="The last day">?</span><u aria-hidden="true">·</u><small>month</small><span class="oracle-date-slot" title="The month">?</span>
+              </div>
+              <div id="oracle-weigh-panel" style="display: none;">
+                <div class="oracle-light" id="oracle-light"><i id="oracle-light-bar"></i><span id="oracle-light-label">The light on the altar</span></div>
+                <button type="button" class="chasm3d-btn relic-ask-btn" id="btn-oracle-moon" hidden>🌙 Wait for the moon</button>
+                <div class="oracle-verse" id="oracle-verse" aria-live="polite"></div>
+                <div class="oracle-balance" id="oracle-balance"></div>
+                <div class="stele-answer-row oracle-read-row" id="oracle-word-row">
+                  <label class="monolith-sr-only" for="oracle-word-input">The word her riddle hides</label>
+                  <input type="text" class="mon3d-input oracle-text-input" id="oracle-word-input" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Her word">
+                  <button type="button" class="chasm3d-btn is-way" id="btn-oracle-word">✦ Say the word</button>
+                </div>
+                <div class="stele-answer-row oracle-read-row" id="oracle-weight-row" style="display: none;">
+                  <label class="monolith-sr-only" for="oracle-weight-input">What the word weighs, as one number</label>
+                  <input type="text" inputmode="numeric" class="mon3d-input oracle-text-input" id="oracle-weight-input" maxlength="3" autocomplete="off" placeholder="Its weight">
+                  <button type="button" class="chasm3d-btn is-way" id="btn-oracle-weigh">⚖ Weigh it</button>
                 </div>
               </div>
               <div class="oracle-when" id="oracle-when" style="display: none;">The First Truth · the WHEN<strong>18 – 20 December</strong></div>
@@ -4224,22 +4234,21 @@
                 <button type="button" class="chasm3d-btn" id="btn-oracle-unsay" aria-label="Take back the last word">⌫ Take back</button>
                 <button type="button" class="chasm3d-btn is-way" id="btn-oracle-vow">✦ Let Hermes say it</button>
               </div>
+              <button type="button" class="chasm3d-btn relic-ask-btn" id="btn-oracle-pebble" hidden>🎒 Give her something of hers</button>
               <div class="monolith-feedback" id="oracle-vow-feedback" role="status" aria-live="polite"></div>
             </div>
             <div class="monolith-lock-note">Read the WHEN on the disc first.</div>
           </div>
           <div class="laby-hint" id="oracle-hint" style="display: none;"></div>
 
-          <div class="chasm-victory-card" id="oracle-victory" style="display: none;">
-            <div class="chasm-victory-title"><span>⭐</span><span>The Oracle Remembers</span></div>
-            <div class="chasm-victory-text" id="oracle-victory-text"></div>
+          <div class="drw-done" id="oracle-victory" style="display: none;">
+            <div class="drw-done-title">✦ She remembers</div>
             <div class="oracle-when">The First Truth · the WHEN<strong>18 – 20 December</strong></div>
-            <div class="laby3d-eqs">
-              <span class="monolith-equation">[I] + [E] = 12</span>
-              <span class="monolith-equation">[I] + [J] = 18</span>
-            </div>
-            <p class="laby3d-eq-note">Scratched on the back of the disc, in a hand Hermes knows. Both lines are now in your Cipher Ledger.</p>
-            <div class="laby3d-eqs oracle-glyphs">
+            <button type="button" class="chasm3d-btn chasm3d-again" id="btn-oracle-reward">🏆 See your reward</button>
+            <button type="button" class="btn-chasm-finish" id="btn-oracle-finish"><span>📻 To Hermes on the Field Wire ➔</span></button>
+          </div>
+          <!-- the two glyphs she wins here, drawn once: the reward screen shows them (s19-oracle-horizon.js showReward) -->
+          <div id="oracle-glyph-src" hidden>
               <figure class="rw-glyph" aria-label="The glyph of the letter I in the Order's secret alphabet equals the letter I">
                 <div class="rw-seal" aria-hidden="true"><svg viewBox="0 0 48 64" style="color:#ffe9d6" fill="none"><line x1="24" y1="8" x2="24" y2="56" stroke="currentColor" stroke-width="2.5"/><ellipse cx="24" cy="22" rx="14" ry="5" stroke="currentColor" stroke-width="1.8"/><ellipse cx="24" cy="42" rx="14" ry="5" stroke="currentColor" stroke-width="1.8"/><circle cx="24" cy="32" r="3" fill="currentColor"/></svg></div>
                 <figcaption><span>Glyph</span><u>=</u><i class="rw-letter">I</i></figcaption>
@@ -4248,10 +4257,6 @@
                 <div class="rw-seal" aria-hidden="true"><svg viewBox="0 0 48 64" style="color:#ffe9d6" fill="none"><path d="M34 16 Q14 20 14 36 Q14 52 28 52 Q36 52 36 42" stroke="currentColor" stroke-width="2.2"/><polygon points="24,8 28,12 24,16 20,12" fill="currentColor"/><line x1="10" y1="26" x2="38" y2="26" stroke="currentColor" stroke-width="1.8"/></svg></div>
                 <figcaption><span>Glyph</span><u>=</u><i class="rw-letter">J</i></figcaption>
               </figure>
-            </div>
-            <p class="laby3d-eq-note">Two new glyphs for your alphabet: <strong>I</strong> and <strong>J</strong>. They share one cell in the Polybius square, and now they share the back of the disc.</p>
-            <p class="laby3d-eq-note">⭐ <strong>The Gilded Star</strong> is in your satchel: she painted it for you.</p>
-            <button type="button" class="btn-chasm-finish" id="btn-oracle-finish"><span>✦ From the Desert to the Stage ➔</span></button>
           </div>
           <button type="button" class="chasm3d-btn chasm3d-help" id="btn-oracle-howto" aria-label="How to play: what everything on the screen means">📖 How to play</button>
 
@@ -4261,7 +4266,9 @@
               <li>The disc has three rings of eight sightings, one letter each, around a jewel. Each ring carries one gold star, engraved beside one of its letters.</li>
               <li>Turn each ring until its star points where that star stands in the sky over Tower II. North is at the top of the disc, as on the sky Hermes drew.</li>
               <li>Click a ring on the disc to turn it clockwise; right-click, or hold Shift, to turn it the other way. The buttons do the same.</li>
-              <li>When all three point true, the disc answers. Hermes engraved it to be read from the north, clockwise: each spoke from the rim to the heart, three letters a spoke.</li>
+              <li>When all three point true, the disc goes on the Oracle's balance. It was never written to be read: it is written to be weighed.</li>
+              <li>She sings three riddles. Each hides a word, and each word weighs what its letters weigh together in your Cipher Ledger: the first day, the last day and the month of the first truth.</li>
+              <li>The balance never says whether you are over or under. It only settles for the true weight.</li>
               <li>Then, the vow: choose the words she half remembers, in the right order, and let Hermes say them.</li>
             </ul>
           </details>
@@ -4275,7 +4282,7 @@
           <section class="chasm3d-howto-page" data-page="0">
             <h3>What you are doing</h3>
             <p>Hermes is at the bottom of the inner stair of Tower II, with the Servant's key. Behind a carved door, someone is humming: <strong>the Oracle</strong>, who receives no one.</p>
-            <p>Part I opens the door with a sigil from your journal. Part II reads a brass disc she holds up. Part III gives her back some words she has lost.</p>
+            <p>Part I opens the door with a sigil from your journal. Part II sets a brass disc by the sky and weighs three words on her balance. Part III gives her back some words she has lost.</p>
           </section>
           <section class="chasm3d-howto-page" data-page="1" hidden>
             <h3>I · The sigil</h3>
@@ -4286,7 +4293,9 @@
             <ol class="chasm3d-howto-steps">
               <li>Each ring of the disc carries one <strong>gold star</strong>. The card in the corner shows where those three stars stand in the sky, north at the top.</li>
               <li><strong>Click a ring</strong> to turn it clockwise, right-click (or Shift) to turn it back, or use the buttons. Make every star point where it stands in the sky.</li>
-              <li>When all three are true, the jewel wakes. Read from the north, clockwise, each spoke from the rim to the heart, and type what it says.</li>
+              <li>When all three are true, the jewel wakes and the disc goes on <strong>the Oracle's balance</strong>. She sings a riddle: find the <strong>word</strong> it hides and say it.</li>
+              <li>Then <strong>weigh the word</strong>: add the numbers of its letters in your own <strong>Cipher Ledger</strong> (the balance shows them under each letter) and type the sum. Three words, three numbers: the first day, the last day and the month.</li>
+              <li>The beam of light is slowly leaving the altar. If it goes, nothing is lost: wait for the moon and weigh that word again.</li>
             </ol>
           </section>
           <section class="chasm3d-howto-page" data-page="3" hidden>
@@ -4678,29 +4687,6 @@
           <button type="button" class="chasm3d-howto-skip" id="btn-gallery-howto-skip">Skip, I know how to play</button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- From the desert to the stage (shown once, after the audience with the Oracle) -->
-  <div class="stage-passage-overlay" id="stage-passage-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="stage-passage-title">
-    <div class="stage-passage-card">
-      <svg viewBox="0 0 200 110" aria-hidden="true">
-        <rect x="0" y="0" width="200" height="110" fill="#0e0905"></rect>
-        <path d="M0 96 L200 96" stroke="#3b2a17" stroke-width="1"></path>
-        <path d="M20 96 L100 66 L180 96" fill="none" stroke="#4c1d95" stroke-width="0.6"></path>
-        <path d="M60 96 L100 66 L140 96" fill="none" stroke="#4c1d95" stroke-width="0.6"></path>
-        <circle cx="100" cy="40" r="12" fill="none" stroke="#fde68a" stroke-width="0.8"></circle>
-        <path d="M100 30 L102.5 37.5 L110 40 L102.5 42.5 L100 50 L97.5 42.5 L90 40 L97.5 37.5 Z" fill="#fde68a"></path>
-        <path d="M84 96 Q90 90 96 96 Q102 90 108 96 Q114 90 120 96" fill="none" stroke="#b8a07a" stroke-width="0.6"></path>
-        <g class="stage-curtain"><path d="M0 0 L100 0 L100 8 Q86 50 96 110 L0 110 Z" fill="#5b21b6"></path><path d="M20 0 Q30 55 18 110 M45 0 Q55 55 44 110 M70 0 Q80 55 70 110" stroke="#3b0764" stroke-width="2" fill="none"></path></g>
-        <g class="stage-curtain is-right"><path d="M200 0 L100 0 L100 8 Q114 50 104 110 L200 110 Z" fill="#5b21b6"></path><path d="M180 0 Q170 55 182 110 M155 0 Q145 55 156 110 M130 0 Q120 55 130 110" stroke="#3b0764" stroke-width="2" fill="none"></path></g>
-        <path d="M0 0 L200 0 L200 8 Q150 16 100 8 Q50 16 0 8 Z" fill="#7c3aed"></path>
-      </svg>
-      <h2 class="stage-passage-title" id="stage-passage-title">FROM THE DESERT TO THE STAGE</h2>
-      <p>The Desert Path is complete. The Oracle of Tower II has given you the first truth: <strong>the WHEN, 18 – 20 December</strong>.</p>
-      <p>The raiders have gone east with the Astrolabe, toward the third tower. There, the Mirror Speaker keeps the second truth: the WHERE.</p>
-      <p class="stage-passage-motto">"The road ends where the curtain rises."</p>
-      <button type="button" class="monolith-btn monolith-btn-primary" id="btn-stage-passage-close">✦ Path III · The Stage Tower</button>
     </div>
   </div>
 
@@ -5195,6 +5181,7 @@
   <script src="./hub/js/wire-ceremony.js"></script>
   <script src="./hub/js/hub-core.js"></script>
   <script src="./hub/js/relic-use.js"></script>
+  <script src="./hub/js/desert-farewell.js"></script>
   <script src="./hub/js/stations/s10-desert-map-and-chasm.js"></script>
   <script src="./hub/js/stations/s10-whispering-chasm.js"></script>
   <script src="./hub/js/engine/eclipse-scenery.js"></script>

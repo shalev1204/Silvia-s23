@@ -499,6 +499,8 @@
 }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-hermes  { --gl-c: #6fa8e8; --gl-bg: #172a45; --gl-t: #e6f1ff; --gl-glow: rgba(111,168,232,0.35); }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-servant { --gl-c: #d79a4a; --gl-bg: #3a1e12; --gl-t: #fdebd0; --gl-glow: rgba(215,154,74,0.35); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-aurelia { --gl-c: #e8c56a; --gl-bg: #14264a; --gl-t: #fdf3d6; --gl-glow: rgba(232,197,106,0.35); }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-aurelia .gl-bubble { border-bottom-left-radius: 4px; }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-silvia  { --gl-c: #b79bf2; --gl-bg: #2a2150; --gl-t: #f0e9ff; --gl-glow: rgba(183,155,242,0.35); }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-hermes .gl-bubble  { border-bottom-left-radius: 4px; }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gl-servant .gl-bubble { border-bottom-left-radius: 4px; font-style: italic; }
@@ -570,6 +572,7 @@
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gb-name { font-family: 'Cinzel', Georgia, serif; font-size: 0.62rem; letter-spacing: 0.14em; color: var(--gl-c); font-weight: 700; margin-bottom: 3px; }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-hermes  { --gl-c: #6fa8e8; --gl-bg: #172a45; --gl-t: #e6f1ff; --gl-glow: rgba(111,168,232,0.5); }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-servant { --gl-c: #d79a4a; --gl-bg: #3a1e12; --gl-t: #fdebd0; --gl-glow: rgba(215,154,74,0.5); font-style: italic; }
+:is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-aurelia { --gl-c: #e8c56a; --gl-bg: #14264a; --gl-t: #fdf3d6; --gl-glow: rgba(232,197,106,0.5); }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-silvia  { --gl-c: #b79bf2; --gl-bg: #2a2150; --gl-t: #f0e9ff; --gl-glow: rgba(183,155,242,0.5); border-style: dashed; }
 :is(#modal-gates-tower-ii, #modal-night-erg, #modal-stones-dream, #modal-bridge-spyglass) .gates-bubble.gb-silvia .gb-name::after { content: ' · RADIO'; opacity: 0.7; }
 

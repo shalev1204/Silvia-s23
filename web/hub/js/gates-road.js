@@ -101,6 +101,7 @@
     return true;
   }
   function owns(id) {
+    if (root.RelicUse && root.RelicUse.isSpent(id)) return false;   // used for good (relic-use.js)
     if (id === 'falcon_weight' && get('order_oasis_clepsydra_completed') === 'true') return true;
     try { var l = JSON.parse(get('order_inventory_relics') || '[]'); return Array.isArray(l) && l.indexOf(id) >= 0; } catch (e) { return false; }
   }

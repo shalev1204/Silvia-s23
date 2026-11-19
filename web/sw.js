@@ -7,7 +7,7 @@
 // - The cloud save (Supabase) and anything else outside the site are never touched.
 'use strict';
 // <offline-list> written by scripts/web/offline_list.py; do not edit by hand
-var VERSION = 'dd0aefe51f43';  // 239 files, 54.3 MB
+var VERSION = '7e4d5fd124ea';  // 244 files, 54.7 MB
 var PRECACHE = [
   "./",
   "./assets/branding/favicon-192.png",
@@ -87,6 +87,8 @@ var PRECACHE = [
   "./assets/journal_pages/page_15b_natural_bridge.webp",
   "./assets/journal_pages/page_16a_eastern_buttress.webp",
   "./assets/journal_pages/page_16b_solstice_arch.webp",
+  "./assets/journal_pages/page_17a_polybius_stele.webp",
+  "./assets/journal_pages/page_18a_oracle_horizon.webp",
   "./assets/js/camera-city-data.js",
   "./assets/js/desert-map-3d.js",
   "./assets/js/stage-mirror-data.js",
@@ -141,6 +143,7 @@ var PRECACHE = [
   "./hub/css/base.css",
   "./hub/css/camp-messenger.css",
   "./hub/css/cinematic.css",
+  "./hub/css/desert-farewell.css",
   "./hub/css/desert-map.css",
   "./hub/css/field-journal.css",
   "./hub/css/gate-profiles.css",
@@ -153,6 +156,7 @@ var PRECACHE = [
   "./hub/css/previously.css",
   "./hub/css/relic-use.css",
   "./hub/css/sandstorm.css",
+  "./hub/css/stations/desert-reward.css",
   "./hub/css/stations/s10-chasm-walk.css",
   "./hub/css/stations/s10-whispering-chasm.css",
   "./hub/css/stations/s11-salt-playa.css",
@@ -196,6 +200,7 @@ var PRECACHE = [
   "./hub/js/cloud-config.js",
   "./hub/js/cloud-save.js",
   "./hub/js/dawn-map-layer.js",
+  "./hub/js/desert-farewell.js",
   "./hub/js/engine/eclipse-figure.js",
   "./hub/js/engine/eclipse-fx.js",
   "./hub/js/engine/eclipse-scenery.js",

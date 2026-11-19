@@ -82,11 +82,18 @@
           if (typeof onDone === 'function') onDone();
         }
       }
-      // for the tester's resets: a station replayed from the start gets its relic back
-      function unspend(id) {
+      // for the tester's resets: a station replayed from the start gets its relic back. Most relics come back by themselves
+      // (the satchel derives them from the game's flags); `restore` puts back one that only lived in the satchel's own list.
+      function unspend(id, restore) {
         var l = spentList(), i = l.indexOf(id);
         if (i < 0) return;
         l.splice(i, 1); set(KEY, JSON.stringify(l));
+        if (restore) {
+          try {
+            var inv = JSON.parse(get('order_inventory_relics') || '[]');
+            if (Array.isArray(inv) && inv.indexOf(id) < 0) { inv.push(id); set('order_inventory_relics', JSON.stringify(inv)); }
+          } catch (e) {}
+        }
         if (typeof window.syncLampOil === 'function') window.syncLampOil();
       }
 
@@ -121,6 +128,12 @@
         });
         return tray;
       }
+      // (stations listen for Escape on the document, in the capture phase: this listener was added before theirs, so it runs first)
+      document.addEventListener('keydown', function (e) {
+        if (!tray || tray.hidden || e.key !== 'Escape') return;
+        e.preventDefault(); e.stopImmediatePropagation();
+        close(true);
+      }, true);
       function wants(id) { return !!pending && pending.want.indexOf(id) >= 0; }
       function fill() {
         var grid = tray.querySelector('.rt-grid');

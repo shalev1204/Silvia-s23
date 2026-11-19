@@ -169,8 +169,10 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
                          "order_labyrinth_cine_intro": "seen", "order_labyrinth_cine_outro": "seen", "order_labyrinth_howto": "seen", "order_labyrinth_fresh_v1": "done",
                          "order_cairn4_cine_intro": "seen", "order_cairn4_howto": "seen",
                          "order_cairn5_cine_intro": "seen", "order_cairn5_howto": "seen",
-                         "order_stele_cine_intro": "seen", "order_stele_howto": "seen",
-                         "order_oracle_cine_intro": "seen", "order_oracle_howto": "seen",
+                         "order_stele_cine_intro": "seen", "order_stele_howto": "seen", "order_stele_cine_outro": "seen",
+                         "order_oracle_cine_intro": "seen", "order_oracle_howto": "seen", "order_oracle_cine_outro": "seen",
+                         # (the way down the inner stair of Station 19 asks the satchel for a key and a lamp, once: section s19 tests it)
+                         "order_oracle_key": "servant", "order_oracle_lamp": "dark",
                          "order_masks_cine_intro": "seen", "order_masks_howto": "seen",
                          "order_camera_cine_intro": "seen", "order_camera_howto": "seen",
                          "order_gallery_cine_intro": "seen", "order_gallery_howto": "seen"}, **seed)
@@ -946,7 +948,20 @@ def test_solstice_arch(browser):
     js("window.__cairn5.frames(200)")
     w = js("window.__cairn5.world()")
     check(w["night"] and w["fire"] > 0.9, "3D: a red glow rises at the foot of Tower II", str(w))
-    page.click("#btn-five-seals-close"); page.click("#btn-close-solstice"); page.wait_for_timeout(300)
+    page.click("#btn-five-seals-close"); page.wait_for_timeout(900)
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-solstice-arch .chasm3d-reward'))")
+    check("The Last Seal" in reward() and "Sheet" not in reward()
+          and js("[...document.querySelectorAll('#modal-solstice-arch .rw-eq')].map(e => e.getAttribute('aria-label')).join('|')") == "Y minus O equals 2|L plus G equals 23"
+          and js("document.querySelectorAll('#modal-solstice-arch .arch-rw-map .rw-road').length") == 4
+          and js("[...document.querySelectorAll('#modal-solstice-arch .arch-rw-signal')].map(e => e.textContent).join('|')") == "· ·|· — ·|— — · ·|· · · — —"
+          and js("document.querySelectorAll('#modal-solstice-arch .drw-relic').length") == 2 and "Lamp Oil" in reward()
+          and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')"),
+          "after the ceremony the reward rises: the four rays in gold, the code of the night, the seal, the mirror, both Ledger lines and the oil it burnt", reward()[:200].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and modal_open(), "Escape puts the reward away, the courtyard stays open")
+    js("document.getElementById('btn-solstice-reward').click()"); page.wait_for_timeout(300)
+    check("The Last Seal" in reward(), "🏆 See your reward opens it again")
+    page.click("#btn-close-solstice"); page.wait_for_timeout(300)
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
     ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
@@ -1209,6 +1224,31 @@ def test_polybius_stele(browser):
     for dx, dy in moves:
         js(f"window.__stele.move({dx}, {dy})")
     page.wait_for_timeout(500)
+    # the hatch has lost its counterweight: with no ibis for the stone keepers, the Falcon Weight can take its place (relic-use.js)
+    tray_open = lambda: js("!!document.getElementById('relic-tray') && !document.getElementById('relic-tray').hidden")
+    check(tray_open() and js("window.__stele.state().hatchPending") and get("order_polybius_stele_completed") is None,
+          "at the hatch Hermes asks the satchel for something heavy")
+    js("document.querySelector('#relic-tray [data-relic=\"water_skins\"]').click()"); page.wait_for_timeout(150)
+    check(tray_open() and "Empty skins" in js("document.querySelector('#relic-tray .rt-reply').textContent"), "the water skins are too light: the tray stays open")
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not tray_open() and modal_open() and get("order_stele_falcon") == "no" and get("order_polybius_stele_completed") == "true",
+          "Escape closes only the tray: Hermes heaves the hatch alone, and the station stays open")
+    # the same crossing again, this time with the falcon on the chain
+    js("['order_polybius_stele_completed','order_stele_falcon','order_stele_trail'].forEach(k => localStorage.removeItem(k)); window.dropRelic('servant_key')")
+    finds = {f["id"]: f["at"] for f in js("window.__stele.finds")}
+    check(js("window.__stele.found()") == ["glasses"], "the Servant's spectacles lie on the shortest crossing: Hermes picked them up on the way", str(js("window.__stele.found()")))
+    check(atrium_route(atrium, [finds["watchbook"]]) is not None and len(atrium_route(atrium, [finds["watchbook"]])) == atrium["breath"]
+          and len(atrium_route(atrium, [finds["firepot"]])) == atrium["breath"] and atrium_route(atrium, [finds["watchbook"], finds["firepot"]]) is None,
+          "the watch-book and the fire-pot each cost the two spare turns, and no crossing takes both")
+    js("localStorage.removeItem('order_stele_cine_outro')")   # the closing film plays the first time
+    js("window.closeSteleModal()"); page.wait_for_timeout(400); js("window.openSteleModal()"); page.wait_for_timeout(600)
+    js("window.__stele.restart()")
+    for dx, dy in moves:
+        js(f"window.__stele.move({dx}, {dy})")
+    page.wait_for_timeout(400)
+    js("document.querySelector('#relic-tray [data-relic=\"falcon_weight\"]').click()"); page.wait_for_timeout(500)
+    check(get("order_stele_falcon") == "used" and "falcon_weight" not in js("window.getOwnedRelicIds()") and "falcon" in js("document.getElementById('stele-dispatch-text').textContent"),
+          "the Falcon Weight goes on the chain and leaves the satchel")
     check(get("order_polybius_stele_completed") == "true", "the searched route reaches the hatch: the Servant is alive")
     page.wait_for_timeout(5500)
     w = js("window.__stele.world()")
@@ -1216,7 +1256,54 @@ def test_polybius_stele(browser):
           "3D: the bronze hatch lifts and the Servant climbs out of the well", str(w))
     check("servant_key" in js("window.getOwnedRelicIds()"), "the Servant's Key is in the satchel")
     check(js("getComputedStyle(document.getElementById('stele-victory')).display") != "none", "the victory card shows")
-    page.click("#btn-close-stele"); page.wait_for_timeout(300)
+    filmed = False
+    for _ in range(40):   # a short film closes the night (once), and then the reward rises
+        if js("window.__stele.rewardOpen()"):
+            break
+        if js("window.__stele.cine()"):
+            filmed = True
+            page.wait_for_timeout(1200); js("window.__stele.skipCine()")
+        page.wait_for_timeout(400)
+    check(filmed and get("order_stele_cine_outro") == "seen", "the closing film plays once the Servant is out, before the reward")
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-polybius-stele .chasm3d-reward'))")
+    check("The Servant Lives" in reward() and "Sheet" not in reward()
+          and js("[...document.querySelectorAll('#modal-polybius-stele .rw-eq')].map(e => e.getAttribute('aria-label')).join('|')") == "H minus U equals 16|M plus T equals 25"
+          and js("document.querySelector('#modal-polybius-stele .stele-rw-map .rw-road').points.length") == len(moves) + 1
+          and "348°" in reward() and "Falcon Weight" in reward() and js("document.querySelectorAll('#modal-polybius-stele .drw-relic.is-new').length") == 1
+          and "1/3" in reward() and js("document.querySelectorAll('#modal-polybius-stele .drw-find.is-have').length") == 1 and js("document.querySelectorAll('#modal-polybius-stele .drw-again').length") == 1
+          and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')"),
+          "the reward rises: his road across the fire in gold, the Servant's Key, both Ledger lines, and the falcon on the well chain", reward()[:200].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and modal_open(), "Escape puts the reward away, the atrium stays open")
+    js("document.getElementById('btn-stele-reward').click()"); page.wait_for_timeout(300)
+    check("The Servant Lives" in reward(), "🏆 See your reward opens it again")
+    # Back through the fire for the two finds that cost the spare turns: one crossing each
+    fails_before = get("order_stele_fire_fails")
+    for fid in ("watchbook", "firepot"):
+        js("document.querySelector('#modal-polybius-stele .drw-again').click()"); page.wait_for_timeout(500)
+        if fid == "watchbook":
+            check(js("window.__stele.replaying()") and not reward() and js("window.__stele.state().run.t") == 0
+                  and not js("document.getElementById('btn-stele-up').disabled") and not js("document.getElementById('btn-stele-replay-end').hidden")
+                  and js("document.querySelectorAll('#stele-atrium .stele-glint').length") == 2,
+                  "Back through the fire: Hermes is at the side door again, and two glints wait in the atrium")
+            js("window.__stele.move(0, -1)")
+            for _ in range(6):
+                js("window.__stele.move(0, 0)")
+            check(js("window.__stele.replaying()") and js("window.__stele.state().run.t") == 0 and get("order_stele_fire_fails") == fails_before,
+                  "caught by the fire on the way back: he starts again at the door, and no fail is counted")
+            js("window.__stele.settle()")
+        for dx, dy in atrium_route(atrium, [finds[fid]]):
+            js(f"window.__stele.move({dx}, {dy})")
+        page.wait_for_timeout(1500)
+        check(fid in js("window.__stele.found()") and not js("window.__stele.replaying()") and reward(), f"the {fid} is found, and the reward comes back", str(js("window.__stele.found()")))
+    check("3/3" in reward() and js("document.querySelectorAll('#modal-polybius-stele .drw-find.is-have').length") == 3
+          and js("document.querySelectorAll('#modal-polybius-stele .drw-again').length") == 0 and get("order_polybius_stele_completed") == "true",
+          "all three finds: nothing is left in the fire")
+    js("document.querySelector('#modal-polybius-stele .chasm3d-reward-wire').click()"); page.wait_for_timeout(900)
+    check(js("document.getElementById('modal-item-acquired').style.display") == "flex" and "Key" in js("document.getElementById('iac-title').textContent"),
+          "leaving shows the card of the Servant's Key")
+    js("window.closeItemAcquiredModal()"); page.wait_for_timeout(600)
+    check(not modal_open() and js("document.getElementById('view-field-wire').classList.contains('active')"), "then straight to Hermes on the Field Wire")
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
     ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
@@ -1226,6 +1313,7 @@ def test_polybius_stele(browser):
     text = wire_text()
     check(get("order_field_wire_step") == "27" and choices() == 3 and "edge of the sky with a disc in her arms" in text,
           "debrief: step 27 (the Servant's words) with 3 replies")
+    check("his spectacles" in text and "pot of pitch" in text and "wrote me down" in text, "the Field Wire remembers the three finds of the atrium")
     answer_first()
     check(get("order_field_wire_step") == "29" and "[H] − [U] = 16" in wire_text() and "with the five seals, she will receive you" in wire_text()
           and choices() == 3 and "mint tea" in wire_text(), "step 28: the equations, the key, then dawn at the inner stair (step 29)")
@@ -1237,6 +1325,57 @@ def test_polybius_stele(browser):
     ctx.close()
 
 
+# (the satchel of this journey also holds what the uses of Stations 18 and 19 ask for: the coin, the ibis, the lamp and the survey)
+def atrium_route(atrium, via):
+    """The shortest crossing of the burning atrium that steps on every flagstone in `via` before the hatch, by the page's own rules
+    (a flagstone still burning next turn cannot be entered; the hatch may be reached on the last turn). None if there is none."""
+    from collections import deque
+    rows, burn, limit = atrium["map"], atrium["burn"], atrium["breath"]
+    H, W = len(rows), len(rows[0])
+    cell = lambda x, y: rows[y][x] if 0 <= x < W and 0 <= y < H else None
+    ig, queue = {}, deque()
+    for y in range(H):
+        for x in range(W):
+            if cell(x, y) == "L":
+                ig[(x, y)] = 0; queue.append((x, y))
+    while queue:
+        x, y = queue.popleft()
+        for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0)):
+            n = (x + dx, y + dy)
+            if cell(*n) == "f" and n not in ig:
+                ig[n] = ig[(x, y)] + 1; queue.append(n)
+    burning = lambda q, t: cell(*q) == "L" or (cell(*q) == "f" and q in ig and ig[q] <= t < ig[q] + burn)
+    via = [tuple(v) for v in via]
+    full, goal = (1 << len(via)) - 1, tuple(atrium["hatch"])
+    start = (tuple(atrium["start"]), 0, 0)
+    prev, queue = {start: None}, deque([start])
+    while queue:
+        node = queue.popleft()
+        q, t, m = node
+        if q == goal:
+            if m != full:
+                continue
+            moves = []
+            while prev[node]:
+                b = prev[node]; moves.append((node[0][0] - b[0][0], node[0][1] - b[0][1])); node = b
+            return moves[::-1]
+        for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)):
+            n = (q[0] + dx, q[1] + dy)
+            c = cell(*n)
+            if (dx or dy) and (c is None or c in "#L" or (burning(n, t) and burning(n, t + 1))):
+                continue
+            if n != goal and (burning(n, t + 1) or t + 1 >= limit):
+                continue
+            nxt = (n, t + 1, m | (1 << via.index(n)) if n in via else m)
+            if nxt not in prev:
+                prev[nxt] = node; queue.append(nxt)
+    return None
+
+
+ORACLE_RELICS = dict(order_inventory_relics=json.dumps(["gilded_feather", "order_wax_seal", "surveyor_compass", "servant_coin", "ibis_figure", "founders_lamp", "raiders_survey"]),
+                     order_gates_flags=json.dumps({"coin": True, "statues": "riddle", "lieCaught": True}),
+                     order_oracle_key="", order_oracle_lamp="",   # (empty: the inner stair has not been walked yet)
+                     order_oracle_cine_outro="")                 # (and the closing film has not played)
 ORACLE_SEED_EXTRA = dict(order_sun_monolith_completed="true", order_seal_cairn_2="true",
                          order_sandstone_labyrinth_completed="true", order_seal_cairn_3="true", order_monolith_gate_seal1="true",
                          order_cairn_iv_completed="true", order_seal_cairn_4="true", order_cairn4_sound="off",
@@ -1248,12 +1387,15 @@ ORACLE_SEED_EXTRA = dict(order_sun_monolith_completed="true", order_seal_cairn_2
 
 def test_oracle_horizon(browser):
     print("\n10. Station 19 · The Oracle's Horizon, end to end")
-    seed = dict(DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA)
+    seed = dict(DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, **ORACLE_RELICS)
     ctx, page, errors = new_page(browser, seed)
     page.goto(f"{BASE}/index.html", wait_until="load")
     page.wait_for_timeout(2500)
     get = lambda key: page.evaluate("k => localStorage.getItem(k)", key)
     js = page.evaluate
+    owned = lambda: js("window.getOwnedRelicIds()")
+    tray_open = lambda: js("!!document.getElementById('relic-tray') && !document.getElementById('relic-tray').hidden")
+    hand = lambda rid: js("(id => document.querySelector('#relic-tray [data-relic=\"' + id + '\"]').click())", rid)
     modal_open = lambda: js("getComputedStyle(document.getElementById('modal-oracle-horizon')).display") != "none"
     choices = lambda: js("[...document.querySelectorAll('#wire-choices-grid button')].length")
     wire_text = lambda: js("document.getElementById('view-field-wire').innerText")
@@ -1278,6 +1420,45 @@ def test_oracle_horizon(browser):
     js("window.openOracleModal()"); page.wait_for_timeout(1500)
     gates_open = lambda: js("getComputedStyle(document.getElementById('modal-gates-tower-ii')).display") != "none"
     check(gates_open() and not modal_open(), "five seals home: the bronze doors open first, before the inner stair")
+    # the return goes through the satchel: the seals one by one, the falcon and the ibis, the raiders' copy of the survey
+    def gates_choice(cid):
+        for _ in range(80):
+            if js("(id => !!document.getElementById(id))", "choice-" + cid):
+                break
+            js("window.__gates.fast()"); page.wait_for_timeout(300)
+        js("(id => document.getElementById(id).click())", "choice-" + cid); page.wait_for_timeout(500)
+    def gates_idle():
+        for _ in range(80):
+            if js("[...document.querySelectorAll('#gates-choices button')].length") > 0:
+                return
+            js("window.__gates.fast()"); page.wait_for_timeout(300)
+    gates_choice("rt_seals")
+    check(tray_open() and "seal_cairn_1" not in owned() and js("[...document.querySelectorAll('#relic-tray [data-relic^=\"seal_cairn_\"]')].length") == 4,
+          "Hermes asks for the seals: four in the satchel, Seal I in the arch since dusk")
+    hand("ibis_figure"); page.wait_for_timeout(150)
+    check("stone keepers" in js("document.querySelector('#relic-tray .rt-reply').textContent"), "the ibis is not a seal: Hermes says whose it is")
+    hand("seal_cairn_3"); page.wait_for_timeout(900)
+    check(tray_open() and "seal_cairn_3" not in owned() and "Three to go" in js("document.getElementById('relic-tray-ask').textContent")
+          and js("document.querySelectorAll('.gate-socket-chip.is-fitted').length") == 2,
+          "a seal handed over goes into the arch and leaves the satchel")
+    js("document.querySelector('#relic-tray .rt-cancel').click()"); page.wait_for_timeout(400)
+    gates_idle()
+    check(not any(s.startswith("seal_cairn_") for s in owned()) and '"sealed":true' in (get("order_gates_return") or ""),
+          "Hermes fits the rest himself: the five seals stay in the arch, and the return remembers it")
+    gates_choice("rt_keepers")
+    check(tray_open(), "the stone keepers are paid from the satchel")
+    hand("falcon_weight"); page.wait_for_timeout(700); hand("ibis_figure"); page.wait_for_timeout(700)
+    gates_idle()
+    check("falcon_weight" not in owned() and "ibis_figure" not in owned() and "statue_seal" in owned(), "falcon and ibis are given, and the Seal of the Two Keepers comes back")
+    js("window.closeItemAcquiredModal && window.closeItemAcquiredModal()"); page.wait_for_timeout(300)
+    gates_choice("rt_survey")
+    for _ in range(60):
+        if js("getComputedStyle(document.getElementById('modal-item-relinquished')).display") != "none":
+            break
+        js("window.__gates.fast()"); page.wait_for_timeout(300)
+    check("copyist" in js("document.getElementById('gates-log').innerText") and "raiders_survey" not in owned(),
+          "the Servant knows the hand that copied the survey, and keeps it")
+    js("document.getElementById('ir-btn-continue').click()"); page.wait_for_timeout(500)
     for _ in range(100):
         if js("getComputedStyle(document.getElementById('gates-decree-card')).display") != "none":
             break
@@ -1287,6 +1468,17 @@ def test_oracle_horizon(browser):
     check(js("getComputedStyle(document.getElementById('gates-decree-card')).display") != "none"
           and '"done":true' in (get("order_gates_return") or ""), "the welcome ends with the doors open, and is saved")
     js("document.getElementById('btn-gates-depart').click()"); page.wait_for_timeout(800)
+    # the inner stair, once: the Servant's Key for its door, the Founders' Lamp for the dark
+    check(js("document.getElementById('oracle-key-input').disabled"), "the sigil waits until Hermes is down the inner stair")
+    js("document.getElementById('btn-oracle-howto-skip').click()"); page.wait_for_timeout(900)
+    check(tray_open() and "locked" in js("document.getElementById('relic-tray-ask').textContent"), "the door of the inner stair is locked: Hermes asks for what opens it")
+    hand("servant_key"); page.wait_for_timeout(3000)
+    check(get("order_oracle_key") == "turned" and "servant_key" not in owned() and tray_open() and "lamp" in js("document.getElementById('relic-tray-ask').textContent"),
+          "the Servant's Key turns and goes back to him; then the dark asks for a lamp")
+    hand("founders_lamp"); page.wait_for_timeout(500)
+    check(get("order_oracle_lamp") == "lit" and "founders_lamp" not in owned() and get("order_hint_s19-disc_level") == "1"
+          and "Polaris" in feedback("oracle-dispatch-text") and not js("document.getElementById('oracle-key-input').disabled"),
+          "the Founders' Lamp burns on the stair: the painted stars are a first note for the disc, and the sigil can be spoken")
     check(modal_open() and not gates_open() and js("document.querySelector('#oracle-disc-game .monolith-game-inner').inert") is True
           and js("document.querySelector('#oracle-vow-game .monolith-game-inner').inert") is True,
           "the chamber opens, the disc and the vow locked until the sigil")
@@ -1300,6 +1492,11 @@ def test_oracle_horizon(browser):
     for word in ["OVERTURN", "OVERTUREE", "ORACLE"]:
         page.fill("#oracle-key-input", word); page.click("#btn-oracle-speak"); page.wait_for_timeout(120)
     check(get("order_oracle_hint") == "true" and get("order_oracle_awake") is None, "6 wrong sigils open the Ask Hermes hint, the door stays shut")
+    check(js("!document.getElementById('btn-oracle-coin').hidden"), "the hollow disc of the slab waits for something from the satchel")
+    js("document.getElementById('btn-oracle-coin').click()"); page.wait_for_timeout(300)
+    hand("servant_coin"); page.wait_for_timeout(400)
+    check(get("order_oracle_coin") == "set" and "servant_coin" not in owned() and js("document.getElementById('btn-oracle-coin').hidden"),
+          "the Servant's coin is set in the Oracle's door and leaves the satchel")
     page.fill("#oracle-key-input", " over-ture "); page.click("#btn-oracle-speak"); page.wait_for_timeout(250)
     check(get("order_oracle_awake") == "true", "forgiving sigil 'over-ture' opens the inner chamber")
     page.wait_for_timeout(2600)
@@ -1328,14 +1525,17 @@ def test_oracle_horizon(browser):
           "the sky card says where the three stars stand")
     sky_spoke = {"Aldebaran": 6, "Capella": 7, "Polaris": 0}
     stars = js("window.__oracle.stars")
-    check(js("getComputedStyle(document.getElementById('oracle-read-panel')).display") == "none", "the disc cannot be read while it is crooked")
+    check(js("getComputedStyle(document.getElementById('oracle-weigh-panel')).display") == "none", "nothing is weighed while the disc is crooked")
     for ring, star in enumerate(stars):
         while (star["spoke"] + js("window.__oracle.rot()")[ring]) % 8 != sky_spoke[star["name"]]:
             js(f"window.__oracle.turn({ring}, 1)")
-    reading = "".join(js(f"window.__oracle.letterAt({ring}, {k})") for k in range(8) for ring in range(3))
-    check(js("window.__oracle.rot()") == [0, 0, 0] and reading == "DECEMBEREIGHTEENTOTWENTY",
-          "three stars set to the sky: read from the north, rim to heart, the disc says DECEMBER EIGHTEEN TO TWENTY")
-    check(js("getComputedStyle(document.getElementById('oracle-read-panel')).display") != "none", "the shining disc can be read")
+    reading = "".join(js(f"window.__oracle.letterAt({ring}, {k})") for ring in range(3) for k in range(8))
+    check(js("window.__oracle.rot()") == [0, 0, 0] and reading == "ABCDEFGHKLMNOPQRSTUVWXYZ",
+          "three stars set to the sky: each ring reads its letters in order, the 24 letters she can weigh (all but I and J)")
+    check(js("getComputedStyle(document.getElementById('oracle-weigh-panel')).display") != "none"
+          and js("getComputedStyle(document.querySelector('#oracle-disc-game .oracle-ring-ctrls')).display") == "none", "the true disc goes on the balance: the weighing begins")
+    js("window.__oracle.turn(0, 1)")
+    check(js("window.__oracle.rot()") == [0, 0, 0], "once it is true, the disc no longer turns")
     ring_true = lambda w: w.get("jewel", 0) > 0.5 and all(abs(a) < 0.05 or abs(abs(a) - 6.28) < 0.05 for a in w.get("rings", [1]))
     for _ in range(12):   # the rings ease into place: under a busy GPU the last one can take a moment longer
         page.wait_for_timeout(300)
@@ -1344,15 +1544,63 @@ def test_oracle_horizon(browser):
             break
     check(w.get("jewel", 0) > 0.5 and all(abs(a) < 0.05 or abs(abs(a) - 6.28) < 0.05 for a in w.get("rings", [1])),
           "3D: the three rings turned true and the jewel at the heart wakes", w)
-    js("window.__oracle.read('DECEMBER EIGHTEEN')")
-    check(get("order_oracle_when_read") is None and get("order_oracle_read_fails") == "1", "half the reading is refused")
-    for wrong in ["december 2018 2020", "18 december 2020"]:
-        js(f"window.__oracle.read('{wrong}')")
-    check(get("order_oracle_when_read") is None, "years are not days: 2018 / 2020 are refused")
-    js("window.__oracle.read('the eighteenth to the twentieth of December')")
-    check(get("order_oracle_when_read") == "true" and "18 – 20 December" in js("document.getElementById('oracle-when').innerText"),
-          "the WHEN read in Hermes's own words is accepted: 18 – 20 December")
-
+    # The last game of the Desert Path: three riddles, three words, and each word weighed in her own Cipher Ledger
+    ws = lambda: js("window.__oracle.weighState()")
+    verse = lambda: js("document.getElementById('oracle-verse').innerText")
+    mine = lambda: js("[...document.querySelectorAll('#oracle-balance .ob-word .ob-tile:not(.is-sum) i')].map(e => e.textContent).join(' ')")
+    check(ws()["step"] == 0 and not ws()["word"] and "what is left can hear" in verse() and js("document.querySelectorAll('#oracle-date .oracle-date-slot.is-set').length") == 0
+          and js("getComputedStyle(document.getElementById('oracle-weight-row')).display") == "none" and js("window.__oracle.world().phase") == "weigh",
+          "she sings the first riddle: no word yet, nothing to weigh, the date still empty", verse()[:120])
+    js("window.__oracle.weigh(18)")
+    check(ws()["step"] == 0, "a weight with no word on the pan is nothing")
+    js("window.__oracle.word('ear')")
+    check("first letter is gone" in feedback("oracle-disc-feedback") and not ws()["word"], "EAR is what is left of her word: a near miss gets its own answer")
+    js("window.__oracle.word('dread')"); js("window.__oracle.word('cold')")
+    check("fifty-five years" in verse() and get("order_oracle_word_fails") == "3", "three wrong words: she sings a line she had left out")
+    js("window.EclipseLedger.set('F', 6)")
+    js("window.__oracle.word(' fear ')"); page.wait_for_timeout(200)
+    check(ws()["word"] and ws()["balance"] == "loaded" and js("document.querySelectorAll('#oracle-balance .ob-word .ob-tile:not(.is-sum)').length") == 4
+          and mine().split().count("6") == 1 and "?" in mine() and not js("getComputedStyle(document.getElementById('oracle-weight-row')).display") == "none",
+          "FEAR lies on the pan: under each letter only the number she wrote herself, and ? for the rest", mine())
+    js("window.__oracle.weigh(17)"); page.wait_for_timeout(150)
+    fb = feedback("oracle-disc-feedback").lower()
+    check(ws()["step"] == 0 and get("order_oracle_weigh_fails") == "1" and ws()["balance"] == "swing" and "will not settle" in fb
+          and not any(w in fb for w in ("heavy", "light", "over", "under", "more", "less", "high", "low")),
+          "a wrong weight: the balance swings and never says which way", fb)
+    js("window.__oracle.weigh(18)"); page.wait_for_timeout(300)
+    check(ws()["step"] == 1 and js("[...document.querySelectorAll('#oracle-date .oracle-date-slot')].map(e => e.textContent).join('|')") == "18|?|?"
+          and "terrace" in js("document.getElementById('oracle3d-subtitle').textContent") and "eighteenth" in feedback("oracle-dispatch-text"),
+          "FEAR weighs the first day, and Aurelia remembers a terrace and the cold")
+    js("window.__oracle.word('light')")
+    check("old tongue" in feedback("oracle-disc-feedback"), "LIGHT is right in the wrong tongue")
+    js("window.__oracle.word('lux')"); page.wait_for_timeout(150)
+    # the beam of light leaves the altar: nothing is lost but the weighing in hand
+    js("window.__oracle.expireLight()"); page.wait_for_timeout(200)
+    check(ws()["gone"] and get("order_oracle_beams_lost") == "1" and js("!document.getElementById('btn-oracle-moon').hidden")
+          and js("getComputedStyle(document.getElementById('oracle-weight-row')).display") == "none", "the light has left the altar: she cannot weigh in the dark")
+    js("window.__oracle.weigh(20)")
+    check(ws()["step"] == 1 and ws()["word"], "the word stays on the pan, and nothing is weighed until the moon comes")
+    js("document.getElementById('btn-oracle-moon').click()"); page.wait_for_timeout(200)
+    check(not ws()["gone"] and ws()["moon"] and ws()["light"] > 0.95 and "moon" in js("document.getElementById('oracle-light-label').textContent").lower(), "the moon finds the opening: the beam is whole again")
+    js("window.__oracle.weigh(20)"); page.wait_for_timeout(300)
+    check(ws()["step"] == 2 and "Fire" in js("document.getElementById('oracle3d-subtitle').textContent"), "LUX weighs the last day, and she remembers the fire")
+    js("window.__oracle.word('are')")
+    check("other way" in feedback("oracle-disc-feedback"), "ARE is her word turned round")
+    js("window.__oracle.word('era')"); js("window.__oracle.weigh(12)"); page.wait_for_timeout(300)
+    check(get("order_oracle_when_read") == "true" and "18 – 20 December" in js("document.getElementById('oracle-when').innerText")
+          and "twelfth month" in feedback("oracle-dispatch-text") and "voice" in js("document.getElementById('oracle3d-subtitle').textContent"),
+          "ERA weighs the month: from FEAR to LUX in the twelfth month, the WHEN is 18 – 20 December")
+    w = js("window.__oracle.world()")
+    check(w.get("phase") == "vow", "3D: the camera leaves the balance for the two of them", w)
+    # the pebble she once hid in the pillar goes back to her, and brings one word of the song
+    check(js("!document.getElementById('btn-oracle-pebble').hidden"), "Hermes carries something of hers")
+    js("document.getElementById('btn-oracle-pebble').click()"); page.wait_for_timeout(300)
+    hand("gilded_feather"); page.wait_for_timeout(150)
+    check("Alps" in js("document.querySelector('#relic-tray .rt-reply').textContent"), "the feather is not hers")
+    hand("tuning_pebble"); page.wait_for_timeout(400)
+    check(get("order_oracle_pebble") == "given" and "tuning_pebble" not in owned()
+          and js("document.querySelector('#oracle-tiles .is-recalled').textContent") == "ALWAYS" and int(get("order_hint_s19-vow_level") or 0) >= 1,
+          "the Tuning Pebble is back in her hands: she says ALWAYS")
     # The vow, from the words she half remembers
     tiles = js("window.__oracle.tiles")
     say = lambda words: [js(f"window.__oracle.say({tiles.index(w)})") for w in words]
@@ -1370,13 +1618,32 @@ def test_oracle_horizon(browser):
     w = js("window.__oracle.world()")
     check(w.get("phase") == "end" and w.get("onAltar"), "3D: she lays the disc on the altar and the camera steps back", w)
     check("gilded_star" in js("window.getOwnedRelicIds()"), "the Gilded Star is in the satchel")
-    check(js("document.querySelectorAll('#oracle-victory .rw-glyph').length") == 2 and js("[...document.querySelectorAll('#oracle-victory .rw-letter')].map(e => e.textContent).join('')") == "IJ",
+    filmed = False
+    for _ in range(50):   # a short film closes the Desert Path (once), and then the reward rises
+        if js("window.__oracle.rewardOpen()"):
+            break
+        if js("window.__oracle.cine()"):
+            filmed = True
+            page.wait_for_timeout(1200); js("window.__oracle.skipCine()")
+        page.wait_for_timeout(400)
+    check(filmed and get("order_oracle_cine_outro") == "seen", "the closing film plays once she has lifted the veil, before the reward")
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-oracle-horizon .chasm3d-reward'))")
+    check(js("document.querySelectorAll('.oracle-reward .rw-glyph').length") == 2 and js("[...document.querySelectorAll('.oracle-reward .rw-letter')].map(e => e.textContent).join('')") == "IJ",
           "the reward gives the two last glyphs of the Desert Path: I and J")
-    page.click("#btn-oracle-finish"); page.wait_for_timeout(1200)
-    check(js("getComputedStyle(document.getElementById('stage-passage-overlay')).display") != "none" and get("order_stage_passage_seen") == "true",
-          "from the desert to the stage: the passage plays once")
-    page.click("#btn-stage-passage-close"); page.wait_for_timeout(400)
-    check(js("getComputedStyle(document.getElementById('btn-tab-path-stage')).display") != "none", "Path III · The Stage Tower appears on the map")
+    check("The Oracle Remembers" in reward() and "18 – 20 December" in reward() and "Sheet" not in reward()
+          and js("[...document.querySelectorAll('.oracle-reward .rw-eq')].map(e => e.getAttribute('aria-label')).join('|')") == "I plus E equals 12|I plus J equals 18"
+          and js("document.querySelectorAll('.oracle-reward .oracle-rw-letter').length") == 24 and js("document.querySelectorAll('.oracle-reward .drw-spent li').length") == 4
+          and js("document.querySelectorAll('.oracle-reward .drw-relic.is-new').length") == 1,
+          "the reward rises: the disc set true, the WHEN, the Gilded Star, both Ledger lines and the four things the satchel gave", reward()[:200].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and modal_open(), "Escape puts the reward away, the chamber stays open")
+    page.click("#btn-oracle-finish"); page.wait_for_timeout(900)
+    check(js("document.getElementById('modal-item-acquired').style.display") == "flex" and "Star" in js("document.getElementById('iac-title').textContent"),
+          "leaving shows the card of the Gilded Star first")
+    js("window.closeItemAcquiredModal()"); page.wait_for_timeout(1200)
+    check(not modal_open() and js("document.getElementById('view-field-wire').classList.contains('active')") and get("order_desert_farewell_pending") == "true"
+          and js("getComputedStyle(document.getElementById('btn-tab-path-stage')).display") == "none",
+          "then straight to Hermes on the Field Wire: the Desert Path is not over yet, and Path III stays off the map")
 
     js("document.querySelector('[data-view=\"view-cipher\"]').click()"); page.wait_for_timeout(500)
     ids = js("[...document.querySelectorAll('.clue-equation-item')].map(e => e.id)")
@@ -1406,9 +1673,45 @@ def test_oracle_horizon(browser):
           "debrief: step 31 (Aurelia) with 3 replies")
     answer_first()
     bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
-    check(get("order_field_wire_step") == "32" and "Chapter III complete" in bar and js("!document.getElementById('btn-wire-ceremony').hidden"),
-          "step 32 ends Chapter III: the bar offers to close it before Tower III", bar)
-    js("document.getElementById('btn-wire-ceremony').click()"); page.wait_for_timeout(6000)
+    check(get("order_field_wire_step") == "32" and "Dawn at the gates" in bar and "Dawn at the gates" in js("document.getElementById('btn-wire-ceremony-text').textContent")
+          and js("!document.getElementById('btn-wire-ceremony').hidden"),
+          "step 32 ends the talk from Tower II: the bar calls her to the gates at dawn", bar)
+    # The end of the Desert Path: the farewell at the bronze doors, the road walked, the curtain, and then the chapter closes
+    js("document.getElementById('btn-wire-ceremony').click()"); page.wait_for_timeout(2500)
+    check(gates_open() and js("window.__gates.dlg().mode") == "farewell", "Dawn at the gates: the scene of the bronze doors opens for the farewell")
+    def fw_choice(cid):
+        for _ in range(80):
+            if js("(id => !!document.getElementById(id))", "choice-" + cid):
+                break
+            js("window.__gates.fast()"); page.wait_for_timeout(300)
+        js("(id => document.getElementById(id).click())", "choice-" + cid); page.wait_for_timeout(400)
+    fw_choice("fw_veil")
+    for _ in range(80):
+        if js("!!document.getElementById('choice-fw_go')"):
+            break
+        js("window.__gates.fast()"); page.wait_for_timeout(300)
+    log = js("document.getElementById('gates-log').innerText")
+    check("Aurelia" in log and "one winter" in log and js("!document.getElementById('choice-fw_veil')") and js("!!document.getElementById('choice-fw_compass')")
+          and js("!document.getElementById('choice-fw_cord')") and js("!document.getElementById('choice-fw_flint')"),
+          "Aurelia speaks at the gates and leaves her veil; each gesture is offered once, and only for what the satchel still holds")
+    fw_choice("fw_compass"); fw_choice("fw_go")
+    for _ in range(100):
+        if js("getComputedStyle(document.getElementById('gates-decree-card')).display") != "none":
+            break
+        js("window.__gates.fast()"); page.wait_for_timeout(300)
+    card = js("document.getElementById('gates-decree-card').innerText")
+    check("the road east" in card.lower() and "the veil stays" in card.lower() and "two degrees east" in card.lower() and js("window.__gates.dlg().sealGlow") is True,
+          "the doors close, the five seals burn in the arch, and the card tells her goodbye", card[:160].replace("\n", " "))
+    js("document.getElementById('btn-gates-depart').click()"); page.wait_for_timeout(1200)
+    recap = js("(b => b && !b.hidden ? b.innerText : '')(document.getElementById('desert-farewell'))")
+    check("The Desert Path, walked" in recap and "18 – 20 December" in recap and "5/5" in recap and "Aurelia left the Oracle" in recap and "two degrees east" in recap
+          and js("document.querySelectorAll('#desert-farewell .dfw-node').length") == 12 and js("document.querySelectorAll('#desert-farewell .dfw-node.is-seal').length") == 5
+          and js("document.activeElement && document.activeElement.classList.contains('dfw-go')") and not gates_open(),
+          "The Desert Path, walked: twelve places, five seals, the WHEN and what she chose", recap[:200].replace("\n", " "))
+    js("document.querySelector('#desert-farewell .dfw-go').click()"); page.wait_for_timeout(6000)
+    check('"done":true' in (get("order_desert_farewell") or "") and '"veil":true' in get("order_desert_farewell") and get("order_desert_farewell_pending") is None
+          and js("document.getElementById('desert-farewell').hidden") and js("getComputedStyle(document.getElementById('btn-tab-path-stage')).display") != "none",
+          "the curtain closes over the desert: the farewell is saved, and Path III · The Stage Tower appears on the map")
     bar = js("document.querySelector('.messenger-waypoint-title')?.innerText || ''")
     check(get("order_field_wire_step") == "33" and "THE DESERT PATH IS COMPLETE" in wire_text() and "[I] + [J] = 18" in wire_text()
           and "The Unsent Letter" in wire_text() and choices() == 3,
@@ -1416,6 +1719,7 @@ def test_oracle_horizon(browser):
     page.reload(); page.wait_for_timeout(2500); open_wire()
     text = wire_text()
     check(text.count("mint tea") == 1 and text.count("She did not die in 1971") == 1 and text.count("the best day I have had since 1971") == 1, "reload replays steps 29-33 once each")
+    check("walks bare-headed" in text and "reads true" in text and "you gave back to her" in text, "the Field Wire remembers the pebble she gave back, the veil and the compass")
     check(not errors, "no JS errors during Station 19", "; ".join(sorted(set(errors))[:3]))
     ctx.close()
 
@@ -2328,7 +2632,8 @@ A11Y_SEED = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_ho
              "order_field_wire_choices": json.dumps([2, 0, 1, 0] + [0] * 30), "order_masks_march_start": "1",
              "order_masks_march_bypassed": "true", "order_masks_gate_completed": "true", "order_stage_pause_skipped_41": "true",
              "order_sheet_seal_41": "true", "order_camera_obscura_completed": "true", "order_stage_pause_skipped_42": "true",
-             "order_sheet_seal_42": "true", "order_chasm_howto": "seen"}   # How to play has its own checks in section 31
+             "order_sheet_seal_42": "true", "order_chasm_howto": "seen",   # How to play has its own checks in section 31
+             "order_stage_passage_seen": "true"}   # a journey this far saw the passage to the Stage (Station 19 now shows it on any way out)
 A11Y_FOCUSABLE = ('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),'
                   'textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')
 # The controls in a part of the page: what the mouse can click but the keyboard cannot reach, and every control

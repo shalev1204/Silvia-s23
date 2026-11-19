@@ -10,6 +10,8 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
   const WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five'];
   const seals = (n) => (WORDS[n] || String(n)) + (n === 1 ? ' seal' : ' seals');
   const keep = (list) => list.filter(Boolean);
+  // what Hermes picked up in the burning atrium (Station 18, s18-polybius-stele.js FINDS)
+  const steleFound = (id) => { try { const l = JSON.parse(ls('order_stele_finds') || '[]'); return Array.isArray(l) && l.indexOf(id) >= 0; } catch (e) { return false; } };
 
   // ---- Step 25 · Under the Arch at noon: the smoke over Tower II (Station 18 next) ----
   window.WIRE_SCRIPT[25] = {
@@ -103,6 +105,12 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         "You were right to send me to him first. Everything else could burn, and nearly did."
       ][W.choice(25)] || null,
       "The library is embers. The stele still stands in the atrium, black with soot and whole.",
+      ls('order_stele_falcon') === 'used' ? "The brass falcon hangs on the chain of his well now, and holds the hatch open. He looked at it for a while and said the founders would have liked the arithmetic." : null,
+      steleFound('glasses') ? "I gave him back his spectacles, one lens cracked. He put them on and looked at me for a long time." : null,
+      steleFound('glasses') ? "'Older,' he said. 'So am I.'" : null,
+      steleFound('firepot') ? "I showed him the pot of pitch with the ring burnt into it. 'Three of those came through the roof-light at dusk,' he said. 'I counted them. Then I stopped counting and ran.'" : null,
+      steleFound('watchbook') ? "And his watch-book was under the ash, in an iron box. October 1998: 'A surveyor on the north ridge at dusk. He did not come down. He will.'" : null,
+      steleFound('watchbook') ? "He saw me, Silvia. Twenty-eight years ago, on that ridge, and he wrote me down." : null,
       { ask: [
         { text: "Is he badly hurt?", silviaMsg: "Is he badly hurt, Hermes? Tell me the truth.",
           reply: ["Burnt palms and a cough. He says he has had worse from a bad stew.", "That is why the wet cloth."] },
@@ -290,7 +298,9 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
         { text: "Does she know about me?", silviaMsg: "Does she know about me?",
           reply: ["She calls you 'the navigator'. She said it before I said a word about you.", "I did not ask how."] }
       ] },
-      "The gold stars, the lapis blue, the pebble in the pillar: hers too. I waited fifty-five years for this hour, and I do not know what to do with it."
+      (ls('order_oracle_pebble') === 'given'
+        ? "The gold stars, the lapis blue, the pebble you gave back to her: all hers."
+        : "The gold stars, the lapis blue, the pebble in the pillar: hers too.") + " I waited fifty-five years for this hour, and I do not know what to do with it."
     ]),
     choices: [
       {

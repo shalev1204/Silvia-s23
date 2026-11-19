@@ -6,6 +6,8 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
   'use strict';
   const S = window.WIRE_SCRIPT;
   const clean = (list) => list.filter(Boolean);
+  // how she had them say goodbye at the gates of Tower II (hub/js/desert-farewell.js): { veil, cord, compass, flint }
+  const farewell = () => { try { return JSON.parse(localStorage.getItem('order_desert_farewell') || '{}') || {}; } catch (e) { return {}; } };
 
   // =========================================================================================
   // 33 · Tower II, dawn: the letter nobody sent and the eight new pages
@@ -19,6 +21,8 @@ window.WIRE_SCRIPT = window.WIRE_SCRIPT || {};
           : c === 1 ? "I watched her remember, a little more each hour: cedar smoke, a tune, my voice. Not the bridge, and I do not push."
           : c === 2 ? "You wanted us on the raiders’ road. Aurelia kept me one more day, and I was glad of it."
           : "She showed me her charts, and I watched her hands.",
+        farewell().veil ? "Aurelia walks bare-headed this morning. The veil is folded in the Servant’s hands, and she has not once looked back for it." : null,
+        farewell().compass ? "And my compass reads true for the first time since it was made. I keep taking it out to look." : null,
         "The raiders have a day’s start and the Astrolabe, and their ruts run east, to Tower III: the Stage Tower, and the Mirror Speaker’s truth. The WHERE.",
         { ask: [
           { text: "Did you sleep at all?", silviaMsg: "Did you actually sleep, old man, or did you stare at charts all night?",

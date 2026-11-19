@@ -7,7 +7,7 @@
   'use strict';
 
   window.GatesExtras = function (c) {
-    var ds = c.ds, nar = c.nar, H = c.sayH, S = c.sayS, V = c.sayV, look = c.look, R = c.R;
+    var ds = c.ds, nar = c.nar, H = c.sayH, S = c.sayS, V = c.sayV, AU = c.sayA, look = c.look, R = c.R;
     // the people on the stairs (walk, bow, hand over): a no-op when the scene has no 3D
     function A() { return (c.act && c.act()) || null; }
     function react(who, kind) { var a = A(); if (a) a.react(who, kind); }
@@ -277,13 +277,14 @@
         else { ds.flags.lostOil = true; R(-1); ds.stage = 'test'; c.setMission('Answer his question'); }
       } else if (p) nextRound(p);
     }
-    function reset() { pendingRound = 0; }
+    function reset() { pendingRound = 0; keepersGiven = {}; }
 
     function menu(stage) {
       var f = ds.flags, out = [], seen = ds.seen;
       if (stage === 'lie_pick') return ['lc_oracle', 'lc_dusk', 'lc_servant', 'lc_back'];
       if (stage === 'ret') return returnMenu();
-      if (stage === 'ret_done') return [];
+      if (stage === 'ret_done' || stage === 'fw_done') return [];
+      if (stage === 'fw') return farewellMenu();
       if (stage === 'duel_pact') return ['duel_yes', 'duel_no'];
       if (stage === 'statue') return ['sr_fj', 'sr_fi', 'sr_ss', 'statue_back'];
       if (stage === 'duel_prize') return ['dp_raiders', 'dp_oracle'];
@@ -308,9 +309,14 @@
     // how the Servant greets whoever comes back with five seals: the tone of the first meeting, then what each choice left behind
     function returnLines() {
       var f = ds.flags, out = [
-        nar('Dawn. Tower II is the colour of a ripe peach, and the bronze doors are still shut. The old man is already on the top step, as if he had never left it.'),
-        H('Silvia, I am at the gates again. Five seals in my coat. He is not looking at me. He is looking at the coat.')
+        nar('Dawn. The old man will not let Hermes touch the Oracle’s door yet. He leads him out by the side door and round to the front of Tower II, where the bronze doors are still shut.'),
+        nar('He climbs to the top step, his burnt hands wrapped in linen, and stands as if he had never left it.'),
+        H('Silvia, I am at the gates again. Five seals in my coat. “She receives no one until the five are home,” he says. He is not looking at me. He is looking at the coat.')
       ];
+      // a return that was left half done: the arch already holds what she handed over
+      if (ds.ret.sealed) return [
+        nar('Dawn, still. The five seals burn in the arch of Tower II, and the old man waits on the top step.'),
+        H('The seals are home, Silvia. Only the doors are left.')];
       if (ds.tone === 'bold') out.push(S('The one who came hard. I wondered if the desert would soften you. A little, I see.'));
       else if (ds.tone === 'observer') out.push(S('The one who looked before he spoke. You have been looking all the way here, I think.'));
       else out.push(S('You bowed to me once, at dusk, with a single seal. Now you stand here with five.'));
@@ -325,10 +331,50 @@
       return out;
     }
 
+    // ---- The seals go home through the satchel: she hands them to Hermes one by one (relic-use.js) ----
+    var RU = function () { return window.RelicUse || null; };
+    var sealId = function (i) { return 'seal_cairn_' + i; };
+    // the seals still in the satchel (Seal I went into the arch at dusk, the day Hermes first stood here)
+    function sealsLeft() {
+      var ru = RU(), out = [];
+      for (var i = ru ? 1 : 2; i <= 5; i++) if (!ru || !ru.isSpent(sealId(i))) out.push(i);
+      return out;
+    }
+    function toArch() { look('arch')(); var a = A(); if (a) a.walk('hermes', -1.0, 1.35, { speed: 1.0, face: a.faceTo('hermes', -0.6, -2) }); }
+    function fitOne(i) {
+      var ru = RU();
+      if (ru) ru.spend(sealId(i), { silent: true });
+      react('hermes', 'offer');
+      c.fitSeals(ru ? 5 - sealsLeft().length : i);
+    }
+    var COUNT = ['', 'One more, Silvia. The last socket.', 'Two to go.', 'Three to go. The arch is waking.', 'Four to go.'];
+    function askSeals() {
+      var ru = RU(), left = sealsLeft();
+      if (!ru || !left.length) { c.pick('rt_seals_go'); return; }
+      if (ru.isOpen()) return;
+      ru.ask({
+        ask: left.length >= 4 ? 'The arch has five sockets, Silvia. Hand me the seals, one by one.' : COUNT[left.length],
+        want: left.map(sealId),
+        wrong: {
+          statue_seal: 'A seal, yes, but the keepers’ own. The arch wants the five of the cairns.',
+          servant_key: 'Not the key. The arch has sockets, not a lock.',
+          falcon_weight: 'The falcon is for the stone keepers. First the seals.',
+          ibis_figure: 'The ibis is for the stone keepers. First the seals.'
+        },
+        cancel: 'Fit the rest yourself, Hermes',
+        onRight: function (id) {
+          fitOne(parseInt(id.slice(-1), 10));
+          if (sealsLeft().length) setTimeout(askSeals, 650); else setTimeout(function () { c.pick('rt_seals_go'); }, 500);
+        },
+        onCancel: function () { c.pick('rt_seals_go'); }
+      });
+    }
+
     function fitLines() {
-      var out = [nar('Hermes climbs the steps. The first seal still glows in its socket, high in the arch, where he fitted it at dusk.', { hold: 1000, fx: function () { look('arch')(); var a = A(); if (a) a.walk('hermes', -1.0, 1.35, { speed: 1.0, face: a.faceTo('hermes', -0.6, -2) }); } })];
-      [2, 3, 4, 5].forEach(function (i) {
-        out.push(nar('The seal of ' + SEAL_NAMES[i] + ' goes into its socket and turns.', { fx: function () { react('hermes', 'offer'); c.fitSeals(i); } }));
+      var left = sealsLeft(), out = [];
+      if (left.length) out.push(nar(left.length === 5 ? 'Hermes climbs the steps to the arch.' : 'Hermes takes the rest from his coat.', { hold: 800, fx: toArch }));
+      left.forEach(function (i) {
+        out.push(nar('The seal of ' + SEAL_NAMES[i] + ' goes into its socket and turns.', { fx: function () { fitOne(i); } }));
       });
       out.push(
         S('Five. The arch has not held five since the earthquake.'),
@@ -351,6 +397,48 @@
       return [
         H('Why did the doors stay shut for so long?'),
         S('Because they open when the five are home. Not for hurry, and not for hunger.')];
+    }
+
+    var keepersGiven = {};
+    function askKeepers() {
+      var ru = RU();
+      if (!ru) { c.pick('rt_keepers_go'); return; }
+      var want = ['falcon_weight', 'ibis_figure'].filter(function (id) { return !keepersGiven[id]; });
+      if (!want.length) { c.pick('rt_keepers_go'); return; }
+      if (ru.isOpen()) return;
+      ru.ask({
+        ask: want.length === 2 ? 'The keepers’ hands are empty, Silvia. A falcon for the left, an ibis for the right. Have we got them?'
+          : (keepersGiven.falcon_weight ? 'The falcon is in my hand. And for the right-hand keeper?' : 'The ibis is in my hand. And for the left-hand keeper?'),
+        want: want,
+        wrong: {
+          statue_seal: 'That is what they give, Silvia, not what they ask.',
+          servant_coin: 'They are stone. They do not take coin.',
+          raiders_survey: 'That one is for the old man, not for the keepers.'
+        },
+        onRight: function (id) {
+          keepersGiven[id] = true;
+          react('hermes', 'offer');
+          setTimeout(askKeepers, 500);
+        },
+        onCancel: function () { keepersGiven = {}; }
+      });
+    }
+    function payKeepers() {
+      var ru = RU();
+      if (!ru) return;
+      ru.spend('falcon_weight', { silent: true });
+      ru.spend('ibis_figure', { silent: true });
+    }
+
+    // the raiders' copy of the founders' survey (a find of the Labyrinth): the Servant knows the hand that drew it
+    function surveyLines() {
+      return [
+        H('One more thing, elder. The raiders dropped this in the labyrinth: a copy of the founders’ survey.', { fx: function () { react('hermes', 'offer'); } }),
+        nar('The old man unfolds the sheet with his wrapped hands. He does not read the map. He reads the handwriting.', { hold: 1400 }),
+        S('I know this hand. The long tails on the sevens, the dot inside every circle. I taught it.'),
+        S('A copyist of the Order. He sat at my table for six years. One winter he took his pens and walked out to the Ashes.'),
+        H('So that is how they knew where every cairn stood, Silvia.'),
+        S('He copied the map well. He never copied what the cairns ask. Leave it with me: the Order keeps its own mistakes.')];
     }
 
     function keepersLines() {
@@ -404,7 +492,7 @@
         nar('The old man comes down from the top step for the first time, and bows to Hermes. Then he lays both hands on the leaves.', { hold: 3500, fx: open }),
         S('Enter, travellers. This house is yours.'),
         H('He bowed first, Silvia.')];
-      if (ds.flags.coin && ending !== 'keepers') out.push(S('The coin has done its work. Keep it as a memory.'));
+      if (ds.flags.coin && ending !== 'keepers' && !(RU() && RU().isSpent('servant_coin'))) out.push(S('The coin has not finished its work. Keep it close on the stair.'));
       out.push(
         nar('Beyond the doors lies the burned atrium, and at the back of it a short stair cut down into the rock.'),
         S('Come. The inner stair is this way.'),
@@ -412,18 +500,130 @@
       return out;
     }
 
+    // =====================================================================
+    // THE FAREWELL · dawn at the gates, the last scene of the Desert Path (stage 'fw'; desert-farewell.js launches it)
+    // Hermes and Aurelia leave for Tower III. Silvia chooses the gestures of the goodbye; then the doors close and the seals burn.
+    // =====================================================================
+    function fwHas(id) { var ru = RU(); return ru ? ru.has(id) : false; }
+    function farewellLines() {
+      return [
+        nar('Dawn. The bronze doors of Tower II stand open, and for the first time in fifty-five years Aurelia walks out through them.', { hold: 1400, fx: function () { react('aurelia', 'wonder'); } }),
+        nar('She stops on the top step, bare-faced in the cold light, and looks at the desert as if someone had moved it in the night.'),
+        AU('It is bigger than I drew it.'),
+        H('We are on the steps, Silvia, with the road east at our feet. The Servant has come to see us off. He is pretending he has not.'),
+        S('I came to shut the doors. Someone has to.')];
+    }
+    function veilLines() {
+      return [
+        H('Silvia asks about your veil, Aurelia.'),
+        nar('Aurelia unpins the grey veil from her shoulder, folds it in four, and lays it in the old man’s wrapped hands.', { hold: 1500, fx: function () { react('aurelia', 'offer'); var a = A(); if (a) a.later(0.9, function () { react('servant', 'bow'); }); } }),
+        AU('Keep it, old friend. The desert can do without an Oracle for one winter.'),
+        S('And if someone comes to ask the Oracle a question?'),
+        AU('Tell them she has gone to ask one of her own.')];
+    }
+    function cordLines() {
+      return [
+        nar('Hermes holds out his staff. The red cord hangs from it, twelve knots, worn grey by the road.', { fx: function () { react('hermes', 'offer'); } }),
+        nar('The old man takes it in his burnt fingers and, slowly, ties one more.', { hold: 1700, fx: function () { react('servant', 'offer'); if (c.cue) c.cue('click'); } }),
+        S('Twelve knots for the road you walked. One for the road you have not.'),
+        H('The thirteenth, Silvia. He pulled it tighter than all the others.')];
+    }
+    function compassLines() {
+      return [
+        nar('Aurelia takes the brass compass from Hermes, taps the glass, and turns the little screw on its back with her thumbnail.', { hold: 1600, fx: function () { react('hermes', 'offer'); var a = A(); if (a) a.later(0.8, function () { react('aurelia', 'nod'); }); } }),
+        AU('Two degrees east. It has been two degrees east since the day it was made.'),
+        H('Two degrees, Silvia. It lay in a rock shelf for twenty-eight years, I walked this whole desert by it, and nobody told me.'),
+        AU('I am telling you now.')];
+    }
+    function flintLines() {
+      return [
+        nar('Hermes lays his flint and tinder on the rim of the bronze brazier.', { fx: function () { if (c.feedFire) c.feedFire('hermes'); else react('hermes', 'offer'); } }),
+        H('For your lamp, elder. Mine has had its share of fire.'),
+        S('I will light it at dusk. Every dusk, until you are back.')];
+    }
+    function eastLines() {
+      var fw = ds.fw || {};
+      var out = [
+        nar('They go down the steps together, Aurelia a pace ahead. Behind them the old man lays both hands on the bronze leaves, and closes them.', { hold: 3200, fx: function () {
+          var a = A();
+          if (a) {
+            a.walk('aurelia', -0.6, 3.9, { speed: 0.9, face: Math.PI });
+            a.walk('hermes', -1.5, 3.4, { speed: 0.9, face: a.faceTo('hermes', 0.2, 0.4) });
+            a.walk('servant', 0.15, 0.6, { speed: 0.8, face: 0, then: function () { react('servant', 'offer'); c.openDoors('shut'); if (c.cue) c.cue('stone'); } });
+          } else c.openDoors('shut');
+        } }),
+        nar('In the arch the five seals catch the first sun, one after the other, and burn like five small suns.', { hold: 2200, fx: function () { look('arch')(); c.sealGlow(); c.fireBurst(1.2); if (c.cue) c.cue('bell', { f: 196, v: 0.5, len: 5 }); } }),
+        S('As long as they burn, the house is kept. Go.', { fx: function () { var a = A(); if (a) a.walk('servant', 0.95, 0.95, { speed: 0.8, face: 2.44 }); } })];
+      if (fw.veil) out.push(nar('He stands on the top step with the folded veil against his chest, and does not go in.'));
+      out.push(
+        H('Five lights in the arch, Silvia. I can still see them from the road. You put every one of them there.', { fx: function () { look('overview')(); react('hermes', 'bow'); } }),
+        AU('Come along, surveyor. The east will not wait for a man who looks back.'));
+      return out;
+    }
+    var farewellChoices = {
+      fw_veil: {
+        icon: '🕊', label: 'Ask Aurelia about the Oracle’s veil.', say: 'Hermes, ask her about the veil. Is she taking it?',
+        lines: veilLines, after: function () { ds.fw.veil = true; }
+      },
+      fw_cord: {
+        icon: '🧶', label: 'Show the Servant his red cord.', say: 'The red cord, Hermes. Show him you kept it all the way.',
+        lines: cordLines, after: function () { ds.fw.cord = true; }
+      },
+      fw_compass: {
+        icon: '🧭', label: 'Let Aurelia see the compass.', say: 'Give Aurelia your compass for a moment, Hermes. She corrected your chart in a minute.',
+        lines: compassLines, after: function () { ds.fw.compass = true; }
+      },
+      fw_flint: {
+        icon: '🔥', label: 'Leave the flint with the Servant.', say: 'Leave him your flint and tinder, Hermes. For his lamp.',
+        lines: flintLines,
+        after: function () { ds.fw.flint = true; var ru = RU(); if (ru) ru.spend('flint_tinder', { silent: true }); }
+      },
+      fw_go: {
+        icon: '🌅', label: 'East, Hermes. The road is waiting.', say: 'East, Hermes. Both of you. The road is waiting, and so am I.',
+        lines: eastLines,
+        after: function () { ds.stage = 'fw_done'; c.setMission('The road east'); c.finishFarewell(ds.fw); }
+      }
+    };
+    for (var fk in farewellChoices) choices[fk] = farewellChoices[fk];
+    function farewellMenu() {
+      var fw = ds.fw || {}, out = [];
+      if (!fw.veil) out.push('fw_veil');
+      if (!fw.cord && fwHas('red_cord')) out.push('fw_cord');
+      if (!fw.compass && fwHas('surveyor_compass')) out.push('fw_compass');
+      if (!fw.flint && fwHas('flint_tinder')) out.push('fw_flint');
+      return out.concat(['fw_go']);
+    }
+
     var returnChoices = {
+      // she hands the seals over from the satchel; the reply goes to the Servant only when the arch is full (or she lets Hermes finish)
       rt_seals: {
+        icon: '🎒', label: 'Hand Hermes the seals for the arch.',
+        opens: function () { toArch(); askSeals(); }
+      },
+      rt_seals_go: {
         icon: '🗝️', label: 'Fit the five seals into the arch.', say: 'Hermes, the five seals. Fit them into the arch, one by one.',
-        lines: fitLines, after: function () { ds.ret.sealed = true; c.setMission('The five seals are home'); }
+        lines: fitLines, after: function () { ds.ret.sealed = true; Road.saveReturn({ sealed: true }); c.setMission('The five seals are home'); }
       },
       rt_ask: {
         icon: '💬', label: 'Ask why the doors stayed shut for so long.', say: 'Ask him, Hermes: why did the doors stay shut for so long?',
-        lines: whyShutLines, after: function () { ds.ret.asked = true; }
+        lines: whyShutLines, after: function () { ds.ret.asked = true; Road.saveReturn({ asked: true }); }
       },
       rt_keepers: {
+        icon: '🎒', label: 'Pay the two stone keepers.',
+        opens: function () { askKeepers(); }
+      },
+      rt_keepers_go: {
         icon: '🗿', label: 'Pay the two stone keepers.', say: 'Hermes, the stone keepers. They asked for a falcon and an ibis. Pay them.',
-        lines: keepersLines, after: function () { ds.ret.keepers = true; }
+        lines: keepersLines, after: function () { ds.ret.keepers = true; payKeepers(); Road.saveReturn({ keepers: true }); }
+      },
+      rt_survey: {
+        icon: '📜', label: 'Show him the raiders’ copy of the survey.', say: 'Hermes, the copy the raiders dropped in the labyrinth. Show it to him.',
+        lines: surveyLines,
+        after: function () {
+          ds.ret.survey = true; Road.saveReturn({ survey: true });
+          var ru = RU();
+          if (ru) ru.spend('raiders_survey', { tag: 'KEPT BY THE SERVANT', lore: 'The Servant knew the hand at once: a copyist of the Order who left for the Ashes. He keeps the copy now. The Order keeps its own mistakes.' });
+        }
       },
       rt_open: {
         icon: '🚪', label: 'Ask him to open the bronze doors.', say: 'Elder, the five seals are home. Open the doors.',
@@ -443,6 +643,7 @@
       if (!ds.ret.sealed) return ['rt_seals', 'rt_ask'].filter(function (id) { return !(id === 'rt_ask' && ds.ret.asked); });
       if (!ds.ret.asked) out.push('rt_ask');
       if (!ds.ret.keepers && Road.canPayKeepers(ds.flags)) out.push('rt_keepers');
+      if (!ds.ret.survey && RU() && RU().has('raiders_survey')) out.push('rt_survey');
       return out.concat(['rt_open']);
     }
 
@@ -455,6 +656,12 @@
       return out;
     }
 
-    return { choices: choices, menu: menu, add: add, reset: reset, lintel: LINTEL, returnLines: returnLines };
+    if (window.RelicUse) {
+      var inReturn = function () { return ds.mode === 'return' && ds.stage === 'ret' && !ds.busy; };
+      window.RelicUse.register('raiders_survey', function () { if (!inReturn() || !ds.ret.sealed || ds.ret.survey) return false; c.pick('rt_survey'); return true; });
+      [1, 2, 3, 4, 5].forEach(function (i) { window.RelicUse.register(sealId(i), function () { if (!inReturn() || ds.ret.sealed) return false; toArch(); fitOne(i); if (sealsLeft().length) askSeals(); else c.pick('rt_seals_go'); return true; }); });
+    }
+
+    return { choices: choices, menu: menu, add: add, reset: reset, lintel: LINTEL, returnLines: returnLines, farewellLines: farewellLines };
   };
 })();

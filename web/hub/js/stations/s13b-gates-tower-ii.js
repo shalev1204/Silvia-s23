@@ -55,7 +55,8 @@
   // =========================================================================
   var orbitCtl = null;
   var updaters = [];
-  var focusTarget = { overview: [0, 3.9, 1.6, 19], servant: [0.7, 2.6, 1.1, 11], hermes: [-0.7, 2.3, 2.3, 11] };
+  var focusTarget = { overview: [0, 3.9, 1.6, 19], servant: [0.7, 2.6, 1.1, 11], hermes: [-0.7, 2.3, 2.3, 11], aurelia: [-0.2, 2.6, 1.5, 11] };
+  var aureliaRef = null;   // Aurelia, unveiled: she only stands here in the farewell at dawn (mode 'farewell')
   var sealFlash = 0;
   var sealLight = null;
   var hintEl = null;
@@ -526,7 +527,18 @@
     hermes.scale.setScalar(1.15);
     hermes.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     scene.add(hermes);
-    servantRef = servant; hermesRef = hermes;
+    // Aurelia walks out of Tower II in the last scene of the Desert Path (hidden until then)
+    var aurelia = null;
+    try {
+      aurelia = SC.chars.oracle ? SC.chars.oracle(paint, { scale: 1.1 }) : null;
+      if (aurelia) {
+        if (aurelia.userData.lift) aurelia.userData.lift(1);
+        aurelia.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+        aurelia.position.set(-0.25, PLAT, 1.35); aurelia.rotation.y = Math.PI; aurelia.visible = false;
+        scene.add(aurelia);
+      }
+    } catch (e) { aurelia = null; }
+    servantRef = servant; hermesRef = hermes; aureliaRef = aurelia;
     // the shared feel (EclipseFX): fire, gold and the Seal bloom; Hermes breathes and looks at whoever speaks
     gfx = null;
     try {
@@ -603,6 +615,8 @@
           sealLight.intensity = firstSealMesh && firstSealMesh.visible ? 0.7 + 0.15 * Math.sin(t * 2) : 0;
           sealMat.emissiveIntensity = 0.55;
         }
+        // the farewell: the five seals keep burning in the arch, like five small suns
+        if (ds.sealGlow) { sealMat.emissiveIntensity = Math.max(sealMat.emissiveIntensity, 1.7 + 0.3 * Math.sin(t * 1.7)); sealLight.intensity = Math.max(sealLight.intensity, 2.2); }
         // the bronze doors swing in on their hinges (the return), and the dark behind them turns to morning
         var dk = Math.min(1, dt * doors.speed);
         ['L', 'R', 'W'].forEach(function (k) { doors[k] += (doors['t' + k] - doors[k]) * (reducedMotion ? 1 : dk); if (Math.abs(doors['t' + k] - doors[k]) < 0.0005) doors[k] = doors['t' + k]; });
@@ -653,12 +667,13 @@
           if (w.then) w.then();
         }
       });
-      [hermes, servant].forEach(function (o) {
+      [hermes, servant, aurelia].forEach(function (o) {
+        if (!o) return;
         var want = stairY(o.position.x, o.position.z);
         o.position.y += (want - o.position.y) * Math.min(1, dt * 9);
       });
     }
-    function who(name) { return name === 'servant' ? servant : hermes; }
+    function who(name) { return name === 'servant' ? servant : name === 'aurelia' && aurelia ? aurelia : hermes; }
     act = {
       walk: function (name, x, z, o) {
         o = o || {};
@@ -669,6 +684,7 @@
       // name, kind: 'bow', 'nod', 'offer', 'kneel', 'startle', 'cheer', 'wonder'
       react: function (name, kind) {
         if (name === 'servant') { if (servant.userData.react) servant.userData.react(kind); }
+        else if (name === 'aurelia') { if (aurelia && aurelia.userData.react) aurelia.userData.react(kind); }
         else if (gfx && gfx.gait && gfx.gait.react) gfx.gait.react(kind);
       },
       later: function (sec, fn) { timers.push({ t: sec, fn: fn }); },
@@ -685,7 +701,10 @@
         walks = []; timers = [];
         ['hermes', 'servant'].forEach(function (n) { var o = who(n), h = HOME[n]; o.position.set(h.x, stairY(h.x, h.z), h.z); o.rotation.y = h.rot; o.visible = true; });
         birds.forEach(function (b) { b.life = 0; b.m.visible = false; });
+        if (aurelia) aurelia.visible = false;
       },
+      // put someone on a spot at once (the farewell starts with the three of them on the landing)
+      place: function (name, x, z, rot) { var o = who(name); if (name === 'aurelia' && !aurelia) return; o.position.set(x, stairY(x, z), z); o.rotation.y = rot; o.visible = true; },
       // Hermes has already left for Cairn II: only his voice is here, on the field wire
       hermesAway: function (away) { hermes.visible = !away; },
       where: function (name) { var o = who(name); return { x: o.position.x, z: o.position.z }; },
@@ -765,6 +784,7 @@
     if (!tmpV) tmpV = new T.Vector3();
     var who = ds.speaker;
     if (who === 'servant') servantRef.localToWorld(tmpV.set(0, 2.5, 0));
+    else if (who === 'aurelia' && aureliaRef && aureliaRef.visible) aureliaRef.localToWorld(tmpV.set(0, 2.3, 0));
     else if (!hermesRef.visible) tmpV.set(who === 'silvia' ? -2.6 : -1.2, who === 'silvia' ? 3.2 : 2.4, 4.6);   // only his voice: at the foot of the stairs
     else if (who === 'hermes') hermesRef.localToWorld(tmpV.set(0, 2.35, 0));
     else hermesRef.localToWorld(tmpV.set(-0.8, 2.9, 0));
@@ -822,7 +842,8 @@
   var CAST = {
     hermes:  { name: 'Hermes',      role: 'Cartographer',       icon: '🧭' },
     servant: { name: 'The Servant', role: 'Elder of Tower II',  icon: '🏛️' },
-    silvia:  { name: 'Silvia',      role: 'on the field wire',  icon: '📡' }
+    silvia:  { name: 'Silvia',      role: 'on the field wire',  icon: '📡' },
+    aurelia: { name: 'Aurelia',     role: 'Oracle of Tower II', icon: '⭐' }
   };
   var ds = { token: 0, stage: 'intro', asked: {}, sealPlaced: false, busy: false, fast: false, speaker: null, knows: false, regard: 0, tone: null, seen: {}, flags: {}, wrongs: 0, picked: {}, duel: null, relics: [] };
   var UNKNOWN = { name: '???', role: 'unknown', icon: '❔' };
@@ -965,7 +986,7 @@
       '<div class="gb-text">' + (text ? text.replace(/</g, '&lt;') : '<span class="gl-typing"><i></i><i></i><i></i></span>') + '</div>';
     if (who === 'silvia') bubbleEl.classList.add('gb-radio');
     if (who === 'hermes' && hermesRef && !hermesRef.visible) bubbleEl.classList.add('gb-away');
-    focusOn(who === 'servant' ? 'servant' : who === 'hermes' && !(hermesRef && !hermesRef.visible) ? 'hermes' : 'overview');
+    focusOn(who === 'servant' ? 'servant' : who === 'aurelia' ? 'aurelia' : who === 'hermes' && !(hermesRef && !hermesRef.visible) ? 'hermes' : 'overview');
   }
   function hideStageBubble() {
     if (bubbleEl) bubbleEl.className = 'gates-bubble';
@@ -987,6 +1008,7 @@
   function sayS(t, extra) { var o = { who: 'servant', say: t }; if (extra) for (var k in extra) o[k] = extra[k]; return o; }
   function nar(t, extra) { var o = { narr: t }; if (extra) for (var k in extra) o[k] = extra[k]; return o; }
   function sayV(t, extra) { var o = { who: 'silvia', say: t }; if (extra) for (var k in extra) o[k] = extra[k]; return o; }
+  function sayA(t, extra) { var o = { who: 'aurelia', say: t }; if (extra) for (var k in extra) o[k] = extra[k]; return o; }
   var STAFF_Q = 'How many points does the star on my staff carry?';
 
   // The road so far, in the shape GatesRoad stores it (also what decides the march)
@@ -1400,9 +1422,10 @@
 
   // the long scenes (riddle duel, the statues' riddle, the Servant's lie) live in s13b-gates-extras.js
   var extras = window.GatesExtras ? window.GatesExtras({
-    ds: ds, CHOICES: CHOICES, nar: nar, sayH: sayH, sayS: sayS, sayV: sayV, look: look, R: R, STAFF_Q: STAFF_Q,
+    ds: ds, CHOICES: CHOICES, nar: nar, sayH: sayH, sayS: sayS, sayV: sayV, sayA: sayA, look: look, R: R, STAFF_Q: STAFF_Q,
+    finishFarewell: showFarewellCard, sealGlow: function () { ds.sealGlow = true; sealFlash = 1.4; },
     setMission: setMission, focusThing: focusThing, giveRelic: giveRelic, fireBurst: fireBurst,
-    fitSeals: fitSeals, openDoors: openDoors, finishReturn: showReturnCard,
+    fitSeals: fitSeals, openDoors: openDoors, finishReturn: showReturnCard, pick: function (id) { return pick(id); },
     act: function () { return act; }, feedFire: feedFire, handOver: handOver, cue: cue, shake: function (k) { shakeK = Math.max(shakeK, k); }
   }) : null;
   if (extras) for (var xid in extras.choices) CHOICES[xid] = extras.choices[xid];
@@ -1483,7 +1506,7 @@
     if (c.after) c.after();
     ds.busy = false;
     if (ds.relics.length) showQueuedRelics();
-    if (ds.stage !== 'done' && ds.stage !== 'ret_done' && ds.mode !== 'return') act.home();
+    if (ds.stage !== 'done' && ds.stage !== 'ret_done' && ds.mode !== 'return' && ds.mode !== 'farewell') act.home();
     if (ds.stage !== 'done') renderChoices();
     setSpeaking(null);
     if (ds.stage !== 'done') hideStageBubbleSoon(token);
@@ -1549,7 +1572,7 @@
     if (extras) extras.reset();
     // the doors stand open only for those who have already been received at the end of the Desert Path
     var back = !!(window.GatesRoad && window.GatesRoad.returned());
-    ds.mode = null; ds.onReturn = null; ds.retSeals = back ? 5 : 0; ds.away = !!resume;
+    ds.mode = null; ds.onReturn = null; ds.retSeals = back ? 5 : 0; ds.away = !!resume; ds.sealGlow = false;
     openDoors(back ? 'full' : 'shut');
     act.reset(); act.setTime('dusk'); act.hermesAway(!!resume);
     pauseCtl.set(false);
@@ -1611,13 +1634,17 @@
   // ---- the return (launched by Station 19): five seals home, the bronze doors open ----
   async function startReturn(onDone) {
     var token = ++ds.token, Road = window.GatesRoad;
-    ds.mode = 'return'; ds.onReturn = onDone || null;
+    ds.mode = 'return'; ds.onReturn = onDone || null; ds.sealGlow = false;
     ds.stage = 'intro'; ds.asked = {}; ds.busy = true; ds.fast = false; ds.knows = true;
     ds.flags = Road ? Road.flags() : {}; ds.tone = Road ? Road.tone() : null;
     ds.regard = ds.flags.regard || 0; ds.seen = ds.flags.seen || {};
     ds.wrongs = 0; ds.picked = {}; ds.duel = null; ds.relics = []; ds.statueMiss = 0;
-    ds.ret = { sealed: false, asked: false, keepers: false };
-    ds.retSeals = 1; ds.away = false;
+    // what was done at an earlier visit is remembered; Seal I has been in the arch since the dusk Hermes first stood here
+    var was = Road ? Road.returnState() : {}, RU = window.RelicUse || null;
+    if (RU && getLs('order_monolith_gate_seal1') === 'true') RU.spend('seal_cairn_1', { silent: true });
+    ds.ret = { sealed: !!was.sealed, asked: !!was.asked, keepers: !!was.keepers, survey: !!was.survey };
+    ds.retSeals = ds.ret.sealed ? 5 : RU ? [1, 2, 3, 4, 5].filter(function (i) { return RU.isSpent('seal_cairn_' + i); }).length : 1;
+    ds.away = false;
     openDoors('shut'); act.reset(); act.setTime('dawn'); act.hermesAway(false);
     fireFed = !!(ds.flags.gaveOil || ds.flags.lostOil);
     pauseCtl.set(false);
@@ -1642,9 +1669,81 @@
     ds.stage = 'ret';
     ds.busy = false;
     setSpeaking(null);
-    setMission('Fit the five seals');
+    setMission(ds.ret.sealed ? 'The five seals are home' : 'Fit the five seals');
     renderChoices();
     hideStageBubbleSoon(token);
+  }
+
+  // ---- the farewell (launched by desert-farewell.js after the last talk of the Desert Path): dawn, the doors open, the three of them ----
+  async function startFarewell(onDone) {
+    var token = ++ds.token, Road = window.GatesRoad;
+    ds.mode = 'farewell'; ds.onReturn = onDone || null;
+    ds.stage = 'intro'; ds.asked = {}; ds.busy = true; ds.fast = false; ds.knows = true;
+    ds.flags = Road ? Road.flags() : {}; ds.tone = Road ? Road.tone() : null;
+    ds.regard = ds.flags.regard || 0; ds.seen = ds.flags.seen || {};
+    ds.wrongs = 0; ds.picked = {}; ds.duel = null; ds.relics = []; ds.statueMiss = 0;
+    ds.ret = { sealed: true, asked: true, keepers: true, survey: true };
+    ds.fw = {};   // the gestures of the goodbye she chose
+    ds.retSeals = 5; ds.away = false; ds.sealGlow = false;
+    openDoors('full'); act.reset(); act.setTime('dawn'); act.hermesAway(false);
+    act.place('servant', 1.15, 0.95, 2.6);
+    act.place('hermes', -1.15, 1.75, -0.9);
+    act.place('aurelia', -0.2, 1.3, Math.PI);
+    fireFed = !!(ds.flags.gaveOil || ds.flags.lostOil);
+    pauseCtl.set(false);
+    if (SUB) SUB.reset(subtitle, 'Dawn at the gates of Tower II.');
+    if (hudTime) hudTime.textContent = '06:05 · DAWN';
+    if (extras) extras.reset();
+    logEl.innerHTML = '';
+    choicesBox.innerHTML = '';
+    choicesBox.parentNode.style.display = 'none';
+    if (decreeCard) decreeCard.style.display = 'none';
+    hideStageBubble();
+    updateHUD();
+    focusThing('overview');
+    setMission('Dawn at the gates · the road east');
+    logCard('📖 Where we are', [
+      'The Desert Path is walked. Hermes and Aurelia leave Tower II at first light, on the ruts of the wagons.',
+      'The Servant has come to the bronze doors to see them off. How they part is yours to choose.'
+    ]);
+    await sleep(1400);
+    var ok = await play(extras ? extras.farewellLines() : [], token);
+    if (!ok) return;
+    ds.stage = 'fw';
+    ds.busy = false;
+    setSpeaking(null);
+    setMission('Say goodbye at the gates');
+    renderChoices();
+    hideStageBubbleSoon(token);
+  }
+  // the row of tags over the card's text (made the first time any card needs it: a session that opens on the return or the farewell had none)
+  function tagsRow(body) {
+    var t = decreeCard.querySelector('.gates-path-tags');
+    if (!t && body) { t = document.createElement('div'); t.className = 'gates-path-tags'; decreeCard.insertBefore(t, body); }
+    return t;
+  }
+  function showFarewellCard(fw) {
+    if (!decreeCard) return;
+    var title = decreeCard.querySelector('.gates-decree-title span:last-child');
+    var body = decreeCard.querySelector('.gates-decree-body');
+    var tagsEl = tagsRow(body);
+    var tags = [];
+    if (fw && fw.veil) tags.push('🕊 The veil stays');
+    if (fw && fw.cord) tags.push('🧶 A thirteenth knot');
+    if (fw && fw.compass) tags.push('🧭 Two degrees east');
+    if (fw && fw.flint) tags.push('🔥 A flint for his lamp');
+    if (tagsEl) tagsEl.innerHTML = '<span class="gpt-label">YOUR GOODBYE</span>' + tags.concat(['☀ Five seals burning']).map(function (x) { return '<span class="gpt-tag">' + x + '</span>'; }).join('');
+    var icon = decreeCard.querySelector('.gates-decree-title span:first-child');
+    if (icon) icon.textContent = '🌅';
+    if (title) title.textContent = 'The Road East';
+    if (body) body.textContent = 'The bronze doors are shut behind them, and five small suns burn in the arch. Ahead lie the ruts of the wagons, a plateau of wind, and the third tower.';
+    if (btnDepart) { var lb = btnDepart.querySelector('span'); if (lb) lb.textContent = '🗺️ The Desert Path, walked ➔'; }
+    if (btnReplay) btnReplay.style.display = 'none';
+    decreeCard.style.display = 'flex';
+    if (sfx.playCelestialChime) sfx.playCelestialChime();
+    if (logEl) logEl.scrollTop = logEl.scrollHeight;
+    decreeCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    if (btnDepart) setTimeout(function () { try { btnDepart.focus({ preventScroll: true }); } catch (e) {} }, 80);
   }
 
   var RETURN_WORDS = {
@@ -1658,7 +1757,7 @@
     if (!decreeCard) return;
     var title = decreeCard.querySelector('.gates-decree-title span:last-child');
     var body = decreeCard.querySelector('.gates-decree-body');
-    var tagsEl = decreeCard.querySelector('.gates-path-tags');
+    var tagsEl = tagsRow(body);
     if (tagsEl) tagsEl.innerHTML = '<span class="gpt-label">YOUR WELCOME</span>' + pathTags().filter(function (t) { return !/Shortcut|Storm/.test(t); }).concat(keepers ? ['🗿 Seal of the Two Keepers'] : []).map(function (x) { return '<span class="gpt-tag">' + x + '</span>'; }).join('');
     var icon = decreeCard.querySelector('.gates-decree-title span:first-child');
     if (icon) icon.textContent = '🚪';
@@ -1755,15 +1854,15 @@
 
   // openGatesModal({ mode: 'return', onDone }) is the welcome at the bronze doors (Station 19); with no options it is the first meeting
   function openGatesModal(opts) {
-    var ret = !!(opts && opts.mode === 'return');
-    if (!ret && typeof window.isGatesMarchOver === 'function' && !window.isGatesMarchOver() && !(window.isAdminTester && window.isAdminTester()) && localStorage.getItem('order_gates_scene_completed') !== 'true') {
+    var ret = !!(opts && opts.mode === 'return'), fare = !!(opts && opts.mode === 'farewell');
+    if (!ret && !fare && typeof window.isGatesMarchOver === 'function' && !window.isGatesMarchOver() && !(window.isAdminTester && window.isAdminTester()) && localStorage.getItem('order_gates_scene_completed') !== 'true') {
       if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ ON THE ROAD ✦ Hermes is still walking to the gates of Tower II. He will call you from the steps at last light.');
       return;
     }
     returnFocusTo = document.activeElement;
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
-    var begin = function () { if (ret) startReturn(opts.onDone); else startConversation(isCompleted()); };
+    var begin = function () { if (ret) startReturn(opts.onDone); else if (fare) startFarewell(opts.onDone); else startConversation(isCompleted()); };
     if (!isSceneInitialized) {
       setTimeout(function () { setup3D(); handleResize(); begin(); }, 50);
     } else {
@@ -1799,7 +1898,7 @@
 
   if (btnDepart) {
     btnDepart.addEventListener('click', function () {
-      if (ds.mode === 'return') {
+      if (ds.mode === 'return' || ds.mode === 'farewell') {
         var next = ds.onReturn; ds.onReturn = null;
         closeGatesModal();
         if (next) next();

@@ -26,7 +26,7 @@
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
       const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      const HOWTO_KEY = 'order_stele_howto', CINE_INTRO = 'order_stele_cine_intro';
+      const HOWTO_KEY = 'order_stele_howto', CINE_INTRO = 'order_stele_cine_intro', CINE_OUTRO = 'order_stele_cine_outro';
       const KEYS = {
         awake: 'order_stele_awake',
         done: 'order_polybius_stele_completed',
@@ -37,7 +37,11 @@
         knockHint: 'order_stele_knock_hint',
         fireFails: 'order_stele_fire_fails',
         fireHint: 'order_stele_fire_hint',
-        sound: 'order_stele_sound'
+        sound: 'order_stele_sound',
+        coin: 'order_stele_coin',       // 'shown': she handed Hermes the Servant's coin before the stele
+        falcon: 'order_stele_falcon',   // 'used' (the Falcon Weight lifted the hatch) or 'no' (Hermes heaved it alone)
+        trail: 'order_stele_trail',     // the road he took across the fire, for the reward: { p: [[x, y], ...], t: turns }
+        finds: 'order_stele_finds'      // what he picked up in the atrium: ids of FINDS
       };
       const PROVERB = 'STARS GUIDE THOSE WHO SEEK TRUTH';
       const PROVERB_LETTERS = PROVERB.replace(/ /g, '');
@@ -71,10 +75,10 @@
       }
       const KNOCK_MS = 270, GROUP_PAUSE_MS = 900, LETTER_PAUSE_MS = 1750;
       const STANZA_DISPATCH = [
-        "WHO. He asks who is up here, in the grid of his own stele. My name will not do: the raiders know it by now. Silvia... the proverb. 'Those WHO SEEK truth.' He has knocked the first half of a password. Answer him: it is your stanza now.",
-        "A long scrape under the stone, and then quick, light knocks, like a man laughing. He understood, Silvia! Wait... he is knocking again. Slowly.",
-        "WELL. The old well of the atrium! The founders cut a cistern under this floor, and its hatch is in the far corner, past the burning mats. He went down into the dark and pulled the hatch shut over his head. Listen: one more stanza.",
-        "ASH. Not the raiders, Silvia: the ash. Where the fire has passed, it cannot burn twice. He is telling me how to cross. The smoke is pouring into the well, and he cannot hold on for long. Guide me to the hatch."
+        "WHO. He asks who is up here. My name will not do: the raiders know it. The proverb, Silvia: 'those WHO SEEK truth.' He knocked half a password. The next word is yours.",
+        "A long scrape, then quick, light knocks, like a man laughing. He understood, Silvia! Wait. He is knocking again, slowly.",
+        "WELL. The old well of the atrium! Its hatch is in the far corner, past the burning mats. He went down and pulled it shut over his head. One more stanza.",
+        "ASH. Where the fire has passed, it cannot burn twice: he is telling me how to cross. Smoke is pouring into the well, and he cannot hold on for long. Guide me to the hatch."
       ];
 
       // ---- The atrium: 9 × 9 flagstones, north at the top ----
@@ -89,6 +93,20 @@
         breath: 15
       };
       const COLS = 9, ROWS = 9;
+      // Three things the fire has not taken lie on the flagstones, each under a glint. None is needed to save the Servant.
+      // scratch/verifications/s18_finds/finds_solver.py checks them: the spectacles are on every shortest crossing (13 turns),
+      // the watch-book and the fire-pot each cost the two spare turns (15), and no crossing can take both: the third needs a second crossing.
+      const FINDS = [
+        { id: 'glasses', at: [4, 1], icon: '👓', name: 'The Servant’s spectacles', where: 'the bare stone between the columns',
+          sub: 'On the bare stone, a pair of round spectacles, one lens cracked.',
+          say: 'Spectacles, Silvia, on the bare stone, one lens cracked. He ran this way, then, toward the well. They are in my pocket.' },
+        { id: 'watchbook', at: [3, 0], icon: '📓', name: 'The Servant’s watch-book', where: 'the ash under the north wall',
+          sub: 'Under the ash, a small iron box, warm to the touch. Inside it, a watch-book in a tiny hand.',
+          say: 'An iron box under the ash, Silvia, and in it his watch-book: fifty years of dawns in a tiny hand. I opened it at one page. October 1998: “A surveyor on the north ridge at dusk. He did not come down. He will.”' },
+        { id: 'firepot', at: [8, 1], icon: '🏺', name: 'The Ashes’ fire-pot', where: 'the corner beyond the well',
+          sub: 'In the corner, an iron pot of pitch that never broke. A ring is burnt into its side.',
+          say: 'An iron pot of pitch, Silvia, still corked: it rolled into this corner and never broke. A ring is burnt into its side, the mark of the Ashes. They brought this fire with them.' }
+      ];
       const cellAt = (x, y) => (x < 0 || y < 0 || x >= COLS || y >= ROWS ? null : ATRIUM.map[y][x]);
       // A fuel flagstone catches one turn after a burning neighbour: its turn is its distance from the library
       const IGNITE = (() => {
@@ -128,6 +146,7 @@
         breath: $('stele-breath'), turnLabel: $('stele-turn-label'), moveFeedback: $('stele-move-feedback'),
         pad: { up: $('btn-stele-up'), down: $('btn-stele-down'), left: $('btn-stele-left'), right: $('btn-stele-right'), wait: $('btn-stele-wait') },
         hint: $('stele-hint'), victory: $('stele-victory'), victoryText: $('stele-victory-text'), finish: $('btn-stele-finish'),
+        rewardBtn: $('btn-stele-reward'), coinBtn: $('btn-stele-coin'), replayEnd: $('btn-stele-replay-end'),
         dispatch: $('stele-dispatch-text'),
         stage: $('stele3d-stage'), canvas: $('stele3d-canvas'), subtitle: $('stele3d-subtitle'), fade: $('stele3d-fade'), aim: $('stele3d-aim'),
         howto: $('stele3d-howto'), help: $('btn-stele-howto'), breathBox: $('stele3d-breath'), breathBar: $('stele3d-breath-bar'), mapWrap: $('stele3d-map-wrap')
@@ -137,7 +156,7 @@
       const isDone = () => get(KEYS.done) === 'true';
       const knocksDone = () => (isDone() ? STANZAS.length : Math.max(0, Math.min(STANZAS.length, parseInt(get(KEYS.knocks) || '0', 10) || 0)));
       const fireOpen = () => knocksDone() >= STANZAS.length;
-      const soundOn = () => get(KEYS.sound) !== 'off';
+      const soundOn = () => get(KEYS.sound) !== 'off' && get('order_ambience_muted') !== 'true';   // the Hub's speaker button silences the knocks too
 
       // Hints climb three levels (hub/js/hint-ladder.js); level 2 is the older help of each part
       const hints = window.EclipseHints;
@@ -175,7 +194,15 @@
       let playing = null;    // timers of the knocks being played
       let afterPlaying = null; // what to do once they end (judging Silvia's answer must never be lost)
       let lastAdvanceAt = -1e9; // when the last stanza was understood (a double click must not read the next one)
-      let run = null;        // the crossing of the atrium: { x, y, t } (lives only while the page is open)
+      let run = null;        // the crossing of the atrium: { x, y, t, trail } (lives only while the page is open)
+      let cineClosed = false; // she closed the station while the opening film played: it will play again next time
+      let justWon = false;    // the Servant's Key gets its own card when she leaves right after the hatch
+      let hatchPending = false; // Hermes is at the hatch and the satchel's tray is open
+      let replay = false;       // she sent him back through the fire for what he missed
+      const over = () => isDone() && !replay;
+      const readFinds = () => { try { const l = JSON.parse(get(KEYS.finds) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } };
+      const hasFind = (id) => readFinds().indexOf(id) >= 0;
+      const findAt = (x, y) => FINDS.find((f) => f.at[0] === x && f.at[1] === y) || null;
 
       function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
       function subtitle(text, secs, kind) {
@@ -414,21 +441,21 @@
       }
 
       // ---- The burning atrium ----
-      const newRun = () => ({ x: ATRIUM.start[0], y: ATRIUM.start[1], t: 0 });
+      const newRun = () => ({ x: ATRIUM.start[0], y: ATRIUM.start[1], t: 0, trail: [ATRIUM.start.slice()] });
       const C = 10, cx = (x) => x * C + C / 2, cy = (y) => y * C + C / 2;
       function drawAtrium() {
         const svg = el.atrium;
         if (!svg) return;
         svg.textContent = '';
         const t = run ? run.t : 0;
-        const showTurns = get(KEYS.fireHint) === 'true' && fireOpen() && !isDone();
+        const showTurns = get(KEYS.fireHint) === 'true' && fireOpen() && !over();
         svg.appendChild(svgEl('rect', { x: -0.6, y: -0.6, width: COLS * C + 1.2, height: ROWS * C + 1.2, fill: '#1c130b', stroke: '#8a6d3b', 'stroke-width': 0.8 }));
         for (let y = 0; y < ROWS; y++) {
           for (let x = 0; x < COLS; x++) {
             const c = cellAt(x, y), X = x * C, Y = y * C;
             svg.appendChild(svgEl('rect', { x: X + 0.3, y: Y + 0.3, width: C - 0.6, height: C - 0.6, fill: (x + y) % 2 ? '#2a1d12' : '#2f2115', stroke: '#4a3520', 'stroke-width': 0.3 }));
             if (c === 'f') {
-              const st = isDone() ? (IGNITE.has(x + ',' + y) ? 'ash' : 'fuel') : fuelState(x, y, t);
+              const st = over() ? (IGNITE.has(x + ',' + y) ? 'ash' : 'fuel') : fuelState(x, y, t);
               if (st === 'ash') {
                 svg.appendChild(svgEl('rect', { x: X + 0.8, y: Y + 0.8, width: C - 1.6, height: C - 1.6, rx: 1, fill: '#3f3a36' }));
                 [[2.5, 3], [6.5, 2.4], [4.4, 6.8], [7.4, 7.2]].forEach(([a, b]) => svg.appendChild(svgEl('circle', { cx: X + a, cy: Y + b, r: 0.55, fill: '#78716c' })));
@@ -473,8 +500,8 @@
                 svg.appendChild(svgEl('circle', { cx: cx(x), cy: cy(y), r: 2.6, fill: 'none', stroke: '#8a7559', 'stroke-width': 0.35, 'stroke-dasharray': '0.8 0.6' }));
               }
             } else if (c === 'H') {   // the bronze hatch of the well
-              svg.appendChild(svgEl('circle', { cx: cx(x), cy: cy(y), r: 3.8, fill: isDone() ? '#0d0805' : '#7c5a2a', stroke: '#d4a853', 'stroke-width': 0.6 }));
-              if (!isDone()) {
+              svg.appendChild(svgEl('circle', { cx: cx(x), cy: cy(y), r: 3.8, fill: over() ? '#0d0805' : '#7c5a2a', stroke: '#d4a853', 'stroke-width': 0.6 }));
+              if (!over()) {
                 svg.appendChild(svgEl('line', { x1: cx(x) - 2.6, y1: cy(y), x2: cx(x) + 2.6, y2: cy(y), stroke: '#d4a853', 'stroke-width': 0.4 }));
                 svg.appendChild(svgEl('line', { x1: cx(x), y1: cy(y) - 2.6, x2: cx(x), y2: cy(y) + 2.6, stroke: '#d4a853', 'stroke-width': 0.4 }));
               }
@@ -493,17 +520,23 @@
         label(cx(ATRIUM.hatch[0]), -2.6, 'THE WELL');
         label(cx(ATRIUM.start[0]), ROWS * C + 4.2, 'SIDE DOOR');
         // Hermes and the glow of his lamp
-        const hx = run && fireOpen() && !isDone() ? run.x : (isDone() ? ATRIUM.hatch[0] : ATRIUM.start[0]);
-        const hy = run && fireOpen() && !isDone() ? run.y : (isDone() ? ATRIUM.hatch[1] : ATRIUM.start[1]);
+        const hx = run && fireOpen() && !over() ? run.x : (over() ? ATRIUM.hatch[0] : ATRIUM.start[0]);
+        const hy = run && fireOpen() && !over() ? run.y : (over() ? ATRIUM.hatch[1] : ATRIUM.start[1]);
         if (fireOpen()) {
           svg.appendChild(svgEl('circle', { cx: cx(hx), cy: cy(hy), r: 6.5, fill: 'rgba(253, 230, 138, 0.13)' }));
           svg.appendChild(svgEl('circle', { cx: cx(hx), cy: cy(hy), r: 2.7, fill: '#fde68a', stroke: '#7c2d12', 'stroke-width': 0.6 }));
         }
-        const where = fireOpen() && !isDone() && run ? 'Hermes is on row ' + (run.y + 1) + ', column ' + (run.x + 1) + ', turn ' + run.t + '.' : '';
+        if (fireOpen() && !over()) FINDS.forEach((f) => {
+          if (hasFind(f.id)) return;
+          const g = svgEl('text', { class: 'stele-glint', x: cx(f.at[0]), y: cy(f.at[1]) + 1.6, 'text-anchor': 'middle', 'font-size': 5, fill: '#fde68a' });
+          g.textContent = '✧';
+          svg.appendChild(g);
+        });
+        const where = fireOpen() && !over() && run ? 'Hermes is on row ' + (run.y + 1) + ', column ' + (run.x + 1) + ', turn ' + run.t + '.' : '';
         svg.setAttribute('aria-label', 'The atrium of Tower II seen from above. The library on the west wall is burning, and the fire spreads across the mats and scrolls. The side door is at the bottom, the hatch of the well at the top right. ' + where);
       }
       function takeTurn(dx, dy) {
-        if (!fireOpen() || isDone() || !run || modal.style.display === 'none') return;
+        if (!fireOpen() || over() || !run || hatchPending || modal.style.display === 'none') return;
         const nx = run.x + dx, ny = run.y + dy;
         if (dx || dy) {
           const c = cellAt(nx, ny);
@@ -516,6 +549,7 @@
           if (burningAt(nx, ny, run.t) && burningAt(nx, ny, run.t + 1)) { feedback(el.moveFeedback, 'That flagstone is burning. Wait for its ash, or go round.', 'error'); return; }
         }
         run.x = nx; run.y = ny; run.t++;
+        if (run.trail) run.trail.push([nx, ny]);
         if (turnCueOk()) {
           if (!cue(dx || dy ? 'step' : 'tick', { f: 900, v: 0.05 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
           // the fire takes its turn too: flagstones catching, and burnt-out beams giving way to ash
@@ -524,13 +558,37 @@
           if (caught) cue('flame', { dur: 0.6 + Math.min(caught, 4) * 0.15 });
           if (spent) cue('crack', { v: 0.12 });
         }
-        if (run.x === ATRIUM.hatch[0] && run.y === ATRIUM.hatch[1]) { reachHatch(); return; }
+        pickUp();
+        if (run.x === ATRIUM.hatch[0] && run.y === ATRIUM.hatch[1]) { if (replay) endReplay(true); else reachHatch(); return; }
         if (burningAt(run.x, run.y, run.t)) { lose('fire'); return; }
         if (run.t >= ATRIUM.breath) { lose('breath'); return; }
         feedback(el.moveFeedback, dx || dy ? '' : 'Hermes holds still and lets the fire take its turn.', '');
         render();
       }
+      function pickUp() {
+        const f = findAt(run.x, run.y);
+        if (!f || hasFind(f.id)) return false;
+        const list = readFinds(); list.push(f.id);
+        set(KEYS.finds, JSON.stringify(list));
+        cue('bell', { f: 659.25 * Math.pow(2, list.length / 12), v: 0.09, len: 2.4 });
+        cue('shimmer', { deg: 10 + list.length * 3 });
+        say(f.say);
+        subtitle(f.sub, 6, 'act');
+        if (G && G.fx) { G.fx.triumph({ x: wx(run.x), y: 0.8, z: wz(run.y) }, 0.5); if (G.fx.gait) G.fx.gait.react('wonder'); }
+        feedback(el.moveFeedback, '✧ ' + f.name + ' (' + list.length + ' of ' + FINDS.length + ')', 'ok');
+        return true;
+      }
       function lose(why) {
+        if (replay) {   // a second crossing costs nothing: no fail is counted and no note is opened
+          syncWorld();
+          sceneLose(why);
+          run = newRun();
+          cue(why === 'fire' ? 'crack' : 'dusk', { v: 0.28 });
+          feedback(el.moveFeedback, why === 'fire' ? 'The fire reached Hermes. He fell back to the side door.' : 'The smoke is too thick. Hermes went back to the side door for air.', 'error');
+          say(why === 'fire' ? "Singed again, Silvia. The fire runs the same channels as before: once more." : "No air left in here, Silvia. I am back at the side door. Once more, and faster.");
+          render();
+          return;
+        }
         const fails = (parseInt(get(KEYS.fireFails) || '0', 10) || 0) + 1;
         set(KEYS.fireFails, String(fails));
         const before = fireHints.level();
@@ -544,25 +602,267 @@
         feedback(el.moveFeedback, why === 'fire'
           ? 'The fire reached Hermes\'s flagstone. He fell back to the side door, coughing, his sleeve smouldering.'
           : 'Too slow: the knocks from the well are growing faint. Hermes went back to the side door to find a quicker way.', 'error');
-        say((why === 'fire' ? "I am all right, Silvia, only singed. " : "He is still knocking, Silvia, but fainter. ") + "Fire is like water: it always runs down the same channels, in the same order. Watch the glowing flagstones and try again." + (hinted ? " I have been reading the fire: now every flagstone shows the turn it catches." : ''));
+        say((why === 'fire' ? "Only singed, Silvia. " : "He is still knocking, Silvia, but fainter. ") + "Fire is like water: it runs down the same channels, in the same order. Watch the glowing flagstones and try again." + (hinted ? " I have been reading the fire: now every flagstone shows the turn it catches." : ''));
         render();
       }
+      // ---- The satchel (relic-use.js): the Servant's coin before the stele, the Falcon Weight at the hatch ----
+      const RU = () => window.RelicUse || null;
+      const coinWaits = () => { const ru = RU(); return !!ru && !isAwake() && !isDone() && get(KEYS.coin) !== 'shown' && ru.has('servant_coin'); };
+      function showCoin() {
+        if (get(KEYS.coin) === 'shown') return;
+        set(KEYS.coin, 'shown');
+        if (hints && hints.grant) hints.grant('s18-proverb', 1);
+        cue('shimmer', { deg: 9 });
+        react('nod');
+        say("The Servant's coin, of course. There are letters scratched on its rim, two by two. 'Read my stele the way you read a coin,' he said: 'by the pairs.' I will keep it, Silvia. He said it has more work to do.");
+        render();
+      }
+      function askCoin() {
+        const ru = RU();
+        if (!ru || ru.isOpen() || !coinWaits()) return;
+        ru.ask({
+          ask: 'The old man gave me something at his gates, Silvia, for the day I stood before his stele. Which was it?',
+          want: 'servant_coin',
+          wrong: {
+            red_cord: 'The cord was his blessing, not his hint.',
+            statue_seal: 'That came from the stone keepers, not from him.',
+            falcon_weight: 'Too heavy for a hint, Silvia. Keep the falcon ready, though.'
+          },
+          onRight: showCoin
+        });
+      }
+      // The hatch of the well has lost its counterweight. The Falcon Weight can take its place, unless it is owed to the stone keepers.
       function reachHatch() {
-        sceneHatch();
+        const ru = RU();
+        const offer = !!ru && !get(KEYS.falcon) && ru.has('falcon_weight') && !(window.GatesRoad && window.GatesRoad.canPayKeepers());
+        if (!offer) { openHatch(false); return; }
+        hatchPending = true;
+        feedback(el.moveFeedback, 'Hermes is at the hatch. Its counterweight chain hangs empty.', '');
+        subtitle('Hermes drops to his knees at the bronze hatch. The chain of its counterweight hangs empty.', 4, 'act');
+        ru.ask({
+          ask: 'The hatch is solid bronze, Silvia, and its counterweight is gone from the chain. What have we got that is heavy?',
+          want: 'falcon_weight',
+          wrong: {
+            water_skins: 'Empty skins weigh nothing. I need brass, or stone.',
+            tuning_pebble: 'Not the pebble. And it is far too light.',
+            founders_lamp: 'A lamp of thin brass will not pull a hatch of bronze.',
+            servant_coin: 'One coin, against a bronze hatch? No.'
+          },
+          cancel: 'Heave, Hermes!',
+          onRight: () => { set(KEYS.falcon, 'used'); ru.spend('falcon_weight', { silent: true }); openHatch(true); },
+          onCancel: () => { set(KEYS.falcon, 'no'); openHatch(false); }
+        });
+      }
+      function openHatch(falcon) {
+        hatchPending = false;
+        sceneHatch(falcon);
         completeStation();
-        feedback(el.moveFeedback, 'Hermes lifts the bronze hatch of the well.', 'ok');
-        say("I lifted the hatch and he came up out of the dark, Silvia: the Servant, alive, black with smoke, a wet cloth over his mouth and a roll of charts in his arms. He took my wrists in his burnt hands and did not let go. And on the underside of the hatch, in the firelight, two lines cut by the founders. Write them down. I will tell you the rest on the wire, when he can breathe.");
+        feedback(el.moveFeedback, falcon ? 'The brass falcon drops on its chain, and the bronze hatch swings up.' : 'Hermes lifts the bronze hatch of the well.', 'ok');
+        say((falcon
+          ? "I hooked the falcon on the chain, Silvia, and the hatch rose like a feather. "
+          : "I heaved the hatch open, Silvia. ")
+          + "He came up out of the dark: the Servant, alive, black with smoke, a roll of charts in his arms. He took my wrists in his burnt hands and did not let go. Under the hatch, two lines cut by the founders. Write them down.");
       }
       function completeStation() {
+        // the key first: once the station is done the inventory counts it from that flag and would never mark it new
+        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('servant_key');
         set(KEYS.done, 'true');
+        if (run && run.trail) set(KEYS.trail, JSON.stringify({ p: run.trail, t: run.t }));
         stopKnocks();
         cue('groan', { dur: 1.2 });
         if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
-        if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('servant_key');
         applyVictory();
         render();
         if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
         if (typeof window.refreshLedgerUnlocks === 'function') window.refreshLedgerUnlocks();
+        justWon = true;
+        // once the Servant has come up out of the well, a short film closes the night (the first time), and then the reward rises
+        clearTimeout(reward.timer);
+        const film = !!(G && cine && !reduced() && get(CINE_OUTRO) !== 'seen');
+        reward.timer = setTimeout(() => { if (film) outro(showReward); else showReward(); }, G && !reduced() ? 9600 : 700);
+      }
+      function endingShots() {
+        return [
+          { from: { p: [HATCH.x - 3.4, 2.3, HATCH.z + 4.6], l: [HATCH.x - 0.3, 1.1, HATCH.z + 0.9] }, to: { p: [HATCH.x - 2.3, 1.8, HATCH.z + 3.4], l: [HATCH.x - 0.2, 1.15, HATCH.z + 0.9] }, dur: 5,
+            kicker: 'STATION 18', title: 'THE WELL OF TOWER II', line: 'On the rim of the old well the Servant holds the charts against his chest, and breathes.' },
+          { from: { p: [0, 24, 20], l: [0, 0, -1] }, to: { p: [-2, 33, 13], l: [-2, 0, 0] }, dur: 6, line: 'Behind them the library burns down to its stone shelves. By morning the fire will have nothing left to eat.' },
+          { from: { p: [STELE.x - 3.8, 2.9, STELE.z + 5.8], l: [STELE.x, 1.7, STELE.z] }, to: { p: [STELE.x - 2.1, 2.2, STELE.z + 4.1], l: [STELE.x, 1.65, STELE.z] }, dur: 5.5,
+            line: 'And the stele stands where the founders set it, black with soot and whole, its back to the room: 348°, north-north-west.' }
+        ];
+      }
+      function outro(then) {
+        if (modal.style.display === 'none' || modal.classList.contains('closing') || !isDone()) return;
+        set(CINE_OUTRO, 'seen');
+        cue('whoosh', { dur: 1.6 });
+        cine.start(endingShots(), () => {
+          if (el.subtitle) el.subtitle.classList.remove('is-on');
+          view.snapNext = true;
+          if (modal.style.display !== 'none' && !modal.classList.contains('closing')) then();
+        }, { fade: true });
+      }
+
+      // ---- Back through the fire, for what he missed (after the Servant is safe) ----
+      function startReplay() {
+        if (!isDone() || replay || (cine && cine.active)) return;
+        hideReward(true);
+        replay = true; hatchPending = false;
+        view.ending = 0; view.endFireT = null; view.freeze = false; view.snapNext = true;
+        view.endTimers.forEach(clearTimeout); view.endTimers = [];
+        run = newRun();
+        if (G) { G.cam.p = null; G.hGoal = null; G.hMove = null; }
+        const left = FINDS.filter((f) => !hasFind(f.id));
+        say(left.length ? 'Back through the side door, Silvia. The draught has thrown the fire over the mats again, and it runs the same channels. Somewhere in there is still ' + left.map((f) => f.where).join(', and ') + '.'
+          : 'Back through the side door, Silvia, for the pleasure of beating it once more. The fire runs the same channels.');
+        subtitle('The Servant is safe by the well. Hermes ties his scarf over his mouth and goes back to the side door.', 5, 'act');
+        feedback(el.moveFeedback, 'Hermes stands at the side door again. A glint shows what the fire has not taken.', '');
+        render();
+        if (el.pad.up) setTimeout(() => el.pad.up.focus({ preventScroll: true }), 60);
+      }
+      function endReplay(reached) {
+        if (!replay) return;
+        replay = false; hatchPending = false;
+        view.ending = 0; view.endFireT = null; view.freeze = false; view.snapNext = true;
+        const got = FINDS.filter((f) => hasFind(f.id)).length;
+        if (reached) { cue('whoosh', { dur: 1.2 }); if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime(); }
+        say(got === FINDS.length ? 'Back at the well, Silvia, and the fire has nothing left to give: all three finds are in my pockets.'
+          : reached ? 'Back at the well, Silvia. He counted my fingers, to see that I had come back with all of them.' : 'Enough fire for one night, Silvia. I am back at the well.');
+        feedback(el.moveFeedback, '', '');
+        render();
+        clearTimeout(reward.timer);
+        reward.timer = setTimeout(showReward, reached ? 900 : 250);
+      }
+
+      // ---- The reward: the atrium with the road he took, the four words, the key, the Ledger lines, what the satchel gave ----
+      const reward = { box: null, back: null, timer: 0 };
+      const rewardOpen = () => !!reward.box && !reward.box.hidden;
+      function rewardMap() {
+        let trail = null;
+        try { trail = JSON.parse(get(KEYS.trail) || 'null'); } catch (e) { trail = null; }
+        const pts = trail && Array.isArray(trail.p) && trail.p.length > 1 ? trail.p : null;
+        let cells = '';
+        for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
+          const c = cellAt(x, y);
+          const kind = c === 'L' ? 'is-lib' : c === '#' ? 'is-col' : c === 'f' ? 'is-fuel' : 'is-stone';
+          cells += '<rect class="stele-rw-cell ' + kind + '" x="' + (x * C) + '" y="' + (y * C) + '" width="' + C + '" height="' + C + '"/>';
+        }
+        const line = pts ? pts.map((p) => cx(p[0]) + ',' + cy(p[1])).join(' ') : '';
+        const dd = pts ? Math.min(3.2, 0.5 + pts.length * 0.16).toFixed(2) : '0';
+        const [hx, hy] = ATRIUM.hatch, [sx, sy] = ATRIUM.start, [tx, ty] = ATRIUM.stele;
+        return '<svg viewBox="-2 -2 ' + (COLS * C + 4) + ' ' + (ROWS * C + 4) + '" role="img" aria-label="The atrium of Tower II from above: the road Hermes took from the side door to the hatch of the well' + (pts ? ', in ' + trail.t + ' turns' : '') + '">'
+          + '<rect class="stele-rw-floor" x="-1" y="-1" width="' + (COLS * C + 2) + '" height="' + (ROWS * C + 2) + '" rx="2"/>'
+          + cells
+          + '<text class="stele-rw-mark" x="' + cx(tx) + '" y="' + (cy(ty) + 1.6) + '" style="fill:#fde68a">▮</text>'
+          + (pts ? '<polyline class="rw-road-glow" pathLength="1" style="--dd:' + dd + 's;--d0:0.7s" points="' + line + '"/><polyline class="rw-road" pathLength="1" style="--dd:' + dd + 's;--d0:0.7s" points="' + line + '"/>' : '')
+          + FINDS.map((f) => '<text class="stele-rw-find' + (hasFind(f.id) ? ' is-have' : '') + '" x="' + cx(f.at[0]) + '" y="' + (cy(f.at[1]) + 1.9) + '">' + (hasFind(f.id) ? '✦' : '✧') + '</text>').join('')
+          + '<text class="stele-rw-mark" x="' + cx(sx) + '" y="' + (cy(sy) + 1.6) + '">S</text>'
+          + '<g class="stele-rw-hatch" style="--t:' + (0.9 + Number(dd)).toFixed(2) + 's"><circle cx="' + cx(hx) + '" cy="' + cy(hy) + '" r="4"/><text class="stele-rw-mark" x="' + cx(hx) + '" y="' + (cy(hy) + 1.5) + '" style="fill:#fff7d6">W</text></g>'
+          + '</svg>';
+      }
+      function showReward() {
+        clearTimeout(reward.timer);
+        const body = modal.querySelector('.chasm3d-body');
+        if (!body || !isDone() || modal.style.display === 'none') return;
+        if (!reward.box) {
+          reward.box = document.createElement('div');
+          reward.box.className = 'chasm3d-reward stele-reward';
+          reward.box.setAttribute('role', 'dialog');
+          reward.box.setAttribute('aria-label', 'Your reward for the Polybius Stele');
+          reward.box.hidden = true;
+          body.appendChild(reward.box);
+          reward.box.addEventListener('pointerdown', (e) => { if (!(e.target.closest && e.target.closest('button'))) reward.box.classList.add('is-fast'); });
+          reward.box.addEventListener('click', (e) => {
+            const relic = e.target.closest && e.target.closest('[data-relic]');
+            if (relic && typeof window.openItemAcquiredModal === 'function') { justWon = false; relic.classList.remove('is-new'); window.openItemAcquiredModal({ id: relic.getAttribute('data-relic') }); }
+          });
+        }
+        const num = (k) => parseInt(get(k) || '0', 10) || 0;
+        const burnt = num(KEYS.fireFails), falseKnocks = num(KEYS.knockFails), tries = num(KEYS.fails) + 1;
+        let turns = '–';
+        try { const tr = JSON.parse(get(KEYS.trail) || 'null'); if (tr && tr.t) turns = String(tr.t); } catch (e) {}
+        const words = STANZAS.map((s, i) => '<span class="drw-word" style="--t:' + (3.6 + i * 0.3).toFixed(2) + 's">' + s.word + '</span>').join('<u aria-hidden="true">·</u>');
+        const got = FINDS.filter((f) => hasFind(f.id));
+        const findRows = FINDS.map((f, i) => {
+          const have = hasFind(f.id);
+          return '<li style="--t:' + (5.5 + i * 0.2).toFixed(2) + 's"><div class="drw-find ' + (have ? 'is-have' : 'is-missing') + '"><span class="drw-find-icon" aria-hidden="true">' + (have ? f.icon : '✧') + '</span>'
+            + '<span><b>' + (have ? f.name : 'Still in the fire') + '</b><small>' + (have ? f.sub : 'Somewhere on ' + f.where + '.') + '</small></span></div></li>';
+        }).join('');
+        const falcon = get(KEYS.falcon) === 'used';
+        const spent = falcon ? '<div class="rw-label drw-label">The satchel gave</div><ul class="drw-spent"><li><img src="./assets/items/item_falcon_weight.png" alt=""><span><b>The Falcon Weight</b>It hangs on the chain of the well and holds the hatch open.</span></li></ul>' : '';
+        reward.box.innerHTML = '<div class="rw-rays" aria-hidden="true"></div>'
+          + '<div class="rw-sparks" aria-hidden="true">' + Array.from({ length: 18 }, (_, i) => '<i style="--a:' + ((i * 360 / 18) | 0) + 'deg;--d:' + (120 + (i % 5) * 36) + 'px;--t:' + (0.9 + (i % 4) * 0.2).toFixed(2) + 's"></i>').join('') + '</div>'
+          + '<div class="chasm3d-reward-card">'
+          + '<div class="chasm3d-reward-kicker">Station 18 · The Polybius Stele</div>'
+          + '<h3 class="chasm3d-reward-title">The Servant Lives</h3>'
+          + '<p class="rw-sub">The stele turned for the proverb, the stone answered in knocks, and Hermes crossed the fire on the ash.</p>'
+          + '<div class="rw-grid">'
+          + '<section class="rw-map stele-rw-map" aria-label="The crossing of the burning atrium">'
+          + '<div class="rw-label">The road across the fire</div>'
+          + rewardMap()
+          + '<div class="rw-ends"><span>S · the side door</span><span>W · the well</span></div>'
+          + '<div class="drw-words" aria-label="WHO, SEEK, WELL, ASH">' + words + '</div>'
+          + '<div class="chasm3d-reward-stats">'
+          + '<div><b>' + turns + '</b><span>turns</span></div>'
+          + '<div><b>' + burnt + '</b><span>times the fire won</span></div>'
+          + '<div><b>' + falseKnocks + '</b><span>false knocks</span></div>'
+          + '<div><b>' + tries + '</b><span>proverb tries</span></div>'
+          + '</div>'
+          + (burnt === 0 ? '<div class="rw-flawless">✦ Across the fire at the first try ✦</div>' : '')
+          + '</section>'
+          + '<section class="rw-loot">'
+          + '<div class="drw-relics">'
+          + '<button type="button" class="drw-relic' + (justWon ? ' is-new' : '') + '" data-relic="servant_key" aria-label="The Servant\'s Key: open the card"><span class="drw-pic"><img src="./assets/items/item_servant_key.webp" alt="" width="140" height="140"></span><span class="drw-name"><b>The Servant’s Key</b><small>For the inner stair of Tower II</small></span></button>'
+          + '</div>'
+          + '<div class="drw-eqs">'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut under the hatch of the well</div><div class="rw-ledger-title">The First Line</div><div class="rw-eq" aria-label="H minus U equals 16"><i>H</i><u>−</u><i>U</i><u>=</u><b>16</b></div><p>A line for your Cipher Ledger.</p></div></div>'
+          + '<div class="rw-ledger"><div class="rw-ledger-text"><div class="rw-ledger-kicker">Cut beneath it</div><div class="rw-ledger-title">The Second Line</div><div class="rw-eq" aria-label="M plus T equals 25"><i>M</i><u>+</u><i>T</i><u>=</u><b>25</b></div><p>Both lines are now in your Ledger.</p></div></div>'
+          + '</div>'
+          + '<div class="rw-label drw-label">On the back of the stele</div>'
+          + '<ul class="drw-lines"><li style="--t:5.2s">348°, north-north-west: the bearing of Cairn III.</li></ul>'
+          + spent
+          + '<div class="rw-next">Next · Hermes on the Field Wire</div>'
+          + '</section></div>'
+          + '<div class="rw-label drw-label">What the fire did not take · ' + got.length + '/' + FINDS.length + '</div>'
+          + '<ul class="drw-finds">' + findRows + '</ul>'
+          + '<div class="chasm3d-reward-actions">'
+          + '<button type="button" class="chasm3d-reward-wire">📻 Hermes is calling on the Field Wire</button>'
+          + (got.length < FINDS.length ? '<button type="button" class="chasm3d-btn drw-again">✧ Back through the fire for what is missing</button>' : '')
+          + '<button type="button" class="chasm3d-btn chasm3d-reward-stay">Stay in the atrium</button>'
+          + '</div></div>';
+        if (!rewardOpen()) reward.back = document.activeElement;
+        reward.box.hidden = false;
+        reward.box.scrollTop = 0;
+        reward.box.classList.remove('is-fast', 'is-on');
+        void reward.box.offsetWidth;
+        reward.box.classList.add('is-on');
+        if (!cue('shimmer', { deg: 21 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        const wireBtn = reward.box.querySelector('.chasm3d-reward-wire'), stayBtn = reward.box.querySelector('.chasm3d-reward-stay');
+        if (wireBtn) wireBtn.addEventListener('click', () => { hideReward(true); leaveForWire(); });
+        if (stayBtn) stayBtn.addEventListener('click', () => hideReward());
+        const againBtn = reward.box.querySelector('.drw-again');
+        if (againBtn) againBtn.addEventListener('click', startReplay);
+        if (wireBtn) wireBtn.focus({ preventScroll: true });
+      }
+      function hideReward(quietly) {
+        clearTimeout(reward.timer);
+        if (!rewardOpen()) return;
+        reward.box.hidden = true;
+        const back = reward.back; reward.back = null;
+        if (quietly) return;
+        const to = back && document.contains(back) && back.offsetParent ? back : el.rewardBtn;
+        if (to && to.focus) to.focus({ preventScroll: true });
+      }
+      // as at Stations 15 and 16: the new relic's card first, then straight to Hermes on the Field Wire
+      function leaveForWire() {
+        closeSteleModal();
+        const go = () => {
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
+          if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
+          const wireTab = document.querySelector('[data-view="view-field-wire"]');
+          if (wireTab) wireTab.click();
+          if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ The Servant is safe ✦ Hermes is waiting for you on the Field Wire.');
+        };
+        if (justWon && typeof window.openItemAcquiredModal === 'function') { justWon = false; setTimeout(() => window.openItemAcquiredModal({ id: 'servant_key' }, go), 260); }
+        else go();
       }
       function applyVictory() {
         if (el.victoryText) {
@@ -592,13 +892,13 @@
         if (el.keyInput) { el.keyInput.value = PROVERB; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'STARS GUIDE THOSE WHO SEEK TRUTH. The stele turns on its base. On its back: 348° NNW.', 'ok');
-        say("I said it aloud, every word, and the stele turned on its base, Silvia, stone grinding on stone. On its back, cut deep: 348°, north-north-west. The bearing of Cairn III. And then, under my feet... knocking. Someone is knocking on the underside of the floor. Groups of knocks, and pauses. He heard the proverb, and he is answering in the grid of the stele. Listen, and read him with the page “The Polybius Stele”.");
+        say("The stele turned on its base, Silvia, stone grinding on stone. On its back: 348°, north-north-west, the bearing of Cairn III. And now, under my feet, knocking: groups of knocks, and pauses. He heard the proverb, and he answers in the grid of the stele. Read him with your page.");
         render();
         setTimeout(() => { if (modal.style.display !== 'none' && knocksDone() === 0) listen(); }, 1800);
       }
 
       function render() {
-        const awake = isAwake(), done = isDone(), k = knocksDone(), open = fireOpen();
+        const awake = isAwake(), done = over(), k = knocksDone(), open = fireOpen();
         const stanza = k < STANZAS.length ? STANZAS[k] : null;
         if (el.stanzaLabel) {
           el.stanzaLabel.textContent = done || !stanza
@@ -611,9 +911,11 @@
         if (el.listen) el.listen.disabled = !awake || !stanza || !!playing;
         if (el.read) el.read.disabled = !awake || !stanza || stanza.by !== 'servant';
         if (el.sound) { el.sound.setAttribute('aria-pressed', String(soundOn())); el.sound.textContent = soundOn() ? '🔊 Sound' : '🔈 Sound off'; }
+        if (el.coinBtn) el.coinBtn.hidden = !coinWaits();
         Object.values(el.pad).forEach((b) => { if (b) b.disabled = !open || done; });
         drawAtrium();
-        if (el.breath) el.breath.textContent = done ? 'The Servant is safe.' : (open && run ? 'The Servant can hold on: ' + Math.max(0, ATRIUM.breath - run.t) + (ATRIUM.breath - run.t === 1 ? ' turn' : ' turns') : '');
+        if (el.replayEnd) el.replayEnd.hidden = !replay;
+        if (el.breath) el.breath.textContent = done ? 'The Servant is safe.' : (open && run ? (replay ? 'Hermes can hold his breath: ' : 'The Servant can hold on: ') + Math.max(0, ATRIUM.breath - run.t) + (ATRIUM.breath - run.t === 1 ? ' turn' : ' turns') : '');
         if (el.turnLabel) el.turnLabel.textContent = done ? '✦ The Servant lives' : !awake ? 'The stele sleeps' : !open ? 'Stanza ' + ROMAN[k] + ' of IV' : 'Turn ' + (run ? run.t : 0);
         // how long the Servant can hold on, over the scene while Hermes crosses
         if (el.breathBox) {
@@ -652,7 +954,7 @@
         const amb = window.EclipseAmbience;
         if (!amb || !amb.intensity) return;
         let k;
-        if (isDone()) k = 0.6;
+        if (over()) k = 0.6;
         else if (fireOpen()) k = 0.45 + 0.15 * Math.min(1, (run ? run.t : 0) / ATRIUM.breath);
         else k = isAwake() ? 0.32 + 0.03 * knocksDone() : 0.3;
         amb.intensity(k);
@@ -672,13 +974,13 @@
       const SIDE_SPOT = [HATCH.x - 1.05, HATCH.z + 0.95], OUT_SPOT = [HATCH.x + 0.4, HATCH.z + 1.15];
       let G = null, raf = 0, lastT = 0, cine = null, howtoPage = 0;
       const view = { snapNext: true, ending: 0, endT: 0, endFireT: null, sigilT: 0, hover: null, freeze: false, freezeTimer: 0, endTimers: [], phase: '' };
-      const busyOverlay = () => (cine && cine.active) || (el.howto && !el.howto.hidden);
-      const canWalk = () => !!(run && fireOpen() && !isDone() && !view.freeze && !busyOverlay() && modal.style.display !== 'none');
+      const busyOverlay = () => (cine && cine.active) || (el.howto && !el.howto.hidden) || !!(window.RelicUse && window.RelicUse.isOpen());
+      const canWalk = () => !!(run && fireOpen() && !over() && !view.freeze && !busyOverlay() && modal.style.display !== 'none');
 
       // the turn the scene shows: the crossing's own turn, the turn it was won on, or the first turn before it starts
       // (null: the fire has passed everywhere it could, all ash)
       function shownT() {
-        if (isDone()) return view.endFireT;
+        if (over()) return view.endFireT;
         return fireOpen() && run ? run.t : 0;
       }
       const cellState = (x, y, t) => (t === null ? (IGNITE.has(x + ',' + y) ? 'ash' : 'fuel') : fuelState(x, y, t));
@@ -1065,7 +1367,7 @@
       // where Hermes belongs now, and which way he looks when he gets there
       function hermesSpot() {
         const e = view.ending === 1 ? (performance.now() - view.endT) / 1000 : 99;
-        if (isDone()) return e < 0.7 ? { at: [HATCH.x, HATCH.z] } : { at: SIDE_SPOT, face: [OUT_SPOT[0] - SIDE_SPOT[0], OUT_SPOT[1] - SIDE_SPOT[1]] };
+        if (over()) return e < 0.7 ? { at: [HATCH.x, HATCH.z] } : { at: SIDE_SPOT, face: [OUT_SPOT[0] - SIDE_SPOT[0], OUT_SPOT[1] - SIDE_SPOT[1]] };
         if (fireOpen() && run) return { at: [wx(run.x), wz(run.y)] };
         if (isAwake()) return { at: [wx(KNEEL[0]) + 0.3, wz(KNEEL[1]) + 0.1], face: [CRACK.x - wx(KNEEL[0]) - 0.3, CRACK.z - wz(KNEEL[1]) - 0.1] };
         return { at: [STELE.x + 1.35, STELE.z + 1.55], face: [-1.35, -1.55] };
@@ -1103,7 +1405,7 @@
       function syncWorld() {
         if (!G || view.freeze) return;
         const snap = view.snapNext;
-        const t = shownT(), hintOn = get(KEYS.fireHint) === 'true' && fireOpen() && !isDone();
+        const t = shownT(), hintOn = get(KEYS.fireHint) === 'true' && fireOpen() && !over();
         G.cells.forEach((c) => {
           applyCell(c, cellState(c.x, c.y, t), !snap);
           const show = hintOn && c.ig !== undefined && (c.state === 'fuel' || c.state === 'glow');
@@ -1126,16 +1428,17 @@
         if (c === '#') return { text: dir + ' · ' + (x === ATRIUM.stele[0] && y === ATRIUM.stele[1] ? 'the stele' : 'a column') + ' stands in the way', ring: null };
         if (c === 'L') return { text: dir + ' · the library is a wall of fire', ring: null };
         if (c === 'H') return { text: dir + ' · ✦ the hatch of the well', ring: 'gold' };
-        if (c !== 'f') return { text: dir + ' · bare stone: it never burns', ring: 'gold' };
+        const fd = findAt(x, y), glint = fd && !hasFind(fd.id) ? ' · ✧ something glints there' : '';
+        if (c !== 'f') return { text: dir + ' · bare stone: it never burns' + glint, ring: 'gold' };
         const st = fuelState(x, y, t);
-        if (st === 'ash') return { text: dir + ' · ash: it cannot burn again', ring: 'gold' };
+        if (st === 'ash') return { text: dir + ' · ash: it cannot burn again' + glint, ring: 'gold' };
         if (st === 'fire') return burningAt(x, y, t + 1) ? { text: dir + ' · burning: wait for its ash, or go round', ring: 'red' } : { text: dir + ' · its last flames: ash as he steps in', ring: 'gold' };
         if (st === 'glow') return { text: dir + ' · glowing: it catches next turn', ring: 'amber' };
         return { text: dir + ' · mats and scrolls: they will burn', ring: 'gold' };
       }
       const RING_COL = { gold: 0xfde68a, amber: 0xf59e0b, red: 0xef4444 };
       function placeRings() {
-        const on = canWalk() || (run && fireOpen() && !isDone() && busyOverlay());
+        const on = canWalk() || (run && fireOpen() && !over() && busyOverlay());
         [[0, -1], [1, 0], [0, 1], [-1, 0], [0, 0]].forEach(([dx, dy], i) => {
           const m = G.rings[i], x = run ? run.x + dx : 0, y = run ? run.y + dy : 0;
           const w = on ? cellWords(x, y) : null;
@@ -1211,7 +1514,7 @@
       }
       // each part of the station frames its own corner of the atrium
       function cameraPhase() {
-        if (isDone() || view.ending) return 'end';
+        if (over() || view.ending) return 'end';
         if (!isAwake() || (view.sigilT && performance.now() - view.sigilT < 3400)) return 'stele';
         if (!fireOpen()) return 'knocks';
         return 'fire';
@@ -1282,7 +1585,7 @@
       }
       function drawFrame(now, dt) {
         if (!G) return;
-        const t = now / 1000, rm = reduced(), done = isDone(), lp = G.lowPower ? 0.6 : 1;
+        const t = now / 1000, rm = reduced(), done = over(), lp = G.lowPower ? 0.6 : 1;
         // Hermes: walks where the part needs him, turns to what he is doing (and stays where the fire caught him)
         if (!view.freeze) steerHermes(false);
         if (G.hermes) {
@@ -1304,6 +1607,11 @@
         const sk = view.sigilT ? Math.max(0, 1 - (now - view.sigilT) / 3600) : 0;
         G.backFace.material.emissiveIntensity = sk * 1.6 + (isAwake() ? 0.12 : 0);
         G.frontFace.material.emissiveIntensity = isAwake() ? 0 : 0.05 + (rm ? 0 : 0.04 * Math.sin(t * 1.6));
+        // a glint over every find still lying in the atrium
+        if (G.fx && G.fx.sparks && fireOpen() && !over() && !rm && now - (G.glintT || 0) > 700) {
+          G.glintT = now;
+          FINDS.forEach((f) => { if (!hasFind(f.id)) G.fx.sparks.emit({ x: wx(f.at[0]), y: 0.25, z: wz(f.at[1]) }, 3, { color: 0xfff1c4, size: [0.04, 0.08], speed: [0.05, 0.25], up: [0.5, 1.1], life: [0.6, 1.1], alpha: 0.95, gravity: -0.2, spread: 0.5 }); });
+        }
         // the chalk and the rings of every knock
         drawChalk();
         G.knockRings.forEach((m) => {
@@ -1467,9 +1775,11 @@
           view.freezeTimer = setTimeout(() => { view.freeze = false; view.snapNext = true; syncWorld(); el.fade.classList.remove('is-on'); }, 450);
         }, 650);
       }
-      function sceneHatch() {
+      function sceneHatch(falcon) {
         view.ending = 1; view.endT = performance.now(); view.endFireT = run ? run.t : null;
-        subtitle('Hermes drops to his knees at the bronze hatch, takes the ring in both hands, and heaves.', 4, 'act');
+        subtitle(falcon ? 'Hermes hooks the brass falcon on the empty chain. It drops into the dark, and the bronze hatch swings up by itself.'
+          : 'Hermes drops to his knees at the bronze hatch, takes the ring in both hands, and heaves.', 4, 'act');
+        if (falcon) cue('click');
         view.endTimers.forEach(clearTimeout);
         view.endTimers = [
           setTimeout(() => { if (modal.style.display !== 'none') subtitle('Out of the dark comes the Servant: alive, black with smoke, a wet cloth over his mouth and a roll of charts in his arms.', 6, 'act'); }, reduced() ? 300 : 3000),
@@ -1483,7 +1793,21 @@
       if (el.listen) el.listen.addEventListener('click', listen);
       if (el.read) el.read.addEventListener('click', readWord);
       if (el.wordInput) el.wordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') readWord(); });
-      if (el.sound) el.sound.addEventListener('click', () => { set(KEYS.sound, soundOn() ? 'off' : 'on'); render(); });
+      if (el.sound) el.sound.addEventListener('click', () => {
+        // with the Hub speaker off, this button turns the sound back on for everything (it would do nothing otherwise)
+        if (get('order_ambience_muted') === 'true') { if (window.EclipseAmbience && window.EclipseAmbience.setMuted) window.EclipseAmbience.setMuted(false); else set('order_ambience_muted', 'false'); set(KEYS.sound, 'on'); }
+        else set(KEYS.sound, soundOn() ? 'off' : 'on');
+        if (!soundOn()) stopKnocks(true);
+        render();
+      });
+      document.addEventListener('click', (e) => { if (modal.style.display !== 'none' && e.target.closest && e.target.closest('#ambience-toggle')) setTimeout(() => { if (!soundOn()) stopKnocks(true); render(); }, 0); });
+      if (el.coinBtn) el.coinBtn.addEventListener('click', askCoin);
+      if (el.rewardBtn) el.rewardBtn.addEventListener('click', showReward);
+      if (el.replayEnd) el.replayEnd.addEventListener('click', () => endReplay(false));
+      if (window.RelicUse) {
+        // the Use button of the satchel: the coin before the stele, the falcon at the hatch
+        window.RelicUse.register('servant_coin', () => { if (modal.style.display === 'none' || !coinWaits()) return false; showCoin(); return true; });
+      }
       if (el.knock) el.knock.addEventListener('click', knock);
       if (el.pause) el.pause.addEventListener('click', pauseKnock);
       if (el.clear) el.clear.addEventListener('click', clearReply);
@@ -1493,7 +1817,7 @@
       const KEYMAP = { ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down', ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right', ' ': 'wait' };
       const press = (k) => { const b = el.pad[k]; if (!b) return; b.classList.add('is-pressed'); setTimeout(() => b.classList.remove('is-pressed'), 130); };
       document.addEventListener('keydown', (e) => {
-        if (modal.style.display === 'none' || !fireOpen() || isDone() || busyOverlay()) return;
+        if (modal.style.display === 'none' || !fireOpen() || over() || busyOverlay()) return;
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
         const k = KEYMAP[e.key];
         if (!k) return;
@@ -1504,11 +1828,11 @@
         takeTurn(STEPS[k][0], STEPS[k][1]);
       });
       document.addEventListener('keyup', (e) => {
-        if (e.key === ' ' && modal.style.display !== 'none' && fireOpen() && !isDone() && e.target && e.target.tagName === 'BUTTON' && modal.contains(e.target)) e.preventDefault();
+        if (e.key === ' ' && modal.style.display !== 'none' && fireOpen() && !over() && e.target && e.target.tagName === 'BUTTON' && modal.contains(e.target)) e.preventDefault();
       });
       if (el.atrium) {
         el.atrium.addEventListener('click', (e) => {
-          if (!run || !fireOpen() || isDone()) return;
+          if (!run || !fireOpen() || over()) return;
           const ctm = el.atrium.getScreenCTM();
           if (!ctm) return;
           const pt = el.atrium.createSVGPoint();
@@ -1539,7 +1863,7 @@
         if (G) placeRings();
       }
       function focusTarget() {
-        if (isDone()) return el.finish;
+        if (over()) return el.finish;
         if (!isAwake()) return el.keyInput;
         if (fireOpen()) return el.pad.up;
         return STANZAS[knocksDone()].by === 'silvia' ? el.knock : el.listen;
@@ -1585,6 +1909,8 @@
         if (hints && hints.grant) hints.grant('s18-proverb', 1);
         return " I almost forgot: the coin the Servant gave me has letters on its rim. He told me to read the stele the way I read a coin: by the pairs.";
       }
+      // with the satchel's tray she hands him the coin herself; Hermes only feels that he is forgetting something
+      const coinLine = () => (RU() ? (coinWaits() ? " And I keep feeling that I am forgetting something in the satchel." : '') : coinNote());
       function openSteleModal() {
         if (!canOpen()) {
           const toast = typeof window.showDesertToast === 'function' ? window.showDesertToast : null;
@@ -1618,11 +1944,12 @@
         if (G && 'ResizeObserver' in window && !el.stage.__steleFit) { el.stage.__steleFit = true; new ResizeObserver(fit).observe(el.stage); }
         fit();
         view.snapNext = true; view.ending = 0; view.endFireT = null; view.sigilT = 0; view.freeze = false; view.phase = ''; view.hover = null;
+        hatchPending = false; replay = false;
         if (G) { G.cam.p = null; G.hGoal = null; G.hMove = null; G.chalkKey = null; G.steleAngle = isAwake() ? Math.PI : 0; }
         if (el.fade) el.fade.classList.remove('is-on');
         if (isDone()) applyVictory();
-        else if (!isAwake()) say("Silvia, I am inside. I came in by a side door the raiders never found: they are out by the wagons, waiting for the fire to do their work for them. The library of the atrium is burning, the roof is full of smoke, and in the middle of it all the stele stands untouched. The Servant is nowhere. Open the page “The Polybius Stele”, please: what does the stele say?" + coinNote());
-        else if (!fireOpen()) say("He is still under the floor, Silvia, waiting for us. Listen to him again whenever you need to, and read him with the page “The Polybius Stele”.");
+        else if (!isAwake()) say("Silvia, I am inside, by a side door the raiders never found. They wait by their wagons for the fire to do their work. The library is burning, the roof is full of smoke, and in the middle the stele stands untouched. The Servant is nowhere. Open your page “The Polybius Stele”: what does the stele say?" + coinLine());
+        else if (!fireOpen()) say("He is still under the floor, Silvia, waiting for us. Listen again whenever you need to, and read him with your page “The Polybius Stele”.");
         else say("The fire is still spreading. The hatch of the well is in the far corner. Guide me, one flagstone at a time.");
         renderTape(el.tape, heard, false);
         renderTape(el.replyTape, reply, replyOpen);
@@ -1638,15 +1965,19 @@
         cancelAnimationFrame(raf);
         if (G) raf = requestAnimationFrame(frame);
         if (G && cine && !reduced() && !isDone() && get(CINE_INTRO) !== 'seen') {
-          set(CINE_INTRO, 'seen');
-          cine.start(openingShots(), finishOpen);
+          cineClosed = false;
+          cine.start(openingShots(), () => { if (!cineClosed) set(CINE_INTRO, 'seen'); finishOpen(); });
         } else finishOpen();
       }
       function closeSteleModal() {
         if (modal.style.display === 'none') return;
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         stopKnocks(true);
-        if (cine && cine.active) cine.skip();
+        hideReward(true);
+        clearTimeout(reward.timer);
+        replay = false;
+        if (window.RelicUse && window.RelicUse.isOpen()) window.RelicUse.close();   // (at the hatch this lets Hermes heave it alone)
+        if (cine && cine.active) { cineClosed = true; cine.skip(); }
         clearTimeout(view.freezeTimer);
         view.endTimers.forEach(clearTimeout); view.endTimers = [];
         view.freeze = false; view.ending = 0;
@@ -1668,17 +1999,11 @@
         if (e.key !== 'Escape' || modal.style.display === 'none') return;
         if (cine && cine.active) { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); return; }
         if (el.howto && !el.howto.hidden) { e.stopImmediatePropagation(); hideHowto(); return; }
+        if (rewardOpen() && (!$('modal-item-acquired') || $('modal-item-acquired').style.display === 'none')) { e.stopImmediatePropagation(); hideReward(); return; }
         closeSteleModal();
       }, true);
       document.addEventListener('visibilitychange', () => { if (document.hidden && playing) { stopKnocks(true); render(); } });
-      if (el.finish) {
-        el.finish.addEventListener('click', () => {
-          closeSteleModal();
-          if (typeof window.switchMapPath === 'function') window.switchMapPath('desert', true);
-          if (typeof window.updateDesertMapMarkers === 'function') window.updateDesertMapMarkers();
-          if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ The Servant is safe ✦ Open the Cliffside Workshop: Hermes has something to tell you.');
-        });
-      }
+      if (el.finish) el.finish.addEventListener('click', leaveForWire);
 
       // Test hook for scripts/audit/web_smoke.py: the atrium and the stanzas (they are in this source anyway) and the controls
       window.__stele = {
@@ -1686,7 +2011,10 @@
         grid: GRID,
         stanzas: STANZAS.map((s) => ({ by: s.by, word: s.word })),
         knocksOf: (word, moon) => knocksOf(word, !!moon),
-        state: () => ({ knocks: knocksDone(), run: run ? { x: run.x, y: run.y, t: run.t } : null, playing: !!playing, done: isDone() }),
+        state: () => ({ knocks: knocksDone(), run: run ? { x: run.x, y: run.y, t: run.t } : null, playing: !!playing, done: isDone(), falcon: get(KEYS.falcon), coin: get(KEYS.coin), hatchPending }),
+        showReward: () => showReward(), rewardOpen: () => rewardOpen(),
+        finds: FINDS.map((f) => ({ id: f.id, at: f.at.slice() })), found: () => readFinds(), replay: () => startReplay(), replaying: () => replay,
+        restart: () => { run = newRun(); hatchPending = false; render(); },
         read: (w) => { if (el.wordInput) el.wordInput.value = w; readWord(); },
         answer: (groups) => { clearReply(); reply = groups.slice(); sendReply(true); },
         move: (dx, dy) => takeTurn(dx, dy),
