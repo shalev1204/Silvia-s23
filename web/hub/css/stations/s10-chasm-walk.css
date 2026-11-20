@@ -550,6 +550,12 @@
     .chasm3d-stage.is-cine .chasm3d-hud, .chasm3d-stage.is-cine .chasm3d-subtitle { opacity: 0.0; }
     .chasm3d-stage.is-cine .chasm3d-subtitle.is-on { opacity: 1; z-index: 8; }
     :is(#modal-salt-playa, #modal-desert-lexicon) .chasm3d-body:has(.is-cine) .chasm3d-controls { visibility: hidden; }
+    /* on a phone the stage is short: the title card goes up under the top bar, and the line of the film rises above Skip */
+    @media (max-width: 600px) {
+      .cine-title { bottom: auto; top: calc(11% + 8px); }
+      .cine-title strong { font-size: 1.2rem; letter-spacing: 0.1em; }
+      .chasm3d-stage.is-cine .chasm3d-subtitle { bottom: calc(11% + 58px); }
+    }
     @media (prefers-reduced-motion: reduce) { .cine-bar, .cine-fade { transition: none; } .cine-title.is-on { animation: none; opacity: 1; } }
 
     /* ---- The frame of every 3D game (hub/js/game-frame.js): full screen, and the side panel folded away ---- */
