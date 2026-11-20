@@ -39,7 +39,7 @@
         mirrorRaised: 'order_cairn5_mirror_raised', // she handed Hermes the Signal Mirror for the night signal
         rays: 'order_cairn5_rays'                   // the road of each of the four rays that closed a lock, for the reward
       };
-      const HOWTO_KEY = 'order_cairn5_howto', CINE_INTRO = 'order_cairn5_cine_intro';
+      const HOWTO_KEY = 'order_cairn5_howto', CINE_INTRO = 'order_cairn5_cine_intro', CINE_OUTRO = 'order_cairn5_cine_outro';
       let cineClosed = false;   // she closed the station while the opening film played: it will play again next time
       const SIGIL = 'DAYBREAK';
 
@@ -85,7 +85,7 @@
         night: $('solstice-night'), watch: $('btn-solstice-watch'), raise: $('btn-solstice-raise'), roundLabel: $('solstice-round-label'), flash: $('btn-solstice-flash'),
         pulses: $('solstice-pulses'), clear: $('btn-solstice-clear'), send: $('btn-solstice-send'), message: $('solstice-message'),
         signalFeedback: $('solstice-signal-feedback'), hint: $('solstice-hint'), rewardBtn: $('btn-solstice-reward'), victory: $('solstice-victory'), victoryText: $('solstice-victory-text'),
-        finish: $('btn-solstice-finish'), dispatch: $('solstice-dispatch-text'), moon: $('solstice-moon-row'), towerTrace: $('solstice-tower-trace'),
+        dispatch: $('solstice-dispatch-text'), moon: $('solstice-moon-row'), towerTrace: $('solstice-tower-trace'),
         tSigil: $('solstice-telem-sigil'), tDawn: $('solstice-telem-dawn'), tSignal: $('solstice-telem-signal'), tSeal: $('solstice-telem-seal'),
         stage: $('solstice3d-stage'), canvas: $('solstice3d-canvas'), subtitle: $('solstice3d-subtitle'), fade: $('solstice3d-fade'), aim: $('solstice3d-aim'),
         status: $('solstice3d-status'), sun: $('solstice3d-sun'), sunLabel: $('solstice3d-sun-label'), howto: $('solstice3d-howto'), help: $('btn-solstice-howto'),
@@ -399,7 +399,7 @@
           sceneDawnDone();
           subtitle('The fourth lock closes. The brass ring turns, and the altar opens like a flower.', 5.2, 'act');
           feedback(el.dawnFeedback, 'The fourth lock closes. The altar opens.', 'ok');
-          say("Four locks! The brass ring turned, Silvia, and the altar opened like a flower: the Seal of Cairn V is in my hand. The fifth one. Under it lay a small bronze hand mirror, freshly polished, with the Order's mark on its rim. I am going to sit down for a moment. Then I will wait for the night here, under the arch: from up here I can see Tower II.");
+          say("Four locks! The ring turned, Silvia, and the altar opened like a flower. The Seal of Cairn V is in my hand: the fifth and last. Under it lay a small bronze mirror with the Order's mark on its rim. Now we wait for the night. From up here I can see Tower II.");
           if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('signal_mirror');
           render();
           return;
@@ -421,7 +421,7 @@
         subtitle('The sun climbs clear of the arch. The courtyard turns to plain day, and the brass ring lets go of its locks.', 5, 'act');
         dawn.locks = 0; dawn.step = 0;
         feedback(el.dawnFeedback, 'The sun climbed past the arch. The dawn is spent; the ring only takes a dawn ray.', 'error');
-        say("Too high, Silvia. The courtyard is in plain daylight and the ring has let go of its locks. Tomorrow the sun will rise again, and the mirrors will still be where you left them." + (get(KEYS.dawnHint) === 'true' ? " I have counted my breaths: tomorrow each ray will wait longer for us." : ''));
+        say("Too high, Silvia. Plain daylight now, and the ring has let go of its locks. The sun rises again tomorrow, and the mirrors stay where you left them." + (get(KEYS.dawnHint) === 'true' ? " I have counted my breaths: tomorrow each ray will wait longer for us." : ''));
         render();
       }
 
@@ -613,7 +613,7 @@
       function runFinale() {
         finale = true;
         feedback(el.signalFeedback, '', '');
-        say("Three short, a pause, two long. Silvia... I made that code for one person, more than fifty years ago, and the light up there has just sent it to us. We sent it back. Now it is spelling something, slowly, in the old light-code of the Order. I am writing it down.");
+        say("Three short, a pause, two long. Silvia... I made that code for one person, more than fifty years ago. Now the light is spelling something in the old light-code of the Order. I am writing it down.");
         const lines = ['[Y] − [O] = 2', '[L] + [G] = 23'];
         const burst = 'SLSSLLSLSSLSLLSS';
         let shown = '';
@@ -625,8 +625,8 @@
           subtitle('The light on Tower II goes out, all at once. A red glow rises at its foot.', 5.5, 'act');
           cue('thud');
           cue('flame', { dur: 2.4 });
-          say("And then the light went out. Not slowly, Silvia: all at once. There is a red glow at the foot of Tower II now, and the wind smells of smoke. The wagons. They have reached the Sanctuary.");
-          setTimeout(completeStation, reduced() ? 1800 : 6000);
+          say("Then the light went out. All at once, Silvia. A red glow at the foot of Tower II, and the wind smells of smoke. The wagons have reached the Sanctuary.");
+          setTimeout(closeTheNight, reduced() ? 1800 : 6000);
         });
         lines.forEach((line, i) => setTimeout(() => {
           shown += (shown ? '   ·   ' : '') + line;
@@ -634,7 +634,31 @@
         }, 2600 + i * 3200));
         render();
       }
+      // the film of the end plays once, before the seal is granted: the five seals and the reward follow it.
+      // A reload during the film finishes the station (the last signal is saved), so nothing can strand.
+      function endingShots() {
+        const tl = [TOWER.x, TOWER.h * 0.45, TOWER.z];
+        return [
+          { from: { p: [-1.4, 3.1, 6.5], l: tl }, to: { p: [-0.7, 3.5, 3.6], l: [TOWER.x, TOWER.h * 0.5, TOWER.z] }, dur: 5.5,
+            kicker: 'STATION 17', title: 'THE LIGHT GOES OUT', line: 'Far off, at the foot of Tower II, a red glow. Smoke climbs into the stars.' },
+          { from: { p: [2.3, 1.75, -2.7], l: [0.9, 1.3, 0.2] }, to: { p: [1.7, 1.6, -1.9], l: [0.9, 1.35, 0.2] }, dur: 5,
+            line: 'Hermes watches the glow for a long while, and says nothing.' },
+          { from: { p: [0.3, 2.4, 4], l: [4, 3, -40] }, to: { p: [-3, 14, 17], l: [6, 4, -60] }, dur: 6,
+            line: 'Five seals in the satchel now. And the road ahead runs straight into the smoke.' }
+        ];
+      }
+      function closeTheNight() {
+        const film = !!(G && cine && !reduced() && get(CINE_OUTRO) !== 'seen' && modal.style.display !== 'none' && !modal.classList.contains('closing'));
+        if (!film) { completeStation(); return; }
+        set(CINE_OUTRO, 'seen');
+        cine.start(endingShots(), () => {
+          if (el.subtitle) el.subtitle.classList.remove('is-on');
+          view.snapNext = true;
+          completeStation();
+        }, { fade: true });
+      }
       function completeStation() {
+        if (isDone()) return;
         set(KEYS.done, 'true');
         finale = false;
         if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
@@ -797,7 +821,7 @@
         if (G && G.fx) { const [ax, ay] = COURT.altar; G.fx.triumph({ x: colX(ax), y: BEAM_Y, z: rowZ(ay) }, 0.7); }
         subtitle('The carved sun on the arch glows. The brass ring of the altar unlocks its four catches.', 4.8, 'act');
         feedback(el.keyFeedback, 'DAYBREAK. The brass ring of the altar wakes, waiting for its light.', 'ok');
-        say("DAYBREAK... and the ring of the altar unlocked its four catches, Silvia. But it wants a ray of light to close them, and this courtyard was built for a midsummer sun. In November the sun rises further south: its ray will come under the arch at the wrong place. We must turn the mirrors for an autumn dawn. Set them tonight, if we have a light; at dawn, be quick.");
+        say("DAYBREAK! The brass ring unlocked its four catches, Silvia. But only a ray of dawn can close them, and this courtyard was built for a midsummer sun. In November the sun rises further south. We must turn the mirrors for an autumn dawn: tonight, if we have a light, and quickly when the sun comes.");
         render();
         if (el.dawnBtn) setTimeout(() => el.dawnBtn.focus({ preventScroll: true }), 60);
       }
@@ -1633,7 +1657,7 @@
         if (secs) secs.textContent = get(KEYS.dawnHint) === 'true' ? (STEP_MS_HINTED / 1000) + ' seconds'
           : (STEP_MS / 1000) + ' seconds' + (get(KEYS.lamp) === 'dark' ? ' (' + (STEP_MS_HINTED / 1000) + ' for the first, set without a light)' : '');
       }
-      function focusTarget() { return isDone() ? el.finish : (!isAwake() ? el.keyInput : (dawnDone() ? el.watch : el.dawnBtn)); }
+      function focusTarget() { return isDone() ? el.rewardBtn : (!isAwake() ? el.keyInput : (dawnDone() ? el.watch : el.dawnBtn)); }
       function hideHowto() {
         if (el.howto) el.howto.hidden = true;
         set(HOWTO_KEY, 'seen');
@@ -1704,8 +1728,8 @@
         view.opened = dawnDone() ? 1 : 0;
         view.sky = 0; view.fire = isDone() ? 1 : 0; view.burn = 0;
         if (G) { G.cam.p = null; G.skyShown = -1; G.hermesGoal = null; }
-        if (isDone()) { applyVictory(); say('The smoke is still rising over Tower II, Silvia. The Seal of Cairn V is in the satchel with the other four. Come to the Field Wire: I will tell you what I see.'); }
-        else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. The courtyard behind it is paved with bronze mirrors and fallen pillars, and the Solar Altar waits on its terrace with a brass ring. From here I can see the dunes where Cairn V stands guard. On the way I crossed the bootprints of the men who carried the torches in the labyrinth: they went east, to meet the wagons on the road to the Sanctuary. Open the page “Arch of the Solstice & The Solar Altar”, please: the sigil first.");
+        if (isDone()) { applyVictory(); say('Smoke still rises over Tower II. The Seal of Cairn V is in the satchel with the other four. Come to the Field Wire, Silvia: I will tell you what I see.'); }
+        else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. Behind it lies a courtyard of bronze mirrors and fallen pillars, and the Solar Altar with its brass ring. The bootprints of the torch-men from the labyrinth run east from here, toward the wagons. Open the page “Arch of the Solstice & The Solar Altar”: the sigil first.");
         else if (!dawnDone()) say("The mirrors are where you left them. Set them as you think best, and call the dawn when you are ready.");
         else say("Night again. Watch the light on Tower II, and answer it with my mirror.");
         render();
@@ -1759,7 +1783,6 @@
         if (rewardOpen() && (!$('modal-item-acquired') || $('modal-item-acquired').style.display === 'none')) { e.stopImmediatePropagation(); hideReward(); return; }
         closeSolsticeModal();
       }, true);
-      if (el.finish) el.finish.addEventListener('click', leaveForWire);
       if (el.rewardBtn) el.rewardBtn.addEventListener('click', showReward);
 
       // ---- The five seals come home (called by grantCairnSeal the first time all five are in the satchel) ----

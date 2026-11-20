@@ -168,7 +168,7 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
             seed = dict({"order_playa_cine_intro": "seen", "order_playa_cine_outro": "seen", "order_lexicon_cine_intro": "seen", "order_lexicon_cine_outro": "seen",
                          "order_labyrinth_cine_intro": "seen", "order_labyrinth_cine_outro": "seen", "order_labyrinth_howto": "seen", "order_labyrinth_fresh_v1": "done",
                          "order_cairn4_cine_intro": "seen", "order_cairn4_howto": "seen",
-                         "order_cairn5_cine_intro": "seen", "order_cairn5_howto": "seen",
+                         "order_cairn5_cine_intro": "seen", "order_cairn5_howto": "seen", "order_cairn5_cine_outro": "seen",
                          "order_stele_cine_intro": "seen", "order_stele_howto": "seen", "order_stele_cine_outro": "seen",
                          "order_oracle_cine_intro": "seen", "order_oracle_howto": "seen", "order_oracle_cine_outro": "seen",
                          # (the way down the inner stair of Station 19 asks the satchel for a key and a lamp, once: section s19 tests it)
