@@ -59,7 +59,7 @@
           verse: ['I walk beside the brave, and still they walk.', 'I am the cold in a man’s hands before a door.', 'Four letters. Take my first away, and what is left can hear.'],
           extra: 'The cartographer has carried me for fifty-five years. This morning he told you my name.',
           near: { EAR: 'She tilts her head: that is what is left of it when its first letter is gone.', AFRAID: 'Close. But she wants the thing itself, in four letters.', DREAD: 'Close. But four letters, and without its first it can hear.', FRIGHT: 'Close. But four letters, and without its first it can hear.', COLD: 'Cold is how it feels, not what it is.' },
-          found: 'FEAR. Aurelia lays four bronze letters on the pan, and the balance leans.',
+          found: 'FEAR. The Oracle lays four bronze letters on the pan, and the balance leans.',
           hermes: "Fear, Silvia. The days begin with fear. The Order never wrote a date in words: it wrote the weight of a word. Weigh it: add its four letters, with the numbers of your own Cipher Ledger.",
           memory: '“Cold,” she says, and stops singing. “A terrace, high up. Cold brass under my hands.”',
           settled: "The balance settled, Silvia. The first day is the eighteenth. And she remembered something: a terrace, and the cold. I know that terrace." },
@@ -326,7 +326,7 @@
         light.gone = true; light.left = 0; light.last = 0;
         set(KEYS.beams, String(numOf(KEYS.beams) + 1));
         cue('dusk');
-        subtitle('The beam of light slides off the altar. Aurelia covers the balance with her sleeve, and waits.', 5.5, 'act');
+        subtitle('The beam of light slides off the altar. The Oracle covers the balance with her sleeve, and waits.', 5.5, 'act');
         say("The light has left the altar, Silvia, and she will not weigh in the dark. Nothing is lost. The moon comes over the opening in a moment, and then we weigh this word again." + (numOf(KEYS.beams) === 2 ? " I will hold my cloak up to the draught: the light should stay with us longer." : ''));
         if (el.weightInput) el.weightInput.value = '';
         render();
@@ -398,7 +398,7 @@
           feedback(el.discFeedback, r.near[typed] || (typed.length !== r.word.length
             ? 'She shakes her head. Count the letters her riddle asks for: ' + (r.word.length === 4 ? 'four' : 'three') + '.'
             : 'She shakes her head slowly, and sings the riddle again from the first line.'), 'error');
-          if (fails === 3) subtitle('Aurelia adds a line she had left out: “' + r.extra + '”', 7, 'act');
+          if (fails === 3) subtitle('The Oracle adds a line she had left out: “' + r.extra + '”', 7, 'act');
           render();
           return;
         }
@@ -456,6 +456,9 @@
         render();
         const first = el.tiles && el.tiles.querySelector('button');
         if (first) setTimeout(() => first.focus({ preventScroll: true }), 60);
+        // on a short screen the words she half remembers are below the fold: bring them up
+        const vowEnd = el.vowGame && el.vowGame.querySelector('.pillars-row');   // (its buttons: the words above them come too)
+        if (vowEnd && vowEnd.scrollIntoView) setTimeout(() => { if (modalOpen()) vowEnd.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' }); }, 900);
       }
 
       // ---- The vow ----
@@ -694,6 +697,7 @@
         }
         return '<svg viewBox="-58 -58 116 116" role="img" aria-label="The brass disc of 24 sightings set true: December eighteen to twenty">' + out + '<circle class="oracle-rw-jewel" cx="0" cy="0" r="7"/></svg>';
       }
+      const stat = (n, one, many) => '<div><b>' + n + '</b><span>' + (n === 1 ? one : many) + '</span></div>';   // the reward's counts, singular when there was only one
       function showReward() {
         clearTimeout(reward.timer);
         const body = modal.querySelector('.chasm3d-body');
@@ -735,10 +739,10 @@
           + '<div class="drw-words oracle-rw-weighed" aria-label="Weighed on the balance: FEAR, LUX, ERA">' + RIDDLES.map((r, i) => '<span class="drw-word" style="--t:' + (3.5 + i * 0.2).toFixed(2) + 's">' + r.word + '</span>').join('<u aria-hidden="true">·</u>') + '</div>'
           + '<div class="drw-words" aria-label="You were always the treasure">' + words + '</div>'
           + '<div class="chasm3d-reward-stats">'
-          + '<div><b>' + num(KEYS.turns) + '</b><span>turns of the rings</span></div>'
-          + '<div><b>' + num(KEYS.weighFails) + '</b><span>unsettled weighings</span></div>'
-          + '<div><b>' + (vowFails + 1) + '</b><span>tries at the vow</span></div>'
-          + '<div><b>' + (num(KEYS.fails) + 1) + '</b><span>sigil tries</span></div>'
+          + stat(num(KEYS.turns), 'turn of the rings', 'turns of the rings')
+          + stat(num(KEYS.weighFails), 'unsettled weighing', 'unsettled weighings')
+          + stat(vowFails + 1, 'try at the vow', 'tries at the vow')
+          + stat(num(KEYS.fails) + 1, 'sigil try', 'sigil tries')
           + '</div>'
           + (vowFails === 0 ? '<div class="rw-flawless">✦ The vow, at the first breath ✦</div>' : '')
           + '</section>'

@@ -39,6 +39,8 @@
 #modal-oracle-horizon .laby3d-game.is-locked .monolith-game-inner { filter: grayscale(0.9) brightness(0.45); pointer-events: none; }
 #modal-oracle-horizon .laby3d-game:not(.is-locked) .monolith-lock-note { display: none; }
 #modal-oracle-horizon .monolith-game-inner { display: flex; flex-direction: column; gap: 8px; }
+/* each line keeps its height: the eight words of the vow never run under the buttons, and the satchel's button stays a button */
+#modal-oracle-horizon .monolith-game-inner > * { flex: 0 0 auto; }
 #modal-oracle-horizon .oracle-ring-ctrls { margin-top: 0; }
 #modal-oracle-horizon .oracle-ring-ctrl .chasm3d-btn { padding: 6px 0; font-size: 1.1rem; }
 #modal-oracle-horizon .oracle-ring-ctrl span.is-true { color: #bbf7d0; }
