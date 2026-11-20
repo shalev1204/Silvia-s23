@@ -265,7 +265,13 @@
         if (turns % TURNS_PER_MISS === 0) discHints.fail();
         // a notch per turn; a ring whose star points true chimes higher the more rings are true
         const trueRings = rot.filter((r) => r === 0).length;
-        const played = trueRings === 3 ? cue('reveal') : rot[ring] === 0 ? cue('shimmer', { deg: 10 + 2 * trueRings }) : cue('tick', { f: 2600 - 400 * ring });
+        const played = cue('ringGrind', { ring: ring });
+        if (trueRings === 3) {
+          cue('starAlign', { count: 3, all: true });
+          cue('reveal');
+        } else if (rot[ring] === 0) {
+          cue('starAlign', { count: trueRings });
+        }
         if (!played && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         sceneTurn(ring, rot[ring] === 0, trueRings === 3);
         if (rot.every((r) => r === 0)) {
@@ -286,7 +292,7 @@
         let t = 200;
         [220, 220, 220, 0, 700, 700].forEach((len) => {
           if (!len) { t += 600; return; }
-          pulsing.push(setTimeout(() => el.disc.classList.add('is-pulse'), t));
+          pulsing.push(setTimeout(() => { el.disc.classList.add('is-pulse'); cue('towerPulse', { long: len >= 500, own: false, v: 0.035 }); }, t));
           t += len;
           pulsing.push(setTimeout(() => el.disc.classList.remove('is-pulse'), t));
           t += 260;
@@ -404,8 +410,7 @@
         }
         set(KEYS.weighWord, 'true'); set(KEYS.wordFails, '0');
         if (el.wordInput) el.wordInput.value = '';
-        if (!cue('shimmer', { deg: 12 + weighStep() * 2 }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
-        cue('click');
+        if (!cue('scaleChime', { loaded: true, step: weighStep() }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
         oracleDoes('nod'); react('wonder');
         subtitle(r.found, 5, 'act');
         feedback(el.discFeedback, r.word + '. Now weigh it: add the numbers of its letters in your Cipher Ledger.', 'ok');
@@ -422,7 +427,7 @@
         if (parseInt(raw, 10) !== r.weight) {
           set(KEYS.weighFails, String(numOf(KEYS.weighFails) + 1));
           weighHints.fail();
-          cue('wrong'); react('worry');
+          cue('wrong'); cue('scaleChime', { swing: true }); react('worry');
           setBalance('swing');
           setTimeout(() => { if (bal.state === 'swing') setBalance('loaded'); }, 1500);
           // (never which way: the balance does not say whether she is over or under)
@@ -433,8 +438,8 @@
         const i = weighStep();
         set(KEYS.weighStep, String(i + 1)); set(KEYS.weighWord, 'false'); set(KEYS.wordFails, '0');
         if (el.weightInput) el.weightInput.value = '';
-        if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
-        cue('bell', { f: 392 * Math.pow(2, i / 6), v: 0.12, len: 3 });
+        if (!cue('scaleChime', { settled: true, step: i }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        cue('reveal');
         oracleDoes('nod'); react('wonder');
         sceneSettle(i);
         setBalance('settled');
@@ -491,7 +496,7 @@
         said.push(i);
         sceneWord(TILES[i]);
         // each word sung a step higher, like the song she is trying to remember
-        if (!cue('echo', { deg: 5 + said.length, n: 1, v: 0.05 }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!cue('vowChord', { step: said.length }) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         render();
         const next = el.tiles && el.tiles.querySelector('button:not([disabled])');
         if (next) next.focus({ preventScroll: true });
@@ -519,6 +524,7 @@
           render();
           return;
         }
+        cue('vowChord', { final: true });
         sceneVow();
         completeStation();
         if (el.finish) setTimeout(() => el.finish.focus({ preventScroll: true }), 60);
@@ -634,7 +640,7 @@
         set(KEYS.coin, 'set');
         if (ru) ru.spend('servant_coin', { silent: true });
         if (hints && hints.grant) hints.grant('s19-sigil', 1);
-        cue('click'); cue('shimmer', { deg: 10 }); react('nod');
+        cue('scaleChime', { loaded: true }); cue('shimmer', { deg: 10 }); react('nod');
         subtitle('The coin clicks into the hollow disc. For a breath, a thread of light runs from each beacon across the three mirrors.', 5, 'act');
         say("It fits, Silvia. And I remember the old man's last word about it: 'Do not read a beacon where it stands.' Each one has to cross the three mirrors first.");
         render();
@@ -662,7 +668,7 @@
         set(KEYS.pebble, 'given');
         if (ru) ru.spend('tuning_pebble', { silent: true });
         vowHints.grant ? vowHints.grant(1) : (hints && hints.grant && hints.grant('s19-vow', 1));
-        cue('shimmer', { deg: 14 }); oracleDoes('nod'); react('wonder');
+        cue('starAlign', { count: 2 }); oracleDoes('nod'); react('wonder');
         subtitle('She takes the painted pebble in both hands and holds it to her ear, like a shell. Then, very softly: “…always…”', 6, 'act');
         say("She knew it at once, Silvia. She held it to her ear and said one word: 'always'. It is one of the words she is looking for.");
         render();

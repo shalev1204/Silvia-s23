@@ -61,14 +61,21 @@
         'modal-sun-monolith': { name: 'noon on the ridge', wind: [0.45, 900, 0.5, 0.04], drone: [0.1, 73.4, 110], music: 'ridge' },
         'modal-sandstone-labyrinth': { name: 'labyrinth', wind: [0.35, 450, 1.2, 0.05, true], crackle: [0.1, 0.8], music: 'labyrinth' },
         'modal-cairn-four': { name: 'singing canyon', wind: [0.4, 300, 1.5, 0.08, true], music: 'canyon' },
-        'modal-solstice-arch': { name: 'courtyard of rays', wind: [0.3, 1200, 0.6, 0.05], drone: [0.07, 130.8, 196, 261.6], music: 'sanctum' },
-        'modal-polybius-stele': { name: 'tower in flames', rumble: [0.35, 300], crackle: [0.28, 3] },
-        'modal-oracle-horizon': { name: 'inner chamber', wind: [0.12, 600, 0.8, 0.04], drone: [0.13, 98, 147, 196], music: 'sanctum' },
+        'modal-solstice-arch': { name: 'courtyard of rays', wind: [0.2, 1200, 0.6, 0.05], drone: [0.045, 146.83, 220], music: 'desertAdventureArch' },
+        'modal-polybius-stele': { name: 'tower in flames', rumble: [0.22, 280], crackle: [0.2, 2.6], music: 'desertAdventureFire' },
+        'modal-oracle-horizon': { name: 'inner chamber', wind: [0.1, 600, 0.8, 0.04], drone: [0.08, 73.42, 146.83, 220], music: 'desertAdventureOracle' },
         'modal-masks-gate': { name: 'theatre gate', wind: [0.1, 500, 0.9, 0.03], drone: [0.11, 65.4, 98], crackle: [0.07, 0.5], music: 'stage' },
         'modal-camera-obscura': { name: 'dark room', wind: [0.05, 380, 1.1, 0.02], drone: [0.1, 55, 82.4], drips: [0.14, 0.35] },
         'modal-whispering-gallery': { name: 'stone gallery', wind: [0.04, 700, 0.9, 0.02], drone: [0.05, 73.4, 110], drips: [0.08, 0.2], music: 'stage' },
         // Field Wire sits last so any open station modal keeps priority over the chat ambience
         'wire-ambient-probe': { name: 'the wire', wind: [0.13, 520, 0.7, 0.04], drone: [0.045, 73.42, 110], music: 'wireDawn' }
+      };
+      var GATES_RETURN_BED = { name: 'gates of tower ii', wind: [0.24, 480, 0.8, 0.05], drone: [0.05, 73.42, 110], crackle: [0.08, 1.2], music: 'desertAdventure' };
+      // Unified Hub soundtracks outside The Field Wire, switching by active trail path
+      var HUB_BEDS = {
+        constellation: { name: 'constellation hub', music: 'hubMondstadt' },
+        desert: { name: 'desert hub', music: 'hubLiyue' },
+        stage: { name: 'stage hub', music: 'hubFontaine' }
       };
       var WIRE_MOOD_BEDS = {
         dawn:  { name: 'the wire', wind: [0.13, 520, 0.7, 0.04], drone: [0.045, 73.42, 110], music: 'wireDawn' },
@@ -79,8 +86,8 @@
         lamp:  { name: 'the wire', wind: [0.06, 540, 0.9, 0.02], drips: [0.07, 0.22], drone: [0.055, 87.31, 130.81], music: 'wireLamp' }
       };
 
-      var ctx = null, master = null, noise = null, verb = null, fxBus = null, current = null, currentWireMood = null, bed = null;
-      var muted = false, intensity = 0.5, notes = 0, hushed = false;
+      var ctx = null, master = null, noise = null, verb = null, fxBus = null, current = null, currentWireMood = null, currentGatesMode = null, bed = null;
+      var muted = false, intensity = 0.5, notes = 0, hushed = false, autoDucked = false;
       try { muted = localStorage.getItem(MUTE_KEY) === 'true'; } catch (e) {}
 
       function audio() {
@@ -103,9 +110,12 @@
           }
           verb = ctx.createConvolver();
           verb.buffer = ir;
+          var verbLp = ctx.createBiquadFilter();
+          verbLp.type = 'lowpass';
+          verbLp.frequency.value = 3200;
           var wet = ctx.createGain();
           wet.gain.value = 0.5;
-          verb.connect(wet); wet.connect(master);
+          verb.connect(verbLp); verbLp.connect(wet); wet.connect(master);
         } catch (e) { verb = null; }
         // the games' moments: louder than the bed, under the same mute
         fxBus = ctx.createGain();
@@ -293,8 +303,17 @@
         }
         if (def.drips) timers.push(every(def.drips[1], function () { drip(out, def.drips[0]); }));
         if (def.crackle) timers.push(every(def.crackle[1], function () { crackle(out, def.crackle[0]); }));
-        var song = def.music && MUSIC[def.music] ? composer(MUSIC[def.music], out) : null;
-        if (song) { if (hushed) song.mix.gain.value = 0.0001; song.tick(); timers.push(setInterval(song.tick, 100)); }
+        var comp = window.EclipseMusicComposer;
+        var song = (def.music && comp && comp.has(def.music))
+          ? comp.create(def.music, ctx, out, {
+            noise: noise,
+            verb: verb,
+            isMuted: function () { return muted; },
+            getIntensity: function () { return intensity; },
+            onNote: function () { notes++; }
+          })
+          : (def.music && MUSIC[def.music] ? composer(MUSIC[def.music], out) : null);
+        if (song) { if (hushed || autoDucked) song.mix.gain.value = 0.0001; song.tick(); timers.push(setInterval(song.tick, 100)); }
         return { out: out, stops: stops, timers: timers, song: song, mood: def.music || null };
       }
       // Random events, on average `perSecond` times a second
@@ -325,6 +344,7 @@
         b.out.gain.setValueAtTime(b.out.gain.value, t);
         b.out.gain.linearRampToValueAtTime(0, t + FADE_S);
         setTimeout(function () {
+          if (b.song && typeof b.song.stop === 'function') { try { b.song.stop(); } catch (e) {} }
           b.stops.forEach(function (n) { try { n.stop(); } catch (e) {} });
           b.out.disconnect();
         }, FADE_S * 1000 + 100);
@@ -355,7 +375,9 @@
         n.connect(bp); bp.connect(g); g.connect(fxBus); n.start(t); n.stop(t + len + 0.05);
       }
       function scaleOf() {
-        var m = bed && bed.mood ? MUSIC[bed.mood] : MUSIC.ridge;
+        var comp = window.EclipseMusicComposer;
+        var compMeta = (bed && bed.mood && comp && comp.meta) ? comp.meta(bed.mood) : null;
+        var m = compMeta || (bed && bed.mood ? MUSIC[bed.mood] : null) || MUSIC.ridge;
         var mode = MODES[m.mode] || MODES.hijaz;
         return function (d) { var n = mode.length, o = Math.floor(d / n), k = ((d % n) + n) % n; return m.root * Math.pow(2, o + mode[k] / 12); };
       }
@@ -451,7 +473,119 @@
         // a page turned, a scrap of cloth or paper
         paper: function (t) { swish(t, 0.28, 0.06, 1500, 5200); swish(t + 0.12, 0.2, 0.04, 2400, 6000); },
         // a lens or a shutter: a soft click and the slide of brass
-        lens: function (t) { SFX.tick(t, { f: 3200, v: 0.08 }); swish(t + 0.03, 0.35, 0.05, 900, 2200); SFX.tick(t + 0.36, { f: 1800, v: 0.06 }); }
+        lens: function (t) { SFX.tick(t, { f: 3200, v: 0.08 }); swish(t + 0.03, 0.35, 0.05, 900, 2200); SFX.tick(t + 0.36, { f: 1800, v: 0.06 }); },
+        // ---- S17: Arch of the Solstice ----
+        brassTurn: function (t, o) {
+          var i = o.i || 0;
+          SFX.tick(t, { f: 2450 - (i % 5) * 130, v: 0.075 });
+          bell(t + 0.008, 1360 + (i % 4) * 105, 0.03, 0.24);
+        },
+        sunBeam: function (t, o) {
+          var hz = scaleOf();
+          if (o.moon) {
+            var base = 1046.5 * Math.pow(2, -(o.k || 0) / 12);
+            bell(t, base, 0.036, 1.3);
+            bell(t + 0.06, base * 1.5, 0.022, 1.1);
+            swish(t, 0.55, 0.025, 1100, 2600);
+          } else {
+            swish(t, o.dur || 1.6, 0.09, 320, 2400);
+            [7, 9, 11, 14].forEach(function (d, i) { bell(t + i * 0.09, hz(d), 0.045, 1.7); });
+          }
+        },
+        archLock: function (t, o) {
+          var hz = scaleOf(), lk = o.lock || 1;
+          SFX.tick(t, { f: 1950, v: 0.08 });
+          bell(t + 0.015, hz(10 + lk * 2), 0.06, 1.6);
+          bell(t + 0.08, hz(14 + lk * 2), 0.045, 1.9);
+        },
+        towerPulse: function (t, o) {
+          var len = o.long ? 1.25 : 0.38, f = o.own ? 880 : 1318.5;
+          bell(t, f, o.v || (o.own ? 0.045 : 0.042), len);
+          if (o.own) bell(t + 0.01, f * 1.5, 0.016, len * 0.7);
+        },
+        altarOpen: function (t) {
+          var hz = scaleOf();
+          grind(t, 1.9, 0.16);
+          [7, 9, 11, 14, 18].forEach(function (d, i) { bell(t + 0.18 + i * 0.13, hz(d), 0.075, 2.5); });
+          swish(t + 0.25, 1.5, 0.065, 450, 3200);
+        },
+        // ---- S18: The Polybius Stele ----
+        steleKnock: function (t, o) {
+          var below = !!o.fromBelow, pair = o.pair ? 1 : 0;
+          var oOsc = ctx.createOscillator(), og = env(t, below ? 0.26 : 0.34, 0.003, 0.17);
+          oOsc.type = 'sine';
+          oOsc.frequency.setValueAtTime(below ? (pair ? 138 : 124) : (pair ? 184 : 166), t);
+          oOsc.frequency.exponentialRampToValueAtTime(below ? 58 : 78, t + 0.12);
+          oOsc.connect(og); og.connect(fxBus); oOsc.start(t); oOsc.stop(t + 0.22);
+          var n = noiseSource(), bp = ctx.createBiquadFilter(), ng = env(t, below ? 0.12 : 0.2, 0.002, 0.055);
+          bp.type = 'bandpass'; bp.frequency.value = below ? (pair ? 720 : 620) : (pair ? 1260 : 1040); bp.Q.value = 1.4;
+          n.connect(bp); bp.connect(ng); ng.connect(fxBus); n.start(t); n.stop(t + 0.09);
+        },
+        chalkScratch: function (t) {
+          swish(t, 0.16, 0.055, 1700, 3900);
+          SFX.tick(t + 0.02, { f: 2800, v: 0.04 });
+        },
+        emberSurge: function (t, o) {
+          var len = o.dur || 1.1, cnt = Math.min(8, Math.max(2, (o.count || 2) + 2));
+          SFX.flame(t, { dur: len });
+          SFX.crack(t + 0.06, { v: 0.12 });
+          for (var i = 0; i < cnt; i++) {
+            var d = t + Math.random() * len * 0.85, c = noiseSource(), hp = ctx.createBiquadFilter(), cg = env(d, 0.05, 0.001, 0.03);
+            hp.type = 'highpass'; hp.frequency.value = 2800 + Math.random() * 1400;
+            c.connect(hp); hp.connect(cg); cg.connect(fxBus); c.start(d); c.stop(d + 0.06);
+          }
+        },
+        hatchOpen: function (t, o) {
+          if (o.falcon) {
+            [0, 0.08, 0.17].forEach(function (d, i) { SFX.tick(t + d, { f: 2400 - i * 280, v: 0.07 }); });
+            swish(t + 0.15, 0.9, 0.1, 260, 1200);
+          } else {
+            SFX.groan(t, { dur: 1.15 });
+            SFX.thud(t + 0.65);
+          }
+        },
+        // ---- S19: The Oracle's Horizon ----
+        ringGrind: function (t, o) {
+          var r = o.ring || 0;
+          swish(t, 0.22, 0.055, 220 + r * 70, 520 + r * 140);
+          SFX.tick(t + 0.02, { f: 2250 - r * 350, v: 0.07 });
+          bell(t + 0.025, 620 + r * 180, 0.024, 0.35);
+        },
+        starAlign: function (t, o) {
+          var hz = scaleOf(), count = Math.max(1, o.count || 1);
+          [0, 2, 4, 7].slice(0, count + 1).forEach(function (d, i) { bell(t + i * 0.065, hz(7 + d), 0.05, 1.7); });
+          if (o.all) swish(t + 0.08, 1.1, 0.05, 800, 3400);
+        },
+        scaleChime: function (t, o) {
+          if (o.swing) {
+            bell(t, 415.3, 0.06, 0.7);
+            bell(t + 0.18, 392.0, 0.055, 0.9);
+          } else if (o.settled) {
+            var base = 392 * Math.pow(2, (o.step || 0) / 6);
+            bell(t, base, 0.11, 2.8);
+            bell(t + 0.08, base * 1.5, 0.06, 2.4);
+            SFX.tick(t, { f: 1650, v: 0.05 });
+          } else {
+            SFX.tick(t, { f: 2100, v: 0.06 });
+            bell(t + 0.02, 587.33 + (o.step || 0) * 60, 0.05, 1.2);
+          }
+        },
+        vowChord: function (t, o) {
+          if (o.final) {
+            [146.83, 220, 293.66, 369.99, 440, 587.33].forEach(function (f, i) {
+              var osc = ctx.createOscillator(), g = env(t + i * 0.06, 0.045, 0.18, 2.8);
+              osc.type = i < 2 ? 'triangle' : 'sine';
+              osc.frequency.value = f;
+              osc.connect(g); g.connect(fxBus); osc.start(t + i * 0.06); osc.stop(t + 3.4);
+            });
+            swish(t + 0.1, 1.6, 0.045, 600, 2800);
+          } else {
+            var notesSeq = [293.66, 329.63, 369.99, 440.0, 587.33];
+            var f = notesSeq[((o.step || 1) - 1) % notesSeq.length];
+            bell(t, f, 0.055, 1.8);
+            bell(t + 0.04, f * 0.5, 0.032, 1.6);
+          }
+        }
       };
       function sfx(kind, o) {
         if (muted || !SFX[kind] || !audio()) return false;
@@ -460,30 +594,77 @@
         return true;
       }
 
-      // ---- Which game is on screen
-      function onScreen() {
-        var ids = Object.keys(BEDS);
-        for (var i = 0; i < ids.length; i++) {
-          var m = document.getElementById(ids[i]);
-          if (m && m.style.display !== 'none' && m.getClientRects().length) return ids[i];
-        }
-        return null;
+      // ---- Which game or Hub path is on screen
+      function activePath() {
+        var p = document.documentElement && document.documentElement.getAttribute('data-map-path');
+        return (p === 'desert' || p === 'stage') ? p : 'constellation';
+      }
+      function activeView() {
+        return (document.body && document.body.getAttribute('data-active-view')) || '';
+      }
+      function sandstormOn() {
+        var s = document.getElementById('sandstorm-lockout-overlay');
+        return !!(s && s.style.display !== 'none' && s.getClientRects().length);
+      }
+      function gatesMode() {
+        var m = document.getElementById('modal-gates-tower-ii');
+        return (m && m.dataset && m.dataset.gatesMode) || null;
       }
       function wireMood() {
         var w = document.querySelector('.messenger-app-window');
         return (w && w.dataset && w.dataset.mood) || 'dawn';
       }
+      function onScreen() {
+        var ids = Object.keys(BEDS);
+        for (var i = 0; i < ids.length; i++) {
+          if (ids[i] === 'wire-ambient-probe') continue;
+          var m = document.getElementById(ids[i]);
+          if (m && m.style.display !== 'none' && m.getClientRects().length) return ids[i];
+        }
+        if (sandstormOn()) return null;
+        var probe = document.getElementById('wire-ambient-probe');
+        if (probe && probe.style.display !== 'none' && probe.getClientRects().length) return 'wire-ambient-probe';
+        return 'hub:' + activePath();
+      }
+      function bedDef(id, wm, gm) {
+        if (!id) return null;
+        if (id === 'wire-ambient-probe') return WIRE_MOOD_BEDS[wm] || BEDS[id];
+        if (id === 'modal-gates-tower-ii' && (gm === 'return' || gm === 'farewell')) return GATES_RETURN_BED;
+        if (id.indexOf('hub:') === 0) return HUB_BEDS[id.slice(4)] || HUB_BEDS.constellation;
+        return BEDS[id] || null;
+      }
+      function updateSongMix(fadeS) {
+        if (!ctx || !bed || !bed.song) return;
+        var g = bed.song.mix.gain, t = ctx.currentTime;
+        var silent = hushed || autoDucked;
+        g.cancelScheduledValues(t);
+        g.setValueAtTime(Math.max(0.0001, g.value), t);
+        g.linearRampToValueAtTime(silent ? 0.0001 : bed.song.level, t + (fadeS || (silent ? 0.55 : 1.6)));
+      }
+      function setAutoDuck(on) {
+        on = !!on;
+        if (on === autoDucked) return;
+        autoDucked = on;
+        updateSongMix(on ? 0.5 : 1.5);
+      }
       function sync() {
         var id = onScreen();
         var wm = id === 'wire-ambient-probe' ? wireMood() : null;
-        if (id === current && wm === currentWireMood) return;
+        var gm = id === 'modal-gates-tower-ii' ? gatesMode() : null;
+        var duck = !!(id && id.indexOf('hub:') === 0 && activeView() === 'view-transmissions');
+        if (id === current && wm === currentWireMood && gm === currentGatesMode) {
+          setAutoDuck(duck);
+          return;
+        }
         if (bed) { fadeOut(bed); bed = null; }
         current = id;
         currentWireMood = wm;
-        // back to neutral only when the game closes: a game that set its level as it opened keeps it
-        if (!id) { intensity = 0.5; hushed = false; }
-        if (!id || !audio()) return;
-        var def = id === 'wire-ambient-probe' ? (WIRE_MOOD_BEDS[wm] || BEDS[id]) : BEDS[id];
+        currentGatesMode = gm;
+        autoDucked = duck;
+        // back to neutral only when no station is on screen: a game that set its level as it opened keeps it
+        if (!id || id.indexOf('hub:') === 0) { intensity = 0.5; hushed = false; }
+        var def = bedDef(id, wm, gm);
+        if (!def || !audio()) return;
         bed = build(def);
         bed.out.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_S);
         if (ctx.state === 'suspended' && !document.hidden) ctx.resume().catch(function () {});
@@ -491,7 +672,13 @@
       setInterval(sync, POLL_MS);
 
       // Sound may only start after a gesture; the tab going away pauses it
-      function wake() { if (audio() && ctx.state === 'suspended' && !document.hidden) ctx.resume().catch(function () {}); }
+      function wake() {
+        if (!audio()) return;
+        if (ctx.state === 'suspended' && !document.hidden) {
+          ctx.resume().then(function () { if (bed && bed.song) bed.song.tick(); }).catch(function () {});
+        }
+        sync();
+      }
       ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { window.addEventListener(ev, wake, true); });
       document.addEventListener('visibilitychange', function () {
         if (!ctx) return;
@@ -535,13 +722,20 @@
           on = !!on;
           if (on === hushed) return;
           hushed = on;
-          if (!ctx || !bed || !bed.song) return;
-          var g = bed.song.mix.gain, t = ctx.currentTime;
-          g.cancelScheduledValues(t); g.setValueAtTime(Math.max(0.0001, g.value), t);
-          g.linearRampToValueAtTime(on ? 0.0001 : bed.song.level, t + (on ? 0.6 : 2.5));
+          updateSongMix(on ? 0.6 : 2.5);
         },
         state: function () {
-          return { bed: current ? BEDS[current].name : null, muted: muted, running: !!(ctx && ctx.state === 'running'), music: bed && bed.mood || null, notes: notes, intensity: intensity, hushed: hushed };
+          var d = current ? bedDef(current, currentWireMood, currentGatesMode) : null;
+          return {
+            bed: d ? d.name : null,
+            muted: muted,
+            running: !!(ctx && ctx.state === 'running'),
+            music: bed && bed.mood || null,
+            notes: notes,
+            intensity: intensity,
+            hushed: hushed,
+            ducked: autoDucked
+          };
         }
       };
     })();

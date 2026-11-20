@@ -18,7 +18,7 @@
       const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       // A held key turns mirrors faster than the ticks should sound
       let lastTurnCue = 0;
-      const turnCue = () => { const n = Date.now(); if (n - lastTurnCue < 80) return true; lastTurnCue = n; return cue('tick', { f: 1700, v: 0.08 }); };
+      const turnCue = (i) => { const n = Date.now(); if (n - lastTurnCue < 80) return true; lastTurnCue = n; return cue('brassTurn', { i: i }); };
       const $ = (id) => document.getElementById(id);
       const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -246,7 +246,7 @@
         if (!isAwake() || dawnDone() || dawn.running || k < 0 || k >= COURT.entries.length) return;
         if (view.rehearse && view.rehearse.k === k) { endRehearse(); return; }
         view.rehearse = { k };
-        cue('bell', { f: 1046.5 * Math.pow(2, -k / 12), v: 0.035, len: 1.2 });
+        cue('sunBeam', { moon: true, k: k });
         if (G && G.fx && G.fx.gait) G.fx.gait.react('wonder');
         moonNote();
         armRehearse();
@@ -274,7 +274,7 @@
         if (!dawn.running && get(KEYS.lamp) !== 'lit') { askLamp(); return; }
         mirrors[i] = mirrors[i] === 'f' ? 'b' : 'f';
         set(KEYS.mirrors, mirrors.join(''));
-        if (!turnCue() && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
+        if (!turnCue(i) && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         const hadFocus = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-i') === String(i);
         checkRay();
         if (rehearsing()) { moonNote(); armRehearse(); }
@@ -331,7 +331,7 @@
         if (view.rehearse) { view.rehearse = null; clearTimeout(rehearseT); }
         dawn.running = true; dawn.step = 0; dawn.locks = 0; dawn.seen = 0;
         dawn.deadline = performance.now() + stepMs();
-        cue('whoosh', { dur: 1.4 });
+        cue('sunBeam', { dur: 1.8 });
         feedback(el.dawnFeedback, 'The first ray slips under the arch.', '');
         subtitle('The sun comes up behind the arch. Its first ray slips in at the bronze notch, low and gold.', 5, 'act');
         if (G && G.fx && G.fx.gait) G.fx.gait.react('wonder');
@@ -389,8 +389,12 @@
         const last = dawn.locks >= COURT.entries.length;
         sceneLock(dawn.locks, last, COURT.entries[dawn.step]);
         // each lock rings a step higher; the last one opens the altar
-        if (last) cue('stone', { dur: 2 });
-        if (!cue(last ? 'reveal' : 'shimmer', { deg: 12 + dawn.locks * 2 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        if (last) {
+          cue('altarOpen');
+          if (!cue('reveal') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        } else if (!cue('archLock', { lock: dawn.locks }) && sfx && sfx.playCelestialChime) {
+          sfx.playCelestialChime();
+        }
         setMood();
         if (dawn.locks >= COURT.entries.length) {
           stopDawn();
@@ -481,7 +485,7 @@
           if (pause) t += PAUSE_MS - GAP_MS;
           // a high bell rings with each flash of the far light, longer for a long flash; the log draws it as it comes
           playing.push(setTimeout(() => {
-            lightOn(true); cue('bell', { f: 1318.5, v: 0.04, len: p === 'L' ? 1.4 : 0.45 });
+            lightOn(true); cue('towerPulse', { long: p === 'L', own: false });
             if (traced) { seen += (pause ? ' ' : '') + p; towerTrace(seen); }
           }, t));
           t += FLASH_MS[p];
@@ -572,7 +576,7 @@
         const own = el.night && el.night.querySelector('.solstice-own');
         if (own) { own.setAttribute('fill', '#b8a07a'); own.setAttribute('r', '2'); }
         if (pulses.length >= 8) { feedback(el.signalFeedback, 'Eight flashes is all the mirror can hold. Clear them with ⌫ and try again.', 'error'); return; }
-        cue('bell', { f: 880, v: 0.04, len: held >= LONG_PRESS_MS ? 1.4 : 0.45 });
+        cue('towerPulse', { long: held >= LONG_PRESS_MS, own: true });
         pulses.push(held >= LONG_PRESS_MS ? 'L' : 'S');
         view.pulseT = performance.now();
         renderPulses();
@@ -594,7 +598,7 @@
         }
         pulses = []; renderPulses(); towerTrace('');
         set(KEYS.round, String(r + 1));
-        if (!cue('shimmer', { deg: 10 + r * 2 }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
+        if (!cue('starAlign', { count: Math.min(3, r + 1) }) && sfx && sfx.playChimeHover) sfx.playChimeHover();
         if (r + 1 >= ROUNDS.length) { runFinale(); return; }
         feedback(el.signalFeedback, 'The light answers.', 'ok');
         if (G && G.fx && G.fx.gait) G.fx.gait.react('cheer');
@@ -624,7 +628,7 @@
           if (G && G.fx) { G.fx.shake.add(0.25); if (G.fx.gait) G.fx.gait.react('flinch'); }
           subtitle('The light on Tower II goes out, all at once. A red glow rises at its foot.', 5.5, 'act');
           cue('thud');
-          cue('flame', { dur: 2.4 });
+          cue('emberSurge', { dur: 2.4, count: 4 });
           say("Then the light went out. All at once, Silvia. A red glow at the foot of Tower II, and the wind smells of smoke. The wagons have reached the Sanctuary.");
           setTimeout(closeTheNight, reduced() ? 1800 : 6000);
         });

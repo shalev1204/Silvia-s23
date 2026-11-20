@@ -378,7 +378,7 @@
       });
       out.push(
         S('Five. The arch has not held five since the earthquake.'),
-        nar('All five sockets burn the same amber, and the whole arch hums like a struck bell.', { fx: function () { c.fireBurst(1.0); if (c.cue) c.cue('bell', { f: 196, v: 0.5, len: 5 }); } }),
+        nar('All five sockets burn the same amber, and the whole arch hums like a struck bell.', { fx: function () { c.fireBurst(1.0); if (c.cue) { c.cue('altarOpen'); c.cue('bell', { f: 196, v: 0.4, len: 5 }); } } }),
         H('The doors have not moved yet, Silvia.'));
       return out;
     }
@@ -552,7 +552,7 @@
             a.walk('servant', 0.15, 0.6, { speed: 0.8, face: 0, then: function () { react('servant', 'offer'); c.openDoors('shut'); if (c.cue) c.cue('stone'); } });
           } else c.openDoors('shut');
         } }),
-        nar('In the arch the five seals catch the first sun, one after the other, and burn like five small suns.', { hold: 2200, fx: function () { look('arch')(); c.sealGlow(); c.fireBurst(1.2); if (c.cue) c.cue('bell', { f: 196, v: 0.5, len: 5 }); } }),
+        nar('In the arch the five seals catch the first sun, one after the other, and burn like five small suns.', { hold: 2200, fx: function () { look('arch')(); c.sealGlow(); c.fireBurst(1.2); if (c.cue) { c.cue('starAlign', { count: 3, all: true }); c.cue('bell', { f: 196, v: 0.4, len: 5 }); } } }),
         S('As long as they burn, the house is kept. Go.', { fx: function () { var a = A(); if (a) a.walk('servant', 0.95, 0.95, { speed: 0.8, face: 2.44 }); } })];
       if (fw.veil) out.push(nar('He stands on the top step with the folded veil against his chest, and does not go in.'));
       out.push(

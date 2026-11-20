@@ -2349,35 +2349,92 @@ def test_stage_pause(browser):
 
 
 def test_ambience(browser):
-    print("\n21. Ambient sound: each station game has its own bed, it stops on close, and the speaker mutes it")
-    ctx, page, errors = new_page(browser, dict(DESERT_BASE, **DESERT_DONE, order_clepsydra_march_start="1", order_clepsydra_march_bypassed="true"))
+    print("\n21. Ambient sound: Hub path themes, continuous navigation, S17-S19 desert adventure score, custom SFX and mute")
+    ctx, page, errors = new_page(browser, dict(
+        DESERT_BASE, **DESERT_DONE,
+        order_clepsydra_march_start="1", order_clepsydra_march_bypassed="true",
+        order_cairn_iv_completed="true",
+        order_arch_solstice_completed="true",
+        order_polybius_stele_completed="true",
+        order_oracle_horizon_completed="true",
+        order_seal_cairn_2="true", order_seal_cairn_3="true", order_seal_cairn_4="true", order_seal_cairn_5="true",
+        order_cairn5_howto="seen", order_cairn5_cine_intro="seen",
+        order_polybius_howto="seen", order_polybius_cine_intro="seen",
+        order_oracle_howto="seen", order_oracle_cine_intro="seen",
+    ))
     page.goto(f"{BASE}/index.html", wait_until="load")
-    page.wait_for_timeout(2500)
+    page.wait_for_timeout(1800)
     js = page.evaluate
     state = lambda: js("EclipseAmbience.state()")
-    check(state()["bed"] is None and js("document.getElementById('ambience-toggle').getClientRects().length > 0"), "on the map: no bed, the speaker is on screen")
+    check(js("document.getElementById('ambience-toggle').getClientRects().length > 0"), "the speaker toggle is on screen")
     page.mouse.click(5, 5)   # the first gesture lets the browser play sound
-    js("window.openOasisClepsydraModal()"); page.wait_for_timeout(1500)
-    try: page.wait_for_function("EclipseAmbience.state().bed === 'four wells'", timeout=9000)
-    except Exception: pass
+    js("window.switchMapPath('constellation', true)")
+    until(page, "EclipseAmbience.state().music === 'hubMondstadt' && EclipseAmbience.state().running && EclipseAmbience.state().notes > 0", 9)
+    st = state()
+    check(st["bed"] == "constellation hub" and st["music"] == "hubMondstadt" and st["running"] and st["notes"] > 0 and not st["muted"],
+          "Constellation Hub plays Mondstadt-style soundtrack", str(st))
+
+    js("window.switchMapPath('desert', true)")
+    until(page, "EclipseAmbience.state().music === 'hubLiyue'", 9)
+    st = state()
+    check(st["bed"] == "desert hub" and st["music"] == "hubLiyue", "Desert Hub plays Liyue-style soundtrack", str(st))
+
+    # Moving between Quest Map and Cipher Ledger keeps the Hub soundtrack playing continuously without ducking
+    js("window.activateHubView('view-cipher')"); page.wait_for_timeout(900)
+    st = state()
+    check(st["bed"] == "desert hub" and st["music"] == "hubLiyue" and not st["ducked"],
+          "Cipher Ledger shares the Desert Hub soundtrack uninterrupted", str(st))
+
+    # Transmissions view auto-ducks Hub music so radio audio recordings remain clear
+    js("window.activateHubView('view-transmissions')")
+    until(page, "EclipseAmbience.state().ducked === true", 6)
+    check(state()["ducked"] is True, "Transmissions view auto-ducks Hub music", str(state()))
+    js("window.activateHubView('view-trail')")
+    until(page, "EclipseAmbience.state().ducked === false", 6)
+    check(state()["ducked"] is False, "returning to Quest Map restores Hub music", str(state()))
+
+    js("window.switchMapPath('stage', true)")
+    until(page, "EclipseAmbience.state().music === 'hubFontaine'", 9)
+    st = state()
+    check(st["bed"] == "stage hub" and st["music"] == "hubFontaine", "Stage Hub plays Fontaine-style soundtrack", str(st))
+
+    # Station games take priority over the Hub soundtrack and switch cleanly between one another
+    js("window.openOasisClepsydraModal()")
+    until(page, "EclipseAmbience.state().bed === 'four wells'", 9)
     st = state()
     check(st["bed"] == "four wells" and st["running"] and not st["muted"], "the Four Wells play their own bed", str(st))
-    js("window.closeOasisVisions()"); page.wait_for_timeout(1500)
-    js("window.openSaltPlayaModal()"); page.wait_for_timeout(1500)
-    # (the Playa builds a rich 3D scene on the main thread: under software GL the bed's 600 ms poll can wait a few seconds)
-    try: page.wait_for_function("EclipseAmbience.state().bed === 'salt flat'", timeout=9000)
-    except Exception: pass
+    js("window.closeOasisVisions()")
+    until(page, "EclipseAmbience.state().bed !== 'four wells'", 6)
+    js("window.openSaltPlayaModal()")
+    until(page, "EclipseAmbience.state().bed === 'salt flat'", 9)
     check(state()["bed"] == "salt flat", "closing one game and opening another changes the bed", str(state()))
-    page.click("#ambience-toggle"); page.wait_for_timeout(300)
-    check(state()["muted"] and js("localStorage.getItem('order_ambience_muted')") == "true", "the speaker, above the game, mutes it")
     js("window.closeSaltPlayaModal()")
-    # the window fades for 220 ms and the bed follows on its next 600 ms look: slower when the machine is busy
-    for _ in range(30):
-        page.wait_for_timeout(200)
-        if state()["bed"] is None:
-            break
-    check(state()["bed"] is None, "with no game open there is silence")
-    page.reload(wait_until="load"); page.wait_for_timeout(2500)
+    until(page, "EclipseAmbience.state().bed === 'stage hub'", 9)
+    check(state()["bed"] == "stage hub", "closing the station restores the Hub soundtrack", str(state()))
+
+    # Stations 17-19 and Tower II Gates return share the medieval Arabic desert adventure score
+    for opener, closer, want_bed, want_music in [
+        ("window.openSolsticeModal()", "window.closeSolsticeModal()", "courtyard of rays", "desertAdventureArch"),
+        ("window.openSteleModal()", "window.closeSteleModal()", "tower in flames", "desertAdventureFire"),
+        ("window.openOracleModal()", "window.closeOracleModal()", "inner chamber", "desertAdventureOracle"),
+        ("window.openGatesTowerIIModal({ mode: 'return' })", "document.getElementById('btn-close-gates-tower-ii').click()", "gates of tower ii", "desertAdventure"),
+    ]:
+        js(opener)
+        until(page, f"EclipseAmbience.state().music === '{want_music}'", 9)
+        st = state()
+        check(st["bed"] == want_bed and st["music"] == want_music, f"{want_bed} plays {want_music}", str(st))
+        js(closer)
+        until(page, "EclipseAmbience.state().bed === 'stage hub'", 9)
+
+    sfx_ok = js("""['brassTurn', 'sunBeam', 'archLock', 'towerPulse', 'altarOpen',
+      'steleKnock', 'chalkScratch', 'emberSurge', 'hatchOpen',
+      'ringGrind', 'starAlign', 'scaleChime', 'vowChord'].every(k => EclipseAmbience.sfx(k, { i: 1, lock: 2, count: 2, ring: 1, step: 2 }))""")
+    check(sfx_ok is True, "all custom SFX for S17-S19 synthesize cleanly")
+
+    page.click("#ambience-toggle"); page.wait_for_timeout(300)
+    check(state()["muted"] and js("localStorage.getItem('order_ambience_muted')") == "true" and not js("EclipseAmbience.sfx('steleKnock')"),
+          "the speaker mutes music and SFX")
+    page.reload(wait_until="load"); page.wait_for_timeout(2000)
     check(state()["muted"] and js("document.getElementById('ambience-toggle').getAttribute('aria-pressed')") == "true", "the choice is remembered")
     check(not errors, "no JS errors with the ambient sound", "; ".join(sorted(set(errors))[:3]))
     ctx.close()

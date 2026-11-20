@@ -1860,6 +1860,7 @@
       return;
     }
     returnFocusTo = document.activeElement;
+    modal.dataset.gatesMode = ret ? 'return' : (fare ? 'farewell' : 'first');
     modal.style.display = 'flex';
     document.body.classList.add('modal-open');
     var begin = function () { if (ret) startReturn(opts.onDone); else if (fare) startFarewell(opts.onDone); else startConversation(isCompleted()); };
@@ -1875,6 +1876,7 @@
   var returnFocusTo = null;
   function closeGatesModal() {
     if (modal.style.display === 'none') return;
+    delete modal.dataset.gatesMode;
     modal.style.display = 'none';
     document.body.classList.remove('modal-open');
     ds.token++;

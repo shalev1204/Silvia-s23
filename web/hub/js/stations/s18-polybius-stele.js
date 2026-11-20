@@ -251,7 +251,12 @@
           return audio;
         } catch (e) { return null; }
       }
-      function knockSound(fromBelow) {
+      function knockSound(fromBelow, pair) {
+        const amb = window.EclipseAmbience;
+        if (amb && typeof amb.sfx === 'function') {
+          amb.sfx('steleKnock', { fromBelow: !!fromBelow, pair: pair || 0 });
+          return;
+        }
         const a = ensureAudio();
         if (!a) return;
         try {
@@ -311,7 +316,10 @@
       function stopKnocks(finish) {
         if (playing && belowRun) { heard = []; renderTape(el.tape, heard, false); }
         belowRun = false;
-        if (playing) playing.forEach((t) => clearTimeout(t));
+        if (playing) {
+          playing.forEach((t) => clearTimeout(t));
+          if (window.EclipseAmbience && window.EclipseAmbience.hush) window.EclipseAmbience.hush(false);
+        }
         playing = null;
         const then = afterPlaying;
         afterPlaying = null;
@@ -323,13 +331,14 @@
         playing = [];
         afterPlaying = done || null;
         belowRun = !!fromBelow;
+        if (window.EclipseAmbience && window.EclipseAmbience.hush) window.EclipseAmbience.hush(true);
         if (fromBelow) { heard = []; renderTape(el.tape, heard, false); }
         let t = 350;
         groups.forEach((count, gi) => {
           if (gi > 0) t += gi % 2 ? GROUP_PAUSE_MS - KNOCK_MS : LETTER_PAUSE_MS - KNOCK_MS;
           for (let k = 0; k < count; k++) {
             playing.push(setTimeout(() => {
-              knockSound(fromBelow);
+              knockSound(fromBelow, gi % 2);
               ripple(fromBelow);
               if (fromBelow) {
                 if (heard.length <= gi) heard.push(0);
@@ -342,6 +351,7 @@
         });
         playing.push(setTimeout(() => {
           playing = null; afterPlaying = null; belowRun = false;
+          if (window.EclipseAmbience && window.EclipseAmbience.hush) window.EclipseAmbience.hush(false);
           if (fromBelow) renderTape(el.tape, heard, false);
           render();
           if (done) done();
@@ -394,6 +404,7 @@
       function pauseKnock() {
         if (!replyActive() || playing || !replyOpen) return;
         replyOpen = false;
+        cue('chalkScratch');
         renderTape(el.replyTape, reply, false);
       }
       function clearReply() { reply = []; replyOpen = false; renderTape(el.replyTape, reply, false); }
@@ -555,7 +566,7 @@
           // the fire takes its turn too: flagstones catching, and burnt-out beams giving way to ash
           let caught = 0, spent = 0;
           IGNITE.forEach((ig) => { if (ig === run.t) caught++; else if (ig + ATRIUM.burn === run.t) spent++; });
-          if (caught) cue('flame', { dur: 0.6 + Math.min(caught, 4) * 0.15 });
+          if (caught) cue('emberSurge', { count: caught, dur: 0.65 + Math.min(caught, 4) * 0.14 });
           if (spent) cue('crack', { v: 0.12 });
         }
         pickUp();
@@ -657,20 +668,20 @@
       function openHatch(falcon) {
         hatchPending = false;
         sceneHatch(falcon);
-        completeStation();
+        completeStation(falcon);
         feedback(el.moveFeedback, falcon ? 'The brass falcon drops on its chain, and the bronze hatch swings up.' : 'Hermes lifts the bronze hatch of the well.', 'ok');
         say((falcon
           ? "I hooked the falcon on the chain, Silvia, and the hatch rose like a feather. "
           : "I heaved the hatch open, Silvia. ")
           + "He came up out of the dark: the Servant, alive, black with smoke, a roll of charts in his arms. He took my wrists in his burnt hands and did not let go. Under the hatch, two lines cut by the founders. Write them down.");
       }
-      function completeStation() {
+      function completeStation(falcon) {
         // the key first: once the station is done the inventory counts it from that flag and would never mark it new
         if (typeof window.addRelicToInventory === 'function') window.addRelicToInventory('servant_key');
         set(KEYS.done, 'true');
         if (run && run.trail) set(KEYS.trail, JSON.stringify({ p: run.trail, t: run.t }));
         stopKnocks();
-        cue('groan', { dur: 1.2 });
+        cue('hatchOpen', { falcon: !!falcon });
         if (!cue('win') && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
         applyVictory();
         render();
@@ -950,14 +961,14 @@
         setMood();
         proverbHints.refresh(); knockHints.refresh(); fireHints.refresh();
       }
-      // The flames bed has no music, so this only nudges it; it rises with the stanzas and the crossing
+      // The flames bed carries the shared medieval desert adventure score: it escalates across stanzas and rises with the fire crossing
       function setMood() {
         const amb = window.EclipseAmbience;
         if (!amb || !amb.intensity) return;
         let k;
-        if (over()) k = 0.6;
-        else if (fireOpen()) k = 0.45 + 0.15 * Math.min(1, (run ? run.t : 0) / ATRIUM.breath);
-        else k = isAwake() ? 0.32 + 0.03 * knocksDone() : 0.3;
+        if (over()) k = 0.7;
+        else if (fireOpen()) k = 0.5 + 0.45 * Math.min(1, (run ? run.t : 0) / ATRIUM.breath);
+        else k = isAwake() ? 0.32 + 0.04 * knocksDone() : 0.3;
         amb.intensity(k);
       }
 
