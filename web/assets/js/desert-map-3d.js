@@ -959,6 +959,28 @@
     }
 
     var tmp = new THREE.Vector3();
+    // A station's name opens over its pin. Near the edge of the map it must not leave it: it slides sideways to stay inside,
+    // wraps when it is wider than the whole map (a phone), and drops under the pin when the pin is at the top.
+    var LABEL_PAD = 10;
+    function fitLabel(m, x, y, s, w) {
+      var lab = m.label === undefined ? (m.label = m.el.querySelector('.d3-label')) : m.label;
+      if (!lab) return;
+      var room = w - 2 * LABEL_PAD;
+      if (m.fitW !== w || !m.lw) {   // measured once per map width (the text of a marker never changes between rebuilds)
+        lab.classList.remove('is-wrap'); lab.style.width = '';
+        m.lw = lab.offsetWidth; m.fitW = w;
+        if (m.lw * s > room && room > 80) { lab.classList.add('is-wrap'); lab.style.width = Math.floor(room / s) + 'px'; m.lw = lab.offsetWidth; }
+      }
+      var half = m.lw * s / 2, dx = 0;
+      if (x - half < LABEL_PAD) dx = LABEL_PAD - (x - half);
+      else if (x + half > w - LABEL_PAD) dx = (w - LABEL_PAD) - (x + half);
+      var shift = Math.round(dx / s);
+      if (m.shift !== shift) { m.shift = shift; lab.style.setProperty('--d3-lx', shift + 'px'); }
+      var below = y < 90;
+      if (m.below !== below) { m.below = below; m.el.classList.toggle('is-label-below', below); }
+    }
+    window.addEventListener('resize', function () { for (var i = 0; i < markers.length; i++) markers[i].fitW = 0; });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { for (var i = 0; i < markers.length; i++) markers[i].fitW = 0; });
     function updateMarkers() {
       var w = stage.clientWidth, h = stage.clientHeight;
       world.updateMatrixWorld(true);
@@ -972,6 +994,7 @@
         var s = clamp(camDist / depth, 0.72, 1.3);
         m.el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) translate(-50%,-50%) scale(' + s.toFixed(3) + ')';
         m.el.style.zIndex = String(Math.round(1000 - depth * 100));
+        if (!m.hermes) fitLabel(m, x, y, s, w);
       }
     }
 

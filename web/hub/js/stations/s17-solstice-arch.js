@@ -142,6 +142,7 @@
       let pulses = [];
       let playing = null;   // timers of the light on Tower II
       let towerOn = false;  // the light on Tower II is burning this instant
+      let speaking = false; // the light on Tower II is spelling a pattern: the scene is left clear to watch it
       let finale = false;
 
       function say(text) { if (el.dispatch) el.dispatch.textContent = '"' + text + '"'; }
@@ -300,7 +301,7 @@
             spyglass_lens: 'The lens makes the dark bigger, not lighter.',
             founders_lamp: 'Empty: I poured its oil into my own lamp in the labyrinth.'
           },
-          cancel: 'We have no light',
+          cancel: get(KEYS.lamp) === 'dark' ? 'Wait for the dawn' : 'We have no light',
           onRight: () => {
             set(KEYS.lamp, 'lit');
             ru.spend('lamp_oil', { tag: 'BURNT UNDER THE ARCH', lore: 'The last of the nomads’ oil. It burnt down under the Arch of the Solstice while Hermes set the mirrors for the dawn.' }, () => {
@@ -417,6 +418,7 @@
         dawnHints.fail();
         cue('dusk');
         sceneSpent();
+        subtitle('The sun climbs clear of the arch. The courtyard turns to plain day, and the brass ring lets go of its locks.', 5, 'act');
         dawn.locks = 0; dawn.step = 0;
         feedback(el.dawnFeedback, 'The sun climbed past the arch. The dawn is spent; the ring only takes a dawn ray.', 'error');
         say("Too high, Silvia. The courtyard is in plain daylight and the ring has let go of its locks. Tomorrow the sun will rise again, and the mirrors will still be where you left them." + (get(KEYS.dawnHint) === 'true' ? " I have counted my breaths: tomorrow each ray will wait longer for us." : ''));
@@ -453,32 +455,40 @@
       }
       function stopLight() {
         if (playing) playing.forEach((t) => clearTimeout(t));
-        playing = null;
+        playing = null; speaking = false;
         lightOn(false);
       }
-      function towerTrace(text) {
+      // a flash is drawn as a pip: a round dot for a short one, a bar for a long one; a pause in the light is a gap
+      function pips(pattern) {
+        return pattern.split('').map((p) => (p === ' ' ? '<i class="sp-gap"></i>' : '<i class="' + (p === 'L' ? 'sp-l' : 'sp-s') + '"></i>')).join('');
+      }
+      const spoken = (pattern) => pattern.replace(/ /g, '').split('').map((p) => (p === 'L' ? 'long' : 'short')).join(', ');
+      function towerTrace(pattern) {
         if (!el.towerTrace) return;
-        el.towerTrace.textContent = text;
-        el.towerTrace.classList.toggle('is-on', !!text);
+        if (pattern === '' || pattern === undefined) { el.towerTrace.classList.remove('is-on'); el.towerTrace.innerHTML = ''; el.towerTrace.removeAttribute('aria-label'); return; }
+        el.towerTrace.innerHTML = '<span class="sp-who">Tower II</span><span class="sp-row">' + pips(pattern) + '</span>';
+        el.towerTrace.setAttribute('aria-label', 'Tower II: ' + (spoken(pattern) || 'watching'));
+        el.towerTrace.classList.add('is-on');
       }
       function playPattern(pattern, done, traced) {
         stopLight();
         playing = [];
         let t = 400, seen = '';
-        if (traced) towerTrace('Tower II:');
+        if (traced) towerTrace(' ');
+        speaking = true; setHover(view.hover);
         pattern.split('').forEach((p, i) => {
           const pause = pattern === ROUNDS[3] && i === 3;
           if (pause) t += PAUSE_MS - GAP_MS;
           // a high bell rings with each flash of the far light, longer for a long flash; the log draws it as it comes
           playing.push(setTimeout(() => {
             lightOn(true); cue('bell', { f: 1318.5, v: 0.04, len: p === 'L' ? 1.4 : 0.45 });
-            if (traced) { seen += (pause ? '   ' : ' ') + (p === 'S' ? '·' : '—'); towerTrace('Tower II:' + seen); }
+            if (traced) { seen += (pause ? ' ' : '') + p; towerTrace(seen); }
           }, t));
           t += FLASH_MS[p];
           playing.push(setTimeout(() => lightOn(false), t));
           t += GAP_MS;
         });
-        playing.push(setTimeout(() => { playing = null; if (done) done(); }, t));
+        playing.push(setTimeout(() => { playing = null; speaking = false; setHover(view.hover); if (done) done(); }, t));
       }
       // ---- The Signal Mirror: she hands it to Hermes before he can answer the tower ----
       const mirrorRaised = () => isDone() || get(KEYS.mirrorRaised) === 'true';
@@ -529,12 +539,14 @@
       }
       function renderPulses() {
         if (!el.pulses) return;
-        el.pulses.textContent = pulses.map((p) => (p === 'S' ? '·' : '—')).join(' ') || ' ';
+        el.pulses.innerHTML = pulses.length ? pips(pulses.join('')) : '<span class="sp-empty">your flashes</span>';
+        el.pulses.setAttribute('aria-label', pulses.length ? 'Your flashes: ' + spoken(pulses.join('')) : 'No flashes yet');
+        el.pulses.classList.toggle('is-full', pulses.length >= 8);
       }
-      let pressAt = 0, pressPointer = null;
+      let pressAt = 0, pressPointer = null, longT = 0;
       function cancelPress() {
-        pressAt = 0; pressPointer = null;
-        if (el.flash) el.flash.classList.remove('is-down');
+        pressAt = 0; pressPointer = null; clearTimeout(longT);
+        if (el.flash) el.flash.classList.remove('is-down', 'is-long');
         const own = el.night && el.night.querySelector('.solstice-own');
         if (own) { own.setAttribute('fill', '#b8a07a'); own.setAttribute('r', '2'); }
       }
@@ -544,6 +556,8 @@
         pressPointer = e && e.pointerId !== undefined ? e.pointerId : null;
         pressAt = performance.now();
         if (el.flash) el.flash.classList.add('is-down');
+        clearTimeout(longT);
+        longT = setTimeout(() => { if (pressAt && el.flash) { el.flash.classList.add('is-long'); cue('tick', { f: 1100, v: 0.05 }); } }, LONG_PRESS_MS);
         const own = el.night && el.night.querySelector('.solstice-own');
         if (own) { own.setAttribute('fill', '#fff7d6'); own.setAttribute('r', '4'); }
       }
@@ -553,11 +567,11 @@
         if (e) e.preventDefault();
         pressPointer = null;
         const held = performance.now() - pressAt;
-        pressAt = 0;
-        if (el.flash) el.flash.classList.remove('is-down');
+        pressAt = 0; clearTimeout(longT);
+        if (el.flash) el.flash.classList.remove('is-down', 'is-long');
         const own = el.night && el.night.querySelector('.solstice-own');
         if (own) { own.setAttribute('fill', '#b8a07a'); own.setAttribute('r', '2'); }
-        if (pulses.length >= 8) return;
+        if (pulses.length >= 8) { feedback(el.signalFeedback, 'Eight flashes is all the mirror can hold. Clear them with ⌫ and try again.', 'error'); return; }
         cue('bell', { f: 880, v: 0.04, len: held >= LONG_PRESS_MS ? 1.4 : 0.45 });
         pulses.push(held >= LONG_PRESS_MS ? 'L' : 'S');
         view.pulseT = performance.now();
@@ -593,7 +607,8 @@
         if (!el.hint) return;
         const r = roundsDone();
         el.hint.style.display = '';
-        el.hint.textContent = '✦ Hermes wrote the last flashes in his log: ' + ROUNDS[Math.min(r, ROUNDS.length - 1)].split('').map((p) => (p === 'S' ? '·' : '—')).join(' ');
+        const last = ROUNDS[Math.min(r, ROUNDS.length - 1)];
+        el.hint.innerHTML = '✦ Hermes wrote the last flashes in his log: <span class="sp-row" role="img" aria-label="' + spoken(last) + '">' + pips(last) + '</span>';
       }
       function runFinale() {
         finale = true;
@@ -1315,7 +1330,10 @@
         const pt = { down: false, x: 0, y: 0, moved: 0, flash: false };
         c.addEventListener('pointerdown', (e) => {
           // at night the whole scene is Hermes's mirror: press and hold to flash
-          if (nightMode() && !isDone() && !finale && !busyOverlay()) { pt.flash = true; pressStart(e); return; }
+          if (nightMode() && !isDone() && !finale && !busyOverlay()) {
+            if (!mirrorRaised()) { askMirror(); return; }
+            pt.flash = true; pressStart(e); return;
+          }
           pt.down = true; pt.x = e.clientX; pt.y = e.clientY; pt.moved = 0; try { c.setPointerCapture(e.pointerId); } catch (err) {}
         });
         c.addEventListener('pointermove', (e) => {
@@ -1359,8 +1377,8 @@
           const [x, y] = COURT.mirrors[view.hover];
           el.aim.textContent = '⟲ Turn this mirror · row ' + (y + 1) + ', column ' + (x + 1);
           el.aim.classList.add('is-on');
-        } else if (nightMode() && !isDone() && dawnDone() && !finale) {
-          el.aim.textContent = '🪞 Press and hold on the scene to flash the mirror';
+        } else if (nightMode() && !isDone() && dawnDone() && !finale && !speaking) {
+          el.aim.textContent = mirrorRaised() ? '🪞 Press and hold on the scene to flash the mirror' : '🎒 Hand Hermes the little mirror first';
           el.aim.classList.add('is-on');
         } else el.aim.classList.remove('is-on');
       }
@@ -1581,7 +1599,15 @@
         el.flash.addEventListener('click', (e) => e.preventDefault());
         el.flash.addEventListener('blur', cancelPress);
       }
-      if (el.clear) el.clear.addEventListener('click', () => { if (pulses.length) cue('tick', { f: 1300, v: 0.06 }); pulses = []; renderPulses(); });
+      if (el.clear) el.clear.addEventListener('click', () => {
+        if (pulses.length) cue('tick', { f: 1300, v: 0.06 });
+        // ⌫ takes back the last flash; a second press soon after clears them all
+        const now = performance.now();
+        if (pulses.length && now - (el.clear.__t || 0) > 900) pulses.pop(); else pulses = [];
+        el.clear.__t = now;
+        if (el.signalFeedback && el.signalFeedback.classList.contains('is-error')) feedback(el.signalFeedback, '', '');
+        renderPulses();
+      });
       if (el.send) el.send.addEventListener('click', sendSignal);
       if (el.speak) el.speak.addEventListener('click', speakSigil);
       if (el.keyInput) el.keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') speakSigil(); });
@@ -1602,6 +1628,10 @@
         const count = $('solstice3d-howto-count'); if (count) count.textContent = (howtoPage + 1) + ' of 4';
         const dots = $('solstice3d-howto-dots'); if (dots) dots.querySelectorAll('i').forEach((d, n) => d.classList.toggle('is-on', n === howtoPage));
         const next = $('btn-solstice-howto-next'); if (next) next.textContent = howtoPage === 3 ? 'Begin' : 'Next →';
+        // the time each ray waits, as it is for her now
+        const secs = $('solstice-howto-secs');
+        if (secs) secs.textContent = get(KEYS.dawnHint) === 'true' ? (STEP_MS_HINTED / 1000) + ' seconds'
+          : (STEP_MS / 1000) + ' seconds' + (get(KEYS.lamp) === 'dark' ? ' (' + (STEP_MS_HINTED / 1000) + ' for the first, set without a light)' : '');
       }
       function focusTarget() { return isDone() ? el.finish : (!isAwake() ? el.keyInput : (dawnDone() ? el.watch : el.dawnBtn)); }
       function hideHowto() {
@@ -1674,7 +1704,7 @@
         view.opened = dawnDone() ? 1 : 0;
         view.sky = 0; view.fire = isDone() ? 1 : 0; view.burn = 0;
         if (G) { G.cam.p = null; G.skyShown = -1; G.hermesGoal = null; }
-        if (isDone()) applyVictory();
+        if (isDone()) { applyVictory(); say('The smoke is still rising over Tower II, Silvia. The Seal of Cairn V is in the satchel with the other four. Come to the Field Wire: I will tell you what I see.'); }
         else if (!isAwake()) say("Silvia, I am under the Arch of the Solstice. The courtyard behind it is paved with bronze mirrors and fallen pillars, and the Solar Altar waits on its terrace with a brass ring. From here I can see the dunes where Cairn V stands guard. On the way I crossed the bootprints of the men who carried the torches in the labyrinth: they went east, to meet the wagons on the road to the Sanctuary. Open the page “Arch of the Solstice & The Solar Altar”, please: the sigil first.");
         else if (!dawnDone()) say("The mirrors are where you left them. Set them as you think best, and call the dawn when you are ready.");
         else say("Night again. Watch the light on Tower II, and answer it with my mirror.");
@@ -1813,5 +1843,6 @@
       if (!isDone() && dawnDone() && (parseInt(get(KEYS.round) || '0', 10) || 0) >= ROUNDS.length) completeStation();
       if (isDone()) applyVictory();
       else if (isAwake() && el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; if (el.speak) el.speak.disabled = true; }
+      renderPulses();
       render();
     })();

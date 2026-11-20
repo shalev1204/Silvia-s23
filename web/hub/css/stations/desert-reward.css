@@ -83,7 +83,7 @@
 .arch-rw-mirror { stroke: #7c2d12; stroke-width: 1.5; stroke-linecap: round; }
 .arch-rw-map .rw-road { stroke-width: 1.1; }
 .arch-rw-map .rw-road-glow { stroke-width: 3; }
-.arch-rw-entry { font: 700 4.4px 'Cinzel', serif; fill: #7a4a18; text-anchor: middle; }
+.arch-rw-entry { font: 700 4.8px 'Cinzel', serif; fill: #7a4a18; text-anchor: middle; paint-order: stroke; stroke: #f1dcae; stroke-width: 1.6px; }
 .arch-rw-altar circle { fill: #fde68a; stroke: #92400e; stroke-width: 0.7; }
 .arch-rw-altar text { font-size: 5px; fill: #92400e; text-anchor: middle; }
 .arch-rw-altar { transform-box: fill-box; transform-origin: center; }

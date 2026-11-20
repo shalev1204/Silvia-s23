@@ -3896,9 +3896,9 @@
                 <span class="monolith-feedback" id="solstice-round-label" style="margin: 0;"></span>
               </div>
               <button type="button" class="chasm3d-btn is-way solstice-flash-btn" id="btn-solstice-flash">🪞 Hold to flash the mirror</button>
-              <div class="pillars-row">
-                <div class="solstice-pulses" id="solstice-pulses" aria-live="polite"></div>
-                <button type="button" class="chasm3d-btn" id="btn-solstice-clear" aria-label="Clear your flashes">⌫</button>
+              <div class="pillars-row solstice-answer-row">
+                <div class="solstice-pulses" id="solstice-pulses" role="img" aria-live="polite"></div>
+                <button type="button" class="chasm3d-btn" id="btn-solstice-clear" aria-label="Take back the last flash (press twice to clear them all)" title="Take back the last flash · twice to clear">⌫</button>
                 <button type="button" class="chasm3d-btn is-way" id="btn-solstice-send">✦ Send</button>
               </div>
               <div class="solstice-message" id="solstice-message" role="status" aria-live="polite"></div>
@@ -3946,7 +3946,7 @@
               <li><strong>Click a mirror</strong> to turn it a quarter. You can set the first ray in the dark, before the sun comes up. Drag to look around, scroll to come closer.</li>
               <li><strong>🌙 By moonlight</strong>, before you call the dawn, the buttons <em>Ray I</em> to <em>Ray IV</em> show where each ray will go. No clock runs and no lock closes.</li>
               <li>Press <strong>☀ Await the dawn</strong>. A ray comes under the arch at one of the four bronze notches and bounces from mirror to mirror. Fallen pillars stop it.</li>
-              <li>When the ray reaches the brass ring, a lock closes and the sun climbs: the next ray enters further west. Four rays, four locks. Each ray gives you 30 seconds (the bar at the top). If it runs out, you start again from the first ray; the mirrors stay as you left them.</li>
+              <li>When the ray reaches the brass ring, a lock closes and the sun climbs: the next ray enters further west. Four rays, four locks. Each ray gives you <span id="solstice-howto-secs">30 seconds</span> (the bar at the top). If it runs out, you start again from the first ray; the mirrors stay as you left them.</li>
             </ol>
           </section>
           <section class="chasm3d-howto-page" data-page="3" hidden>

@@ -214,7 +214,7 @@
 }
 .d3-marker.is-discovered-pulse .d3-label {
   opacity: 1 !important;
-  transform: translateX(-50%) translateY(0) !important;
+  transform: translateX(calc(-50% + var(--d3-lx, 0px))) translateY(0) !important;
   border-color: #fde68a !important;
   box-shadow: 0 0 26px rgba(251, 191, 36, 0.8) !important;
   background: rgba(14, 18, 30, 0.96) !important;
@@ -225,7 +225,7 @@
   position: absolute;
   left: 50%;
   bottom: calc(100% + 12px);
-  transform: translateX(-50%) translateY(4px);
+  transform: translateX(calc(-50% + var(--d3-lx, 0px))) translateY(4px);
   white-space: nowrap;
   padding: 5px 13px;
   border: 1.3px solid #fbbf24;
@@ -243,7 +243,10 @@
 .d3-marker.is-done .d3-label { border-color: #6ee7b7; color: #a7f3d0; }
 .d3-marker:hover .d3-label,
 .d3-marker.is-active .d3-label,
-.d3-pin:focus-visible + .d3-label { opacity: 1; transform: translateX(-50%) translateY(0); }
+.d3-pin:focus-visible + .d3-label { opacity: 1; transform: translateX(calc(-50% + var(--d3-lx, 0px))) translateY(0); }
+/* a name wider than the map wraps inside it; a pin at the top of the map opens its name underneath */
+.d3-label.is-wrap { white-space: normal; text-align: center; line-height: 1.25; box-sizing: border-box; }
+.d3-marker.is-label-below .d3-label { bottom: auto; top: calc(100% + 12px); }
 
 /* Hermes: the lantern the map follows */
 .d3-hermes { z-index: 3; }

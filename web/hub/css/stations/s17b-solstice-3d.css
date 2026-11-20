@@ -41,7 +41,33 @@
 #modal-solstice-arch .solstice3d-dawn-row .is-way { flex: 1; }
 #modal-solstice-arch .solstice-court { max-height: 300px; margin-top: 6px; }
 #modal-solstice-arch .solstice-flash-btn { margin-top: 0; min-height: 58px; }
-#modal-solstice-arch .solstice-pulses { flex: 1; }
+/* the night signal: the tower's flashes and hers, drawn the same way so they can be compared at a glance */
+#modal-solstice-arch .solstice-answer-row { display: grid; grid-template-columns: minmax(0, 1fr) 56px auto; flex-wrap: nowrap; }
+#modal-solstice-arch .solstice-answer-row .chasm3d-btn { width: auto; min-width: 44px; margin: 0; }
+#modal-solstice-arch .solstice-pulses {
+  min-height: 46px; padding: 6px 12px; box-sizing: border-box; gap: 7px; flex-wrap: nowrap; overflow: hidden;
+  border: 1px dashed rgba(253, 230, 138, 0.4); border-radius: 10px; background: rgba(10, 6, 3, 0.45);
+}
+#modal-solstice-arch .solstice-pulses.is-full { border-color: rgba(254, 202, 202, 0.7); }
+#modal-solstice-arch .sp-empty { font: italic 0.9rem 'EB Garamond', Georgia, serif; letter-spacing: 0; color: rgba(214, 195, 160, 0.6); }
+#modal-solstice-arch .sp-row { display: inline-flex; align-items: center; gap: 7px; vertical-align: middle; }
+#modal-solstice-arch .sp-s, #modal-solstice-arch .sp-l { display: inline-block; flex: none; height: 12px; border-radius: 6px; background: #fde68a; box-shadow: 0 0 8px rgba(253, 230, 138, 0.65); animation: sp-in 0.25s cubic-bezier(.2, .9, .3, 1.5) both; }
+#modal-solstice-arch .sp-s { width: 12px; }
+#modal-solstice-arch .sp-l { width: 34px; }
+#modal-solstice-arch .sp-gap { display: inline-block; flex: none; width: 14px; }
+@keyframes sp-in { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: none; } }
+#modal-solstice-arch .solstice-tower-trace { display: flex; align-items: center; gap: 12px; min-height: 30px; white-space: normal; }
+#modal-solstice-arch .solstice-tower-trace .sp-who { font-size: 0.82rem; letter-spacing: 0.12em; color: #fca5a5; }
+#modal-solstice-arch .solstice-tower-trace .sp-s, #modal-solstice-arch .solstice-tower-trace .sp-l { background: #fecaca; box-shadow: 0 0 8px rgba(252, 165, 165, 0.6); }
+#modal-solstice-arch .laby-hint .sp-row { margin-left: 6px; }
+/* a press that has become a long flash */
+#modal-solstice-arch .solstice-flash-btn { position: relative; }
+#modal-solstice-arch .solstice-flash-btn.is-long { background: rgba(253, 230, 138, 0.62); box-shadow: 0 0 30px rgba(253, 230, 138, 0.85); }
+#modal-solstice-arch .solstice-flash-btn.is-down::after {
+  content: 'short'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); padding: 2px 8px; border-radius: 999px;
+  font: 700 0.68rem 'Cinzel', Georgia, serif; letter-spacing: 0.1em; text-transform: uppercase; color: #2a1709; background: #fde68a;
+}
+#modal-solstice-arch .solstice-flash-btn.is-long::after { content: 'long'; padding: 2px 16px; }
 #modal-solstice-arch .laby3d-eqs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px 0; }
 #modal-solstice-arch .laby3d-eq-note { font-size: 0.78rem; color: #b8a07a; margin: 0; text-align: center; }
 #modal-solstice-arch .solstice-locks b { transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.3s cubic-bezier(.2, .9, .3, 1.4); }
@@ -50,6 +76,11 @@
 /* the night horizon is the scene itself; it is drawn in the panel only without WebGL */
 #modal-solstice-arch .chasm3d-stage:not(.is-flat) ~ .chasm3d-panel .solstice-night { display: none; }
 #modal-solstice-arch .chasm3d-stage.is-flat .solstice3d-aim { display: none; }
+/* the scene already shows "Signal n of 4": the panel keeps the words for screen readers only */
+#modal-solstice-arch .chasm3d-stage:not(.is-flat) ~ .chasm3d-panel #solstice-round-label {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+#modal-solstice-arch .chasm3d-stage:not(.is-flat) ~ .chasm3d-panel #btn-solstice-watch { flex: 1; }
 
 @media (max-width: 760px) {
   #modal-solstice-arch .solstice3d-sun { width: 82%; top: 8px; padding: 4px 8px 6px; }
@@ -59,4 +90,5 @@
 @media (prefers-reduced-motion: reduce) {
   #modal-solstice-arch .solstice3d-sun.is-late .solstice3d-sun-label { animation: none; }
   #modal-solstice-arch .solstice-locks b { transition: none; }
+  #modal-solstice-arch .sp-s, #modal-solstice-arch .sp-l { animation: none; }
 }
