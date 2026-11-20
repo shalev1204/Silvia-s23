@@ -2633,7 +2633,8 @@ A11Y_SEED = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_ho
              "order_masks_march_bypassed": "true", "order_masks_gate_completed": "true", "order_stage_pause_skipped_41": "true",
              "order_sheet_seal_41": "true", "order_camera_obscura_completed": "true", "order_stage_pause_skipped_42": "true",
              "order_sheet_seal_42": "true", "order_chasm_howto": "seen",   # How to play has its own checks in section 31
-             "order_stage_passage_seen": "true"}   # a journey this far saw the passage to the Stage (Station 19 now shows it on any way out)
+             "order_stage_passage_seen": "true",   # a journey this far saw the passage to the Stage (Station 19 now shows it on any way out)
+             "order_stele_cine_outro": "seen"}   # and the closing film of Station 18 (unseen, it plays on return and the reward rises)
 A11Y_FOCUSABLE = ('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),'
                   'textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')
 # The controls in a part of the page: what the mouse can click but the keyboard cannot reach, and every control

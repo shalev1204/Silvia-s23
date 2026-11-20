@@ -145,7 +145,7 @@
         fireGame: $('stele-fire-game'), fireInner: document.querySelector('#stele-fire-game .monolith-game-inner'), atrium: $('stele-atrium'),
         breath: $('stele-breath'), turnLabel: $('stele-turn-label'), moveFeedback: $('stele-move-feedback'),
         pad: { up: $('btn-stele-up'), down: $('btn-stele-down'), left: $('btn-stele-left'), right: $('btn-stele-right'), wait: $('btn-stele-wait') },
-        hint: $('stele-hint'), victory: $('stele-victory'), victoryText: $('stele-victory-text'), finish: $('btn-stele-finish'),
+        hint: $('stele-hint'), victory: $('stele-victory'),
         rewardBtn: $('btn-stele-reward'), coinBtn: $('btn-stele-coin'), replayEnd: $('btn-stele-replay-end'),
         dispatch: $('stele-dispatch-text'),
         stage: $('stele3d-stage'), canvas: $('stele3d-canvas'), subtitle: $('stele3d-subtitle'), fade: $('stele3d-fade'), aim: $('stele3d-aim'),
@@ -602,7 +602,7 @@
         feedback(el.moveFeedback, why === 'fire'
           ? 'The fire reached Hermes\'s flagstone. He fell back to the side door, coughing, his sleeve smouldering.'
           : 'Too slow: the knocks from the well are growing faint. Hermes went back to the side door to find a quicker way.', 'error');
-        say((why === 'fire' ? "Only singed, Silvia. " : "He is still knocking, Silvia, but fainter. ") + "Fire is like water: it runs down the same channels, in the same order. Watch the glowing flagstones and try again." + (hinted ? " I have been reading the fire: now every flagstone shows the turn it catches." : ''));
+        say((why === 'fire' ? "Only singed, Silvia. " : "He is still knocking, Silvia, but fainter. ") + "Fire runs the same channels every time. Watch the glowing flagstones and try again." + (hinted ? " Now I can read it: every flagstone shows the turn it catches." : ''));
         render();
       }
       // ---- The satchel (relic-use.js): the Servant's coin before the stele, the Falcon Weight at the hatch ----
@@ -614,7 +614,7 @@
         if (hints && hints.grant) hints.grant('s18-proverb', 1);
         cue('shimmer', { deg: 9 });
         react('nod');
-        say("The Servant's coin, of course. There are letters scratched on its rim, two by two. 'Read my stele the way you read a coin,' he said: 'by the pairs.' I will keep it, Silvia. He said it has more work to do.");
+        say("The Servant's coin, of course! Letters scratched on its rim, two by two. 'Read my stele the way you read a coin,' he said: 'by the pairs.' I'll keep it, Silvia. It has more work to do.");
         render();
       }
       function askCoin() {
@@ -662,7 +662,7 @@
         say((falcon
           ? "I hooked the falcon on the chain, Silvia, and the hatch rose like a feather. "
           : "I heaved the hatch open, Silvia. ")
-          + "He came up out of the dark: the Servant, alive, black with smoke, a roll of charts in his arms. He took my wrists in his burnt hands and did not let go. Under the hatch, two lines cut by the founders. Write them down.");
+          + "Out he came: the Servant, alive, black with smoke, the charts in his arms. He gripped my wrists and would not let go. And under the hatch, two lines cut by the founders. Write them down.");
       }
       function completeStation() {
         // the key first: once the station is done the inventory counts it from that flag and would never mark it new
@@ -712,7 +712,7 @@
         run = newRun();
         if (G) { G.cam.p = null; G.hGoal = null; G.hMove = null; }
         const left = FINDS.filter((f) => !hasFind(f.id));
-        say(left.length ? 'Back through the side door, Silvia. The draught has thrown the fire over the mats again, and it runs the same channels. Somewhere in there is still ' + left.map((f) => f.where).join(', and ') + '.'
+        say(left.length ? 'Back through the side door, Silvia. The fire is over the mats again, running the same channels. Somewhere in there is still ' + left.map((f) => f.where).join(', and ') + '.'
           : 'Back through the side door, Silvia, for the pleasure of beating it once more. The fire runs the same channels.');
         subtitle('The Servant is safe by the well. Hermes ties his scarf over his mouth and goes back to the side door.', 5, 'act');
         feedback(el.moveFeedback, 'Hermes stands at the side door again. A glint shows what the fire has not taken.', '');
@@ -866,9 +866,6 @@
         else go();
       }
       function applyVictory() {
-        if (el.victoryText) {
-          el.victoryText.textContent = "The stele turned for the proverb on the page “The Polybius Stele” and showed its back: 348° north-north-west, the bearing of Cairn III. Under the floor, the Servant answered in the founders' grid, and Silvia answered him back. Then Hermes crossed the burning atrium on the ash and lifted the hatch of the well: the Servant is alive, and so are the Oracle's charts.";
-        }
         if (el.keyInput) { el.keyInput.value = PROVERB; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
       }
@@ -893,7 +890,7 @@
         if (el.keyInput) { el.keyInput.value = PROVERB; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'STARS GUIDE THOSE WHO SEEK TRUTH. The stele turns on its base. On its back: 348° NNW.', 'ok');
-        say("The stele turned on its base, Silvia, stone grinding on stone. On its back: 348°, north-north-west, the bearing of Cairn III. And now, under my feet, knocking: groups of knocks, and pauses. He heard the proverb, and he answers in the grid of the stele. Read him with your page.");
+        say("The stele turned, Silvia, stone on stone. On its back: 348°, north-north-west, the bearing of Cairn III. And under my feet, knocking! Groups of knocks, and pauses: he answers in the grid of the stele. Read him with your page.");
         render();
         setTimeout(() => { if (modal.style.display !== 'none' && knocksDone() === 0) listen(); }, 1800);
       }
@@ -1864,7 +1861,7 @@
         if (G) placeRings();
       }
       function focusTarget() {
-        if (over()) return el.finish;
+        if (over()) return el.rewardBtn;
         if (!isAwake()) return el.keyInput;
         if (fireOpen()) return el.pad.up;
         return STANZAS[knocksDone()].by === 'silvia' ? el.knock : el.listen;
@@ -1948,8 +1945,8 @@
         hatchPending = false; replay = false;
         if (G) { G.cam.p = null; G.hGoal = null; G.hMove = null; G.chalkKey = null; G.steleAngle = isAwake() ? Math.PI : 0; }
         if (el.fade) el.fade.classList.remove('is-on');
-        if (isDone()) { applyVictory(); say("The Servant is safe by the well, Silvia, and so are the Oracle's charts. The key and the two lines under the hatch are in your reward, and I am waiting for you on the Field Wire."); }
-        else if (!isAwake()) say("Silvia, I am inside, by a side door the raiders never found. They wait by their wagons for the fire to do their work. The library is burning, the roof is full of smoke, and in the middle the stele stands untouched. The Servant is nowhere. Open your page “The Polybius Stele”: what does the stele say?" + coinLine());
+        if (isDone()) { applyVictory(); say("The Servant is safe by the well, Silvia, and so are the Oracle's charts. Your reward holds his key and the two lines from under the hatch. I'm on the Field Wire."); }
+        else if (!isAwake()) say("I'm in, Silvia, by a side door the raiders missed. The library is burning, and in the middle the stele stands untouched. No sign of the Servant. Open your page “The Polybius Stele”: what does the stele say?" + coinLine());
         else if (!fireOpen()) say("He is still under the floor, Silvia, waiting for us. Listen again whenever you need to, and read him with your page “The Polybius Stele”.");
         else say("The fire is still spreading. The hatch of the well is in the far corner. Guide me, one flagstone at a time.");
         renderTape(el.tape, heard, false);
@@ -1959,6 +1956,8 @@
         setTimeout(setMood, 700);
         const finishOpen = () => {
           if (get(HOWTO_KEY) !== 'seen' && !isDone()) { showHowto(0); return; }
+          // won, but closed before the closing film: it plays now, and the reward rises after it
+          if (isDone() && G && cine && !reduced() && get(CINE_OUTRO) !== 'seen') { outro(showReward); return; }
           const target = focusTarget();
           if (target) setTimeout(() => { if (modal.style.display !== 'none') target.focus({ preventScroll: true }); }, 60);
         };
@@ -2005,7 +2004,6 @@
         closeSteleModal();
       }, true);
       document.addEventListener('visibilitychange', () => { if (document.hidden && playing) { stopKnocks(true); render(); } });
-      if (el.finish) el.finish.addEventListener('click', leaveForWire);
 
       // Test hook for scripts/audit/web_smoke.py: the atrium and the stanzas (they are in this source anyway) and the controls
       window.__stele = {
