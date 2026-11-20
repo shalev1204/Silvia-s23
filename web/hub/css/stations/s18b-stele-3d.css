@@ -51,8 +51,11 @@
 #modal-polybius-stele .stele-tape { margin-top: 0; }
 #modal-polybius-stele .stele-answer-row, #modal-polybius-stele .stele-knock-row { margin-top: 0; }
 #modal-polybius-stele .stele-answer-row .mon3d-input { flex: 1 1 140px; min-width: 0; }
+#modal-polybius-stele .stele-answer-row .chasm3d-btn { flex: 0 0 auto; }   /* the field takes the room, so its hint is read whole */
 #modal-polybius-stele .stele-knock-row .chasm3d-btn { flex: 1 1 auto; }
 #modal-polybius-stele .stele-text-input { letter-spacing: 0.1em; }
+/* the hint inside the empty fields fits its box: smaller and closer than the capitals she types */
+#modal-polybius-stele .stele-text-input::placeholder { font-size: 0.8rem; letter-spacing: 0.04em; }
 #modal-polybius-stele .laby-pad { grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(3, 46px); margin-top: 2px; }
 #modal-polybius-stele .laby-pad .chasm3d-btn { padding: 0; font-size: 1.1rem; }
 #modal-polybius-stele .laby-pad .laby-wait { font-size: 0.7rem; font-family: 'Cinzel', serif; letter-spacing: 0.05em; }
@@ -72,7 +75,9 @@
 #modal-polybius-stele .chasm3d-stage.is-flat .stele3d-aim { display: none; }
 
 @media (max-width: 760px) {
-  #modal-polybius-stele .stele3d-breath { width: 70%; top: 8px; padding: 4px 8px 6px; }
+  /* on a phone the plan of the atrium takes the right corner: the breath sits left of it */
+  #modal-polybius-stele .stele3d-breath { left: 8px; width: calc(68% - 30px); top: 8px; padding: 4px 8px 6px; transform: translate(0, -6px); }
+  #modal-polybius-stele .stele3d-breath.is-on { transform: translate(0, 0); }
   #modal-polybius-stele .stele3d-breath .stele-breath { font-size: 0.7rem; }
   #modal-polybius-stele .stele3d-map-wrap { width: 32%; }
   #modal-polybius-stele .stele3d-aim { font-size: 0.7rem; bottom: 54px; }

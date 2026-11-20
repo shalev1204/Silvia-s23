@@ -638,6 +638,7 @@
         if (!offer) { openHatch(false); return; }
         hatchPending = true;
         feedback(el.moveFeedback, 'Hermes is at the hatch. Its counterweight chain hangs empty.', '');
+        render();   // the turn that reached the hatch shows on the labels while the satchel is open
         subtitle('Hermes drops to his knees at the bronze hatch. The chain of its counterweight hangs empty.', 4, 'act');
         ru.ask({
           ask: 'The hatch is solid bronze, Silvia, and its counterweight is gone from the chain. What have we got that is heavy?',
@@ -802,9 +803,9 @@
           + '<div class="drw-words" aria-label="WHO, SEEK, WELL, ASH">' + words + '</div>'
           + '<div class="chasm3d-reward-stats">'
           + '<div><b>' + turns + '</b><span>turns</span></div>'
-          + '<div><b>' + burnt + '</b><span>times the fire won</span></div>'
-          + '<div><b>' + falseKnocks + '</b><span>false knocks</span></div>'
-          + '<div><b>' + tries + '</b><span>proverb tries</span></div>'
+          + '<div><b>' + burnt + '</b><span>' + (burnt === 1 ? 'time' : 'times') + ' the fire won</span></div>'
+          + '<div><b>' + falseKnocks + '</b><span>' + (falseKnocks === 1 ? 'false knock' : 'false knocks') + '</span></div>'
+          + '<div><b>' + tries + '</b><span>' + (tries === 1 ? 'proverb try' : 'proverb tries') + '</span></div>'
           + '</div>'
           + (burnt === 0 ? '<div class="rw-flawless">✦ Across the fire at the first try ✦</div>' : '')
           + '</section>'
@@ -1947,7 +1948,7 @@
         hatchPending = false; replay = false;
         if (G) { G.cam.p = null; G.hGoal = null; G.hMove = null; G.chalkKey = null; G.steleAngle = isAwake() ? Math.PI : 0; }
         if (el.fade) el.fade.classList.remove('is-on');
-        if (isDone()) applyVictory();
+        if (isDone()) { applyVictory(); say("The Servant is safe by the well, Silvia, and so are the Oracle's charts. The key and the two lines under the hatch are in your reward, and I am waiting for you on the Field Wire."); }
         else if (!isAwake()) say("Silvia, I am inside, by a side door the raiders never found. They wait by their wagons for the fire to do their work. The library is burning, the roof is full of smoke, and in the middle the stele stands untouched. The Servant is nowhere. Open your page “The Polybius Stele”: what does the stele say?" + coinLine());
         else if (!fireOpen()) say("He is still under the floor, Silvia, waiting for us. Listen again whenever you need to, and read him with your page “The Polybius Stele”.");
         else say("The fire is still spreading. The hatch of the well is in the far corner. Guide me, one flagstone at a time.");
@@ -1982,6 +1983,7 @@
         view.endTimers.forEach(clearTimeout); view.endTimers = [];
         view.freeze = false; view.ending = 0;
         if (el.fade) el.fade.classList.remove('is-on');
+        clearTimeout(subtitle.t); if (el.subtitle) el.subtitle.classList.remove('is-on');   // no line from the last scene waits for her return
         modal.classList.add('closing');
         modal.removeEventListener('wheel', stopHubScroll);
         modal.removeEventListener('touchmove', stopHubScroll);
