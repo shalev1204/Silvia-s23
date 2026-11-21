@@ -4682,8 +4682,8 @@ def test_game_cinematics(browser):
         js("document.querySelector('#lex3d-controls button').click()"); page.wait_for_timeout(500)
         check(st()["phase"] == "done" and js("window.__lexicon.cine()") and js("localStorage.getItem('order_desert_lexicon_completed')") == "true", "reading the hearth stone starts the ending, and the station is already done", st()["phase"])
         check(not js("(r => !!r && !r.hidden)(document.querySelector('#modal-desert-lexicon .chasm3d-reward'))"), "the reward waits for the ending")
-        js("window.__lexicon.frames(60)")
-        check("BC ASHES" in js("document.querySelector('#lex3d-stage .cine-title strong').innerText").upper(), "its first card is the name: The BC Ashes")
+        # read the first card as soon as the ending starts: stepping frames here, on top of the engine's own clock, could carry a busy machine past the 5-second first shot
+        check("BC ASHES" in js("document.querySelector('#lex3d-stage .cine-title strong').textContent").upper(), "its first card is the name: The BC Ashes")
         js("window.__lexicon.skipCine()"); page.wait_for_timeout(4200)
         check(not js("window.__lexicon.cine()") and js("(r => !!r && !r.hidden)(document.querySelector('#modal-desert-lexicon .chasm3d-reward'))"), "when the ending is over (or skipped), the reward rises")
     else:
