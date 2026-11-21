@@ -35,9 +35,10 @@
 
       function visible(node) { return !!node && document.contains(node) && node.getClientRects().length > 0; }
       function solved(d) { try { return !!(d.solved && d.solved()); } catch (e) { return false; } }
+      function active(d) { if (!d.active) return true; try { return !!d.active(); } catch (e) { return false; } }
       function playing(d) {
         if (solved(d) || level(d.id) >= 3) return false;
-        if (d.active) { try { if (!d.active()) return false; } catch (e) { return false; } }
+        if (!active(d)) return false;
         return visible(typeof d.anchor === 'function' ? d.anchor() : d.anchor);
       }
 
@@ -52,7 +53,10 @@
           d.box.setAttribute('aria-live', 'polite');
           anchor.parentNode.insertBefore(d.box, anchor.nextSibling);
         }
-        var n = solved(d) ? 0 : level(d.id);
+        // a note given early (by an object, a choice on the wire) waits for its part of the puzzle to begin
+        var on = !solved(d) && active(d);
+        d.shownOn = on;
+        var n = on ? level(d.id) : 0;
         d.box.style.display = n ? '' : 'none';
         d.box.textContent = '';
         for (var i = 0; i < n; i++) {
@@ -71,6 +75,9 @@
         if (document.visibilityState === 'hidden') return;
         order.forEach(function (id) {
           var d = defs[id];
+          // its part of the puzzle has just begun (or ended): show or hide the notes it already has
+          var on = !solved(d) && active(d);
+          if (d.shownOn !== on) draw(d, on && level(d.id) > 0);
           if (!playing(d)) { flush(d); return; }
           d.unsaved += TICK_S;
           if (d.unsaved >= SAVE_EVERY_S) flush(d);

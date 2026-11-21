@@ -1468,6 +1468,14 @@
           G.hemi.intensity = 0.17 + s * 0.63;   // a real night: the moon draws the stones, it does not light them like a day
           G.hemi.color.setHex(0x6a7cc8).lerp(new G.T.Color(0xffe8c8), Math.min(1, s * 1.4));
           G.hemi.groundColor.setHex(0x1a1626).lerp(new G.T.Color(0x6a5040), s);
+          // the lens of the night: the stones and the sand go cool and grey under the moon, and warm again with the dawn
+          // (without it the courtyard read as a bright day under a night sky)
+          if (G.fx && G.fx.post) {
+            const n = Math.max(0, 1 - s * 2.2), pp = G.fx.post.params;
+            pp.gain = [1.0 - 0.3 * n, 1.0 - 0.2 * n, 1.03 - 0.02 * n];
+            pp.sat = 1.04 - 0.34 * n;
+            pp.vignette = 0.34 + 0.14 * n;
+          }
         }
         // the sun: low behind the arch, sliding west and climbing with every ray
         const s = view.sky;

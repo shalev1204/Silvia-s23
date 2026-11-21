@@ -7128,6 +7128,29 @@
         return d.toTimeString().slice(0, 5) + ' ' + zone;
       }
 
+      // The hour each message reached the Wire, kept with the save: the chat drawn again shows when a message came,
+      // not the hour it is now. Messages from before this was kept have no hour on record, and show none rather than a false one.
+      const WIRE_TIMES_KEY = 'order_wire_times';
+      let wireTimes = null;
+      let wireTimesBaseline = (() => { try { return localStorage.getItem(WIRE_TIMES_KEY) === null; } catch (e) { return false; } })();
+      function wireTimeOf(text, meta, isLive) {
+        try {
+          if (!wireTimes) wireTimes = JSON.parse(localStorage.getItem(WIRE_TIMES_KEY) || '{}') || {};
+          let h = 5381; const s = String(text || '');
+          for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+          const key = (meta && meta.type || 'x') + ':' + (meta && meta.step != null ? meta.step : '') + ':' + h.toString(36);
+          if (!(key in wireTimes)) {
+            wireTimes[key] = (wireTimesBaseline && !isLive) ? 0 : Math.round(Date.now() / 60000);
+            localStorage.setItem(WIRE_TIMES_KEY, JSON.stringify(wireTimes));
+          }
+          const min = wireTimes[key];
+          if (!min) return '';
+          const d = new Date(min * 60000), now = new Date();
+          const day = d.toDateString() === now.toDateString() ? '' : d.toLocaleDateString('en-GB', { weekday: 'short' }) + ' ';
+          return day + getWireTimestamp((now.getTime() - d.getTime()) / 60000);
+        } catch (e) { return getWireTimestamp(); }
+      }
+
       function updateHeaderContactName(title) {
         const wrap = document.getElementById('messenger-contact-name-wrap');
         const textEl = document.getElementById('messenger-contact-name');
@@ -7216,7 +7239,7 @@
         },
         tuning_pebble: {
           id: "tuning_pebble",
-          name: "The Tuning Pebble · Cairn IV",
+          name: "The Tuning Pebble",
           category: "Mysterious Token",
           image: "assets/items/item_tuning_pebble.png",
           origin: "Throat of the Left Pillar · Cairn IV",
@@ -7225,7 +7248,7 @@
         },
         signal_mirror: {
           id: "signal_mirror",
-          name: "The Signal Mirror · Cairn V",
+          name: "The Signal Mirror",
           category: "Order Relic",
           image: "assets/items/item_signal_mirror.webp",
           origin: "Courtyard of Rays · Arch of the Solstice",
@@ -7234,7 +7257,7 @@
         },
         gilded_star: {
           id: "gilded_star",
-          name: "The Gilded Star · Tower II",
+          name: "The Gilded Star",
           category: "Gift of the Oracle",
           image: "assets/items/item_gilded_star.webp",
           origin: "The Inner Chamber · Tower II",
@@ -7243,7 +7266,7 @@
         },
         servant_key: {
           id: "servant_key",
-          name: "The Servant's Key · Tower II",
+          name: "The Servant's Key",
           category: "Order Relic",
           image: "assets/items/item_servant_key.webp",
           origin: "The Well of the Atrium · Tower II",
@@ -9680,7 +9703,7 @@
               ${rewindBtnHtml}
               <div class="chat-bubble">
                 <div class="chat-bubble-text">${formattedText}</div>
-                <span class="chat-bubble-time">${getWireTimestamp()}${checks}</span>
+                <span class="chat-bubble-time">${wireTimeOf(text, effectiveMeta, isLive)}${checks}</span>
               </div>
               <div class="silvia-avatar-stamp" title="Silvia · Master Navigator" aria-label="Silvia Navigator Stamp">
                 <img src="assets/silvia_navigator_avatar.jpg" alt="Silvia" class="silvia-avatar-img">
@@ -9706,7 +9729,7 @@
             <div class="chat-bubble-row">
               <div class="chat-bubble${isLongDispatch ? ' is-long-chat' : ''}">
                 <div class="chat-bubble-text">${formattedText}</div>
-                <span class="chat-bubble-time">${getWireTimestamp()}</span>
+                <span class="chat-bubble-time">${wireTimeOf(text, effectiveMeta, false)}</span>
               </div>
               ${rewindBtnHtml}
             </div>
@@ -9725,7 +9748,7 @@
           <div class="chat-bubble-row">
             <div class="chat-bubble highlight-pulse${isLongDispatch ? ' is-long-chat' : ''}">
               <div class="chat-bubble-text"><span class="telegraph-typewriter-target"></span><span class="telegraph-cursor"></span></div>
-              <span class="chat-bubble-time">${getWireTimestamp()}</span>
+              <span class="chat-bubble-time">${wireTimeOf(text, effectiveMeta, true)}</span>
             </div>
             ${rewindBtnHtml}
           </div>
@@ -9807,7 +9830,7 @@
             <div class="chat-bubble chat-sketch-bubble">
               <img src="${src}" alt="${caption}" loading="lazy" role="button" tabindex="0" aria-haspopup="dialog" title="Inspect sketch">
               <div class="chat-sketch-cap">${caption}</div>
-              <span class="chat-bubble-time">${getWireTimestamp()}</span>
+              <span class="chat-bubble-time">${wireTimeOf(src, meta, false)}</span>
             </div>
             ${rewindBtnHtml}
           </div>
@@ -10810,6 +10833,7 @@
         if (chasmWirePlaying) { chasmWirePlaying = false; window.__wireTypewriterToken = (window.__wireTypewriterToken || 0) + 1; }
         if (wireBeatsPlaying) { wireBeatsPlaying = false; window.__wireTypewriterToken = (window.__wireTypewriterToken || 0) + 1; showTyping(false); }
         if (typeof syncSilviaWaypointBaseline === 'function') syncSilviaWaypointBaseline();
+        if (wireTimesBaseline) setTimeout(() => { wireTimesBaseline = false; }, 0);   // the history drawn now has no hour on record; what comes after has
         try {
           const savedStep = localStorage.getItem('order_field_wire_step');
           if (savedStep !== null) wireCurrentStep = parseInt(savedStep, 10);

@@ -485,12 +485,12 @@ Cartela de cierre del cap. I al abrirse el II (`WIRE_CHAPTER_CARDS[0]`): premio 
 | `seal_cairn_2` | Seal of Cairn II · Sun Monolith | E14 | `item_seal_cairn_2.svg` |
 | `seal_cairn_3` | Seal of Cairn III · Sandstone Labyrinth | E15 | `…_3.svg` |
 | `founders_lamp`, `raiders_survey` | The Founders' Lamp · The Raiders' Copy of the Survey | E15 (opcionales, destellos del laberinto) | `item_founders_lamp.svg`, `item_raiders_survey.svg` |
-| `tuning_pebble` | The Tuning Pebble · Cairn IV | E16 | canto con estrella dorada de 8 puntas sobre lapislázuli; `item_tuning_pebble.webp` |
+| `tuning_pebble` | The Tuning Pebble | E16 | canto con estrella dorada de 8 puntas sobre lapislázuli; `item_tuning_pebble.webp` |
 | `seal_cairn_4` | Seal of Cairn IV · Natural Bridge | E16 | ver C-11 |
-| `signal_mirror` | The Signal Mirror · Cairn V | E17 | `item_signal_mirror.webp` |
+| `signal_mirror` | The Signal Mirror | E17 | `item_signal_mirror.webp` |
 | `seal_cairn_5` | Seal of Cairn V · Arch of the Solstice | E17 | `…_5.svg`; ceremonia de los cinco sellos |
-| `servant_key` | The Servant's Key · Tower II | E18 | llave de bronce con cuadrícula 5×5 en el ojo |
-| `gilded_star` | The Gilded Star · Tower II | E19 | estrella de pan de oro sobre lapislázuli, «For the navigator who brought him back» |
+| `servant_key` | The Servant's Key | E18 | llave de bronce con cuadrícula 5×5 en el ojo |
+| `gilded_star` | The Gilded Star | E19 | estrella de pan de oro sobre lapislázuli, «For the navigator who brought him back» |
 
 (Los ítems `gilded_feather` y `order_wax_seal` vienen del Constellation Path.)
 

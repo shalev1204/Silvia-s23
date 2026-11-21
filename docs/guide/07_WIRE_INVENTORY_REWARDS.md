@@ -600,10 +600,10 @@ Sin ninguna nota de pista. «Skip» del tester guarda `{done:true, skipped:true}
 | `servant_coin` | The Servant's Coin | `item_servant_coin.png` | 13B `lc_dusk` | S18 (`s18-proverb` 1), S19 (`s19-sigil` 1), −1 h del cruce, Wire 23, retorno | no | sí | ✅ |
 | `statue_seal` | The Seal of the Two Keepers | `item_statue_seal.png` | retorno 13B `rt_keepers` | nada («opens nothing the five did not») | — | no | ⚠️ huérfana |
 | `ibis_figure` | The Brass Ibis | `item_ibis_figure.png` | S14 si `statues` (`s14:898`) | solo `canPayKeepers` | no se quita | solo rama observer | 🟡 condicional |
-| `tuning_pebble` | The Tuning Pebble · Cairn IV | `item_tuning_pebble.webp` | S16 (`s16:1080`) | Wire 19–23 y 31 (texto) | no | no | ⚠️ huérfana |
-| `signal_mirror` | The Signal Mirror · Cairn V | `item_signal_mirror.webp` | S17 (`s17:530`) | Wire 23 y 29 (texto; «responder a la luz») | no | no | ⚠️ huérfana |
-| `servant_key` | The Servant's Key · Tower II | `item_servant_key.webp` | S18 (`s18:561`) | Wire 28–30 («the key in my hand»); apertura de la puerta de S19 es narrativa | no | no | ⚠️ huérfana tras S19 |
-| `gilded_star` | The Gilded Star · Tower II | `item_gilded_star.webp` | S19 (`s19:346`) | cartela del cap. III; Wire 32 | no | no | ⚠️ huérfana |
+| `tuning_pebble` | The Tuning Pebble | `item_tuning_pebble.webp` | S16 (`s16:1080`) | Wire 19–23 y 31 (texto) | no | no | ⚠️ huérfana |
+| `signal_mirror` | The Signal Mirror | `item_signal_mirror.webp` | S17 (`s17:530`) | Wire 23 y 29 (texto; «responder a la luz») | no | no | ⚠️ huérfana |
+| `servant_key` | The Servant's Key | `item_servant_key.webp` | S18 (`s18:561`) | Wire 28–30 («the key in my hand»); apertura de la puerta de S19 es narrativa | no | no | ⚠️ huérfana tras S19 |
+| `gilded_star` | The Gilded Star | `item_gilded_star.webp` | S19 (`s19:346`) | cartela del cap. III; Wire 32 | no | no | ⚠️ huérfana |
 | `mirror_fragment_1..3` | Fragments I–III of the Mirror | `item_mirror_fragment_N.svg` | S20–S22 (flags) | **Espejo Vivo** del mapa Path III (cada fragmento destella), cartelas, chips | no | sí (progreso al WHERE) | ✅ (IV–IX no existen) |
 
 Recuento (24 ids): **uso mecánico 11** (`seal_cairn_1`, `seal_cairn_2..5` ×4, `lamp_oil`, `red_cord`, `servant_coin`, `mirror_fragment_1..3` ×3) · **condicionales 2** (`falcon_weight`, `ibis_figure`) · **huérfanos 11** (los de la lista de §4.3).

@@ -14,6 +14,10 @@
 
 .wcer-scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px clamp(20px, 6vw, 90px); gap: 8px;
   transition: opacity 0.8s ease, transform 0.8s ease; }
+/* on a phone the closing of a chapter can be taller than the screen: nothing in it is squeezed (the relics used to fold to
+   nothing and sit on the list of her choices), the scene scrolls instead */
+.wcer-scene.wcer-close { justify-content: safe center; overflow-y: auto; }
+.wcer-close > * { flex-shrink: 0; }
 .wcer-close.is-gone { opacity: 0; transform: translateY(-24px) scale(0.98); pointer-events: none; }
 .wcer-open { opacity: 0; pointer-events: none; }
 .wcer.is-open-scene .wcer-open { opacity: 1; pointer-events: auto; }
