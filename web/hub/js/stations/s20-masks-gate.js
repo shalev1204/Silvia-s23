@@ -19,7 +19,7 @@
       const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
       const cue = (kind, o) => { const a = window.EclipseAmbience; return !!(a && a.sfx && a.sfx(kind, o)); };
       const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      const HOWTO_KEY = 'order_masks_howto', CINE_INTRO = 'order_masks_cine_intro';
+      const HOWTO_KEY = 'order_masks_howto', CINE_INTRO = 'order_masks_cine_intro', CINE_OUTRO = 'order_masks_cine_outro';
       let lastScratch = 0;   // the pen's whisper on the glass, at most every 160 ms
       const scratch = () => { const t = performance.now(); if (t - lastScratch >= 160) { lastScratch = t; cue('step'); } };
       const KEYS = {
@@ -29,7 +29,9 @@
         hint: 'order_masks_hint',
         carved: 'order_masks_carved',
         drawFails: 'order_masks_draw_fails',
-        drawHint: 'order_masks_draw_hint'
+        drawHint: 'order_masks_draw_hint',
+        misses: 'order_masks_draw_misses',     // every time a half held to the mirror did not close the face (all three masks)
+        helped: 'order_masks_speaker_carved'   // halves the Mirror Speaker carved for her
       };
       const WORD = 'SILVER', TRAP = 'GOLDEN';
       // the twelve great masks of the wall, in the order of the page (4 across, 3 down): true ones carry SILVER, liars GOLDEN
@@ -80,8 +82,8 @@
         keyFeedback: $('masks-key-feedback'), game: $('masks-draw-game'), inner: document.querySelector('#masks-draw-game .monolith-game-inner'),
         canvas: $('masks-canvas'), count: $('masks-draw-count'), lead: $('masks-draw-lead'), undo: $('btn-masks-undo'), clear: $('btn-masks-clear'),
         hold: $('btn-masks-hold'), helpRow: $('masks-help-row'), finish: $('btn-masks-finish'), drawFeedback: $('masks-draw-feedback'),
-        hint: $('masks-hint'), victory: $('masks-victory'), victoryText: $('masks-victory-text'), fragment: $('masks-fragment-svg'),
-        done: $('btn-masks-finish-station'), dispatch: $('masks-dispatch-text'),
+        hint: $('masks-hint'), victory: $('masks-victory'), fragment: $('masks-fragment-svg'),
+        rewardBtn: $('btn-masks-reward'), dispatch: $('masks-dispatch-text'),
         stage: $('masks3d-stage'), stage3d: $('masks3d-canvas'), subtitle: $('masks3d-subtitle'), fade: $('masks3d-fade'),
         status: $('masks3d-status'), howto: $('masks3d-howto'), help: $('btn-masks-howto'), glass: $('masks3d-glass')
       };
@@ -314,6 +316,7 @@
         const res = judge(mask);
         if (res.ok) { carveTrue(); return; }
         set(KEYS.drawFails, String(drawFails() + 1));
+        set(KEYS.misses, String((parseInt(get(KEYS.misses) || '0', 10) || 0) + 1));
         if (!cue('wrong') && sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         let msg;
         if (res.empty) msg = 'The mirror shows nothing yet. Draw the missing half on the glass, to the right of the dotted line.';
@@ -343,8 +346,8 @@
         set(KEYS.carved, String(n));
         render();
         const lines = [
-          "One face whole, Silvia. The mask turned on its nail by itself, all the way round, and stopped facing the corridor. Aurelia says that means 'pass'.",
-          "Two. That one wept on both sides, as it should. The candles along the corridor all leaned toward the glass at once, though there is no wind in here."
+          "One face whole, Silvia! The mask turned on its nail by itself, all the way round. Aurelia says that means 'pass'.",
+          "Two. That one weeps on both sides now, as it should. Every candle in the corridor just leaned toward the glass, and there is no wind in here."
         ];
         say(lines[i]);
         setTimeout(() => {
@@ -360,6 +363,7 @@
       function letSpeakerCarve() {
         if (!canDraw() || !guideShown()) return;
         strokes = MASKS[maskIdx()].strokes.map((s) => s.map(toCanvas(1)));
+        set(KEYS.helped, String((parseInt(get(KEYS.helped) || '0', 10) || 0) + 1));
         carveTrue();
       }
 
@@ -371,13 +375,157 @@
         applyVictory();
         render();
         if (typeof window.updatePathTabsUI === 'function') window.updatePathTabsUI();
+        justWon = true;
         if (modal.style.display !== 'none') {
           justSet = true;   // the mirror is refreshed once the modal closes, so its flash is seen
-          if (el.done) setTimeout(() => el.done.focus({ preventScroll: true }), 60);
+          if (el.rewardBtn) setTimeout(() => el.rewardBtn.focus({ preventScroll: true }), 60);
         } else {
           showMirror();     // the modal was closed during the reveal: show the mirror now
         }
-        say("The third mask closed, and the whole wall breathed out, Silvia. Behind the last mask there was a little niche, and in it, wrapped in black velvet, a piece of mirror the size of my hand. Fragment I. There is a moon in it that is not in the sky. And in the glass beside us, for one moment, a woman in a grey gown raised her hand and drew a straight line in the air.");
+        say("The third mask closed, and the whole wall breathed out, Silvia. Behind it, a niche, and in black velvet a piece of mirror the size of my hand: Fragment I. And in the glass beside us, a woman in a grey gown raised her hand and drew a straight line in the air.");
+        // once the Mirror Speaker has drawn her line, a short film closes the night (the first time), and then the reward rises
+        clearTimeout(reward.timer);
+        const film = !!(G && cine && !reduced() && get(CINE_OUTRO) !== 'seen');
+        reward.timer = setTimeout(() => { if (film) outro(showReward); else showReward(); }, G && !reduced() ? 14000 : 900);
+      }
+      function endingShots() {
+        const N = COR_END;
+        return [
+          { from: { p: [0.9, 1.75, N + 2.9], l: [0, 1.45, N] }, to: { p: [0.35, 1.55, N + 1.7], l: [0, 1.45, N] }, dur: 5,
+            kicker: 'STATION 20', title: 'FRAGMENT I', line: 'One piece of nine, in black velvet. In it, a moon that is not in the sky.' },
+          { from: { p: [0.2, 1.9, N + 1.6], l: [0, 1.7, -2] }, to: { p: [-0.2, 1.8, N + 4.4], l: [0, 1.7, 0] }, dur: 5.5,
+            line: 'Down the corridor the three masks hang whole. On the last one, someone has pinned a note sealed with ash.' },
+          { from: { p: [-2.5, 4.2, 12], l: [0, 3, 0] }, to: { p: [-6, 6.5, 16], l: [0, 3, -2] }, dur: 5,
+            line: 'Behind them the gate stands open on the plateau. Tonight they sleep among old costumes.' }
+        ];
+      }
+      function outro(then) {
+        if (modal.style.display === 'none' || modal.classList.contains('closing') || !isDone()) return;
+        set(CINE_OUTRO, 'seen');
+        cue('whoosh', { dur: 1.6 });
+        cine.start(endingShots(), () => {
+          if (el.subtitle) el.subtitle.classList.remove('is-on');
+          view.snapNext = true;
+          if (modal.style.display !== 'none' && !modal.classList.contains('closing')) then();
+        }, { fade: true });
+      }
+
+      // ---- The reward: the wall of twelve and its word, the three faces made whole, Fragment I, the Speaker's line, the note ----
+      const reward = { box: null, back: null, timer: 0 };
+      let justWon = false;
+      const rewardOpen = () => !!reward.box && !reward.box.hidden;
+      function rewardWall() {
+        // the twelve great masks in the order of the page: the true ones keep their letter in gold, the liars are struck out
+        const TRUE = [0, 2, 5, 6, 8, 11];
+        let out = '', k = 0;
+        GREAT.forEach((ch, i) => {
+          const x = 14 + (i % 4) * 24, y = 14 + Math.floor(i / 4) * 26, ok = TRUE.indexOf(i) >= 0;
+          const t = ok ? (0.9 + (k++) * 0.28).toFixed(2) : '0.6';
+          out += '<g class="masks-rw-mask ' + (ok ? 'is-true' : 'is-liar') + '" style="--t:' + t + 's">'
+            + '<ellipse cx="' + x + '" cy="' + y + '" rx="8.5" ry="10.5"/>'
+            + '<text x="' + x + '" y="' + (y + 3.4) + '">' + ch + '</text>'
+            + (ok ? '' : '<line x1="' + (x - 6) + '" y1="' + (y + 6) + '" x2="' + (x + 6) + '" y2="' + (y - 6) + '"/>') + '</g>';
+        });
+        return '<svg class="masks-rw-wall" viewBox="0 0 100 80" role="img" aria-label="The twelve great masks of the wall: the six true ones spell SILVER, the six that lie are struck out">' + out + '</svg>';
+      }
+      function rewardFaces() {
+        // the three masks made whole: the carved half in gold, the half she gave them in pale silver
+        return MASKS.map((m, i) => {
+          const d = (sgn) => m.strokes.map((st) => st.map(toCanvas(sgn)).map((p, j) => (j ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ')).join(' ');
+          return '<figure class="masks-rw-face" style="--t:' + (3.2 + i * 0.35).toFixed(2) + 's"><svg viewBox="20 30 260 340" aria-hidden="true">'
+            + '<path class="is-gold" d="' + d(-1) + '"/><path class="is-silver" d="' + d(1) + '"/></svg>'
+            + '<figcaption>' + m.name.replace(/^the /, '') + '</figcaption></figure>';
+        }).join('');
+      }
+      function showReward() {
+        clearTimeout(reward.timer);
+        const body = modal.querySelector('.chasm3d-body');
+        if (!body || !isDone() || modal.style.display === 'none') return;
+        if (!reward.box) {
+          reward.box = document.createElement('div');
+          reward.box.className = 'chasm3d-reward masks-reward';
+          reward.box.setAttribute('role', 'dialog');
+          reward.box.setAttribute('aria-label', 'Your reward for the Gate of a Thousand Masks');
+          reward.box.hidden = true;
+          body.appendChild(reward.box);
+          reward.box.addEventListener('pointerdown', (e) => { if (!(e.target.closest && e.target.closest('button'))) reward.box.classList.add('is-fast'); });
+          reward.box.addEventListener('click', (e) => {
+            const relic = e.target.closest && e.target.closest('[data-relic]');
+            if (relic && typeof window.openItemAcquiredModal === 'function') { justWon = false; relic.classList.remove('is-new'); window.openItemAcquiredModal({ id: relic.getAttribute('data-relic') }); }
+          });
+        }
+        const num = (k) => parseInt(get(k) || '0', 10) || 0;
+        const misses = num(KEYS.misses), helped = num(KEYS.helped), tries = num(KEYS.fails) + 1;
+        const stat = (n, one, many) => '<div><b>' + n + '</b><span>' + (n === 1 ? one : many) + '</span></div>';
+        const word = WORD.split('').map((c, i) => '<span class="drw-word" style="--t:' + (2.6 + i * 0.18).toFixed(2) + 's">' + c + '</span>').join('');
+        reward.box.innerHTML = '<div class="rw-rays" aria-hidden="true"></div>'
+          + '<div class="rw-sparks" aria-hidden="true">' + Array.from({ length: 18 }, (_, i) => '<i style="--a:' + ((i * 360 / 18) | 0) + 'deg;--d:' + (120 + (i % 5) * 36) + 'px;--t:' + (0.9 + (i % 4) * 0.2).toFixed(2) + 's"></i>').join('') + '</div>'
+          + '<div class="chasm3d-reward-card">'
+          + '<div class="chasm3d-reward-kicker">Station 20 · The Gate of a Thousand Masks</div>'
+          + '<h3 class="chasm3d-reward-title">The Gate Is Open</h3>'
+          + '<p class="rw-sub">Six masks told the truth, the wall opened like a curtain, and three faces came whole in the mirror.</p>'
+          + '<div class="rw-grid">'
+          + '<section class="rw-map masks-rw-map" aria-label="The wall of masks and the three faces">'
+          + '<div class="rw-label">The wall of twelve</div>'
+          + rewardWall()
+          + '<div class="drw-words masks-rw-word" aria-label="SILVER">' + word + '</div>'
+          + '<div class="rw-label">The missing halves</div>'
+          + '<div class="masks-rw-faces">' + rewardFaces() + '</div>'
+          + '<div class="chasm3d-reward-stats">'
+          + stat(tries, 'try at the word', 'tries at the word')
+          + stat(misses, 'face that did not close', 'faces that did not close')
+          + stat(MASKS.length - helped, 'half drawn by you', 'halves drawn by you')
+          + '</div>'
+          + (misses === 0 && helped === 0 ? '<div class="rw-flawless">✦ Three faces, not one line astray ✦</div>' : '')
+          + '</section>'
+          + '<section class="rw-loot">'
+          + '<div class="drw-relics">'
+          + '<button type="button" class="drw-relic' + (justWon ? ' is-new' : '') + '" data-relic="mirror_fragment_1" aria-label="Fragment I of the mirror: open the card"><span class="drw-pic"><img src="./assets/items/item_mirror_fragment_1.svg" alt="" width="140" height="140"></span><span class="drw-name"><b>Fragment I</b><small>One ninth of the mirror of Tower III</small></span></button>'
+          + '</div>'
+          + '<div class="rw-label drw-label">In the glass, a woman in grey</div>'
+          + '<ul class="drw-lines"><li style="--t:4.6s">“You saw what was not equal. Come in, and be patient with this house.”</li><li style="--t:5s">She signs with a straight line.</li></ul>'
+          + '<div class="rw-label drw-label">Pinned on the last mask</div>'
+          + '<ul class="drw-lines"><li style="--t:5.4s">A note that smells of smoke, sealed with ash. Hermes has it in his coat.</li></ul>'
+          + '<div class="rw-next">Next · Hermes on the Field Wire</div>'
+          + '</section></div>'
+          + '<div class="chasm3d-reward-actions">'
+          + '<button type="button" class="chasm3d-reward-wire">📻 Hermes is calling on the Field Wire</button>'
+          + '<button type="button" class="chasm3d-btn chasm3d-reward-stay">Stay at the gate</button>'
+          + '</div></div>';
+        if (!rewardOpen()) reward.back = document.activeElement;
+        reward.box.hidden = false;
+        reward.box.scrollTop = 0;
+        reward.box.classList.remove('is-fast', 'is-on');
+        void reward.box.offsetWidth;
+        reward.box.classList.add('is-on');
+        if (!cue('shimmer', { deg: 21 }) && sfx && sfx.playCelestialChime) sfx.playCelestialChime();
+        const goBtn = reward.box.querySelector('.chasm3d-reward-wire'), stayBtn = reward.box.querySelector('.chasm3d-reward-stay');
+        if (goBtn) goBtn.addEventListener('click', () => { hideReward(true); leaveForWire(); });
+        if (stayBtn) stayBtn.addEventListener('click', () => hideReward());
+        if (goBtn) goBtn.focus({ preventScroll: true });
+      }
+      function hideReward(quietly) {
+        clearTimeout(reward.timer);
+        if (!rewardOpen()) return;
+        reward.box.hidden = true;
+        const back = reward.back; reward.back = null;
+        if (quietly) return;
+        const to = back && document.contains(back) && back.offsetParent ? back : el.rewardBtn;
+        if (to && to.focus) to.focus({ preventScroll: true });
+      }
+      // as in the desert: the new relic's card first, then straight to Hermes on the Field Wire (Fragment I already sits in the mirror of Path III)
+      function leaveForWire() {
+        justSet = false;
+        closeMasksModal();
+        const go = () => {
+          if (typeof window.switchMapPath === 'function') window.switchMapPath('stage', true);
+          else if (window.StageMirror && typeof window.StageMirror.refresh === 'function') window.StageMirror.refresh();
+          const wireTab = document.querySelector('[data-view="view-field-wire"]');
+          if (wireTab) wireTab.click();
+          if (typeof window.showDesertToast === 'function') window.showDesertToast('✦ Fragment I is in the mirror of Tower III ✦ Hermes is waiting for you on the Field Wire.');
+        };
+        if (justWon && typeof window.openItemAcquiredModal === 'function') { justWon = false; setTimeout(() => window.openItemAcquiredModal({ id: 'mirror_fragment_1' }, go), 260); }
+        else go();
       }
       function drawFragment() {
         const D = window.STAGE_MIRROR;
@@ -402,9 +550,6 @@
         mk('path', { d, fill: 'none', stroke: '#f7dc8c', 'stroke-width': 3 });
       }
       function applyVictory() {
-        if (el.victoryText) {
-          el.victoryText.textContent = 'Silvia found the six true masks on the page “The Gate of a Thousand Masks”, read their letters on the wall and spoke their word, SILVER, and the wall of masks opened like a curtain. Inside, she gave three half-carved masks their missing halves, the way a mirror would. Behind the last one waited the first piece of the mirror of Tower III. On the same mask, someone had pinned a note sealed with ash.';
-        }
         if (el.keyInput) { el.keyInput.value = WORD; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         drawFragment();
@@ -431,7 +576,7 @@
         if (el.keyInput) { el.keyInput.value = WORD; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'SILVER. The wall of masks opens like a curtain.', 'ok');
-        say("SILVER... and the whole wall moved, Silvia, every mask turning on its nail at once, like a theatre full of heads turning to look at us. Then it opened down the middle like a curtain. Inside: a corridor of mirrors, and three masks hanging in it, carved on one side only. The other side is smooth and blank, as if it were waiting. Aurelia says the house wants us to finish them.");
+        say("SILVER... and the whole wall moved, Silvia! Every mask turned on its nail at once, like a theatre full of heads, and then it opened down the middle like a curtain. Inside: a corridor of mirrors, and three masks carved on one side only. Aurelia says the house wants us to finish them.");
         render();
         if (el.hold) setTimeout(() => el.hold.focus({ preventScroll: true }), 60);
       }
@@ -1121,7 +1266,7 @@
         const next = $('btn-masks-howto-next'); if (next) next.textContent = howtoPage === 3 ? 'Begin' : 'Next →';
       }
       function focusTarget() {
-        if (isDone()) return el.done;
+        if (isDone()) return el.rewardBtn;
         if (!isAwake()) return el.keyInput;
         return el.hold;
       }
@@ -1202,13 +1347,15 @@
         if (G) { G.cam.p = null; G.spot = null; G.hMove = null; G.aMove = null; }
         if (el.fade) el.fade.classList.remove('is-on');
         if (isDone()) { applyVictory(); say("We sleep tonight behind the gate, Silvia, in the dressing rooms, on piles of old costumes. The masks have all turned back to face the corridor. Every one of them is smiling now."); }
-        else if (!isAwake()) say("Silvia, we are at the gate of Tower III. It is not a door: it is a wall of masks, hundreds of them, from the ground to the top of the arch, all white, all staring. Aurelia says the old charts of the Sanctuary call it the Gate of a Thousand Masks. Six of these lie, she says, and the letter knew it. In the middle of the wall twelve great masks carry a letter each on the forehead. Find their page in your journal, please.");
+        else if (!isAwake()) say("Silvia, we are at the gate of Tower III, and it is not a door: it is a wall of masks, hundreds of them, all white, all staring. In the middle, twelve great masks carry a letter each on the forehead. Six of them lie, Aurelia says. Find their page in your journal: “The Gate of a Thousand Masks”.");
         else say("The three masks are waiting, Silvia, each carved on one side only. Give each its other half. Aurelia is holding the lamp.");
         render();
         sizeCanvas();
         setTimeout(mood, 700);   // the bed starts on its next poll (600 ms) and resets the intensity to 0.5
         const finishOpen = () => {
           if (get(HOWTO_KEY) !== 'seen' && !isDone()) { showHowto(0); return; }
+          // won, but closed before the closing film: it plays now, and the reward rises after it
+          if (isDone() && G && cine && !reduced() && get(CINE_OUTRO) !== 'seen') { outro(showReward); return; }
           const target = focusTarget();
           if (target) setTimeout(() => { if (modal.style.display !== 'none') target.focus({ preventScroll: true }); }, 60);
         };
@@ -1224,8 +1371,11 @@
         if (modal.style.display === 'none') return;
         if (sfx && sfx.playMechanicalClick) sfx.playMechanicalClick();
         current = null;
+        hideReward(true);
+        clearTimeout(reward.timer);
         if (cine && cine.active) cine.skip();
         view.endTimers.forEach(clearTimeout); view.endTimers = [];
+        clearTimeout(subtitle.t); if (el.subtitle) el.subtitle.classList.remove('is-on');
         if (el.fade) el.fade.classList.remove('is-on');
         modal.classList.add('closing');
         modal.removeEventListener('wheel', stopHubScroll);
@@ -1243,21 +1393,18 @@
         const wrap = document.getElementById('stage-map-canvas-wrap');
         if (wrap && wrap.offsetParent) setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'center' }), 260);
       }
-      function finishStation() {
-        justSet = true;
-        closeMasksModal();
-      }
       window.openMasksModal = openMasksModal;
       window.closeMasksModal = closeMasksModal;
       window.STAGE_OPENERS = window.STAGE_OPENERS || {};
       window.STAGE_OPENERS[NODE] = openMasksModal;
       if (el.close) el.close.addEventListener('click', closeMasksModal);
-      if (el.done) el.done.addEventListener('click', finishStation);
+      if (el.rewardBtn) el.rewardBtn.addEventListener('click', showReward);
       modal.addEventListener('click', (e) => { if (e.target === modal) closeMasksModal(); });
       document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape' || modal.style.display === 'none') return;
         if (cine && cine.active) { e.stopImmediatePropagation(); e.preventDefault(); cine.skip(); return; }
         if (el.howto && !el.howto.hidden) { e.stopImmediatePropagation(); hideHowto(); return; }
+        if (rewardOpen() && (!$('modal-item-acquired') || $('modal-item-acquired').style.display === 'none')) { e.stopImmediatePropagation(); hideReward(); return; }
         closeMasksModal();
       }, true);
       window.addEventListener('resize', () => { if (modal.style.display !== 'none') sizeCanvas(); });
@@ -1321,6 +1468,7 @@
         judge: () => judge(MASKS[maskIdx()]),
         gfx: () => G,
         cine: () => !!(cine && cine.active), skipCine: () => { if (cine) cine.skip(); },
+        showReward: () => showReward(), rewardOpen: () => rewardOpen(),
         world: () => {
           if (!G) return { gl: false };
           return {

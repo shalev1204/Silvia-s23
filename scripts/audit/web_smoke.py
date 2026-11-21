@@ -173,7 +173,7 @@ def new_page(browser, seed=None, reduced_motion=False, cine_seen=True):
                          "order_oracle_cine_intro": "seen", "order_oracle_howto": "seen", "order_oracle_cine_outro": "seen",
                          # (the way down the inner stair of Station 19 asks the satchel for a key and a lamp, once: section s19 tests it)
                          "order_oracle_key": "servant", "order_oracle_lamp": "dark",
-                         "order_masks_cine_intro": "seen", "order_masks_howto": "seen",
+                         "order_masks_cine_intro": "seen", "order_masks_howto": "seen", "order_masks_cine_outro": "seen",
                          "order_camera_cine_intro": "seen", "order_camera_howto": "seen",
                          "order_gallery_cine_intro": "seen", "order_gallery_howto": "seen"}, **seed)
         if not cine_seen:
@@ -1637,7 +1637,10 @@ def test_oracle_horizon(browser):
           "the reward rises: the disc set true, the WHEN, the Gilded Star, both Ledger lines and the four things the satchel gave", reward()[:200].replace("\n", " "))
     page.keyboard.press("Escape"); page.wait_for_timeout(300)
     check(not reward() and modal_open(), "Escape puts the reward away, the chamber stays open")
-    page.click("#btn-oracle-finish"); page.wait_for_timeout(900)
+    check(js("document.activeElement && document.activeElement.id") == "btn-oracle-reward" and not js("document.getElementById('btn-oracle-finish')"),
+          "no green button on the side: with the reward put away, the focus is on See your reward")
+    page.click("#btn-oracle-reward"); page.wait_for_timeout(400)
+    page.click("#modal-oracle-horizon .chasm3d-reward-wire"); page.wait_for_timeout(900)
     check(js("document.getElementById('modal-item-acquired').style.display") == "flex" and "Star" in js("document.getElementById('iac-title').textContent"),
           "leaving shows the card of the Gilded Star first")
     js("window.closeItemAcquiredModal()"); page.wait_for_timeout(1200)
@@ -2085,10 +2088,28 @@ def test_masks_gate(browser):
     w = wait_world(lambda w: w.get("phase") == "end" and w.get("whole") == 3 and w.get("shard", 0) > 0.5 and w.get("glass") is False, 12)
     check(w.get("phase") == "end" and w.get("whole") == 3 and w.get("shard", 0) > 0.5 and w.get("glass") is False,
           "3D: the last mirror opens on the niche and Fragment I shines in it", w)
-    page.click("#btn-masks-finish-station"); page.wait_for_timeout(900)
+    for _ in range(50):   # after the end of the scene (the closing film is seen in this seed) the reward rises by itself
+        if js("window.__masks.rewardOpen()"):
+            break
+        page.wait_for_timeout(400)
+    reward = lambda: js("(r => r && !r.hidden ? r.innerText : '')(document.querySelector('#modal-masks-gate .chasm3d-reward'))")
+    check("The Gate Is Open" in reward() and "Fragment I" in reward() and "sealed with ash" in reward() and "Sheet" not in reward()
+          and js("document.querySelectorAll('#modal-masks-gate .masks-rw-mask.is-true').length") == 6
+          and js("[...document.querySelectorAll('#modal-masks-gate .masks-rw-mask.is-true text')].map(t => t.textContent).join('')") == "SILVER"
+          and js("document.querySelectorAll('#modal-masks-gate .masks-rw-face').length") == 3
+          and js("document.activeElement && document.activeElement.classList.contains('chasm3d-reward-wire')")
+          and not js("document.getElementById('btn-masks-finish-station')"),
+          "the reward rises by itself: the wall of twelve spelling SILVER, the three faces, Fragment I and the note; no green button", reward()[:160].replace("\n", " "))
+    page.keyboard.press("Escape"); page.wait_for_timeout(300)
+    check(not reward() and modal_open() and js("document.activeElement && document.activeElement.id") == "btn-masks-reward",
+          "Escape puts the reward away: the gate stays open, the focus on See your reward")
+    page.click("#btn-masks-reward"); page.wait_for_timeout(400)
+    page.click("#modal-masks-gate .chasm3d-reward-wire"); page.wait_for_timeout(900)
+    check(js("document.getElementById('modal-item-acquired').style.display") == "flex", "the reward's Field Wire button shows Fragment I's card first")
+    js("window.closeItemAcquiredModal()"); page.wait_for_timeout(1200)
     st = js("""() => ({ path: document.documentElement.dataset.mapPath, set: document.querySelectorAll('.sm-shard.is-set').length,
-        fresh: document.querySelectorAll('.sm-shard.is-new').length })""")
-    check(st["path"] == "stage" and st["set"] == 1 and st["fresh"] == 1, "Fragment I flashes into the Living Mirror", str(st))
+        wire: document.getElementById('view-field-wire').classList.contains('active') })""")
+    check(not modal_open() and st["path"] == "stage" and st["set"] == 1 and st["wire"], "then to the Field Wire, with Fragment I set in the Living Mirror", str(st))
 
     open_wire()
     check(get("order_field_wire_step") == "35" and choices() == 3 and "sealed with ash" in wire_text(),
@@ -2691,7 +2712,7 @@ A11Y_SEED = {**DESERT_BASE, **DESERT_DONE, **ORACLE_SEED_EXTRA, "order_oracle_ho
              "order_sheet_seal_41": "true", "order_camera_obscura_completed": "true", "order_stage_pause_skipped_42": "true",
              "order_sheet_seal_42": "true", "order_chasm_howto": "seen",   # How to play has its own checks in section 31
              "order_stage_passage_seen": "true",   # a journey this far saw the passage to the Stage (Station 19 now shows it on any way out)
-             "order_stele_cine_outro": "seen"}   # and the closing film of Station 18 (unseen, it plays on return and the reward rises)
+             "order_stele_cine_outro": "seen", "order_oracle_cine_outro": "seen", "order_masks_cine_outro": "seen"}   # and the closing films of Stations 18 and 19 (unseen, one plays on return and the reward rises)
 A11Y_FOCUSABLE = ('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),'
                   'textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])')
 # The controls in a part of the page: what the mouse can click but the keyboard cannot reach, and every control

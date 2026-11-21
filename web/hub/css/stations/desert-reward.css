@@ -1,4 +1,4 @@
-/* The reward screens of Stations 18 and 19 (the same pieces as Cairn IV's, under names any station can use):
+/* The reward screens of Stations 17 to 20 (the same pieces as Cairn IV's, under names any station can use):
    the relics on a pedestal of light, the Ledger lines, the words, what was spent on the way, and the small "done" row of the panel. */
 .drw-done { display: grid; gap: 8px; margin: 10px 0; }
 .drw-done-title { font: 700 1rem 'Cinzel', serif; letter-spacing: 0.08em; color: #fde68a; text-align: center; }
@@ -115,6 +115,28 @@
 .oracle-reward .rw-map svg { max-width: 230px; }
 @media (max-width: 520px) { .oracle-reward .drw-relics { grid-template-columns: 1fr; } }
 
+/* Station 20: the wall of twelve great masks (the true ones spell the word), and the three faces made whole in the mirror */
+.masks-rw-wall { display: block; width: 100%; max-width: 250px; margin: 0 auto; }
+.masks-rw-mask ellipse { fill: #f6ecd2; stroke: #7a4a18; stroke-width: 0.7; }
+.masks-rw-mask text { font: 700 8px 'Cinzel', serif; text-anchor: middle; fill: #7c2d12; }
+.masks-rw-mask.is-liar { opacity: 0.45; }
+.masks-rw-mask.is-liar ellipse { fill: #d9cbab; stroke-dasharray: 1.6 1.2; }
+.masks-rw-mask.is-liar text { fill: #7a6a50; }
+.masks-rw-mask.is-liar line { stroke: #9b1c1c; stroke-width: 1.1; stroke-linecap: round; }
+.masks-rw-mask.is-true ellipse { fill: #fdf3d0; stroke: #b45309; stroke-width: 1; }
+.masks-rw-mask { transform-box: fill-box; transform-origin: center; }
+.chasm3d-reward.is-on .masks-rw-mask { animation: rw-pop 0.5s cubic-bezier(.2, .9, .3, 1.6) var(--t) both; }
+.masks-rw-word { font-size: 1.5rem; letter-spacing: 0.3em; gap: 0 2px; }
+.masks-rw-faces { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 2px 0 8px; }
+.masks-rw-face { margin: 0; text-align: center; }
+.masks-rw-face svg { display: block; width: 100%; max-width: 86px; margin: 0 auto; }
+.masks-rw-face path { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.masks-rw-face .is-gold { stroke: #b45309; }
+.masks-rw-face .is-silver { stroke: #6b7280; }
+.masks-rw-face figcaption { font: 700 0.68rem 'Cinzel', serif; letter-spacing: 0.06em; color: #7a4a18; text-transform: uppercase; }
+.chasm3d-reward.is-on .masks-rw-face { animation: chasm-rise 0.45s ease var(--t) both; }
+.masks-reward .drw-relics { grid-template-columns: minmax(0, 1fr); }
+
 /* the buttons that open the satchel's tray from a station panel */
 .relic-ask-btn { width: 100%; min-height: 44px; margin-top: 8px; }
 .relic-ask-btn[hidden] { display: none; }
@@ -125,5 +147,6 @@
   .chasm3d-reward.is-on .drw-relic, .chasm3d-reward.is-on .drw-pic img, .chasm3d-reward.is-on .drw-word, .chasm3d-reward.is-on .drw-lines li,
   .chasm3d-reward.is-on .drw-spent li, .chasm3d-reward.is-on .stele-rw-hatch, .chasm3d-reward.is-on .oracle-rw-letter, .chasm3d-reward.is-on .oracle-rw-jewel,
   .chasm3d-reward.is-on .oracle-rw-when strong, .chasm3d-reward.is-on .drw-finds li, .stele-atrium .stele-glint,
-  .chasm3d-reward.is-on .arch-rw-altar, .chasm3d-reward.is-on .arch-rw-signal { animation: none !important; }
+  .chasm3d-reward.is-on .arch-rw-altar, .chasm3d-reward.is-on .arch-rw-signal,
+  .chasm3d-reward.is-on .masks-rw-mask, .chasm3d-reward.is-on .masks-rw-face { animation: none !important; }
 }

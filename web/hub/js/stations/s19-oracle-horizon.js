@@ -104,7 +104,7 @@
         dateBox: $('oracle-date'), dateSlots: Array.from(document.querySelectorAll('#oracle-date .oracle-date-slot')),
         when: $('oracle-when'), discFeedback: $('oracle-disc-feedback'), vowGame: $('oracle-vow-game'), vowInner: document.querySelector('#oracle-vow-game .monolith-game-inner'),
         said: $('oracle-said'), tiles: $('oracle-tiles'), unsay: $('btn-oracle-unsay'), vow: $('btn-oracle-vow'), vowFeedback: $('oracle-vow-feedback'),
-        hint: $('oracle-hint'), victory: $('oracle-victory'), victoryText: $('oracle-victory-text'), finish: $('btn-oracle-finish'), dispatch: $('oracle-dispatch-text'),
+        hint: $('oracle-hint'), victory: $('oracle-victory'), dispatch: $('oracle-dispatch-text'),
         rewardBtn: $('btn-oracle-reward'), coinBtn: $('btn-oracle-coin'), pebbleBtn: $('btn-oracle-pebble'), stairBtn: $('btn-oracle-stair'),
         stage: $('oracle3d-stage'), canvas: $('oracle3d-canvas'), subtitle: $('oracle3d-subtitle'), fade: $('oracle3d-fade'), aim: $('oracle3d-aim'),
         status: $('oracle3d-status'), howto: $('oracle3d-howto'), help: $('btn-oracle-howto'), ringCtrls: document.querySelector('#oracle-disc-game .oracle-ring-ctrls'),
@@ -276,7 +276,7 @@
         sceneTurn(ring, rot[ring] === 0, trueRings === 3);
         if (rot.every((r) => r === 0)) {
           feedback(el.discFeedback, 'The three stars point true. The jewel of the disc wakes.', 'ok');
-          say("Silvia... the jewel. Three short flashes, a pause, two long ones: the code I engraved in it, more than fifty years ago. Twenty-four sightings, twenty-four letters in their order, and it spells nothing. It was never written to be read. She has set it beside a bronze balance on the altar, in the beam of light, and she has begun to sing.");
+          say("Silvia... the jewel! Three short flashes, a pause, two long: the code I engraved in it more than fifty years ago. Twenty-four letters, and they spell nothing: they were never meant to be read. She has set the disc by a bronze balance in the beam of light, and she has begun to sing.");
           pulseCode();
           startWeighing();
         } else {
@@ -457,7 +457,7 @@
         stopPulse();
         sceneRead(true);
         feedback(el.discFeedback, 'From FEAR to LUX, in the twelfth month: 18 – 20 December. The first truth: the WHEN.', 'ok');
-        say("Twelve, Silvia: the twelfth month. From fear to light, the eighteenth to the twentieth of December. The first truth, hidden in the weight of three words, and you carried every weight across this desert yourself. She remembered a voice. Now she is saying words through her veil, very softly, like someone looking for a song. Help me. I think I know which words they are." + (pebbleWaits() ? " And I am carrying something of hers." : ''));
+        say("Twelve, Silvia: the twelfth month. From fear to light, the eighteenth to the twentieth of December. The first truth, and you carried every weight across this desert yourself. Now she is whispering through her veil, like someone looking for a song. Help me. I think I know the words." + (pebbleWaits() ? " And I am carrying something of hers." : ''));
         render();
         const first = el.tiles && el.tiles.querySelector('button');
         if (first) setTimeout(() => first.focus({ preventScroll: true }), 60);
@@ -527,8 +527,8 @@
         cue('vowChord', { final: true });
         sceneVow();
         completeStation();
-        if (el.finish) setTimeout(() => el.finish.focus({ preventScroll: true }), 60);
-        say("I said it, Silvia: 'You were always the treasure.' She let go of the disc and lifted the veil herself. It is Aurelia. Older, a white streak in her hair, lapis blue under her nails, and the same eyes. She remembers my voice, the fire, the cold of the terrace. Not everything. She said her own name slowly, like a word in a language she used to speak. I cannot write any more right now.");
+        if (el.rewardBtn) setTimeout(() => el.rewardBtn.focus({ preventScroll: true }), 60);
+        say("I said it, Silvia: 'You were always the treasure.' She let go of the disc and lifted the veil herself. Aurelia. Older, a white streak in her hair, lapis under her nails, and the same eyes. She remembers my voice, the fire, the terrace. Not everything. She said her own name slowly, like a word from a language she once spoke. I can't write any more right now.");
       }
       function completeStation() {
         // the star first: once the station is done the inventory counts it from that flag and would never mark it new
@@ -575,7 +575,7 @@
       const RU = () => window.RelicUse || null;
       const modalOpen = () => modal.style.display !== 'none';
       const stairDone = () => isDone() || isAwake() || (!!get(KEYS.key) && !!get(KEYS.lamp));
-      const ARRIVE = "I am at the bottom of the inner stair, Silvia. The door is a slab of sandstone carved with a horizon: three mirrors and eight small sockets. It opens only for the sigil of the Oracle. Open your page “The Oracle's Horizon”, please. Someone is humming behind it.";
+      const ARRIVE = "I'm at the bottom of the inner stair, Silvia. The door is sandstone carved with a horizon: three mirrors, eight small sockets. Only the Oracle's sigil opens it. Open your page “The Oracle's Horizon”. Someone is humming behind it.";
       // The way down, once: the locked door of the stair (the Servant's Key), then the dark (the Founders' Lamp, if she found it)
       function stairChain() {
         const ru = RU();
@@ -624,7 +624,7 @@
               if (hints && hints.grant) hints.grant('s19-disc', 1);
               cue('flame', { dur: 1.4 }); react('wonder');
               subtitle('The Servant tips a little oil from his own lamp into the founders’ lamp. It catches at once.', 4.6, 'act');
-              say("The founders' lamp burns again, Silvia. By its light the whole stair is painted: three gold stars on blue, Polaris at the top, then Capella, then Aldebaran. I left it burning on the last step. Now the door: a slab of sandstone carved with a horizon, three mirrors and eight sockets. It opens only for the sigil of the Oracle. Open your page “The Oracle's Horizon”. Someone is humming behind it." + coinLine());
+              say("The founders' lamp burns again, Silvia, and the whole stair lights up: three gold stars painted on blue, Polaris, Capella, Aldebaran. I left it on the last step. Now the door: sandstone carved with a horizon, three mirrors, eight sockets. Only the Oracle's sigil opens it. Open your page “The Oracle's Horizon”. Someone is humming behind it." + coinLine());
               render();
             },
             onCancel: () => { set(KEYS.lamp, 'dark'); say(ARRIVE + coinLine()); render(); }
@@ -790,9 +790,6 @@
         if (to && to.focus) to.focus({ preventScroll: true });
       }
       function applyVictory() {
-        if (el.victoryText) {
-          el.victoryText.textContent = "The horizon was sealed with OVERTURE and the inner chamber opened. The veiled Oracle raised a brass disc of 24 sightings; set to the sky before dawn, it gave the first truth, the WHEN. Then Hermes said the vow, and the Oracle lifted her veil: Aurelia, alive, remembering the fire, the terrace and his voice, though not yet everything. At dawn the raiders left east with the Astrolabe, toward the Stage.";
-        }
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
       }
@@ -816,7 +813,7 @@
         if (el.keyInput) { el.keyInput.value = SIGIL; el.keyInput.disabled = true; }
         if (el.speak) el.speak.disabled = true;
         feedback(el.keyFeedback, 'OVERTURE. The horizon is sealed, and the door of the inner chamber opens.', 'ok');
-        say("OVERTURE, and the door sank into the floor, Silvia. A round chamber, a beam of grey light on a stone altar. She is there: veiled, hooded, very still, without a word. She is holding up a brass disc. My disc: twenty-four sightings, three rings. She turns it toward me to be read, and its rings are all crooked.");
+        say("OVERTURE, and the door sank into the floor, Silvia. A round chamber, grey light on a stone altar. And her: veiled, hooded, silent. She holds up a brass disc. My disc, Silvia: twenty-four sightings, three rings, every ring crooked. She turns it for me to read.");
         render();
         const b = el.ringBtns[0] && el.ringBtns[0][1];
         if (b) setTimeout(() => b.focus({ preventScroll: true }), 60);
@@ -1580,7 +1577,7 @@
         setHover(-1);
       }
       function focusTarget() {
-        if (isDone()) return el.finish;
+        if (isDone()) return el.rewardBtn;
         if (!isAwake()) return el.keyInput;
         if (!whenRead()) return discTrue() ? (light.gone ? el.moonBtn : wordFound() ? el.weightInput : el.wordInput) : el.ringBtns[0][1];
         return el.tiles && el.tiles.querySelector('button:not([disabled])');
@@ -1670,6 +1667,8 @@
         setTimeout(mood, 700);   // the bed starts on its next poll (600 ms) and resets the intensity to 0.5
         const finishOpen = () => {
           if (get(HOWTO_KEY) !== 'seen' && !isDone()) { showHowto(0); return; }
+          // won, but closed before the closing film: it plays now, and the reward rises after it
+          if (isDone() && G && cine && !reduced() && get(CINE_OUTRO) !== 'seen') { outro(showReward); return; }
           const target = focusTarget();
           if (target) setTimeout(() => { if (modal.style.display !== 'none') target.focus({ preventScroll: true }); }, 60);
           if (!stairDone()) setTimeout(stairChain, 900);
@@ -1729,7 +1728,6 @@
         if (justWon && typeof window.openItemAcquiredModal === 'function') { justWon = false; setTimeout(() => window.openItemAcquiredModal({ id: 'gilded_star' }, go), 260); }
         else go();
       }
-      if (el.finish) el.finish.addEventListener('click', leaveForWire);
 
       // Test hook for scripts/audit/web_smoke.py: the disc and the vow (they are in this source anyway) and the controls
       window.__oracle = {

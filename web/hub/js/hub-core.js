@@ -1238,7 +1238,7 @@
           {
             id: 's20', tag: 'Station 20', label: 'The Gate of a Thousand Masks · Tower III', flag: 'order_masks_gate_completed', built: true,
             complete() { set('order_masks_march_start', '1'); set('order_masks_gate_awake', 'true'); set('order_masks_carved', '3'); set('order_masks_gate_completed', 'true'); },
-            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41', 'order_ashes_clues', 'order_speaker_line_41']); }
+            reset() { dels(['order_masks_gate_completed', 'order_masks_gate_awake', 'order_masks_key_fails', 'order_masks_hint', 'order_masks_carved', 'order_masks_draw_fails', 'order_masks_draw_hint', 'order_masks_draw_misses', 'order_masks_speaker_carved', 'order_masks_cine_outro', 'order_masks_march_start', 'order_masks_march_bypassed', 'order_stage_mirror_seen', 'order_stage_pause_skipped_41', 'order_ashes_clues', 'order_speaker_line_41']); }
           },
           {
             id: 's21', tag: 'Station 21', label: 'The Camera Obscura · Tower III', flag: 'order_camera_obscura_completed', built: true,
